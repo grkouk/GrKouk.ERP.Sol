@@ -32,7 +32,7 @@ namespace GrKouk.Web.ERP.Controllers
             _mapper = mapper;
         }
 
-        private decimal ConvertAmount(int companyCurrencyId, int displayCurrencyId, IList<ExchangeRate> rates,
+        private static decimal ConvertAmount(int companyCurrencyId, int displayCurrencyId, IList<ExchangeRate> rates,
             decimal amount)
         {
             decimal retAmount = amount;

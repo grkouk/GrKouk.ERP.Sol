@@ -2375,7 +2375,7 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
-        private string GetDocSeriesName(RecurringDocTypeEnum docType, int docSeriesId, IList<BuyDocSeriesDef> buyDocSeriesList, IList<SellDocSeriesDef> sellDocSeriesList)
+        private static string GetDocSeriesName(RecurringDocTypeEnum docType, int docSeriesId, IList<BuyDocSeriesDef> buyDocSeriesList, IList<SellDocSeriesDef> sellDocSeriesList)
         {
             string docName = string.Empty;
             string docCode = string.Empty;
@@ -2404,7 +2404,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             return docName;
         }
-        private string GetRecurringTypeName(RecurringDocTypeEnum recurringType)
+        private static string GetRecurringTypeName(RecurringDocTypeEnum recurringType)
         {
             string typeName = string.Empty;
             switch (recurringType)
@@ -2422,7 +2422,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             return typeName;
         }
-        private string GetDocSeriesCode(RecurringDocTypeEnum docType, int docSeriesId, IList<BuyDocSeriesDef> buyDocSeriesList, IList<SellDocSeriesDef> sellDocSeriesList)
+        private static string GetDocSeriesCode(RecurringDocTypeEnum docType, int docSeriesId, IList<BuyDocSeriesDef> buyDocSeriesList, IList<SellDocSeriesDef> sellDocSeriesList)
         {
             string docName = string.Empty;
             string docCode = string.Empty;
