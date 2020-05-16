@@ -1,0 +1,104 @@
+﻿@page
+@model DeleteModel
+
+@{
+    ViewData["Title"] = "Delete";
+    var formDisabled = Model.NotUpdatable ? "disabled" : "";
+}
+
+<h2>Delete</h2>
+@{
+    if (Model.NotUpdatable)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>Not updateable!</strong> This transaction is from other section and cannot be updated.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+}
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>WarehouseTransaction</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.TransDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.TransDate)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.TransWarehouseDocSeries)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.TransWarehouseDocSeries.Name)
+        </dd>
+       
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.TransRefCode)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.TransRefCode)
+        </dd>
+       
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.WarehouseItem)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.WarehouseItem.Name)
+        </dd>
+        
+
+       
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.Quontity1)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.Quontity1)
+        </dd>
+       
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.AmountFpa)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.AmountFpa)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.AmountNet)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.AmountNet)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.AmountDiscount)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.AmountDiscount)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.Etiology)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.Etiology)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.Company)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.Company.Code)
+        </dd>
+       
+    </dl>
+
+    <form method="post">
+       
+        <fieldset @formDisabled>
+            <input type="hidden" asp-for="WarehouseTransaction.Id" />
+            <input type="submit" value="Delete" class="btn btn-primary" /> |
+            <a asp-page="./Index">Back to List</a>
+        </fieldset>
+    </form>
+</div>

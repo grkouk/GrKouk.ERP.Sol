@@ -1,0 +1,49 @@
+﻿@page
+@model GrKouk.Web.Erp.Pages.Configuration.TransactorTransDocSeries.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>TransTransactorDocSeriesDef</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.TransTransactorDocSeriesDef.Code)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransTransactorDocSeriesDef.Code)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransTransactorDocSeriesDef.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransTransactorDocSeriesDef.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransTransactorDocSeriesDef.Active)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransTransactorDocSeriesDef.Active)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransTransactorDocSeriesDef.TransTransactorDocTypeDef)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransTransactorDocSeriesDef.TransTransactorDocTypeDef.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransTransactorDocSeriesDef.Company)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransTransactorDocSeriesDef.Company.Code)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.TransTransactorDocSeriesDef.Id">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>

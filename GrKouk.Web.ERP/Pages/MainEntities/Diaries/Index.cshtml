@@ -1,0 +1,44 @@
+﻿@page
+@model IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h4>List of Diaries</h4>
+
+<p>
+    <a class="small" asp-page="Create">Create New</a>
+</p>
+<table class="table table-bordered table-sm">
+    <thead class="thead-light">
+        <tr>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.DiaryDef[0].Name)
+            </th>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.DiaryDef[0].DiaryType)
+            </th>
+           
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.DiaryDef) {
+        <tr>
+            <td class="small">
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td class="small">
+                @Html.DisplayFor(modelItem => item.DiaryType)
+            </td>
+           
+            <td class="small">
+                <a asp-page="./Edit" asp-route-id="@item.Id"><i class="fas fa-edit"></i></a> |
+                <a asp-page="./Details" asp-route-id="@item.Id"><i class="fas fa-info-circle"></i></a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id"><i class="fas fa-trash"></i></a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

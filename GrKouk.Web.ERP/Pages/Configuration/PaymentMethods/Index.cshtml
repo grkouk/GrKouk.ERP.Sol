@@ -1,0 +1,54 @@
+﻿@page
+@model GrKouk.Web.Erp.Pages.Configuration.PaymentMethods.IndexModel
+
+@{
+    ViewData["Title"] = "Payments List";
+}
+
+<h4>Peyment Methods List</h4>
+
+<p>
+    <a class="small" asp-page="Create">Create New</a>
+</p>
+<table class="table table-bordered table-sm">
+    <thead class="thead-light">
+        <tr>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.PaymentMethod[0].Name)
+            </th>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.PaymentMethod[0].DaysOverdue)
+            </th>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.PaymentMethod[0].AutoPayoffWay)
+            </th>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.PaymentMethod[0].PayoffSeriesId)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.PaymentMethod) {
+        <tr>
+            <td class="small">
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td class="small">
+                @Html.DisplayFor(modelItem => item.DaysOverdue)
+            </td>
+            <td class="small">
+                @Html.DisplayFor(modelItem => item.AutoPayoffWay)
+            </td>
+            <td class="small">
+                @Html.DisplayFor(modelItem => item.PayoffSeriesId)
+            </td>
+            <td class="small">
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Company>GrKouk</Company>
+    <Authors>George Koukoudis</Authors>
+    <Copyright>George Koukoudis</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GrKouk.Erp.Definitions\GrKouk.Erp.Definitions.csproj" />
+    <ProjectReference Include="..\GrKouk.Erp.Domain\GrKouk.Erp.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

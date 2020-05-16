@@ -1,0 +1,31 @@
+﻿@page
+@model GrKouk.Web.ERP.Pages.CommonEntities.CostCentres.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>CostCentre</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.CostCentre.Code)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CostCentre.Code)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CostCentre.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CostCentre.Name)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.CostCentre.Id">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>

@@ -1,0 +1,1044 @@
+﻿@page
+@model IndexModel
+
+@{
+    ViewData["Title"] = "Transactor Transactions";
+}
+@section MyCss
+    {
+    <link rel="stylesheet" href="~/css/custom-checkbox.css" />
+    <link rel="stylesheet" href="~/css/searchbar.css" />
+}
+<h4>Transactor Transactions Index</h4>
+
+<div class="container ">
+    <ul class="nav small justify-content-end ">
+        <li class="nav-item">
+            <a href="#" role="button" class="nav-link" id="CreateNew">Create New</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#filterCollapse" role="button" id="filtersToggle"
+               aria-expanded="false" aria-controls="filterCollapse">
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#" id="rowSelectorsToggle" role="button">
+
+            </a>
+        </li>
+        <li class="nav-item dropdown " id="SelectedRowsActionsMenu">
+            <a class="nav-link dropdown-toggle disabled" role="button" id="ddSelectedRowsActions" data-toggle="dropdown"
+               aria-haspopup="true" aria-expanded="false">Actions</a>
+            <div class="dropdown-menu small">
+                <a class="dropdown-item" href="#" id="deleteSelectedRows">Delete Selected</a>
+                <a class="dropdown-item" href="#">Another action</a>
+                <a class="dropdown-item" href="#">Something else here</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">Separated link</a>
+
+            </div>
+        </li>
+    </ul>
+</div>
+
+<div class="collapse show" id="filterCollapse">
+    <form class="form-inline" id="FiltersForm" method="get">
+        <input type="hidden" id="filtersVisible" />
+        <input type="hidden" id="rowSelectorsVisible" />
+        <input type="hidden" id="currentSort" />
+        <input type="hidden" id="currentFilter" />
+        <input type="hidden" id="totalPages" />
+        <input type="hidden" id="totalRecords" />
+        <input type="hidden" id="pageIndex" />
+        <div class="container">
+            <div class="form-row">
+                <div class="form-group col-md-auto">
+                    <div class="searchbar">
+                        <input class="search_input" type="text" name="" placeholder="Search...">
+                        <a href="#" class="search_icon"><i class="fas fa-search fa-xs"></i></a>
+                    </div>
+                </div>
+
+                <div class="form-group col-md-auto">
+                    <label class="small"> Period:</label>
+                    <select name="DatePeriodFilter" id="DatePeriodFilter" class="form-control form-control-sm small"
+                            asp-items="ViewBag.DataFilterValues"></select>
+                </div>
+                <div class="form-group col-md-auto">
+                    <label class="small">Company:</label>
+                    <select id="CompanyFilter" class="form-control form-control-sm small"
+                            asp-items="ViewBag.CompanyFilter"></select>
+                </div>
+                <div class="form-group col-md-auto">
+                    <label class="small"> Page Size:</label>
+                    <select id="PageSize" class="form-control form-control-sm small"
+                            asp-items="ViewBag.PageFilterSize"></select>
+                </div>
+                <div class="form-group col-md-auto">
+                    <small>
+                        <label name="PagingInfo"> </label>
+
+                    </small>
+                </div>
+                <div class="form-group col-md-auto">
+                    <label class="small"> Currency:</label>
+                    <select id="CurrencySelector" class="form-control form-control-sm small"
+                            asp-items="ViewBag.CurrencySelector"></select>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<br />
+
+<table class="table table-bordered table-sm" id="myTable">
+    <thead class="thead-light">
+
+    </thead>
+    <tbody>
+    </tbody>
+
+</table>
+
+<div class="row">
+    <div class="col-3">
+        <label class="small" name="PagingInfo"> </label>
+    </div>
+    <div class="col-9">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination pagination-sm justify-content-end">
+                <li class="page-item ">
+                    <a href="#" id="GoToFirst"
+                       class="page-link" aria-label="First">
+                        First
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a href="#" id="GoToPrevious"
+                       class="page-link" aria-label="Previous">
+                        Previous
+                    </a>
+                </li>
+
+                <li class="page-item ">
+                    <a href="#" id="GoToNext"
+                       class="page-link" aria-label="Next">
+                        Next
+                    </a>
+                </li>
+                <li class="page-item  ">
+                    <a href="#" id="GoToLast"
+                       class="page-link" aria-label="Last">
+                        Last
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="loader"></div>
+                <div>
+                    <p>Executing request. <br><br><small>Please wait...</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+    <script src="~/js/moment.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
+            // currentCulture = 'el-GR';
+            var formatterCurrency = new Intl.NumberFormat(currentCulture,
+                {
+                    style: 'currency',
+                    currency: 'EUR',
+                    minimumFractionDigits: 2
+                });
+            var formatterNumber = new Intl.NumberFormat(currentCulture,
+                {
+                    maximumFractionDigits: 3
+
+                });
+            //#region variables
+            var $filtersVisible = $('#filtersVisible');
+            var $filterCollapse = $('#filterCollapse');
+
+            var $filtersToggle = $('#filtersToggle');
+            var $rowSelectorsToggle = $('#rowSelectorsToggle');
+            var $rowSelectorsVisible = $('#rowSelectorsVisible');
+
+            var $selectedRowsActionsMenu = $('#SelectedRowsActionsMenu');
+            var $selectedRowsActionsLink = $('#ddSelectedRowsActions');
+            var $deleteSelectedRowsLink = $('#deleteSelectedRows');
+            var $pageIndex = $('#pageIndex');
+            var $pageSize = $('#PageSize');
+            var $totalPages = $('#totalPages');
+            var $totalRecords = $('#totalRecords');
+            var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
+            //#endregion
+            var reallyIsNaN = function(x) {
+                return x !== x;
+            };
+
+            var handleSelectedRowsUi = () => {
+                var $rowSelectors = $('input[name=checkTableRow]');
+                var $checkAllRows = $('input[name=checkAllRows]');
+                var $selectedRowsActionsLink = $('#ddSelectedRowsActions');
+                var allRows = $rowSelectors.length;
+                var selectedRowsCount = $rowSelectors.filter(':checked').length;
+                if (selectedRowsCount > 0) {
+                    $selectedRowsActionsLink.removeClass('disabled');
+                    //$selectedRowsActionsLink.prop('disabled', 'false');
+                } else {
+                    $selectedRowsActionsLink.addClass('disabled');
+                }
+                if (selectedRowsCount == allRows) {
+                    $checkAllRows.prop('checked', true);
+                } else {
+                    $checkAllRows.prop('checked', false);
+                }
+            };
+            const setTableCurrentSort = (currentSort) => {
+                $('#currentSort').val(currentSort);
+            };
+            const getTableCurrentSort = () => {
+                try {
+                    let cSort = $('#currentSort').val();
+
+                    return cSort;
+                } catch (e) {
+                    return "";
+                }
+            };
+           
+            const handlePagingUi = (totalPages, totalRecords, pageIndex, hasPrevious, hasNext) => {
+                $totalPages.val(totalPages);
+                $totalRecords.val(totalRecords);
+                var pagingInfo =
+                    ` Page:${pageIndex} of ${totalPages} Total Items ${totalRecords}`;
+                $('[name=PagingInfo]').text(pagingInfo);
+
+                if (hasPrevious) {
+                    $('#GoToFirst, #GoToPrevious').parent().removeClass('disabled');
+                } else {
+                    $('#GoToFirst, #GoToPrevious').parent().addClass('disabled');
+                }
+                if (hasNext) {
+                    $('#GoToLast, #GoToNext').parent().removeClass('disabled');
+                } else {
+                    $('#GoToLast, #GoToNext').parent().addClass('disabled');
+                }
+            };
+            var getTableData =
+                (pageIndex, pageSize, sortData, dateRange, companyFilter, searchFilter, displayCurrencyId) => {
+                    //#region getTableData
+                    var timeout;
+
+                    var uri = `/api/GrKoukInfoApi/GetIndexTblDataTransactorTrans`;
+                    uri += `?pageIndex=${pageIndex}`;
+                    uri += `&pageSize=${pageSize}`;
+                    uri += `&companyFilter=${companyFilter}`;
+                    uri += `&dateRange=${dateRange}`;
+                    uri += `&sortData=${sortData}`;
+                    uri += `&searchFilter=${searchFilter}`;
+                    uri += `&displayCurrencyId=${displayCurrencyId}`;
+                    $.ajax({
+                        contentType: 'application/json; charset=utf-8',
+
+                        dataType: 'json',
+                        type: 'GET',
+
+                        url: uri,
+                        beforeSend: function() {
+                            if (timeout) {
+                                clearTimeout(timeout);
+                            }
+                            timeout = setTimeout(function() {
+
+                                    $("#loadMe").modal({
+                                        backdrop: "static", //remove ability to close modal with click
+                                        keyboard: false, //remove option to close with keyboard
+                                        show: true //Display loader!
+                                    });
+                                },
+                                1000);
+
+                        },
+                        success: function(result) {
+                            handlePagingUi(result.totalPages,
+                                result.totalRecords,
+                                pageIndex,
+                                result.hasPrevious,
+                                result.hasNext);
+                            $('#myTable > tbody').empty();
+                            $('#myTable > thead').empty();
+                            let colDefs = [
+                                {
+                                    totalKey: '',
+                                    grandTotalKey: '',
+                                    totalFormatter: '',
+                                    sortKey: 'TransactionDateSort',
+                                    sortType: 'numeric',
+                                    header: 'Date',
+                                    text: '',
+                                    headerClass: 'small text-center d-none d-md-table-cell',
+                                    class: 'small d-none d-md-table-cell'
+                                },
+                                {
+                                    totalKey: 'label',
+                                    grandTotalKey: 'label',
+                                    totalFormatter: '',
+                                    sortKey: 'TransactorNameSort',
+                                    sortType: 'alpha',
+                                    header: 'Transactor',
+                                    text: '',
+                                    headerClass: 'small text-center',
+                                    class: 'small'
+                                },
+                                {
+                                    totalKey: '',
+                                    grandTotalKey: '',
+                                    totalFormatter: '',
+                                    sortKey: 'SeriesCodeSort',
+                                    sortType: 'alpha',
+                                    header: 'Series',
+                                    text: '',
+                                    headerClass: 'small text-center d-none d-md-table-cell',
+                                    class: 'small d-none d-md-table-cell '
+                                },
+                                {
+                                    totalKey: '',
+                                    grandTotalKey: '',
+                                    totalFormatter: '',
+                                    sortKey: '',
+                                    sortType: '',
+                                    header: 'Ref Number',
+                                    text: '',
+                                    headerClass: 'small text-center d-none d-md-table-cell',
+                                    class: 'small d-none d-md-table-cell '
+                                },
+                                {
+                                    totalKey: '',
+                                    grandTotalKey: '',
+                                    totalFormatter: '',
+                                    sortKey: 'SectionCodeSort',
+                                    sortType: 'alpha',
+                                    header: 'Section',
+                                    text: '',
+                                    headerClass: 'small text-center',
+                                    class: 'small '
+                                },
+                                {
+                                    totalKey: '',
+                                    grandTotalKey: '',
+                                    totalFormatter: '',
+                                    sortKey: 'CompanyCodeSort',
+                                    sortType: 'alpha',
+                                    header: 'Company',
+                                    text: '',
+                                    headerClass: 'small text-center',
+                                    class: 'small '
+                                },
+                                {
+                                    totalKey: 'sumOfDebit',
+                                    grandTotalKey: 'grandSumOfDebit',
+                                    totalFormatter: 'currency',
+                                    sortKey: '',
+                                    sortType: '',
+                                    header: 'Debit',
+                                    text: '',
+                                    headerClass: 'small text-center',
+                                    class: 'small text-right '
+                                },
+                                {
+                                    totalKey: 'sumOfCredit',
+                                    grandTotalKey: 'grandSumOfCredit',
+                                    totalFormatter: 'currency',
+                                    sortKey: '',
+                                    sortType: '',
+                                    header: 'Credit',
+                                    text: '',
+                                    headerClass: 'small text-center',
+                                    class: 'small text-right '
+                                }
+                            ];
+                            let curSortUndefined = false;
+                            let curSortAr = [];
+                            var curSort = getTableCurrentSort();
+                            if (curSort === undefined || curSort === null || curSort.length === 0) {
+                                curSortUndefined = true;
+                            } else {
+                                curSortAr = curSort.split(':');
+                            }
+                            var $trHead = $('<tr>');
+                            var $tdSelectCol = $(
+                                '<th name="selectAllRowsColumn"> <label class="custom-control custom-checkbox">  ' +
+                                ' <input type="checkbox" class="custom-control-input" name="checkAllRows" >' +
+                                '<span class="custom-control-indicator"></span></label></th>');
+                            $trHead.append($tdSelectCol);
+                            colDefs.forEach(function(item) {
+                                var tdColHead = '';
+                                if (item.sortKey.length !== 0) {
+                                    let colHtml = "";
+                                    colHtml = `<th class="${item.headerClass}"> `;
+                                    colHtml += `<a href="#" role="button" name="SortHeader" tabindex="-1" `;
+                                    colHtml += `data-sortkey="${item.sortKey}" data-sorttype="${item.sortType}">  `;
+                                    colHtml += `${item.header}  `;
+                                    colHtml += `</a>  `;
+                                    if (curSortUndefined) {
+                                        colHtml += `<i class="" name="SortIcon"></i>  `;
+                                    } else {
+                                        if (curSortAr[0] === item.sortKey) {
+
+                                            var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
+                                            var iconSortType = "fas fa-sort-" + item.sortType + newSortIconType;
+                                            colHtml += `<i class="${iconSortType}" name="SortIcon"></i>  `;
+                                        } else {
+                                            colHtml += `<i class="" name="SortIcon"></i>  `;
+                                        }
+                                    }
+
+                                    colHtml += `</a>  `;
+                                    tdColHead = colHtml;
+                                } else {
+                                    tdColHead = $('<th>').text(item.header).addClass(item.headerClass);
+                                }
+                                $trHead.append($(tdColHead));
+                            });
+                            $trHead.append($('<th>'));
+                            $trHead.appendTo('#myTable > thead');
+                            $.each(result.data,
+                                function(index, value) {
+                                    colDefs[0].text = moment(value.transDate).format('DD/MM/YYYY');
+                                    colDefs[1].text = value.transactorName;
+                                    colDefs[2].text = value.transTransactorDocSeriesCode;
+                                    colDefs[3].text = value.transRefCode;
+                                    colDefs[4].text = value.sectionCode;
+                                    colDefs[5].text = value.companyCode;
+                                    colDefs[6].text = formatterCurrency.format(value.debitAmount);
+                                    colDefs[7].text = formatterCurrency.format(value.creditAmount);
+
+
+                                    // var amountTotal = value.totalAmount;
+                                    var itemId = value.id;
+                                    var urlEdit = `@Url.Page("./Edit")?id=${itemId}`;
+                                    let urlEditPrototype =grkoukCommon.editPrototypeUrl("SCNTRANSACTORTRANS",value.sectionCode,value.creatorId);
+                                    var urlInfo = `@Url.Page("./Details")?id=${itemId}`;
+                                    var urlDel = `@Url.Page("./Delete")?id=${itemId}`;
+                                    var urlNewLikeThis = `@Url.Page("./Create")?copyFromId=${itemId}`;
+                                    var urlKartela = `@Url.Page("./Kartela")?transactorId=${itemId}`;
+                                    var actionsCol = '<td class="small text-center d-none d-md-table-cell">';
+                                    actionsCol += `<a href="${urlEdit}">`;
+                                    actionsCol += `<i class="fas fa-edit fa-lg" style="color:slategray"></i> `;
+                                    actionsCol += `</a> |`;
+                                    actionsCol += `<a href="${urlInfo}"><i class="fas fa-info-circle fa-lg" style="color:slategray"></i></a> | `;
+                                    actionsCol += `<a href="${urlDel}"><i class="fas fa-trash fa-lg" style="color:slategray"></i></a> | `;
+                                    actionsCol += `<a href="${urlNewLikeThis}"><i class="fas fa-clone fa-lg" style="color:slategray"></i>|</a> `;
+                                    actionsCol += '<a class=" dropdown-toggle" role="button" id="dropdownMenuButton"';
+                                    actionsCol += 'data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                                    actionsCol += '<i class="fas fa-bars" style="color:slategray"></i></a>';
+                                    actionsCol +=
+                                        ' <div class="dropdown-menu small" aria-labelledby="dropdownMenuButton">';
+                                    actionsCol += `<a href="${urlKartela}" class="dropdown-item">Καρτέλα</a>`;
+                                    actionsCol += `<a class="dropdown-item" href="${urlEditPrototype}" target="_blank">Edit Prototype</a>`;
+                                    actionsCol += ' </div>';
+                                    actionsCol += '</td>';
+                                    var actionColMobile =
+                                        '<td class="small text-center d-table-cell d-sm-table-cell d-md-none">';
+                                    actionColMobile +=
+                                        '<a class=" dropdown-toggle" role="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" ';
+                                    actionColMobile +=
+                                        'aria-expanded="false"><i class="fas fa-bars fa-lg" style="color:slategray"></i></a>';
+                                    actionColMobile +=
+                                        '<div class="dropdown-menu small" aria-labelledby="dropdownMenuButton">';
+                                    actionColMobile += `<a class="dropdown-item" href="${urlEdit
+                                        }"><i class="fas fa-edit fa-lg" style="color:slategray"></i>  Edit</a> `;
+                                    actionColMobile += `<a class="dropdown-item" href="${urlEditPrototype}"> target="_blank"`;
+                                    actionColMobile += `    <i class="fas fa-edit fa-lg" style="color:slategray"></i> `;
+                                    actionColMobile += ` Edit Prototype</a> `;
+                                    actionColMobile += `<a class="dropdown-item" href="${urlInfo
+                                        }"><i class="fas fa-info-circle fa-lg" style="color:slategray"></i> Details</a> `;
+                                    actionColMobile += `<a class="dropdown-item" href="${urlDel
+                                        }"><i class="fas fa-trash fa-lg" style="color:slategray"></i> Delete</a> `;
+                                    actionColMobile += `<a class="dropdown-item" href="${urlNewLikeThis
+                                        }"><i class="fas fa-clone fa-lg" style="color:slategray"></i> Duplicate</a> `;
+                                    actionColMobile += '</div></td>';
+
+                                    var $tr = $('<tr>');
+
+                                    var $td = $(
+                                        '<td name="selectRowColumn"> <label class="custom-control custom-checkbox">  ' +
+                                        ' <input type="checkbox" class="custom-control-input" name="checkTableRow" ' +
+                                        `data-itemId="${itemId}">` +
+                                        '<span class="custom-control-indicator"></span></label></td>');
+                                    $tr.append($td);
+                                    colDefs.forEach(function(item) {
+                                        var $tdCol = $('<td>').text(item.text).addClass(item.class);
+                                        $tr.append($tdCol);
+                                    });
+                                    $tr.append(actionsCol);
+                                    $tr.append(actionColMobile);
+                                    $tr.appendTo('#myTable > tbody');
+                                });
+                            $('input[name=checkAllRows]').on('change',
+                                function() {
+                                    var th = $(this).index();
+                                    var isChecked = $(this).prop('checked');
+                                    $('input[name=checkTableRow]').prop('checked', isChecked);
+                                    var selectedRowsCount = countSelectedRows();
+                                    if (selectedRowsCount > 0) {
+                                        $selectedRowsActionsLink.removeClass('disabled');
+                                    } else {
+                                        $selectedRowsActionsLink.addClass('disabled');
+                                    }
+                                });
+                            $('input[name=checkTableRow]').on('change',
+                                function() {
+                                    handleSelectedRowsUi();
+                                });
+                            $('[name=SortHeader]').on('click',
+                                function(event) {
+                                    var button = $(event.delegateTarget);
+                                    var reqSort = button.data('sortkey');
+                                    let reqSortType = button.data('sorttype');
+                                    let iconSortType = '';
+                                    var newSortVal = '';
+                                    var curSort = getTableCurrentSort();
+                                    if (curSort === undefined || curSort === null || curSort.length === 0) {
+                                        curSort = reqSort + ':desc';
+                                    }
+                                    var curSortAr = curSort.split(':');
+                                    if (curSortAr[0] === reqSort) {
+                                        var newSort = curSortAr[1] === 'asc' ? 'desc' : 'asc';
+                                        var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
+                                        newSortVal = curSortAr[0] + ':' + newSort;
+                                        iconSortType = "fas fa-sort-" + reqSortType + newSortIconType;
+                                    } else {
+                                        newSortVal = reqSort + ':asc';
+                                        iconSortType = "fas fa-sort-" + reqSortType + "-up";
+                                    }
+                                    let $btParent = button.parent();
+                                    let $icon = $btParent.find('i:eq(0)');
+                                    if ($icon !== null) {
+                                        $icon.removeClass();
+                                        $icon.addClass(iconSortType);
+                                    }
+
+                                    setTableCurrentSort(newSortVal);
+                                    //$('#pageIndex').val(1);
+                                    refreshTableData();
+                                });
+                             let pageSummaryCount = 0;
+                            let totalSummaryCount = 0;
+                            let $pageSummaryRow = $('<tr class="table-info">');
+                            $pageSummaryRow.append('<td name="selectRowColumn"> </td> ');
+                            let $totalSummaryRow = $('<tr class="table-info">');
+                            $totalSummaryRow.append('<td name="selectRowColumn"> </td> ');
+
+                            colDefs.forEach(function(item) {
+                                var tdColPage = '';
+                                var tdColTotal = '';
+                                if (item.totalKey.length !== 0) {
+                                    if (item.totalKey === "label") {
+                                        tdColPage = $('<td>').text('Σύνολα Σελίδας').addClass('small font-weight-bold');
+                                    } else {
+                                        if (item.totalFormatter === "currency") {
+                                            try {
+                                                let fAmount = formatterCurrency.format(result[item.totalKey]);
+                                                tdColPage = `<td class="${item.class} font-weight-bold"> `;
+                                                tdColPage += `${fAmount} </td> `;
+                                                pageSummaryCount++;
+                                            } catch (e) {
+                                                tdColPage = `<td class="${item.class}"> `;
+                                                tdColPage += `#Err </td> `;
+                                            }
+
+                                        }
+                                    }
+                                } else {
+                                    tdColPage = `<td class="${item.class}"> `;
+                                    tdColPage += ` </td> `;
+                                }
+                                if (item.grandTotalKey.length !== 0) {
+                                    if (item.grandTotalKey === "label") {
+                                        tdColTotal = $('<td>').text('Γενικό Σύνολο').addClass('small font-weight-bold');
+                                    } else {
+                                        if (item.totalFormatter === "currency") {
+                                            try {
+                                                let fAmount = formatterCurrency.format(result[item.grandTotalKey]);
+                                                tdColTotal = `<td class="${item.class} font-weight-bold"> `;
+                                                tdColTotal += `${fAmount} </td> `;
+                                                totalSummaryCount++;
+                                            } catch (e) {
+                                                tdColTotal = `<td class="${item.class}"> `;
+                                                tdColTotal += `#Err </td> `;
+                                            }
+
+                                        }
+                                    }
+                                } else {
+                                    tdColTotal = `<td class="${item.class}"> `;
+                                    tdColTotal += ` </td> `;
+                                }
+                                $pageSummaryRow.append($(tdColPage));
+                                $totalSummaryRow.append($(tdColTotal));
+                            });
+                            if (pageSummaryCount > 0) {
+                                $pageSummaryRow.append($('<td>'));
+                                $pageSummaryRow.appendTo('#myTable >  tbody:last');
+                            }
+                            if (totalSummaryCount > 0) {
+                                $totalSummaryRow.append($('<td>'));
+                                $totalSummaryRow.appendTo('#myTable >  tbody:last');
+                            }
+                        rowSelectorsUi();
+                        },
+                        complete: function() {
+                            if (timeout) {
+                                clearTimeout(timeout);
+                            }
+                            $("#loadMe").modal("hide");
+                            setTimeout(function() {
+                                    console.log('Checking for open modals');
+                                    var isOpen = $('#loadMe').hasClass('show');
+                                    if (isOpen) {
+                                        console.log('There is an open Modal');
+                                        $("#loadMe").modal("hide");
+                                    } else {
+                                        console.log('No open modal');
+                                    }
+                                },
+                                2000);
+                        },
+                        error: function(e) {
+                            console.log(e);
+
+                        }
+                    });
+                    //#endregion
+                };
+
+            var rowSelectorsUi = () => {
+                var $selectSingleSelectors = $('td[name=selectRowColumn]');
+                var $selectAllSelector = $('th[name=selectAllRowsColumn]');
+                var selectorsVisible = $rowSelectorsVisible.val();
+                var newSelectorsVisible =
+                    (selectorsVisible == 'True' || selectorsVisible == 'true' || selectorsVisible === true)
+                        ? 'True'
+                        : 'False';
+                if (newSelectorsVisible == 'True') {
+                    $selectAllSelector.removeAttr('hidden');
+                    $selectSingleSelectors.removeAttr('hidden');
+                    $selectAllSelector.show();
+                    $selectSingleSelectors.show();
+                    $rowSelectorsVisible.val(true);
+                    $rowSelectorsToggle.text('Hide Row Selectors');
+                    $selectedRowsActionsMenu.removeAttr('hidden');
+                    $selectedRowsActionsLink.addClass('disabled');
+                } else {
+                    $selectAllSelector.hide();
+                    $selectSingleSelectors.hide();
+                    $rowSelectorsVisible.val(false);
+                    $rowSelectorsToggle.text('Show Row Selectors');
+                    $selectedRowsActionsMenu.attr('hidden', 'true');
+                }
+            };
+            var refreshTableData = () => {
+                var pageIndexVal = parseInt($('#pageIndex').val());
+
+                var pageIndex = reallyIsNaN(pageIndexVal)
+                    ? 1
+                    : pageIndexVal;
+                $('#pageIndex').val(pageIndex);
+
+                var pageSize = $('#PageSize').val() == null || $('#PageSize').val().length == 0
+                    ? 10
+                    : parseInt($('#PageSize').val());
+
+
+                var companyFilter = $('#CompanyFilter').val();
+                var datePeriod = $('#DatePeriodFilter').val();
+                var sortData = $('#currentSort').val();
+                var searchVal = $('.search_input').val();
+                var $dcId = $('#CurrencySelector');
+                var displayCurrencyId = $dcId.val() == null || $dcId.val().length == 0
+                    ? 1
+                    : parseInt($dcId.val());
+
+                getTableData(pageIndex, pageSize, sortData, datePeriod, companyFilter, searchVal, displayCurrencyId);
+
+            };
+            var gotoFirstPage = () => {
+                var curPageIndex = 1;
+                $pageIndex.val(curPageIndex);
+                refreshTableData();
+            };
+            var gotoLastPage = () => {
+                var curPageIndex = parseInt($totalPages.val());
+
+                $pageIndex.val(curPageIndex);
+                refreshTableData();
+            };
+            var gotoNextPage = () => {
+                var curPageIndex = parseInt($pageIndex.val());
+                curPageIndex += 1;
+                $pageIndex.val(curPageIndex);
+                refreshTableData();
+
+            };
+            var gotoPreviousPage = () => {
+                var curPageIndex = parseInt($pageIndex.val());
+                curPageIndex -= 1;
+                $pageIndex.val(curPageIndex);
+                refreshTableData();
+
+            };
+            var deleteSelectedRows = () => {
+                var $rowSelectors = $('input[name=checkTableRow]');
+                var selectedRows = $rowSelectors.filter(':checked');
+                var idsToDelete = [];
+                $.each(selectedRows,
+                    function(key, value) {
+                        console.log(value);
+                        var id = parseInt(value.dataset.itemid);
+                        idsToDelete.push(id);
+                    });
+                if (idsToDelete.length > 0) {
+                    var idsJs = JSON.stringify({
+                        //ToDo: Change this
+                        section: 'SectionCode',
+                        ids: idsToDelete
+                    });
+                    var timeout;
+
+                    $.ajax({
+                        contentType: 'application/json; charset=utf-8',
+
+                        dataType: 'json',
+                        type: 'POST',
+                        data: idsJs,
+                        url: "/api/GrkoukInfoApi/DeletesellDocumentsList",
+                        beforeSend: function() {
+                            if (timeout) {
+                                clearTimeout(timeout);
+                            }
+                            timeout = setTimeout(function() {
+
+                                    $("#loadMe").modal({
+                                        backdrop: "static", //remove ability to close modal with click
+                                        keyboard: false, //remove option to close with keyboard
+                                        show: true //Display loader!
+                                    });
+                                },
+                                1000);
+
+                        },
+                        success: function(result) {
+                            console.log(result);
+                            toastr.success("Delete", result.message);
+                            refreshTableData();
+
+                        },
+                        complete: function() {
+                            if (timeout) {
+                                clearTimeout(timeout);
+                            }
+                            $("#loadMe").modal("hide");
+                            setTimeout(function() {
+                                    console.log('Checking for open modals');
+                                    var isOpen = $('#loadMe').hasClass('show');
+                                    if (isOpen) {
+                                        console.log('There is an open Modal');
+                                        $("#loadMe").modal("hide");
+                                    } else {
+                                        console.log('No open modal');
+                                    }
+                                },
+                                2000);
+                        },
+                        error: function(e) {
+                            console.log(e);
+                            toastr.error("Error", e.responseJSON.error);
+
+                        }
+                    });
+
+                }
+
+            };
+            var getSelectedRows = () => {
+                var $rowSelectors = $('input[name=checkTableRow]');
+                var selectedRows = $rowSelectors.filter(':checked');
+                console.log('Selected table rows=' + selectedRows);
+            };
+            var countSelectedRows = () => {
+                var $rowSelectors = $('input[name=checkTableRow]');
+                var selectedRows = $rowSelectors.filter(':checked');
+                return selectedRows.length;
+            };
+            var handleFiltersUi = () => {
+                var filterVisible = $filtersVisible.val();
+                if (filterVisible === 'True' || filterVisible === 'true') {
+                    $filterCollapse.collapse('show');
+                } else {
+                    $filterCollapse.collapse('hide');
+                }
+            };
+            var showFiltersUi = () => {
+
+            };
+            $deleteSelectedRowsLink.on('click',
+                () => {
+                    deleteSelectedRows();
+                });
+
+
+            $filterCollapse.on('hidden.bs.collapse',
+                function() {
+                    console.log('Filters Hidden');
+                    $filtersToggle.text('Show Filters');
+
+
+                    $filtersVisible.val(false);
+                });
+
+            $filterCollapse.on('shown.bs.collapse',
+                function() {
+                    console.log('Filters Shown');
+                    $filtersToggle.text('Hide Filters');
+                    // var alist = $('a[href*="&filtersVisible"]');
+
+                    $filtersVisible.val(true);
+                });
+
+
+
+            var rosSelectorsToggleHandler = () => {
+                var $selectSingleSelectors = $('td[name=selectRowColumn]');
+                var $selectAllSelector = $('th[name=selectAllRowsColumn]');
+                var selectorsVisible = $rowSelectorsVisible.val();
+                var newSelectorsVisible =
+                    (selectorsVisible == 'True' || selectorsVisible == 'true' || selectorsVisible === true)
+                        ? 'False'
+                        : 'True';
+                if (newSelectorsVisible == 'True') {
+                    $selectAllSelector.removeAttr('hidden');
+                    $selectSingleSelectors.removeAttr('hidden');
+                    $selectAllSelector.show();
+                    $selectSingleSelectors.show();
+                    $rowSelectorsVisible.val(true);
+                    $rowSelectorsToggle.text('Hide Row Selectors');
+                    $selectedRowsActionsMenu.removeAttr('hidden');
+                    $selectedRowsActionsLink.addClass('disabled');
+                } else {
+                    $selectAllSelector.hide();
+                    $selectSingleSelectors.hide();
+                    $rowSelectorsVisible.val(false);
+                    $rowSelectorsToggle.text('Show Row Selectors');
+                    $selectedRowsActionsMenu.attr('hidden', 'true');
+                }
+            };
+            $rowSelectorsToggle.on('click',
+                function() {
+                    rosSelectorsToggleHandler();
+                });
+            var currencyChanged = () => {
+                let curCurrencySelected = parseInt($('#CurrencySelector').val());
+                var currencyCode;
+                try {
+                    let currentCurrency = currencyListJs.find(x => x.id === curCurrencySelected);
+                    currencyCode = currentCurrency.code;
+                    let locale = currentCurrency.displayLocale;
+                    formatterCurrency = new Intl.NumberFormat(locale,
+                        {
+                            style: 'currency',
+                            currency: currencyCode,
+                            minimumFractionDigits: 2
+                        });
+                } catch (e) {
+                    //not found keep old formater or maybe create a default one
+                    console.log('Not found currency code for this id');
+                }
+            };
+            $('#CurrencySelector').on('change',
+                function() {
+                    currencyChanged();
+                    refreshTableData();
+                });
+            $('#DatePeriodFilter').on('change',
+                function() {
+                    $('#pageIndex').val(1);
+                    refreshTableData();
+                });
+            $('#CompanyFilter').on('change',
+                function() {
+                    $('#pageIndex').val(1);
+                    refreshTableData();
+                });
+            $('#PageSize').on('change',
+                function() {
+                    $('#pageIndex').val(1);
+                    refreshTableData();
+                });
+            $('#GoToLast').on('click',
+                function() {
+                    gotoLastPage();
+                });
+            $('#GoToFirst').on('click',
+                function() {
+                    gotoFirstPage();
+                });
+            $('#GoToNext').on('click',
+                function() {
+                    gotoNextPage();
+                });
+            $('#GoToPrevious').on('click',
+                function() {
+                    gotoPreviousPage();
+                });
+
+
+            $('#CreateNew').on('click',
+                function() {
+                    var uri = '@Url.Page("Create")';
+                    window.location.href = uri;
+                });
+            $('.search_icon').on('click',
+                           function() {
+                               icon = $(this).find("svg");
+                               if (icon.hasClass('fa-search')) {
+                                   icon.addClass("fa-times").removeClass("fa-search");
+                               } else {
+                                   icon.addClass("fa-search").removeClass("fa-times");
+                                   $('.search_input').val('');
+                               }
+
+                               refreshTableData();
+                           });
+
+            $('#FiltersForm').on('submit',
+                function(e) {
+                    e.preventDefault();
+                    var $icon = $('.search_icon').find("svg");
+                    if ($icon.hasClass('fa-search')) {
+                        $icon.addClass("fa-times").removeClass("fa-search");
+                    } else {
+                        $icon.addClass("fa-search").removeClass("fa-times");
+
+                    }
+                    refreshTableData();
+                });
+            var storageItemJs = localStorage.getItem('TransactorTransIndexView');
+            if (storageItemJs === undefined || storageItemJs === null) {
+                $('#pageIndex').val(1);
+                $('#filtersVisible').val(true);
+                $('#rowSelectorsVisible').val(true);
+                // $rowSelectorsToggle.text('Hide Row Selectors');
+                // $filtersToggle.text('Hide Filters');
+                $('#DatePeriodFilter').val('CURMONTH');
+                $('#CompanyFilter').val(0);
+                $('#currentSort').val('transactiondate:desc');
+            } else {
+                var storageItem = JSON.parse(storageItemJs);
+                var filtersValue = storageItem.find(x => x.filterKey === 'filtersVisible').filterValue;
+                if (filtersValue === true) {
+                    $filtersToggle.text('Hide Filters');
+                } else {
+                    $filtersToggle.text('Show Filters');
+                }
+                $('#filtersVisible').val(filtersValue);
+                filtersValue = storageItem.find(x => x.filterKey === 'rowSelectorsVisible').filterValue;
+                $('#rowSelectorsVisible').val(filtersValue);
+                filtersValue = storageItem.find(x => x.filterKey === 'dateRangeFilter').filterValue;
+                $('#DatePeriodFilter').val(filtersValue);
+                filtersValue = storageItem.find(x => x.filterKey === 'currentSort').filterValue;
+                $('#currentSort').val(filtersValue);
+                filtersValue = storageItem.find(x => x.filterKey === 'companyFilter').filterValue;
+                $('#CompanyFilter').val(filtersValue);
+                filtersValue = storageItem.find(x => x.filterKey === 'pageSize').filterValue;
+                $('#PageSize').val(filtersValue);
+                filtersValue = storageItem.find(x => x.filterKey === 'pageIndex').filterValue;
+                $('#pageIndex').val(filtersValue);
+                try {
+                    filtersValue = storageItem.find(x => x.filterKey === 'currentCurrency').filterValue;
+                    $('#CurrencySelector').val(filtersValue);
+                } catch (e) {
+
+                }
+            }
+            handleFiltersUi();
+            currencyChanged();
+            refreshTableData();
+
+            rowSelectorsUi();
+        });
+
+        $(window).on('beforeunload',
+            function(e) {
+                //#region CommentOut
+                //#region Variables
+                var filtersVisible = $('#filterCollapse').hasClass('show');
+                var $rowSelectorsColumn = $('th[name=selectAllRowsColumn]');
+
+                var rowSelectorsNotVisible = $rowSelectorsColumn.is(':hidden');
+                var rowSelectorsVisible = (rowSelectorsNotVisible) ? false : true;
+
+                var pageSize = $('#PageSize').val();
+                var dateRange = $('#DatePeriodFilter').val();
+                var currentSort = $('#currentSort').val();
+                var companyFilter = $('#CompanyFilter').val();
+                var pageIndex = $('#pageIndex').val();
+                var currentCurrency = $('#CurrencySelector').val()
+                var filtersArr = [];
+                //#endregion
+                filtersArr.push({
+                    filterKey: 'filtersVisible',
+                    filterValue: filtersVisible
+                });
+                filtersArr.push({
+                    filterKey: 'rowSelectorsVisible',
+                    filterValue: rowSelectorsVisible
+                });
+                filtersArr.push({
+                    filterKey: 'pageIndex',
+                    filterValue: pageIndex
+                });
+                filtersArr.push({
+                    filterKey: 'pageSize',
+                    filterValue: pageSize
+                });
+                filtersArr.push({
+                    filterKey: 'dateRangeFilter',
+                    filterValue: dateRange
+                });
+                filtersArr.push({
+                    filterKey: 'currentSort',
+                    filterValue: currentSort
+                });
+                filtersArr.push({
+                    filterKey: 'companyFilter',
+                    filterValue: companyFilter
+                });
+                filtersArr.push({
+                    filterKey: 'currentCurrency',
+                    filterValue: currentCurrency
+                });
+
+
+                var sessionVal = JSON.stringify(filtersArr);
+
+                localStorage.setItem('TransactorTransIndexView', sessionVal);
+                //#endregion
+
+            });
+    </script>
+}

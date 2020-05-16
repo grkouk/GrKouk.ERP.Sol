@@ -1,0 +1,37 @@
+﻿@page
+@model GrKouk.Web.Erp.Pages.Configuration.TransactorTypes.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>TransactorType</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorType.IsSystem)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorType.IsSystem)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorType.Code)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorType.Code)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorType.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorType.Name)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.TransactorType.Id">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>

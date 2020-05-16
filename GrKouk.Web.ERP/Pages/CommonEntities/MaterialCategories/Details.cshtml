@@ -1,0 +1,31 @@
+﻿@page
+@model DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>WarehouseItemCategory</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.MaterialCategory.Code)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MaterialCategory.Code)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.MaterialCategory.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MaterialCategory.Name)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.MaterialCategory.Id">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>

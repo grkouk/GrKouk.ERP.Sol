@@ -1,0 +1,48 @@
+﻿@page
+@model GrKouk.Web.Erp.Pages.CommonEntities.CrCashCatWarehouseItem.IndexModel2
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.CrCatWarehouseItem[0].ClientProfile)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CrCatWarehouseItem[0].CashRegCategory)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CrCatWarehouseItem[0].WarehouseItem)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.CrCatWarehouseItem) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ClientProfile.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CashRegCategory.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WarehouseItem.Name)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

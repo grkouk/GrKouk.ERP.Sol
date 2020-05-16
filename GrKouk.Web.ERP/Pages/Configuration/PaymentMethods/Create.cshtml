@@ -1,0 +1,53 @@
+﻿@page
+@model GrKouk.Web.Erp.Pages.Configuration.PaymentMethods.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+<h4>Create PaymentMethod</h4>
+<hr />
+<div class="container">
+
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label asp-for="PaymentMethod.Name" class="control-label small"></label>
+                <input asp-for="PaymentMethod.Name" class="form-control form-control-sm" />
+                <span asp-validation-for="PaymentMethod.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-2">
+                <label asp-for="PaymentMethod.DaysOverdue" class="control-label small"></label>
+                <input asp-for="PaymentMethod.DaysOverdue" class="form-control form-control-sm" />
+                <span asp-validation-for="PaymentMethod.DaysOverdue" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label asp-for="PaymentMethod.AutoPayoffWay" class="control-label small"></label>
+                <select asp-for="PaymentMethod.AutoPayoffWay" class="form-control form-control-sm" asp-items="ViewBag.AutoPayoffWay"></select>
+                <span asp-validation-for="PaymentMethod.AutoPayoffWay" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-3">
+                <label asp-for="PaymentMethod.PayoffSeriesId" class="control-label small"></label>
+                <input asp-for="PaymentMethod.PayoffSeriesId" class="form-control form-control-sm" />
+                <span asp-validation-for="PaymentMethod.PayoffSeriesId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-secondary btn-sm" />
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<div>
+    <a class="small" asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

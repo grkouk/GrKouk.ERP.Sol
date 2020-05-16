@@ -1,0 +1,130 @@
+﻿@page
+@model GrKouk.Web.Erp.Pages.MainEntities.Transactors.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+@section MyCss
+{
+    @*<link rel="stylesheet" href="~/css/bootstrap-multiselect.css" />*@
+    <link rel="stylesheet" href="~/lib/bootstrap-select/css/bootstrap-select.min.css" />
+}
+<h4>Create Transactor</h4>
+<hr />
+<div class="container">
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+        <input type="hidden" asp-for="ItemVm.SelectedCompanies" />
+        <div class="form-row ">
+            <div class="form-group col-md-2">
+                <label asp-for="ItemVm.Code" class="control-label small"></label>
+                <input asp-for="ItemVm.Code" class="form-control form-control-sm" />
+                <span asp-validation-for="ItemVm.Code" class="text-danger small"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="ItemVm.Name" class="form-control-label small"></label>
+                <input asp-for="ItemVm.Name" class="form-control form-control-sm" />
+                <span asp-validation-for="ItemVm.Name" class="text-danger small"></span>
+            </div>
+            <div class="form-group col-md-2">
+                <label asp-for="ItemVm.TransactorTypeId" class="form-control-label small"></label>
+                <select asp-for="ItemVm.TransactorTypeId" class="form-control form-control-sm" asp-items="ViewBag.TransactorTypeId"></select>
+            </div>
+            <div class=" form-group col-md-2">
+                <label class="form-control-label small">Selected Companies</label>
+                <select class="selectpicker form-control " id="SelectedCompanies" multiple
+                        data-selected-text-format="count > 2"></select>
+            </div>
+            @*<div class="form-group col-md-2">
+                    <label asp-for="ItemVm.CompanyId" class="control-label small"></label>
+                    <select asp-for="ItemVm.CompanyId" class="form-control form-control-sm " asp-items="ViewBag.CompanyId"></select>
+                </div>*@
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label asp-for="ItemVm.Address" class="control-label small"></label>
+                <input asp-for="ItemVm.Address" class="form-control form-control-sm" />
+                <span asp-validation-for="ItemVm.Address" class="text-danger small"></span>
+            </div>
+            <div class="form-group col-md-4">
+                <label asp-for="ItemVm.City" class="control-label small"></label>
+                <input asp-for="ItemVm.City" class="form-control form-control-sm" />
+                <span asp-validation-for="ItemVm.City" class="text-danger small"></span>
+            </div>
+            <div class="form-group col-md-2">
+                <label asp-for="ItemVm.Zip" class="control-label small"></label>
+                <input asp-for="ItemVm.Zip" class="form-control form-control-sm" />
+                <span asp-validation-for="ItemVm.Zip" class="text-danger small"></span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label asp-for="ItemVm.PhoneWork" class="control-label small"></label>
+                <input asp-for="ItemVm.PhoneWork" class="form-control form-control-sm" />
+                <span asp-validation-for="ItemVm.PhoneWork" class="text-danger small"></span>
+            </div>
+            <div class="form-group col-md-3">
+                <label asp-for="ItemVm.PhoneMobile" class="control-label small"></label>
+                <input asp-for="ItemVm.PhoneMobile" class="form-control form-control-sm" />
+                <span asp-validation-for="ItemVm.PhoneMobile" class="text-danger small"></span>
+            </div>
+            <div class="form-group col-md-3">
+                <label asp-for="ItemVm.PhoneFax" class="control-label small"></label>
+                <input asp-for="ItemVm.PhoneFax" class="form-control form-control-sm" />
+                <span asp-validation-for="ItemVm.PhoneFax" class="text-danger small"></span>
+            </div>
+            <div class="form-group col-md-3">
+                <label asp-for="ItemVm.EMail" class="control-label small"></label>
+                <input asp-for="ItemVm.EMail" class="form-control form-control-sm" />
+                <span asp-validation-for="ItemVm.EMail" class="text-danger small"></span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary btn-sm" />
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/bootstrap-select/js/bootstrap-select.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var companiesListJs = @Html.Raw(Json.Serialize(ViewBag.CompaniesListJs));
+
+            var loadCompanies = () => {
+                $('#SelectedCompanies').empty();
+                $.each(companiesListJs, function(index, item) {
+                    $('#SelectedCompanies').append($('<option></option>').attr('value', item.value).text(item.title));
+                });
+               
+                $('#SelectedCompanies').selectpicker('refresh');
+            };
+
+           
+
+            $('#SelectedCompanies').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+                var sel = $('#SelectedCompanies option:selected');
+                var selected = [];
+                $(sel).each(function(index, item) {
+                    selected.push([$(this).val()]);
+                });
+                console.log('selected=' + selected);
+                var sDocs = selected.toString();
+                console.log('sDocs=' + sDocs);
+               
+                $('#ItemVm_SelectedCompanies').val(sDocs);
+            });
+
+            loadCompanies();
+            //$('.selectpicker').selectpicker( );
+        });
+    </script>
+}

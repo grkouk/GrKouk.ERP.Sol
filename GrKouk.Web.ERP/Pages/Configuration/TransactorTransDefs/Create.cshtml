@@ -1,0 +1,70 @@
+﻿@page
+@model GrKouk.Web.Erp.Pages.Configuration.TransactorTransDefs.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h4>Create TransTransactorDef</h4>
+<hr />
+<div class="container">
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-row">
+            <div class="form-group col-md-2">
+                <label asp-for="TransTransactorDef.Code" class="control-label"></label>
+                <input asp-for="TransTransactorDef.Code" class="form-control form-control-sm" />
+                <span asp-validation-for="TransTransactorDef.Code" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-5">
+                <label asp-for="TransTransactorDef.Name" class="control-label"></label>
+                <input asp-for="TransTransactorDef.Name" class="form-control form-control-sm" />
+                <span asp-validation-for="TransTransactorDef.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-2">
+                <label asp-for="TransTransactorDef.DefaultDocSeriesId"></label>
+                <select asp-for="TransTransactorDef.DefaultDocSeriesId" class="form-control form-control-sm" asp-items="ViewBag.DefaultDocSeriesId"></select>
+            </div>
+            <div class="form-group col-md-2">
+                <label asp-for="TransTransactorDef.CompanyId" class="control-label"></label>
+                <select asp-for="TransTransactorDef.CompanyId" class="form-control form-control-sm" asp-items="ViewBag.CompanyId"></select>
+                <span asp-validation-for="TransTransactorDef.CompanyId" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-1 ">
+
+                <label asp-for="TransTransactorDef.Active"></label>
+                <input asp-for="TransTransactorDef.Active" class="form-check form-control-sm" />
+
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label asp-for="TransTransactorDef.FinancialTransAction" class="control-label"></label>
+                <select asp-for="TransTransactorDef.FinancialTransAction" class="form-control form-control-sm" asp-items="ViewBag.FinancialActions"></select>
+                <span asp-validation-for="TransTransactorDef.FinancialTransAction" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-4">
+                <label asp-for="TransTransactorDef.TurnOverTransId" class="control-label"></label>
+                <select asp-for="TransTransactorDef.TurnOverTransId" class="form-control form-control-sm" asp-items="ViewBag.TurnOverTransId"></select>
+                <span asp-validation-for="TransTransactorDef.TurnOverTransId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary btn-sm" />
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

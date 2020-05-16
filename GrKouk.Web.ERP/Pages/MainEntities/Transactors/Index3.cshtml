@@ -1,0 +1,266 @@
+﻿@page
+@model GrKouk.Web.Erp.Pages.MainEntities.Transactors.Index3Model
+
+@{
+    ViewData["Title"] = "Transactors List";
+}
+
+<h4>Συναλλασόμενοι</h4>
+<div class="container ">
+    <ul class="nav small justify-content-end ">
+        <li class="nav-item">
+            <a asp-page="Create" class="nav-link"
+               asp-route-sortOrder="@Model.CurrentSort"
+               asp-route-pageIndex="@(Model.ListItems.CurrentPage)"
+               asp-route-currentFilter="@Model.CurrentFilter"
+               asp-route-PageSize="@Model.PageSize">Create New</a>
+        </li>
+        <li class="nav-item">
+            <a asp-page="./Isozigio2" class="nav-link">Ισοζύγιο</a>
+        </li>
+        @{
+            if (Model.RelevantDiarys.Count > 0)
+            {
+                <li class="nav-item dropdown ">
+                    <a class="nav-link dropdown-toggle " role="button" id="ddDiarys" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">Ημερολόγια</a>
+                    <div class="dropdown-menu small">
+                        <h6 class="dropdown-header">Σχετικά Ημερολόγια</h6>
+                        @{
+                            foreach (var modelRelevantDiary in Model.RelevantDiarys)
+                            {
+                                <a asp-page="./RunDiary" class="dropdown-item small"
+                                   asp-route-parentPageSize="@Model.PageSize"
+                                   asp-route-transactorTypeFilter="@Model.CurrentTransactorTypeFilter"
+                                   asp-route-parentPageIndex="@Model.ListItems.CurrentPage "
+                                   asp-route-diaryId="@modelRelevantDiary.Value">@modelRelevantDiary.Text</a>
+                            }
+
+                        }
+                    </div>
+                </li>
+            }
+            else
+            {
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Ημερολόγια</a>
+                </li>
+            }
+        }
+
+        <li class="nav-item">
+            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+        </li>
+    </ul>
+</div>
+
+
+
+<form class="form-inline" asp-page="./Index" method="get">
+    <div class="container">
+        <div class="form-row">
+
+            <div class="form-group col-md-auto">
+                <label class="small"> Search:</label>
+                <input class="form-control form-control-sm small" type="text" name="SearchString" value="@Model.CurrentFilter" />
+                <input type="submit" value="Search" class="btn btn-light btn-sm" />
+            </div>
+            <div class="form-group col-md-auto">
+                <a class="small" asp-page="./Index"
+                   asp-route-sortOrder="@Model.CurrentSort"
+                   asp-route-pageIndex="@(Model.ListItems.CurrentPage)"
+                   asp-route-currentFilter="@Model.CurrentFilter"
+                   asp-route-datePeriodFilter="CURMONTH"
+                   asp-route-PageSize="@Model.PageSize">Back to full List</a>
+            </div>
+            <div class="form-group col-md-auto">
+                <label class="small"> Transactor Type:</label>
+                <select name="TransactorTypeFilter" asp-for="CurrentTransactorTypeFilter" class="form-control form-control-sm small"
+                        asp-items="ViewBag.TransactorTypeId" onchange="this.form.submit()"></select>
+
+            </div>
+            <div class="form-group col-md-auto">
+                <label class="small"> Page Size:</label>
+                <select asp-for="PageSize" onchange="this.form.submit()" class="form-control form-control-sm small"
+                        asp-items="ViewBag.PageFilterSize">
+                </select>
+            </div>
+            <div class="form-group col-md-auto">
+                <small>
+
+                    Page:@Model.ListItems.CurrentPage of @Model.ListItems.TotalPages Total Items @Model.ListItems.TotalCount
+                </small>
+            </div>
+
+        </div>
+    </div>
+</form>
+
+
+<br />
+<table class="table table-bordered table-sm">
+    <thead class="thead-light">
+        <tr>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].Code)
+            </th>
+            <th class="small">
+                <a asp-page="./Index" asp-route-sortOrder="@Model.NameSort"
+                   asp-route-searchString="@Model.CurrentFilter"
+                   asp-route-transactorTypeFilter="@Model.CurrentTransactorTypeFilter"
+                   asp-route-PageSize="@Model.PageSize">
+                    @Html.DisplayNameFor(model => model.ListItems[0].Name)
+                </a>
+                <i class="@Model.NameSortIcon"></i>
+            </th>
+
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].EMail)
+            </th>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].TransactorTypeCode)
+            </th>
+
+            <th class="small"></th>
+            <th class="small"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.ListItems)
+        {
+            <tr>
+                <td class="small">
+                    @Html.DisplayFor(modelItem => item.Code)
+                </td>
+                <td class="small">
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td class="small">
+                    @Html.DisplayFor(modelItem => item.EMail)
+                </td>
+                <td class="small">
+                    @Html.DisplayFor(modelItem => item.TransactorTypeCode)
+                </td>
+
+                <td class="small">
+                    <a asp-page="./Edit" asp-route-id="@item.Id"><i class="fas fa-edit" style="color:slategray"></i></a> |
+                    <a asp-page="./Details" asp-route-id="@item.Id"><i class="fas fa-info-circle" style="color: slategray"></i></a> |
+                    <a asp-page="./Delete" asp-route-id="@item.Id"><i class="fas fa-trash" style="color:slategray"></i></a> |
+                    <a class=" dropdown-toggle" role="button" id="dropdownMenuButton" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false"><i class="fas fa-bars" style="color:slategray"></i></a>
+                    <div class="dropdown-menu small" aria-labelledby="dropdownMenuButton">
+                        <h6 class="dropdown-header">Available Actions</h6>
+                        <a asp-page="./Kartela" class="dropdown-item"
+                           asp-route-transactorTypeFilter="@Model.CurrentTransactorTypeFilter"
+                           asp-route-parentPageSize="@Model.PageSize"
+                           asp-route-parentPageIndex="@Model.ListItems.CurrentPage "
+                           asp-route-transactorId="@item.Id"
+                           asp-route-transactorName="@item.Name">Kartella</a>
+                        <a class="dropdown-item" role="button" href="#" data-toggle="modal" data-transactorId="@item.Id"
+                           data-target="#transactorInfo">Open Modal</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+@{
+    var prevDisabled = !Model.ListItems.HasPrevious ? "disabled" : "";
+    var nextDisabled = !Model.ListItems.HasNext ? "disabled" : "";
+}
+
+
+<nav aria-label="Page navigation example">
+    <ul class="pagination pagination-sm">
+        <li class="page-item @prevDisabled">
+            <a asp-page="./Index"
+               asp-route-sortOrder="@Model.CurrentSort"
+               asp-route-pageIndex="1"
+               asp-route-searchFilter="@Model.CurrentFilter"
+               asp-route-transactorTypeFilter="@Model.CurrentTransactorTypeFilter"
+               asp-route-PageSize="@Model.PageSize"
+               class="page-link" aria-label="First">
+                @*<span aria-hidden="true">;</span>*@
+                First
+            </a>
+        </li>
+        <li class="page-item @prevDisabled">
+            <a asp-page="./Index"
+               asp-route-sortOrder="@Model.CurrentSort"
+               asp-route-pageIndex="@(Model.ListItems.CurrentPage - 1)"
+               asp-route-searchFilter="@Model.CurrentFilter"
+               asp-route-transactorTypeFilter="@Model.CurrentTransactorTypeFilter"
+               asp-route-PageSize="@Model.PageSize"
+               class="page-link" aria-label="Previous">
+                @*<span aria-hidden="true">&laquo;</span>*@
+                Previous
+            </a>
+        </li>
+        @*<li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>*@
+        <li class="page-item @nextDisabled">
+            <a asp-page="./Index"
+               asp-route-sortOrder="@Model.CurrentSort"
+               asp-route-pageIndex="@(Model.ListItems.CurrentPage + 1)"
+               asp-route-searchFilter="@Model.CurrentFilter"
+               asp-route-transactorTypeFilter="@Model.CurrentTransactorTypeFilter"
+               asp-route-PageSize="@Model.PageSize"
+               class="page-link" aria-label="Next">
+                @*<span aria-hidden="true">&raquo;</span>*@
+                Next
+            </a>
+        </li>
+        <li class="page-item  @nextDisabled">
+            <a asp-page="./Index"
+               asp-route-sortOrder="@Model.CurrentSort"
+               asp-route-pageIndex="@Model.ListItems.TotalPages"
+               asp-route-searchFilter="@Model.CurrentFilter"
+               asp-route-transactorTypeFilter="@Model.CurrentTransactorTypeFilter"
+               asp-route-PageSize="@Model.PageSize"
+               class="page-link" aria-label="First">
+                @*<span aria-hidden="true">;</span>*@
+                Last
+            </a>
+        </li>
+    </ul>
+</nav>
+
+
+
+<!-- Modal για καρτέλα ίσως?????? -->
+
+<div class="modal fade" id="transactorInfo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Transactor Info</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $('#transactorInfo').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var recipient = button.data('transactorid'); // Extract info from data-* attributes
+            // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+            // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+            var modal = $(this);
+            modal.find('.modal-title').text('New message to ' + recipient);
+            // modal.find('.modal-body input').val(recipient)
+        })
+    </script>
+}

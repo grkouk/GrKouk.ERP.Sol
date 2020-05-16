@@ -1,0 +1,140 @@
+﻿@page
+@model DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>WarehouseTransaction</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.TransDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.TransDate)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.TransWarehouseDocSeries)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.TransWarehouseDocSeries.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.TransWarehouseDocType)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.TransWarehouseDocType.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.TransRefCode)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.TransRefCode)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.Section)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.Section.Code)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.WarehouseItem)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.WarehouseItem.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.FiscalPeriod)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.FiscalPeriod.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.TransactionType)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.TransactionType)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.CreatorId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.CreatorId)
+        </dd>
+       
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.FpaRate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.FpaRate)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.PrimaryUnitId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.PrimaryUnitId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.SecondaryUnitId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.SecondaryUnitId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.Quontity1)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.Quontity1)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.Quontity2)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.Quontity2)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.AmountFpa)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.AmountFpa)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.AmountNet)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.AmountNet)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.AmountDiscount)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.AmountDiscount)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.Etiology)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.Etiology)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.Company)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.Company.Code)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WarehouseTransaction.Timestamp)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WarehouseTransaction.Timestamp)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.WarehouseTransaction.Id">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>

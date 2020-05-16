@@ -1,0 +1,59 @@
+﻿@page
+@model GrKouk.Web.Erp.Pages.Configuration.BuyDocTypeDefinition.DeleteModel
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>BuyDocTypeDef</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocTypeDef.Code)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocTypeDef.Code)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocTypeDef.Abbr)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocTypeDef.Abbr)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocTypeDef.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocTypeDef.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocTypeDef.Active)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocTypeDef.Active)
+        </dd>
+       
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocTypeDef.TransWarehouseDef)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocTypeDef.TransWarehouseDef.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocTypeDef.Company)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocTypeDef.Company.Code)
+        </dd>
+    </dl>
+    
+    <form method="post">
+        <input type="hidden" asp-for="BuyDocTypeDef.Id" />
+        <input type="submit" value="Delete" class="btn btn-default" /> |
+        <a asp-page="./Index">Back to List</a>
+    </form>
+</div>

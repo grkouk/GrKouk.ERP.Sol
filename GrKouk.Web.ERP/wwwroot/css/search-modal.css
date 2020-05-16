@@ -1,0 +1,48 @@
+﻿
+
+.modal-topmost {
+    z-index: 1052 !important;
+}
+
+
+/*Solutions for scrolbars in modal dialog*/
+/*solution 1*/
+/*.modal {
+    display: block !important;
+}
+
+.modal-dialog {
+    overflow-y: initial !important
+}
+
+.modal-body {
+    height: 250px;
+    overflow-y: auto;
+}*/
+/*solution 2*/
+.modal-dialog {
+    overflow-y: initial !important
+}
+
+.modal-body {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+/*solution 3*/
+/*.modal-body {
+    height: 250px;
+    overflow-y: auto;
+}
+
+@media (min-height: 500px) {
+    .modal-body {
+        height: 400px;
+    }
+}
+
+@media (min-height: 800px) {
+    .modal-body {
+        height: 600px;
+    }
+}*/

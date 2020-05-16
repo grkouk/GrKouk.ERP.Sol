@@ -1,0 +1,43 @@
+﻿@page
+@model GrKouk.Web.Erp.Pages.CommonEntities.MeasureUnits.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>MeasureUnit</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.MeasureUnit.Code)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MeasureUnit.Code)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.MeasureUnit.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MeasureUnit.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.MeasureUnit.Active)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MeasureUnit.Active)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.MeasureUnit.DecimalPlaces)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MeasureUnit.DecimalPlaces)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.MeasureUnit.Id">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>

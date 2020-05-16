@@ -1,0 +1,37 @@
+﻿@page
+@model GrKouk.Web.Erp.Pages.Configuration.FinancialMovements.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>FinancialMovement</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.FinancialMovement.Code)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.FinancialMovement.Code)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.FinancialMovement.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.FinancialMovement.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.FinancialMovement.Action)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.FinancialMovement.Action)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.FinancialMovement.Id">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>

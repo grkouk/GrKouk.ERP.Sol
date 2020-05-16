@@ -1,0 +1,139 @@
+﻿@page
+@model DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>TransactorTransaction</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorTransaction.TransDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorTransaction.TransDate)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorTransaction.TransTransactorDocSeries)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorTransaction.TransTransactorDocSeries.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorTransaction.TransTransactorDocType)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorTransaction.TransTransactorDocType.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorTransaction.TransRefCode)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorTransaction.TransRefCode)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorTransaction.Transactor)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorTransaction.Transactor.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorTransaction.Section)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorTransaction.Section.Code)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorTransaction.CreatorId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorTransaction.CreatorId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorTransaction.FiscalPeriod)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorTransaction.FiscalPeriod.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorTransaction.FinancialAction)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorTransaction.FinancialAction)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorTransaction.FpaRate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorTransaction.FpaRate)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorTransaction.DiscountRate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorTransaction.DiscountRate)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorTransaction.AmountFpa)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorTransaction.AmountFpa)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorTransaction.AmountNet)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorTransaction.AmountNet)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorTransaction.AmountDiscount)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorTransaction.AmountDiscount)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorTransaction.TransFpaAmount)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorTransaction.TransFpaAmount)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorTransaction.TransNetAmount)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorTransaction.TransNetAmount)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorTransaction.TransDiscountAmount)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorTransaction.TransDiscountAmount)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorTransaction.Etiology)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorTransaction.Etiology)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorTransaction.Company)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorTransaction.Company.Code)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransactorTransaction.Timestamp)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransactorTransaction.Timestamp)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.TransactorTransaction.Id">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>

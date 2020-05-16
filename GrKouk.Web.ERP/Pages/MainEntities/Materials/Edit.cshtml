@@ -1,0 +1,132 @@
+﻿@page
+@model GrKouk.Web.ERP.Pages.MainEntities.Materials.EditModel
+
+@{
+    ViewData["Title"] = "WarehouseItem Edit";
+}
+
+<h4>Edit WarehouseItem</h4>
+<hr />
+
+<div class="container">
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="WarehouseItemVm.Id" />
+        <input type="hidden" asp-for="WarehouseItemVm.Timestamp" />
+        <div class="form-row">
+            <div class="form-group col-md-2">
+                <label asp-for="WarehouseItemVm.Code" class="control-label small"></label>
+                <input asp-for="WarehouseItemVm.Code" class="form-control form-control-sm small" />
+                <span asp-validation-for="WarehouseItemVm.Code" class="text-danger small"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="WarehouseItemVm.Name" class="control-label small"></label>
+                <input asp-for="WarehouseItemVm.Name" class="form-control form-control-sm small" />
+                <span asp-validation-for="WarehouseItemVm.Name" class="text-danger small"></span>
+            </div>
+
+            <div class="form-group col-md-3">
+                <label asp-for="WarehouseItemVm.WarehouseItemNature" class="control-label small"></label>
+                <select asp-for="WarehouseItemVm.WarehouseItemNature" class="form-control form-control-sm small" asp-items="ViewBag.MaterialNatures"></select>
+                <span asp-validation-for="WarehouseItemVm.WarehouseItemNature" class="text-danger small"></span>
+            </div>
+            <div class="form-group col-md-1 ">
+                <label asp-for="WarehouseItemVm.Active" class="small"></label>
+                <input asp-for="WarehouseItemVm.Active" class="form-check form-control-sm" />
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <label asp-for="WarehouseItemVm.ShortDescription" class="small"></label>
+                <textarea asp-for="WarehouseItemVm.ShortDescription" class="form-control form-control-sm small" placeholder="Σύντομη Περιγραφή"> </textarea>
+                <span asp-validation-for="WarehouseItemVm.ShortDescription" class="text-danger small"></span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-12">
+                <label asp-for="WarehouseItemVm.Description" class="small"></label>
+                <textarea asp-for="WarehouseItemVm.Description" class="form-control form-control-sm small" placeholder="Περιγραφή"> </textarea>
+                <span asp-validation-for="WarehouseItemVm.Description" class="text-danger small"></span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label asp-for="WarehouseItemVm.MainMeasureUnitId" class="control-label small"></label>
+                <select asp-for="WarehouseItemVm.MainMeasureUnitId" class="form-control form-control-sm small" asp-items="ViewBag.MainMeasureUnitId"></select>
+            </div>
+            <div class="form-group col-md-3">
+                <label asp-for="WarehouseItemVm.SecondaryMeasureUnitId" class="control-label small"></label>
+                <select asp-for="WarehouseItemVm.SecondaryMeasureUnitId" class="form-control form-control-sm small" asp-items="ViewBag.SecondaryMeasureUnitId"></select>
+            </div>
+            <div class="form-group col-md-1">
+                <label asp-for="WarehouseItemVm.SecondaryUnitToMainRate" class="control-label small"></label>
+                <input asp-for="WarehouseItemVm.SecondaryUnitToMainRate" class="form-control form-control-sm small" />
+                <span asp-validation-for="WarehouseItemVm.SecondaryUnitToMainRate" class="text-danger small"></span>
+            </div>
+            <div class="form-group col-md-3">
+                <label asp-for="WarehouseItemVm.BuyMeasureUnitId" class="control-label small"></label>
+                <select asp-for="WarehouseItemVm.BuyMeasureUnitId" class="form-control form-control-sm small" asp-items="ViewBag.BuyMeasureUnitId"></select>
+            </div>
+            <div class="form-group col-md-1">
+                <label asp-for="WarehouseItemVm.BuyUnitToMainRate" class="control-label small"></label>
+                <input asp-for="WarehouseItemVm.BuyUnitToMainRate" class="form-control form-control-sm small" />
+                <span asp-validation-for="WarehouseItemVm.BuyUnitToMainRate" class="text-danger small"></span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-2">
+                <label asp-for="WarehouseItemVm.FpaDefId" class="control-label small"></label>
+                <select asp-for="WarehouseItemVm.FpaDefId" class="form-control form-control-sm small" asp-items="ViewBag.FpaDefId"></select>
+            </div>
+            <div class="form-group col-md-3">
+                <label asp-for="WarehouseItemVm.BarCode" class="control-label small"></label>
+                <input asp-for="WarehouseItemVm.BarCode" class="form-control form-control-sm small" />
+                <span asp-validation-for="WarehouseItemVm.BarCode" class="text-danger small"></span>
+            </div>
+            <div class="form-group col-md-3">
+                <label asp-for="WarehouseItemVm.ManufacturerCode" class="control-label small"></label>
+                <input asp-for="WarehouseItemVm.ManufacturerCode" class="form-control form-control-sm small" />
+                <span asp-validation-for="WarehouseItemVm.ManufacturerCode" class="text-danger small"></span>
+            </div>
+            <div class="form-group col-md-2">
+                <label asp-for="WarehouseItemVm.PriceNetto" class="control-label small"></label>
+                <input asp-for="WarehouseItemVm.PriceNetto" class="form-control form-control-sm small" />
+                <span asp-validation-for="WarehouseItemVm.PriceNetto" class="text-danger small"></span>
+            </div>
+            <div class="form-group col-md-2">
+                <label asp-for="WarehouseItemVm.PriceBrutto" class="control-label small"></label>
+                <input asp-for="WarehouseItemVm.PriceBrutto" class="form-control form-control-sm small" />
+                <span asp-validation-for="WarehouseItemVm.PriceBrutto" class="text-danger small"></span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label asp-for="WarehouseItemVm.MaterialType" class="control-label small"></label>
+                <select asp-for="WarehouseItemVm.MaterialType" class="form-control form-control-sm small" asp-items="ViewBag.MaterialType"></select>
+                <span asp-validation-for="WarehouseItemVm.MaterialType" class="text-danger small"></span>
+            </div>
+            <div class="form-group col-md-3">
+                <label asp-for="WarehouseItemVm.MaterialCategoryId" class="control-label small"></label>
+                <select asp-for="WarehouseItemVm.MaterialCategoryId" class="form-control form-control-sm small" asp-items="ViewBag.MaterialCategoryId"></select>
+            </div>
+           
+            <div class="form-group col-md-3">
+                <label asp-for="WarehouseItemVm.CompanyId" class="control-label small"></label>
+                <select asp-for="WarehouseItemVm.CompanyId" class="form-control form-control-sm small" asp-items="ViewBag.CompanyId"></select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <input type="submit" value="Update" class="btn btn-primary btn-sm" />
+            </div>
+        </div>
+    </form>
+</div>
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

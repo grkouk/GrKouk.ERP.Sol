@@ -1,0 +1,62 @@
+﻿@page
+@model Delete
+@{
+    ViewData["Title"] = "Delete Recurring Doc";
+}
+
+<h4>Delete Recurring Document</h4>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>BuyDocument</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.ItemVm.NextTransDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ItemVm.NextTransDate)
+        </dd>
+       
+        <dt>
+            @Html.DisplayNameFor(model => model.ItemVm.Transactor)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ItemVm.Transactor.Name)
+        </dd>
+        
+       
+        <dt>
+            @Html.DisplayNameFor(model => model.ItemVm.AmountFpa)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ItemVm.AmountFpa)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ItemVm.AmountNet)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ItemVm.AmountNet)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ItemVm.AmountDiscount)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ItemVm.AmountDiscount)
+        </dd>
+       
+        <dt>
+            @Html.DisplayNameFor(model => model.ItemVm.Company)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ItemVm.Company.Code)
+        </dd>
+       
+    </dl>
+    
+    <form method="post">
+        <input type="hidden" asp-for="ItemVm.Id" />
+        <input type="submit" value="Delete" class="btn btn-default" /> |
+        <a asp-page="./Index">Back to List</a>
+    </form>
+</div>

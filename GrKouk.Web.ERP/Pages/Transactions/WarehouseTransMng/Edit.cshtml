@@ -1,0 +1,351 @@
+﻿@page
+@model EditModel
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    ViewData["Title"] = "Warehouse Transaction Modify";
+    var formDisabled = Model.NotUpdatable ? "disabled" : "";
+}
+
+<h2>Edit</h2>
+@{
+    if (Model.NotUpdatable)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>Not updateable!</strong> This transaction is from other section and cannot be updated.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+}
+
+<h4>WarehouseTransaction</h4>
+<hr />
+
+<div class="container">
+
+    <form method="post">
+        <fieldset @formDisabled>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ItemVm.Id" />
+            <input type="hidden" asp-for="ItemVm.Timestamp" />
+            <input type="hidden" asp-for="ItemVm.SectionId" />
+            <input type="hidden" asp-for="ItemVm.PrimaryUnitId" />
+            <input type="hidden" asp-for="ItemVm.SecondaryUnitId" />
+            <input type="hidden" asp-for="ItemVm.UnitFactor" />
+            <input type="hidden" asp-for="@Model.InitialLoad" id="IsInitialLoad" />
+            @* <input type="hidden" asp-for="ItemVm.TransWarehouseDocTypeId" />*@
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label asp-for="ItemVm.TransDate" class="small"></label>
+                    <input asp-for="ItemVm.TransDate" class="form-control form-control-sm small" autofocus />
+                    <span asp-validation-for="ItemVm.TransDate" class="text-danger small"></span>
+                </div>
+                <div class="form-group col-md-6">
+                    <label asp-for="ItemVm.TransWarehouseDocSeriesId" class="small"></label>
+                    <div class="input-group ">
+                        <select asp-for="ItemVm.TransWarehouseDocSeriesId" class="form-control form-control-sm small" asp-items="ViewBag.TransWarehouseDocSeriesId"></select>
+                        <div class="input-group-append">
+                            <span class="form-control-sm small" id="seriesLoading" hidden><i class="fas fa-spinner fa-spin"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label asp-for="ItemVm.TransRefCode" class="small"></label>
+                    <input asp-for="ItemVm.TransRefCode" class="form-control form-control-sm small" />
+                    <span asp-validation-for="ItemVm.TransRefCode" class="text-danger small"></span>
+                </div>
+
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label asp-for="ItemVm.WarehouseItemId" class="small " id="materialLabel"></label>
+                    <div class="input-group ">
+                        <select asp-for="ItemVm.WarehouseItemId" class="form-control form-control-sm small " asp-items="ViewBag.WarehouseItemId"></select>
+                        <div class="input-group-append">
+                            <span class="form-control-sm small" id="matLoading" hidden><i class="fas fa-spinner fa-spin"></i></span>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="form-group col-md-3">
+                    <label asp-for="ItemVm.FiscalPeriodId" class="small"></label>
+                    <select asp-for="ItemVm.FiscalPeriodId" class="form-control form-control-sm small" asp-items="ViewBag.FiscalPeriodId" readonly></select>
+                    <span asp-validation-for="ItemVm.FiscalPeriodId" class="text-danger small"></span>
+                    </div>
+                <div class="form-group col-md-3">
+                    <label asp-for="ItemVm.CompanyId" class="small"></label>
+                    <select asp-for="ItemVm.CompanyId" class="form-control form-control-sm small" asp-items="ViewBag.CompanyId"></select>
+                </div>
+            </div>
+           
+            <div class="form-row">
+                <div class="form-group  col-md-2">
+                    <label asp-for="ItemVm.Quontity1" class="small"></label>
+                    <div class="input-group ">
+                        <input asp-for="ItemVm.Quontity1" class="form-control form-control-sm small" />
+                        <div class="input-group-append">
+                            <span class="input-group-text form-control-sm small" id="primaryUnitCode">@Model.ItemVm.PrimaryUnitCode</span>
+                        </div>
+                    </div>
+                    <span asp-validation-for="ItemVm.Quontity1" class="text-danger small"></span>
+                </div>
+                <div class="form-group col-md-2">
+                    <label asp-for="ItemVm.Quontity2" class="small"></label>
+                    <div class="input-group">
+                        <input asp-for="ItemVm.Quontity2"  class="form-control form-control-sm small" />
+                        <div class="input-group-append">
+                            <span class="input-group-text form-control-sm small" id="secondaryUnitCode" >@Model.ItemVm.SecondaryUnitCode</span>
+                        </div>
+                    </div>
+
+                    <span asp-validation-for="ItemVm.Quontity2" class="text-danger small"></span>
+                </div>
+                <div class="form-group col-md-2">
+                    <label asp-for="ItemVm.UnitPrice" class="small"></label>
+                    <input asp-for="ItemVm.UnitPrice"  class="form-control form-control-sm small" />
+                    <span asp-validation-for="ItemVm.UnitPrice" class="text-danger small"></span>
+                </div>
+
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-1">
+                    <label asp-for="ItemVm.FpaRate" class="small"></label>
+                    <input asp-for="ItemVm.FpaRate" class="form-control form-control-sm small" />
+                    <span asp-validation-for="ItemVm.FpaRate" class="text-danger small"></span>
+                </div>
+                <div class="form-group col-md-2">
+                    <label asp-for="ItemVm.AmountNet" class="small"></label>
+                    <input asp-for="ItemVm.AmountNet"  class="form-control form-control-sm small" readonly />
+                    <span asp-validation-for="ItemVm.AmountNet" class="text-danger small"></span>
+                </div>
+                <div class="form-group col-md-2">
+                    <label asp-for="ItemVm.AmountFpa" class="small"></label>
+                    <input asp-for="ItemVm.AmountFpa" class="form-control form-control-sm small" readonly />
+                    <span asp-validation-for="ItemVm.AmountFpa" class="text-danger small"></span>
+                </div>
+                <div class="form-group col-md-2">
+                    <label asp-for="ItemVm.AmountDiscount" class="small"></label>
+                    <input asp-for="ItemVm.AmountDiscount" class="form-control form-control-sm small" />
+                    <span asp-validation-for="ItemVm.AmountDiscount" class="text-danger small"></span>
+                </div>
+                <div class="form-group col-md-2">
+                    <label asp-for="ItemVm.AmountSum" class="small">Sum</label>
+                    <input asp-for="ItemVm.AmountSum"  class="form-control form-control-sm small" disabled />
+
+                </div>
+
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label asp-for="ItemVm.Etiology" class="small"></label>
+                    <textarea asp-for="ItemVm.Etiology" class="form-control form-control-sm small" placeholder="Αιτιολογία Κίνησης"> </textarea>
+                    <span asp-validation-for="ItemVm.Etiology" class="text-danger small"></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <input type="submit" value="Update" class="btn btn-primary btn-sm" />
+                </div>
+            </div>
+        </fieldset>
+    </form>
+</div>
+
+
+
+<div>
+    <a class="small" asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(() => {
+           
+            //#region Variables
+            var $initialLoad = $('#IsInitialLoad');
+            var $material = $('#ItemVm_WarehouseItemId');
+            var $unitPrice = $('#ItemVm_UnitPrice');
+            var $Q1 = $('#ItemVm_Quontity1');
+            var $Q2 = $('#ItemVm_Quontity2');
+            var $amountNet = $('#ItemVm_AmountNet');
+            var $amountFpa = $('#ItemVm_AmountFpa');
+            var $amountDic = $('#ItemVm_AmountDiscount');
+            var $transDate = $('#ItemVm_TransDate');
+            var $primUnitId = $('#ItemVm_PrimaryUnitId');
+            var $secUnitId = $('#ItemVm_SecondaryUnitId');
+            var $unitFactor = $('#ItemVm_UnitFactor');
+            var $sumAmount = $('#ItemVm_AmountSum');
+            var $fpaRate = $('#ItemVm_FpaRate');
+            var $primaryUnitCode = $('#primaryUnitCode');
+            var $secondaryUnitCode = $('#secondaryUnitCode');
+            var $fiscalPeriod = $('#ItemVm_FiscalPeriodId');
+            var $series = $('#ItemVm_TransWarehouseDocSeriesId');
+            var $transType = $('#ItemVm_TransactionType');
+            //#endregion
+            var calculateAmounts = () => {
+                console.log("Calculate Values called");
+                var q1Val = parseFloat($Q1.val());
+                var fpaRate = parseFloat($fpaRate.val());
+                var unitPrice = parseFloat($unitPrice.val());
+                var amountDic = parseFloat($amountDic.val());
+                var amountNet = q1Val * unitPrice;
+                var amountFpa = (amountNet - amountDic) * fpaRate;
+
+                $amountNet.val(amountNet);
+                $amountFpa.val(amountFpa);
+
+                $sumAmount.val(amountNet + amountFpa - amountDic);
+            };
+            var materialChanged = () => {
+                console.log("WarehouseItem changed called");
+                var $spinner = $('#matLoading');
+                $spinner.attr('hidden', false);
+                var materialId = $material.val();
+                console.log("WarehouseItem change event ->" + materialId);
+
+                var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
+                var finalUri = `${uri}/materials/materialdata?warehouseItemId=${materialId}`;
+
+                fetch(finalUri)
+                    .then(function(response) {
+                        if (response.ok) {
+                            return response.json();
+                        } else {
+                            return "";
+                        }
+
+                    })
+                    .then(function(myJson) {
+                        if (myJson) {
+                            console.log(JSON.stringify(myJson));
+                            var rate = parseFloat(myJson.fpaRate);
+                            var lastPrice = parseFloat(myJson.lastPrice);
+                            var fpaId = myJson.fpaId;
+                            //I Use main unit and Buy Unit as secondary
+                            $primaryUnitCode.text(` ${myJson.mainUnitCode}`);
+                            $secondaryUnitCode.text(` ${myJson.secUnitCode}`);
+                            $fpaRate.val(rate);
+                            //$('#WarehouseItemFpaId').val(fpaId);
+                            $unitPrice.val(lastPrice);
+                            $primUnitId.val(myJson.mainUnitId);
+                            $secUnitId.val(myJson.secUnitId);
+                            $unitFactor.val(myJson.factorSeq);
+                        }
+                        $spinner.attr('hidden', true);
+                    })
+                    .catch((error) => {
+                            $spinner.attr('hidden', true);
+                            console.log(error);
+                        }
+                    );
+
+            };
+            var seriesChanged = () => {
+                var $spinner = $('#seriesLoading');
+                $spinner.attr('hidden', false);
+                var seriesId = $series.val();
+                console.log("Series change event ->" + seriesId);
+
+                var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
+                var finalUri = `${uri}/materials/WarehouseTransType?seriesId=${seriesId}`;
+                fetch(finalUri)
+                    .then(function(response) {
+                        if (response.ok) {
+                            return response.json();
+                        } else {
+                            return "";
+                        }
+
+                    })
+                    .then(function(myJson) {
+                        if (myJson) {
+                            console.log(JSON.stringify(myJson));
+                            var type = myJson.transType;
+                           
+                            $transType.val(type);
+                        }
+                        $spinner.attr('hidden', true);
+                    })
+                    .catch((error) => {
+                            $spinner.attr('hidden', true);
+                            console.log(error);
+                        }
+                    );
+
+            };
+            var transactionDateChanged = () => {
+                console.log("Inside transDate Changed");
+
+                var forDate = $transDate.val();
+                var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
+                var finalUri = `${uri}/materials/FiscalPeriod?forDate=${forDate}`;
+                fetch(finalUri)
+                    .then(function(response) {
+                        if (response.ok) {
+                            return response.json();
+                        } else {
+                            return "-1";
+                        }
+
+                    })
+                    .then(function(myJson) {
+                        console.log("Inside fetch then with myJson" + JSON.stringify(myJson));
+                        if (myJson) {
+
+                            var fiscalPeriodId = myJson.periodId;
+                            console.log("Returned PeriodId=" + fiscalPeriodId);
+                            $fiscalPeriod.val(fiscalPeriodId);
+                        }
+                        // $spinner.attr('hidden', true);
+                    })
+                    .catch((error) => {
+                            // $spinner.attr('hidden', true);
+                            console.log(error);
+                        }
+                    );
+            };
+            $transDate.change(() => {
+                transactionDateChanged();
+            });
+            $Q1.change(() => {
+                console.log("Q1 changed called");
+                var factor = parseFloat($unitFactor.val());
+                var q1val = parseFloat($Q1.val());
+                if (factor === 0) {
+                    return;
+                }
+                $Q2.val((q1val / factor).toFixed(2));
+                calculateAmounts();
+            });
+
+            $Q2.change(() => {
+                console.log("Q2 changed called");
+                var factor = parseFloat($unitFactor.val());
+                var q2val = parseFloat($Q2.val());
+                if (factor === 0) {
+                    return;
+                }
+                $Q1.val(q2val * factor);
+                calculateAmounts();
+            });
+            $fpaRate.change(() => {
+                calculateAmounts();
+            });
+            $amountDic.change(() => {
+                calculateAmounts();
+            });
+            $unitPrice.change(() => {
+                calculateAmounts();
+            });
+            $material.change(() => {
+                materialChanged();
+            });
+
+        });
+    </script>
+}

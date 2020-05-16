@@ -1,0 +1,358 @@
+﻿@page
+@model Index3Model
+
+@{
+    ViewData["Title"] = "WarehouseItems List";
+}
+
+<h4>WarehouseItems List</h4>
+<div class="container navbar-dark">
+    <ul class="nav justify-content-end small">
+        <li class="nav-item">
+            <a asp-page="Create" class="nav-link"
+               asp-route-parentSortOrder="@Model.CurrentSort"
+               asp-route-parentPageIndex="@(Model.ListItems.CurrentPage)"
+               asp-route-parentSearchFilter="@Model.CurrentFilter"
+               asp-route-parentWarehouseItemNatureFilter="@Model.WarehouseItemNatureFilter"
+               
+               asp-route-parentPageSize="@Model.PageSize"
+               asp-route-sessionId="-1"
+
+               >Create New</a>
+        </li>
+        <li class="nav-item">
+            <a asp-page="./Isozigio" class="nav-link"
+               asp-route-materialNatureFilter="@Model.WarehouseItemNatureFilter"
+               asp-route-parentPageSize="@Model.PageSize"
+               asp-route-parentPageIndex="@Model.ListItems.CurrentPage ">Ισοζύγιο</a>
+        </li>
+        <li class="nav-item">
+            <a asp-page="/MainEntities/MaterialCodes/index" class="nav-link"
+               asp-route-materialNatureFilter="@Model.WarehouseItemNatureFilter"
+               asp-route-parentPageSize="@Model.PageSize"
+               asp-route-parentPageIndex="@Model.ListItems.CurrentPage "
+               asp-route-sessionId="-1"
+               >WarehouseItem Codes</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+        </li>
+    </ul>
+</div>
+
+
+<form class="form-inline" asp-page="./Index" method="get">
+    <input type="hidden" id="SessionId"/>
+    <div class="container">
+        <div class="form-row">
+
+            <div class="form-group col-md-auto">
+                <label class="small"> Search:</label>
+                <input class="form-control form-control-sm small" type="text" name="SearchString" value="@Model.CurrentFilter"/>
+                <input type="submit" value="Search" class="btn btn-light btn-sm"/>
+            </div>
+            <div class="form-group col-md-auto">
+                <a class="small" asp-page="./Index"
+                   asp-route-sortOrder="@Model.CurrentSort"
+                   asp-route-pageIndex="@(Model.ListItems.CurrentPage)"
+                   asp-route-currentFilter="@Model.CurrentFilter"
+                   asp-route-warehouseItemNatureFilter="@Model.WarehouseItemNatureFilter"
+                   asp-route-PageSize="@Model.PageSize">Back to full List</a>
+            </div>
+            <div class="form-group col-md-auto">
+                <label class="small"> WarehouseItem Nature:</label>
+                <select name="WarehouseItemNatureFilter" asp-for="WarehouseItemNatureFilter" class="form-control form-control-sm small"
+                        asp-items="ViewBag.MaterialNatureValues"></select>
+                @*onchange="mySubmit(this)"*@
+            </div>
+            <div class="form-group col-md-auto">
+                <label class="small"> Page Size:</label>
+                <select asp-for="PageSize" onchange="this.form.submit()" class="form-control form-control-sm small"
+                        asp-items="ViewBag.PageFilterSize"></select>
+            </div>
+            <div class="form-group col-md-auto">
+                <small>
+
+                    Page:@Model.ListItems.CurrentPage of @Model.ListItems.TotalPages Total Items @Model.ListItems.TotalCount
+                </small>
+            </div>
+
+        </div>
+    </div>
+
+</form>
+<br />
+<table class="table table-bordered table-sm">
+    <thead class="thead-light">
+        <tr>
+            @*<th><input type="checkbox" /> </th>*@
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].Id)
+            </th>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].Code)
+            </th>
+            <th class="small">
+                <a asp-page="./Index" asp-route-sortOrder="@Model.NameSort"
+                   asp-route-searchFilter="@Model.CurrentFilter"
+                   asp-route-warehouseItemNatureFilter="@Model.WarehouseItemNatureFilter"
+                   asp-route-PageSize="@Model.PageSize">
+                    @Html.DisplayNameFor(model => model.ListItems[0].Name)
+                </a>
+            </th>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].MaterialCateroryName)
+            </th>
+
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].MaterialTypeName)
+            </th>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].WarehouseItemNatureName)
+            </th>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].FpaDefName)
+            </th>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].CompanyCode)
+            </th>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].Active)
+            </th>
+
+            <th class="small"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.ListItems)
+        {
+            <tr>
+                @* <td><input type="checkbox" /> </td>*@
+                <td class="small">
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td class="small">
+                    @Html.DisplayFor(modelItem => item.Code)
+                </td>
+                <td class="small">
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td class="small">
+                    @Html.DisplayFor(modelItem => item.MaterialCateroryName)
+                </td>
+
+                <td class="small">
+                    @Html.DisplayFor(modelItem => item.MaterialTypeName)
+                </td>
+                <td class="small">
+                    @Html.DisplayFor(modelItem => item.WarehouseItemNatureName)
+                </td>
+                <td class="small">
+                    @Html.DisplayFor(modelItem => item.FpaDefName)
+                </td>
+                <td class="small">
+                    @Html.DisplayFor(modelItem => item.CompanyCode)
+                </td>
+                <td class="small">
+                    @Html.DisplayFor(modelItem => item.Active)
+                </td>
+                <td class="small">
+                    <a asp-page="./Edit" asp-route-id="@item.Id"><i class="fas fa-edit" style="color: slategray"></i></a> |
+                    <a asp-page="./Details" asp-route-id="@item.Id"><i class="fas fa-info-circle" style="color: slategray"></i></a> |
+                    <a asp-page="./Delete" asp-route-id="@item.Id"><i class="fas fa-trash" style="color: slategray"></i></a> |
+                    <a class=" dropdown-toggle" role="button" id="dropdownMenuButton" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false"><i class="fas fa-bars" style="color: slategray"></i></a>
+                    <div class="dropdown-menu small" aria-labelledby="dropdownMenuButton">
+                        <h6 class="dropdown-header">Available Actions</h6>
+                        <a asp-page="./Kartela" class="dropdown-item"
+                           asp-route-warehouseItemNatureFilter="@Model.WarehouseItemNatureFilter"
+                           asp-route-parentPageSize="@Model.PageSize"
+                           asp-route-parentPageIndex="@Model.ListItems.CurrentPage "
+                           asp-route-transactorId="@item.Id"
+                           asp-route-transactorName="@item.Name">Kartella</a>
+                        <a class="dropdown-item" role="button" href="#" data-toggle="modal" data-transactorId="@item.Id"
+                           data-target="#transactorInfo">Open Modal</a>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@{
+    var prevDisabled = !Model.ListItems.HasPrevious ? "disabled" : "";
+    var nextDisabled = !Model.ListItems.HasNext ? "disabled" : "";
+}
+
+<nav aria-label="Page navigation example">
+    <ul class="pagination pagination-sm">
+        <li class="page-item @prevDisabled">
+            <a asp-page="./Index"
+               asp-route-sortOrder="@Model.CurrentSort"
+               asp-route-pageIndex="1"
+               asp-route-searchFilter="@Model.CurrentFilter"
+               asp-route-warehouseItemNatureFilter="@Model.WarehouseItemNatureFilter"
+               asp-route-PageSize="@Model.PageSize"
+               class="page-link" aria-label="First">
+                @*<span aria-hidden="true">;</span>*@
+                First
+            </a>
+        </li>
+        <li class="page-item @prevDisabled">
+            <a asp-page="./Index"
+               asp-route-sortOrder="@Model.CurrentSort"
+               asp-route-pageIndex="@(Model.ListItems.CurrentPage - 1)"
+               asp-route-searchFilter="@Model.CurrentFilter"
+               asp-route-warehouseItemNatureFilter="@Model.WarehouseItemNatureFilter"
+               asp-route-PageSize="@Model.PageSize"
+               class="page-link" aria-label="Previous">
+                @*<span aria-hidden="true">&laquo;</span>*@
+                Previous
+            </a>
+        </li>
+        @*<li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>*@
+        <li class="page-item @nextDisabled">
+            <a asp-page="./Index"
+               asp-route-sortOrder="@Model.CurrentSort"
+               asp-route-pageIndex="@(Model.ListItems.CurrentPage + 1)"
+               asp-route-searchFilter="@Model.CurrentFilter"
+               asp-route-warehouseItemNatureFilter="@Model.WarehouseItemNatureFilter"
+               asp-route-PageSize="@Model.PageSize"
+               class="page-link" aria-label="Next">
+                @*<span aria-hidden="true">&raquo;</span>*@
+                Next
+            </a>
+        </li>
+        <li class="page-item  @nextDisabled">
+            <a asp-page="./Index"
+               asp-route-sortOrder="@Model.CurrentSort"
+               asp-route-pageIndex="@Model.ListItems.TotalPages"
+               asp-route-searchFilter="@Model.CurrentFilter"
+               asp-route-warehouseItemNatureFilter="@Model.WarehouseItemNatureFilter"
+               asp-route-PageSize="@Model.PageSize"
+               class="page-link" aria-label="First">
+                @*<span aria-hidden="true">;</span>*@
+                Last
+            </a>
+        </li>
+    </ul>
+</nav>
+
+@section Scripts {
+    @*<script src="https://wzrd.in/standalone/uuidv4@latest"></script>*@
+    <script src="~/lib/node-uuid/uuid.min.js"></script>
+    <script>
+        //function mySubmit(item,e) {
+            
+        //   item.form.submit();
+        //}
+        $(document).ready(function () {
+            console.log("Inside Document ready event handler");
+            var mySubmit = (item, event) => {
+                var itemForm = item.form;
+
+                //var formData = item.form.serialize();
+                var formData = $(itemForm).serialize();
+                var formDataAr = $(itemForm).serializeArray();
+                formDataAr.push({
+                    name: 'sd',
+                    value:'Test Value'
+                });
+                $.get('', formDataAr);
+                // item.form.submit();
+            };
+
+            $('#WarehouseItemNatureFilter').on('change', function (event) {
+                mySubmit(this, event);
+
+            });
+            var guid = uuid();
+            $('#SessionId').val(guid);
+            var $alist = $('a[href*="&sessionId"]');
+            //#region CommentOut
+            //var sessionVal = sessionStorage.getItem('WarehouseItemsIndex');
+            //console.log('SessionVal for WarehouseItemsIndex=' + sessionVal);
+            //if (sessionVal) {
+            //     var filters = JSON.parse(sessionVal);
+            //}
+            //#endregion
+            $.each($alist,function (key, value) {
+                var href = value.href;
+                var aParams = href.substring(0, href.length).split('&');
+                var retStr = [];
+                $.each(aParams, function (key, value) {
+                    var vPair = value.split('=');
+                    if (vPair[0] === 'sessionId') {
+                        // var s = 'sessionId' + '=False';
+                        var sessionIdValue=$('#SessionId').val();
+                        var s = `sessionId=${sessionIdValue}`;
+                        retStr.push(s);
+                    } else {
+                        retStr.push(value);
+                    }
+                });
+                console.log('href=' + href);
+                console.log('aParams=' + aParams);
+                console.log('retStr=' + retStr);
+                var newHref = retStr.join('&');
+                console.log('new Href=' + newHref);
+                value.href = newHref;
+            });
+            function myChange(e) {
+
+            }
+        });
+        $(window).on( 'beforeunload',function(e)
+        {
+            //#region Variables
+            // var filtersVisible = $('#filterCollapse').hasClass('show');
+            // var $rowSelectorsColumn = $('th[name=selectAllRowsColumn]');
+
+            //var rowSelectorsNotVisible = $rowSelectorsColumn.is(':hidden');
+            //var rowSelectorsVisible = (rowSelectorsNotVisible )? false: true;
+            var $warehouseItemNatureFilter = $('[name=WarehouseItemNatureFilter]');
+            var searchFilterValue = '@Model.CurrentFilter';
+            var pageSize='@Model.ListItems.PageSize';
+            var pageIndex = '@Model.ListItems.CurrentPage';
+            var warehouseItemNatureFilter = '@Model.WarehouseItemNatureFilter';
+            var sortOrder = '@Model.CurrentSort';
+            var filtersArr = [];
+            //#endregion
+            //filtersArr.push({
+            //    filterKey:'filtersVisible',
+            //    filterValue:filtersVisible
+            //});
+            //filtersArr.push({
+            //    filterKey:'rowSelectorsVisible',
+            //    filterValue:rowSelectorsVisible
+            //});
+            filtersArr.push({
+                filterKey:'searchFilterValue',
+                filterValue:searchFilterValue
+            });
+            filtersArr.push({
+                filterKey:'sortOrder',
+                filterValue:sortOrder
+            });
+            filtersArr.push({
+                filterKey:'pageSize',
+                filterValue:pageSize
+            });
+            filtersArr.push({
+                filterKey:'pageIndex',
+                filterValue:pageIndex
+            });
+            filtersArr.push({
+                filterKey:'warehouseItemNatureFilter',
+                filterValue:warehouseItemNatureFilter
+            });
+            var sessionVal = JSON.stringify(filtersArr);
+            var sessionId = $('#SessionId').val();
+            sessionStorage.setItem('WarehouseItemsIndex', sessionVal);
+            sessionStorage.setItem(sessionId, sessionVal);
+        });
+    </script>
+}

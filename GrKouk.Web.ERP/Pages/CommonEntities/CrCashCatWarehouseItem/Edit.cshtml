@@ -1,0 +1,45 @@
+﻿@page
+@model GrKouk.Web.Erp.Pages.CommonEntities.CrCashCatWarehouseItem.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>ItemVm</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ItemVm.Id" />
+            <div class="form-group">
+                <label asp-for="ItemVm.ClientProfileId" class="control-label"></label>
+                <select asp-for="ItemVm.ClientProfileId" class="form-control" asp-items="ViewBag.ClientProfileId"></select>
+                <span asp-validation-for="ItemVm.ClientProfileId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ItemVm.CashRegCategoryId" class="control-label"></label>
+                <select asp-for="ItemVm.CashRegCategoryId" class="form-control" asp-items="ViewBag.CashRegCategoryId"></select>
+                <span asp-validation-for="ItemVm.CashRegCategoryId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ItemVm.WarehouseItemId" class="control-label"></label>
+                <select asp-for="ItemVm.WarehouseItemId" class="form-control" asp-items="ViewBag.WarehouseItemId"></select>
+                <span asp-validation-for="ItemVm.WarehouseItemId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

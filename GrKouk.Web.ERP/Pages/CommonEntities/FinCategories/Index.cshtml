@@ -1,0 +1,45 @@
+﻿@page
+@model GrKouk.Web.Erp.Pages.CommonEntities.FinCategories.IndexModel
+
+@{
+    ViewData["Title"] = "Financial Categories Index";
+}
+
+<h4>Financial Categories Index</h4>
+
+<p>
+    <small>
+        
+        <a asp-page="Create">Create New</a>
+        </small>
+</p>
+<table class="table table-bordered table-sm">
+    <thead>
+        <tr>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.FinTransCategory[0].Code)
+            </th>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.FinTransCategory[0].Name)
+            </th>
+            <th class="small"></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.FinTransCategory) {
+        <tr>
+            <td class="small">
+                @Html.DisplayFor(modelItem => item.Code)
+            </td>
+            <td class="small">
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td class="small">
+                <a asp-page="./Edit" asp-route-id="@item.Id"><i class="fas fa-edit"></i></a> |
+                <a asp-page="./Details" asp-route-id="@item.Id"><i class="fas fa-info-circle"></i></a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id"><i class="fas fa-trash"></i></a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

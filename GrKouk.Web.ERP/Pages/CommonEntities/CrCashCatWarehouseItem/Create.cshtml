@@ -1,0 +1,178 @@
+﻿@page
+@model GrKouk.Web.ERP.Pages.CommonEntities.CrCashCatWarehouseItem.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+@section MyCss
+{
+    @*<link rel="stylesheet" type="text/css" href="~/lib/bootstrap4-duallistbox/bootstrap-duallistbox.min.css" />*@
+}
+
+<h4>Cash register category products</h4>
+<hr />
+<div class="container">
+    <form id="ItemForm">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label asp-for="ItemVm.ClientProfileId" class="control-label small"></label>
+                <select asp-for="ItemVm.ClientProfileId" class="form-control form-control-sm small" asp-items="ViewBag.ClientProfileId"></select>
+                <span asp-validation-for="ItemVm.ClientProfileId" class="text-danger small"></span>
+            </div>
+
+            <div class="form-group col-md-3">
+                <label asp-for="ItemVm.CashRegCategoryId" class="control-label small"></label>
+                <select asp-for="ItemVm.CashRegCategoryId" class="form-control form-control-sm" asp-items="ViewBag.CashRegCategoryId"></select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-9">
+                <label class="h4">Select Products</label>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-4">
+                <select name="from[]" id="multiselect" style="width: 100%" class="form-control form-control-sm" size="8" multiple="multiple"
+                        asp-items="ViewBag.WarehouseItemId"></select>
+            </div>
+            <div class="col-1">
+                <button type="button" id="multiselect_rightAll" class="btn btn-sm btn-outline-secondary btn-block"><i class="fas fa-forward"></i></button>
+                <button type="button" id="multiselect_rightSelected" class="btn btn-sm btn-outline-secondary btn-block"><i class="fas fa-caret-right"></i></button>
+                <button type="button" id="multiselect_leftSelected" class="btn btn-sm btn-outline-secondary btn-block"><i class="fas fa-caret-left"></i></button>
+                <button type="button" id="multiselect_leftAll" class="btn btn-sm btn-outline-secondary btn-block"><i class="fas fa-backward"></i></button>
+            </div>
+            <div class="col-4 ">
+                <select name="to[]" id="multiselect_to" class="form-control form-control-sm" size="8" multiple="multiple"></select>
+            </div>
+        </div>
+        @*<div class="form-row"> </div>*@
+        <div class="form-row">
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary btn-sm" />
+            </div>
+        </div>
+    </form>
+</div>
+
+<div>
+    <a class="small" asp-page="Index">Back to List</a>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="loader"></div>
+                <div>
+                    <p>Executing request. <br><br><small>Please wait...</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @*<script src="~/lib/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>*@
+    <script src="~/lib/multiselectListbox/multiselect.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var saveItems = () => {
+                var clientProfileId = $('#ItemVm_ClientProfileId').val();
+                var cashRegCategoryId = $('#ItemVm_CashRegCategoryId').val();
+                var $selectedItems = $('#multiselect_to');
+               
+                var warehouseItems = [];
+                $('#multiselect_to option').each(function () {
+                    $this = $(this);
+                    console.log($this);
+                    var id = parseInt($this.val());
+                    warehouseItems.push(id);
+                });
+               
+                if (warehouseItems.length > 0) {
+                    var idsJs = JSON.stringify({
+                        clientProfileId: clientProfileId,
+                        cashRegCategoryId: cashRegCategoryId,
+                        productIdList: warehouseItems
+                    });
+                    var timeout;
+
+                    $.ajax({
+                        contentType: 'application/json; charset=utf-8',
+
+                        dataType: 'json',
+                        type: 'POST',
+                        data: idsJs,
+                        url: "/api/GrkoukInfoApi/AssignProductsToCashCategory",
+                        beforeSend: function () {
+                            if (timeout) {
+                                clearTimeout(timeout);
+                            }
+                            timeout = setTimeout(function () {
+
+                                $("#loadMe").modal({
+                                    backdrop: "static", //remove ability to close modal with click
+                                    keyboard: false, //remove option to close with keyboard
+                                    show: true //Display loader!
+                                });
+                            },
+                                1000);
+
+                        },
+                        success: function (result) {
+                            console.log(result);
+                            toastr.success("Delete", result.message);
+                            //refreshTableData();
+
+                        },
+                        complete: function () {
+                            if (timeout) {
+                                clearTimeout(timeout);
+                            }
+                            $("#loadMe").modal("hide");
+                            setTimeout(function () {
+                                console.log('Checking for open modals');
+                                var isOpen = $('#loadMe').hasClass('show');
+                                if (isOpen) {
+                                    console.log('There is an open Modal');
+                                    $("#loadMe").modal("hide");
+                                } else {
+                                    console.log('No open modal');
+                                }
+                            },
+                                2000);
+                        },
+                        error: function (e) {
+                            console.log(e);
+                            toastr.error("Error", e.responseJSON.error);
+
+                        }
+                    });
+
+                }
+
+
+            };
+            $('#multiselect').multiselect({
+                search: {
+                    left: '<input type="text" name="q" class="form-control form-control-sm " placeholder="Search..." />',
+                    right: '<input type="text" name="q" class="form-control form-control-sm" placeholder="Search..." />',
+                },
+                fireSearch: function (value) {
+                    return value.length > 2;
+                }
+            });
+            $('#ItemForm').on('submit', function (e) {
+                e.preventDefault();
+                saveItems();
+            });
+
+
+
+
+
+
+        });
+    </script>
+}

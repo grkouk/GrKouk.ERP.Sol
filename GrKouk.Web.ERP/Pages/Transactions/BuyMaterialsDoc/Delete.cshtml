@@ -1,0 +1,90 @@
+﻿@page
+@model DeleteModel
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h4>Delete Buy Document</h4>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>BuyDocument</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocument.TransDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocument.TransDate)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocument.TransRefCode)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocument.TransRefCode)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocument.Section)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocument.Section.Code)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocument.Transactor)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocument.Transactor.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocument.FiscalPeriod)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocument.FiscalPeriod.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocument.BuyDocSeries)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocument.BuyDocSeries.Code)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocument.BuyDocType)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocument.BuyDocType.Code)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocument.AmountFpa)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocument.AmountFpa)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocument.AmountNet)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocument.AmountNet)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocument.AmountDiscount)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocument.AmountDiscount)
+        </dd>
+       
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocument.Company)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocument.Company.Code)
+        </dd>
+       
+    </dl>
+    
+    <form method="post">
+        <input type="hidden" asp-for="BuyDocument.Id" />
+        <input type="submit" value="Delete" class="btn btn-default" /> |
+        <a asp-page="./Index">Back to List</a>
+    </form>
+</div>

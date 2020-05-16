@@ -1,0 +1,34 @@
+﻿@page
+@model GrKouk.Web.ERP.Pages.CommonEntities.CostCentres.DeleteModel
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>CostCentre</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.CostCentre.Code)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CostCentre.Code)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CostCentre.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CostCentre.Name)
+        </dd>
+    </dl>
+    
+    <form method="post">
+        <input type="hidden" asp-for="CostCentre.Id" />
+        <input type="submit" value="Delete" class="btn btn-default" /> |
+        <a asp-page="./Index">Back to List</a>
+    </form>
+</div>

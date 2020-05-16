@@ -1,0 +1,52 @@
+﻿@page
+@model GrKouk.Web.Erp.Pages.Configuration.WarehouseTransDocTypeDef.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h4>Edit TransWarehouseDocTypeDef</h4>
+<hr />
+<div class="container">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+            <input type="hidden" asp-for="TransWarehouseDocTypeDef.Id" />
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label asp-for="TransWarehouseDocTypeDef.Code" class="control-label small"></label>
+                    <input asp-for="TransWarehouseDocTypeDef.Code" class="form-control form-control-sm" />
+                    <span asp-validation-for="TransWarehouseDocTypeDef.Code" class="text-danger small"></span>
+                </div>
+                <div class="form-group col-md-7">
+                    <label asp-for="TransWarehouseDocTypeDef.Name" class="control-label small"></label>
+                    <input asp-for="TransWarehouseDocTypeDef.Name" class="form-control form-control-sm" />
+                    <span asp-validation-for="TransWarehouseDocTypeDef.Name" class="text-danger small"></span>
+                </div>
+                <div class="form-group col-md-2 ">
+                    <label asp-for="TransWarehouseDocTypeDef.Active"></label>
+                    <input asp-for="TransWarehouseDocTypeDef.Active" class="form-check form-control-sm" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label asp-for="TransWarehouseDocTypeDef.TransWarehouseDefId" class="control-label small"></label>
+                    <select asp-for="TransWarehouseDocTypeDef.TransWarehouseDefId" class="form-control form-control-sm" asp-items="ViewBag.TransWarehouseDefId"></select>
+                </div>
+                <div class="form-group col-md-3">
+                    <label asp-for="TransWarehouseDocTypeDef.CompanyId" class="control-label small"></label>
+                    <select asp-for="TransWarehouseDocTypeDef.CompanyId" class="form-control form-control-sm" asp-items="ViewBag.CompanyId"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+</div>
+
+<div>
+    <a asp-page="./Index" class="small">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

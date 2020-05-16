@@ -1,0 +1,156 @@
+﻿@page
+@model GrKouk.Web.Erp.Pages.Configuration.SellDocTypeDefs.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+@section MyCss
+{
+    <link rel="stylesheet" href="~/lib/bootstrap-select/css/bootstrap-select.min.css" />
+}
+<h4>Edit SellDocTypeDef</h4>
+<hr />
+
+<div class="container">
+    <form method="post">
+        <input type="hidden" asp-for="SellDocTypeDef.Id" />
+        <input type="hidden" asp-for="SellDocTypeDef.SelectedWarehouseItemNatures" />
+        <input type="hidden" asp-for="SellDocTypeDef.AllowedTransactorTypes" />
+
+        <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+        <div class="form-row">
+            <div class="form-group col-md-2">
+                <label asp-for="SellDocTypeDef.Code" class="control-label small"></label>
+                <input asp-for="SellDocTypeDef.Code" class="form-control form-control-sm small" />
+                <span asp-validation-for="SellDocTypeDef.Code" class="text-danger small"></span>
+            </div>
+            <div class="form-group col-md-2">
+                <label asp-for="SellDocTypeDef.Abbr" class="control-label small"></label>
+                <input asp-for="SellDocTypeDef.Abbr" class="form-control form-control-sm small" />
+                <span asp-validation-for="SellDocTypeDef.Abbr" class="text-danger small"></span>
+            </div>
+            <div class="form-group col-md-5">
+                <label asp-for="SellDocTypeDef.Name" class="control-label small"></label>
+                <input asp-for="SellDocTypeDef.Name" class="form-control form-control-sm small" />
+                <span asp-validation-for="SellDocTypeDef.Name" class="text-danger small"></span>
+            </div>
+
+            <div class="form-group col-md-2 ">
+
+                <label asp-for="SellDocTypeDef.Active" class="small"></label>
+                <input asp-for="SellDocTypeDef.Active" class="form-check form-control-sm" />
+
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label asp-for="SellDocTypeDef.TransTransactorDefId" class="control-label small"></label>
+                <select asp-for="SellDocTypeDef.TransTransactorDefId" class="form-control form-control-sm small" asp-items="ViewBag.TransTransactorDefId"></select>
+            </div>
+            <div class="form-group col-md-3">
+                <label asp-for="SellDocTypeDef.TransWarehouseDefId" class="control-label small"></label>
+                <select asp-for="SellDocTypeDef.TransWarehouseDefId" class="form-control form-control-sm small" asp-items="ViewBag.TransWarehouseDefId"></select>
+            </div>
+            <div class="form-group col-md-2">
+                <label asp-for="SellDocTypeDef.UsedPrice" class="control-label small"></label>
+                <select asp-for="SellDocTypeDef.UsedPrice" class="form-control form-control-sm small" asp-items="ViewBag.UsedPrice"></select>
+            </div>
+
+            <div class="form-group col-md-2">
+                <label asp-for="SellDocTypeDef.CompanyId" class="control-label small"></label>
+                <select asp-for="SellDocTypeDef.CompanyId" class="form-control form-control-sm small" asp-items="ViewBag.CompanyId"></select>
+                <span asp-validation-for="SellDocTypeDef.CompanyId" class="text-danger small"></span>
+            </div>
+        </div>
+        <div class="form-row">
+             <div class="form-group col-md-3">
+                <label asp-for="SellDocTypeDef.SectionId" class="control-label small"></label>
+                <select asp-for="SellDocTypeDef.SectionId" class="form-control form-control-sm" asp-items="ViewBag.SectionList"></select>
+                <span asp-validation-for="SellDocTypeDef.SectionId" class="text-danger small"></span>
+            </div>
+            <div class=" form-group col-md-3">
+                <label class="control-label small">WarehouseItem Natures </label>
+                <select class="selectpicker form-control " id="MaterialNatureTypes" multiple
+                        data-selected-text-format="count > 1"
+                        asp-items="ViewBag.warehouseItemNaturesList"></select>
+            </div>
+            <div class=" form-group col-md-3">
+                <label class="control-label small">Allowed Transactor Types </label>
+                <select class="selectpicker form-control " id="SelectedTransactorTypes" multiple
+                        data-selected-text-format="count > 1"
+                        asp-items="ViewBag.transactorTypesList"></select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <input type="submit" value="Update" class="btn btn-primary btn-sm" />
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/bootstrap-select/js/bootstrap-select.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var $selectedWarehouseItemNatures = $('#SellDocTypeDef_SelectedWarehouseItemNatures');
+            var $matNatureTypes = $('#MaterialNatureTypes');
+            var $allowedTransTypes = $('#SellDocTypeDef_AllowedTransactorTypes');
+            var $selectedTransactorTypes = $('#SelectedTransactorTypes');
+
+            $('.selectpicker').selectpicker();
+            var updateSelectedWareItemNatures = () => {
+               
+                var matList = $selectedWarehouseItemNatures.val();
+                console.log('matList=' + matList);
+               if (matList != null) {
+                    var matListArr = matList.split(',');
+                    $matNatureTypes.selectpicker('val', matListArr);
+                }
+               
+            };
+            var updateSelectedAllowedTransactorTypes = () => {
+                var matList = $allowedTransTypes.val();
+               
+                console.log('matList=' + matList);
+                if (matList != null) {
+                    var matListArr = matList.split(',');
+                    $selectedTransactorTypes.selectpicker('val', matListArr);
+                }
+               
+            };
+            $matNatureTypes.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+                var sel = $('#MaterialNatureTypes option:selected');
+                var selected = [];
+                $(sel).each(function(index, item) {
+                    selected.push([$(this).val()]);
+                });
+                console.log('selected=' + selected);
+                var sDocs = selected.toString();
+                console.log('sDocs=' + sDocs);
+               
+                $selectedWarehouseItemNatures.val(sDocs);
+            });
+            $selectedTransactorTypes.on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+                var sel = $('#SelectedTransactorTypes option:selected');
+                var selected = [];
+                $(sel).each(function(index, item) {
+                    selected.push([$(this).val()]);
+                });
+                console.log('selected=' + selected);
+                var sDocs = selected.toString();
+                console.log('sDocs=' + sDocs);
+               
+                $allowedTransTypes.val(sDocs);
+            });
+            updateSelectedWareItemNatures();
+            updateSelectedAllowedTransactorTypes();
+        });
+    </script>
+}

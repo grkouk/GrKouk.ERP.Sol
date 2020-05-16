@@ -1,0 +1,91 @@
+﻿@page
+@model CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+@section MyCss
+{
+    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
+    @*<link href="https://unpkg.com/filepond-plugin-image-edit/dist/filepond-plugin-image-edit.css" rel="stylesheet">*@
+}
+
+<h2>Create</h2>
+
+<h4>MediaEntry</h4>
+<hr />
+
+<div class="container">
+    <form method="post" enctype="multipart/form-data">
+        <div class="form-row">
+            <div class="col-sm-12 col-md-10 col-lg-8">
+                <input type="file" class="my-pond" name="filepond"/>
+            </div>
+        </div>
+    </form>
+</div>
+<div>
+    <a class="small" asp-page="Index">Back to List</a>
+</div>
+@section Scripts
+{
+    <!-- include FilePond plugins -->
+    <!-- include FilePond library -->
+    <script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
+
+
+    <!-- include FilePond jQuery adapter -->
+    <script src="https://unpkg.com/filepond-plugin-image-exif-orientation/dist/filepond-plugin-image-exif-orientation.js"></script>
+    <script src="https://unpkg.com/jquery-filepond/filepond.jquery.js"></script>
+    <script src="https://unpkg.com/filepond-plugin-image-crop/dist/filepond-plugin-image-crop.js"></script>
+    <script src="https://unpkg.com/filepond-plugin-image-resize/dist/filepond-plugin-image-resize.js"></script>
+    <script src="https://unpkg.com/filepond-plugin-image-transform/dist/filepond-plugin-image-transform.js"></script>
+    <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.js"></script>
+    @*<script src="https://unpkg.com/filepond-plugin-image-edit/dist/filepond-plugin-image-edit.js"></script>*@
+    <script>
+        $(function () {
+            // First register any plugins
+            $.fn.filepond.registerPlugin(
+                FilePondPluginImageExifOrientation,
+                FilePondPluginImagePreview,
+                FilePondPluginImageCrop,
+                FilePondPluginImageResize,
+                FilePondPluginImageTransform
+                //FilePondPluginImageEdit
+            );
+
+            // Turn input element into a pond
+            $('.my-pond').filepond({
+                allowMultiple: true,
+                maxFiles:5,
+                imagePreviewHeight: 250,
+                imageCropAspectRatio: '1:1',
+                imageResizeTargetWidth: 400,
+                imageResizeTargetHeight: 400,
+                //stylePanelLayout: 'compact circle',
+                styleLoadIndicatorPosition: 'center bottom',
+                styleProgressIndicatorPosition: 'right bottom',
+                styleButtonRemoveItemPosition: 'left bottom',
+                //styleImageEditButtonEditItemPosition:'center center',
+                styleButtonProcessItemPosition: 'right bottom',
+                server: {
+                    process: {
+                        url: 'create',
+                        method: 'POST',
+                        headers: {
+                            'RequestVerificationToken': $('[name=__RequestVerificationToken]').val()
+                        },
+                        timeout: 10000,
+                        onload: null,
+                        onerror: null,
+                        ondata: null
+                    },
+                    load: 'create',
+                    fetch: null,
+                    revert: null
+                }
+            });
+        });
+    </script>
+}

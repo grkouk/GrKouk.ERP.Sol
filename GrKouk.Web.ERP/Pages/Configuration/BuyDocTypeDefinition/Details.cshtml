@@ -1,0 +1,56 @@
+﻿@page
+@model GrKouk.Web.Erp.Pages.Configuration.BuyDocTypeDefinition.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>BuyDocTypeDef</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocTypeDef.Code)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocTypeDef.Code)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocTypeDef.Abbr)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocTypeDef.Abbr)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocTypeDef.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocTypeDef.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocTypeDef.Active)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocTypeDef.Active)
+        </dd>
+       
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocTypeDef.TransWarehouseDef)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocTypeDef.TransWarehouseDef.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BuyDocTypeDef.Company)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BuyDocTypeDef.Company.Code)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.BuyDocTypeDef.Id">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>

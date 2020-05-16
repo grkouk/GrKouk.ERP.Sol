@@ -1,0 +1,52 @@
+﻿@page
+@model GrKouk.Web.Erp.Pages.Configuration.TransactorTransDocTypes.DeleteModel
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>TransTransactorDocTypeDef</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.TransTransactorDocTypeDef.Code)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransTransactorDocTypeDef.Code)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransTransactorDocTypeDef.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransTransactorDocTypeDef.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransTransactorDocTypeDef.Active)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransTransactorDocTypeDef.Active)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransTransactorDocTypeDef.TransTransactorDef)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransTransactorDocTypeDef.TransTransactorDef.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TransTransactorDocTypeDef.Company)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TransTransactorDocTypeDef.Company.Code)
+        </dd>
+    </dl>
+    
+    <form method="post">
+        <input type="hidden" asp-for="TransTransactorDocTypeDef.Id" />
+        <input type="submit" value="Delete" class="btn btn-default" /> |
+        <a asp-page="./Index">Back to List</a>
+    </form>
+</div>

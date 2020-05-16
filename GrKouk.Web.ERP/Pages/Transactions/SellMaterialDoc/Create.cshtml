@@ -1,0 +1,1873 @@
+﻿@page
+
+@model CreateModel
+@using GrKouk.Erp.Domain.DocDefinitions
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+@{
+    ViewData["Title"] = "Νέο Παραστατικό Πώλησης";
+}
+@section MyCss
+{
+    <link rel="stylesheet" href="~/css/search-modal.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-select/css/bootstrap-select.min.css" />
+}
+<style>
+    .ui-autocomplete-loading {
+        background: white url('@Url.Content("~/images/ui-anim_basic_16x16.gif")') right center no-repeat;
+    }
+    .ui-autocomplete.ui-widget {
+        font-family: Verdana,Arial,sans-serif;
+        font-size: 12px;
+    }
+</style>
+<h4>Νέο παραστατικό Πώλησης</h4>
+<hr />
+<div class="container">
+    <form method="post" id="transForm">
+        <fieldset id="thisForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+            <input type="hidden" asp-for="@Model.CopyFromId" id="CopyFromId" />
+            <input type="hidden" asp-for="@Model.InitialLoad" id="IsInitialLoad" />
+            <input type="hidden" id="MaterialId" />
+            <input type="hidden" id="MaterialLastPrice" />
+            <input type="hidden" id="MaterialNettoPrice" />
+            <input type="hidden" id="MaterialBruttoPrice" />
+            <input type="hidden" id="MaterialFactor" />
+            <input type="hidden" id="MaterialFpaId" />
+            <input type="hidden" id="MaterialMainUnitId" />
+            <input type="hidden" id="MaterialSecondaryUnitId" />
+            <input type="hidden" id="MaterialsCounter" />
+            <input type="hidden" id="SeriesUsedPrice" />
+            <input type="hidden" id="LineEditing" />
+            <input type="hidden" id="LookupValueValid" />
+            <div class="form-row">
+                <div class="form-group col-md-2">
+                    <label asp-for="ItemVm.TransDate" class="control-label small "></label>
+                    <input asp-for="ItemVm.TransDate" class="form-control form-control-sm " autofocus />
+                    <span asp-validation-for="ItemVm.TransDate" class="text-danger small"></span>
+                </div>
+                <div class="form-group col-md-6">
+                    <label asp-for="ItemVm.SellDocSeriesId" class="control-label small"></label>
+                    <select asp-for="ItemVm.SellDocSeriesId" class="form-control form-control-sm " asp-items="ViewBag.SellDocSeriesId"></select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label asp-for="ItemVm.TransRefCode" class="control-label small"></label>
+                    <input asp-for="ItemVm.TransRefCode" class="form-control form-control-sm " />
+                    <span asp-validation-for="ItemVm.TransRefCode" class="text-danger small"></span>
+
+                </div>
+                <div class="form-group col-md-2">
+                    <label asp-for="ItemVm.SalesChannelId" class="control-label small"></label>
+                    <select asp-for="ItemVm.SalesChannelId" class="form-control form-control-sm " asp-items="ViewBag.SalesChannelId"></select>
+                </div>
+
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label asp-for="ItemVm.TransactorId" class="control-label small"></label>
+                    <div class="input-group input-group-sm">
+                        <select asp-for="ItemVm.TransactorId" class="form-control form-control-sm small" asp-items="ViewBag.TransactorId"></select>
+                        <div class="input-group-append" id="button-addon4">
+                            <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#itemSelector" data-selectorType="SuppliersSelector" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-md-3">
+                    <label asp-for="ItemVm.CompanyId" class="control-label small"></label>
+                    <select asp-for="ItemVm.CompanyId" class="form-control form-control-sm " asp-items="ViewBag.CompanyId"></select>
+                </div>
+                <div class="form-group col-md-3">
+                    <label asp-for="ItemVm.PaymentMethodId" class="control-label small" small></label>
+                    <select asp-for="ItemVm.PaymentMethodId" class="form-control form-control-sm small" asp-items="ViewBag.PaymentMethodId"></select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-sm-1">
+                    <label class="control-label small">Seek Type</label>
+                    <select asp-for="SeekType" class="form-control form-control-sm " style="font-size: 0.7rem" asp-items="ViewBag.SeekType"></select>
+                </div>
+                <div class="form-group col-md-3">
+                    <label class="small">LookUp</label>
+                    <div class="input-group input-group-sm">
+                        <input class="form-control form-control-sm " style="font-size: 0.7rem" id="Lookup" autocomplete="off"/>
+                        <div class="input-group-append" id="button-addon5">
+                            <button class="btn btn-outline-secondary btn-sm " data-toggle="modal" data-target="#itemSelector" data-selectorType="ProductsSelector" style="font-size: 0.7rem" type="button"><i class="fab fa-asymmetrik"></i></button>
+                        </div>
+                    </div>
+                    <span class="text-danger small"></span>
+                </div>
+
+                <div class="form-group col-md-1">
+                    <label class="small" id="q1Label">Q1</label>
+                    <input class="form-control form-control-sm  " style="font-size: 0.7rem" type="number" placeholder="Q 1" id="Q1" />
+                    <div class="invalid-feedback">
+                        Please enter a valid Q1.
+                    </div>
+                </div>
+                <div class="form-group col-md-1">
+                    <label class="small" id="q2Label">Q2</label>
+                    <input class="form-control form-control-sm " type="number" style="font-size: 0.7rem" placeholder="Q 2" id="Q2" />
+                    <span class="text-danger small"></span>
+                </div>
+                <div class="form-group col-md-1">
+                    <label class="small" id="priceLabel">Price</label>
+                    <input class="form-control form-control-sm " type="number" style="font-size: 0.7rem" placeholder="Price" id="Price" />
+                    <span class="text-danger small"></span>
+                </div>
+                <div class="form-group col-md-1">
+                    <label class="small">Price Net</label>
+                    <input class="form-control form-control-sm " style="font-size: 0.7rem" type="number" placeholder="Price Net" id="PriceNet" tabindex="-1" readonly />
+                    <span class="text-danger small"></span>
+                </div>
+                <div class="form-group col-md-1">
+                    <label class="small">Dis% </label>
+                    <input class="form-control form-control-sm " style="font-size: 0.7rem" type="number" placeholder="Dis %" id="Discount" />
+                    <span class="text-danger small"></span>
+                </div>
+                <div class="form-group col-md-1">
+                    <label class="small">VAT% </label>
+                    <input class="form-control form-control-sm " style="font-size: 0.7rem" type="number" placeholder="Vat%" id="VatPercent" />
+                    <span class="text-danger small"></span>
+                </div>
+                <div class="form-group col-md-1 align-self-end">
+                    <button id="addToList" class="btn btn-primary btn-sm">
+                        <i class="far fa-arrow-alt-circle-down"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="form-row">
+                <table id="detailsTable" class="table table-responsive-sm">
+                    <thead class="small">
+                        <tr>
+                            <th class="small" style="width: 0%"> #</th>
+                            <th class="small" style="width: 20%">Product</th>
+                            <th class="small text-center" style="width: 5%">Q1</th>
+                            <th class="small text-center" style="width: 5%">Q2</th>
+                            <th class="small text-center" style="width: 10%">Unit Price</th>
+                            <th class="small text-center" style="width: 5%">Disc%</th>
+                            <th class="small text-center" style="width: 5%">Vat%</th>
+                            <th class="small text-center" style="width: 10%">Net</th>
+                            <th class="small text-center" style="width: 10%">Disc</th>
+                            <th class="small text-center" style="width: 10%">Vat</th>
+                            <th class="small text-center" style="width: 10%">Gross</th>
+                            <th class="small" style="width: 5%"></th>
+                            <th class="small" style="width: 5%"></th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            var lineCount = 0;
+                            if (Model.CopyFromItemVm != null)
+                            {
+                                foreach (var docLine in Model.CopyFromItemVm.SellDocLines)
+                                {
+                                    lineCount++;
+                                    var materialId = docLine.WarehouseItemId;
+                                    var q1 = docLine.Quontity1;
+                                    var q1Str = $@"{q1:N2}";
+                                    var q2 = docLine.Quontity2;
+                                    var q2Str = $@"{q2:N2}";
+                                    var unitPrice = docLine.UnitPrice;
+                                    var vatRate = docLine.FpaRate;
+                                    var mainUnitId = docLine.PrimaryUnitId;
+                                    var secUnitId = docLine.SecondaryUnitId;
+                                    var factor = docLine.Factor;
+                                    var materialName = docLine.WarehouseItemName;
+                                    var disRate = docLine.DiscountRate;
+                                    var disAmount = docLine.AmountDiscount;
+                                    var vatAmount = docLine.AmountFpa;
+                                    var netAmount = docLine.AmountNet;
+                                    var grosAmount = netAmount - disAmount + vatAmount;
+                                    var q1Actual = FormattableString.Invariant($"{q1}");
+                                    var q2Actual = FormattableString.Invariant($"{q2}");
+                                    var unitPriceActual = FormattableString.Invariant($"{unitPrice}");
+                                    var vatRateActual = FormattableString.Invariant($"{vatRate}");
+                                    var factorActual = FormattableString.Invariant($"{factor}");
+                                    var disRateActual = FormattableString.Invariant($"{disRate}");
+                                    var disAmountActual = FormattableString.Invariant($"{disAmount}");
+                                    var vatAmountActual = FormattableString.Invariant($"{vatAmount}");
+                                    var netAmountActual = FormattableString.Invariant($"{netAmount}");
+                                    var grosAmountActual = FormattableString.Invariant($"{grosAmount}");
+
+                                    var tLine = $"<tr><td class=\"small\"> {lineCount}" +
+                                                $"</td><td class=\"small\" data-materialId=\"{materialId}\" " +
+                                                $"data-factor=\"{factorActual}\" data-mainUnitId=\"{mainUnitId}\" data-secUnitId=\"{secUnitId}\">" +
+                                                $"{materialName} </td><td class=\"small text-right\"  data-actualValue=\"{q1Actual}\" >" +
+                                                $" {q1Str} </td><td class=\"small text-right\"  data-actualValue=\"{q2Actual}\" > " +
+                                                $" {q2Str} </td><td class=\"small text-right\"  data-actualValue=\"{unitPriceActual}\" >" +
+                                                $" {unitPrice} </td><td class=\"small text-right\"  data-actualValue=\"{disRateActual}\" >" +
+                                                $"{disRate} </td><td class=\"small text-right\"  data-actualValue=\"{vatRateActual}\" >" +
+                                                $"{vatRate} </td><td class=\"small text-right\"  data-actualValue=\"{netAmountActual}\" >" +
+                                                $"{netAmount} </td><td class=\"small text-right\"  data-actualValue=\"{disAmountActual}\" >" +
+                                                $"{disAmount} </td><td class=\"small text-right\"  data-actualValue=\"{vatAmountActual}\" >" +
+                                                $"{vatAmount} </td><td class=\"small text-right\"  data-actualValue=\"{grosAmountActual}\" >" +
+                                                $"{grosAmount} </td>" +
+                                                $"<td class=\"small\">" +
+                                                $"<a data-itemId=\"0\" href=\"#\" class=\"modifyItem\"><i class=\"fas fa-edit\"></i></a></td>" +
+                                                $"<td class=\"small\">" +
+                                                $"<a data-itemId=\"0\" href=\"#\" class=\"deleteItem\"><i class=\"fas fa-trash\"></i></a></td></tr>";
+                                    @Html.Raw(tLine)
+                                    ;
+                                }
+                            }
+
+
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class=" small">Net Amount</label>
+                    <input id="ItemVm_AmountNet" class="form-control form-control-sm small text-right" type="text" disabled />
+                    <span asp-validation-for="ItemVm.AmountNet" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <label class=" small">Discount</label>
+                    <input id="ItemVm_AmountDiscount" class="form-control form-control-sm small text-right" type="text" disabled />
+                    <span asp-validation-for="ItemVm.AmountDiscount" class="text-danger small"></span>
+                </div>
+                <div class="form-group">
+                    <label class="small">Amount VAT</label>
+                    <input id="ItemVm_AmountFpa" class="form-control form-control-sm small text-right" type="text" disabled />
+                    <span asp-validation-for="ItemVm.AmountFpa" class="text-danger small"></span>
+                </div>
+
+
+                <div class="form-group">
+                    <label class=" small">Sum</label>
+                    <input id="DocumentSum" type="text" class="form-control form-control-sm small text-right" disabled />
+
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label asp-for="ItemVm.Etiology" class="control-label small"></label>
+                    <textarea asp-for="ItemVm.Etiology" class="form-control form-control-sm small"></textarea>
+                    <span asp-validation-for="ItemVm.Etiology" class="text-danger small"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary btn-sm" id="saveForm" />
+            </div>
+        </fieldset>
+    </form>
+
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+<!-- Modal Image Viewer -->
+<div class="modal fade" id="imageViewer" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog " role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Image</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="imageControl" src="" style="height:400px;width:400px;" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Item selector -->
+<div class="modal fade" id="itemSelector" tabindex="-1" role="dialog" aria-labelledby="itemsModalLabel" aria-hidden="true" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="overflow-y: scroll; max-height:75%;  margin-top: 50px; margin-bottom:50px;" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="container-fluid">
+                    <div class="form-row">
+                        <div class="col-6">
+                            <p class="modal-title font-weight-bold" id="itemsModalLabel">Selector</p>
+                        </div>
+                        <div class="col-6 text-right">
+
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <select class="selectpicker form-control form-control-sm small " id="CompaniesList" multiple
+                                    title="Companies" data-actions-box="true" data-selected-text-format="count > 1"></select>
+                        </div>
+                        <div class="form-group col-md-3" id="MaterialNatureTypesDiv">
+                            <select class="selectpicker form-control form-control-sm small " id="MaterialNatureTypes" multiple
+                                    title="Item Natures" data-actions-box="true" data-selected-text-format="count > 1"></select>
+                        </div>
+                        <div class="form-group col-md-3" id="TransactorSelectorTypesDiv">
+                            <select class="selectpicker form-control form-control-sm small " id="TransactorTypes" multiple
+                                    title="Item Natures" data-actions-box="true" data-selected-text-format="count > 1"></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-10">
+                            <input class="form-control form-control-sm" name="itemsSearchText" placeholder="Search text" type="text" />
+
+                        </div>
+                        <div class="col-2">
+                            <span class="spinner-border spinner-border-sm text-primary" id="SpinnerLoader" style="display: none"></span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body ">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <table class="table table-bordered table-sm" id="selectorItemsList">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th class="small">
+                                            Product
+                                        </th>
+                                        <th class="small">
+                                            col 2
+                                        </th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade modal-topmost" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="loader"></div>
+                <div>
+                    <p>Executing request. <br><small>Please wait...</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/lib/bootstrap-select/js/bootstrap-select.min.js"></script>
+    <script src="~/lib/jqueryui/jquery-ui.min.js"></script>
+    <script src="~/js/jquery.ui.autocomplete.scroll.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            console.log("Inside Document ready");
+            $('#LineEditing').val(0);
+            var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
+            console.log('Current Culture ' + currentCulture);
+
+            var formatterCurrency = new Intl.NumberFormat(currentCulture,
+                {
+                    style: 'currency',
+                    currency: 'EUR',
+                    minimumFractionDigits: 2
+                });
+            var formatterNumber = new Intl.NumberFormat(currentCulture,
+                {
+                    maximumFractionDigits: 3
+
+                });
+            //#region variables
+            var $initialLoad = $('#IsInitialLoad');
+            var $transDate = $('#ItemVm_TransDate');
+            var securityToken = $('[name=__RequestVerificationToken]').val();
+
+            var $lookUp = $('#Lookup');
+            var $q1 = $('#Q1');
+            var $q2 = $('#Q2');
+
+            var $materialCounter = $('#MaterialsCounter');
+            var $lineEditing = $('#LineEditing');
+            var $amountNet = $('#ItemVm_AmountNet');
+            var $amountFpa = $('#ItemVm_AmountFpa');
+            var $amountDiscount = $('#ItemVm_AmountDiscount');
+            var $amountSum = $('#DocumentSum');
+            var $q1Label = $('#q1Label');
+            var $q2Label = $('#q2Label');
+
+            var $discount = $("#Discount");
+            var $materialId = $('#MaterialId');
+            var $vatPercent = $('#VatPercent');
+            var $factor = $('#MaterialFactor');
+            var $mainUnitId = $('#MaterialMainUnitId');
+            var $secUnitId = $('#MaterialSecondaryUnitId');
+            var $priceNetto = $('#MaterialNettoPrice');
+            var $priceBrutto = $('#MaterialBruttoPrice');
+            var $seriesUsedPrice = $('#SeriesUsedPrice');
+            var $priceLabel = $('#priceLabel');
+            var $translDocSeriesId = $('#ItemVm_SellDocSeriesId');
+            var $companyId = $('#ItemVm_CompanyId');
+            var $price = $("#Price");
+            var $priceNet = $("#PriceNet");
+            var $lookupValueValid = $("#LookupValueValid");
+            var $materialFpaId = $('#MaterialFpaId');
+            var $seekType = $('#SeekType');
+            //#endregion
+
+              //#region items selectors modals
+            $.fn.selectpicker.Constructor.BootstrapVersion = '4';
+            var selectedCompanies = "";
+            var selectedNatures = "";
+            var selectedTransTypes = "";
+            var curSelectorType = "";
+            const setProductSelectorCurrentSort = (currentSort) => {
+                var filtersArr = [];
+                filtersArr.push({
+                    filterKey: 'currentSort',
+                    filterValue: currentSort
+                });
+                let sessionVal = JSON.stringify(filtersArr);
+
+                localStorage.setItem('ProductSelectorStore', sessionVal);
+            };
+            const getProductSelectorCurrentSort = () => {
+                var storageItemJs = localStorage.getItem('ProductSelectorStore');
+                if (storageItemJs === undefined || storageItemJs === null) {
+                    return "";
+                } else {
+
+                    var storageItem = JSON.parse(storageItemJs);
+                    try {
+                        let filtersValue = storageItem.find(x => x.filterKey === 'currentSort').filterValue;
+                        return filtersValue;
+                    } catch (e) {
+                        return "";
+                    }
+                }
+            };
+            const setTransactorSelectorCurrentSort = (currentSort) => {
+                var filtersArr = [];
+                filtersArr.push({
+                    filterKey: 'currentSort',
+                    filterValue: currentSort
+                });
+                let sessionVal = JSON.stringify(filtersArr);
+
+                localStorage.setItem('TransactorSelectorStore', sessionVal);
+            };
+            const getTransactorSelectorCurrentSort = () => {
+                var storageItemJs = localStorage.getItem('TransactorSelectorStore');
+                if (storageItemJs === undefined || storageItemJs === null) {
+                    return "";
+                } else {
+
+                    var storageItem = JSON.parse(storageItemJs);
+                    try {
+                        let filtersValue = storageItem.find(x => x.filterKey === 'currentSort').filterValue;
+                        return filtersValue;
+                    } catch (e) {
+                        return "";
+                    }
+                }
+            };
+            var getWarehouseItemNatureList = () => {
+                var timeout;
+                var pageIndex = 1;
+                var uri = '/api/GrKoukInfoApi/GetSelectorMaterialNatures';
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'GET',
+                    url: uri,
+                    beforeSend: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        timeout = setTimeout(function() {
+                                $("#loadMe").modal({
+                                    backdrop: "static",
+                                    keyboard: false,
+                                    show: true
+                                });
+                            },
+                            1000);
+                    },
+                    success: function(result) {
+                        $.each(result,
+                            function(index, item) {
+                                $('#MaterialNatureTypes').append($('<option></option>').attr('value', item.valueInt)
+                                    .text(item.title));
+                            });
+                        $('#MaterialNatureTypes').selectpicker('refresh');
+                    },
+                    complete: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        $("#loadMe").modal("hide");
+                        setTimeout(function() {
+                                console.log('Checking for open modals');
+                                var isOpen = $('#loadMe').hasClass('show');
+                                if (isOpen) {
+                                    console.log('There is an open Modal');
+                                    $("#loadMe").modal("hide");
+                                } else {
+                                    console.log('No open modal');
+                                }
+                            },
+                            2000);
+                    },
+                    error: function(e) {
+                        console.log(e);
+
+                    }
+                });
+            };
+            var getTransactorTypeList = () => {
+                var timeout;
+                var pageIndex = 1;
+                var uri = '/api/GrKoukInfoApi/GetSelectorTransactorTypes';
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'GET',
+                    url: uri,
+                    beforeSend: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        timeout = setTimeout(function() {
+                                $("#loadMe").modal({
+                                    backdrop: "static",
+                                    keyboard: false,
+                                    show: true
+                                });
+                            },
+                            1000);
+                    },
+                    success: function(result) {
+                        $.each(result,
+                            function(index, item) {
+                                $('#TransactorTypes').append($('<option></option>').attr('value', item.valueInt)
+                                    .text(item.title));
+                            });
+                        $('#TransactorTypes').selectpicker('refresh');
+                    },
+                    complete: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        $("#loadMe").modal("hide");
+                        setTimeout(function() {
+                                console.log('Checking for open modals');
+                                var isOpen = $('#loadMe').hasClass('show');
+                                if (isOpen) {
+                                    console.log('There is an open Modal');
+                                    $("#loadMe").modal("hide");
+                                } else {
+                                    console.log('No open modal');
+                                }
+                            },
+                            2000);
+                    },
+                    error: function(e) {
+                        console.log(e);
+
+                    }
+                });
+            };
+            var getCompanyList = () => {
+                var timeout;
+                var pageIndex = 1;
+                var uri = '/api/GrKoukInfoApi/GetSelectorCompanies';
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'GET',
+                    url: uri,
+                    beforeSend: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        timeout = setTimeout(function() {
+                                $("#loadMe").modal({
+                                    backdrop: "static",
+                                    keyboard: false,
+                                    show: true
+                                });
+                            },
+                            1000);
+                    },
+                    success: function(result) {
+                        $.each(result,
+                            function(index, item) {
+                                $('#CompaniesList')
+                                    .append($('<option></option>').attr('value', item.value).text(item.title));
+                            });
+                        $('#CompaniesList').selectpicker('refresh');
+                    },
+                    complete: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        $("#loadMe").modal("hide");
+                        setTimeout(function() {
+                                console.log('Checking for open modals');
+                                var isOpen = $('#loadMe').hasClass('show');
+                                if (isOpen) {
+                                    console.log('There is an open Modal');
+                                    $("#loadMe").modal("hide");
+                                } else {
+                                    console.log('No open modal');
+                                }
+                            },
+                            2000);
+                    },
+                    error: function(e) {
+                        console.log(e);
+
+                    }
+                });
+            };
+            var getProductsSelectorList = (selCompanies, selNatures, searchFilter, sortData, pageSize,selectionCallback) => {
+                var timeout;
+                var pageIndex = 1;
+                var uri = '/api/GrKoukInfoApi/GetSelectorWareHouseItems';
+                uri += `?pageIndex=${pageIndex}`;
+                uri += `&pageSize=${pageSize}`;
+                uri += `&warehouseItemNatureFilter=${selNatures}`;
+                uri += `&companyFilter=${selCompanies}`;
+                uri += `&sortData=${sortData}`;
+                uri += `&searchFilter=${searchFilter}`;
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'GET',
+                    url: uri,
+                    beforeSend: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        timeout = setTimeout(function() {
+                                $('#SpinnerLoader').show();
+
+                            },
+                            1000);
+                    },
+                    success: function(result) {
+                        $('#selectorItemsList > tbody').empty();
+                        $('#selectorItemsList > thead').empty();
+                        let colDefs = [
+                            {
+                                sortKey: 'ProductCodeSort',
+                                sortType: 'alpha',
+                                header: 'Code',
+                                text: '',
+                                class: 'small d-none d-md-table-cell'
+                            },
+                            {
+                                sortKey: 'ProductNameSort',
+                                sortType: 'alpha',
+                                header: 'Product',
+                                text: '',
+                                class: 'small'
+                            },
+                            {
+                                sortKey: '',
+                                sortType: '',
+                                header: 'Nature',
+                                text: '',
+                                class: 'small'
+                            },
+                            {
+                                sortKey: 'CompanyNameSort',
+                                sortType: 'alpha',
+                                header: 'Company',
+                                text: '',
+                                class: 'small'
+                            }
+                        ];
+                        let curSortUndefined = false;
+                        let curSortAr = [];
+                        var curSort = getProductSelectorCurrentSort();
+                        if (curSort === undefined || curSort === null || curSort.length === 0) {
+                            curSortUndefined = true;
+                        } else {
+                            curSortAr = curSort.split(':');
+                        }
+                        var $trHead = $('<tr>');
+                        colDefs.forEach(function(item) {
+                            //var $tdColHead = $('<th>').text(item.header).addClass(item.class);
+                            var tdColHead = '';
+                            if (item.sortKey.length !== 0) {
+                                let colHtml = "";
+                                colHtml = `<th class="${item.class}"> `;
+                                colHtml += `<a href="#" role="button" name="SortHeader" tabindex="-1" `;
+                                colHtml += `data-sortkey="${item.sortKey}" data-sorttype="${item.sortType}">  `;
+                                colHtml += `${item.header}  `;
+                                colHtml += `</a>  `;
+                                if (curSortUndefined) {
+                                    colHtml += `<i class="" name="SortIcon"></i>  `;
+                                } else {
+                                    if (curSortAr[0] === item.sortKey) {
+
+                                        var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
+                                        var iconSortType = "fas fa-sort-" + item.sortType + newSortIconType;
+                                        colHtml += `<i class="${iconSortType}" name="SortIcon"></i>  `;
+                                    } else {
+                                        colHtml += `<i class="" name="SortIcon"></i>  `;
+                                    }
+                                }
+
+                                colHtml += `</a>  `;
+                                tdColHead = colHtml;
+                            } else {
+                                tdColHead = $('<th>').text(item.header).addClass(item.class);
+                            }
+                            $trHead.append($(tdColHead));
+                        });
+                        $trHead.append($('<th>'));
+                        $trHead.appendTo('#selectorItemsList > thead');
+                        $.each(result.data,
+                            function(index, value) {
+                                //colDefs[0].text = value.url;
+                                colDefs[0].text = value.code;
+                                colDefs[1].text = value.name;
+                                //colDefs[2].text = value.materialCateroryName;
+                                colDefs[2].text = value.warehouseItemNatureName;
+                                colDefs[3].text = value.companyCode;
+                                var itemId = value.id;
+                                // var urlDel = `@Url.Page("./Delete")?id=${itemId}`;
+
+                                var $tr = $('<tr>');
+
+                                colDefs.forEach(function(item) {
+                                    var $tdCol = $('<td>').text(item.text).addClass(item.class);
+                                    $tr.append($tdCol);
+
+                                });
+                                var actionsCol = '<td class="small text-center">';
+                                actionsCol += '<button type="button" class="btn btn-outline-info btn-sm" ';
+                                actionsCol += `data-itemId="${itemId}"`;
+                                actionsCol += 'name="selectItem">';
+                                actionsCol +=
+                                    '<span><i class="far fa-check-square fa-lg" style="color:slategray"></i></span>';
+                                actionsCol += '</button>';
+                                actionsCol += '</td>';
+
+                                $tr.append(actionsCol);
+                                $tr.appendTo('#selectorItemsList > tbody');
+
+                            });
+
+                        $('[name=selectItem]').on('click',
+                            function(event) {
+                                var button = $(event.delegateTarget);
+                                var productId = button.data('itemid');
+                                console.log('Inside click event handler for selectItem');
+                                selectionCallback(productId);
+                                //getWarehouseItemInfo(productId);
+                                $('#itemSelector').modal('hide');
+
+                            });
+                        $('[name=SortHeader]').on('click',
+                            function(event) {
+                                var button = $(event.delegateTarget);
+                                var reqSort = button.data('sortkey');
+                                let reqSortType = button.data('sorttype');
+                                let iconSortType = '';
+                                var newSortVal = '';
+                                var curSort = getProductSelectorCurrentSort();
+                                if (curSort === undefined || curSort === null || curSort.length === 0) {
+                                    curSort = reqSort + ':desc';
+                                }
+                                var curSortAr = curSort.split(':');
+                                if (curSortAr[0] === reqSort) {
+                                    var newSort = curSortAr[1] === 'asc' ? 'desc' : 'asc';
+                                    var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
+                                    newSortVal = curSortAr[0] + ':' + newSort;
+                                    iconSortType = "fas fa-sort-" + reqSortType + newSortIconType;
+                                } else {
+                                    newSortVal = reqSort + ':asc';
+                                    iconSortType = "fas fa-sort-" + reqSortType + "-up";
+                                }
+                                let $btParent = button.parent();
+                                let $icon = $btParent.find('i:eq(0)');
+                                if ($icon !== null) {
+                                    $icon.removeClass();
+                                    $icon.addClass(iconSortType);
+                                }
+
+                                setProductSelectorCurrentSort(newSortVal);
+                                //$('#pageIndex').val(1);
+                                getProductsSelectorList(selCompanies, selNatures, searchFilter, newSortVal, 1000,productSelected);
+
+
+                            });
+                    },
+                    complete: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        $("#loadMe").modal("hide");
+                        setTimeout(function() {
+                                console.log('Checking for open modals');
+                                //var isOpen = $('#loadMe').hasClass('show');
+                                var isOpen = $('#SpinnerLoader').is(':visible');
+                                if (isOpen) {
+                                    console.log('Spinner is showing');
+
+                                    $('#SpinnerLoader').hide();
+                                } else {
+                                    console.log('No open modal');
+                                }
+                            },
+                            2000);
+                    },
+                    error: function(e) {
+                        console.log(e);
+
+                    }
+                });
+            };
+
+            var getTransactorSelectorList = (selCompanies, selTransTypes, searchFilter, sortData, pageSize,selectionCallback) => {
+                var timeout;
+                var pageIndex = 1;
+                var uri = '/api/GrKoukInfoApi/GetSelectorTransactors';
+                uri += `?pageIndex=${pageIndex}`;
+                uri += `&pageSize=${pageSize}`;
+                uri += `&transactorTypeFilter=${selTransTypes}`;
+                uri += `&sortData=${sortData}`;
+                uri += `&companyFilter=${selCompanies}`;
+                uri += `&searchFilter=${searchFilter}`;
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+
+                    dataType: 'json',
+                    type: 'GET',
+
+                    url: uri,
+                    beforeSend: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        timeout = setTimeout(function() {
+                                $('#SpinnerLoader').show();
+
+                            },
+                            1000);
+                    },
+                    success: function(result) {
+                        $('#selectorItemsList > tbody').empty();
+                        $('#selectorItemsList > thead').empty();
+                        let colDefs = [
+                            {
+                                sortKey: 'TransactorCodeSort',
+                                sortType: 'alpha',
+                                header: 'Code',
+                                text: '',
+                                class: 'small d-none d-md-table-cell'
+                            },
+                            {
+                                sortKey: 'TransactorNameSort',
+                                sortType: 'alpha',
+                                header: 'Transactor',
+                                text: '',
+                                class: 'small'
+                            },
+                            {
+                                sortKey: '',
+                                sortType: '',
+                                header: 'Type',
+                                text: '',
+                                class: 'small'
+                            },
+                            {
+                                sortKey: 'CompanyCodeSort',
+                                sortType: 'alpha',
+                                header: 'Company',
+                                text: '',
+                                class: 'small'
+                            }
+                        ];
+                        let curSortUndefined = false;
+                        let curSortAr = [];
+                        var curSort = getTransactorSelectorCurrentSort();
+                        if (curSort === undefined || curSort === null || curSort.length === 0) {
+                            curSortUndefined = true;
+                        } else {
+                            curSortAr = curSort.split(':');
+                        }
+                        var $trHead = $('<tr>');
+                        colDefs.forEach(function(item) {
+                            var tdColHead = '';
+                            if (item.sortKey.length !== 0) {
+                                let colHtml = "";
+                                colHtml = `<th class="${item.class}"> `;
+                                colHtml += `<a href="#" role="button" name="SortHeader" tabindex="-1" `;
+                                colHtml += `data-sortkey="${item.sortKey}" data-sorttype="${item.sortType}">  `;
+                                colHtml += `${item.header}  `;
+                                colHtml += `</a>  `;
+                                if (curSortUndefined) {
+                                    colHtml += `<i class="" name="SortIcon"></i>  `;
+                                } else {
+                                    if (curSortAr[0] === item.sortKey) {
+
+                                        var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
+                                        var iconSortType = "fas fa-sort-" + item.sortType + newSortIconType;
+                                        colHtml += `<i class="${iconSortType}" name="SortIcon"></i>  `;
+                                    } else {
+                                        colHtml += `<i class="" name="SortIcon"></i>  `;
+                                    }
+                                }
+
+                                colHtml += `</a>  `;
+                                tdColHead = colHtml;
+                            } else {
+                                tdColHead = $('<th>').text(item.header).addClass(item.class);
+                            }
+                            $trHead.append($(tdColHead));
+                        });
+                        $trHead.append($('<th>'));
+                        $trHead.appendTo('#selectorItemsList > thead');
+                        $.each(result.data,
+                            function(index, value) {
+                                //colDefs[0].text = value.url;
+                                colDefs[0].text = value.code;
+                                colDefs[1].text = value.name;
+                                //colDefs[2].text = value.materialCateroryName;
+                                colDefs[2].text = value.transactorTypeName;
+                                colDefs[3].text = value.companyCode;
+                                var itemId = value.id;
+                                // var urlDel = `@Url.Page("./Delete")?id=${itemId}`;
+
+                                var $tr = $('<tr>');
+
+                                colDefs.forEach(function(item) {
+                                    var $tdCol = $('<td>').text(item.text).addClass(item.class);
+                                    $tr.append($tdCol);
+
+                                });
+                                var actionsCol = '<td class="small text-center">';
+                                actionsCol += '<button type="button" class="btn btn-outline-info btn-sm" ';
+                                actionsCol += `data-itemId="${itemId}"`;
+                                actionsCol += 'name="selectItem">';
+                                actionsCol +=
+                                    '<span><i class="far fa-check-square fa-lg" style="color:slategray"></i></span>';
+                                actionsCol += '</button>';
+                                actionsCol += '</td>';
+
+                                $tr.append(actionsCol);
+                                $tr.appendTo('#selectorItemsList > tbody');
+
+                            });
+
+                        $('[name=selectItem]').on('click',
+                            function(event) {
+                                var button = $(event.delegateTarget);
+                                var transactorId = button.data('itemid');
+                                console.log('Inside click event handler for selectItem');
+                                //$('#ItemVm_TransactorId').val(transactorId);
+                                selectionCallback(transactorId);
+                                $('#itemSelector').modal('hide');
+
+                            });
+                         $('[name=SortHeader]').on('click',
+                            function(event) {
+                                var button = $(event.delegateTarget);
+                                var reqSort = button.data('sortkey');
+                                let reqSortType = button.data('sorttype');
+                                let iconSortType = '';
+                                var newSortVal = '';
+                                var curSort = getTransactorSelectorCurrentSort();
+                                if (curSort === undefined || curSort === null || curSort.length === 0) {
+                                    curSort = reqSort + ':desc';
+                                }
+                                var curSortAr = curSort.split(':');
+                                if (curSortAr[0] === reqSort) {
+                                    var newSort = curSortAr[1] === 'asc' ? 'desc' : 'asc';
+                                    var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
+                                    newSortVal = curSortAr[0] + ':' + newSort;
+                                    iconSortType = "fas fa-sort-" + reqSortType + newSortIconType;
+                                } else {
+                                    newSortVal = reqSort + ':asc';
+                                    iconSortType = "fas fa-sort-" + reqSortType + "-up";
+                                }
+                                let $btParent = button.parent();
+                                let $icon = $btParent.find('i:eq(0)');
+                                if ($icon !== null) {
+                                    $icon.removeClass();
+                                    $icon.addClass(iconSortType);
+                                }
+
+                                setTransactorSelectorCurrentSort(newSortVal);
+                                //$('#pageIndex').val(1);
+                                getTransactorSelectorList(selCompanies, selTransTypes, searchFilter, newSortVal, 1000,selectionCallback);
+
+
+                            });
+                    },
+                    complete: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        $("#loadMe").modal("hide");
+                        setTimeout(function() {
+                                console.log('Checking for open modals');
+                                //var isOpen = $('#loadMe').hasClass('show');
+                                var isOpen = $('#SpinnerLoader').is(':visible');
+                                if (isOpen) {
+                                    console.log('Spinner is showing');
+
+                                    $('#SpinnerLoader').hide();
+                                } else {
+                                    console.log('No open modal');
+                                }
+                            },
+                            2000);
+                    },
+                    error: function(e) {
+                        console.log(e);
+
+                    }
+                });
+            };
+            $('#imageViewer').on('show.bs.modal',
+                function(event) {
+                    var button = $(event.relatedTarget);
+                    var imageUrl = button.data('imageurl');
+                    var $modal = $(this);
+                    $modal.find('.modal-title').text('Image');
+                    $modal.find('#imageControl').attr("src", imageUrl);
+
+                });
+            $('#itemSelector').on('shown.bs.modal',
+                function() {
+                    let currentCompany = $('#ItemVm_CompanyId').val();
+                    $('[name=itemsSearchText]').val("");
+                    $('#selectorItemsList > tbody').empty();
+                    $('#selectorItemsList > thead').empty();
+                    // $('#MaterialNatureTypes').selectpicker('deselectall');
+                    // $('#TransactorTypes').selectpicker('deselectall');
+                    var $compList = $('#CompaniesList');
+                    $compList.selectpicker('val', currentCompany);
+                    $compList.selectpicker('render');
+                    var $transList = $('#TransactorTypes');
+
+                    $transList.selectpicker('val', 2);
+                    $transList.selectpicker('render');
+
+                    $('[name=itemsSearchText]').trigger('focus');
+                    //$compList.selectpicker('refresh');
+
+                });
+            $('#itemSelector').on('show.bs.modal',
+                function(event) {
+                    var button = $(event.relatedTarget);
+                    var selectorType = button.data('selectortype');
+                    var modal = $(this);
+                    switch (selectorType) {
+                    case "ProductsSelector":
+                        modal.find('.modal-title').text("Ευρετήριο Προιόντων");
+                        $('#TransactorSelectorTypesDiv').hide();
+                        $('#MaterialNatureTypesDiv').show();
+                        curSelectorType = "ProductsSelector";
+                        var $matNatures = $('#MaterialNatureTypes');
+                        if ($matNatures.children('option').length === 0) {
+                            getWarehouseItemNatureList();
+                        }
+                        break;
+                    case "SuppliersSelector":
+                        modal.find('.modal-title').text("Supplier selector");
+                        $('#TransactorSelectorTypesDiv').show();
+                        $('#MaterialNatureTypesDiv').hide();
+                        curSelectorType = "SuppliersSelector";
+                        var $transTypes = $('#TransactorTypes');
+                        if ($transTypes.children('option').length === 0) {
+                            getTransactorTypeList();
+                        }
+                        break;
+                    default:
+                    }
+
+
+                    var $compList = $('#CompaniesList');
+                    if ($compList.children('option').length === 0) {
+                        getCompanyList();
+                    }
+                });
+            $('#TransactorTypes').on('changed.bs.select',
+                function(e, clickedIndex, isSelected, previousValue) {
+                    var sel = $('#TransactorTypes option:selected');
+                    var selected = [];
+                    $(sel).each(function(index, item) {
+                        selected.push([$(this).val()]);
+                    });
+
+                    var sItem = selected.toString();
+
+                    selectedTransTypes = sItem;
+                });
+            $('#MaterialNatureTypes').on('changed.bs.select',
+                function(e, clickedIndex, isSelected, previousValue) {
+                    var sel = $('#MaterialNatureTypes option:selected');
+                    var selected = [];
+                    $(sel).each(function(index, item) {
+                        selected.push([$(this).val()]);
+                    });
+
+                    var sItem = selected.toString();
+
+                    selectedNatures = sItem;
+                });
+
+            $('#CompaniesList').on('changed.bs.select',
+                function(e, clickedIndex, isSelected, previousValue) {
+                    var sel = $('#CompaniesList option:selected');
+                    var selected = [];
+                    $(sel).each(function(index, item) {
+                        selected.push([$(this).val()]);
+                    });
+
+                    var sItem = selected.toString();
+
+                    selectedCompanies = sItem;
+                });
+            var timeKey;
+            $('[name=itemsSearchText]').on('keyup',
+                function(event) {
+                    //var button = $(event.relatedTarget);
+
+                    var $this = $(this);
+                    console.log("Inside keyUp event");
+                    //var searchText = $('[name=itemsSearchText]').val();
+                    var searchText = $this.val();
+                    if (searchText.length === 0) {
+                        console.log("search text lenght 0 returning");
+                        return;
+                    }
+                    if (timeKey) {
+                        console.log("Clear timeKey");
+                        clearTimeout(timeKey);
+                    }
+                    timeKey = setTimeout(function() {
+                            console.log("Will execute get request in 1 sec!");
+
+                            switch (curSelectorType) {
+                                case "ProductsSelector":
+                                    var curSort = getProductSelectorCurrentSort();
+                                    if (curSort === undefined || curSort === null || curSort.length === 0) {
+                                        curSort = '';
+                                    }
+                                     getProductsSelectorList(selectedCompanies, selectedNatures, searchText, curSort, 100,productSelected);
+                                     break;
+                                case "SuppliersSelector":
+                                    var curSortTrans = getTransactorSelectorCurrentSort();
+                                    if (curSortTrans === undefined || curSortTrans === null || curSortTrans.length === 0) {
+                                        curSortTrans = '';
+                                    }
+                                     getTransactorSelectorList(selectedCompanies, selectedTransTypes, searchText,curSortTrans, 100,transactorSelected);
+                                     break;
+                            default:
+                            }
+
+                            $('#itemSelector').modal('handleUpdate');
+                        },
+                        1000);
+                });
+            const transactorSelected = (transactorId) => {
+                $('#ItemVm_TransactorId').val(transactorId);
+            };
+            const productSelected = (productId) => {
+                getWarehouseItemInfo(productId);
+            };
+            //#endregion
+
+            var priceChanged = () => {
+                var priceValue =parseFloat( $price.val());
+                var fpaValue = parseFloat($vatPercent.val());
+                var priceNetValue = 0;
+
+                if (fpaValue != 0) {
+                    priceNetValue = priceValue / (1 + fpaValue);
+                } else {
+                    priceNetValue = priceValue;
+                }
+                var priceType = $seriesUsedPrice.val();
+                switch (priceType) {
+                case '1':
+                    $priceNet.val(priceValue);
+                    break;
+                case '2':
+                    $priceNet.val(priceNetValue);
+                    break;
+                default:
+                    break;
+                }
+            };
+            var lineUpdatePrice = (linePrice, lineFpaRate) => {
+                var priceNetValue = parseFloat( linePrice);
+                var fpaValue = parseFloat(lineFpaRate);
+                var priceValue = 0;
+
+                if (fpaValue != 0) {
+                    priceValue = priceNetValue * (1 + fpaValue);
+                } else {
+                    priceValue = priceNetValue;
+                }
+                var priceType = $seriesUsedPrice.val();
+                switch (priceType) {
+                case '1'://Netto
+                        $priceNet.val(priceNetValue);
+                        $price.val(priceNetValue);
+                    break;
+                case '2'://Brutto
+                        $priceNet.val(priceNetValue);
+                        $price.val(priceValue);
+                    break;
+                default:
+                    break;
+                }
+            };
+
+            var companyChanged = () => {
+                return $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'GET',
+                    url: "/api/Materials/SetCompanyInSession?companyId="+$companyId.val(),
+                    success: function(result) {
+                    },
+                    error: function(e) {
+                    }
+                });
+            };
+            var seriesChanged = () => {
+                console.log("Inside Series Changed");
+
+                var seriesId = $translDocSeriesId.val();
+                var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
+                var finalUri = `${uri}/materials/SalesSeriesData?seriesId=${seriesId}`;
+                fetch(finalUri)
+                    .then(function(response) {
+                        if (response.ok) {
+                            return response.json();
+                        } else {
+                            return "-1";
+                        }
+
+                    })
+                    .then(function(myJson) {
+                        console.log("Inside fetch then with myJson" + JSON.stringify(myJson));
+                        if (myJson) {
+
+                            var usedPrice = myJson.usedPrice;
+                            console.log("Returned usedPrice=" + usedPrice);
+                            $seriesUsedPrice.val(usedPrice);
+
+                        }
+                        // $spinner.attr('hidden', true);
+                    })
+                    .catch((error) => {
+                            // $spinner.attr('hidden', true);
+                            console.log(error);
+                        }
+                    );
+            };
+            var q1Changed = () => {
+                $q2.val($q1.val() / $factor.val());
+            };
+            var q2Changed = () => {
+                $q1.val($q2.val() * $factor.val());
+            };
+            var setupUnitToUse = (e) => {
+                switch (e) {
+                case 'MAIN':
+                    $q1.prop('disabled', false);
+                    $q2.prop('disabled' , true);
+                    break;
+                case 'SEC':
+                    $q1.prop('disabled', true);
+                    $q2.prop('disabled' , false);
+                    break;
+                case 'BUY':
+                    $q1.prop('disabled', true);
+                    $q2.prop('disabled' , false);
+                    break;
+
+                default:
+                    $q1.prop('disabled', false);
+                    $q2.prop('disabled', false);
+                    break;
+                }
+            };
+            var initValUnitToUse = (e) => {
+                switch (e) {
+                case 'MAIN':
+                    $q1.val(1);
+                    q1Changed();
+                    $q1.focus();
+                    break;
+                case 'SEC':
+                    $q2.val(1);
+                    q2Changed();
+                    $q2.focus();
+                    break;
+                case 'BUY':
+                    $q2.val(1);
+                    q2Changed();
+                    $q2.focus();
+                    break;
+
+                default:
+                    $q1.val(1);
+                    q1Changed();
+                    break;
+                }
+            };
+            var seekBarcode = () => {
+                return $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'GET',
+                    url: "/api/Materials/SeekBarcode?barcode="+$lookUp.val(),
+
+                    success: function(result) {
+
+                        var r = result;
+                        console.log(r);
+                        var mName = r.name;
+                        var mFactor = r.factor;
+                        var mId = r.id;
+                        var rate = r.fpaRate;
+                        var lastPrice = r.lastPrice;
+                        var fpaId = r.fpaId;
+                        var unitToUse = r.unitToUse;
+                        setupUnitToUse(unitToUse);
+                        $mainUnitId.val(r.mainUnitId);
+                        $secUnitId.val(r.buyUnitId);
+                        $materialId.val(mId);
+                        $factor.val(mFactor);
+                        $vatPercent.val(rate);
+                        $discount.val(0);
+                        $materialFpaId.val(fpaId);
+                        $price.val(lastPrice);
+                        $priceNet.val(lastPrice);
+                        $lookUp.val(mName);
+                        initValUnitToUse(unitToUse);
+                        $lookupValueValid.val('OK');
+                    },
+                    error: function(e) {
+                        $lookupValueValid.val('ERROR');
+                        //toastr.error("Error", "Error");
+                    }
+                });
+            };
+            var updateCounter = () => {
+                var lineCounter = 0;
+                var sumNet = 0;
+                var sumVat = 0;
+                var sumDisc = 0;
+                var sumGross = 0;
+
+                $.each($('#detailsTable tbody tr'),
+                    function() {
+                        lineCounter++;
+                        $(this).find('td:eq(0)').text(lineCounter);
+                        var lineNet = $(this).find('td:eq(7)').attr('data-actualValue');
+                        var lineDisc = $(this).find('td:eq(8)').attr('data-actualValue');
+                        var lineVat = $(this).find('td:eq(9)').attr('data-actualValue');
+                        var lineGross = $(this).find('td:eq(10)').attr('data-actualValue');
+                        sumNet += parseFloat(lineNet);
+                        sumDisc += parseFloat(lineDisc);
+                        sumVat += parseFloat(lineVat);
+                        sumGross += parseFloat(lineGross);
+                    });
+                $amountNet.val(formatterCurrency.format(sumNet));
+                $amountNet.attr('data-actualValue', sumNet);
+                $amountFpa.val(formatterCurrency.format(sumVat));
+                $amountFpa.attr('data-actualValue', sumVat);
+                $amountDiscount.val(formatterCurrency.format(sumDisc));
+                $amountDiscount.attr('data-actualValue', sumDisc);
+                $amountSum.val(formatterCurrency.format(sumGross));
+                $amountSum.attr('data-actualValue', sumGross);
+            };
+             var getWarehouseItemInfo = (itemId) => {
+                var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
+                var finalUri = `${uri}/materials/materialdata?warehouseItemId=${itemId}`;
+                $materialId.val(itemId);
+                console.log(finalUri);
+
+                fetch(finalUri)
+                    .then(function(response) {
+                        if (response.ok) {
+                            return response.json();
+                        } else {
+                            return "";
+                        }
+
+                    })
+                    .then(function(myJson) {
+                        if (myJson) {
+                            console.log(JSON.stringify(myJson));
+                            var rate = myJson.fpaRate;
+                            var lastPrice = myJson.lastPrice;
+                            var priceNetto = myJson.priceNetto;
+                            var priceBrutto = myJson.priceBrutto;
+                            var fpaId = myJson.fpaId;
+                            //I Use main unit and Buy Unit as secondary
+                            $q1Label.text(`Q1(${myJson.mainUnitCode})`);
+                            $q2Label.text(`Q2(${myJson.buyUnitCode})`);
+                            $vatPercent.val(rate);
+                            $('#MaterialFpaId').val(fpaId);
+                            $price.val(lastPrice);
+                            $priceNetto.val(priceNetto);
+                            $priceBrutto.val(priceBrutto);
+                            $discount.val('0');
+                            $mainUnitId.val(myJson.mainUnitId);
+                            $secUnitId.val(myJson.buyUnitId);
+                            $factor.val(myJson.factorBuy);
+                            var priceType = $seriesUsedPrice.val();
+                            switch (priceType) {
+                            case '1':
+                                $price.val(priceNetto);
+                                break;
+                            case '2':
+                                $price.val(priceBrutto);
+                                break;
+                            default:
+                                break;
+                            }
+                            priceChanged();
+                            $lookUp.val(myJson.warehouseItemName);
+                            $lookupValueValid.val('OK');
+                        }
+                        else {
+                            $lookupValueValid.val('ERROR');
+                        }
+
+                    })
+                    .catch((error) => {
+                        $lookupValueValid.val('ERROR');
+                        console.log(error);
+                    });
+            };
+            var autoCompleteNameDef = {
+                source: '/api/materials/SearchWarehouseItemsForSale',
+                minLength: 2,
+                maxShowItems:10,
+                select: function(event, ui) {
+                    $materialId.val(ui.item.value);
+                    console.log(ui.item.value.toString());
+                    this.value = ui.item.label;
+                    //Get WarehouseItem data
+                    getWarehouseItemInfo(ui.item.value);
+                    return false;
+                }
+
+            };
+            var setSeekType = () => {
+                $lookUp.off('change');
+                try {
+                    $lookUp.autocomplete("destroy");
+                } catch (e) {
+                    console.log('Error in autocomplete destroy.');
+                }
+
+                var sType = $seekType.val();
+                switch (sType) {
+                case 'NAME':
+                    $q1.prop('disabled', false);
+                    $q2.prop('disabled' , false);
+                    $lookUp.autocomplete(autoCompleteNameDef);
+                    break;
+                case 'CODE':
+                    break;
+                case 'BARCODE':
+                    $lookUp.change(() => {
+                        seekBarcode();
+                    });
+                    break;
+                default:
+                }
+            };
+            $seekType.change(() => {
+                setSeekType();
+            });
+            $vatPercent.change(() => {
+                priceChanged();
+            });
+            $price.change(() => {
+                priceChanged();
+            });
+            $companyId.change(() => {
+                companyChanged();
+            });
+
+            $translDocSeriesId.change(() => {
+                seriesChanged();
+            });
+
+            $q1.change(() => {
+                console.log("Q1 change event ->" + $q1.val());
+                q1Changed();
+            });
+
+            $q2.change(() => {
+                console.log("Q2 change event ->" + $q2.val());
+                q2Changed();
+
+            });
+            //$('.ui-autocomplete-input').css('fontSize', '8px');
+
+
+            $('#addToList').click((e) => {
+                e.preventDefault();
+                if ($lookupValueValid.val() != 'OK') {
+                    toastr.error('Lookup value not correct');
+                    return;
+                }
+                if ($.trim($lookUp.val()) == "" ||
+                    $.trim($price.val()) == "" ||
+                    $.trim($q1.val()) == "") return;
+                var productName = $lookUp.val();
+                var price = $priceNet.val();
+                var quantity1 = $q1.val();
+                var quantity2 = $q2.val();
+                var discount = $discount.val();
+                var materialId = $materialId.val();
+                var vatPercent = $vatPercent.val();
+                var factor = $factor.val();
+                var mainUnitId = $mainUnitId.val();
+                var secUnitId = $secUnitId.val();
+                var materialCounter = parseInt($materialCounter.val()) + 1;
+                var netAmount = parseFloat(quantity1) * parseFloat(price);
+                var discountAmount = netAmount * parseFloat(discount);
+                var lineEdit = $lineEditing.val();
+                var fpaAmount = (netAmount - discountAmount) * parseFloat(vatPercent);
+                var grosAmount = (netAmount - discountAmount) + fpaAmount;
+
+                console.log("Inside AddToList with lineEdit is " + lineEdit);
+                if (lineEdit == 0) {
+                    console.log("Inside lineEdit Adding Line");
+                    //Εισαγωγή γραμμής
+
+                    var detailsTableBody = $("#detailsTable tbody");
+
+                    //#region Add Table Line
+                    var productItem = '<tr><td class="small">' +
+                        materialCounter +
+                        '</td><td class="small " data-materialId="' +
+                        materialId +
+                        '"' +
+                        'data-factor="' +
+                        factor +
+                        '"' +
+                        'data-mainUnitId="' +
+                        mainUnitId +
+                        '"' +
+                        'data-secUnitId="' +
+                        secUnitId +
+                        '"' +
+                        '>' +
+                        productName +
+                        '</td><td class="small text-right" ' +
+                        'data-actualValue="' +
+                        quantity1 +
+                        '" >' +
+                        formatterNumber.format(quantity1) +
+                        '</td><td class="small text-right" ' +
+                        'data-actualValue="' +
+                        quantity2 +
+                        '" >' +
+                        formatterNumber.format(quantity2) +
+                        '</td><td class="small text-right" ' +
+                        'data-actualValue="' +
+                        price +
+                        '" >' +
+                        formatterCurrency.format(price) +
+                        '</td><td class="small text-right" ' +
+                        'data-actualValue="' +
+                        discount +
+                        '" >' +
+                        formatterNumber.format(discount) +
+                        '</td><td class="small text-right" ' +
+                        'data-actualValue="' +
+                        vatPercent +
+                        '" >' +
+                        formatterNumber.format(vatPercent) +
+                        '</td><td class="small text-right" ' +
+                        'data-actualValue="' +
+                        netAmount +
+                        '" >' +
+                        formatterCurrency.format(netAmount) +
+                        '</td><td class="small text-right" ' +
+                        'data-actualValue="' +
+                        discountAmount +
+                        '" >' +
+                        formatterCurrency.format(discountAmount) +
+                        '</td><td class="small text-right" ' +
+                        'data-actualValue="' +
+                        fpaAmount +
+                        '" >' +
+                        formatterCurrency.format(fpaAmount) +
+                        '</td><td class="small text-right" ' +
+                        'data-actualValue="' +
+                        grosAmount +
+                        '" >' +
+                        formatterCurrency.format(grosAmount) +
+                        '</td><td class="small">' +
+                        '<a data-itemId="0" href="#" class="modifyItem"><i class="fas fa-edit"></i></a>' +
+                        '</td><td class="small">' +
+                        '<a data-itemId="0" href="#" class="deleteItem"><i class="fas fa-trash"></i></a>' +
+                        '</td></tr>';
+                    detailsTableBody.append(productItem);
+                    //#endregion
+                } else {
+                    console.log("Inside lineEdit Modifying Line");
+                    //Μεταβολή γραμμής πίνακα
+                    var $tbl = $('#detailsTable');
+                    var $rows = $('tr',$tbl);
+                    var $row = $rows.eq(lineEdit);
+
+                    var $colMaterial = $('td:eq(1)', $row);
+                    var $colQ1 = $('td:eq(2)', $row);
+                    var $colQ2 = $('td:eq(3)', $row);
+                    var $colPrice = $('td:eq(4)', $row);
+                    var $colDiscRate = $('td:eq(5)', $row);
+                    var $colFpaRate = $('td:eq(6)', $row);
+                    var $colNetAmount = $('td:eq(7)', $row);
+                    var $colDiscAmount = $('td:eq(8)', $row);
+                    var $colFpaAmount = $('td:eq(9)', $row);
+                    var $colGrossAmount = $('td:eq(10)', $row);
+
+                    $colMaterial.attr('data-materialId', materialId);
+                    $colMaterial.attr('data-mainUnitId', mainUnitId);
+                    $colMaterial.attr('data-secUnitId', secUnitId);
+                    $colMaterial.attr('data-factor', factor);
+                    $colMaterial.text(productName);
+
+                    $colQ1.attr('data-actualValue', quantity1);
+                    $colQ1.text(formatterNumber.format(quantity1));
+
+                    $colQ2.attr('data-actualValue', quantity2);
+                    $colQ2.text(formatterNumber.format(quantity2));
+
+                    $colPrice.attr('data-actualValue', price);
+                    $colPrice.text(formatterCurrency.format(price));
+
+                    $colDiscRate.attr('data-actualValue', discount);
+                    $colDiscRate.text(formatterNumber.format(discount));
+
+                    $colFpaRate.attr('data-actualValue', vatPercent);
+                    $colFpaRate.text(formatterNumber.format(vatPercent));
+
+                    $colNetAmount.attr('data-actualValue', netAmount);
+                    $colNetAmount.text(formatterCurrency.format(netAmount));
+
+                    $colDiscAmount.attr('data-actualValue', discountAmount);
+                    $colDiscAmount.text(formatterCurrency.format(discountAmount));
+
+                    $colFpaAmount.attr('data-actualValue', fpaAmount);
+                    $colFpaAmount.text(formatterCurrency.format(fpaAmount));
+
+                    $colGrossAmount.attr('data-actualValue', grosAmount);
+                    $colGrossAmount.text(formatterCurrency.format(grosAmount));
+                }
+
+                $lineEditing.val(0);
+                clearItem();
+                $lookUp.focus();
+                updateCounter();
+
+            });
+
+            //After Add A New Order In The List, Clear Clean The Form For Add More Order.
+            function clearItem() {
+                $lookUp.val('');
+                $price.val('');
+                $q1.val('');
+                $q2.val('');
+                $discount.val('');
+                $vatPercent.val('');
+                $priceNet.val('');
+                $q1.prop('disabled', false);
+                $q2.prop('disabled', false);
+            }
+
+            $(document).on('click','a.deleteItem',function(e) {
+                    e.preventDefault();
+                    var $self = $(this);
+                    if ($(this).attr('data-itemId') == "0") {
+                       
+                        $(this).parents('tr').css("background-color", "#ff6347").fadeOut(800,
+                            function() {
+                                $(this).remove();
+                                updateCounter();
+                            });
+
+                    }
+                });
+            //--------------------
+            $(document).on('click','a.modifyItem',function(e) {
+                    e.preventDefault();
+                    var $self = $(this);
+                    if ($(this).attr('data-itemId') == "0") {
+                        var lineEdit = $(this).parents('tr').find('td:eq(0)').text();
+                        var materialId = $(this).parents('tr').find('td:eq(1)').attr('data-materialId');
+                        var materialName = $(this).parents('tr').find('td:eq(1)').text();
+                        var mainUnitId = $(this).parents('tr').find('td:eq(1)').attr('data-mainUnitId');
+                        var secUnitId = $(this).parents('tr').find('td:eq(1)').attr('data-secUnitId');
+                        var factor = $(this).parents('tr').find('td:eq(1)').attr('data-factor');
+                        var q1 = $(this).parents('tr').find('td:eq(2)').attr('data-actualValue');
+                        var q2 = $(this).parents('tr').find('td:eq(3)').attr('data-actualValue');
+                        var price = $(this).parents('tr').find('td:eq(4)').attr('data-actualValue');
+                        var discountRate = $(this).parents('tr').find('td:eq(5)').attr('data-actualValue');
+                        var fpaRate = $(this).parents('tr').find('td:eq(6)').attr('data-actualValue');
+
+                        $lineEditing.val(lineEdit);
+                        $materialId.val(materialId);
+                        $lookUp.val(materialName);
+                        $lookupValueValid.val('OK');
+                        $q1.val(q1);
+                        $q2.val(q2);
+                        $vatPercent.val(fpaRate);
+                        $discount.val(discountRate);
+                        $mainUnitId.val(mainUnitId);
+                        $secUnitId.val(secUnitId);
+                        $factor.val(factor);
+                        lineUpdatePrice(price,fpaRate);
+                    }
+                });
+
+
+            function saveData(data) {
+                return $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+
+                    dataType: 'json',
+                    type: 'POST',
+                    url: "/api/Materials/SalesDoc",
+                    data: data,
+                    headers: {
+                        'RequestVerificationToken': securityToken
+                    },
+                    success: function(result) {
+                        toastr.success("Success", "Success");
+                        //location.reload();
+                        window.location.href = '@Url.Page("Index")';
+                    },
+                    error: function(e) {
+                        var r = e.responseJSON.error;
+                        toastr.error(r, "saveData");
+
+                    }
+                });
+            }
+
+
+            $("#saveForm").click(function(e) {
+
+                var $form = $('#transForm');
+                var f = document.getElementById("transForm");
+               
+                e.preventDefault();
+
+                $('#thisForm').prop("disabled", true);
+
+                var linesArr = [];
+                linesArr.length = 0;
+
+                $.each($("#detailsTable tbody tr"),function() {
+                        linesArr.push({
+                            // materialId: $(this).find('td:eq(0)').html(),
+                            warehouseItemId: $(this).find('td:eq(1)').attr('data-materialId'),
+                            mainUnitId: $(this).find('td:eq(1)').attr('data-mainUnitId'),
+                            secUnitId: $(this).find('td:eq(1)').attr('data-secUnitId'),
+                            factor: $(this).find('td:eq(1)').attr('data-factor'),
+                            q1: $(this).find('td:eq(2)').attr('data-actualValue'),
+                            q2: $(this).find('td:eq(3)').attr('data-actualValue'),
+                            price: $(this).find('td:eq(4)').attr('data-actualValue'),
+                            discount: $(this).find('td:eq(5)').attr('data-actualValue'),
+                            discountRate: $(this).find('td:eq(5)').attr('data-actualValue'),
+                            fpaRate: $(this).find('td:eq(6)').attr('data-actualValue'),
+                            vatPercent: $(this).find('td:eq(6)').attr('data-actualValue')
+
+                        });
+                    });
+
+                var data = JSON.stringify({
+                    transDate: $("#ItemVm_TransDate").val(),
+                    transRefCode: $("#ItemVm_TransRefCode").val(),
+                    transactorId: $("#ItemVm_TransactorId").val(),
+                    companyId: $("#ItemVm_CompanyId").val(),
+                    sellDocSeriesId: $("#ItemVm_SellDocSeriesId").val(),
+                    paymentMethodId: $("#ItemVm_PaymentMethodId").val(),
+                    salesChannelId: $("#ItemVm_SalesChannelId").val(),
+                    Etiology: $("#ItemVm_Etiology").val(),
+                    amountFpa: $("#ItemVm_AmountFpa").attr('data-actualValue'),
+                    amountNet: $("#ItemVm_AmountNet").attr('data-actualValue'),
+                    amountDiscount: $("#ItemVm_AmountDiscount").attr('data-actualValue'),
+
+                    sellDocLines: linesArr
+
+                });
+                console.log("Data->" + data);
+                $.when(saveData(data))
+                    .then(function(response) {
+                        console.log(response);
+                        $('#thisForm').prop("disabled", false);
+                    })
+                    .fail(function(err) {
+                        console.log(err);
+                        $('#thisForm').prop("disabled", false);
+                    });
+            });
+            //-------------
+            $transDate.val(new Date().toISOString().slice(0, 10));
+            var copyFromId =parseInt( $('#CopyFromId').val());
+
+            if (copyFromId === 0) {
+                $materialCounter.val(0);
+
+                $amountNet.attr('data-actualValue', '0');
+                $amountNet.val(0);
+                $amountFpa.attr('data-actualValue', '0');
+                $amountFpa.val(0);
+                $amountDiscount.attr('data-actualValue', '0');
+                $amountDiscount.val(0);
+                $amountSum.attr('data-actualValue', '0');
+                $amountSum.val(0);
+            } else {
+                updateCounter();
+            }
+            if ($initialLoad.val()=='True') {
+                console.log("Initial load is true setting initial values");
+                seriesChanged();
+                companyChanged();
+                setSeekType();
+            }
+            console.log("After initial load check");
+
+            $initialLoad.val(false);
+        });
+
+
+    </script>
+}

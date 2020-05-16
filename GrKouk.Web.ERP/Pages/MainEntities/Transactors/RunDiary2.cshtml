@@ -1,0 +1,251 @@
+﻿@page
+@model GrKouk.Web.Erp.Pages.MainEntities.Transactors.RunDiaryModel2
+@{
+    ViewData["Title"] = "Diary";
+}
+<h4>RunDiary</h4>
+<form class="form-inline" asp-page="./RunDiary" method="get">
+    <input type="hidden" asp-for="DiaryId" />
+    <input type="hidden" asp-for="TransactorId" />
+    <input type="hidden" asp-for="TransactorName" />
+    <input type="hidden" asp-for="TransactorTypeFilter" />
+    <input type="hidden" asp-for="ParentPageIndex" />
+    <input type="hidden" asp-for="ParentPageSize" />
+    <div class="container">
+        <div class="form-row">
+
+            <div class="form-group col-md-auto">
+                <label class="small"> Search:</label>
+                <input class="form-control form-control-sm small" type="text" name="SearchString" value="@Model.CurrentFilter" />
+                <input type="submit" value="Search" class="btn btn-light btn-sm" />
+            </div>
+            <div class="form-group col-md-auto">
+                <a class="small" asp-page="./RunDiary"
+                   asp-route-sortOrder="@Model.CurrentSort"
+                   asp-route-pageIndex="@(Model.ListItems.CurrentPage)"
+                   asp-route-transactorTypeFilter="@Model.TransactorTypeFilter"
+                   asp-route-parentPageIndex="@Model.ParentPageIndex "
+                   asp-route-parentPageSize="@Model.ParentPageSize"
+                   asp-route-currentFilter="@Model.CurrentFilter"
+                   asp-route-datePeriodFilter="@Model.CurrentDatePeriod"
+                   asp-route-PageSizeKartela="@Model.ListItems.PageSize"
+                   asp-route-companyFilter="@Model.CompanyFilter"
+                   asp-route-diaryId="@Model.DiaryId">Back to full List</a>
+            </div>
+            <div class="form-group col-md-auto">
+                <label class="small"> Period:</label>
+                <select name="DatePeriodFilter" asp-for="CurrentDatePeriod" class="form-control form-control-sm small" asp-items="ViewBag.DataFilterValues"
+                        onchange="this.form.submit()"></select>
+            </div>
+            <div class="form-group col-md-auto">
+                <label class="small">Company:</label>
+                <select asp-for="CompanyFilter" class="form-control form-control-sm small"
+                        asp-items="ViewBag.CompanyFilter" onchange="this.form.submit()"></select>
+
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-auto">
+                    <label class="small"> Page Size:</label>
+                    <select asp-for="PageSizeKartela" onchange="this.form.submit()"
+                            asp-items="ViewBag.PageFilterSize"
+                            class="form-control form-control-sm small"></select>
+                </div>
+                <div class="form-group col-md-auto">
+                    <small>
+                        Page:@Model.ListItems.CurrentPage of @Model.ListItems.TotalPages Total Items @Model.ListItems.TotalCount
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<br />
+<table class="table table-bordered table-sm">
+    <thead class="thead-light">
+        <tr>
+            <th class="small text-center">
+                <a asp-page="./RunDiary" asp-route-sortOrder="@Model.DateSort"
+                   asp-route-PageSizeKartela="@Model.PageSizeKartela"
+                   asp-route-transactorTypeFilter="@Model.TransactorTypeFilter"
+                   asp-route-companyFilter="@Model.CompanyFilter"
+                   asp-route-parentPageIndex="@Model.ParentPageIndex "
+                   asp-route-parentPageSize="@Model.ParentPageSize"
+                   asp-route-searchFilter="@Model.CurrentFilter"
+                   asp-route-diaryId="@Model.DiaryId"
+                   asp-route-datePeriodFilter="@Model.CurrentDatePeriod">
+                    @Html.DisplayNameFor(model => model.ListItems[0].TransDate)
+
+                </a>
+                <i class="@Model.DateSortIcon"></i>
+            </th>
+            <th class="small">
+                <a asp-page="./RunDiary" asp-route-sortOrder="@Model.NameSort"
+                   asp-route-PageSizeKartela="@Model.PageSizeKartela"
+                   asp-route-parentPageIndex="@Model.ParentPageIndex "
+                   asp-route-transactorTypeFilter="@Model.TransactorTypeFilter"
+                   asp-route-companyFilter="@Model.CompanyFilter"
+                   asp-route-parentPageSize="@Model.ParentPageSize"
+                   asp-route-searchFilter="@Model.CurrentFilter"
+                   asp-route-datePeriodFilter="@Model.CurrentDatePeriod"
+                   asp-route-diaryId="@Model.DiaryId">
+                    @Html.DisplayNameFor(model => model.ListItems[0].TransactorName)
+                </a>
+
+                <i class="@Model.NameSortIcon"></i>
+            </th>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].TransTransactorDocSeriesCode)
+            </th>
+          
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].TransRefCode)
+            </th>
+
+           
+
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].DebitAmount)
+            </th>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].CreditAmount)
+            </th>
+
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].CompanyCode)
+            </th>
+
+           
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.ListItems)
+        {
+            <tr>
+                <td class="text-right small">
+                    @Html.DisplayFor(modelItem => item.TransDate)
+                </td>
+                <td class="small">
+                    @Html.DisplayFor(modelItem => item.TransactorName)
+                </td>
+                <td class="small">
+                    @Html.DisplayFor(modelItem => item.TransTransactorDocSeriesCode)
+                </td>
+              
+                <td class="small">
+                    @Html.DisplayFor(modelItem => item.TransRefCode)
+                </td>
+               
+                <td class="text-right small">
+                    @Html.DisplayFor(modelItem => item.DebitAmount)
+                </td>
+                <td class="text-right small">
+                    @Html.DisplayFor(modelItem => item.CreditAmount)
+                </td>
+
+                <td class="small">
+                    @Html.DisplayFor(modelItem => item.CompanyCode)
+                </td>
+            </tr>
+
+
+        }
+            <tr class="table-info" >
+                <td class="small"></td>
+                <td class="small"></td>
+                <td class="small font-weight-bold">
+                    Σύνολα Σελίδας
+                </td>
+              
+                <td class="small"></td>
+                <td class="small text-right font-weight-bold">
+                    @Html.DisplayFor(modelItem => modelItem.sumDebit)
+                </td>
+                <td class="small text-right font-weight-bold">
+                    @Html.DisplayFor(modelItem => modelItem.sumCredit)
+                </td>
+                <td class="small"></td>
+               
+            </tr>
+    </tbody>
+</table>
+
+@{
+    var prevDisabled = !Model.ListItems.HasPrevious ? "disabled" : "";
+    var nextDisabled = !Model.ListItems.HasNext ? "disabled" : "";
+}
+
+
+
+
+<nav aria-label="Page navigation example">
+    <ul class="pagination pagination-sm">
+        <li class="page-item @prevDisabled">
+            <a asp-page="./rundiary"
+               asp-route-pageIndexKartela="1"
+               asp-route-PageSizeKartela="@Model.PageSizeKartela"
+               asp-route-sortOrder="@Model.CurrentSort"
+               asp-route-parentPageIndex="@Model.ParentPageIndex "
+               asp-route-transactorTypeFilter="@Model.TransactorTypeFilter"
+               asp-route-companyFilter="@Model.CompanyFilter"
+               asp-route-parentPageSize="@Model.ParentPageSize"
+               asp-route-diaryId="@Model.DiaryId"
+               class="page-link" aria-label="First">
+                @*<span aria-hidden="true">;</span>*@
+                First
+            </a>
+        </li>
+        <li class="page-item @prevDisabled">
+            <a asp-page="./rundiary"
+               asp-route-pageIndexKartela="@(Model.ListItems.CurrentPage - 1)"
+               asp-route-PageSizeKartela="@Model.PageSizeKartela"
+               asp-route-sortOrder="@Model.CurrentSort"
+               asp-route-parentPageIndex="@Model.ParentPageIndex "
+               asp-route-transactorTypeFilter="@Model.TransactorTypeFilter"
+               asp-route-companyFilter="@Model.CompanyFilter"
+               asp-route-parentPageSize="@Model.ParentPageSize"
+               asp-route-diaryId="@Model.DiaryId"
+               class="page-link" aria-label="Previous">
+                @*<span aria-hidden="true">&laquo;</span>*@
+                Previous
+            </a>
+        </li>
+
+        <li class="page-item @nextDisabled">
+            <a asp-page="./rundiary"
+               asp-route-pageIndexKartela="@(Model.ListItems.CurrentPage + 1)"
+               asp-route-PageSizeKartela="@Model.PageSizeKartela"
+               asp-route-sortOrder="@Model.CurrentSort"
+               asp-route-parentPageIndex="@Model.ParentPageIndex "
+               asp-route-transactorTypeFilter="@Model.TransactorTypeFilter"
+               asp-route-companyFilter="@Model.CompanyFilter"
+               asp-route-ParentPageSize="@Model.ParentPageSize"
+               asp-route-diaryId="@Model.DiaryId"
+               class="page-link" aria-label="Next">
+                @*<span aria-hidden="true">&raquo;</span>*@
+                Next
+            </a>
+        </li>
+        <li class="page-item  @nextDisabled">
+            <a asp-page="./rundiary"
+               asp-route-pageIndexKartela="@Model.ListItems.TotalPages"
+               asp-route-PageSizeKartela="@Model.PageSizeKartela"
+               asp-route-sortOrder="@Model.CurrentSort"
+               asp-route-parentPageIndex="@Model.ParentPageIndex "
+               asp-route-transactorTypeFilter="@Model.TransactorTypeFilter"
+               asp-route-companyFilter="@Model.CompanyFilter"
+               asp-route-ParentPageSize="@Model.ParentPageSize"
+               asp-route-diaryId="@Model.DiaryId"
+               class="page-link" aria-label="First">
+                @*<span aria-hidden="true">;</span>*@
+                Last
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<br />
+<a asp-page="./Index"
+   asp-route-pageIndex="@Model.ParentPageIndex "
+   asp-route-transactorTypeFilter="@Model.TransactorTypeFilter"
+   asp-route-PageSize="@Model.ParentPageSize"
+   class="small">Back to List</a>

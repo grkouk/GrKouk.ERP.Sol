@@ -1,0 +1,72 @@
+﻿@page
+@model GrKouk.Web.Erp.Pages.Configuration.SellDocSeriesDefs.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h4>Edit SellDocSeriesDef</h4>
+<hr />
+
+<div class="container">
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="SellDocSeriesDef.Id" />
+        <div class="form-row">
+            <div class="form-group col-md-2">
+                <label asp-for="SellDocSeriesDef.Code" class="control-label small"></label>
+                <input asp-for="SellDocSeriesDef.Code" class="form-control form-control-sm" />
+                <span asp-validation-for="SellDocSeriesDef.Code" class="text-danger small"></span>
+            </div>
+            <div class="form-group col-md-2">
+                <label asp-for="SellDocSeriesDef.Abbr" class="control-label small"></label>
+                <input asp-for="SellDocSeriesDef.Abbr" class="form-control form-control-sm" />
+                <span asp-validation-for="SellDocSeriesDef.Abbr" class="text-danger small"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="SellDocSeriesDef.Name" class="control-label small"></label>
+                <input asp-for="SellDocSeriesDef.Name" class="form-control form-control-sm" />
+                <span asp-validation-for="SellDocSeriesDef.Name" class="text-danger small"></span>
+            </div>
+            <div class="form-group col-md-2 ">
+                <label asp-for="SellDocSeriesDef.Active" class="small"></label>
+                <input asp-for="SellDocSeriesDef.Active" class="form-check form-control-sm" />
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label asp-for="SellDocSeriesDef.AutoPayoffWay" class="control-label small"></label>
+                <select asp-for="SellDocSeriesDef.AutoPayoffWay" class="form-control form-control-sm" asp-items="ViewBag.AutoPayoffWay"></select>
+            </div>
+            <div class="form-group col-md-3">
+                <label asp-for="SellDocSeriesDef.PayoffSeriesId" class="control-label small"></label>
+                <select asp-for="SellDocSeriesDef.PayoffSeriesId" class="form-control form-control-sm" asp-items="ViewBag.PayoffSeriesId"></select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label asp-for="SellDocSeriesDef.SellDocTypeDefId" class="control-label small"></label>
+                <select asp-for="SellDocSeriesDef.SellDocTypeDefId" class="form-control form-control-sm" asp-items="ViewBag.SellDocTypeDefId"></select>
+            </div>
+            <div class="form-group col-md-2">
+                <label asp-for="SellDocSeriesDef.CompanyId" class="control-label small"></label>
+                <select asp-for="SellDocSeriesDef.CompanyId" class="form-control form-control-sm" asp-items="ViewBag.CompanyId"></select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <input type="submit" value="Update" class="btn btn-secondary btn-sm" />
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<div>
+    <a class="small" asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

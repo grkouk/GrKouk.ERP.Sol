@@ -1,0 +1,31 @@
+﻿@page
+@model GrKouk.Web.Erp.Pages.CommonEntities.FinCategories.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>FinTransCategory</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.FinTransCategory.Code)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.FinTransCategory.Code)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.FinTransCategory.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.FinTransCategory.Name)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.FinTransCategory.Id">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>

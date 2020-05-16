@@ -1,0 +1,44 @@
+﻿@page
+@model GrKouk.Web.Erp.Pages.CommonEntities.MaterialCategories.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h4>WarehouseItem Categories Index</h4>
+
+<p>
+    <small>
+        <a asp-page="Create">Create New</a>
+    </small>
+</p>
+<table class="table table-bordered table-sm">
+    <thead class="thead-light">
+        <tr>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.MaterialCategory[0].Code)
+            </th>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.MaterialCategory[0].Name)
+            </th>
+            <th class="small"></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.MaterialCategory) {
+        <tr>
+            <td class="small">
+                @Html.DisplayFor(modelItem => item.Code)
+            </td>
+            <td class="small">
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td class="small">
+                <a asp-page="./Edit" asp-route-id="@item.Id"><i class="fas fa-edit"></i></a> |
+                <a asp-page="./Details" asp-route-id="@item.Id"><i class="fas fa-info-circle"></i></a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id"><i class="fas fa-trash"></i></a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

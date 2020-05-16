@@ -1,0 +1,535 @@
+﻿@page
+@model Index2Model
+@section MyCss
+    {
+    <link rel="stylesheet" href="~/css/custom-checkbox.css" />
+}
+<h4>Warehouse Transactions 2</h4>
+@{
+    var filtersShow = Model.FiltersVisible ? "show" : "";
+    var filtersShowText = Model.FiltersVisible ? "Hide Filters" : "Show Filters";
+    var RowSelectorsHidden = Model.RowSelectorsVisible ? "" : "hidden";
+    var SelectedToggleText = Model.RowSelectorsVisible ? "Hide Row Selectors" : "Show Row Selectors";
+    var SelectedRowsMenuItem = Model.RowSelectorsVisible ? "" : "hidden ";
+}
+<div class="container ">
+    <ul class="nav small justify-content-end ">
+        <li class="nav-item">
+            <a asp-page="Create" class="nav-link"
+               asp-route-sortOrder="@Model.CurrentSort"
+               asp-route-pageIndex="@(Model.ListItems.CurrentPage)"
+               asp-route-currentFilter="@Model.CurrentFilter"
+               asp-route-PageSize="@Model.PageSize">Create New</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#filterCollapse" role="button" id="filtersToggle"
+               aria-expanded="false" aria-controls="filterCollapse">
+                @filtersShowText
+            </a>
+
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#" role="button" id="rowSelectorsToggle">
+                @SelectedToggleText
+
+            </a>
+        </li>
+        <li class="nav-item dropdown " @SelectedRowsMenuItem id="SelectedRowsActionsMenu">
+            <a class="nav-link dropdown-toggle disabled" role="button" id="ddSelectedRowsActions" data-toggle="dropdown"
+               aria-haspopup="true" aria-expanded="false">Actions</a>
+            <div class="dropdown-menu small">
+                <a class="dropdown-item" href="#" id="deleteSelectedRows">Delete Selected</a>
+                <a class="dropdown-item" href="#">Another action</a>
+                <a class="dropdown-item" href="#">Something else here</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">Separated link</a>
+
+            </div>
+        </li>
+    </ul>
+</div>
+
+
+<div class="collapse @filtersShow" id="filterCollapse">
+    <form class="form-inline" asp-page="./Index2" method="get">
+        <input type="hidden" asp-for="@Model.FiltersVisible" id="filtersVisible" />
+        <input type="hidden" asp-for="@Model.RowSelectorsVisible" id="rowSelectorsVisible" />
+        <div class="container">
+            <div class="form-row">
+
+                <div class="form-group col-md-auto">
+                    <label class="small"> Search:</label>
+                    <input class="form-control form-control-sm small" type="text" name="SearchString" value="@Model.CurrentFilter" />
+                    <input type="submit" value="Search" class="btn btn-light btn-sm" />
+                </div>
+                <div class="form-group col-md-auto">
+                    <a class="small" asp-page="./Index2"
+                       asp-route-sortOrder="@Model.CurrentSort"
+                       asp-route-pageIndex="@(Model.ListItems.CurrentPage)"
+                       asp-route-currentFilter="@Model.CurrentFilter"
+                       asp-route-companyFilter="@Model.CompanyFilter"
+                       asp-route-filtersVisible="@Model.FiltersVisible"
+                       asp-route-rowselectorsVisible="@Model.RowSelectorsVisible"
+                       asp-route-datePeriodFilter="@Model.CurrentDatePeriod"
+                       asp-route-PageSize="@Model.PageSize">Back to full List</a>
+                </div>
+                <div class="form-group col-md-auto">
+                    <label class="small"> Period:</label>
+                    <select name="DatePeriodFilter" asp-for="CurrentDatePeriod" class="form-control form-control-sm small" asp-items="ViewBag.DataFilterValues"
+                            onchange="this.form.submit()"></select>
+                </div>
+                <div class="form-group col-md-auto">
+                    <label class="small">Company:</label>
+                    <select asp-for="CompanyFilter" class="form-control form-control-sm small"
+                            asp-items="ViewBag.CompanyFilter" onchange="this.form.submit()"></select>
+
+                </div>
+                <div class="form-group col-md-auto">
+                    <label class="small"> Page Size:</label>
+                    <select asp-for="PageSize" onchange="this.form.submit()" class="form-control form-control-sm small" asp-items="ViewBag.PageFilterSize"></select>
+                </div>
+                <div class="form-group col-md-auto">
+                    <small>
+                        Page:@Model.ListItems.CurrentPage of @Model.ListItems.TotalPages Total Items @Model.ListItems.TotalCount
+                    </small>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<br />
+<table class="table table-bordered table-sm">
+    <thead class="thead-light">
+        <tr>
+            <th name="selectAllRowsColumn" @RowSelectorsHidden>
+                <label class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" name="checkAllRows">
+                    <span class="custom-control-indicator"></span>
+                </label>
+            </th>
+            <th class="small text-center">
+                <a asp-page="./Index2" asp-route-sortOrder="@Model.DateSort"
+                   asp-route-searchFilter="@Model.CurrentFilter"
+                   asp-route-companyFilter="@Model.CompanyFilter"
+                   asp-route-datePeriodFilter="@Model.CurrentDatePeriod"
+                   asp-route-filtersVisible="@Model.FiltersVisible"
+                   asp-route-rowselectorsVisible="@Model.RowSelectorsVisible"
+                   asp-route-PageSize="@Model.PageSize">
+                    @Html.DisplayNameFor(model => model.ListItems[0].TransDate)
+
+                </a>
+                <i class="@Model.DateSortIcon"></i>
+            </th>
+            <th class="small">
+                <a asp-page="./Index2" asp-route-sortOrder="@Model.NameSort"
+                   asp-route-searchFilter="@Model.CurrentFilter"
+                   asp-route-companyFilter="@Model.CompanyFilter"
+                   asp-route-datePeriodFilter="@Model.CurrentDatePeriod"
+                   asp-route-filtersVisible="@Model.FiltersVisible"
+                   asp-route-rowselectorsVisible="@Model.RowSelectorsVisible"
+                   asp-route-PageSize="@Model.PageSize">
+                    @Html.DisplayNameFor(model => model.ListItems[0].WarehouseItemName)
+                </a>
+
+                <i class="@Model.NameSortIcon"></i>
+            </th>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].TransWarehouseDocSeriesName)
+            </th>
+            @*<th class="small">
+                    @Html.DisplayNameFor(model => model.ListItems[0].SectionCode)
+                </th>*@
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].TransRefCode)
+            </th>
+
+
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].InvoicedImportUnits)
+            </th>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].InvoicedExportUnits)
+            </th>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].InvoicedImportAmount)
+            </th>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].InvoicedExportAmount)
+            </th>
+
+            <th class="small">
+                @Html.DisplayNameFor(model => model.ListItems[0].CompanyCode)
+            </th>
+
+            <th class="small"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.ListItems)
+        {
+            <tr>
+                <td name="selectRowColumn" @RowSelectorsHidden>
+                    <label class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" name="checkTableRow" data-itemId="@item.Id">
+                        <span class="custom-control-indicator"></span>
+                    </label>
+                </td>
+                <td class="text-right small">
+                    @Html.DisplayFor(modelItem => item.TransDate)
+                </td>
+                <td class="small">
+                    @Html.DisplayFor(modelItem => item.WarehouseItemName)
+                </td>
+                <td class="small">
+                    @Html.DisplayFor(modelItem => item.TransWarehouseDocSeriesName)
+                </td>
+
+                <td class="small">
+                    @Html.DisplayFor(modelItem => item.TransRefCode)
+                </td>
+
+                <td class="text-right small">
+                    @Html.DisplayFor(modelItem => item.InvoicedImportUnits)
+                </td>
+                <td class="text-right small">
+                    @Html.DisplayFor(modelItem => item.InvoicedExportUnits)
+                </td>
+                <td class="text-right small">
+                    @Html.DisplayFor(modelItem => item.InvoicedImportAmount)
+                </td>
+                <td class="text-right small">
+                    @Html.DisplayFor(modelItem => item.InvoicedExportAmount)
+                </td>
+                <td class="small">
+                    @Html.DisplayFor(modelItem => item.CompanyCode)
+                </td>
+
+                <td class="small">
+                    <a asp-page="./Edit" asp-route-id="@item.Id"><i class="fas fa-edit"></i></a> |
+                    <a asp-page="./Details" asp-route-id="@item.Id"><i class="fas fa-info-circle"></i></a> |
+                    <a asp-page="./Delete" asp-route-id="@item.Id"><i class="fas fa-trash"></i></a>
+                </td>
+            </tr>
+        }
+        <tr class="table-info">
+            <td class="small" name="selectRowColumn" @RowSelectorsHidden></td>
+            <td class="small"></td>
+            <td class="small"></td>
+
+            <td class="small font-weight-bold">
+                Σύνολα Σελίδας
+            </td>
+            <td class="small"></td>
+            <td class="small text-right font-weight-bold">
+                @Html.DisplayFor(modelItem => modelItem.SumImportVolume)
+            </td>
+            <td class="small text-right font-weight-bold">
+                @Html.DisplayFor(modelItem => modelItem.SumExportVolume)
+            </td>
+            <td class="small text-right font-weight-bold">
+                @Html.DisplayFor(modelItem => modelItem.SumImportValue)
+            </td>
+            <td class="small text-right font-weight-bold">
+                @Html.DisplayFor(modelItem => modelItem.SumExportValue)
+            </td>
+            <td class="small"></td>
+            <td class="small"></td>
+        </tr>
+    </tbody>
+</table>
+
+@{
+    var prevDisabled = !Model.ListItems.HasPrevious ? "disabled" : "";
+    var nextDisabled = !Model.ListItems.HasNext ? "disabled" : "";
+}
+
+
+<nav aria-label="Page navigation example">
+    <ul class="pagination pagination-sm">
+        <li class="page-item @prevDisabled">
+            <a asp-page="./Index2"
+               asp-route-sortOrder="@Model.CurrentSort"
+               asp-route-pageIndex="1"
+               asp-route-searchFilter="@Model.CurrentFilter"
+               asp-route-companyFilter="@Model.CompanyFilter"
+               asp-route-datePeriodFilter="@Model.CurrentDatePeriod"
+               asp-route-filtersVisible="@Model.FiltersVisible"
+               asp-route-rowselectorsVisible="@Model.RowSelectorsVisible"
+               asp-route-PageSize="@Model.PageSize"
+               class="page-link" aria-label="First">
+                First
+            </a>
+        </li>
+        <li class="page-item @prevDisabled">
+            <a asp-page="./Index2"
+               asp-route-sortOrder="@Model.CurrentSort"
+               asp-route-pageIndex="@(Model.ListItems.CurrentPage - 1)"
+               asp-route-searchFilter="@Model.CurrentFilter"
+               asp-route-companyFilter="@Model.CompanyFilter"
+               asp-route-datePeriodFilter="@Model.CurrentDatePeriod"
+               asp-route-filtersVisible="@Model.FiltersVisible"
+               asp-route-rowselectorsVisible="@Model.RowSelectorsVisible"
+               asp-route-PageSize="@Model.PageSize"
+               class="page-link" aria-label="Previous">
+                Previous
+            </a>
+        </li>
+
+        <li class="page-item @nextDisabled">
+            <a asp-page="./Index2"
+               asp-route-sortOrder="@Model.CurrentSort"
+               asp-route-pageIndex="@(Model.ListItems.CurrentPage + 1)"
+               asp-route-searchFilter="@Model.CurrentFilter"
+               asp-route-companyFilter="@Model.CompanyFilter"
+               asp-route-datePeriodFilter="@Model.CurrentDatePeriod"
+               asp-route-filtersVisible="@Model.FiltersVisible"
+               asp-route-rowselectorsVisible="@Model.RowSelectorsVisible"
+               asp-route-PageSize="@Model.PageSize"
+               class="page-link" aria-label="Next">
+                @*<span aria-hidden="true">&raquo;</span>*@
+                Next
+            </a>
+        </li>
+        <li class="page-item  @nextDisabled">
+            <a asp-page="./Index2"
+               asp-route-sortOrder="@Model.CurrentSort"
+               asp-route-pageIndex="@Model.ListItems.TotalPages"
+               asp-route-searchFilter="@Model.CurrentFilter"
+               asp-route-companyFilter="@Model.CompanyFilter"
+               asp-route-datePeriodFilter="@Model.CurrentDatePeriod"
+               asp-route-filtersVisible="@Model.FiltersVisible"
+               asp-route-rowselectorsVisible="@Model.RowSelectorsVisible"
+               asp-route-PageSize="@Model.PageSize"
+               class="page-link" aria-label="First">
+                @*<span aria-hidden="true">;</span>*@
+                Last
+            </a>
+        </li>
+    </ul>
+</nav>
+
+<!-- Modal -->
+<div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="loader"></div>
+                <div>
+                    <p>Executing request. <br><br><small>Please wait...</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+    {
+    <script>
+        $(document).ready(function () {
+            //#region variables
+            var $filtersVisible = $('#filtersVisible');
+            var $filterCollapse = $('#filterCollapse');
+            var $alist = $('a[href*="&filtersVisible"]');
+            var $checkAllRows = $('input[name=checkAllRows]');
+            var $filtersToggle = $('#filtersToggle');
+            var $rowSelectorsToggle = $('#rowSelectorsToggle');
+            var $rowSelectorsVisible = $('#rowSelectorsVisible');
+            var $selectAllSelector = $('th[name=selectAllRowsColumn]');
+            var $selectSingleSelectors = $('td[name=selectRowColumn]');
+            var $selectedRowsActionsMenu = $('#SelectedRowsActionsMenu');
+            var $selectedRowsActionsLink = $('#ddSelectedRowsActions');
+            var $rowSelectors = $('input[name=checkTableRow]');
+            var $deleteSelectedRowsLink = $('#deleteSelectedRows');
+            //#endregion
+             var deleteSelectedRows = () => {
+                var selectedRows = $rowSelectors.filter(':checked');
+                var idsToDelete = [];
+                $.each(selectedRows, function (key, value) {
+                    console.log(value);
+                    var id = parseInt(value.dataset.itemid);
+                    idsToDelete.push(id);
+                });
+                if (idsToDelete.length > 0) {
+                    var idsJs = JSON.stringify({
+                        section:'@Model.SectionCode',
+                        ids: idsToDelete
+                    });
+                    var timeout;
+
+                    $.ajax({
+                        contentType: 'application/json; charset=utf-8',
+
+                        dataType: 'json',
+                        type: 'POST',
+                        data: idsJs,
+                        url: "/api/GrkoukInfoApi/DeleteBuyDocumentsList",
+                        beforeSend: function () {
+                            if (timeout) { clearTimeout(timeout); }
+                            timeout = setTimeout(function() {
+
+                                $("#loadMe").modal({
+                                    backdrop: "static", //remove ability to close modal with click
+                                    keyboard: false, //remove option to close with keyboard
+                                    show: true //Display loader!
+                                });
+                            }, 1000);
+
+                        },
+                        success: function (result) {
+                            console.log(success);
+                        },
+                        complete: function () {
+                            if (timeout) { clearTimeout(timeout); }
+                            $("#loadMe").modal("hide");
+                            setTimeout(function() {
+                                console.log('Checking for open modals');
+                                var isOpen = $('#loadMe').hasClass('show');
+                                if ( isOpen ) {
+                                    console.log('There is an open Modal');
+                                    $("#loadMe").modal("hide");
+                                } else {
+                                    console.log('No open modal');
+                                }
+                            }, 2000);
+                        },
+                        error: function (e) {
+                            console.log(e);
+
+                        }
+                    });
+
+                }
+
+            };
+            var getSelectedRows = () => {
+                var selectedRows = $rowSelectors.filter(':checked');
+                console.log('Selected table rows=' + selectedRows);
+            };
+            var countSelectedRows = () => {
+                var selectedRows = $rowSelectors.filter(':checked');
+                return selectedRows.length;
+            };
+            var handleSelectedRowsUi = () => {
+                var allRows = $rowSelectors.length;
+                var selectedRowsCount = $rowSelectors.filter(':checked').length;
+                if (selectedRowsCount > 0) {
+                    $selectedRowsActionsLink.removeClass('disabled');
+                    //$selectedRowsActionsLink.prop('disabled', 'false');
+                } else {
+                    $selectedRowsActionsLink.addClass('disabled');
+                }
+                if (selectedRowsCount == allRows) {
+                    $checkAllRows.prop('checked', true);
+                } else {
+                    $checkAllRows.prop('checked', false);
+                }
+            };
+            $deleteSelectedRowsLink.on('click', () => {
+                deleteSelectedRows();
+            });
+            $rowSelectors.on('change', function () {
+                handleSelectedRowsUi();
+            });
+            $rowSelectors.on('change', function () {
+                var selectedRowsCount = countSelectedRows();
+                if (selectedRowsCount > 0) {
+                    $selectedRowsActionsLink.removeClass('disabled');
+                    //$selectedRowsActionsLink.prop('disabled', 'false');
+                } else {
+                    $selectedRowsActionsLink.addClass('disabled');
+                }
+            });
+            $filterCollapse.on('hidden.bs.collapse', function () {
+                console.log('Filters Hidden');
+                $filtersToggle.text('Show Filters');
+                //var alist = $('a[href*="&filtersVisible"]');
+                $.each($alist,
+                    function (key, value) {
+                        var href = value.href;
+                        var aParams = href.substring(0, href.length).split('&');
+                        var retStr = [];
+                        $.each(aParams, function (key, value) {
+                            var vPair = value.split('=');
+                            if (vPair[0] === 'filtersVisible') {
+                                var s = 'filtersVisible' + '=False';
+                                retStr.push(s);
+                            } else {
+                                retStr.push(value);
+                            }
+                        });
+                        console.log('href=' + href);
+                        console.log('aParams=' + aParams);
+                        console.log('retStr=' + retStr);
+                        var newHref = retStr.join('&');
+                        console.log('new Href=' + newHref);
+                        value.href = newHref;
+
+
+                    });
+
+                $filtersVisible.val(false);
+            });
+
+            $filterCollapse.on('shown.bs.collapse', function () {
+                console.log('Filters Shown');
+                $filtersToggle.text('Hide Filters');
+                // var alist = $('a[href*="&filtersVisible"]');
+                $.each($alist,
+                    function (key, value) {
+                        var href = value.href;
+                        var aParams = href.substring(0, href.length).split('&');
+                        var retStr = [];
+                        $.each(aParams, function (key, value) {
+                            var vPair = value.split('=');
+                            if (vPair[0] === 'filtersVisible') {
+                                var s = 'filtersVisible' + '=True';
+                                retStr.push(s);
+                            } else {
+                                retStr.push(value);
+                            }
+                        });
+                        console.log('href=' + href);
+                        console.log('aParams=' + aParams);
+                        console.log('retStr=' + retStr);
+                        var newHref = retStr.join('&');
+                        console.log('new Href=' + newHref);
+                        value.href = newHref;
+
+
+                    });
+                $filtersVisible.val(true);
+            });
+            $checkAllRows.on('change', function () {
+                var th = $(this).index();
+                var isChecked = $(this).prop('checked');
+                $('input[name=checkTableRow]').prop('checked', isChecked);
+                var selectedRowsCount = countSelectedRows();
+                if (selectedRowsCount > 0) {
+                    $selectedRowsActionsLink.removeClass('disabled');
+                } else {
+                    $selectedRowsActionsLink.addClass('disabled');
+                }
+            });
+            $rowSelectorsToggle.on('click', function () {
+                var selectorsVisible = $rowSelectorsVisible.val();
+                var newSelectorsVisible = (selectorsVisible == 'True' || selectorsVisible == 'true') ? 'False' : 'True';
+                if (newSelectorsVisible == 'True') {
+                    $selectAllSelector.removeAttr('hidden');
+                    $selectSingleSelectors.removeAttr('hidden');
+                    $selectAllSelector.show();
+                    $selectSingleSelectors.show();
+                    $rowSelectorsVisible.val(true);
+                    $rowSelectorsToggle.text('Hide Row Selectors');
+                    $selectedRowsActionsMenu.removeAttr('hidden');
+                    $selectedRowsActionsLink.addClass('disabled');
+                } else {
+                    $selectAllSelector.hide();
+                    $selectSingleSelectors.hide();
+                    $rowSelectorsVisible.val(false);
+                    $rowSelectorsToggle.text('Show Row Selectors');
+                    $selectedRowsActionsMenu.attr('hidden', 'true');
+                }
+            });
+        });
+    </script>
+}

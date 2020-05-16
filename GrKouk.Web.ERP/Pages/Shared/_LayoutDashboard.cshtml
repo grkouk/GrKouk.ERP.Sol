@@ -1,0 +1,60 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,shrink-to-fit=no" />
+    <title>@ViewData["Title"] - GrKouk Web ERP</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/material.css" />
+    
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        @@media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+            font-size: 3.5rem;
+        }
+        }
+        </style>
+    <!-- Custom styles for this template -->
+    <link href="~/css/dashboard.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-dark fixed-top bg-secondary flex-md-nowrap p-0 shadow">
+    <a class="navbar-brand mr-2 pr-2 pl-2" href="/index">Grkouk Web ERP</a>
+    @* <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search"> *@
+    <h4 class="text-light w-100">@ViewData["ItemTitle"]</h4>
+    <ul class="navbar-nav px-3">
+        <li class="nav-item text-nowrap">
+            <a class="nav-link" href="index">Back to List</a>
+        </li>
+    </ul>
+</nav>
+    
+        @RenderBody()
+@* <hr /> *@
+
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+ <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
+<environment include="Development">
+   <script src="~/js/site.js" asp-append-version="true"></script>
+</environment>
+<environment exclude="Development">E
+   <script src="~/js/site.min.js" asp-append-version="true"></script>
+</environment>
+ <ejs-scripts></ejs-scripts>
+
+    @RenderSection("Scripts", required: false)
+    @await Component.InvokeAsync("NToastNotify")
+</body>
+</html>
