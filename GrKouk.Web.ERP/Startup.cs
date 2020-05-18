@@ -55,7 +55,7 @@ namespace GrKouk.Web.ERP
             services.AddSession(options => { options.IdleTimeout = TimeSpan.FromMinutes(30); });
             services.AddAutoMapper(typeof(Startup));
             services.AddRazorPages();
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
