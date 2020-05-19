@@ -28,7 +28,7 @@ namespace GrKouk.Web.ERP.Pages.Settings
         {
             LoadCombos();
             ItemVm= new List<AppSetting>();
-            //ToDo: Change to singleorDefault
+           
             var allCompanyCodeSetting = await _context.AppSettings.FirstOrDefaultAsync(p => p.Code == GrKouk.Erp.Definitions.Constants.AllCompaniesCodeKey);
             if (allCompanyCodeSetting != null)
             {
