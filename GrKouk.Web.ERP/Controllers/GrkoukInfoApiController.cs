@@ -314,7 +314,7 @@ namespace GrKouk.Web.ERP.Controllers
         public async Task<IActionResult> GetIndexTblDataBuyDocuments([FromQuery] IndexDataTableRequest request)
         {
             IQueryable<BuyDocument> fullListIq = _context.BuyDocuments;
-
+            //Thread.Sleep(2000);
             if (!string.IsNullOrEmpty(request.SortData))
             {
                 switch (request.SortData.ToLower())
