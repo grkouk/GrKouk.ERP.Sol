@@ -517,7 +517,7 @@ namespace GrKouk.Web.ERP.Controllers
             var docSellSeries = await _context.SellDocSeriesDefs.ToListAsync();
 
             var t = fullListIq.ProjectTo<RecurringDocListDto>(_mapper.ConfigurationProvider);
-            var t1 = t.Select(p => new RecurringDocListDto
+            var t1 = await t.Select(p => new RecurringDocListDto
             {
                 Id = p.Id,
                 NextTransDate = p.NextTransDate,
@@ -537,13 +537,13 @@ namespace GrKouk.Web.ERP.Controllers
                 CompanyId = p.CompanyId,
                 CompanyCode = p.CompanyCode,
                 CompanyCurrencyId = p.CompanyCurrencyId
-            });
+            }).ToListAsync();
 
 
             var pageIndex = request.PageIndex;
             var pageSize = request.PageSize;
 
-            var listItems = await PagedList<RecurringDocListDto>.CreateAsync(t1, pageIndex, pageSize);
+            var listItems = await PagedList<RecurringDocListDto>.CreateAsync(t, pageIndex, pageSize);
             var grandSumOfAmount = t1.Sum(p => p.TotalAmount);
             var gransSumOfNetAmount = t1.Sum(p => p.TotalNetAmount);
             foreach (var listItem in listItems)
