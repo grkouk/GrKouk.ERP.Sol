@@ -129,8 +129,8 @@
                 console.log("Inside transDate Changed");
 
                 var forDate = $transDate.val();
-                var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
-                var finalUri = `${uri}/materials/FiscalPeriod?forDate=${forDate}`;
+                //var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
+                var finalUri = `/api/materials/FiscalPeriod?forDate=${forDate}`;
                 fetch(finalUri)
                     .then(function(response) {
                         if (response.ok) {

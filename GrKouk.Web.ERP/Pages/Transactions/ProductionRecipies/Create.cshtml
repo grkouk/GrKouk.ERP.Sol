@@ -333,8 +333,8 @@
                 console.log("Inside Series Changed");
                 setSeriesInSession();
                 var seriesId = $transDocSeriesId.val();
-                var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
-                var finalUri = `${uri}/materials/BuySeriesData?seriesId=${seriesId}`;
+                //var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
+                var finalUri = `/api/materials/BuySeriesData?seriesId=${seriesId}`;
                 fetch(finalUri)
                     .then(function(response) {
                         if (response.ok) {
@@ -489,8 +489,8 @@
                     console.log(ui.item.value.toString());
                     this.value = ui.item.label;
                     //Get WarehouseItem data
-                    var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
-                    var finalUri = `${uri}/materials/materialdata?warehouseItemId=${ui.item.value}`;
+                    //var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
+                    var finalUri = `/api/materials/materialdata?warehouseItemId=${ui.item.value}`;
 
                     console.log(finalUri);
 

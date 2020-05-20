@@ -1437,8 +1437,8 @@
                 $amountSum.attr('data-actualValue', sumGross);
             };
             var getWarehouseItemInfo = (itemId) => {
-                var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
-                var finalUri = `${uri}/materials/materialdata?warehouseItemId=${itemId}`;
+                //var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
+                var finalUri = `/api/materials/materialdata?warehouseItemId=${itemId}`;
                 $materialId.val(itemId);
                 console.log(finalUri);
 
