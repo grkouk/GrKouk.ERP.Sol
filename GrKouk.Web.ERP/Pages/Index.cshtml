@@ -3,11 +3,26 @@
 @{
     ViewData["Title"] = "Home page";
 }
+
 @section MyCss
 {
-    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/material.css" />
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/material.css"/>
 }
+
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <p>User Name is @User.Identity.Name</p>
+    <p> User is authenticated is @User.Identity.IsAuthenticated</p>
+    @if (User.IsInRole("Admin"))
+    {
+        <p>This user is in the Adnin role that's why you see this</p>
+    }
 </div>
+
+@section Scripts
+{
+    <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+
+}

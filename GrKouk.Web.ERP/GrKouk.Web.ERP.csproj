@@ -31,10 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="Pages\_MainInfo.cshtml">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
+    <Content Remove="Pages\_MainInfo.cshtml" />
   </ItemGroup>
 
 </Project>
