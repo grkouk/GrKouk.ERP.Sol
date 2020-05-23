@@ -9,11 +9,14 @@
     <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/material.css"/>
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>User Name is @User.Identity.Name</p>
-    <p> User is authenticated is @User.Identity.IsAuthenticated</p>
-</div>
+@if (!User.IsInRole("Admin"))
+{
+    <div class="text-center">
+        <h1 class="display-4">Welcome</h1>
+        <p>User Name is @User.Identity.Name</p>
+        <p> User is authenticated is @User.Identity.IsAuthenticated</p>
+    </div>
+}
 @if (User.IsInRole("Admin"))
 {
     <div class="row">
@@ -48,7 +51,7 @@
                     </div>
                 </div>
             </div>
-           
+
 
             @* <hr/> *@
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-2 pb-2 mb-3 border-bottom">
@@ -63,7 +66,7 @@
                     <div class="col-lg-4 col-sm-12">
                         <div class="card">
                             <div class="card-body text-center">
-                                <h3 class="card-text" id="totincome">100</h3>
+                                <h3 class="card-text" id="totincome">1</h3>
                                 <span class="card-text">Income</span>
                             </div>
                         </div>
