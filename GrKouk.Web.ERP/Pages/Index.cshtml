@@ -16,8 +16,7 @@
 </div>
 @if (User.IsInRole("Admin"))
 {
-    
-     <div class="row">
+    <div class="row">
         <main role="main" class="col-md-12 ml-sm-auto col-lg-12 px-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 @* <h3 class="h3">@Model.Item.TransactorTypeName @Model.Item.Name Details</h3> *@
@@ -49,17 +48,7 @@
                     </div>
                 </div>
             </div>
-            @* <div class="container"> *@
-            @*     <div class="card bg-light"> *@
-            @*         <div class="card-body"> *@
-            @*             <h5 class="card-title">@Model.Item.Code</h5> *@
-            @*             <h6 class="card-subtitle mb-2 text-muted">@Model.Item.Companies</h6> *@
-            @*             <p class="card-text"></p> *@
-            @*             <a href="#" class="card-link">Card link</a> *@
-            @*             <a href="#" class="card-link">Another link</a> *@
-            @*         </div> *@
-            @*     </div> *@
-            @* </div> *@
+           
 
             @* <hr/> *@
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-2 pb-2 mb-3 border-bottom">
@@ -73,31 +62,25 @@
                 <div class="row align-items-center justify-content-between">
                     <div class="col-lg-4 col-sm-12">
                         <div class="card">
-                            <div class="card-header text-dark text-center">
-                                <h5>Debit</h5>
-                            </div>
                             <div class="card-body text-center">
-                                <h6 id="Debit"></h6>
+                                <h3 class="card-text" id="totincome">100</h3>
+                                <span class="card-text">Income</span>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 col-sm-12">
                         <div class="card">
-                            <div class="card-header text-dark text-center">
-                                <h5>Credit</h5>
-                            </div>
                             <div class="card-body text-center">
-                                <h6 id="Credit"></h6>
+                                <h3 class="card-text" id="totexpenses">20</h3>
+                                <span class="card-text">Expenses</span>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-4 col-sm-12">
                         <div class="card">
-                            <div class="card-header text-center">
-                                <h5>Balance</h5>
-                            </div>
                             <div class="card-body text-center">
-                                <h6 id="Balance"></h6>
+                                <h3 class="card-text" id="totbalance">10</h3>
+                                <span class="card-text">Balance</span>
                             </div>
                         </div>
                     </div>
@@ -125,9 +108,9 @@
 
                 </div>
             </div>
-          
+
             <ejs-grid id="Grid" allowPaging="true" allowResizing="true" enablePersistence="true">
-                 @* <e-data-manager url="@Url.Action("GetTransactions2", "FinancialData")" adaptor="UrlAdaptor"></e-data-manager> *@
+                @* <e-data-manager url="@Url.Action("GetTransactions2", "FinancialData")" adaptor="UrlAdaptor"></e-data-manager> *@
                 <e-grid-aggregates>
                     <e-grid-aggregate>
                         <e-aggregate-columns>
@@ -152,7 +135,7 @@
 
 
             <hr/>
-           
+
 
         </main>
     </div>
@@ -398,55 +381,55 @@
 
          };
          //--------------------------------------------------------------------------
-          const getFinancialData = (transactorId, dateRange, selCompany, selCurrency, selectionCallback) => {
-                         var timeout;
-                         var uri = '/api/FinancialData/GetTransactorFinancialSummaryData?';
-                         uri += `&transactorId=${transactorId}`;
-                         uri += `&companyFilter=${selCompany}`;
-                         uri += `&dateRange=${dateRange}`;
-                         uri += `&displayCurrencyId=${selCurrency}`;
-                         $.ajax({
-                             contentType: 'application/json; charset=utf-8',
-                             dataType: 'json',
-                             type: 'GET',
-                             url: uri,
-                             beforeSend: function() {
-                                 if (timeout) {
-                                     clearTimeout(timeout);
-                                 }
-                                 timeout = setTimeout(function() {
-                                         $('#FinancialLoader').show();
-         
-                                     },
-                                     1000);
-                             },
-                             success: function(result) {
-                                 console.log('Result for transaction financial data');
-                                 console.log(result);
-                                 $('#Debit').text(formatterCurrency.format(result.sumOfDebit));
-                                 $('#Credit').text(formatterCurrency.format(result.sumOfCredit));
-                                 $('#Balance').text(formatterCurrency.format(result.sumOfDifference));
-                             },
-                             complete: function() {
-                                 if (timeout) {
-                                     clearTimeout(timeout);
-                                 }
-                                 setTimeout(function() {
-                                         var isOpen = $('#FinancialLoader').is(':visible');
-                                         if (isOpen) {
-                                             $('#FinancialLoader').hide();
-                                         } else {
-                                             console.log('No open modal');
-                                         }
-                                     },
-                                     2000);
-                             },
-                             error: function(e) {
-                                 console.log(e);
-         
+         const getFinancialData = (transactorId, dateRange, selCompany, selCurrency, selectionCallback) => {
+             var timeout;
+             var uri = '/api/FinancialData/GetTransactorFinancialSummaryData?';
+             uri += `&transactorId=${transactorId}`;
+             uri += `&companyFilter=${selCompany}`;
+             uri += `&dateRange=${dateRange}`;
+             uri += `&displayCurrencyId=${selCurrency}`;
+             $.ajax({
+                 contentType: 'application/json; charset=utf-8',
+                 dataType: 'json',
+                 type: 'GET',
+                 url: uri,
+                 beforeSend: function() {
+                     if (timeout) {
+                         clearTimeout(timeout);
+                     }
+                     timeout = setTimeout(function() {
+                             $('#FinancialLoader').show();
+
+                         },
+                         1000);
+                 },
+                 success: function(result) {
+                     console.log('Result for transaction financial data');
+                     console.log(result);
+                     $('#Debit').text(formatterCurrency.format(result.sumOfDebit));
+                     $('#Credit').text(formatterCurrency.format(result.sumOfCredit));
+                     $('#Balance').text(formatterCurrency.format(result.sumOfDifference));
+                 },
+                 complete: function() {
+                     if (timeout) {
+                         clearTimeout(timeout);
+                     }
+                     setTimeout(function() {
+                             var isOpen = $('#FinancialLoader').is(':visible');
+                             if (isOpen) {
+                                 $('#FinancialLoader').hide();
+                             } else {
+                                 console.log('No open modal');
                              }
-                         });
-                     };
+                         },
+                         2000);
+                 },
+                 error: function(e) {
+                     console.log(e);
+
+                 }
+             });
+         };
          const getTransactionsData = (transactorId, dateRange, selCompany, selCurrency, selectionCallback) => {
              var timeout;
              var uri = '/api/FinancialData/GetTransactorTransactions?';
