@@ -3,7 +3,8 @@
     public static class Constants
     {
         public const string AllCompaniesCodeKey = "ALLCOMPCODE";
-       
+        public const string MainInfoPage = "";
+
 
     }
 }
