@@ -64,6 +64,35 @@ namespace GrKouk.Web.ERP.Controllers
             return retAmount;
         }
 
+        [HttpGet("GetMainDashboardInfo")]
+        public async Task<IActionResult> GetMainDashboardInfo([FromQuery] IndexDataTableRequest request)
+        {
+            IQueryable<WarehouseTransaction> fullListIq = _context.WarehouseTransactions;
+            if (!string.IsNullOrEmpty(request.CompanyFilter))
+            {
+                if (int.TryParse(request.CompanyFilter, out var companyId))
+                {
+                    if (companyId > 0)
+                    {
+                        fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
+                    }
+                }
+            } 
+            DateTime beforePeriodDate = DateTime.Today;
+            if (!string.IsNullOrEmpty(request.DateRange))
+            {
+                var datePeriodFilter = request.DateRange;
+                DateFilterDates dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
+                DateTime fromDate = dfDates.FromDate;
+                beforePeriodDate = fromDate.AddDays(-1);
+                DateTime toDate = dfDates.ToDate;
+
+                //transactionsList = transactionsList.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
+                //transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
+            }
+            var response = new MainDashboardInfoResponse {};
+            return Ok(response);
+        }
         [HttpGet("GetTransactorFinancialSummaryData")]
         public async Task<IActionResult> GetTransactorFinancialSummaryData([FromQuery] IndexDataTableRequest request)
         {
