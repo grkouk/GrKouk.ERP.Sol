@@ -35,7 +35,6 @@ namespace GrKouk.Web.ERP.Pages.Settings
                 var acs = new AppSetting
                 {
                     Code = allCompanyCodeSetting.Value,
-                    
                 };
                 ItemVm.Add(acs);
             }
@@ -44,7 +43,22 @@ namespace GrKouk.Web.ERP.Pages.Settings
                 ItemVm.Add(new AppSetting
                 {
                     Code = "ALLCOMP"
-                    
+                });
+            }
+            var sumOfMaterialBuysSetting = await _context.AppSettings.FirstOrDefaultAsync(p => p.Code == GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfMaterialBuys);
+            if (sumOfMaterialBuysSetting != null)
+            {
+                var acs = new AppSetting
+                {
+                    Code = sumOfMaterialBuysSetting.Value
+                };
+                ItemVm.Add(acs);
+            }
+            else
+            {
+                ItemVm.Add(new AppSetting
+                {
+                    Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfMaterialBuys
                 });
             }
 

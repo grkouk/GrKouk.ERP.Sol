@@ -1,8 +1,6 @@
 ﻿@page
 @model AppSettingsModel
-@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
+
 @{
     ViewData["Title"] = "Application Settings";
 }
@@ -14,9 +12,15 @@
                 <div class="form-group col-md-3">
                     <label asp-for="ItemVm[0].Code" class="control-label" small>All Companies Setting</label>
                     <select asp-for="ItemVm[0].Code" class="form-control form-control-sm small" asp-items="ViewBag.CompanyId"></select>
-
                 </div>
             </div>
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label asp-for="ItemVm[1].Code" class="control-label" small>Sum Of Material Buys Definition</label>
+                    
+                </div>
+            </div>
+
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary btn-sm" id="saveForm" />
             </div>
