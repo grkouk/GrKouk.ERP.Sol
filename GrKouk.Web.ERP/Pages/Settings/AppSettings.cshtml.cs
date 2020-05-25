@@ -50,7 +50,8 @@ namespace GrKouk.Web.ERP.Pages.Settings
             {
                 var acs = new AppSetting
                 {
-                    Code = sumOfMaterialBuysSetting.Value
+                    Code = sumOfMaterialBuysSetting.Code,
+                    Value = sumOfMaterialBuysSetting.Value
                 };
                 ItemVm.Add(acs);
             }
@@ -58,7 +59,8 @@ namespace GrKouk.Web.ERP.Pages.Settings
             {
                 ItemVm.Add(new AppSetting
                 {
-                    Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfMaterialBuys
+                    Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfMaterialBuys,
+                    Value = ""
                 });
             }
 
@@ -88,7 +90,21 @@ namespace GrKouk.Web.ERP.Pages.Settings
                 };
                 _context.AppSettings.Add(newAllCompSetting);
             }
-
+            var buyMaterialsSumSetting = await _context.AppSettings.FirstOrDefaultAsync(p => p.Code == GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfMaterialBuys);
+            if (buyMaterialsSumSetting != null)
+            {
+                buyMaterialsSumSetting.Value=ItemVm[1].Value;
+                _context.Attach(buyMaterialsSumSetting).State = EntityState.Modified;
+            }
+            else
+            {
+                var newBuyMaterialsSumSetting = new AppSetting
+                {
+                    Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfMaterialBuys,
+                    Value = ItemVm[1].Value
+                };
+                _context.AppSettings.Add(newBuyMaterialsSumSetting);
+            }
             try
             {
                 await _context.SaveChangesAsync();
