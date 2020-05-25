@@ -41,7 +41,7 @@
 </div>
 <!-- Modal Item selector -->
 <div class="modal fade" id="itemSelector" tabindex="-1" role="dialog" aria-labelledby="itemsModalLabel" aria-hidden="true" data-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered modal-lg" style="overflow-y: scroll; max-height:75%;  margin-top: 50px; margin-bottom:50px;" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg"  role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="container-fluid">
@@ -63,22 +63,37 @@
                 <div class="container-fluid">
 
                     <div class="form-row">
-                        <div class="form-group col-md-3">
-                            <ejs-multiselect id="MultiSelectCompanies"  placeholder="Select Companies" mode="CheckBox"
+                        <div class="form-group col-md-6 col-sm-12">
+                            <label>Select Companies</label>
+                            <ejs-multiselect id="MultiSelectCompanies" placeholder="Select Companies" mode="CheckBox"
                                              showDropDownIcon="true"
                                              showSelectAll="true" selectAllText="Select All" unSelectAllText="unSelect All">
                                 <e-multiselect-fields text="title" value="value"></e-multiselect-fields>
                             </ejs-multiselect>
-                           
+
                         </div>
-                        <div class="form-group col-md-3" id="MaterialNatureTypesDiv">
-                           <ejs-multiselect id="MultiSelectMaterialNatures"  placeholder="Select Natures" mode="CheckBox"
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-10 col-sm-12" id="MaterialNatureTypesDiv">
+                            <label>Select Material Natures</label>
+                            <ejs-multiselect id="MultiSelectMaterialNatures" placeholder="Select Natures" mode="CheckBox"
                                              showDropDownIcon="true"
                                              showSelectAll="true" selectAllText="Select All" unSelectAllText="unSelect All">
                                 <e-multiselect-fields text="title" value="valueInt"></e-multiselect-fields>
                             </ejs-multiselect>
                         </div>
-                        
+
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-10 col-sm-12">
+                            <label>Select Transactor Type</label>
+                            <ejs-multiselect id="MultiSelectTransactorTypes" placeholder="Select Transactor Type" mode="CheckBox"
+                                             showDropDownIcon="true"
+                                             showSelectAll="true" selectAllText="Select All" unSelectAllText="unSelect All">
+                                <e-multiselect-fields text="title" value="value"></e-multiselect-fields>
+                            </ejs-multiselect>
+                        </div>
+
                     </div>
                     <div class="form-row">
                         <div class="col-10">
@@ -180,7 +195,7 @@
                         //    1000);
                     },
                     success: function (result) {
-                       var multiSelect = document.getElementById("MultiSelectMaterialNatures").ej2_instances[0];
+                        var multiSelect = document.getElementById("MultiSelectTransactorTypes").ej2_instances[0];
                        multiSelect.dataSource = result;
                     },
                     complete: function () {
@@ -285,6 +300,7 @@
                             //}
                             getTransactorTypeList();
                             getWarehouseItemNatureList();
+                            getCompanyList();
                             break;
                         case "SuppliersSelector":
                             //modal.find('.modal-title').text("Supplier selector");
