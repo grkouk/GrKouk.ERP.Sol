@@ -110,29 +110,29 @@
     <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
     <ejs-scripts></ejs-scripts>
     <script>
-    $(document).ready(function() {
-    var getWarehouseItemNatureList = () => {
-    var timeout;
-    var pageIndex = 1;
-    var uri = '/api/GrKoukInfoApi/GetSelectorMaterialNatures';
-    $.ajax({
+    $(document).ready(function() { 
+        var getWarehouseItemNatureList = () => {
+            var timeout;
+            var pageIndex = 1;
+            var uri = '/api/GrKoukInfoApi/GetSelectorMaterialNatures';
+            $.ajax({
     contentType: 'application/json; charset=utf-8',
     dataType: 'json',
     type: 'GET',
     url: uri,
-    beforeSend: function() {
-    if (timeout) {
-    clearTimeout(timeout);
-    }
-    timeout = setTimeout(function() {
-    $("#loadMe").modal({
-    backdrop: "static",
-    keyboard: false,
-    show: true
-    });
-    },
-    1000);
-    },
+        beforeSend: function() {
+            if (timeout) {
+                clearTimeout(timeout);
+            }
+            timeout = setTimeout(function() {
+                $("#loadMe").modal({
+                    backdrop: "static",
+                    keyboard: false,
+                    show: true
+                });
+            },
+            1000);
+            },
     success: function(result) {
     $.each(result,
     function(index, item) {
