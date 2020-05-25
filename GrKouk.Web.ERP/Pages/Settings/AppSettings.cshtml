@@ -16,13 +16,13 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-row">
                 <div class="form-group col-md-3">
-                    <label asp-for="ItemVm[0].Code" class="control-label" small>All Companies Setting</label>
+                    <label asp-for="ItemVm[0].Code" class="" small>All Companies Setting</label>
                     <select asp-for="ItemVm[0].Code" class="form-control form-control-sm small" asp-items="ViewBag.CompanyId"></select>
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group col-10">
-                    <label class="control-label" small>Sum Of Material Buys Definition</label>
+                    <label class="" small>Sum Of Material Buys Definition</label>
                     <div class="input-group input-group-sm">
                         <input id="BuyMaterialsValue" asp-for="ItemVm[1].Value" disabled />
 
