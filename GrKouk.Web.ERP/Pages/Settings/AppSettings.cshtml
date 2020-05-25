@@ -7,7 +7,7 @@
 
 @section MyCss
 {
-    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/material.css"/>
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/material.css" />
 }
 
 <div class="container">
@@ -24,7 +24,7 @@
                 <div class="form-group col-10">
                     <label class="control-label" small>Sum Of Material Buys Definition</label>
                     <div class="input-group input-group-sm">
-                        <input id="BuyMaterialsValue" asp-for="ItemVm[1].Value" disabled/>
+                        <input id="BuyMaterialsValue" asp-for="ItemVm[1].Value" disabled />
 
                         <div class="input-group-append" id="button-addon4">
                             <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#itemSelector" data-selectorType="BuyMaterialsSettings" type="button">...</button>
@@ -34,7 +34,7 @@
             </div>
 
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary btn-sm" id="saveForm"/>
+                <input type="submit" value="Save" class="btn btn-primary btn-sm" id="saveForm" />
             </div>
         </fieldset>
     </form>
@@ -86,7 +86,7 @@
                     </div>
                     <div class="form-row">
                         <div class="col-10">
-                            <input class="form-control form-control-sm" name="itemsSearchText" placeholder="Search text" type="text"/>
+                            <input class="form-control form-control-sm" name="itemsSearchText" placeholder="Search text" type="text" />
 
                         </div>
                         <div class="col-2">
@@ -110,167 +110,167 @@
     <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
     <ejs-scripts></ejs-scripts>
     <script>
-    $(document).ready(function() { 
-        var getWarehouseItemNatureList = () => {
-            var timeout;
-            var pageIndex = 1;
-            var uri = '/api/GrKoukInfoApi/GetSelectorMaterialNatures';
-            $.ajax({
-    contentType: 'application/json; charset=utf-8',
-    dataType: 'json',
-    type: 'GET',
-    url: uri,
-        beforeSend: function() {
-            if (timeout) {
-                clearTimeout(timeout);
-            }
-            timeout = setTimeout(function() {
-                $("#loadMe").modal({
-                    backdrop: "static",
-                    keyboard: false,
-                    show: true
+        $(document).ready(function () {
+            var getWarehouseItemNatureList = () => {
+                var timeout;
+                var pageIndex = 1;
+                var uri = '/api/GrKoukInfoApi/GetSelectorMaterialNatures';
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'GET',
+                    url: uri,
+                    beforeSend: function () {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        timeout = setTimeout(function () {
+                            $("#loadMe").modal({
+                                backdrop: "static",
+                                keyboard: false,
+                                show: true
+                            });
+                        },
+                            1000);
+                    },
+                    success: function (result) {
+                        $.each(result,
+                            function (index, item) {
+                                $('#MaterialNatureTypes').append($('<option></option>').attr('value', item.valueInt)
+                                    .text(item.title));
+                            });
+                        $('#MaterialNatureTypes').selectpicker('refresh');
+                    },
+                    complete: function () {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        $("#loadMe").modal("hide");
+                        setTimeout(function () {
+                            console.log('Checking for open modals');
+                            var isOpen = $('#loadMe').hasClass('show');
+                            if (isOpen) {
+                                console.log('There is an open Modal');
+                                $("#loadMe").modal("hide");
+                            } else {
+                                console.log('No open modal');
+                            }
+                        },
+                            2000);
+                    },
+                    error: function (e) {
+                        console.log(e);
+
+                    }
                 });
-            },
-            1000);
-            },
-    success: function(result) {
-    $.each(result,
-    function(index, item) {
-    $('#MaterialNatureTypes').append($('<option></option>').attr('value', item.valueInt)
-    .text(item.title));
-    });
-    $('#MaterialNatureTypes').selectpicker('refresh');
-    },
-    complete: function() {
-    if (timeout) {
-    clearTimeout(timeout);
-    }
-    $("#loadMe").modal("hide");
-    setTimeout(function() {
-    console.log('Checking for open modals');
-    var isOpen = $('#loadMe').hasClass('show');
-    if (isOpen) {
-    console.log('There is an open Modal');
-    $("#loadMe").modal("hide");
-    } else {
-    console.log('No open modal');
-    }
-    },
-    2000);
-    },
-    error: function(e) {
-    console.log(e);
+            };
+            var getTransactorTypeList = () => {
+                var timeout;
+                var pageIndex = 1;
+                var uri = '/api/GrKoukInfoApi/GetSelectorTransactorTypes';
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'GET',
+                    url: uri,
+                    beforeSend: function () {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        timeout = setTimeout(function () {
+                            $("#loadMe").modal({
+                                backdrop: "static",
+                                keyboard: false,
+                                show: true
+                            });
+                        },
+                            1000);
+                    },
+                    success: function (result) {
+                        $.each(result,
+                            function (index, item) {
+                                $('#TransactorTypes').append($('<option></option>').attr('value', item.valueInt)
+                                    .text(item.title));
+                            });
+                        $('#TransactorTypes').selectpicker('refresh');
+                    },
+                    complete: function () {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        $("#loadMe").modal("hide");
+                        setTimeout(function () {
+                            console.log('Checking for open modals');
+                            var isOpen = $('#loadMe').hasClass('show');
+                            if (isOpen) {
+                                console.log('There is an open Modal');
+                                $("#loadMe").modal("hide");
+                            } else {
+                                console.log('No open modal');
+                            }
+                        },
+                            2000);
+                    },
+                    error: function (e) {
+                        console.log(e);
 
-    }
-    });
-    };
-    var getTransactorTypeList = () => {
-    var timeout;
-    var pageIndex = 1;
-    var uri = '/api/GrKoukInfoApi/GetSelectorTransactorTypes';
-    $.ajax({
-    contentType: 'application/json; charset=utf-8',
-    dataType: 'json',
-    type: 'GET',
-    url: uri,
-    beforeSend: function() {
-    if (timeout) {
-    clearTimeout(timeout);
-    }
-    timeout = setTimeout(function() {
-    $("#loadMe").modal({
-    backdrop: "static",
-    keyboard: false,
-    show: true
-    });
-    },
-    1000);
-    },
-    success: function(result) {
-    $.each(result,
-    function(index, item) {
-    $('#TransactorTypes').append($('<option></option>').attr('value', item.valueInt)
-    .text(item.title));
-    });
-    $('#TransactorTypes').selectpicker('refresh');
-    },
-    complete: function() {
-    if (timeout) {
-    clearTimeout(timeout);
-    }
-    $("#loadMe").modal("hide");
-    setTimeout(function() {
-    console.log('Checking for open modals');
-    var isOpen = $('#loadMe').hasClass('show');
-    if (isOpen) {
-    console.log('There is an open Modal');
-    $("#loadMe").modal("hide");
-    } else {
-    console.log('No open modal');
-    }
-    },
-    2000);
-    },
-    error: function(e) {
-    console.log(e);
+                    }
+                });
+            };
+            var getCompanyList = () => {
+                var timeout;
+                var pageIndex = 1;
+                var uri = '/api/GrKoukInfoApi/GetSelectorCompanies';
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'GET',
+                    url: uri,
+                    beforeSend: function () {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        timeout = setTimeout(function () {
+                            $("#loadMe").modal({
+                                backdrop: "static",
+                                keyboard: false,
+                                show: true
+                            });
+                        },
+                            1000);
+                    },
+                    success: function (result) {
+                        $.each(result,
+                            function (index, item) {
+                                $('#CompaniesList')
+                                    .append($('<option></option>').attr('value', item.value).text(item.title));
+                            });
+                        $('#CompaniesList').selectpicker('refresh');
+                    },
+                    complete: function () {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        $("#loadMe").modal("hide");
+                        setTimeout(function () {
+                            console.log('Checking for open modals');
+                            var isOpen = $('#loadMe').hasClass('show');
+                            if (isOpen) {
+                                console.log('There is an open Modal');
+                                $("#loadMe").modal("hide");
+                            } else {
+                                console.log('No open modal');
+                            }
+                        },
+                            2000);
+                    },
+                    error: function (e) {
+                        console.log(e);
 
-    }
-    });
-    };
-    var getCompanyList = () => {
-    var timeout;
-    var pageIndex = 1;
-    var uri = '/api/GrKoukInfoApi/GetSelectorCompanies';
-    $.ajax({
-    contentType: 'application/json; charset=utf-8',
-    dataType: 'json',
-    type: 'GET',
-    url: uri,
-    beforeSend: function() {
-    if (timeout) {
-    clearTimeout(timeout);
-    }
-    timeout = setTimeout(function() {
-    $("#loadMe").modal({
-    backdrop: "static",
-    keyboard: false,
-    show: true
-    });
-    },
-    1000);
-    },
-    success: function(result) {
-    $.each(result,
-    function(index, item) {
-    $('#CompaniesList')
-    .append($('<option></option>').attr('value', item.value).text(item.title));
-    });
-    $('#CompaniesList').selectpicker('refresh');
-    },
-    complete: function() {
-    if (timeout) {
-    clearTimeout(timeout);
-    }
-    $("#loadMe").modal("hide");
-    setTimeout(function() {
-    console.log('Checking for open modals');
-    var isOpen = $('#loadMe').hasClass('show');
-    if (isOpen) {
-    console.log('There is an open Modal');
-    $("#loadMe").modal("hide");
-    } else {
-    console.log('No open modal');
-    }
-    },
-    2000);
-    },
-    error: function(e) {
-    console.log(e);
+                    }
+                });
+            };
+        });
 
-    }
-    });
-    };
-    });
-
-</script>
+    </script>
 }
