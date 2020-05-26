@@ -25,7 +25,7 @@ namespace GrKouk.Web.ERP.Pages.Settings
             _toastNotification = toastNotification;
         }
         [BindProperty]
-        public IList<AppSetting> ItemVm { get; set; }
+        public List<AppSetting> ItemVm { get; set; }
         public async Task<IActionResult> OnGetAsync()
         {
             LoadCombos();
@@ -36,7 +36,8 @@ namespace GrKouk.Web.ERP.Pages.Settings
             {
                 var acs = new AppSetting
                 {
-                    Code = allCompanyCodeSetting.Value,
+                    Code = allCompanyCodeSetting.Code,
+                    Value = allCompanyCodeSetting.Value,
                 };
                 ItemVm.Add(acs);
             }
@@ -44,7 +45,8 @@ namespace GrKouk.Web.ERP.Pages.Settings
             {
                 ItemVm.Add(new AppSetting
                 {
-                    Code = "ALLCOMP"
+                    Code = GrKouk.Erp.Definitions.Constants.AllCompaniesCodeKey,
+                    Value = "ALLCOMP"
                 });
             }
             var sumOfMaterialBuysSetting = await _context.AppSettings.FirstOrDefaultAsync(p => p.Code == GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfMaterialBuys);
@@ -107,7 +109,7 @@ namespace GrKouk.Web.ERP.Pages.Settings
             var allCompanyCodeSetting = await _context.AppSettings.FirstOrDefaultAsync(p => p.Code == GrKouk.Erp.Definitions.Constants.AllCompaniesCodeKey);
             if (allCompanyCodeSetting != null)
             {
-                allCompanyCodeSetting.Value=ItemVm[0].Code;
+                allCompanyCodeSetting.Value=ItemVm[0].Value;
                 _context.Attach(allCompanyCodeSetting).State = EntityState.Modified;
             }
             else
@@ -115,7 +117,7 @@ namespace GrKouk.Web.ERP.Pages.Settings
                 var newAllCompSetting = new AppSetting
                 {
                     Code = GrKouk.Erp.Definitions.Constants.AllCompaniesCodeKey,
-                    Value = ItemVm[0].Code
+                    Value = ItemVm[0].Value
                 };
                 _context.AppSettings.Add(newAllCompSetting);
             }

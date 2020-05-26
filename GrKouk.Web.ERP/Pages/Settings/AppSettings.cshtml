@@ -16,17 +16,16 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" id="CurrentSelectorType" />
             <div class="form-row">
-                <div class="form-group col-md-3">
+                <div class="form-group col-md-10 col-sm-10 col-lg-10">
                     <label asp-for="ItemVm[0].Code" class="" small>All Companies Setting</label>
                     <select asp-for="ItemVm[0].Code" class="form-control form-control-sm small" asp-items="ViewBag.CompanyId"></select>
                 </div>
             </div>
             <div class="form-row">
-                <div class="form-group col-10">
+                <div class="form-group col-md-10 col-sm-10 col-lg-10">
                     <label class="" small>Sum Of Material Buys Definition</label>
                     <div class="input-group input-group-sm">
-                        <input id="BuyMaterialsValue" asp-for="ItemVm[1].Value" disabled />
-
+                        <textarea class="form-control" asp-for="ItemVm[1].Value" id="BuyMaterialsValue" rows="2"></textarea>
                         <div class="input-group-append">
                             <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#itemSelector" data-selectorType="BuyMaterialsSettings" type="button">...</button>
                         </div>
@@ -34,11 +33,10 @@
                 </div>
             </div>
             <div class="form-row">
-                <div class="form-group col-10">
+                <div class="form-group col-md-10 col-sm-10 col-lg-10">
                     <label class="" small>Sum Of Expenses Buys Definition</label>
                     <div class="input-group input-group-sm">
-                        <input id="BuyExpensesValue" asp-for="ItemVm[2].Value" disabled />
-
+                        <textarea class="form-control" asp-for="ItemVm[2].Value" id="BuyExpensesValue" rows="2"></textarea>
                         <div class="input-group-append">
                             <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#itemSelector" data-selectorType="BuyExpensesSettings" type="button">...</button>
                         </div>
