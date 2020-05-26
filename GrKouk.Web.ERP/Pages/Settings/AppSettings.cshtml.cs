@@ -66,6 +66,24 @@ namespace GrKouk.Web.ERP.Pages.Settings
                 });
             }
 
+            var sumOfExpensesBuysSetting = await _context.AppSettings.FirstOrDefaultAsync(p => p.Code == GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfExpenseBuys);
+            if (sumOfExpensesBuysSetting != null)
+            {
+                var acs = new AppSetting
+                {
+                    Code = sumOfExpensesBuysSetting.Code,
+                    Value = sumOfExpensesBuysSetting.Value
+                };
+                ItemVm.Add(acs);
+            }
+            else
+            {
+                ItemVm.Add(new AppSetting
+                {
+                    Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfExpenseBuys,
+                    Value = ""
+                });
+            }
             return Page();
         }
 
@@ -76,7 +94,8 @@ namespace GrKouk.Web.ERP.Pages.Settings
                 .Cast<MainInfoSourceTypeEnum>()
                 .Select(c => new SelectListItem()
                 {
-                    Value = c.ToString(),
+                    
+                    Value = ((int)c).ToString(),
                     Text = c.GetDescription()
                 }).ToList();
             ViewData["SourceType"] = sourceTypeList;
@@ -114,6 +133,22 @@ namespace GrKouk.Web.ERP.Pages.Settings
                     Value = ItemVm[1].Value
                 };
                 _context.AppSettings.Add(newBuyMaterialsSumSetting);
+            }
+            
+            var buyExpensesSumSetting = await _context.AppSettings.FirstOrDefaultAsync(p => p.Code == GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfExpenseBuys);
+            if (buyExpensesSumSetting != null)
+            {
+                buyExpensesSumSetting.Value=ItemVm[2].Value;
+                _context.Attach(buyExpensesSumSetting).State = EntityState.Modified;
+            }
+            else
+            {
+                var newBuyExpensesSumSetting = new AppSetting
+                {
+                    Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfExpenseBuys,
+                    Value = ItemVm[2].Value
+                };
+                _context.AppSettings.Add(newBuyExpensesSumSetting);
             }
             try
             {
