@@ -169,6 +169,17 @@ namespace GrKouk.Erp.Definitions
         [Description("Κινήσεις Συναλλασσόμενων")]
         DiaryTypeEnumTransactors = 6
     }
+    public enum MainInfoSourceTypeEnum
+    {
+        [Description("Πωλήσεις")]
+        SourceTypeSales = 1,
+        [Description("Αγορές")]
+        SourceTypeBuys = 2,
+        [Description("Κινήσεις Αποθήκης")]
+        SourceTypeWarehouseTransactions = 5,
+        [Description("Κινήσεις Συναλλασσόμενων")]
+        SourceTypeTransactorTransactions = 6
+    }
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1712:Do not prefix enum values with type name", Justification = "<Pending>")]
     public enum InfoEntityActionEnum
     {

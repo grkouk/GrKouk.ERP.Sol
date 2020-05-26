@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -70,6 +72,14 @@ namespace GrKouk.Web.ERP.Pages.Settings
         private void LoadCombos()
         {
             ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(p => p.Name).AsNoTracking(), "Code", "Name");
+            var sourceTypeList = Enum.GetValues(typeof(MainInfoSourceTypeEnum))
+                .Cast<MainInfoSourceTypeEnum>()
+                .Select(c => new SelectListItem()
+                {
+                    Value = c.ToString(),
+                    Text = c.GetDescription()
+                }).ToList();
+            ViewData["SourceType"] = sourceTypeList;
         }
 
         public async Task<IActionResult> OnPostAsync()

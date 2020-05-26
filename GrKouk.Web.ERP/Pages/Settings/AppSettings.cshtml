@@ -41,7 +41,7 @@
 </div>
 <!-- Modal Item selector -->
 <div class="modal fade" id="itemSelector" tabindex="-1" role="dialog" aria-labelledby="itemsModalLabel" aria-hidden="true" data-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered modal-lg"  role="document">
+    <div class="modal-dialog modal-dialog-centered modal-sm"  role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="container-fluid">
@@ -59,11 +59,19 @@
 
                 </div>
             </div>
-            <div class="modal-body ">
+            <div class="modal-body">
                 <div class="container-fluid">
-
                     <div class="form-row">
-                        <div class="form-group col-md-10 col-sm-12">
+                        <div class="form-group col-12">
+                            <label>Select Source Type</label>
+                            <ejs-combobox id="SourceType" dataSource="@ViewBag.SourceType" placeholder="Source Type">
+                                <e-combobox-fields value="Value" text="Text"></e-combobox-fields>
+                            </ejs-combobox>
+
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
                             <label>Select Companies</label>
                             <ejs-multiselect id="MultiSelectCompanies" placeholder="Select Companies" mode="CheckBox"
                                              showDropDownIcon="true"
@@ -74,7 +82,7 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-md-10 col-sm-12" id="MaterialNatureTypesDiv">
+                        <div class="form-group col-12" id="MaterialNatureTypesDiv">
                             <label>Select Material Natures</label>
                             <ejs-multiselect id="MultiSelectMaterialNatures" placeholder="Select Natures" mode="CheckBox"
                                              showDropDownIcon="true"
@@ -85,7 +93,7 @@
 
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-md-10 col-sm-12">
+                        <div class="form-group col-12">
                             <label>Select Transactor Type</label>
                             <ejs-multiselect id="MultiSelectTransactorTypes" placeholder="Select Transactor Type" mode="CheckBox"
                                              showDropDownIcon="true"
@@ -282,13 +290,6 @@
                     switch (selectorType) {
                         case "BuyMaterialsSettings":
                             modal.find('.modal-title').text("Buy Materials Settings");
-                            //$('#TransactorSelectorTypesDiv').hide();
-                            //$('#MaterialNatureTypesDiv').show();
-                            //curSelectorType = "ProductsSelector";
-                            //var $matNatures = $('#MaterialNatureTypes');
-                            //if ($matNatures.children('option').length === 0) {
-                            //    getWarehouseItemNatureList();
-                            //}
                             getTransactorTypeList();
                             getWarehouseItemNatureList();
                             getCompanyList();
@@ -304,12 +305,6 @@
                             //}
                             break;
                         default:
-                    }
-
-
-                    var $compList = $('#CompaniesList');
-                    if ($compList.children('option').length === 0) {
-                        getCompanyList();
                     }
                 });
         });
