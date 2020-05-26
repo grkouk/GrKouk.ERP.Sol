@@ -22,6 +22,7 @@ namespace GrKouk.Web.ERP.Helpers
         public string ClientProfileFilter { get; set; }
         public string CashRegCategoryFilter { get; set; }
         public int DisplayCurrencyId { get; set; }
+        public string CodeToCompute { get; set; }
     }
 
     public class IndexDataTableResponse<T>
