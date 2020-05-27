@@ -55,4 +55,14 @@ namespace GrKouk.Web.ERP.Helpers
         public List<SearchListItem> Diaries { get; set; }
 
     }
+
+    public class CodeToComputeDefinition
+    {
+        public string SrcType { get; set; }
+        public string[] MatNatures { get; set; }
+        public string[] TransTypes { get; set; }
+        public string[] CompSelected { get; set; }
+        public string[] DocTypesSelected { get; set; }
+
+    }
 }

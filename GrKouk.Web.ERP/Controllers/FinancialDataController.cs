@@ -64,7 +64,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             return retAmount;
         }
-
+        
         [HttpGet("GetMainDashboardInfo")]
         public async Task<IActionResult> GetMainDashboardInfo([FromQuery] IndexDataTableRequest request)
         {
@@ -93,6 +93,20 @@ namespace GrKouk.Web.ERP.Controllers
             }
             Thread.Sleep(2000);
             decimal r;
+            var codeToComputeDefinition =await
+                _context.AppSettings.FirstOrDefaultAsync(p => p.Code == request.CodeToCompute);
+            if (codeToComputeDefinition == null)
+            {
+                return BadRequest(new {Message = "Code to compute not exist"});
+            }
+
+            if (string.IsNullOrEmpty( codeToComputeDefinition.Value))
+            {
+                return BadRequest(new {Message = "No definition found for code to compute"});
+            }
+
+            var def = codeToComputeDefinition.Value;
+            var defObj = JsonConvert.DeserializeObject<CodeToComputeDefinition>(def);
             switch (request.CodeToCompute)
             {
                 case "SumOfMaterialBuysDf":
