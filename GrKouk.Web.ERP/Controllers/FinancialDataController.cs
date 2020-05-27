@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -90,7 +91,32 @@ namespace GrKouk.Web.ERP.Controllers
                 //transactionsList = transactionsList.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
                 //transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
             }
-            var response = new MainDashboardInfoResponse {};
+            Thread.Sleep(2000);
+            decimal r;
+            switch (request.CodeToCompute)
+            {
+                case "SumOfMaterialBuysDf":
+                    r = 2500;
+                    break;
+                case "SumOfServiceBuysDf":
+                    r = 500;
+                    break;
+                case "SumOfExpenseBuysDf":
+                    r = 200;
+                    break;
+                case "SumOfFixedAssetBuysDf":
+                    r = 1100;
+                    break;
+
+                default:
+                    r = 0;
+                    break;
+            }
+            var response = new MainDashboardInfoResponse
+            {
+                RequestedCodeToCompute = request.CodeToCompute,
+                RequestedCodeSum = r
+            };
             return Ok(response);
         }
         [HttpGet("GetTransactorFinancialSummaryData")]

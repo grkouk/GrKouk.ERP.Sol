@@ -9,5 +9,7 @@
         public decimal SumOfMaterialSales { get; set; }
         public decimal SumOfServiceSales { get; set; }
         public decimal SumOfIncomeSales { get; set; }
+        public decimal RequestedCodeSum { get; set; }
+        public string RequestedCodeToCompute { get; set; }
     }
 }

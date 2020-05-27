@@ -76,11 +76,15 @@
                                             <tr>
                                                 <td>Αγορές Υλικών</td>
                                                 <td>
-                                                    <span id="Code2Value">
-                                                        1000
+                                                    <span name="CodeValue" 
+                                                          data-computeCode="SumOfMaterialBuysDf">
+                                                        0
                                                     </span>
                                                    
-                                                    <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true" id="Code2Loader" style="display: none">
+                                                    <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true" 
+                                                         data-computeCode="SumOfMaterialBuysDf"
+                                                         name="CodeLoader" 
+                                                         style="display: none">
 
                                                     </div>
                                                 </td>
@@ -88,11 +92,15 @@
                                             <tr>
                                                 <td>Αγορές υπηρεσιών</td>
                                                 <td>
-                                                    <span id="Code3Value">
-                                                        1000
+                                                    <span name="CodeValue"
+                                                          data-computeCode="SumOfServiceBuysDf">
+                                                        0
                                                     </span>
-                                                    
-                                                    <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true" id="Code3Loader" style="display: none">
+
+                                                    <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+                                                         data-computeCode="SumOfServiceBuysDf"
+                                                         name="CodeLoader"
+                                                         style="display: none">
 
                                                     </div>
                                                 </td>
@@ -100,10 +108,15 @@
                                             <tr>
                                                 <td>Αγορές παγίων</td>
                                                 <td>
-                                                    <span id="Code4Value">
-                                                        1000
+                                                    <span name="CodeValue"
+                                                          data-computeCode="SumOfFixedAssetBuysDf">
+                                                        0
                                                     </span>
-                                                    <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true" id="Code4Loader" style="display: none">
+
+                                                    <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+                                                         data-computeCode="SumOfFixedAssetBuysDf"
+                                                         name="CodeLoader"
+                                                         style="display: none">
 
                                                     </div>
                                                 </td>
@@ -112,10 +125,15 @@
                                                 <td>Εξοδα</td>
                                                
                                                 <td>
-                                                    <span id="Code5Value">
-                                                        1000
+                                                    <span name="CodeValue"
+                                                          data-computeCode="SumOfExpenseBuysDf">
+                                                        0
                                                     </span>
-                                                    <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true" id="Code5Loader" style="display: none">
+
+                                                    <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+                                                         data-computeCode="SumOfExpenseBuysDf"
+                                                         name="CodeLoader"
+                                                         style="display: none">
 
                                                     </div>
                                                 </td>
@@ -124,7 +142,7 @@
 
                                     </div>
                                     <div class="card-footer text-muted">
-                                        <p>2000</p>
+                                        <p id="ExpencesSumValue">0</p>
                                     </div>
                                 </div>
                             </div>
@@ -234,8 +252,19 @@
                 let selCurrencyId = $selectedCurrency.data('currencyid');
                 const $selectedPeriod = $('.selected-period-text');
                 let selPeriodId = $selectedPeriod.data('periodid');
-                let code1 = 'SumOfMaterialBuysDf';
-                getFinancialData(code1, selPeriodId, selCompanyId, selCurrencyId);
+                let $fieldsToCompute = $('[name=CodeValue]');
+                let $loaders = $('[name=CodeLoader]');
+                $fieldsToCompute.each(function(index) {
+
+                    let $item = $(this);
+                    console.log($item.data('computecode'));
+                    let cd = $item.data('computecode');
+                    let loader = $item.next();
+                    getFinancialData(cd, selPeriodId, selCompanyId, selCurrencyId,$item,loader);
+                    
+                });
+
+
                 //getTransactionsData(transactorId, selPeriodId, selCompanyId, selCurrencyId);
 
             };
@@ -444,7 +473,7 @@
 
             };
             //--------------------------------------------------------------------------
-            const getFinancialData = (codeToCompute, dateRange, selCompany, selCurrency, loader, selectionCallback) => {
+            const getFinancialData = (codeToCompute, dateRange, selCompany, selCurrency,element, loader, selectionCallback) => {
                 var timeout;
                 var uri = '/api/FinancialData/GetMainDashboardInfo?';
                 uri += `codeToCompute=${codeToCompute}`;
@@ -469,7 +498,7 @@
                         }
                     },
                     success: function(result) {
-
+                        element.text(result.requestedCodeSum);
 
                     },
                     complete: function() {
@@ -477,14 +506,14 @@
                             if (timeout) {
                                 clearTimeout(timeout);
                             }
-                            setTimeout(function () {
-                                var isOpen =loader.is(':visible');
-                                if (isOpen) {
-                                    loader.hide();
-                                } else {
-                                    console.log('No open modal');
-                                }
-                            },
+                            setTimeout(function() {
+                                    var isOpen = loader.is(':visible');
+                                    if (isOpen) {
+                                        loader.hide();
+                                    } else {
+                                        console.log('No open modal');
+                                    }
+                                },
                                 2000);
                         }
 
