@@ -76,14 +76,14 @@
                                             <tr>
                                                 <td>Αγορές Υλικών</td>
                                                 <td>
-                                                    <span name="CodeValue" 
+                                                    <span name="BuyCodeValue" 
                                                           data-computeCode="SumOfMaterialBuysDf">
                                                         0
                                                     </span>
                                                    
                                                     <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true" 
                                                          data-computeCode="SumOfMaterialBuysDf"
-                                                         name="CodeLoader" 
+                                                         name="BuyCodeLoader" 
                                                          style="display: none">
 
                                                     </div>
@@ -92,14 +92,14 @@
                                             <tr>
                                                 <td>Αγορές υπηρεσιών</td>
                                                 <td>
-                                                    <span name="CodeValue"
+                                                    <span name="BuyCodeValue"
                                                           data-computeCode="SumOfServiceBuysDf">
                                                         0
                                                     </span>
 
                                                     <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
                                                          data-computeCode="SumOfServiceBuysDf"
-                                                         name="CodeLoader"
+                                                         name="BuyCodeLoader"
                                                          style="display: none">
 
                                                     </div>
@@ -108,14 +108,14 @@
                                             <tr>
                                                 <td>Αγορές παγίων</td>
                                                 <td>
-                                                    <span name="CodeValue"
+                                                    <span name="BuyCodeValue"
                                                           data-computeCode="SumOfFixedAssetBuysDf">
                                                         0
                                                     </span>
 
                                                     <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
                                                          data-computeCode="SumOfFixedAssetBuysDf"
-                                                         name="CodeLoader"
+                                                         name="BuyCodeLoader"
                                                          style="display: none">
 
                                                     </div>
@@ -125,14 +125,14 @@
                                                 <td>Εξοδα</td>
                                                
                                                 <td>
-                                                    <span name="CodeValue"
+                                                    <span name="BuyCodeValue"
                                                           data-computeCode="SumOfExpenseBuysDf">
                                                         0
                                                     </span>
 
                                                     <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
                                                          data-computeCode="SumOfExpenseBuysDf"
-                                                         name="CodeLoader"
+                                                         name="BuyCodeLoader"
                                                          style="display: none">
 
                                                     </div>
@@ -142,7 +142,7 @@
 
                                     </div>
                                     <div class="card-footer text-muted">
-                                        <p id="ExpencesSumValue">0</p>
+                                        <p id="ExpensesSumValue">0</p>
                                     </div>
                                 </div>
                             </div>
@@ -252,16 +252,16 @@
                 let selCurrencyId = $selectedCurrency.data('currencyid');
                 const $selectedPeriod = $('.selected-period-text');
                 let selPeriodId = $selectedPeriod.data('periodid');
-                let $fieldsToCompute = $('[name=CodeValue]');
-                let $loaders = $('[name=CodeLoader]');
+                let $fieldsToCompute = $('[name=BuyCodeValue]');
+               
                 $fieldsToCompute.each(function(index) {
 
                     let $item = $(this);
                     console.log($item.data('computecode'));
                     let cd = $item.data('computecode');
                     let loader = $item.next();
-                    getFinancialData(cd, selPeriodId, selCompanyId, selCurrencyId,$item,loader);
-                    
+                    getFinancialData(cd, selPeriodId, selCompanyId, selCurrencyId, $item, loader);
+
                 });
 
 
@@ -473,7 +473,7 @@
 
             };
             //--------------------------------------------------------------------------
-            const getFinancialData = (codeToCompute, dateRange, selCompany, selCurrency,element, loader, selectionCallback) => {
+            const getFinancialData = (codeToCompute, dateRange, selCompany, selCurrency, element, loader, selectionCallback) => {
                 var timeout;
                 var uri = '/api/FinancialData/GetMainDashboardInfo?';
                 uri += `codeToCompute=${codeToCompute}`;
@@ -498,8 +498,11 @@
                         }
                     },
                     success: function(result) {
-                        element.text(result.requestedCodeSum);
-
+                        let vlVal = parseFloat(result.requestedCodeSum);
+                        let vl = formatterCurrency.format(result.requestedCodeSum);
+                        element.text(vl);
+                        element.attr('value', vlVal);
+                        updateSumForGroup(element);
                     },
                     complete: function() {
                         if (loader) {
@@ -523,6 +526,30 @@
 
                     }
                 });
+            };
+            const updateSumForGroup = (element) => {
+                console.log(element);
+                let code = element.data('computecode');
+                if (code.includes('Buys')) {
+                    let $fieldsToCompute = $('[name=BuyCodeValue]');
+                    let sumOfGroup = parseFloat('0');
+                    $fieldsToCompute.each(function(index) {
+
+                        let $item = $(this);
+                        console.log($item.data('computecode'));
+                        let vlText = $item.text();
+                        let vl1 = $item.attr('value');
+                        if (vl1) {
+                            let vl = parseFloat(vl1);
+                            sumOfGroup += vl;    
+                        }
+                        
+
+
+                    });
+                    $('#ExpensesSumValue').text(formatterCurrency.format(sumOfGroup));
+                }
+               
             };
             const getTransactionsData = (transactorId, dateRange, selCompany, selCurrency, selectionCallback) => {
                 var timeout;
