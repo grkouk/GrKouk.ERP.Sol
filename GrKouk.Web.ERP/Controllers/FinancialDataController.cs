@@ -107,7 +107,18 @@ namespace GrKouk.Web.ERP.Controllers
                 case "SumOfFixedAssetBuysDf":
                     r = 1100;
                     break;
-
+                case "SumOfMaterialSalesDf":
+                    r = 250;
+                    break;
+                case "SumOfServiceSalesDf":
+                    r = 5000;
+                    break;
+                case "SumOfExpenseSalesDf":
+                    r = 20;
+                    break;
+                case "SumOfFixedAssetSalesDf":
+                    r = 110;
+                    break;
                 default:
                     r = 0;
                     break;
