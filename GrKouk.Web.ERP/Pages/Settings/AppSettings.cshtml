@@ -7,17 +7,17 @@
 
 @section MyCss
 {
-    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/material.css" />
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/material.css"/>
 }
 
 <div class="container">
     <form method="post">
         <fieldset id="thisForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" id="CurrentSelectorType" />
+            <input type="hidden" id="CurrentSelectorType"/>
             <div class="form-row">
                 <div class="form-group col-md-10 col-sm-10 col-lg-10">
-                    <label  small>All Companies Setting</label>
+                    <label small>All Companies Setting</label>
                     <select asp-for="ItemVm[0].Value" class="form-control form-control-sm small" asp-items="ViewBag.CompanyId"></select>
                 </div>
             </div>
@@ -43,15 +43,26 @@
                     </div>
                 </div>
             </div>
+            <div class="form-row">
+                <div class="form-group col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Sum Of Material Sales Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[3].Value" id="SellMaterialsValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#itemSelector" data-selectorType="SellMaterialsSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary btn-sm" id="saveForm" />
+                <input type="submit" value="Save" class="btn btn-primary btn-sm" id="saveForm"/>
             </div>
         </fieldset>
     </form>
 </div>
 <!-- Modal Item selector -->
 <div class="modal fade" id="itemSelector" tabindex="-1" role="dialog" aria-labelledby="itemsModalLabel" aria-hidden="true" data-keyboard="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm"  role="document">
+    <div class="modal-dialog modal-dialog-centered modal" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="container-fluid">
@@ -369,6 +380,9 @@
                     case "BuyExpensesSettings":
                         $('#BuyExpensesValue').val(jsJSON);
                         break;
+                    case "SellMaterialsSettings":
+                         $('#SellMaterialsValue').val(jsJSON);
+                         break;
                     default:
                     }
 
@@ -392,7 +406,10 @@
                     case "BuyExpensesSettings":
                         oldVal = $('#BuyExpensesValue').val();
                         break;
-                    default:
+                     case "SellMaterialsSettings":
+                        oldVal = $('#SellMaterialsValue').val();
+                        break;    
+                     default:
                     }
                     if (oldVal.length > 0) {
                         let oldValObj = JSON.parse(oldVal);
@@ -419,6 +436,9 @@
                         break;
                     case "BuyExpensesSettings":
                         modal.find('.modal-title').text("Buy Expenses Setting");
+                        break;
+                    case "SellMaterialsSettings":
+                        modal.find('.modal-title').text("Sell Materials Setting");
                         break;
                     default:
                     }

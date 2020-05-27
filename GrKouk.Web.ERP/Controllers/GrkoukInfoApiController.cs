@@ -493,7 +493,7 @@ namespace GrKouk.Web.ERP.Controllers
                 SumOfAmount = sumAmountTotal,
 
                 GrandSumOfAmount = grandSumOfAmount,
-                //GrandSumOfNetAmount = gransSumOfNetAmount,
+                GrandSumOfNetAmount = gransSumOfNetAmount,
                 Data = listItems
             };
             //return new JsonResult(response);

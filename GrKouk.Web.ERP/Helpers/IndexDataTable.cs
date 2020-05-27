@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GrKouk.Erp.Definitions;
 
 namespace GrKouk.Web.ERP.Helpers
 {
@@ -58,11 +59,11 @@ namespace GrKouk.Web.ERP.Helpers
 
     public class CodeToComputeDefinition
     {
-        public string SrcType { get; set; }
+        public MainInfoSourceTypeEnum SrcType { get; set; }
         public string[] MatNatures { get; set; }
-        public string[] TransTypes { get; set; }
+        public int[] TransTypes { get; set; }
         public string[] CompSelected { get; set; }
-        public string[] DocTypesSelected { get; set; }
+        public int[] DocTypesSelected { get; set; }
 
     }
 }

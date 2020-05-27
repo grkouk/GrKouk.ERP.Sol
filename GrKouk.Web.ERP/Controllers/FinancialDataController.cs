@@ -6,7 +6,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.Shared;
+using GrKouk.Erp.Dtos.BuyDocuments;
+using GrKouk.Erp.Dtos.SellDocuments;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
@@ -68,31 +71,8 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpGet("GetMainDashboardInfo")]
         public async Task<IActionResult> GetMainDashboardInfo([FromQuery] IndexDataTableRequest request)
         {
-            IQueryable<WarehouseTransaction> fullListIq = _context.WarehouseTransactions;
-            if (!string.IsNullOrEmpty(request.CompanyFilter))
-            {
-                if (int.TryParse(request.CompanyFilter, out var companyId))
-                {
-                    if (companyId > 0)
-                    {
-                        fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
-                    }
-                }
-            } 
-            DateTime beforePeriodDate = DateTime.Today;
-            if (!string.IsNullOrEmpty(request.DateRange))
-            {
-                var datePeriodFilter = request.DateRange;
-                DateFilterDates dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
-                DateTime fromDate = dfDates.FromDate;
-                beforePeriodDate = fromDate.AddDays(-1);
-                DateTime toDate = dfDates.ToDate;
-
-                //transactionsList = transactionsList.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
-                //transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
-            }
-            Thread.Sleep(2000);
-            decimal r;
+            
+           
             var codeToComputeDefinition =await
                 _context.AppSettings.FirstOrDefaultAsync(p => p.Code == request.CodeToCompute);
             if (codeToComputeDefinition == null)
@@ -105,37 +85,110 @@ namespace GrKouk.Web.ERP.Controllers
                 return BadRequest(new {Message = "No definition found for code to compute"});
             }
 
+            decimal r = 0;
+            var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
+                .Take(10)
+                .ToListAsync();
             var def = codeToComputeDefinition.Value;
             var defObj = JsonConvert.DeserializeObject<CodeToComputeDefinition>(def);
-            switch (request.CodeToCompute)
+            if (defObj.SrcType == MainInfoSourceTypeEnum.SourceTypeBuys)
             {
-                case "SumOfMaterialBuysDf":
-                    r = 2500;
-                    break;
-                case "SumOfServiceBuysDf":
-                    r = 500;
-                    break;
-                case "SumOfExpenseBuysDf":
-                    r = 200;
-                    break;
-                case "SumOfFixedAssetBuysDf":
-                    r = 1100;
-                    break;
-                case "SumOfMaterialSalesDf":
-                    r = 250;
-                    break;
-                case "SumOfServiceSalesDf":
-                    r = 5000;
-                    break;
-                case "SumOfExpenseSalesDf":
-                    r = 20;
-                    break;
-                case "SumOfFixedAssetSalesDf":
-                    r = 110;
-                    break;
-                default:
-                    r = 0;
-                    break;
+                IQueryable<BuyDocument> fullListIq = _context.BuyDocuments
+                    .Include(p=>p.Transactor);
+                if (!string.IsNullOrEmpty(request.CompanyFilter))
+                {
+                    if (int.TryParse(request.CompanyFilter, out var companyId))
+                    {
+                        if (companyId > 0)
+                        {
+                            fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
+                        }
+                    }
+                } 
+                DateTime beforePeriodDate = DateTime.Today;
+                if (!string.IsNullOrEmpty(request.DateRange))
+                {
+                    var datePeriodFilter = request.DateRange;
+                    DateFilterDates dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
+                    DateTime fromDate = dfDates.FromDate;
+                    beforePeriodDate = fromDate.AddDays(-1);
+                    DateTime toDate = dfDates.ToDate;
+                    fullListIq = fullListIq.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
+                    //transactionsList = transactionsList.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
+                    //transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
+                }
+
+                if (defObj.TransTypes.Length>0)
+                {
+                    fullListIq = fullListIq.Where(p => defObj.TransTypes.Contains(p.Transactor.TransactorTypeId));
+                }
+
+              
+                if (defObj.DocTypesSelected.Length>0)
+                {
+                    fullListIq = fullListIq.Where(p => defObj.DocTypesSelected.Contains(p.BuyDocTypeId));
+                }
+                var t = fullListIq.ProjectTo<BuyDocListDto>(_mapper.ConfigurationProvider);
+                var t1 = await t.Select(p => new BuyDocListDto
+                {
+                    AmountFpa = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountFpa),
+                    AmountNet = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountNet),
+                    AmountDiscount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountDiscount),
+                    CompanyCurrencyId = p.CompanyCurrencyId
+                }).ToListAsync();
+                //var grandSumOfAmount = t1.Sum(p => p.TotalAmount);
+                r = t1.Sum(p => p.TotalNetAmount);
+
+            }
+            if (defObj.SrcType == MainInfoSourceTypeEnum.SourceTypeSales)
+            {
+                IQueryable<SellDocument> fullListIq = _context.SellDocuments
+                    .Include(p => p.Transactor);
+                    
+                if (!string.IsNullOrEmpty(request.CompanyFilter))
+                {
+                    if (int.TryParse(request.CompanyFilter, out var companyId))
+                    {
+                        if (companyId > 0)
+                        {
+                            fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
+                        }
+                    }
+                } 
+                DateTime beforePeriodDate = DateTime.Today;
+                if (!string.IsNullOrEmpty(request.DateRange))
+                {
+                    var datePeriodFilter = request.DateRange;
+                    DateFilterDates dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
+                    DateTime fromDate = dfDates.FromDate;
+                    beforePeriodDate = fromDate.AddDays(-1);
+                    DateTime toDate = dfDates.ToDate;
+                    fullListIq = fullListIq.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
+                    //transactionsList = transactionsList.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
+                    //transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
+                }
+
+                if (defObj.TransTypes.Length>0)
+                {
+                    fullListIq = fullListIq.Where(p => defObj.TransTypes.Contains(p.Transactor.TransactorTypeId));
+                }
+
+              
+                if (defObj.DocTypesSelected.Length>0)
+                {
+                    fullListIq = fullListIq.Where(p => defObj.DocTypesSelected.Contains(p.SellDocTypeId));
+                }
+                var t = fullListIq.ProjectTo<SellDocListDto>(_mapper.ConfigurationProvider);
+                var t1 = await t.Select(p => new SellDocListDto
+                {
+                    AmountFpa = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountFpa),
+                    AmountNet = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountNet),
+                    AmountDiscount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountDiscount),
+                    CompanyCurrencyId = p.CompanyCurrencyId
+                }).ToListAsync();
+                //var grandSumOfAmount = t1.Sum(p => p.TotalAmount);
+                r = t1.Sum(p => p.TotalNetAmount);
+
             }
             var response = new MainDashboardInfoResponse
             {
