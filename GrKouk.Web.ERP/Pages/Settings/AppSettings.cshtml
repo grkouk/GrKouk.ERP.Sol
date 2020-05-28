@@ -449,12 +449,21 @@
                     default:
                     }
                 });
-            $('#itemSelector').on('hide.bs.modal',
+            $('#itemSelector').on('hidden.bs.modal',
                 function(event) {
                     var button = $(event.relatedTarget);
                     var modal = $(this);
-
-                });
+                    var sourceType = document.getElementById("SourceType").ej2_instances[0];
+                    var materialNatures = document.getElementById("MultiSelectMaterialNatures").ej2_instances[0];
+                    var transactorTypes = document.getElementById("MultiSelectTransactorTypes").ej2_instances[0];
+                    var selectedCompanies = document.getElementById("MultiSelectCompanies").ej2_instances[0];
+                    var selectedDocTypes = document.getElementById("MultiSelectDocumentTypes").ej2_instances[0];
+                    sourceType.value = "";
+                    materialNatures.value = "";
+                    transactorTypes.value = "";
+                    selectedCompanies.value = "";
+                    selectedDocTypes.value = "";
+                }); 
             var sourceType = document.getElementById("SourceType").ej2_instances[0];
             sourceType.addEventListener('change',
                 function(e) {
