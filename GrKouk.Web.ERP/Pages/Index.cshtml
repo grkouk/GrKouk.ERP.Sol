@@ -12,6 +12,7 @@
 {
     @if (User.IsInRole("Admin"))
     {
+        <input type="hidden" id="logged" value="true" />
         <div class="container-fluid">
             <div class="row">
                 <main role="main" class="col-md-12 ml-sm-auto col-lg-12 px-4">
@@ -286,6 +287,7 @@
 @if (!User.IsInRole("Admin"))
 {
     <div class="text-center">
+    <input type="hidden" id="logged" value="false" />
         <h1 class="display-4">Welcome</h1>
         <p>User Name is @User.Identity.Name</p>
         <p> User is authenticated is @User.Identity.IsAuthenticated</p>
@@ -768,16 +770,25 @@
                     }
                 }
             };
-            loadCurrencySelector(currencyListJs);
-            loadCompanySelector(companyListJs);
-            loadPeriodSelector(datePeriodListJs);
+           
             loadPreviousSession(sessionKey, sessionObj);
             console.log(sessionObj);
-            let selCurrency = getCurrency(sessionObj.currencyCode, currencyListJs);
-            setCurrency(selCurrency.id, selCurrency.code, selCurrency.displayLocale);
-            setCompany(sessionObj.companyCode, getCompanyName(sessionObj.companyCode, companyListJs));
-            setPeriod(sessionObj.periodCode, getPeriodName(sessionObj.periodCode, datePeriodListJs));
-            refreshView();
+            let selCurrency ='';
+            var signed = $('#logged').val();
+            if(signed === 'true'){
+                loadCurrencySelector(currencyListJs);
+                loadCompanySelector(companyListJs);
+                loadPeriodSelector(datePeriodListJs);
+                selCurrency = getCurrency(sessionObj.currencyCode, currencyListJs);
+                setCurrency(selCurrency.id, selCurrency.code, selCurrency.displayLocale);
+                setCompany(sessionObj.companyCode, getCompanyName(sessionObj.companyCode, companyListJs));
+                setPeriod(sessionObj.periodCode, getPeriodName(sessionObj.periodCode, datePeriodListJs));
+                setTimeout(function () {
+                    console.log('Executing refreshView')
+                    refreshView();   
+                },
+                5000);
+            }
         });
         $(window).on('beforeunload',
             function(e) {
