@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.Shared;
+using GrKouk.Erp.Dtos.BuyDocuments;
+using GrKouk.Erp.Dtos.SellDocuments;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
@@ -63,7 +67,136 @@ namespace GrKouk.Web.ERP.Controllers
 
             return retAmount;
         }
+        
+        [HttpGet("GetMainDashboardInfo")]
+        public async Task<IActionResult> GetMainDashboardInfo([FromQuery] IndexDataTableRequest request)
+        {
+            
+           
+            var codeToComputeDefinition =await
+                _context.AppSettings.FirstOrDefaultAsync(p => p.Code == request.CodeToCompute);
+            if (codeToComputeDefinition == null)
+            {
+                return BadRequest(new {Message = "Code to compute not exist"});
+            }
 
+            if (string.IsNullOrEmpty( codeToComputeDefinition.Value))
+            {
+                return BadRequest(new {Message = "No definition found for code to compute"});
+            }
+
+            decimal r = 0;
+            var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
+                .Take(10)
+                .ToListAsync();
+            var def = codeToComputeDefinition.Value;
+            var defObj = JsonConvert.DeserializeObject<CodeToComputeDefinition>(def);
+            if (defObj.SrcType == MainInfoSourceTypeEnum.SourceTypeBuys)
+            {
+                IQueryable<BuyDocument> fullListIq = _context.BuyDocuments
+                    .Include(p=>p.Transactor);
+                if (!string.IsNullOrEmpty(request.CompanyFilter))
+                {
+                    if (int.TryParse(request.CompanyFilter, out var companyId))
+                    {
+                        if (companyId > 0)
+                        {
+                            fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
+                        }
+                    }
+                } 
+                DateTime beforePeriodDate = DateTime.Today;
+                if (!string.IsNullOrEmpty(request.DateRange))
+                {
+                    var datePeriodFilter = request.DateRange;
+                    DateFilterDates dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
+                    DateTime fromDate = dfDates.FromDate;
+                    beforePeriodDate = fromDate.AddDays(-1);
+                    DateTime toDate = dfDates.ToDate;
+                    fullListIq = fullListIq.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
+                    //transactionsList = transactionsList.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
+                    //transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
+                }
+
+                if (defObj.TransTypes.Length>0)
+                {
+                    fullListIq = fullListIq.Where(p => defObj.TransTypes.Contains(p.Transactor.TransactorTypeId));
+                }
+
+              
+                if (defObj.DocTypesSelected.Length>0)
+                {
+                    fullListIq = fullListIq.Where(p => defObj.DocTypesSelected.Contains(p.BuyDocTypeId));
+                }
+                var t = fullListIq.ProjectTo<BuyDocListDto>(_mapper.ConfigurationProvider);
+                var t1 = await t.Select(p => new BuyDocListDto
+                {
+                    AmountFpa = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountFpa),
+                    AmountNet = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountNet),
+                    AmountDiscount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountDiscount),
+                    CompanyCurrencyId = p.CompanyCurrencyId
+                }).ToListAsync();
+                //var grandSumOfAmount = t1.Sum(p => p.TotalAmount);
+                r = t1.Sum(p => p.TotalNetAmount);
+
+            }
+            if (defObj.SrcType == MainInfoSourceTypeEnum.SourceTypeSales)
+            {
+                IQueryable<SellDocument> fullListIq = _context.SellDocuments
+                    .Include(p => p.Transactor);
+                    
+                if (!string.IsNullOrEmpty(request.CompanyFilter))
+                {
+                    if (int.TryParse(request.CompanyFilter, out var companyId))
+                    {
+                        if (companyId > 0)
+                        {
+                            fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
+                        }
+                    }
+                } 
+                DateTime beforePeriodDate = DateTime.Today;
+                if (!string.IsNullOrEmpty(request.DateRange))
+                {
+                    var datePeriodFilter = request.DateRange;
+                    DateFilterDates dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
+                    DateTime fromDate = dfDates.FromDate;
+                    beforePeriodDate = fromDate.AddDays(-1);
+                    DateTime toDate = dfDates.ToDate;
+                    fullListIq = fullListIq.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
+                    //transactionsList = transactionsList.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
+                    //transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
+                }
+
+                if (defObj.TransTypes.Length>0)
+                {
+                    fullListIq = fullListIq.Where(p => defObj.TransTypes.Contains(p.Transactor.TransactorTypeId));
+                }
+
+              
+                if (defObj.DocTypesSelected.Length>0)
+                {
+                    fullListIq = fullListIq.Where(p => defObj.DocTypesSelected.Contains(p.SellDocTypeId));
+                }
+                var t = fullListIq.ProjectTo<SellDocListDto>(_mapper.ConfigurationProvider);
+                var t1 = await t.Select(p => new SellDocListDto
+                {
+                    AmountFpa = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountFpa),
+                    AmountNet = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountNet),
+                    AmountDiscount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountDiscount),
+                    CompanyCurrencyId = p.CompanyCurrencyId
+                }).ToListAsync();
+                //var grandSumOfAmount = t1.Sum(p => p.TotalAmount);
+                r = t1.Sum(p => p.TotalNetAmount);
+
+            }
+            var response = new MainDashboardInfoResponse
+            {
+                RequestedCodeToCompute = request.CodeToCompute,
+                RequestedCodeSum = r
+            };
+            return Ok(response);
+        }
         [HttpGet("GetTransactorFinancialSummaryData")]
         public async Task<IActionResult> GetTransactorFinancialSummaryData([FromQuery] IndexDataTableRequest request)
         {

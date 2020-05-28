@@ -5,6 +5,11 @@
     <Authors>George Koukoudis</Authors>
     <Company>GrKouk</Company>
     <Copyright>George Koukoudis</Copyright>
+    <PackageVersion>1.0.1</PackageVersion>
+    <Title>GrKouk.Erp.Definitions</Title>
+    <Description>GrKouk.Erp.Definitions </Description>
+    <AssemblyVersion>1.0.1</AssemblyVersion>
+    <FileVersion>1.0.1</FileVersion>
   </PropertyGroup>
 
 </Project>

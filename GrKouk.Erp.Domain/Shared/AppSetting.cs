@@ -9,7 +9,7 @@ namespace GrKouk.Erp.Domain.Shared
         [Required]
         public string Code { get; set; }
         [Display(Name = "Setting Value")]
-        [MaxLength(50)]
+        [MaxLength(500)]
         [Required]
         public string Value { get; set; }
     }

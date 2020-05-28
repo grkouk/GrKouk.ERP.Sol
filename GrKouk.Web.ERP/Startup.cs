@@ -52,6 +52,16 @@ namespace GrKouk.Web.ERP
                     TimeOut = 5000,
                     ExtendedTimeOut = 1000
                 });
+            services.ConfigureApplicationCookie(options =>
+            {
+                // Cookie settings
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+
+                options.LoginPath = "/Identity/Account/Login";
+                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+                options.SlidingExpiration = true;
+            });
             services.AddSession(options => { options.IdleTimeout = TimeSpan.FromMinutes(30); });
             services.AddAutoMapper(typeof(Startup));
             services.AddRazorPages();

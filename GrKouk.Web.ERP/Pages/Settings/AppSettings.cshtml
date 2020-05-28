@@ -1,28 +1,462 @@
 ﻿@page
 @model AppSettingsModel
-@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
+
 @{
     ViewData["Title"] = "Application Settings";
 }
+
+@section MyCss
+{
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/material.css"/>
+}
+
 <div class="container">
-    <form method="post" >
+    <form method="post">
         <fieldset id="thisForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" id="CurrentSelectorType"/>
             <div class="form-row">
-
-                <div class="form-group col-md-3">
-                    <label asp-for="ItemVm[0].Code" class="control-label" small>All Companies Setting</label>
-                    <select asp-for="ItemVm[0].Code" class="form-control form-control-sm small" asp-items="ViewBag.CompanyId"></select>
-
+                <div class="form-group col-md-10 col-sm-10 col-lg-10">
+                    <label small>All Companies Setting</label>
+                    <select asp-for="ItemVm[0].Value" class="form-control form-control-sm small" asp-items="ViewBag.CompanyId"></select>
                 </div>
-
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Sum Of Material Buys Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[1].Value" id="BuyMaterialsValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#itemSelector" data-selectorType="BuyMaterialsSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Sum Of Expenses Buys Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[2].Value" id="BuyExpensesValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#itemSelector" data-selectorType="BuyExpensesSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Sum Of Material Sales Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[3].Value" id="SellMaterialsValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#itemSelector" data-selectorType="SellMaterialsSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary btn-sm" id="saveForm" />
+                <input type="submit" value="Save" class="btn btn-primary btn-sm" id="saveForm"/>
             </div>
         </fieldset>
     </form>
 </div>
+<!-- Modal Item selector -->
+<div class="modal fade" id="itemSelector" tabindex="-1" role="dialog" aria-labelledby="itemsModalLabel" aria-hidden="true" data-keyboard="true">
+    <div class="modal-dialog modal-dialog-centered modal" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="container-fluid">
+                    <div class="form-row">
+                        <div class="col-6">
+                            <p class="modal-title font-weight-bold" id="itemsModalLabel">Selector</p>
+                        </div>
+                        <div class="col-6 text-right">
 
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label>Select Source Type</label>
+                            <ejs-combobox id="SourceType" dataSource="@ViewBag.SourceType" placeholder="Source Type">
+                                <e-combobox-fields value="Value" text="Text"></e-combobox-fields>
+                            </ejs-combobox>
+
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label>Select Companies</label>
+                            <ejs-multiselect id="MultiSelectCompanies" placeholder="Select Companies" mode="CheckBox"
+                                             showDropDownIcon="true"
+                                             showSelectAll="true" selectAllText="Select All" unSelectAllText="unSelect All">
+                                <e-multiselect-fields text="title" value="value"></e-multiselect-fields>
+                            </ejs-multiselect>
+
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12" id="MaterialNatureTypesDiv">
+                            <label>Select Material Natures</label>
+                            <ejs-multiselect id="MultiSelectMaterialNatures" placeholder="Select Natures" mode="CheckBox"
+                                             showDropDownIcon="true"
+                                             showSelectAll="true" selectAllText="Select All" unSelectAllText="unSelect All">
+                                <e-multiselect-fields text="title" value="valueInt"></e-multiselect-fields>
+                            </ejs-multiselect>
+                        </div>
+
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label>Select Transactor Type</label>
+                            <ejs-multiselect id="MultiSelectTransactorTypes" placeholder="Select Transactor Type" mode="CheckBox"
+                                             showDropDownIcon="true"
+                                             showSelectAll="true" selectAllText="Select All" unSelectAllText="unSelect All">
+                                <e-multiselect-fields text="title" value="value"></e-multiselect-fields>
+                            </ejs-multiselect>
+                        </div>
+
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label>Select Document Type</label>
+                            <ejs-multiselect id="MultiSelectDocumentTypes" placeholder="Select Document Type" mode="CheckBox"
+                                             showDropDownIcon="true"
+                                             showSelectAll="true" selectAllText="Select All" unSelectAllText="unSelect All">
+                                <e-multiselect-fields text="title" value="value"></e-multiselect-fields>
+                            </ejs-multiselect>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="SaveItemSelector">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+    <script>
+        $(document).ready(function() {
+            var getWarehouseItemNatureList = () => {
+                var timeout;
+                var pageIndex = 1;
+                var uri = '/api/GrKoukInfoApi/GetSelectorMaterialNatures';
+
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'GET',
+                    url: uri,
+                    beforeSend: function() {
+                        //if (timeout) {
+                        //    clearTimeout(timeout);
+                        // }
+                        //timeout = setTimeout(function () {
+                        //    $("#loadMe").modal({
+                        //        backdrop: "static",
+                        //        keyboard: false,
+                        //        show: true
+                        //    });
+                        //},
+                        //    1000);
+                    },
+                    success: function(result) {
+                        var multiSelect = document.getElementById("MultiSelectMaterialNatures").ej2_instances[0];
+                        multiSelect.dataSource = result;
+
+                    },
+                    complete: function() {
+                        //if (timeout) {
+                        //    clearTimeout(timeout);
+                        //}
+                        //$("#loadMe").modal("hide");
+                        //setTimeout(function () {
+                        //    console.log('Checking for open modals');
+                        //    var isOpen = $('#loadMe').hasClass('show');
+                        //    if (isOpen) {
+                        //        console.log('There is an open Modal');
+                        //        $("#loadMe").modal("hide");
+                        //    } else {
+                        //        console.log('No open modal');
+                        //    }
+                        //},
+                        //    2000);
+                    },
+                    error: function(e) {
+                        console.log(e);
+
+                    }
+                });
+            };
+            var getTransactorTypeList = () => {
+                var timeout;
+                var pageIndex = 1;
+                var uri = '/api/GrKoukInfoApi/GetSelectorTransactorTypes';
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'GET',
+                    url: uri,
+                    beforeSend: function() {
+                        //if (timeout) {
+                        //    clearTimeout(timeout);
+                        //}
+                        //timeout = setTimeout(function () {
+                        //    $("#loadMe").modal({
+                        //        backdrop: "static",
+                        //        keyboard: false,
+                        //        show: true
+                        //    });
+                        //},
+                        //    1000);
+                    },
+                    success: function(result) {
+                        var multiSelect = document.getElementById("MultiSelectTransactorTypes").ej2_instances[0];
+                        multiSelect.dataSource = result;
+                    },
+                    complete: function() {
+                        //if (timeout) {
+                        //    clearTimeout(timeout);
+                        //}
+                        //$("#loadMe").modal("hide");
+                        //setTimeout(function () {
+                        //    console.log('Checking for open modals');
+                        //    var isOpen = $('#loadMe').hasClass('show');
+                        //    if (isOpen) {
+                        //        console.log('There is an open Modal');
+                        //        $("#loadMe").modal("hide");
+                        //    } else {
+                        //        console.log('No open modal');
+                        //    }
+                        //},
+                        //    2000);
+                    },
+                    error: function(e) {
+                        console.log(e);
+
+                    }
+                });
+            };
+            var getCompanyList = () => {
+                var timeout;
+                var pageIndex = 1;
+                var uri = '/api/GrKoukInfoApi/GetSelectorCompanies';
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'GET',
+                    url: uri,
+                    beforeSend: function() {
+                        //if (timeout) {
+                        //    clearTimeout(timeout);
+                        //}
+                        //timeout = setTimeout(function () {
+                        //    $("#loadMe").modal({
+                        //        backdrop: "static",
+                        //        keyboard: false,
+                        //        show: true
+                        //    });
+                        //},
+                        //    1000);
+                    },
+                    success: function(result) {
+                        var multiSelect = document.getElementById("MultiSelectCompanies").ej2_instances[0];
+                        multiSelect.dataSource = result;
+                    },
+                    complete: function() {
+                        //if (timeout) {
+                        //    clearTimeout(timeout);
+                        //}
+                        //$("#loadMe").modal("hide");
+                        //setTimeout(function () {
+                        //    console.log('Checking for open modals');
+                        //    var isOpen = $('#loadMe').hasClass('show');
+                        //    if (isOpen) {
+                        //        console.log('There is an open Modal');
+                        //        $("#loadMe").modal("hide");
+                        //    } else {
+                        //        console.log('No open modal');
+                        //    }
+                        //},
+                        //    2000);
+                    },
+                    error: function(e) {
+                        console.log(e);
+
+                    }
+                });
+            };
+            var getDocumentTypeList = (docType) => {
+                var timeout;
+                var uri = '/api/GrKoukInfoApi/GetSelectorDocumentTypes';
+                uri += `?docType=${docType}`;
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'GET',
+                    url: uri,
+                    beforeSend: function() {
+                        //if (timeout) {
+                        //    clearTimeout(timeout);
+                        //}
+                        //timeout = setTimeout(function () {
+                        //    $("#loadMe").modal({
+                        //        backdrop: "static",
+                        //        keyboard: false,
+                        //        show: true
+                        //    });
+                        //},
+                        //    1000);
+                    },
+                    success: function(result) {
+                        var multiSelect = document.getElementById("MultiSelectDocumentTypes").ej2_instances[0];
+                        multiSelect.value = "";
+                        multiSelect.dataSource = result;
+                    },
+                    complete: function() {
+                        //if (timeout) {
+                        //    clearTimeout(timeout);
+                        //}
+                        //$("#loadMe").modal("hide");
+                        //setTimeout(function () {
+                        //    console.log('Checking for open modals');
+                        //    var isOpen = $('#loadMe').hasClass('show');
+                        //    if (isOpen) {
+                        //        console.log('There is an open Modal');
+                        //        $("#loadMe").modal("hide");
+                        //    } else {
+                        //        console.log('No open modal');
+                        //    }
+                        //},
+                        //    2000);
+                    },
+                    error: function(e) {
+                        console.log(e);
+
+                    }
+                });
+            };
+            $('#SaveItemSelector').on('click',
+                function(e) {
+                    console.log('Modal save button clicked');
+                    var sourceType = document.getElementById("SourceType").ej2_instances[0];
+                    var materialNatures = document.getElementById("MultiSelectMaterialNatures").ej2_instances[0];
+                    var transactorTypes = document.getElementById("MultiSelectTransactorTypes").ej2_instances[0];
+                    var selectedCompanies = document.getElementById("MultiSelectCompanies").ej2_instances[0];
+                    var selectedDocTypes = document.getElementById("MultiSelectDocumentTypes").ej2_instances[0];
+                    let sourceTypeSelected = sourceType.value;
+                    let materialNaturesSelected = materialNatures.value;
+                    let transactorTypesSelected = transactorTypes.value;
+                    let companiesSelected = selectedCompanies.value;
+                    let docTypesSelected = selectedDocTypes.value;
+                    let js = {
+                        srcType: sourceTypeSelected,
+                        matNatures: materialNaturesSelected,
+                        transTypes: transactorTypesSelected,
+                        compSelected: companiesSelected,
+                        docTypesSelected: docTypesSelected
+                    };
+                    let jsJSON = JSON.stringify(js);
+                    let currentSelectorType = $('#CurrentSelectorType').val();
+                    switch (currentSelectorType) {
+                    case "BuyMaterialsSettings":
+                        $('#BuyMaterialsValue').val(jsJSON);
+                        break;
+                    case "BuyExpensesSettings":
+                        $('#BuyExpensesValue').val(jsJSON);
+                        break;
+                    case "SellMaterialsSettings":
+                         $('#SellMaterialsValue').val(jsJSON);
+                         break;
+                    default:
+                    }
+
+                    console.log(js);
+                    console.log(jsJSON);
+                    $('#itemSelector').modal('hide');
+                });
+            $('#itemSelector').on('shown.bs.modal',
+                function() {
+                    var sourceType = document.getElementById("SourceType").ej2_instances[0];
+                    var materialNatures = document.getElementById("MultiSelectMaterialNatures").ej2_instances[0];
+                    var transactorTypes = document.getElementById("MultiSelectTransactorTypes").ej2_instances[0];
+                    var selectedCompanies = document.getElementById("MultiSelectCompanies").ej2_instances[0];
+                    var selectedDocTypes = document.getElementById("MultiSelectDocumentTypes").ej2_instances[0];
+                    let currentSelectorType = $('#CurrentSelectorType').val();
+                    var oldVal = "";
+                    switch (currentSelectorType) {
+                    case "BuyMaterialsSettings":
+                        oldVal = $('#BuyMaterialsValue').val();
+                        break;
+                    case "BuyExpensesSettings":
+                        oldVal = $('#BuyExpensesValue').val();
+                        break;
+                     case "SellMaterialsSettings":
+                        oldVal = $('#SellMaterialsValue').val();
+                        break;    
+                     default:
+                    }
+                    if (oldVal.length > 0) {
+                        let oldValObj = JSON.parse(oldVal);
+                        sourceType.value = oldValObj.srcType;
+                        materialNatures.value = oldValObj.matNatures;
+                        transactorTypes.value = oldValObj.transTypes;
+                        selectedCompanies.value = oldValObj.compSelected;
+                        selectedDocTypes.value = oldValObj.docTypesSelected;
+                    }
+
+                });
+            $('#itemSelector').on('show.bs.modal',
+                function(event) {
+                    var button = $(event.relatedTarget);
+                    var selectorType = button.data('selectortype');
+                    var modal = $(this);
+                    $('#CurrentSelectorType').val(selectorType);
+                    getTransactorTypeList();
+                    getWarehouseItemNatureList();
+                    getCompanyList();
+                    switch (selectorType) {
+                    case "BuyMaterialsSettings":
+                        modal.find('.modal-title').text("Buy Materials Setting");
+                        break;
+                    case "BuyExpensesSettings":
+                        modal.find('.modal-title').text("Buy Expenses Setting");
+                        break;
+                    case "SellMaterialsSettings":
+                        modal.find('.modal-title').text("Sell Materials Setting");
+                        break;
+                    default:
+                    }
+                });
+            $('#itemSelector').on('hide.bs.modal',
+                function(event) {
+                    var button = $(event.relatedTarget);
+                    var modal = $(this);
+
+                });
+            var sourceType = document.getElementById("SourceType").ej2_instances[0];
+            sourceType.addEventListener('change',
+                function(e) {
+
+                    getDocumentTypeList(e.value);
+                });
+
+        });
+
+    </script>
+}

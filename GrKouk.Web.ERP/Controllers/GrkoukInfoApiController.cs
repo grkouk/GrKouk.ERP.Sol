@@ -310,6 +310,57 @@ namespace GrKouk.Web.ERP.Controllers
             }
             return Ok(companiesList);
         }
+        [HttpGet("GetSelectorDocumentTypes")]
+        public ActionResult<IList<UISelectTypeItem>> GetSelectorDocumentTypes(MainInfoSourceTypeEnum docType)
+        {
+            List<UISelectTypeItem> result;
+           
+            switch (docType)
+            {
+                case MainInfoSourceTypeEnum.SourceTypeSales:
+                    result = _context.SellDocTypeDefs.OrderBy(p => p.Name)
+                        .Select(p => new UISelectTypeItem()
+                        {
+
+                            Title = p.Name,
+                            ValueInt = p.Id,
+                            Value = p.Id.ToString()
+                        }).ToList();
+                    break;
+                case MainInfoSourceTypeEnum.SourceTypeBuys:
+                    result = _context.BuyDocTypeDefs.OrderBy(p => p.Name)
+                        .Select(p => new UISelectTypeItem()
+                        {
+                            Title = p.Name,
+                            ValueInt = p.Id,
+                            Value = p.Id.ToString()
+                        }).ToList();
+                    break;
+                case MainInfoSourceTypeEnum.SourceTypeWarehouseTransactions:
+                    result = _context.TransWarehouseDocTypeDefs.OrderBy(p => p.Name)
+                        .Select(p => new UISelectTypeItem()
+                        {
+                            Title = p.Name,
+                            ValueInt = p.Id,
+                            Value = p.Id.ToString()
+                        }).ToList();
+                    break;
+                case MainInfoSourceTypeEnum.SourceTypeTransactorTransactions:
+                    result = _context.TransTransactorDocTypeDefs.OrderBy(p => p.Name)
+                        .Select(p => new UISelectTypeItem()
+                        {
+                            Title = p.Name,
+                            ValueInt = p.Id,
+                            Value = p.Id.ToString()
+                        }).ToList();
+                    break;
+                default:
+                    result = new List<UISelectTypeItem>();
+                    break;
+            }
+           
+            return Ok(result);
+        }
         [HttpGet("GetIndexTblDataBuyDocuments")]
         public async Task<IActionResult> GetIndexTblDataBuyDocuments([FromQuery] IndexDataTableRequest request)
         {
@@ -442,7 +493,7 @@ namespace GrKouk.Web.ERP.Controllers
                 SumOfAmount = sumAmountTotal,
 
                 GrandSumOfAmount = grandSumOfAmount,
-                //GrandSumOfNetAmount = gransSumOfNetAmount,
+                GrandSumOfNetAmount = gransSumOfNetAmount,
                 Data = listItems
             };
             //return new JsonResult(response);

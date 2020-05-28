@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GrKouk.Erp.Definitions;
 
 namespace GrKouk.Web.ERP.Helpers
 {
@@ -22,6 +23,7 @@ namespace GrKouk.Web.ERP.Helpers
         public string ClientProfileFilter { get; set; }
         public string CashRegCategoryFilter { get; set; }
         public int DisplayCurrencyId { get; set; }
+        public string CodeToCompute { get; set; }
     }
 
     public class IndexDataTableResponse<T>
@@ -52,6 +54,16 @@ namespace GrKouk.Web.ERP.Helpers
         public decimal GrandSumExportValue { get; set; }
         public List<T> Data { get; set; }
         public List<SearchListItem> Diaries { get; set; }
+
+    }
+
+    public class CodeToComputeDefinition
+    {
+        public MainInfoSourceTypeEnum SrcType { get; set; }
+        public string[] MatNatures { get; set; }
+        public int[] TransTypes { get; set; }
+        public string[] CompSelected { get; set; }
+        public int[] DocTypesSelected { get; set; }
 
     }
 }
