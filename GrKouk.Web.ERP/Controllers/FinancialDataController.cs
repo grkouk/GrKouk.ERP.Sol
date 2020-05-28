@@ -67,20 +67,23 @@ namespace GrKouk.Web.ERP.Controllers
 
             return retAmount;
         }
-        
+
         [HttpGet("GetMainDashboardInfo")]
         public async Task<IActionResult> GetMainDashboardInfo([FromQuery] IndexDataTableRequest request)
         {
-            
-           
-            var codeToComputeDefinition =await
+            if (request.CodeToCompute == "SumOfExpenseBuysDf")
+            {
+                Debug.Print("Compute SumOfExpenseBuys");
+            }
+
+            var codeToComputeDefinition = await
                 _context.AppSettings.FirstOrDefaultAsync(p => p.Code == request.CodeToCompute);
             if (codeToComputeDefinition == null)
             {
                 return BadRequest(new {Message = "Code to compute not exist"});
             }
 
-            if (string.IsNullOrEmpty( codeToComputeDefinition.Value))
+            if (string.IsNullOrEmpty(codeToComputeDefinition.Value))
             {
                 return BadRequest(new {Message = "No definition found for code to compute"});
             }
@@ -94,7 +97,7 @@ namespace GrKouk.Web.ERP.Controllers
             if (defObj.SrcType == MainInfoSourceTypeEnum.SourceTypeBuys)
             {
                 IQueryable<BuyDocument> fullListIq = _context.BuyDocuments
-                    .Include(p=>p.Transactor);
+                    .Include(p => p.Transactor);
                 if (!string.IsNullOrEmpty(request.CompanyFilter))
                 {
                     if (int.TryParse(request.CompanyFilter, out var companyId))
@@ -104,7 +107,8 @@ namespace GrKouk.Web.ERP.Controllers
                             fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
                         }
                     }
-                } 
+                }
+
                 DateTime beforePeriodDate = DateTime.Today;
                 if (!string.IsNullOrEmpty(request.DateRange))
                 {
@@ -118,33 +122,44 @@ namespace GrKouk.Web.ERP.Controllers
                     //transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
                 }
 
-                if (defObj.TransTypes.Length>0)
+                if (defObj.TransTypes != null)
                 {
-                    fullListIq = fullListIq.Where(p => defObj.TransTypes.Contains(p.Transactor.TransactorTypeId));
+                    if (defObj.TransTypes.Length > 0)
+                    {
+                        fullListIq = fullListIq.Where(p => defObj.TransTypes.Contains(p.Transactor.TransactorTypeId));
+                    }
                 }
 
-              
-                if (defObj.DocTypesSelected.Length>0)
+
+                if (defObj.DocTypesSelected != null)
                 {
-                    fullListIq = fullListIq.Where(p => defObj.DocTypesSelected.Contains(p.BuyDocTypeId));
+                    if (defObj.DocTypesSelected.Length > 0)
+                    {
+                        fullListIq = fullListIq.Where(p => defObj.DocTypesSelected.Contains(p.BuyDocTypeId));
+                    }
                 }
+
+
                 var t = fullListIq.ProjectTo<BuyDocListDto>(_mapper.ConfigurationProvider);
                 var t1 = await t.Select(p => new BuyDocListDto
                 {
-                    AmountFpa = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountFpa),
-                    AmountNet = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountNet),
-                    AmountDiscount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountDiscount),
+                    AmountFpa = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                        p.AmountFpa),
+                    AmountNet = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                        p.AmountNet),
+                    AmountDiscount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                        p.AmountDiscount),
                     CompanyCurrencyId = p.CompanyCurrencyId
                 }).ToListAsync();
                 //var grandSumOfAmount = t1.Sum(p => p.TotalAmount);
                 r = t1.Sum(p => p.TotalNetAmount);
-
             }
+
             if (defObj.SrcType == MainInfoSourceTypeEnum.SourceTypeSales)
             {
                 IQueryable<SellDocument> fullListIq = _context.SellDocuments
                     .Include(p => p.Transactor);
-                    
+
                 if (!string.IsNullOrEmpty(request.CompanyFilter))
                 {
                     if (int.TryParse(request.CompanyFilter, out var companyId))
@@ -154,7 +169,8 @@ namespace GrKouk.Web.ERP.Controllers
                             fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
                         }
                     }
-                } 
+                }
+
                 DateTime beforePeriodDate = DateTime.Today;
                 if (!string.IsNullOrEmpty(request.DateRange))
                 {
@@ -168,28 +184,38 @@ namespace GrKouk.Web.ERP.Controllers
                     //transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
                 }
 
-                if (defObj.TransTypes.Length>0)
+                if (defObj.TransTypes != null)
                 {
-                    fullListIq = fullListIq.Where(p => defObj.TransTypes.Contains(p.Transactor.TransactorTypeId));
+                    if (defObj.TransTypes.Length > 0)
+                    {
+                        fullListIq = fullListIq.Where(p => defObj.TransTypes.Contains(p.Transactor.TransactorTypeId));
+                    }
                 }
 
-              
-                if (defObj.DocTypesSelected.Length>0)
+                if (defObj.DocTypesSelected != null)
                 {
-                    fullListIq = fullListIq.Where(p => defObj.DocTypesSelected.Contains(p.SellDocTypeId));
+                    if (defObj.DocTypesSelected.Length > 0)
+                    {
+                        fullListIq = fullListIq.Where(p => defObj.DocTypesSelected.Contains(p.SellDocTypeId));
+                    }
                 }
+
+
                 var t = fullListIq.ProjectTo<SellDocListDto>(_mapper.ConfigurationProvider);
                 var t1 = await t.Select(p => new SellDocListDto
                 {
-                    AmountFpa = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountFpa),
-                    AmountNet = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountNet),
-                    AmountDiscount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountDiscount),
+                    AmountFpa = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                        p.AmountFpa),
+                    AmountNet = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                        p.AmountNet),
+                    AmountDiscount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                        p.AmountDiscount),
                     CompanyCurrencyId = p.CompanyCurrencyId
                 }).ToListAsync();
                 //var grandSumOfAmount = t1.Sum(p => p.TotalAmount);
                 r = t1.Sum(p => p.TotalNetAmount);
-
             }
+
             var response = new MainDashboardInfoResponse
             {
                 RequestedCodeToCompute = request.CodeToCompute,
@@ -197,6 +223,7 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
+
         [HttpGet("GetTransactorFinancialSummaryData")]
         public async Task<IActionResult> GetTransactorFinancialSummaryData([FromQuery] IndexDataTableRequest request)
         {
@@ -296,7 +323,7 @@ namespace GrKouk.Web.ERP.Controllers
         public async Task<IActionResult> GetTransactions2([FromBody] DataManagerRequest request)
         {
             Debug.Print(request.ToJson());
-            return new JsonResult(new { result = "", count = 0 });
+            return new JsonResult(new {result = "", count = 0});
         }
 
         [HttpGet("GetTransactorTransactions")]

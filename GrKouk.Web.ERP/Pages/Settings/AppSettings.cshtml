@@ -152,7 +152,7 @@
     <ejs-scripts></ejs-scripts>
     <script>
         $(document).ready(function() {
-            var getWarehouseItemNatureList = () => {
+            const getWarehouseItemNatureList = () => {
                 var timeout;
                 var pageIndex = 1;
                 var uri = '/api/GrKoukInfoApi/GetSelectorMaterialNatures';
@@ -203,7 +203,7 @@
                     }
                 });
             };
-            var getTransactorTypeList = () => {
+            const getTransactorTypeList = () => {
                 var timeout;
                 var pageIndex = 1;
                 var uri = '/api/GrKoukInfoApi/GetSelectorTransactorTypes';
@@ -252,7 +252,7 @@
                     }
                 });
             };
-            var getCompanyList = () => {
+            const getCompanyList = () => {
                 var timeout;
                 var pageIndex = 1;
                 var uri = '/api/GrKoukInfoApi/GetSelectorCompanies';
@@ -301,7 +301,7 @@
                     }
                 });
             };
-            var getDocumentTypeList = (docType) => {
+            const getDocumentTypeList = (docType,value) => {
                 var timeout;
                 var uri = '/api/GrKoukInfoApi/GetSelectorDocumentTypes';
                 uri += `?docType=${docType}`;
@@ -325,8 +325,11 @@
                     },
                     success: function(result) {
                         var multiSelect = document.getElementById("MultiSelectDocumentTypes").ej2_instances[0];
-                        multiSelect.value = "";
+                        //multiSelect.value = "";
                         multiSelect.dataSource = result;
+                        if(value){
+                            multiSelect.value = value;
+                        }
                     },
                     complete: function() {
                         //if (timeout) {
@@ -391,7 +394,7 @@
                     $('#itemSelector').modal('hide');
                 });
             $('#itemSelector').on('shown.bs.modal',
-                function() {
+                 ()=> {
                     var sourceType = document.getElementById("SourceType").ej2_instances[0];
                     var materialNatures = document.getElementById("MultiSelectMaterialNatures").ej2_instances[0];
                     var transactorTypes = document.getElementById("MultiSelectTransactorTypes").ej2_instances[0];
@@ -414,15 +417,18 @@
                     if (oldVal.length > 0) {
                         let oldValObj = JSON.parse(oldVal);
                         sourceType.value = oldValObj.srcType;
+                        if (sourceType.value){
+                            getDocumentTypeList(sourceType.value,oldValObj.docTypesSelected);
+                        }
                         materialNatures.value = oldValObj.matNatures;
                         transactorTypes.value = oldValObj.transTypes;
                         selectedCompanies.value = oldValObj.compSelected;
-                        selectedDocTypes.value = oldValObj.docTypesSelected;
+                        //selectedDocTypes.value = oldValObj.docTypesSelected;
                     }
 
                 });
             $('#itemSelector').on('show.bs.modal',
-                function(event) {
+                (event)=> {
                     var button = $(event.relatedTarget);
                     var selectorType = button.data('selectortype');
                     var modal = $(this);
@@ -452,8 +458,11 @@
             var sourceType = document.getElementById("SourceType").ej2_instances[0];
             sourceType.addEventListener('change',
                 function(e) {
-
-                    getDocumentTypeList(e.value);
+                    console.log(`Source Type changed value is ${e.value}`);
+                    if (e.value){
+                        getDocumentTypeList(e.value);    
+                    }
+                    
                 });
 
         });

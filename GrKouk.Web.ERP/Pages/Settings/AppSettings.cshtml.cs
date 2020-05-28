@@ -94,9 +94,10 @@ namespace GrKouk.Web.ERP.Pages.Settings
             
             try
             {
-                await _context.SaveChangesAsync();
-                _toastNotification.AddSuccessToastMessage("Settings saved");
-                return RedirectToPage("./AppSettings");
+               var iRec= await _context.SaveChangesAsync();
+               var ms = $"Updated {iRec} settings";
+                _toastNotification.AddSuccessToastMessage(ms);
+                return Page();
             }
             catch (Exception e)
             {
