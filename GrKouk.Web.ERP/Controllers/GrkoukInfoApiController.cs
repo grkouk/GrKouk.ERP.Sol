@@ -114,14 +114,14 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpPost("DeleteBuyDocumentsList")]
         public async Task<IActionResult> DeleteBuyDocumentList([FromBody] IdList docIds)
         {
-            using (var transaction = _context.Database.BeginTransaction())
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 foreach (var itemId in docIds.Ids)
                 {
                     Debug.Write("test");
                 }
 
-                transaction.Commit();
+                await transaction.CommitAsync();
             }
 
             return Ok();
@@ -370,11 +370,21 @@ namespace GrKouk.Web.ERP.Controllers
             IQueryable<BuyDocList2Dto> fullListIq1 = _context.BuyDocuments
                 .Select(p => new BuyDocList2Dto()
                 {
-                    Id = p.Id, TransDate = p.TransDate, AmountDiscount = p.AmountDiscount, AmountFpa = p.AmountFpa,
-                    AmountNet = p.AmountNet, BuyDocSeriesCode = p.BuyDocSeries.Code, BuyDocSeriesId = p.BuyDocSeriesId,
-                    BuyDocSeriesName = p.BuyDocSeries.Name, CompanyCode = p.Company.Code, CompanyId = p.CompanyId,
-                    CompanyCurrencyId = p.Company.CurrencyId, SectionCode = p.Section.Code,
-                    SectionId = p.SectionId, TransactorId = p.TransactorId, TransactorName = p.Transactor.Name,
+                    Id = p.Id, 
+                    TransDate = p.TransDate,
+                    AmountDiscount = p.AmountDiscount, 
+                    AmountFpa = p.AmountFpa,
+                    AmountNet = p.AmountNet, 
+                    BuyDocSeriesCode = p.BuyDocSeries.Code, 
+                    BuyDocSeriesId = p.BuyDocSeriesId,
+                    BuyDocSeriesName = p.BuyDocSeries.Name, 
+                    CompanyCode = p.Company.Code, 
+                    CompanyId = p.CompanyId,
+                    CompanyCurrencyId = p.Company.CurrencyId, 
+                    SectionCode = p.Section.Code,
+                    SectionId = p.SectionId, 
+                    TransactorId = p.TransactorId, 
+                    TransactorName = p.Transactor.Name,
                     TransRefCode = p.TransRefCode,
                     PayedOfAmount = p.PaymentMappings.Sum(t => t.AmountUsed)
                 });
