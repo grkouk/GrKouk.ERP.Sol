@@ -423,6 +423,17 @@
                                     text: '',
                                     headerClass:'small text-center',
                                     class: 'small text-right '
+                                },
+                                {
+                                    totalKey: 'sumOfPayedAmount',
+                                    grandTotalKey: 'grandSumOfPayedAmount',
+                                    totalFormatter: 'currency',
+                                    sortKey: '',
+                                    sortType: '',
+                                    header: 'Payed Amount',
+                                    text: '',
+                                    headerClass:'small text-center',
+                                    class: 'small text-right '
                                 }
                             ];
                             let curSortUndefined = false;
@@ -481,6 +492,7 @@
                                     colDefs[i++].text = value.companyCode;
                                     colDefs[i++].text = formatterCurrency.format(value.totalNetAmount);
                                     colDefs[i++].text = formatterCurrency.format(value.totalAmount);
+                                     colDefs[i++].text = formatterCurrency.format(value.payedOfAmount);
 
 //new delete
                                     var itemId = value.id;
