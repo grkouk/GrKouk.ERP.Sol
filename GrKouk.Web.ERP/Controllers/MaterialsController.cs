@@ -1061,7 +1061,7 @@ namespace GrKouk.Web.ERP.Controllers
                 });
             }
 
-            var tr = _context.Database.CurrentTransaction;
+            //var tr = _context.Database.CurrentTransaction;
             using (var transaction = _context.Database.BeginTransaction())
             {
                 #region Fiscal Period
@@ -1249,11 +1249,33 @@ namespace GrKouk.Web.ERP.Controllers
                         try
                         {
                             await _context.SaveChangesAsync();
+                            
                         }
                         catch (Exception e)
                         {
                             transaction.Rollback();
-                            string msg = e.InnerException.Message;
+                            string msg = e.InnerException?.Message;
+                            return BadRequest(new
+                            {
+                                error = e.Message + " " + msg
+                            });
+                        }
+
+                        try
+                        {
+                            var payOfTransactionId = _context.Entry(sTransactorTransaction).Entity.Id;
+                            var payOffMapping = new BuyDocTransPaymentMapping()
+                            {
+                                BuyDocumentId = docId,
+                                TransactorTransactionId = payOfTransactionId,
+                                AmountUsed = sTransactorTransaction.AmountNet+sTransactorTransaction.AmountFpa-sTransactorTransaction.AmountDiscount
+                            };
+                            _context.BuyDocTransPaymentMappings.Add(payOffMapping);
+                        }
+                        catch (Exception e)
+                        {
+                            transaction.Rollback();
+                            string msg = e.InnerException?.Message;
                             return BadRequest(new
                             {
                                 error = e.Message + " " + msg
@@ -1427,10 +1449,9 @@ namespace GrKouk.Web.ERP.Controllers
                 _context.BuyDocLines.RemoveRange(_context.BuyDocLines.Where(p => p.BuyDocumentId == data.Id));
                 _context.TransactorTransactions.RemoveRange(
                     _context.TransactorTransactions.Where(p => p.SectionId == data.SectionId && p.CreatorId == data.Id));
-                //_context.SupplierTransactions.RemoveRange(_context.SupplierTransactions.Where(p=>p.SectionId==section.Id && p.CreatorId==data.Id));
                 _context.WarehouseTransactions.RemoveRange(
                     _context.WarehouseTransactions.Where(p => p.SectionId == data.SectionId && p.CreatorId == data.Id));
-
+                _context.BuyDocTransPaymentMappings.RemoveRange(_context.BuyDocTransPaymentMappings.Where(p=>p.BuyDocumentId==data.Id));
                 #region Fiscal Period
 
                 var fiscalPeriod = await _context.FiscalPeriods.FirstOrDefaultAsync(p =>
@@ -1607,7 +1628,27 @@ namespace GrKouk.Web.ERP.Controllers
                         catch (Exception e)
                         {
                             transaction.Rollback();
-                            string msg = e.InnerException.Message;
+                            string msg = e.InnerException?.Message;
+                            return BadRequest(new
+                            {
+                                error = e.Message + " " + msg
+                            });
+                        }
+                        try
+                        {
+                            var payOfTransactionId = _context.Entry(sTransactorTransaction).Entity.Id;
+                            var payOffMapping = new BuyDocTransPaymentMapping()
+                            {
+                                BuyDocumentId = docId,
+                                TransactorTransactionId = payOfTransactionId,
+                                AmountUsed = sTransactorTransaction.AmountNet+sTransactorTransaction.AmountFpa-sTransactorTransaction.AmountDiscount
+                            };
+                            _context.BuyDocTransPaymentMappings.Add(payOffMapping);
+                        }
+                        catch (Exception e)
+                        {
+                            transaction.Rollback();
+                            string msg = e.InnerException?.Message;
                             return BadRequest(new
                             {
                                 error = e.Message + " " + msg
@@ -2002,7 +2043,27 @@ namespace GrKouk.Web.ERP.Controllers
                         catch (Exception e)
                         {
                             transaction.Rollback();
-                            string msg = e.InnerException.Message;
+                            string msg = e.InnerException?.Message;
+                            return BadRequest(new
+                            {
+                                error = e.Message + " " + msg
+                            });
+                        }
+                        try
+                        {
+                            var payOfTransactionId = _context.Entry(sTransactorTransaction).Entity.Id;
+                            var payOffMapping = new SellDocTransPaymentMapping()
+                            {
+                                SellDocumentId = docId,
+                                TransactorTransactionId = payOfTransactionId,
+                                AmountUsed = sTransactorTransaction.AmountNet+sTransactorTransaction.AmountFpa-sTransactorTransaction.AmountDiscount
+                            };
+                            _context.SellDocTransPaymentMappings.Add(payOffMapping);
+                        }
+                        catch (Exception e)
+                        {
+                            transaction.Rollback();
+                            string msg = e.InnerException?.Message;
                             return BadRequest(new
                             {
                                 error = e.Message + " " + msg
@@ -2178,7 +2239,7 @@ namespace GrKouk.Web.ERP.Controllers
                     _context.TransactorTransactions.Where(p => p.SectionId == data.SectionId && p.CreatorId == data.Id));
                 _context.WarehouseTransactions.RemoveRange(
                     _context.WarehouseTransactions.Where(p => p.SectionId == data.SectionId && p.CreatorId == data.Id));
-
+                _context.SellDocTransPaymentMappings.RemoveRange(_context.SellDocTransPaymentMappings.Where(p=>p.SellDocumentId==data.Id));
                 #region Fiscal Period
 
                 var fiscalPeriod = await _context.FiscalPeriods.FirstOrDefaultAsync(p =>
@@ -2344,7 +2405,27 @@ namespace GrKouk.Web.ERP.Controllers
                         catch (Exception e)
                         {
                             transaction.Rollback();
-                            string msg = e.InnerException.Message;
+                            string msg = e.InnerException?.Message;
+                            return BadRequest(new
+                            {
+                                error = e.Message + " " + msg
+                            });
+                        }
+                        try
+                        {
+                            var payOfTransactionId = _context.Entry(sTransactorTransaction).Entity.Id;
+                            var payOffMapping = new SellDocTransPaymentMapping()
+                            {
+                                SellDocumentId = docId,
+                                TransactorTransactionId = payOfTransactionId,
+                                AmountUsed = sTransactorTransaction.AmountNet+sTransactorTransaction.AmountFpa-sTransactorTransaction.AmountDiscount
+                            };
+                            _context.SellDocTransPaymentMappings.Add(payOffMapping);
+                        }
+                        catch (Exception e)
+                        {
+                            transaction.Rollback();
+                            string msg = e.InnerException?.Message;
                             return BadRequest(new
                             {
                                 error = e.Message + " " + msg

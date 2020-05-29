@@ -454,6 +454,12 @@ namespace GrKouk.Web.ERP.Data
                 entity.HasOne(p => p.TransactorTransaction)
                     .WithMany()
                     .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(p => p.BuyDocument)
+                    .WithMany(p => p.PaymentMappings)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(p => p.TransactorTransaction)
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.Restrict);
             });
            
             modelBuilder.Entity<ProductRecipeLine>(entity =>
@@ -475,15 +481,7 @@ namespace GrKouk.Web.ERP.Data
                     .WithMany()
                     .OnDelete(DeleteBehavior.Restrict);
             });
-            modelBuilder.Entity<BuyDocTransPaymentMapping>(entity =>
-            {
-                entity.HasOne(p => p.BuyDocument)
-                    .WithMany(p => p.PaymentMappings)
-                    .OnDelete(DeleteBehavior.Restrict);
-                entity.HasOne(p => p.TransactorTransaction)
-                    .WithMany()
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
+           
             modelBuilder.Entity<SellDocTransPaymentMapping>(entity =>
             {
                 entity.HasIndex(p => new
@@ -498,9 +496,6 @@ namespace GrKouk.Web.ERP.Data
                 entity.HasOne(p => p.TransactorTransaction)
                     .WithMany()
                     .OnDelete(DeleteBehavior.Restrict);
-            });
-            modelBuilder.Entity<SellDocTransPaymentMapping>(entity =>
-            {
                 entity.HasOne(p => p.SellDocument)
                     .WithMany(p => p.PaymentMappings)
                     .OnDelete(DeleteBehavior.Restrict);
@@ -508,7 +503,7 @@ namespace GrKouk.Web.ERP.Data
                     .WithMany()
                     .OnDelete(DeleteBehavior.Restrict);
             });
-
+           
             modelBuilder.Entity<ExchangeRate>(entity =>
             {
                 entity.HasIndex(p => p.ClosingDate);
