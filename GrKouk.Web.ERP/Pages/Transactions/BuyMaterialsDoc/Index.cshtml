@@ -593,6 +593,10 @@
                                         actionsCol += `<a class="dropdown-item" href="#" name="PayoffDoc" data-docid="${itemId}">`;
                                         actionsCol += '<i class="fab fa-amazon-pay fa-lg" style="color:slategray"></i>';
                                         actionsCol += 'Εξόφληση Παραστατικού</a> ';
+
+                                        actionsCol += `<a class="dropdown-item" href="#" name="AssignPayments" data-docid="${itemId}">`;
+                                        actionsCol += '<i class="fas fa-compress-arrows-alt fa-lg" style="color:slategray"></i>';
+                                        actionsCol += 'Αντιστοίχιση Πληρωμών</a> ';
                                     }
                                     actionsCol += ' </div>';
                                     actionsCol += '</td>';
@@ -616,6 +620,11 @@
                                         actionColMobile += `<a class="dropdown-item" href="#" name="PayoffDoc" data-docid="${itemId}">`;
                                         actionColMobile += '<i class="fab fa-amazon-pay fa-lg" style="color:slategray"></i>';
                                         actionColMobile += 'Εξόφληση Παραστατικού</a> |';
+
+                                        actionColMobile += `<a class="dropdown-item" href="#" name="AssignPayments" data-docid="${itemId}">`;
+                                        actionColMobile += '<i class="fas fa-compress-arrows-alt fa-lg" style="color:slategray"></i>';
+                                        actionColMobile += 'Αντιστοίχιση Πληρωμών</a> |';
+
                                     }
                                     actionColMobile += '</div></td>';
 
@@ -640,6 +649,11 @@
                                 let button = $(event.delegateTarget);
                                 let docId = button.data('docid');
                                 payOfDocument(docId);
+                            });
+                            $('[name=AssignPayments').on('click', function (event) {
+                                let button = $(event.delegateTarget);
+                                let docId = button.data('docid');
+                                //payOfDocument(docId);
                             });
                             $('input[name=checkAllRows]').on('change',
                                 function() {
