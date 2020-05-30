@@ -366,8 +366,7 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpGet("GetIndexTblDataBuyDocuments")]
         public async Task<IActionResult> GetIndexTblDataBuyDocuments([FromQuery] IndexDataTableRequest request)
         {
-            //IQueryable<BuyDocument> fullListIq = _context.BuyDocuments;
-            IQueryable<BuyDocList2Dto> fullListIq1 = _context.BuyDocuments
+            IQueryable<BuyDocList2Dto> fullListIq = _context.BuyDocuments
                 .Select(p => new BuyDocList2Dto()
                 {
                     Id = p.Id, 
@@ -393,37 +392,29 @@ namespace GrKouk.Web.ERP.Controllers
                 switch (request.SortData.ToLower())
                 {
                     case "transactiondatesort:asc":
-                       // fullListIq = fullListIq.OrderBy(p => p.TransDate);
-                        fullListIq1 = fullListIq1.OrderBy(p => p.TransDate);
+                        fullListIq = fullListIq.OrderBy(p => p.TransDate);
                         break;
                     case "transactiondatesort:desc":
-                        //fullListIq = fullListIq.OrderByDescending(p => p.TransDate);
-                        fullListIq1 = fullListIq1.OrderByDescending(p => p.TransDate);
+                        fullListIq = fullListIq.OrderByDescending(p => p.TransDate);
                         break;
                     case "transactornamesort:asc":
-                        //fullListIq = fullListIq.OrderBy(p => p.Transactor.Name);
-                        fullListIq1 = fullListIq1.OrderBy(p => p.TransactorName);
+                        fullListIq = fullListIq.OrderBy(p => p.TransactorName);
                         break;
                     case "transactornamesort:desc":
-                        //fullListIq = fullListIq.OrderByDescending(p => p.Transactor.Name);
-                        fullListIq1 = fullListIq1.OrderByDescending(p => p.TransactorName);
+                        fullListIq = fullListIq.OrderByDescending(p => p.TransactorName);
                         break;
 
                     case "seriescodesort:asc":
-                        //fullListIq = fullListIq.OrderBy(p => p.BuyDocSeries.Code);
-                        fullListIq1 = fullListIq1.OrderBy(p => p.BuyDocSeriesCode);
+                        fullListIq = fullListIq.OrderBy(p => p.BuyDocSeriesCode);
                         break;
                     case "seriescodesort:desc":
-                        //fullListIq = fullListIq.OrderByDescending(p => p.BuyDocSeries.Code);
-                        fullListIq1 = fullListIq1.OrderByDescending(p => p.BuyDocSeriesCode);
+                        fullListIq = fullListIq.OrderByDescending(p => p.BuyDocSeriesCode);
                         break;
                     case "companycodesort:asc":
-                        //fullListIq = fullListIq.OrderBy(p => p.Company.Code);
-                        fullListIq1 = fullListIq1.OrderBy(p => p.CompanyCode);
+                        fullListIq = fullListIq.OrderBy(p => p.CompanyCode);
                         break;
                     case "companycodesort:desc":
-                        //fullListIq = fullListIq.OrderByDescending(p => p.Company.Code);
-                        fullListIq1 = fullListIq1.OrderByDescending(p => p.CompanyCode);
+                        fullListIq = fullListIq.OrderByDescending(p => p.CompanyCode);
                         break;
                 }
             }
@@ -435,8 +426,7 @@ namespace GrKouk.Web.ERP.Controllers
                 DateTime fromDate = dfDates.FromDate;
                 DateTime toDate = dfDates.ToDate;
 
-                //fullListIq = fullListIq.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
-                fullListIq1 = fullListIq1.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
+                fullListIq = fullListIq.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
             }
 
             if (!string.IsNullOrEmpty(request.CompanyFilter))
@@ -445,17 +435,14 @@ namespace GrKouk.Web.ERP.Controllers
                 {
                     if (companyId > 0)
                     {
-                      //      fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
-                        fullListIq1 = fullListIq1.Where(p => p.CompanyId == companyId);
+                        fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
                     }
                 }
             }
 
             if (!string.IsNullOrEmpty(request.SearchFilter))
             {
-                //fullListIq = fullListIq.Where(p => p.Transactor.Name.Contains(request.SearchFilter)
-                //                                   || p.TransRefCode.Contains(request.SearchFilter));
-                fullListIq1 = fullListIq1.Where(p => p.TransactorName.Contains(request.SearchFilter)
+                fullListIq = fullListIq.Where(p => p.TransactorName.Contains(request.SearchFilter)
                                                      || p.TransRefCode.Contains(request.SearchFilter));
             }
 
@@ -463,29 +450,8 @@ namespace GrKouk.Web.ERP.Controllers
                 .Take(10)
                 .ToListAsync();
 
-            //var t = fullListIq.ProjectTo<BuyDocListDto>(_mapper.ConfigurationProvider);
-            var tNew = fullListIq1;
-            //var t1 = await t.Select(p => new BuyDocListDto
-            // {
-            //     Id = p.Id,
-            //     TransDate = p.TransDate,
-            //     TransRefCode = p.TransRefCode,
-            //     SectionId = p.SectionId,
-            //     SectionCode = p.SectionCode,
-            //     TransactorId = p.TransactorId,
-            //     TransactorName = p.TransactorName,
-            //     BuyDocSeriesId = p.BuyDocSeriesId,
-            //     BuyDocSeriesCode = p.BuyDocSeriesCode,
-            //     BuyDocSeriesName = p.BuyDocSeriesName,
-            //     AmountFpa = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountFpa),
-            //     AmountNet = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountNet),
-            //     AmountDiscount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
-            //         p.AmountDiscount),
-            //     CompanyId = p.CompanyId,
-            //     CompanyCode = p.CompanyCode,
-            //     CompanyCurrencyId = p.CompanyCurrencyId
-            // }).ToListAsync();
-            var t1New = await tNew.Select(p => new BuyDocList2Dto
+            var t = fullListIq;
+            var t1 = await t.Select(p => new BuyDocList2Dto
             {
                 Id = p.Id,
                 TransDate = p.TransDate,
@@ -507,16 +473,12 @@ namespace GrKouk.Web.ERP.Controllers
                     p.PayedOfAmount),
                 CompanyCurrencyId = p.CompanyCurrencyId
             }).ToListAsync();
-            //var grandSumOfAmount = t1.Sum(p => p.TotalAmount);
-            var grandSumOfAmountNew = t1New.Sum(p => p.TotalAmount);
-            //var gransSumOfNetAmount = t1.Sum(p => p.TotalNetAmount);
-            var gransSumOfNetAmountNew = t1New.Sum(p => p.TotalNetAmount);
-            var grandSumOfPayedAmount = t1New.Sum((p => p.PayedOfAmount));
+            var grandSumOfAmountNew = t1.Sum(p => p.TotalAmount);
+            var gransSumOfNetAmountNew = t1.Sum(p => p.TotalNetAmount);
+            var grandSumOfPayedAmount = t1.Sum((p => p.PayedOfAmount));
             var pageIndex = request.PageIndex;
-
             var pageSize = request.PageSize;
-
-            var listItems = await PagedList<BuyDocList2Dto>.CreateAsync(tNew, pageIndex, pageSize);
+            var listItems = await PagedList<BuyDocList2Dto>.CreateAsync(t, pageIndex, pageSize);
             foreach (var listItem in listItems)
             {
                 if (listItem.CompanyCurrencyId != 1)
@@ -549,8 +511,6 @@ namespace GrKouk.Web.ERP.Controllers
             decimal sumAmountTotal = listItems.Sum(p => p.TotalAmount);
             decimal sumAmountTotalNet = listItems.Sum(p => p.TotalNetAmount);
             decimal sumAmountTotalPayed = listItems.Sum(p => p.PayedOfAmount);
-            //decimal sumDebit = listItems.Sum(p => p.DebitAmount);
-            //decimal sumCredit = listItems.Sum(p => p.CreditAmount);
             var response = new IndexDataTableResponse<BuyDocList2Dto>
             {
                 TotalRecords = listItems.TotalCount,
@@ -565,7 +525,6 @@ namespace GrKouk.Web.ERP.Controllers
                 GrandSumOfPayedAmount = grandSumOfPayedAmount,
                 Data = listItems
             };
-            //return new JsonResult(response);
             return Ok(response);
         }
 

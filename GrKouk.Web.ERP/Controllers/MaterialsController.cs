@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -17,7 +18,6 @@ using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 
@@ -64,6 +64,7 @@ namespace GrKouk.Web.ERP.Controllers
             HttpContext.Session.SetString("SeriesId", seriesId);
             return Ok(new { });
         }
+
         [HttpGet("SetSaleSeriesInSession")]
         public IActionResult SaleSeriesInSession(string seriesId)
         {
@@ -297,7 +298,7 @@ namespace GrKouk.Web.ERP.Controllers
                     {
                         var natures = Array.ConvertAll(docType.SelectedWarehouseItemNatures.Split(","), int.Parse);
                         //var natures = docType.SelectedWarehouseItemNatures;
-                        fullListIq = fullListIq.Where(p => natures.Contains((int)p.WarehouseItemNature));
+                        fullListIq = fullListIq.Where(p => natures.Contains((int) p.WarehouseItemNature));
                     }
                 }
             }
@@ -306,7 +307,7 @@ namespace GrKouk.Web.ERP.Controllers
             fullListIq = fullListIq.Where(p => p.Name.Contains(term) || p.Code.Contains(term));
             var materials = await fullListIq
                 .ProjectTo<WarehouseItemSearchListDto>(_mapper.ConfigurationProvider)
-                .Select(p => new { label = p.Label, value = p.Id }).ToListAsync();
+                .Select(p => new {label = p.Label, value = p.Id}).ToListAsync();
 
             if (materials == null)
             {
@@ -349,7 +350,7 @@ namespace GrKouk.Web.ERP.Controllers
                     {
                         var natures = Array.ConvertAll(docType.SelectedWarehouseItemNatures.Split(","), int.Parse);
                         //var natures = docType.SelectedWarehouseItemNatures;
-                        fullListIq = fullListIq.Where(p => natures.Contains((int)p.WarehouseItemNature));
+                        fullListIq = fullListIq.Where(p => natures.Contains((int) p.WarehouseItemNature));
                     }
                 }
             }
@@ -360,7 +361,7 @@ namespace GrKouk.Web.ERP.Controllers
             //    .Select(p => new { label = p.Label, value = p.Id }).ToListAsync();
             var materials = await fullListIq
                 .ProjectTo<WarehouseItemSearchListDto>(_mapper.ConfigurationProvider)
-                .Select(p => new { label = p.Label, value = p.Id }).ToListAsync();
+                .Select(p => new {label = p.Label, value = p.Id}).ToListAsync();
             if (materials == null)
             {
                 return NotFound();
@@ -375,7 +376,7 @@ namespace GrKouk.Web.ERP.Controllers
             var materials = await _context.WarehouseItems.Where(p =>
                     p.Name.Contains(term) &&
                     p.WarehouseItemNature == WarehouseItemNatureEnum.WarehouseItemNatureService)
-                .Select(p => new { label = p.Name, value = p.Id }).ToListAsync();
+                .Select(p => new {label = p.Name, value = p.Id}).ToListAsync();
 
             if (materials == null)
             {
@@ -391,7 +392,7 @@ namespace GrKouk.Web.ERP.Controllers
             var materials = await _context.WarehouseItems.Where(p =>
                     p.Name.Contains(term) &&
                     p.WarehouseItemNature == WarehouseItemNatureEnum.WarehouseItemNatureExpense)
-                .Select(p => new { label = p.Name, value = p.Id }).ToListAsync();
+                .Select(p => new {label = p.Name, value = p.Id}).ToListAsync();
 
             if (materials == null)
             {
@@ -463,7 +464,7 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
             Debug.Print("******Inside GetFiscal period Returning period id " + fiscalPeriod.Id);
-            return Ok(new { PeriodId = fiscalPeriod.Id });
+            return Ok(new {PeriodId = fiscalPeriod.Id});
         }
 
         [HttpGet("SalesSeriesData")]
@@ -487,7 +488,7 @@ namespace GrKouk.Web.ERP.Controllers
             var usedPrice = salesTypeDef.UsedPrice;
 
             Debug.Print("Inside GetSalesSeriesData Returning usedPrice " + usedPrice.ToString());
-            return Ok(new { UsedPrice = usedPrice });
+            return Ok(new {UsedPrice = usedPrice});
         }
 
         [HttpGet("RecSeriesData")]
@@ -505,6 +506,7 @@ namespace GrKouk.Web.ERP.Controllers
                             error = "No Series Found"
                         });
                     }
+
                     //BuySeriesInSession(seriesId.ToString());
                     await _context.Entry(buySeriesDef)
                         .Reference(p => p.BuyDocTypeDef)
@@ -512,7 +514,7 @@ namespace GrKouk.Web.ERP.Controllers
                     var buyTypeDef = buySeriesDef.BuyDocTypeDef;
                     var usedBuyPrice = buyTypeDef.UsedPrice;
                     Debug.Print("Inside GetBuySeriesData Returning usedPrice " + usedBuyPrice.ToString());
-                    return Ok(new { UsedPrice = usedBuyPrice });
+                    return Ok(new {UsedPrice = usedBuyPrice});
                     break;
                 case RecurringDocTypeEnum.SellType:
                     Debug.Print("Inside GetSalesSeriesData " + seriesId.ToString());
@@ -525,18 +527,20 @@ namespace GrKouk.Web.ERP.Controllers
                             error = "No Series Found"
                         });
                     }
+
                     await _context.Entry(salesSeriesDef)
                         .Reference(p => p.SellDocTypeDef)
                         .LoadAsync();
                     var salesTypeDef = salesSeriesDef.SellDocTypeDef;
                     var usedSellPrice = salesTypeDef.UsedPrice;
                     Debug.Print("Inside GetSalesSeriesData Returning usedPrice " + usedSellPrice.ToString());
-                    return Ok(new { UsedPrice = usedSellPrice });
+                    return Ok(new {UsedPrice = usedSellPrice});
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(docType), docType, null);
             }
         }
+
         [HttpGet("BuySeriesData")]
         public async Task<IActionResult> GetBuySeriesData(int seriesId)
         {
@@ -559,7 +563,7 @@ namespace GrKouk.Web.ERP.Controllers
             var usedPrice = buyTypeDef.UsedPrice;
 
             Debug.Print("Inside GetBuySeriesData Returning usedPrice " + usedPrice.ToString());
-            return Ok(new { UsedPrice = usedPrice });
+            return Ok(new {UsedPrice = usedPrice});
         }
 
         [HttpGet("WarehouseTransType")]
@@ -607,7 +611,7 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
             Debug.Print("******Inside GetWarehouseTransType Returning Action value " + transType);
-            return Ok(new { TransType = transType });
+            return Ok(new {TransType = transType});
         }
 
         [HttpPost("CreateRecurringDoc")]
@@ -647,12 +651,12 @@ namespace GrKouk.Web.ERP.Controllers
 
             using (var transaction = _context.Database.BeginTransaction())
             {
-
                 int sectionId = 0;
                 switch (transToAttach.RecurringDocType)
                 {
                     case RecurringDocTypeEnum.BuyType:
-                        var buySeries = await _context.BuyDocSeriesDefs.SingleOrDefaultAsync(m => m.Id == data.DocSeriesId);
+                        var buySeries =
+                            await _context.BuyDocSeriesDefs.SingleOrDefaultAsync(m => m.Id == data.DocSeriesId);
                         if (buySeries is null)
                         {
                             transaction.Rollback();
@@ -673,10 +677,14 @@ namespace GrKouk.Web.ERP.Controllers
                                 error = "Doc Series has not doc type definition"
                             });
                         }
+
                         #region Section Management
+
                         if (buyTypeDef.SectionId == 0)
                         {
-                            var section = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == defaultBuySectionCode);
+                            var section =
+                                await _context.Sections.SingleOrDefaultAsync(s =>
+                                    s.SystemName == defaultBuySectionCode);
                             if (section == null)
                             {
                                 transaction.Rollback();
@@ -686,16 +694,20 @@ namespace GrKouk.Web.ERP.Controllers
                                     error = "Could not locate section "
                                 });
                             }
+
                             sectionId = section.Id;
                         }
                         else
                         {
                             sectionId = buyTypeDef.SectionId;
                         }
+
                         #endregion
+
                         break;
                     case RecurringDocTypeEnum.SellType:
-                        var sellSeries = await _context.SellDocSeriesDefs.SingleOrDefaultAsync(m => m.Id == data.DocSeriesId);
+                        var sellSeries =
+                            await _context.SellDocSeriesDefs.SingleOrDefaultAsync(m => m.Id == data.DocSeriesId);
                         if (sellSeries is null)
                         {
                             transaction.Rollback();
@@ -705,6 +717,7 @@ namespace GrKouk.Web.ERP.Controllers
                                 error = "Sell Doc Series not found"
                             });
                         }
+
                         await _context.Entry(sellSeries).Reference(t => t.SellDocTypeDef).LoadAsync();
                         var sellTypeDef = sellSeries.SellDocTypeDef;
                         if (sellTypeDef == null)
@@ -715,10 +728,14 @@ namespace GrKouk.Web.ERP.Controllers
                                 error = "Doc Series has not doc type definition"
                             });
                         }
+
                         #region Section Management
+
                         if (sellTypeDef.SectionId == 0)
                         {
-                            var section = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == defaultSellSectionCode);
+                            var section =
+                                await _context.Sections.SingleOrDefaultAsync(
+                                    s => s.SystemName == defaultSellSectionCode);
                             if (section == null)
                             {
                                 transaction.Rollback();
@@ -728,17 +745,21 @@ namespace GrKouk.Web.ERP.Controllers
                                     error = "Could not locate section "
                                 });
                             }
+
                             sectionId = section.Id;
                         }
                         else
                         {
                             sectionId = sellTypeDef.SectionId;
                         }
+
                         #endregion
+
                         break;
                     default:
                         break;
                 }
+
                 transToAttach.SectionId = sectionId;
                 transToAttach.DocTypeId = data.DocSeriesId;
                 _context.RecurringTransDocs.Add(transToAttach);
@@ -777,9 +798,9 @@ namespace GrKouk.Web.ERP.Controllers
 
                     var docLine = new RecurringTransDocLine();
                     decimal unitPrice = dataBuyDocLine.Price;
-                    decimal units = (decimal)dataBuyDocLine.Q1;
-                    decimal fpaRate = (decimal)dataBuyDocLine.FpaRate;
-                    decimal discountRate = (decimal)dataBuyDocLine.DiscountRate;
+                    decimal units = (decimal) dataBuyDocLine.Q1;
+                    decimal fpaRate = (decimal) dataBuyDocLine.FpaRate;
+                    decimal discountRate = (decimal) dataBuyDocLine.DiscountRate;
                     decimal lineNetAmount = unitPrice * units;
                     decimal lineDiscountAmount = lineNetAmount * discountRate;
                     decimal lineFpaAmount = (lineNetAmount - lineDiscountAmount) * fpaRate;
@@ -799,7 +820,6 @@ namespace GrKouk.Web.ERP.Controllers
                     docLine.Etiology = transToAttach.Etiology;
                     //_context.Entry(transToAttach).Entity
                     transToAttach.DocLines.Add(docLine);
-
                 }
 
                 try
@@ -821,6 +841,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             return Ok(new { });
         }
+
         [HttpPost("UpdateRecurringDoc")]
         public async Task<IActionResult> UpdateRecurringDoc([FromBody] RecurringTransDocModifyAjaxDto data)
         {
@@ -836,6 +857,7 @@ namespace GrKouk.Web.ERP.Controllers
                     error = "Empty request data"
                 });
             }
+
             try
             {
                 transToAttachNoLines = _mapper.Map<RecurringTransDocModifyAjaxNoLinesDto>(data);
@@ -852,13 +874,14 @@ namespace GrKouk.Web.ERP.Controllers
 
             using (var transaction = _context.Database.BeginTransaction())
             {
-
-                _context.RecurringTransDocLines.RemoveRange(_context.RecurringTransDocLines.Where(p => p.RecurringTransDocId == data.Id));
+                _context.RecurringTransDocLines.RemoveRange(
+                    _context.RecurringTransDocLines.Where(p => p.RecurringTransDocId == data.Id));
                 int sectionId = 0;
                 switch (transToAttach.RecurringDocType)
                 {
                     case RecurringDocTypeEnum.BuyType:
-                        var buySeries = await _context.BuyDocSeriesDefs.SingleOrDefaultAsync(m => m.Id == data.DocSeriesId);
+                        var buySeries =
+                            await _context.BuyDocSeriesDefs.SingleOrDefaultAsync(m => m.Id == data.DocSeriesId);
                         if (buySeries is null)
                         {
                             transaction.Rollback();
@@ -879,10 +902,14 @@ namespace GrKouk.Web.ERP.Controllers
                                 error = "Doc Series has not doc type definition"
                             });
                         }
+
                         #region Section Management
+
                         if (buyTypeDef.SectionId == 0)
                         {
-                            var section = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == defaultBuySectionCode);
+                            var section =
+                                await _context.Sections.SingleOrDefaultAsync(s =>
+                                    s.SystemName == defaultBuySectionCode);
                             if (section == null)
                             {
                                 transaction.Rollback();
@@ -892,16 +919,20 @@ namespace GrKouk.Web.ERP.Controllers
                                     error = "Could not locate section "
                                 });
                             }
+
                             sectionId = section.Id;
                         }
                         else
                         {
                             sectionId = buyTypeDef.SectionId;
                         }
+
                         #endregion
+
                         break;
                     case RecurringDocTypeEnum.SellType:
-                        var sellSeries = await _context.SellDocSeriesDefs.SingleOrDefaultAsync(m => m.Id == data.DocSeriesId);
+                        var sellSeries =
+                            await _context.SellDocSeriesDefs.SingleOrDefaultAsync(m => m.Id == data.DocSeriesId);
                         if (sellSeries is null)
                         {
                             transaction.Rollback();
@@ -911,6 +942,7 @@ namespace GrKouk.Web.ERP.Controllers
                                 error = "Sell Doc Series not found"
                             });
                         }
+
                         await _context.Entry(sellSeries).Reference(t => t.SellDocTypeDef).LoadAsync();
                         var sellTypeDef = sellSeries.SellDocTypeDef;
                         if (sellTypeDef == null)
@@ -921,10 +953,14 @@ namespace GrKouk.Web.ERP.Controllers
                                 error = "Doc Series has not doc type definition"
                             });
                         }
+
                         #region Section Management
+
                         if (sellTypeDef.SectionId == 0)
                         {
-                            var section = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == defaultSellSectionCode);
+                            var section =
+                                await _context.Sections.SingleOrDefaultAsync(
+                                    s => s.SystemName == defaultSellSectionCode);
                             if (section == null)
                             {
                                 transaction.Rollback();
@@ -934,17 +970,21 @@ namespace GrKouk.Web.ERP.Controllers
                                     error = "Could not locate section "
                                 });
                             }
+
                             sectionId = section.Id;
                         }
                         else
                         {
                             sectionId = sellTypeDef.SectionId;
                         }
+
                         #endregion
+
                         break;
                     default:
                         break;
                 }
+
                 transToAttach.SectionId = sectionId;
                 transToAttach.DocTypeId = data.DocSeriesId;
 
@@ -968,11 +1008,12 @@ namespace GrKouk.Web.ERP.Controllers
                     }
 
                     #region MaterialLine
+
                     var docLine = new RecurringTransDocLine();
                     decimal unitPrice = dataBuyDocLine.Price;
-                    decimal units = (decimal)dataBuyDocLine.Q1;
-                    decimal fpaRate = (decimal)dataBuyDocLine.FpaRate;
-                    decimal discountRate = (decimal)dataBuyDocLine.DiscountRate;
+                    decimal units = (decimal) dataBuyDocLine.Q1;
+                    decimal fpaRate = (decimal) dataBuyDocLine.FpaRate;
+                    decimal discountRate = (decimal) dataBuyDocLine.DiscountRate;
                     decimal lineNetAmount = unitPrice * units;
                     decimal lineDiscountAmount = lineNetAmount * discountRate;
                     decimal lineFpaAmount = (lineNetAmount - lineDiscountAmount) * fpaRate;
@@ -1008,6 +1049,7 @@ namespace GrKouk.Web.ERP.Controllers
 
                     #endregion
                 }
+
                 try
                 {
                     await _context.SaveChangesAsync();
@@ -1025,6 +1067,143 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
             return Ok(new { });
+        }
+
+        [HttpPost("AddBuyPaymentMapping")]
+        public async Task<IActionResult> PostBuyPaymentMapping([FromBody] IdList docIds)
+        {
+            if (docIds == null)
+            {
+                return BadRequest(new
+                {
+                    ErrorMessage = "Empty request data"
+                });
+            }
+
+            var docId = docIds.Ids[0];
+            var doc = await _context.BuyDocuments.FindAsync(docId);
+            if (doc ==null)
+            {
+                return BadRequest(new
+                {
+                    ErrorMessage = "Requested document not found"
+                });
+            }
+            await _context.Entry(doc)
+                .Reference(t => t.BuyDocSeries)
+                .LoadAsync();
+            var docSeries = doc.BuyDocSeries;
+            if (docSeries.PayoffSeriesId==null || docSeries.PayoffSeriesId==0)
+            {    
+                return BadRequest(new
+                {
+                    ErrorMessage = "No payoff series defined"
+                });
+            }
+            int payoffSeriesId = (int)docSeries.PayoffSeriesId;
+            var payoffSeries = await _context.TransTransactorDocSeriesDefs.FindAsync(payoffSeriesId);
+           
+            if (payoffSeries==null )
+            {    
+                return BadRequest(new
+                {
+                    ErrorMessage = "Payoff series definition not found"
+                });
+            }
+            await _context.Entry(payoffSeries).Reference(t => t.TransTransactorDocTypeDef)
+                .LoadAsync();
+            var payoffSeriesType = payoffSeries.TransTransactorDocTypeDef;
+            if (payoffSeriesType==null )
+            {    
+                return BadRequest(new
+                {
+                    ErrorMessage = "Payoff series type Definition not found"
+                });
+            }
+            await _context.Entry(payoffSeriesType)
+                .Reference(t => t.TransTransactorDef)
+                .LoadAsync();
+            var payoffTransactorTransactionDef = payoffSeriesType.TransTransactorDef;
+            
+            var payoffTransaction = new TransactorTransaction
+            {
+                TransDate = DateTime.Today,
+                TransTransactorDocSeriesId = payoffSeriesId,
+                TransTransactorDocTypeId = payoffSeries.TransTransactorDocTypeDefId,
+                TransRefCode = doc.TransRefCode,
+                TransactorId =doc.TransactorId ,
+                SectionId = doc.SectionId,
+                CreatorId = doc.Id,
+                FiscalPeriodId = doc.FiscalPeriodId,
+                AmountFpa = doc.AmountFpa,
+                AmountNet = doc.AmountNet,
+                AmountDiscount =doc.AmountDiscount ,
+                Etiology = $"Payoff doc {doc.TransRefCode}",
+                CompanyId = doc.CompanyId
+            };
+            ActionHandlers.TransactorFinAction(payoffTransactorTransactionDef.FinancialTransAction, payoffTransaction);
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    await _context.TransactorTransactions.AddAsync(payoffTransaction);
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e.Message);
+                    await transaction.RollbackAsync();
+                    return BadRequest(new
+                    {
+                        ErrorMessage = $"Error inserting transactor transaction {e.Message}"
+                    });
+                }
+
+                var mapping = new BuyDocTransPaymentMapping
+                {
+                    BuyDocument = doc,
+                    TransactorTransaction = payoffTransaction,
+                    AmountUsed = payoffTransaction.AmountNet + payoffTransaction.AmountFpa -
+                                 payoffTransaction.AmountDiscount
+                };
+                try
+                {
+                    await _context.BuyDocTransPaymentMappings.AddAsync(mapping);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    await transaction.RollbackAsync();
+                    return BadRequest(new
+                    {
+                        ErrorMessage = $"Error inserting buy payment mapping {e.Message}"
+                    });
+                }
+
+                try
+                {
+                    var recs = await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    // var ms = new StringBuilder()
+                    //     .Append("Η αντιστοίχιση εικόνων ολοκληρώθηκε")
+                    //     .Append($"</br>Στάλθηκαν:       {requested} εικόνες")
+                    //     .Append($"</br>Αντιστοιχισμένες:{allreadyAssigned} εικόνες")
+                    //     .Append($"</br>Επιτυχής :       {addedCount} εικόνες");
+                    //
+                    // string message = ms.ToString();
+                    return Ok(new {Message=$"Successfully added mappings"});
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    await transaction.RollbackAsync();
+                    return BadRequest(new
+                    {
+                        ErrorMessage = $"Error updating database {e.Message}"
+                    });
+                }
+            }
+
+           
         }
 
         [HttpPost("MaterialBuyDoc")]
@@ -1095,16 +1274,16 @@ namespace GrKouk.Web.ERP.Controllers
 
                 await _context.Entry(docSeries).Reference(t => t.BuyDocTypeDef).LoadAsync();
                 var docTypeDef = docSeries.BuyDocTypeDef;
-                //await _context.Entry(docTypeDef)
-                //      .Reference(t => t.TransSupplierDef)
-                //      .LoadAsync();
+               
                 await _context.Entry(docTypeDef)
                     .Reference(t => t.TransTransactorDef)
                     .LoadAsync();
 
                 await _context.Entry(docTypeDef).Reference(t => t.TransWarehouseDef)
                     .LoadAsync();
+
                 #region Section Management
+
                 int sectionId = 0;
                 if (docTypeDef.SectionId == 0)
                 {
@@ -1118,13 +1297,16 @@ namespace GrKouk.Web.ERP.Controllers
                             error = "Could not locate section "
                         });
                     }
+
                     sectionId = sectn.Id;
                 }
                 else
                 {
                     sectionId = docTypeDef.SectionId;
                 }
+
                 #endregion
+
                 //var transSupplierDef = docTypeDef.TransSupplierDef;
                 var transTransactorDef = docTypeDef.TransTransactorDef;
                 var transWarehouseDef = docTypeDef.TransWarehouseDef;
@@ -1244,12 +1426,12 @@ namespace GrKouk.Web.ERP.Controllers
                             .LoadAsync();
                         var transPaymentTransactorDef = transTransactorDocTypeDef.TransTransactorDef;
 
-                        ActionHandlers.TransactorFinAction(transPaymentTransactorDef.FinancialTransAction, sTransactorTransaction);
+                        ActionHandlers.TransactorFinAction(transPaymentTransactorDef.FinancialTransAction,
+                            sTransactorTransaction);
                         _context.TransactorTransactions.Add(sTransactorTransaction);
                         try
                         {
                             await _context.SaveChangesAsync();
-                            
                         }
                         catch (Exception e)
                         {
@@ -1268,7 +1450,8 @@ namespace GrKouk.Web.ERP.Controllers
                             {
                                 BuyDocumentId = docId,
                                 TransactorTransactionId = payOfTransactionId,
-                                AmountUsed = sTransactorTransaction.AmountNet+sTransactorTransaction.AmountFpa-sTransactorTransaction.AmountDiscount
+                                AmountUsed = sTransactorTransaction.AmountNet + sTransactorTransaction.AmountFpa -
+                                             sTransactorTransaction.AmountDiscount
                             };
                             _context.BuyDocTransPaymentMappings.Add(payOffMapping);
                         }
@@ -1330,9 +1513,9 @@ namespace GrKouk.Web.ERP.Controllers
 
                     var buyMaterialLine = new BuyDocLine();
                     decimal unitPrice = dataBuyDocLine.Price;
-                    decimal units = (decimal)dataBuyDocLine.Q1;
-                    decimal fpaRate = (decimal)dataBuyDocLine.FpaRate;
-                    decimal discountRate = (decimal)dataBuyDocLine.DiscountRate;
+                    decimal units = (decimal) dataBuyDocLine.Q1;
+                    decimal fpaRate = (decimal) dataBuyDocLine.FpaRate;
+                    decimal discountRate = (decimal) dataBuyDocLine.DiscountRate;
                     decimal lineNetAmount = unitPrice * units;
                     decimal lineDiscountAmount = lineNetAmount * discountRate;
                     decimal lineFpaAmount = (lineNetAmount - lineDiscountAmount) * fpaRate;
@@ -1377,15 +1560,18 @@ namespace GrKouk.Web.ERP.Controllers
                             CreatorId = transToAttach.Id,
                             TransDate = transToAttach.TransDate,
                             TransRefCode = transToAttach.TransRefCode,
-                            UnitFactor = (decimal)dataBuyDocLine.Factor,
+                            UnitFactor = (decimal) dataBuyDocLine.Factor,
                             TransWarehouseDocSeriesId = warehouseSeriesId,
                             TransWarehouseDocTypeId = warehouseTypeId
                         };
 
-                        ActionHandlers.ItemNatureHandler(material.WarehouseItemNature, warehouseTrans, transWarehouseDef);
-                        ActionHandlers.ItemInventoryActionHandler(warehouseTrans.InventoryAction, dataBuyDocLine.Q1, dataBuyDocLine.Q2,
+                        ActionHandlers.ItemNatureHandler(material.WarehouseItemNature, warehouseTrans,
+                            transWarehouseDef);
+                        ActionHandlers.ItemInventoryActionHandler(warehouseTrans.InventoryAction, dataBuyDocLine.Q1,
+                            dataBuyDocLine.Q2,
                             warehouseTrans);
-                        ActionHandlers.ItemInventoryValueActionHandler(warehouseTrans.InventoryValueAction, warehouseTrans);
+                        ActionHandlers.ItemInventoryValueActionHandler(warehouseTrans.InventoryValueAction,
+                            warehouseTrans);
                         _context.WarehouseTransactions.Add(warehouseTrans);
 
                         #endregion
@@ -1448,10 +1634,13 @@ namespace GrKouk.Web.ERP.Controllers
             {
                 _context.BuyDocLines.RemoveRange(_context.BuyDocLines.Where(p => p.BuyDocumentId == data.Id));
                 _context.TransactorTransactions.RemoveRange(
-                    _context.TransactorTransactions.Where(p => p.SectionId == data.SectionId && p.CreatorId == data.Id));
+                    _context.TransactorTransactions.Where(p =>
+                        p.SectionId == data.SectionId && p.CreatorId == data.Id));
                 _context.WarehouseTransactions.RemoveRange(
                     _context.WarehouseTransactions.Where(p => p.SectionId == data.SectionId && p.CreatorId == data.Id));
-                _context.BuyDocTransPaymentMappings.RemoveRange(_context.BuyDocTransPaymentMappings.Where(p=>p.BuyDocumentId==data.Id));
+                _context.BuyDocTransPaymentMappings.RemoveRange(
+                    _context.BuyDocTransPaymentMappings.Where(p => p.BuyDocumentId == data.Id));
+
                 #region Fiscal Period
 
                 var fiscalPeriod = await _context.FiscalPeriods.FirstOrDefaultAsync(p =>
@@ -1488,7 +1677,9 @@ namespace GrKouk.Web.ERP.Controllers
                     .LoadAsync();
                 await _context.Entry(docTypeDef).Reference(t => t.TransWarehouseDef)
                     .LoadAsync();
+
                 #region Section Management
+
                 int sectionId = 0;
                 if (docTypeDef.SectionId == 0)
                 {
@@ -1502,12 +1693,14 @@ namespace GrKouk.Web.ERP.Controllers
                             error = "Could not locate section "
                         });
                     }
+
                     sectionId = sectn.Id;
                 }
                 else
                 {
                     sectionId = docTypeDef.SectionId;
                 }
+
                 #endregion
 
                 var transTransactorDef = docTypeDef.TransTransactorDef;
@@ -1634,6 +1827,7 @@ namespace GrKouk.Web.ERP.Controllers
                                 error = e.Message + " " + msg
                             });
                         }
+
                         try
                         {
                             var payOfTransactionId = _context.Entry(sTransactorTransaction).Entity.Id;
@@ -1641,7 +1835,8 @@ namespace GrKouk.Web.ERP.Controllers
                             {
                                 BuyDocumentId = docId,
                                 TransactorTransactionId = payOfTransactionId,
-                                AmountUsed = sTransactorTransaction.AmountNet+sTransactorTransaction.AmountFpa-sTransactorTransaction.AmountDiscount
+                                AmountUsed = sTransactorTransaction.AmountNet + sTransactorTransaction.AmountFpa -
+                                             sTransactorTransaction.AmountDiscount
                             };
                             _context.BuyDocTransPaymentMappings.Add(payOffMapping);
                         }
@@ -1704,9 +1899,9 @@ namespace GrKouk.Web.ERP.Controllers
 
                     var warehouseItemLine = new BuyDocLine();
                     decimal unitPrice = dataBuyDocLine.Price;
-                    decimal units = (decimal)dataBuyDocLine.Q1;
-                    decimal fpaRate = (decimal)dataBuyDocLine.FpaRate;
-                    decimal discountRate = (decimal)dataBuyDocLine.DiscountRate;
+                    decimal units = (decimal) dataBuyDocLine.Q1;
+                    decimal fpaRate = (decimal) dataBuyDocLine.FpaRate;
+                    decimal discountRate = (decimal) dataBuyDocLine.DiscountRate;
                     decimal lineNetAmount = unitPrice * units;
                     decimal lineDiscountAmount = lineNetAmount * discountRate;
                     decimal lineFpaAmount = (lineNetAmount - lineDiscountAmount) * fpaRate;
@@ -1764,15 +1959,18 @@ namespace GrKouk.Web.ERP.Controllers
                             CreatorId = transToAttach.Id,
                             TransDate = transToAttach.TransDate,
                             TransRefCode = transToAttach.TransRefCode,
-                            UnitFactor = (decimal)dataBuyDocLine.Factor,
+                            UnitFactor = (decimal) dataBuyDocLine.Factor,
                             TransWarehouseDocSeriesId = warehouseSeriesId,
                             TransWarehouseDocTypeId = warehouseTypeId
                         };
 
-                        ActionHandlers.ItemNatureHandler(material.WarehouseItemNature, warehouseTrans, transWarehouseDef);
-                        ActionHandlers.ItemInventoryActionHandler(warehouseTrans.InventoryAction, dataBuyDocLine.Q1, dataBuyDocLine.Q2,
+                        ActionHandlers.ItemNatureHandler(material.WarehouseItemNature, warehouseTrans,
+                            transWarehouseDef);
+                        ActionHandlers.ItemInventoryActionHandler(warehouseTrans.InventoryAction, dataBuyDocLine.Q1,
+                            dataBuyDocLine.Q2,
                             warehouseTrans);
-                        ActionHandlers.ItemInventoryValueActionHandler(warehouseTrans.InventoryValueAction, warehouseTrans);
+                        ActionHandlers.ItemInventoryValueActionHandler(warehouseTrans.InventoryValueAction,
+                            warehouseTrans);
 
                         try
                         {
@@ -1851,8 +2049,6 @@ namespace GrKouk.Web.ERP.Controllers
 
             using (var transaction = _context.Database.BeginTransaction())
             {
-
-
                 #region Fiscal Period
 
                 var fiscalPeriod = await _context.FiscalPeriods.FirstOrDefaultAsync(p =>
@@ -1893,6 +2089,7 @@ namespace GrKouk.Web.ERP.Controllers
                     .LoadAsync();
 
                 #region Section Management
+
                 int sectionId = 0;
                 if (docTypeDef.SectionId == 0)
                 {
@@ -1906,13 +2103,16 @@ namespace GrKouk.Web.ERP.Controllers
                             error = "Could not locate section "
                         });
                     }
+
                     sectionId = sectn.Id;
                 }
                 else
                 {
                     sectionId = docTypeDef.SectionId;
                 }
+
                 #endregion
+
                 var transTransactorDef = docTypeDef.TransTransactorDef;
                 var transWarehouseDef = docTypeDef.TransWarehouseDef;
 
@@ -2049,6 +2249,7 @@ namespace GrKouk.Web.ERP.Controllers
                                 error = e.Message + " " + msg
                             });
                         }
+
                         try
                         {
                             var payOfTransactionId = _context.Entry(sTransactorTransaction).Entity.Id;
@@ -2056,7 +2257,8 @@ namespace GrKouk.Web.ERP.Controllers
                             {
                                 SellDocumentId = docId,
                                 TransactorTransactionId = payOfTransactionId,
-                                AmountUsed = sTransactorTransaction.AmountNet+sTransactorTransaction.AmountFpa-sTransactorTransaction.AmountDiscount
+                                AmountUsed = sTransactorTransaction.AmountNet + sTransactorTransaction.AmountFpa -
+                                             sTransactorTransaction.AmountDiscount
                             };
                             _context.SellDocTransPaymentMappings.Add(payOffMapping);
                         }
@@ -2120,9 +2322,9 @@ namespace GrKouk.Web.ERP.Controllers
 
                     var sellDocLine = new SellDocLine();
                     decimal unitPrice = docLine.Price;
-                    decimal units = (decimal)docLine.Q1;
-                    decimal fpaRate = (decimal)docLine.FpaRate;
-                    decimal discountRate = (decimal)docLine.DiscountRate;
+                    decimal units = (decimal) docLine.Q1;
+                    decimal fpaRate = (decimal) docLine.FpaRate;
+                    decimal discountRate = (decimal) docLine.DiscountRate;
                     decimal lineNetAmount = unitPrice * units;
                     decimal lineDiscountAmount = lineNetAmount * discountRate;
                     decimal lineFpaAmount = (lineNetAmount - lineDiscountAmount) * fpaRate;
@@ -2167,14 +2369,17 @@ namespace GrKouk.Web.ERP.Controllers
                         warehouseTrans.CreatorId = transToAttach.Id;
                         warehouseTrans.TransDate = transToAttach.TransDate;
                         warehouseTrans.TransRefCode = transToAttach.TransRefCode;
-                        warehouseTrans.UnitFactor = (decimal)docLine.Factor;
+                        warehouseTrans.UnitFactor = (decimal) docLine.Factor;
 
                         warehouseTrans.TransWarehouseDocSeriesId = warehouseSeriesId;
                         warehouseTrans.TransWarehouseDocTypeId = warehouseTypeId;
-                        ActionHandlers.ItemNatureHandler(material.WarehouseItemNature, warehouseTrans, transWarehouseDef);
-                        ActionHandlers.ItemInventoryActionHandler(warehouseTrans.InventoryAction, docLine.Q1, docLine.Q2,
+                        ActionHandlers.ItemNatureHandler(material.WarehouseItemNature, warehouseTrans,
+                            transWarehouseDef);
+                        ActionHandlers.ItemInventoryActionHandler(warehouseTrans.InventoryAction, docLine.Q1,
+                            docLine.Q2,
                             warehouseTrans);
-                        ActionHandlers.ItemInventoryValueActionHandler(warehouseTrans.InventoryValueAction, warehouseTrans);
+                        ActionHandlers.ItemInventoryValueActionHandler(warehouseTrans.InventoryValueAction,
+                            warehouseTrans);
 
                         _context.WarehouseTransactions.Add(warehouseTrans);
 
@@ -2236,10 +2441,13 @@ namespace GrKouk.Web.ERP.Controllers
             {
                 _context.SellDocLines.RemoveRange(_context.SellDocLines.Where(p => p.SellDocumentId == data.Id));
                 _context.TransactorTransactions.RemoveRange(
-                    _context.TransactorTransactions.Where(p => p.SectionId == data.SectionId && p.CreatorId == data.Id));
+                    _context.TransactorTransactions.Where(p =>
+                        p.SectionId == data.SectionId && p.CreatorId == data.Id));
                 _context.WarehouseTransactions.RemoveRange(
                     _context.WarehouseTransactions.Where(p => p.SectionId == data.SectionId && p.CreatorId == data.Id));
-                _context.SellDocTransPaymentMappings.RemoveRange(_context.SellDocTransPaymentMappings.Where(p=>p.SellDocumentId==data.Id));
+                _context.SellDocTransPaymentMappings.RemoveRange(
+                    _context.SellDocTransPaymentMappings.Where(p => p.SellDocumentId == data.Id));
+
                 #region Fiscal Period
 
                 var fiscalPeriod = await _context.FiscalPeriods.FirstOrDefaultAsync(p =>
@@ -2278,7 +2486,9 @@ namespace GrKouk.Web.ERP.Controllers
                     .LoadAsync();
                 await _context.Entry(docTypeDef).Reference(t => t.TransWarehouseDef)
                     .LoadAsync();
+
                 #region Section Management
+
                 int sectionId = 0;
                 if (docTypeDef.SectionId == 0)
                 {
@@ -2292,12 +2502,14 @@ namespace GrKouk.Web.ERP.Controllers
                             error = "Could not locate section "
                         });
                     }
+
                     sectionId = sectn.Id;
                 }
                 else
                 {
                     sectionId = docTypeDef.SectionId;
                 }
+
                 #endregion
 
                 var transTransactorDef = docTypeDef.TransTransactorDef;
@@ -2411,6 +2623,7 @@ namespace GrKouk.Web.ERP.Controllers
                                 error = e.Message + " " + msg
                             });
                         }
+
                         try
                         {
                             var payOfTransactionId = _context.Entry(sTransactorTransaction).Entity.Id;
@@ -2418,7 +2631,8 @@ namespace GrKouk.Web.ERP.Controllers
                             {
                                 SellDocumentId = docId,
                                 TransactorTransactionId = payOfTransactionId,
-                                AmountUsed = sTransactorTransaction.AmountNet+sTransactorTransaction.AmountFpa-sTransactorTransaction.AmountDiscount
+                                AmountUsed = sTransactorTransaction.AmountNet + sTransactorTransaction.AmountFpa -
+                                             sTransactorTransaction.AmountDiscount
                             };
                             _context.SellDocTransPaymentMappings.Add(payOffMapping);
                         }
@@ -2480,9 +2694,9 @@ namespace GrKouk.Web.ERP.Controllers
 
                     var sellDocLine = new SellDocLine();
                     decimal unitPrice = docLine.Price;
-                    decimal units = (decimal)docLine.Q1;
-                    decimal fpaRate = (decimal)docLine.FpaRate;
-                    decimal discountRate = (decimal)docLine.DiscountRate;
+                    decimal units = (decimal) docLine.Q1;
+                    decimal fpaRate = (decimal) docLine.FpaRate;
+                    decimal discountRate = (decimal) docLine.DiscountRate;
                     decimal lineNetAmount = unitPrice * units;
                     decimal lineDiscountAmount = lineNetAmount * discountRate;
                     decimal lineFpaAmount = (lineNetAmount - lineDiscountAmount) * fpaRate;
@@ -2527,15 +2741,18 @@ namespace GrKouk.Web.ERP.Controllers
                             CreatorId = transToAttach.Id,
                             TransDate = transToAttach.TransDate,
                             TransRefCode = transToAttach.TransRefCode,
-                            UnitFactor = (decimal)docLine.Factor,
+                            UnitFactor = (decimal) docLine.Factor,
                             TransWarehouseDocSeriesId = warehouseSeriesId,
                             TransWarehouseDocTypeId = warehouseTypeId
                         };
 
-                        ActionHandlers.ItemNatureHandler(material.WarehouseItemNature, warehouseTrans, transWarehouseDef);
-                        ActionHandlers.ItemInventoryActionHandler(warehouseTrans.InventoryAction, docLine.Q1, docLine.Q2,
+                        ActionHandlers.ItemNatureHandler(material.WarehouseItemNature, warehouseTrans,
+                            transWarehouseDef);
+                        ActionHandlers.ItemInventoryActionHandler(warehouseTrans.InventoryAction, docLine.Q1,
+                            docLine.Q2,
                             warehouseTrans);
-                        ActionHandlers.ItemInventoryValueActionHandler(warehouseTrans.InventoryValueAction, warehouseTrans);
+                        ActionHandlers.ItemInventoryValueActionHandler(warehouseTrans.InventoryValueAction,
+                            warehouseTrans);
 
                         _context.WarehouseTransactions.Add(warehouseTrans);
 

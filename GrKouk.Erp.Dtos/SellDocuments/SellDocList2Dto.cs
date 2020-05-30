@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GrKouk.Erp.Dtos.SellDocuments
 {
-    public class SellDocListDto
+    public class SellDocList2Dto
     {
         public int Id { get; set; }
 
@@ -43,5 +43,8 @@ namespace GrKouk.Erp.Dtos.SellDocuments
         public string CompanyCode { get; set; }
         public int CompanyCurrencyId { get; set; }
         public int SalesChannelId { get; set; }
+        public decimal PayedOfAmount { get; set; }
+
+        public decimal UncoveredAmount => PayedOfAmount - TotalAmount;
     }
 }
