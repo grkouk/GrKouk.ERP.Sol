@@ -327,7 +327,8 @@
                      },
                      error: function(e) {
                          console.log(e);
-                         toastr.error("Error", e.errorMessage);
+                         let message=e.responseJSON.errorMessage;
+                         toastr.error("Error", message);
     
                      }
                  });       

@@ -1072,6 +1072,7 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpPost("AddBuyPaymentMapping")]
         public async Task<IActionResult> PostBuyPaymentMapping([FromBody] IdList docIds)
         {
+           
             if (docIds == null)
             {
                 return BadRequest(new
