@@ -8,6 +8,8 @@
 {
     <link rel="stylesheet" href="~/css/custom-checkbox.css" />
     <link rel="stylesheet" href="~/css/searchbar.css" />
+    <link rel="stylesheet" href="~/css/search-modal.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-select/css/bootstrap-select.min.css" />
 }
 <h4>Λίστα Αγορών/Εξόδων</h4>
 
@@ -94,12 +96,9 @@
 <br />
 <table class="table table-bordered table-sm m-0" id="myTable">
     <thead class="thead-light">
-    
+
     </thead>
     <tbody>
-
-     
-
     </tbody>
 </table>
 <div class="row">
@@ -156,8 +155,73 @@
         </div>
     </div>
 </div>
+<!-- Modal Item selector for payments -->
+<div class="modal fade" id="itemSelector" tabindex="-1" role="dialog" aria-labelledby="itemsModalLabel" aria-hidden="true" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="overflow-y: scroll; max-height:75%;  margin-top: 50px; margin-bottom:50px;" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="container-fluid">
+                    <div class="form-row">
+                        <div class="col-6">
+                            <p class="modal-title font-weight-bold" id="itemsModalLabel">Selector</p>
+                        </div>
+                        <div class="col-6 text-right">
+
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <select class="selectpicker form-control form-control-sm small " id="CompaniesList" multiple
+                                    title="Companies" data-actions-box="true" data-selected-text-format="count > 1"></select>
+                        </div>
+                        <div class="form-group col-md-3" id="MaterialNatureTypesDiv">
+                            <select class="selectpicker form-control form-control-sm small " id="MaterialNatureTypes" multiple
+                                    title="Item Natures" data-actions-box="true" data-selected-text-format="count > 1"></select>
+                        </div>
+                        <div class="form-group col-md-3" id="TransactorSelectorTypesDiv">
+                            <select class="selectpicker form-control form-control-sm small " id="TransactorTypes" multiple
+                                    title="Item Natures" data-actions-box="true" data-selected-text-format="count > 1"></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-10">
+                            <input class="form-control form-control-sm" name="itemsSearchText" placeholder="Search text" type="text" />
+
+                        </div>
+                        <div class="col-2">
+                            <span class="spinner-border spinner-border-sm text-primary" id="SpinnerLoader" style="display: none"></span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body ">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <table class="table table-bordered table-sm" id="selectorItemsList">
+                                <thead class="thead-light">
+                                    
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts
 {
+    <script src="~/lib/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script src="~/js/moment.min.js"></script>
     <script>
         $(document).ready(function() {
@@ -195,7 +259,739 @@
             var reallyIsNaN = function(x) {
                 return x !== x;
             };
+         //#region items selectors modals
+            $.fn.selectpicker.Constructor.BootstrapVersion = '4';
+            var selectedCompanies = "";
+            var selectedNatures = "";
+            var selectedTransTypes = "";
+            var curSelectorType = "";
+            let selectedDocumentId = 0;
 
+            const setProductSelectorCurrentSort = (currentSort) => {
+                var filtersArr = [];
+                filtersArr.push({
+                    filterKey: 'currentSort',
+                    filterValue: currentSort
+                });
+                let sessionVal = JSON.stringify(filtersArr);
+
+                localStorage.setItem('ProductSelectorStore', sessionVal);
+            };
+            const getProductSelectorCurrentSort = () => {
+                var storageItemJs = localStorage.getItem('ProductSelectorStore');
+                if (storageItemJs === undefined || storageItemJs === null) {
+                    return "";
+                } else {
+
+                    var storageItem = JSON.parse(storageItemJs);
+                    try {
+                        let filtersValue = storageItem.find(x => x.filterKey === 'currentSort').filterValue;
+                        return filtersValue;
+                    } catch (e) {
+                        return "";
+                    }
+                }
+            };
+            const setTransactorSelectorCurrentSort = (currentSort) => {
+                var filtersArr = [];
+                filtersArr.push({
+                    filterKey: 'currentSort',
+                    filterValue: currentSort
+                });
+                let sessionVal = JSON.stringify(filtersArr);
+
+                localStorage.setItem('TransactorSelectorStore', sessionVal);
+            };
+            const getTransactorSelectorCurrentSort = () => {
+                var storageItemJs = localStorage.getItem('TransactorSelectorStore');
+                if (storageItemJs === undefined || storageItemJs === null) {
+                    return "";
+                } else {
+
+                    var storageItem = JSON.parse(storageItemJs);
+                    try {
+                        let filtersValue = storageItem.find(x => x.filterKey === 'currentSort').filterValue;
+                        return filtersValue;
+                    } catch (e) {
+                        return "";
+                    }
+                }
+            };
+            var getWarehouseItemNatureList = () => {
+                var timeout;
+                var pageIndex = 1;
+                var uri = '/api/GrKoukInfoApi/GetSelectorMaterialNatures';
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'GET',
+                    url: uri,
+                    beforeSend: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        timeout = setTimeout(function() {
+                                $("#loadMe").modal({
+                                    backdrop: "static",
+                                    keyboard: false,
+                                    show: true
+                                });
+                            },
+                            1000);
+                    },
+                    success: function(result) {
+                        $.each(result,
+                            function(index, item) {
+                                $('#MaterialNatureTypes').append($('<option></option>').attr('value', item.valueInt)
+                                    .text(item.title));
+                            });
+                        $('#MaterialNatureTypes').selectpicker('refresh');
+                    },
+                    complete: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        $("#loadMe").modal("hide");
+                        setTimeout(function() {
+                                console.log('Checking for open modals');
+                                var isOpen = $('#loadMe').hasClass('show');
+                                if (isOpen) {
+                                    console.log('There is an open Modal');
+                                    $("#loadMe").modal("hide");
+                                } else {
+                                    console.log('No open modal');
+                                }
+                            },
+                            2000);
+                    },
+                    error: function(e) {
+                        console.log(e);
+
+                    }
+                });
+            };
+            var getTransactorTypeList = () => {
+                var timeout;
+                var pageIndex = 1;
+                var uri = '/api/GrKoukInfoApi/GetSelectorTransactorTypes';
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'GET',
+                    url: uri,
+                    beforeSend: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        timeout = setTimeout(function() {
+                                $("#loadMe").modal({
+                                    backdrop: "static",
+                                    keyboard: false,
+                                    show: true
+                                });
+                            },
+                            1000);
+                    },
+                    success: function(result) {
+                        $.each(result,
+                            function(index, item) {
+                                $('#TransactorTypes').append($('<option></option>').attr('value', item.valueInt)
+                                    .text(item.title));
+                            });
+                        $('#TransactorTypes').selectpicker('refresh');
+                    },
+                    complete: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        $("#loadMe").modal("hide");
+                        setTimeout(function() {
+                                console.log('Checking for open modals');
+                                var isOpen = $('#loadMe').hasClass('show');
+                                if (isOpen) {
+                                    console.log('There is an open Modal');
+                                    $("#loadMe").modal("hide");
+                                } else {
+                                    console.log('No open modal');
+                                }
+                            },
+                            2000);
+                    },
+                    error: function(e) {
+                        console.log(e);
+
+                    }
+                });
+            };
+            var getCompanyList = () => {
+                var timeout;
+                var pageIndex = 1;
+                var uri = '/api/GrKoukInfoApi/GetSelectorCompanies';
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'GET',
+                    url: uri,
+                    beforeSend: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        timeout = setTimeout(function() {
+                                $("#loadMe").modal({
+                                    backdrop: "static",
+                                    keyboard: false,
+                                    show: true
+                                });
+                            },
+                            1000);
+                    },
+                    success: function(result) {
+                        $.each(result,
+                            function(index, item) {
+                                $('#CompaniesList')
+                                    .append($('<option></option>').attr('value', item.value).text(item.title));
+                            });
+                        $('#CompaniesList').selectpicker('refresh');
+                    },
+                    complete: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        $("#loadMe").modal("hide");
+                        setTimeout(function() {
+                                console.log('Checking for open modals');
+                                var isOpen = $('#loadMe').hasClass('show');
+                                if (isOpen) {
+                                    console.log('There is an open Modal');
+                                    $("#loadMe").modal("hide");
+                                } else {
+                                    console.log('No open modal');
+                                }
+                            },
+                            2000);
+                    },
+                    error: function(e) {
+                        console.log(e);
+
+                    }
+                });
+            };
+            var getPaymentsToSuppliersList = (docId,selCompanies, searchFilter, sortData, pageSize,selectionCallback) => {
+                var timeout;
+                let pageIndex = 1;
+                let uri = '/api/GrKoukInfoApi/GetSelectorPaymentsToSuppliersItems';
+                uri += `?`;
+                uri += `pageIndex=${pageIndex}`;
+                uri += `&pageSize=${pageSize}`;
+                uri += `&companyFilter=${selCompanies}`;
+                uri += `&sortData=${sortData}`;
+                uri += `&documentId=${docId}`;
+                uri += `&searchFilter=${searchFilter}`;
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'GET',
+                    url: uri,
+                    beforeSend: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        timeout = setTimeout(function() {
+                                $('#SpinnerLoader').show();
+
+                            },
+                            1000);
+                    },
+                    success: function(result) {
+                        $('#selectorItemsList > tbody').empty();
+                        $('#selectorItemsList > thead').empty();
+                        let colDefs = [
+                            {
+                                sortKey: 'ProductCodeSort',
+                                sortType: 'alpha',
+                                header: 'Code',
+                                text: '',
+                                class: 'small d-none d-md-table-cell'
+                            },
+                            {
+                                sortKey: 'ProductNameSort',
+                                sortType: 'alpha',
+                                header: 'Product',
+                                text: '',
+                                class: 'small'
+                            },
+                            {
+                                sortKey: '',
+                                sortType: '',
+                                header: 'Nature',
+                                text: '',
+                                class: 'small'
+                            },
+                            {
+                                sortKey: 'CompanyNameSort',
+                                sortType: 'alpha',
+                                header: 'Company',
+                                text: '',
+                                class: 'small'
+                            }
+                        ];
+                        let curSortUndefined = false;
+                        let curSortAr = [];
+                        var curSort = getProductSelectorCurrentSort();
+                        if (curSort === undefined || curSort === null || curSort.length === 0) {
+                            curSortUndefined = true;
+                        } else {
+                            curSortAr = curSort.split(':');
+                        }
+                        var $trHead = $('<tr>');
+                        colDefs.forEach(function(item) {
+                            //var $tdColHead = $('<th>').text(item.header).addClass(item.class);
+                            var tdColHead = '';
+                            if (item.sortKey.length !== 0) {
+                                let colHtml = "";
+                                colHtml = `<th class="${item.class}"> `;
+                                colHtml += `<a href="#" role="button" name="SortHeader" tabindex="-1" `;
+                                colHtml += `data-sortkey="${item.sortKey}" data-sorttype="${item.sortType}">  `;
+                                colHtml += `${item.header}  `;
+                                colHtml += `</a>  `;
+                                if (curSortUndefined) {
+                                    colHtml += `<i class="" name="SortIcon"></i>  `;
+                                } else {
+                                    if (curSortAr[0] === item.sortKey) {
+
+                                        var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
+                                        var iconSortType = "fas fa-sort-" + item.sortType + newSortIconType;
+                                        colHtml += `<i class="${iconSortType}" name="SortIcon"></i>  `;
+                                    } else {
+                                        colHtml += `<i class="" name="SortIcon"></i>  `;
+                                    }
+                                }
+
+                                colHtml += `</a>  `;
+                                tdColHead = colHtml;
+                            } else {
+                                tdColHead = $('<th>').text(item.header).addClass(item.class);
+                            }
+                            $trHead.append($(tdColHead));
+                        });
+                        $trHead.append($('<th>'));
+                        $trHead.appendTo('#selectorItemsList > thead');
+
+                        $.each(result.data,
+                            function(index, value) {
+                                //colDefs[0].text = value.url;
+                                colDefs[0].text = value.code;
+                                colDefs[1].text = value.name;
+                                //colDefs[2].text = value.materialCateroryName;
+                                colDefs[2].text = value.warehouseItemNatureName;
+                                colDefs[3].text = value.companyCode;
+                                var itemId = value.id;
+                                // var urlDel = `@Url.Page("./Delete")?id=${itemId}`;
+
+                                var $tr = $('<tr>');
+
+                                colDefs.forEach(function(item) {
+                                    var $tdCol = $('<td>').text(item.text).addClass(item.class);
+                                    $tr.append($tdCol);
+
+                                });
+                                var actionsCol = '<td class="small text-center">';
+                                actionsCol += '<button type="button" class="btn btn-outline-info btn-sm" ';
+                                actionsCol += `data-itemId="${itemId}"`;
+                                actionsCol += 'name="selectItem">';
+                                actionsCol +=
+                                    '<span><i class="far fa-check-square fa-lg" style="color:slategray"></i></span>';
+                                actionsCol += '</button>';
+                                actionsCol += '</td>';
+
+                                $tr.append(actionsCol);
+                                $tr.appendTo('#selectorItemsList > tbody');
+
+                            });
+
+                        //$('[name=selectItem]').on('click',
+                        //    function(event) {
+                        //        var button = $(event.delegateTarget);
+                        //        var productId = button.data('itemid');
+                        //        console.log('Inside click event handler for selectItem');
+                        //        selectionCallback(productId);
+                        //        $('#itemSelector').modal('hide');
+
+                        //    });
+                        $('[name=SortHeader]').on('click',
+                            function(event) {
+                                var button = $(event.delegateTarget);
+                                var reqSort = button.data('sortkey');
+                                let reqSortType = button.data('sorttype');
+                                let iconSortType = '';
+                                var newSortVal = '';
+                                var curSort = getProductSelectorCurrentSort();
+                                if (curSort === undefined || curSort === null || curSort.length === 0) {
+                                    curSort = reqSort + ':desc';
+                                }
+                                var curSortAr = curSort.split(':');
+                                if (curSortAr[0] === reqSort) {
+                                    var newSort = curSortAr[1] === 'asc' ? 'desc' : 'asc';
+                                    var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
+                                    newSortVal = curSortAr[0] + ':' + newSort;
+                                    iconSortType = "fas fa-sort-" + reqSortType + newSortIconType;
+                                } else {
+                                    newSortVal = reqSort + ':asc';
+                                    iconSortType = "fas fa-sort-" + reqSortType + "-up";
+                                }
+                                let $btParent = button.parent();
+                                let $icon = $btParent.find('i:eq(0)');
+                                if ($icon !== null) {
+                                    $icon.removeClass();
+                                    $icon.addClass(iconSortType);
+                                }
+
+                                setProductSelectorCurrentSort(newSortVal);
+                                //$('#pageIndex').val(1);
+                                getProductsSelectorList(selCompanies, selNatures, searchFilter, newSortVal, 1000,productSelected);
+
+
+                            });
+                    },
+                    complete: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        $("#loadMe").modal("hide");
+                        setTimeout(function() {
+                                console.log('Checking for open modals');
+                                //var isOpen = $('#loadMe').hasClass('show');
+                                var isOpen = $('#SpinnerLoader').is(':visible');
+                                if (isOpen) {
+                                    console.log('Spinner is showing');
+
+                                    $('#SpinnerLoader').hide();
+                                } else {
+                                    console.log('No open modal');
+                                }
+                            },
+                            2000);
+                    },
+                    error: function(e) {
+                        console.log(e);
+
+                    }
+                });
+            };
+
+            var getTransactorSelectorList = (selCompanies, selTransTypes, searchFilter, sortData, pageSize,selectionCallback) => {
+                var timeout;
+                var pageIndex = 1;
+                var uri = '/api/GrKoukInfoApi/GetSelectorTransactors';
+                uri += `?pageIndex=${pageIndex}`;
+                uri += `&pageSize=${pageSize}`;
+                uri += `&transactorTypeFilter=${selTransTypes}`;
+                uri += `&sortData=${sortData}`;
+                uri += `&companyFilter=${selCompanies}`;
+                uri += `&searchFilter=${searchFilter}`;
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+
+                    dataType: 'json',
+                    type: 'GET',
+
+                    url: uri,
+                    beforeSend: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        timeout = setTimeout(function() {
+                                $('#SpinnerLoader').show();
+
+                            },
+                            1000);
+                    },
+                    success: function(result) {
+                        $('#selectorItemsList > tbody').empty();
+                        $('#selectorItemsList > thead').empty();
+                        let colDefs = [
+                            {
+                                sortKey: 'TransactorCodeSort',
+                                sortType: 'alpha',
+                                header: 'Code',
+                                text: '',
+                                class: 'small d-none d-md-table-cell'
+                            },
+                            {
+                                sortKey: 'TransactorNameSort',
+                                sortType: 'alpha',
+                                header: 'Transactor',
+                                text: '',
+                                class: 'small'
+                            },
+                            {
+                                sortKey: '',
+                                sortType: '',
+                                header: 'Type',
+                                text: '',
+                                class: 'small'
+                            },
+                            {
+                                sortKey: 'CompanyCodeSort',
+                                sortType: 'alpha',
+                                header: 'Company',
+                                text: '',
+                                class: 'small'
+                            }
+                        ];
+                        let curSortUndefined = false;
+                        let curSortAr = [];
+                        var curSort = getTransactorSelectorCurrentSort();
+                        if (curSort === undefined || curSort === null || curSort.length === 0) {
+                            curSortUndefined = true;
+                        } else {
+                            curSortAr = curSort.split(':');
+                        }
+                        var $trHead = $('<tr>');
+                        colDefs.forEach(function(item) {
+                            var tdColHead = '';
+                            if (item.sortKey.length !== 0) {
+                                let colHtml = "";
+                                colHtml = `<th class="${item.class}"> `;
+                                colHtml += `<a href="#" role="button" name="SortHeader" tabindex="-1" `;
+                                colHtml += `data-sortkey="${item.sortKey}" data-sorttype="${item.sortType}">  `;
+                                colHtml += `${item.header}  `;
+                                colHtml += `</a>  `;
+                                if (curSortUndefined) {
+                                    colHtml += `<i class="" name="SortIcon"></i>  `;
+                                } else {
+                                    if (curSortAr[0] === item.sortKey) {
+
+                                        var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
+                                        var iconSortType = "fas fa-sort-" + item.sortType + newSortIconType;
+                                        colHtml += `<i class="${iconSortType}" name="SortIcon"></i>  `;
+                                    } else {
+                                        colHtml += `<i class="" name="SortIcon"></i>  `;
+                                    }
+                                }
+
+                                colHtml += `</a>  `;
+                                tdColHead = colHtml;
+                            } else {
+                                tdColHead = $('<th>').text(item.header).addClass(item.class);
+                            }
+                            $trHead.append($(tdColHead));
+                        });
+                        $trHead.append($('<th>'));
+                        $trHead.appendTo('#selectorItemsList > thead');
+                        $.each(result.data,
+                            function(index, value) {
+                                //colDefs[0].text = value.url;
+                                colDefs[0].text = value.code;
+                                colDefs[1].text = value.name;
+                                //colDefs[2].text = value.materialCateroryName;
+                                colDefs[2].text = value.transactorTypeName;
+                                colDefs[3].text = value.companyCode;
+                                var itemId = value.id;
+                                // var urlDel = `@Url.Page("./Delete")?id=${itemId}`;
+
+                                var $tr = $('<tr>');
+
+                                colDefs.forEach(function(item) {
+                                    var $tdCol = $('<td>').text(item.text).addClass(item.class);
+                                    $tr.append($tdCol);
+
+                                });
+                                var actionsCol = '<td class="small text-center">';
+                                actionsCol += '<button type="button" class="btn btn-outline-info btn-sm" ';
+                                actionsCol += `data-itemId="${itemId}"`;
+                                actionsCol += 'name="selectItem">';
+                                actionsCol +=
+                                    '<span><i class="far fa-check-square fa-lg" style="color:slategray"></i></span>';
+                                actionsCol += '</button>';
+                                actionsCol += '</td>';
+
+                                $tr.append(actionsCol);
+                                $tr.appendTo('#selectorItemsList > tbody');
+
+                            });
+
+                        $('[name=selectItem]').on('click',
+                            function(event) {
+                                var button = $(event.delegateTarget);
+                                var transactorId = button.data('itemid');
+                                console.log('Inside click event handler for selectItem');
+                               // $('#ItemVm_TransactorId').val(transactorId);
+                                selectionCallback(transactorId);
+                                $('#itemSelector').modal('hide');
+
+                            });
+                         $('[name=SortHeader]').on('click',
+                            function(event) {
+                                var button = $(event.delegateTarget);
+                                var reqSort = button.data('sortkey');
+                                let reqSortType = button.data('sorttype');
+                                let iconSortType = '';
+                                var newSortVal = '';
+                                var curSort = getTransactorSelectorCurrentSort();
+                                if (curSort === undefined || curSort === null || curSort.length === 0) {
+                                    curSort = reqSort + ':desc';
+                                }
+                                var curSortAr = curSort.split(':');
+                                if (curSortAr[0] === reqSort) {
+                                    var newSort = curSortAr[1] === 'asc' ? 'desc' : 'asc';
+                                    var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
+                                    newSortVal = curSortAr[0] + ':' + newSort;
+                                    iconSortType = "fas fa-sort-" + reqSortType + newSortIconType;
+                                } else {
+                                    newSortVal = reqSort + ':asc';
+                                    iconSortType = "fas fa-sort-" + reqSortType + "-up";
+                                }
+                                let $btParent = button.parent();
+                                let $icon = $btParent.find('i:eq(0)');
+                                if ($icon !== null) {
+                                    $icon.removeClass();
+                                    $icon.addClass(iconSortType);
+                                }
+
+                                setTransactorSelectorCurrentSort(newSortVal);
+                                //$('#pageIndex').val(1);
+                                getTransactorSelectorList(selCompanies, selTransTypes, searchFilter, newSortVal, 1000,selectionCallback);
+
+
+                            });
+                    },
+                    complete: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        $("#loadMe").modal("hide");
+                        setTimeout(function() {
+                                console.log('Checking for open modals');
+                                //var isOpen = $('#loadMe').hasClass('show');
+                                var isOpen = $('#SpinnerLoader').is(':visible');
+                                if (isOpen) {
+                                    console.log('Spinner is showing');
+
+                                    $('#SpinnerLoader').hide();
+                                } else {
+                                    console.log('No open modal');
+                                }
+                            },
+                            2000);
+                    },
+                    error: function(e) {
+                        console.log(e);
+
+                    }
+                });
+            };
+            
+            $('#itemSelector').on('shown.bs.modal',
+                function() {
+                    let currentCompany = $('#ItemVm_CompanyId').val();
+                    $('[name=itemsSearchText]').val("");
+                    $('#selectorItemsList > tbody').empty();
+                    $('#selectorItemsList > thead').empty();
+                    // $('#MaterialNatureTypes').selectpicker('deselectall');
+                    // $('#TransactorTypes').selectpicker('deselectall');
+                    var $compList = $('#CompaniesList');
+                    $compList.selectpicker('val', currentCompany);
+                    $compList.selectpicker('render');
+                    var $transList = $('#TransactorTypes');
+
+                    $transList.selectpicker('val', 3);
+                    $transList.selectpicker('render');
+
+                    $('[name=itemsSearchText]').trigger('focus');
+                    //$compList.selectpicker('refresh');
+
+                });
+            $('#itemSelector').on('show.bs.modal',
+                function(event) {
+                    var button = $(event.relatedTarget);
+                    var selectorType = button.data('selectortype');
+                    selectedDocumentId = button.data('docid');
+                    var modal = $(this);
+                    switch (selectorType) {
+                        case "BuyPaymentsSelector":
+                            modal.find('.modal-title').text("Ευρετήριο Πληρωμών σε Προμηθευτή");
+                            $('#TransactorSelectorTypesDiv').hide();
+                            $('#MaterialNatureTypesDiv').show();
+                            curSelectorType = "BuyPaymentsSelector";
+                            getPaymentsToSuppliersList(selectedDocumentId, '', '', '', 100, '');
+                            break;
+                   
+                   
+                    default:
+                    }
+
+
+                    var $compList = $('#CompaniesList');
+                    if ($compList.children('option').length === 0) {
+                        getCompanyList();
+                    }
+                });
+           
+            $('#MaterialNatureTypes').on('changed.bs.select',
+                function(e, clickedIndex, isSelected, previousValue) {
+                    var sel = $('#MaterialNatureTypes option:selected');
+                    var selected = [];
+                    $(sel).each(function(index, item) {
+                        selected.push([$(this).val()]);
+                    });
+
+                    var sItem = selected.toString();
+
+                    selectedNatures = sItem;
+                });
+
+           
+            var timeKey;
+            $('[name=itemsSearchText]').on('keyup',
+                function(event) {
+                    //var button = $(event.relatedTarget);
+
+                    var $this = $(this);
+                    console.log("Inside keyUp event");
+                    //var searchText = $('[name=itemsSearchText]').val();
+                    var searchText = $this.val();
+                    if (searchText.length === 0) {
+                        console.log("search text lenght 0 returning");
+                        return;
+                    }
+                    if (timeKey) {
+                        console.log("Clear timeKey");
+                        clearTimeout(timeKey);
+                    }
+                    timeKey = setTimeout(function() {
+                            console.log("Will execute get request in 1 sec!");
+
+                            switch (curSelectorType) {
+                                case "ProductsSelector":
+                                    var curSort = getProductSelectorCurrentSort();
+                                    if (curSort === undefined || curSort === null || curSort.length === 0) {
+                                        curSort = '';
+                                    }
+                                    //getProductsSelectorList(selectedCompanies, selectedNatures, searchText, curSort, 100,productSelected);
+                                    //getPaymentsToSuppliersList
+                                     break;
+                                case "SuppliersSelector":
+                                    var curSortTrans = getTransactorSelectorCurrentSort();
+                                    if (curSortTrans === undefined || curSortTrans === null || curSortTrans.length === 0) {
+                                        curSortTrans = '';
+                                    }
+                                    getTransactorSelectorList(selectedCompanies, selectedTransTypes, searchText,curSortTrans, 100,transactorSelected);
+                                     break;
+                            default:
+                            }
+
+                            $('#itemSelector').modal('handleUpdate');
+                        },
+                        1000);
+                });
+            const transactorSelected = (transactorId) => {
+               
+            };
+            const productSelected = (productId) => {
+               
+            };
+            //#endregion
             var handleSelectedRowsUi = () => {
                 var $rowSelectors = $('input[name=checkTableRow]');
                 var $checkAllRows = $('input[name=checkAllRows]');
@@ -233,7 +1029,7 @@
                              clearTimeout(timeout);
                          }
                          timeout = setTimeout(function() {
-    
+
                                  $("#loadMe").modal({
                                      backdrop: "static", //remove ability to close modal with click
                                      keyboard: false, //remove option to close with keyboard
@@ -241,13 +1037,13 @@
                                  });
                              },
                              1000);
-    
+
                      },
                      success: function(result) {
                          console.log(result);
                          toastr.success(result.message);
                          refreshTableData();
-    
+
                      },
                      complete: function() {
                          if (timeout) {
@@ -270,9 +1066,9 @@
                          console.log(e);
                          let message=e.responseJSON.errorMessage;
                          toastr.error("Error", message);
-    
+
                      }
-                 });       
+                 });
             };
             const setTableCurrentSort = (currentSort) => {
                 $('#currentSort').val(currentSort);
@@ -497,7 +1293,7 @@
                                     let totalAmount = parseFloat(value.totalAmount);
                                     let payedAmount = parseFloat(value.payedOfAmount);
                                     let outstanding = totalAmount-payedAmount;
-                                    
+
                                     var itemId = value.id;
                                     var urlEdit = `@Url.Page("./Edit")?id=${itemId}`;
                                     var urlInfo = `@Url.Page("./Details")?id=${itemId}`;
@@ -507,11 +1303,11 @@
                                     var urlRecurring = `@Url.Page("/Transactions/RecurringTransactions/Create")?createFromId=${itemId}&createFromType=1`;
 
                                     var actionsCol = '<td class="small text-center d-none d-lg-table-cell">';
-                                   
+
                                     actionsCol += `<a href="${urlEdit}">`;
                                     actionsCol += `<i class="fas fa-edit fa-lg" style="color:slategray"></i>`;
                                     actionsCol += `</a> |`;
-                                    
+
                                     actionsCol += `<a href="${urlInfo}"> `;
                                     actionsCol += `<i class="fas fa-info-circle fa-lg" style="color:slategray"></i>`;
                                     actionsCol += `</a> | `;
@@ -535,7 +1331,8 @@
                                         actionsCol += '<i class="fab fa-amazon-pay fa-lg" style="color:slategray"></i>';
                                         actionsCol += 'Εξόφληση Παραστατικού</a> ';
 
-                                        actionsCol += `<a class="dropdown-item" href="#" name="AssignPayments" data-docid="${itemId}">`;
+                                        actionsCol += `<a class="dropdown-item" href="#" name="AssignPayments" data-docid="${itemId}"`;
+                                        actionsCol += ` data-toggle="modal" data-target="#itemSelector" data-selectorType="BuyPaymentsSelector">`;
                                         actionsCol += '<i class="fas fa-compress-arrows-alt fa-lg" style="color:slategray"></i>';
                                         actionsCol += 'Αντιστοίχιση Πληρωμών</a> ';
                                     }
@@ -959,214 +1756,8 @@
                     $selectedRowsActionsMenu.attr('hidden', 'true');
                 }
             };
-            var saveDocumentPaymentMappings = (docId) => {
-                var $rowSelectors = $('input[name=checkPaymentRow]');
-                var selectedRows = $rowSelectors.filter(':checked');
-                var idsToAssign = [];
-                $.each(selectedRows,
-                    function(key, value) {
-                        console.log(value);
-                        var id = parseInt(value.dataset.itemid);
-                        idsToAssign.push(id);
-                    });
-                if (idsToAssign.length > 0) {
-                    var idsJs = JSON.stringify({
-                        //ToDo: Change this
-                        productId: docId,
-                        mediaIds: idsToAssign
-                    });
-                    var timeout;
-
-                    $.ajax({
-                        contentType: 'application/json; charset=utf-8',
-                        dataType: 'json',
-                        type: 'POST',
-                        data: idsJs,
-                        url: "/api/GrkoukInfoApi/AssignMediaToProduct",
-                        beforeSend: function() {
-                            if (timeout) {
-                                clearTimeout(timeout);
-                            }
-                            timeout = setTimeout(function() {
-
-                                    $("#loadMe").modal({
-                                        backdrop: "static", //remove ability to close modal with click
-                                        keyboard: false, //remove option to close with keyboard
-                                        show: true //Display loader!
-                                    });
-                                },
-                                1000);
-                        },
-                        success: function(result) {
-                            console.log(result);
-                            toastr.success("Assign Media", result.message);
-                            refreshTableData();
-
-                        },
-                        complete: function() {
-                            if (timeout) {
-                                clearTimeout(timeout);
-                            }
-                            $("#loadMe").modal("hide");
-                            setTimeout(function() {
-                                    console.log('Checking for open modals');
-                                    var isOpen = $('#loadMe').hasClass('show');
-                                    if (isOpen) {
-                                        console.log('There is an open Modal');
-                                        $("#loadMe").modal("hide");
-                                    } else {
-                                        console.log('No open modal');
-                                    }
-                                },
-                                2000);
-                        },
-                        error: function(e) {
-                            console.log(e);
-                            toastr.error("Assign Media", e.responseJSON.error);
-                        }
-                    });
-                }
-            };
-            var getProductsSelectorList = (docId, searchFilter, pageSize) => {
-                console.log("Inside getProductsSelectorList");
-                console.log("searchFilter is " + searchFilter);
-
-                var timeout;
-                var pageIndex = 1;
-                var uri = '/api/GrKoukInfoApi/GetIndexTblDataWarehouseItems';
-                uri += `?pageIndex=${pageIndex}`;
-                uri += `&pageSize=${pageSize}`;
-
-                uri += `&searchFilter=${searchFilter}`;
-                $.ajax({
-                    contentType: 'application/json; charset=utf-8',
-
-                    dataType: 'json',
-                    type: 'GET',
-
-                    url: uri,
-                    beforeSend: function() {
-                        if (timeout) {
-                            clearTimeout(timeout);
-                        }
-                        timeout = setTimeout(function() {
-                                $("#loadMe").modal({
-                                    backdrop: "static",
-                                    keyboard: false,
-                                    show: true
-                                });
-                            },
-                            1000);
-                    },
-                    success: function(result) {
-                        $('#productsList > tbody').empty();
-                        $('#productsList > thead').empty();
-                        let colDefs = [
-                            {
-                                header: 'Code',
-                                text: '',
-                                class: 'small d-none d-md-table-cell'
-                            },
-                            {
-                                header: 'Product',
-                                text: '',
-                                class: 'small'
-                            },
-                            {
-                                header: 'Category',
-                                text: '',
-                                class: 'small d-none d-sm-table-cell'
-                            },
-                            {
-                                header: 'Nature',
-                                text: '',
-                                class: 'small'
-                            },
-                            {
-                                header: 'Company',
-                                text: '',
-                                class: 'small'
-                            }
-                        ];
-                        var $trHead = $('<tr>');
-                        colDefs.forEach(function(item) {
-                            var $tdColHead = $('<th>').text(item.header).addClass(item.class);
-                            $trHead.append($tdColHead);
-                        });
-                        $trHead.append($('<th>'));
-                        $trHead.appendTo('#productsList > thead');
-                        $.each(result.data,
-                            function(index, value) {
-                                colDefs[0].text = value.code;
-                                colDefs[1].text = value.name;
-                                colDefs[2].text = value.materialCateroryName;
-                                colDefs[3].text = value.warehouseItemNatureName;
-                                colDefs[4].text = value.companyCode;
-                                var itemId = value.id;
-                                // var urlDel = `@Url.Page("./Delete")?id=${itemId}`;
-
-                                var $tr = $('<tr>');
-
-                                colDefs.forEach(function(item) {
-                                    var $tdCol = $('<td>').text(item.text).addClass(item.class);
-                                    $tr.append($tdCol);
-
-                                });
-                                var actionsCol = '<td class="small text-center">';
-                                actionsCol += '<button type="button" class="btn btn-outline-info btn-sm" ';
-                                actionsCol += `data-itemId="${itemId}"`;
-                                actionsCol += 'name="selectItem">';
-                                actionsCol +=
-                                    '<span><i class="far fa-check-square fa-lg" style="color:slategray"></i></span>';
-                                actionsCol += '</button>';
-                                actionsCol += '</td>';
-
-                                $tr.append(actionsCol);
-                                $tr.appendTo('#productsList > tbody');
-
-                            });
-                        $('[name=selectItem]').on('click',
-                            function(event) {
-                                var button = $(event.delegateTarget);
-                                var productId = button.data('itemid');
-                                console.log('Inside click event handler for selectItem');
-                                if (docId instanceof Array) {
-                                    if (docId.length == 1) {
-                                        assignMediaToProduct(docId[0], productId);
-                                    }
-
-                                    $('#productSelector').modal('hide');
-                                    console.log("Passed array with length " + docId.length);
-
-                                } else {
-                                    console.log("No media selected");
-
-                                }
-                            });
-                    },
-                    complete: function() {
-                        if (timeout) {
-                            clearTimeout(timeout);
-                        }
-                        $("#loadMe").modal("hide");
-                        setTimeout(function() {
-                                console.log('Checking for open modals');
-                                var isOpen = $('#loadMe').hasClass('show');
-                                if (isOpen) {
-                                    console.log('There is an open Modal');
-                                    $("#loadMe").modal("hide");
-                                } else {
-                                    console.log('No open modal');
-                                }
-                            },
-                            2000);
-                    },
-                    error: function(e) {
-                        console.log(e);
-
-                    }
-                });
-            };
+           
+           
             var currencyChanged = () => {
                 let curCurrencySelected = parseInt($('#CurrencySelector').val());
                 var currencyCode;
