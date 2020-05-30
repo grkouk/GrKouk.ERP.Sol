@@ -359,7 +359,27 @@ namespace GrKouk.Web.ERP.Controllers
                         catch (Exception e)
                         {
                             transaction.Rollback();
-                            string msg = e.InnerException.Message;
+                            string msg = e.InnerException?.Message;
+                            return BadRequest(new
+                            {
+                                error = e.Message + " " + msg
+                            });
+                        }
+                        try
+                        {
+                            var payOfTransactionId = _context.Entry(sTransactorTransaction).Entity.Id;
+                            var payOffMapping = new BuyDocTransPaymentMapping()
+                            {
+                                BuyDocumentId = docId,
+                                TransactorTransactionId = payOfTransactionId,
+                                AmountUsed = sTransactorTransaction.AmountNet+sTransactorTransaction.AmountFpa-sTransactorTransaction.AmountDiscount
+                            };
+                            _context.BuyDocTransPaymentMappings.Add(payOffMapping);
+                        }
+                        catch (Exception e)
+                        {
+                            transaction.Rollback();
+                            string msg = e.InnerException?.Message;
                             return BadRequest(new
                             {
                                 error = e.Message + " " + msg
@@ -749,7 +769,27 @@ namespace GrKouk.Web.ERP.Controllers
                         catch (Exception e)
                         {
                             transaction.Rollback();
-                            string msg = e.InnerException.Message;
+                            string msg = e.InnerException?.Message;
+                            return BadRequest(new
+                            {
+                                error = e.Message + " " + msg
+                            });
+                        }
+                        try
+                        {
+                            var payOfTransactionId = _context.Entry(sTransactorTransaction).Entity.Id;
+                            var payOffMapping = new SellDocTransPaymentMapping()
+                            {
+                                SellDocumentId = docId,
+                                TransactorTransactionId = payOfTransactionId,
+                                AmountUsed = sTransactorTransaction.AmountNet+sTransactorTransaction.AmountFpa-sTransactorTransaction.AmountDiscount
+                            };
+                            _context.SellDocTransPaymentMappings.Add(payOffMapping);
+                        }
+                        catch (Exception e)
+                        {
+                            transaction.Rollback();
+                            string msg = e.InnerException?.Message;
                             return BadRequest(new
                             {
                                 error = e.Message + " " + msg
