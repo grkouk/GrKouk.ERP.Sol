@@ -567,19 +567,26 @@
 
                                     var actionsCol = '<td class="small text-center d-none d-lg-table-cell">';
                                    
-                                    actionsCol += `<a href="${urlEdit
-                                        }"><i class="fas fa-edit fa-lg" style="color:slategray"></i></a> |`;
-                                    actionsCol += `<a href="${urlInfo
-                                        }"><i class="fas fa-info-circle fa-lg" style="color:slategray"></i></a> | `;
-                                    actionsCol += `<a href="${urlDel
-                                        }"><i class="fas fa-trash fa-lg" style="color:slategray"></i></a> | `;
-                                    actionsCol += `<a href="${urlNewLikeThis
-                                        }"><i class="fas fa-clone fa-lg" style="color:slategray"></i>|</a> `;
+                                    actionsCol += `<a href="${urlEdit}">`;
+                                    actionsCol += `<i class="fas fa-edit fa-lg" style="color:slategray"></i>`;
+                                    actionsCol += `</a> |`;
+                                    
+                                    actionsCol += `<a href="${urlInfo}"> `;
+                                    actionsCol += `<i class="fas fa-info-circle fa-lg" style="color:slategray"></i>`;
+                                    actionsCol += `</a> | `;
+
+                                    actionsCol += `<a href="${urlDel}"> `;
+                                    actionsCol += `<i class="fas fa-trash fa-lg" style="color:slategray"></i>`;
+                                    actionsCol += `</a> | `;
+
+                                    actionsCol += `<a href="${urlNewLikeThis}">`;
+                                    actionsCol += `<i class="fas fa-clone fa-lg" style="color:slategray"></i> `;
+                                    actionsCol += `</a> |`;
+
                                     actionsCol += '<a class=" dropdown-toggle" role="button" id="dropdownMenuButton"';
                                     actionsCol += 'data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
                                     actionsCol += '<i class="fas fa-bars" style="color:slategray"></i></a>';
-                                    actionsCol +=
-                                        ' <div class="dropdown-menu small" aria-labelledby="dropdownMenuButton">';
+                                    actionsCol += '<div class="dropdown-menu small" aria-labelledby="dropdownMenuButton">';
                                     actionsCol += `<a href="${urlKartela}" class="dropdown-item">Καρτέλα</a>`;
                                     actionsCol += ` <a class="dropdown-item" href="${urlRecurring}" target="_blanc">Δημιουργία Συνδρομής</a>`;
                                     if (outstanding !== 0) {
@@ -1272,7 +1279,7 @@
                 });
             $('.search_icon').on('click',
                            function() {
-                               icon = $(this).find("svg");
+                               let icon = $(this).find("svg");
                                if (icon.hasClass('fa-search')) {
                                    icon.addClass("fa-times").removeClass("fa-search");
                                } else {
