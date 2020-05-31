@@ -2295,6 +2295,7 @@ namespace GrKouk.Web.ERP.Controllers
                     TransFpaAmount = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.TransFpaAmount),
                     TransNetAmount = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.TransNetAmount),
                     TransDiscountAmount = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.TransDiscountAmount),
+                    AmountUsedInPayments = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.BuyDocPaymentMappings.Sum(k=>k.AmountUsed)),
                     CompanyId = p.CompanyId,
                     CompanyCode = p.Company.Code,
                     CompanyCurrencyId = p.Company.CurrencyId
@@ -2359,11 +2360,7 @@ namespace GrKouk.Web.ERP.Controllers
             List<PaymentTransactionDto> listItems;
             try
             {
-                //var pageIndex = request.PageIndex;
-
-                //var pageSize = request.PageSize;
-
-                //listItems = await PagedList<PaymentTransactionDto>.CreateAsync(fullListIq1, pageIndex, pageSize);
+               
                 listItems = await fullListIq1.ToListAsync();
             }
             catch (Exception e)

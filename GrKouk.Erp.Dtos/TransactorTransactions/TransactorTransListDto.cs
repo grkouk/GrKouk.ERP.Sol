@@ -124,7 +124,7 @@ namespace GrKouk.Erp.Dtos.TransactorTransactions
         public decimal TotalNetAmount => TransNetAmount - TransDiscountAmount;
 
         public decimal TotalAmount => TransNetAmount + TransFpaAmount - TransDiscountAmount;
-
+        public decimal AmountUsedInPayments { get; set; }
         
         public int CompanyId { get; set; }  
         

@@ -414,7 +414,7 @@
                                 colDefs[i++].text = moment(value.transDate).format('DD/MM/YYYY');
                                 colDefs[i++].text = value.docSeriesCode;
                                 colDefs[i++].text = formatterCurrency.format(value.totalAmount);
-                                colDefs[i++].text = formatterCurrency.format("0");
+                                colDefs[i++].text = formatterCurrency.format(value.amountUsedInPayments);
                                 //colDefs[i++].text = value.transRefCode;
                                 colDefs[i++].text = value.companyCode;
                                // colDefs[i++].text = formatterCurrency.format(value.totalNetAmount);
