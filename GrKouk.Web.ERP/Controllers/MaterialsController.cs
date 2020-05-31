@@ -1836,8 +1836,8 @@ namespace GrKouk.Web.ERP.Controllers
                             {
                                 BuyDocumentId = docId,
                                 TransactorTransactionId = payOfTransactionId,
-                                AmountUsed = sTransactorTransaction.AmountNet + sTransactorTransaction.AmountFpa -
-                                             sTransactorTransaction.AmountDiscount
+                                AmountUsed = sTransactorTransaction.TransNetAmount + sTransactorTransaction.TransFpaAmount -
+                                             sTransactorTransaction.TransDiscountAmount
                             };
                             _context.BuyDocTransPaymentMappings.Add(payOffMapping);
                         }
