@@ -330,6 +330,7 @@
                                 sortType: 'numeric',
                                 header: 'Date',
                                 text: '',
+                                actualVal:'',
                                 headerClass:'small text-center d-none d-md-table-cell',
                                 class: 'small d-none d-md-table-cell'
                             },
@@ -338,22 +339,25 @@
                                 sortType: 'alpha',
                                 header: 'Doc Series',
                                 text: '',
+                                actualVal:'',
                                 class: 'small'
                             },
                             {
                                
                                 sortKey: '',
-                                sortType: '',
+                                sortType: 'numeric',
                                 header: 'Amount',
                                 text: '',
+                                actualVal:'',
                                 headerClass:'small text-center',
                                 class: 'small text-right '
                             },
                             {
                                 sortKey: '',
-                                sortType: '',
+                                sortType: 'numeric',
                                 header: 'Used Amount',
                                 text: '',
+                                actualVal:'',
                                 headerClass:'small text-center',
                                 class: 'small text-right '
                             },
@@ -362,6 +366,7 @@
                                 sortType: 'alpha',
                                 header: 'Company',
                                 text: '',
+                                actualVal:'',
                                 class: 'small'
                             }
                         ];
@@ -414,12 +419,9 @@
                                 colDefs[i++].text = moment(value.transDate).format('DD/MM/YYYY');
                                 colDefs[i++].text = value.docSeriesCode;
                                 colDefs[i++].text = formatterCurrency.format(value.totalAmount);
+
                                 colDefs[i++].text = formatterCurrency.format(value.amountUsedInPayments);
-                                //colDefs[i++].text = value.transRefCode;
                                 colDefs[i++].text = value.companyCode;
-                               // colDefs[i++].text = formatterCurrency.format(value.totalNetAmount);
-                               
-                                //colDefs[i++].text = formatterCurrency.format(value.payedOfAmount);
                                
                                 var itemId = value.id;
 
@@ -427,6 +429,9 @@
 
                                 colDefs.forEach(function(item) {
                                     var $tdCol = $('<td>').text(item.text).addClass(item.class);
+                                    if (item.) {
+
+                                    }
                                     $tr.append($tdCol);
 
                                 });
@@ -446,6 +451,7 @@
                             function(event) {
                                 var button = $(event.delegateTarget);
                                 var productId = button.data('itemid');
+                                var lineEdit = button.parents('tr').find('td:eq(0)').attr('data-actualValue');
                                 console.log('Inside click event handler for selectItem');
                                 selectionCallback(productId);
                                 $('#itemSelector').modal('hide');
