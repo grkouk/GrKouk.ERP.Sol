@@ -298,7 +298,7 @@ namespace GrKouk.Web.ERP.Controllers
                     {
                         var natures = Array.ConvertAll(docType.SelectedWarehouseItemNatures.Split(","), int.Parse);
                         //var natures = docType.SelectedWarehouseItemNatures;
-                        fullListIq = fullListIq.Where(p => natures.Contains((int) p.WarehouseItemNature));
+                        fullListIq = fullListIq.Where(p => natures.Contains((int)p.WarehouseItemNature));
                     }
                 }
             }
@@ -307,7 +307,7 @@ namespace GrKouk.Web.ERP.Controllers
             fullListIq = fullListIq.Where(p => p.Name.Contains(term) || p.Code.Contains(term));
             var materials = await fullListIq
                 .ProjectTo<WarehouseItemSearchListDto>(_mapper.ConfigurationProvider)
-                .Select(p => new {label = p.Label, value = p.Id}).ToListAsync();
+                .Select(p => new { label = p.Label, value = p.Id }).ToListAsync();
 
             if (materials == null)
             {
@@ -350,7 +350,7 @@ namespace GrKouk.Web.ERP.Controllers
                     {
                         var natures = Array.ConvertAll(docType.SelectedWarehouseItemNatures.Split(","), int.Parse);
                         //var natures = docType.SelectedWarehouseItemNatures;
-                        fullListIq = fullListIq.Where(p => natures.Contains((int) p.WarehouseItemNature));
+                        fullListIq = fullListIq.Where(p => natures.Contains((int)p.WarehouseItemNature));
                     }
                 }
             }
@@ -361,7 +361,7 @@ namespace GrKouk.Web.ERP.Controllers
             //    .Select(p => new { label = p.Label, value = p.Id }).ToListAsync();
             var materials = await fullListIq
                 .ProjectTo<WarehouseItemSearchListDto>(_mapper.ConfigurationProvider)
-                .Select(p => new {label = p.Label, value = p.Id}).ToListAsync();
+                .Select(p => new { label = p.Label, value = p.Id }).ToListAsync();
             if (materials == null)
             {
                 return NotFound();
@@ -376,7 +376,7 @@ namespace GrKouk.Web.ERP.Controllers
             var materials = await _context.WarehouseItems.Where(p =>
                     p.Name.Contains(term) &&
                     p.WarehouseItemNature == WarehouseItemNatureEnum.WarehouseItemNatureService)
-                .Select(p => new {label = p.Name, value = p.Id}).ToListAsync();
+                .Select(p => new { label = p.Name, value = p.Id }).ToListAsync();
 
             if (materials == null)
             {
@@ -392,7 +392,7 @@ namespace GrKouk.Web.ERP.Controllers
             var materials = await _context.WarehouseItems.Where(p =>
                     p.Name.Contains(term) &&
                     p.WarehouseItemNature == WarehouseItemNatureEnum.WarehouseItemNatureExpense)
-                .Select(p => new {label = p.Name, value = p.Id}).ToListAsync();
+                .Select(p => new { label = p.Name, value = p.Id }).ToListAsync();
 
             if (materials == null)
             {
@@ -464,7 +464,7 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
             Debug.Print("******Inside GetFiscal period Returning period id " + fiscalPeriod.Id);
-            return Ok(new {PeriodId = fiscalPeriod.Id});
+            return Ok(new { PeriodId = fiscalPeriod.Id });
         }
 
         [HttpGet("SalesSeriesData")]
@@ -488,7 +488,7 @@ namespace GrKouk.Web.ERP.Controllers
             var usedPrice = salesTypeDef.UsedPrice;
 
             Debug.Print("Inside GetSalesSeriesData Returning usedPrice " + usedPrice.ToString());
-            return Ok(new {UsedPrice = usedPrice});
+            return Ok(new { UsedPrice = usedPrice });
         }
 
         [HttpGet("RecSeriesData")]
@@ -514,7 +514,7 @@ namespace GrKouk.Web.ERP.Controllers
                     var buyTypeDef = buySeriesDef.BuyDocTypeDef;
                     var usedBuyPrice = buyTypeDef.UsedPrice;
                     Debug.Print("Inside GetBuySeriesData Returning usedPrice " + usedBuyPrice.ToString());
-                    return Ok(new {UsedPrice = usedBuyPrice});
+                    return Ok(new { UsedPrice = usedBuyPrice });
                     break;
                 case RecurringDocTypeEnum.SellType:
                     Debug.Print("Inside GetSalesSeriesData " + seriesId.ToString());
@@ -534,7 +534,7 @@ namespace GrKouk.Web.ERP.Controllers
                     var salesTypeDef = salesSeriesDef.SellDocTypeDef;
                     var usedSellPrice = salesTypeDef.UsedPrice;
                     Debug.Print("Inside GetSalesSeriesData Returning usedPrice " + usedSellPrice.ToString());
-                    return Ok(new {UsedPrice = usedSellPrice});
+                    return Ok(new { UsedPrice = usedSellPrice });
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(docType), docType, null);
@@ -563,7 +563,7 @@ namespace GrKouk.Web.ERP.Controllers
             var usedPrice = buyTypeDef.UsedPrice;
 
             Debug.Print("Inside GetBuySeriesData Returning usedPrice " + usedPrice.ToString());
-            return Ok(new {UsedPrice = usedPrice});
+            return Ok(new { UsedPrice = usedPrice });
         }
 
         [HttpGet("WarehouseTransType")]
@@ -611,7 +611,7 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
             Debug.Print("******Inside GetWarehouseTransType Returning Action value " + transType);
-            return Ok(new {TransType = transType});
+            return Ok(new { TransType = transType });
         }
 
         [HttpPost("CreateRecurringDoc")]
@@ -798,9 +798,9 @@ namespace GrKouk.Web.ERP.Controllers
 
                     var docLine = new RecurringTransDocLine();
                     decimal unitPrice = dataBuyDocLine.Price;
-                    decimal units = (decimal) dataBuyDocLine.Q1;
-                    decimal fpaRate = (decimal) dataBuyDocLine.FpaRate;
-                    decimal discountRate = (decimal) dataBuyDocLine.DiscountRate;
+                    decimal units = (decimal)dataBuyDocLine.Q1;
+                    decimal fpaRate = (decimal)dataBuyDocLine.FpaRate;
+                    decimal discountRate = (decimal)dataBuyDocLine.DiscountRate;
                     decimal lineNetAmount = unitPrice * units;
                     decimal lineDiscountAmount = lineNetAmount * discountRate;
                     decimal lineFpaAmount = (lineNetAmount - lineDiscountAmount) * fpaRate;
@@ -1011,9 +1011,9 @@ namespace GrKouk.Web.ERP.Controllers
 
                     var docLine = new RecurringTransDocLine();
                     decimal unitPrice = dataBuyDocLine.Price;
-                    decimal units = (decimal) dataBuyDocLine.Q1;
-                    decimal fpaRate = (decimal) dataBuyDocLine.FpaRate;
-                    decimal discountRate = (decimal) dataBuyDocLine.DiscountRate;
+                    decimal units = (decimal)dataBuyDocLine.Q1;
+                    decimal fpaRate = (decimal)dataBuyDocLine.FpaRate;
+                    decimal discountRate = (decimal)dataBuyDocLine.DiscountRate;
                     decimal lineNetAmount = unitPrice * units;
                     decimal lineDiscountAmount = lineNetAmount * discountRate;
                     decimal lineFpaAmount = (lineNetAmount - lineDiscountAmount) * fpaRate;
@@ -1072,7 +1072,7 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpPost("AddBuyPaymentMapping")]
         public async Task<IActionResult> PostBuyPaymentMapping([FromBody] IdList docIds)
         {
-           
+
             if (docIds == null)
             {
                 return BadRequest(new
@@ -1083,7 +1083,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             var docId = docIds.Ids[0];
             var doc = await _context.BuyDocuments.FindAsync(docId);
-            if (doc ==null)
+            if (doc == null)
             {
                 return BadRequest(new
                 {
@@ -1094,8 +1094,8 @@ namespace GrKouk.Web.ERP.Controllers
                 .Reference(t => t.BuyDocSeries)
                 .LoadAsync();
             var docSeries = doc.BuyDocSeries;
-            if (docSeries.PayoffSeriesId==null || docSeries.PayoffSeriesId==0)
-            {    
+            if (docSeries.PayoffSeriesId == null || docSeries.PayoffSeriesId == 0)
+            {
                 return BadRequest(new
                 {
                     ErrorMessage = "No payoff series defined"
@@ -1103,9 +1103,9 @@ namespace GrKouk.Web.ERP.Controllers
             }
             int payoffSeriesId = (int)docSeries.PayoffSeriesId;
             var payoffSeries = await _context.TransTransactorDocSeriesDefs.FindAsync(payoffSeriesId);
-           
-            if (payoffSeries==null )
-            {    
+
+            if (payoffSeries == null)
+            {
                 return BadRequest(new
                 {
                     ErrorMessage = "Payoff series definition not found"
@@ -1114,8 +1114,8 @@ namespace GrKouk.Web.ERP.Controllers
             await _context.Entry(payoffSeries).Reference(t => t.TransTransactorDocTypeDef)
                 .LoadAsync();
             var payoffSeriesType = payoffSeries.TransTransactorDocTypeDef;
-            if (payoffSeriesType==null )
-            {    
+            if (payoffSeriesType == null)
+            {
                 return BadRequest(new
                 {
                     ErrorMessage = "Payoff series type Definition not found"
@@ -1125,20 +1125,20 @@ namespace GrKouk.Web.ERP.Controllers
                 .Reference(t => t.TransTransactorDef)
                 .LoadAsync();
             var payoffTransactorTransactionDef = payoffSeriesType.TransTransactorDef;
-            
+
             var payoffTransaction = new TransactorTransaction
             {
                 TransDate = DateTime.Today,
                 TransTransactorDocSeriesId = payoffSeriesId,
                 TransTransactorDocTypeId = payoffSeries.TransTransactorDocTypeDefId,
                 TransRefCode = doc.TransRefCode,
-                TransactorId =doc.TransactorId ,
+                TransactorId = doc.TransactorId,
                 SectionId = doc.SectionId,
                 CreatorId = doc.Id,
                 FiscalPeriodId = doc.FiscalPeriodId,
                 AmountFpa = doc.AmountFpa,
                 AmountNet = doc.AmountNet,
-                AmountDiscount =doc.AmountDiscount ,
+                AmountDiscount = doc.AmountDiscount,
                 Etiology = $"Payoff doc {doc.TransRefCode}",
                 CompanyId = doc.CompanyId
             };
@@ -1191,7 +1191,7 @@ namespace GrKouk.Web.ERP.Controllers
                     //     .Append($"</br>Επιτυχής :       {addedCount} εικόνες");
                     //
                     // string message = ms.ToString();
-                    return Ok(new {Message=$"Successfully added mappings"});
+                    return Ok(new { Message = $"Successfully added mappings" });
                 }
                 catch (Exception e)
                 {
@@ -1204,9 +1204,61 @@ namespace GrKouk.Web.ERP.Controllers
                 }
             }
 
-           
-        }
 
+        }
+        [HttpPost("AddBuyPaymentMappingList")]
+        public async Task<IActionResult> AddBuyPaymentMappingList([FromBody] PaymentMappingCreateDto data)
+        {
+            if (data == null)
+            {
+                return BadRequest(new
+                {
+                    error = "Empty request data"
+                });
+            }
+
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+            foreach (var paymentMapping in data.PaymentMappingLines)
+            {
+                var mapping = new BuyDocTransPaymentMapping
+                {
+                    BuyDocumentId = data.DocId,
+                    TransactorTransactionId = paymentMapping.ReceiptId,
+                    AmountUsed = paymentMapping.AmountUsed
+                };
+                try
+                {
+                    await _context.BuyDocTransPaymentMappings.AddAsync(mapping);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    await transaction.RollbackAsync();
+                    return BadRequest(new
+                    {
+                        ErrorMessage = $"Error inserting buy payment mapping {e.Message}"
+                    });
+                }
+            }
+                
+
+            try
+            {
+                var recs = await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return Ok(new { Message = $"Successfully added {recs} mappings" });
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await transaction.RollbackAsync();
+                return BadRequest(new
+                {
+                    ErrorMessage = $"Error updating database {e.Message}"
+                });
+            }
+        }
         [HttpPost("MaterialBuyDoc")]
         public async Task<IActionResult> PostMaterialBuyDoc([FromBody] BuyDocCreateAjaxDto data)
         {
@@ -1275,7 +1327,7 @@ namespace GrKouk.Web.ERP.Controllers
 
                 await _context.Entry(docSeries).Reference(t => t.BuyDocTypeDef).LoadAsync();
                 var docTypeDef = docSeries.BuyDocTypeDef;
-               
+
                 await _context.Entry(docTypeDef)
                     .Reference(t => t.TransTransactorDef)
                     .LoadAsync();
@@ -1514,9 +1566,9 @@ namespace GrKouk.Web.ERP.Controllers
 
                     var buyMaterialLine = new BuyDocLine();
                     decimal unitPrice = dataBuyDocLine.Price;
-                    decimal units = (decimal) dataBuyDocLine.Q1;
-                    decimal fpaRate = (decimal) dataBuyDocLine.FpaRate;
-                    decimal discountRate = (decimal) dataBuyDocLine.DiscountRate;
+                    decimal units = (decimal)dataBuyDocLine.Q1;
+                    decimal fpaRate = (decimal)dataBuyDocLine.FpaRate;
+                    decimal discountRate = (decimal)dataBuyDocLine.DiscountRate;
                     decimal lineNetAmount = unitPrice * units;
                     decimal lineDiscountAmount = lineNetAmount * discountRate;
                     decimal lineFpaAmount = (lineNetAmount - lineDiscountAmount) * fpaRate;
@@ -1561,7 +1613,7 @@ namespace GrKouk.Web.ERP.Controllers
                             CreatorId = transToAttach.Id,
                             TransDate = transToAttach.TransDate,
                             TransRefCode = transToAttach.TransRefCode,
-                            UnitFactor = (decimal) dataBuyDocLine.Factor,
+                            UnitFactor = (decimal)dataBuyDocLine.Factor,
                             TransWarehouseDocSeriesId = warehouseSeriesId,
                             TransWarehouseDocTypeId = warehouseTypeId
                         };
@@ -1900,9 +1952,9 @@ namespace GrKouk.Web.ERP.Controllers
 
                     var warehouseItemLine = new BuyDocLine();
                     decimal unitPrice = dataBuyDocLine.Price;
-                    decimal units = (decimal) dataBuyDocLine.Q1;
-                    decimal fpaRate = (decimal) dataBuyDocLine.FpaRate;
-                    decimal discountRate = (decimal) dataBuyDocLine.DiscountRate;
+                    decimal units = (decimal)dataBuyDocLine.Q1;
+                    decimal fpaRate = (decimal)dataBuyDocLine.FpaRate;
+                    decimal discountRate = (decimal)dataBuyDocLine.DiscountRate;
                     decimal lineNetAmount = unitPrice * units;
                     decimal lineDiscountAmount = lineNetAmount * discountRate;
                     decimal lineFpaAmount = (lineNetAmount - lineDiscountAmount) * fpaRate;
@@ -1960,7 +2012,7 @@ namespace GrKouk.Web.ERP.Controllers
                             CreatorId = transToAttach.Id,
                             TransDate = transToAttach.TransDate,
                             TransRefCode = transToAttach.TransRefCode,
-                            UnitFactor = (decimal) dataBuyDocLine.Factor,
+                            UnitFactor = (decimal)dataBuyDocLine.Factor,
                             TransWarehouseDocSeriesId = warehouseSeriesId,
                             TransWarehouseDocTypeId = warehouseTypeId
                         };
@@ -2323,9 +2375,9 @@ namespace GrKouk.Web.ERP.Controllers
 
                     var sellDocLine = new SellDocLine();
                     decimal unitPrice = docLine.Price;
-                    decimal units = (decimal) docLine.Q1;
-                    decimal fpaRate = (decimal) docLine.FpaRate;
-                    decimal discountRate = (decimal) docLine.DiscountRate;
+                    decimal units = (decimal)docLine.Q1;
+                    decimal fpaRate = (decimal)docLine.FpaRate;
+                    decimal discountRate = (decimal)docLine.DiscountRate;
                     decimal lineNetAmount = unitPrice * units;
                     decimal lineDiscountAmount = lineNetAmount * discountRate;
                     decimal lineFpaAmount = (lineNetAmount - lineDiscountAmount) * fpaRate;
@@ -2370,7 +2422,7 @@ namespace GrKouk.Web.ERP.Controllers
                         warehouseTrans.CreatorId = transToAttach.Id;
                         warehouseTrans.TransDate = transToAttach.TransDate;
                         warehouseTrans.TransRefCode = transToAttach.TransRefCode;
-                        warehouseTrans.UnitFactor = (decimal) docLine.Factor;
+                        warehouseTrans.UnitFactor = (decimal)docLine.Factor;
 
                         warehouseTrans.TransWarehouseDocSeriesId = warehouseSeriesId;
                         warehouseTrans.TransWarehouseDocTypeId = warehouseTypeId;
@@ -2695,9 +2747,9 @@ namespace GrKouk.Web.ERP.Controllers
 
                     var sellDocLine = new SellDocLine();
                     decimal unitPrice = docLine.Price;
-                    decimal units = (decimal) docLine.Q1;
-                    decimal fpaRate = (decimal) docLine.FpaRate;
-                    decimal discountRate = (decimal) docLine.DiscountRate;
+                    decimal units = (decimal)docLine.Q1;
+                    decimal fpaRate = (decimal)docLine.FpaRate;
+                    decimal discountRate = (decimal)docLine.DiscountRate;
                     decimal lineNetAmount = unitPrice * units;
                     decimal lineDiscountAmount = lineNetAmount * discountRate;
                     decimal lineFpaAmount = (lineNetAmount - lineDiscountAmount) * fpaRate;
@@ -2742,7 +2794,7 @@ namespace GrKouk.Web.ERP.Controllers
                             CreatorId = transToAttach.Id,
                             TransDate = transToAttach.TransDate,
                             TransRefCode = transToAttach.TransRefCode,
-                            UnitFactor = (decimal) docLine.Factor,
+                            UnitFactor = (decimal)docLine.Factor,
                             TransWarehouseDocSeriesId = warehouseSeriesId,
                             TransWarehouseDocTypeId = warehouseTypeId
                         };
