@@ -2386,6 +2386,7 @@ namespace GrKouk.Web.ERP.Controllers
                 TotalRecords = listItems.Count,
                 TotalPages = 1,
                 SumOfAmount = ConvertAmount(doc.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, docAmount),
+                SumOfPayedAmount=ConvertAmount(doc.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, coveredAmount),
                 HasPrevious = false,
                 HasNext = false,
                 Data = listItems
