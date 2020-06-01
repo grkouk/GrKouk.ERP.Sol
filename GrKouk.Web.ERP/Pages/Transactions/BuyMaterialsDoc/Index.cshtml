@@ -326,47 +326,58 @@
                         let colDefs = [
 
                             {
+                                key:'transDate',
                                 sortKey: 'TransDateSort',
                                 sortType: 'numeric',
                                 header: 'Date',
                                 text: '',
                                 actualVal:'',
+                                columnFormat:'d',
                                 headerClass:'small text-center d-none d-md-table-cell',
                                 class: 'small d-none d-md-table-cell'
                             },
                             {
+                                key:'docSeriesCode',
                                 sortKey: 'DocSeriesCodeSort',
                                 sortType: 'alpha',
                                 header: 'Doc Series',
                                 text: '',
                                 actualVal:'',
+                                columnFormat:'t',
+                                headerClass: 'small text-center',
                                 class: 'small'
                             },
                             {
-                               
+                                key: 'totalAmount',
                                 sortKey: '',
                                 sortType: 'numeric',
                                 header: 'Amount',
                                 text: '',
                                 actualVal:'',
+                                columnFormat: 'c',
                                 headerClass:'small text-center',
                                 class: 'small text-right '
                             },
                             {
+                                key:'amountUsedInPayments',
                                 sortKey: '',
                                 sortType: 'numeric',
                                 header: 'Used Amount',
                                 text: '',
                                 actualVal:'',
+                                columnFormat:'c',
                                 headerClass:'small text-center',
                                 class: 'small text-right '
                             },
                             {
+                                key:'companyCode',
                                 sortKey: 'CompanyCodeSort',
                                 sortType: 'alpha',
                                 header: 'Company',
                                 text: '',
                                 actualVal:'',
+                                columnFormat: 't',
+                                headerClass: 'small text-center',
                                 class: 'small'
                             }
                         ];
@@ -384,7 +395,7 @@
                             var tdColHead = '';
                             if (item.sortKey.length !== 0) {
                                 let colHtml = "";
-                                colHtml = `<th class="${item.class}"> `;
+                                colHtml = `<th class="${item.headerClass}"> `;
                                 colHtml += `<a href="#" role="button" name="SortHeader" tabindex="-1" `;
                                 colHtml += `data-sortkey="${item.sortKey}" data-sorttype="${item.sortType}">  `;
                                 colHtml += `${item.header}  `;
@@ -415,25 +426,28 @@
                         $('#tocover').text(toCover);
                         $.each(result.data,
                             function(index, value) {
-                                let i=0;
-                                colDefs[i++].text = moment(value.transDate).format('DD/MM/YYYY');
-                                colDefs[i++].text = value.docSeriesCode;
-                                colDefs[i++].text = formatterCurrency.format(value.totalAmount);
-
-                                colDefs[i++].text = formatterCurrency.format(value.amountUsedInPayments);
-                                colDefs[i++].text = value.companyCode;
-                               
                                 var itemId = value.id;
-
                                 var $tr = $('<tr>');
-
-                                colDefs.forEach(function(item) {
-                                    var $tdCol = $('<td>').text(item.text).addClass(item.class);
-                                    if (item.) {
-
+                                colDefs.forEach(function(col) {
+                                    let $tdCol = $('<td>');
+                                    let txt = '';
+                                    
+                                    switch (col.columnFormat) {
+                                    case 't':
+                                        $tdCol.text ( value[col.key]);  
+                                        break;
+                                    case 'd':
+                                        $tdCol.text ( moment(value[col.key]).format('DD/MM/YYYY'));
+                                        break;
+                                    case 'c':
+                                            $tdCol.text ( formatterCurrency.format(value[col.key]));
+                                            $tdCol.attr('data-actualValue', value[col.key]);
+                                        break;
+                                    default:
                                     }
+                                    $tdCol.addClass(col.class);
                                     $tr.append($tdCol);
-
+                                    
                                 });
                                 var actionsCol = '<td class="small text-center">';
                                 actionsCol += '<input type="checkbox"  ';
@@ -451,10 +465,11 @@
                             function(event) {
                                 var button = $(event.delegateTarget);
                                 var productId = button.data('itemid');
-                                var lineEdit = button.parents('tr').find('td:eq(0)').attr('data-actualValue');
+                                var amount = button.parents('tr').find('td:eq(2)').attr('data-actualValue');
+                                var usedAmount = button.parents('tr').find('td:eq(3)').attr('data-actualValue');
                                 console.log('Inside click event handler for selectItem');
-                                selectionCallback(productId);
-                                $('#itemSelector').modal('hide');
+                                //selectionCallback(productId);
+                                //$('#itemSelector').modal('hide');
 
                             });
                         $('[name=SortHeader]').on('click',
