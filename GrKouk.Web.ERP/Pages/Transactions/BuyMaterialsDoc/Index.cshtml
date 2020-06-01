@@ -214,7 +214,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn btn-primary" id="SaveItemSelector">Save changes</button>
             </div>
         </div>
     </div>
@@ -702,7 +702,38 @@
                     },
                     1000);
             });
-        const transactorSelected = (transactorId) => {
+       
+            $('#SaveItemSelector').on('click',
+                function (e) {
+                    console.log('Modal save button clicked');
+                    
+                    var linesArr = [];
+                    linesArr.length = 0;
+
+                    $.each($("#selectorItemsList tbody tr"),
+                        function() {
+                            var checkbox = $(this).find('td:eq(6)').children('input')[0];
+                            var itemId = $(checkbox).attr('data-itemId');
+                            let isChecked = checkbox.checked;
+                            if (isChecked) {
+                                linesArr.push({
+                                    receiptId: itemId,
+                                    amountUsed: $(this).find('td:eq(5)').attr('data-actualValue')
+                                });    
+                            }
+                            
+                        });
+                    var data = JSON.stringify({
+                        docId: selectedDocumentId,
+                        
+                        paymentMappingLines: linesArr
+
+                    });
+
+                   
+                   // $('#itemSelector').modal('hide');
+                });   
+            const transactorSelected = (transactorId) => {
 
         };
         const productSelected = (productId) => {
