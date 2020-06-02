@@ -2356,12 +2356,15 @@ namespace GrKouk.Web.ERP.Controllers
                // );
             }
 
-            //PagedList<PaymentTransactionDto> listItems;
+            var list1 = await fullListIq1.ToListAsync();
+            var list2 = list1.Where(p =>
+                p.TransFpaAmount + p.TransNetAmount - p.TransDiscountAmount - p.AmountUsedInPayments != 0).ToList();
+            
             List<PaymentTransactionDto> listItems;
             try
             {
                
-                listItems = await fullListIq1.ToListAsync();
+                listItems = list2;
             }
             catch (Exception e)
             {
@@ -2380,7 +2383,7 @@ namespace GrKouk.Web.ERP.Controllers
             //get Document uncovered amount
             var coveredAmount = await _context.BuyDocTransPaymentMappings.Where(p => p.BuyDocumentId == doc.Id)
                 .SumAsync(p => p.AmountUsed);
-            decimal docAmount =doc.AmountNet+doc.AmountFpa-doc.AmountDiscount-coveredAmount ;
+            decimal docAmount =doc.AmountNet+doc.AmountFpa-doc.AmountDiscount ;
             var response = new IndexDataTableResponse<PaymentTransactionDto>
             {
                 TotalRecords = listItems.Count,

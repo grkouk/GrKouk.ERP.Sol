@@ -173,15 +173,19 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-md-4 text-center">
+                        <div class="form-group col-md-3 text-center">
+                            <h3 id="docAmount">0</h3>
+                            <span class="text-muted">Doc Amount</span>
+                        </div>
+                        <div class="form-group col-md-3 text-center">
                             <h3 id="tocover">0</h3>
                             <span class="text-muted">To Cover</span>
                         </div>
-                        <div class="form-group col-md-4 text-center" >
+                        <div class="form-group col-md-3 text-center">
                             <h3 id="covered">0</h3>
                             <span class="text-muted">Covered</span>
                         </div>
-                        <div class="form-group col-md-4 text-center">
+                        <div class="form-group col-md-3 text-center">
                             <h3 id="remaining">0</h3>
                             <span class="text-muted">Remaining</span>
                         </div>
@@ -438,20 +442,27 @@
                         });
                         $trHead.append($('<th>'));
                         $trHead.appendTo('#selectorItemsList > thead');
+                        
+                        let docAmount = formatterCurrency.format(result.sumOfAmount);
+                        let docAmountVal = parseFloat(result.sumOfAmount);
+                        let $docAmount = $('#docAmount');
+                        $docAmount.text(docAmount);
+                        $docAmount.attr('data-actualValue', docAmountVal);
 
-                        let toCover = formatterCurrency.format(result.sumOfAmount);
-                        let toCoverVal = parseFloat(result.sumOfAmount);
+                        let covered = formatterCurrency.format(0);
+                        
+                        let $covered = $('#covered');
+                        $covered.text(covered);
+                        $covered.attr('data-actualValue', 0);
+
+                        let coveredVal = parseFloat(result.sumOfPayedAmount);
+                        let toCoverVal = docAmountVal-coveredVal;
+                        let toCover = formatterCurrency.format(toCoverVal);
                         let $toCover = $('#tocover');
                         $toCover.text(toCover);
                         $toCover.attr('data-actualValue', toCoverVal);
 
-                        let covered = formatterCurrency.format(result.sumOfPayedAmount);
-                        let coveredVal = parseFloat(result.sumOfPayedAmount);
-                        let $covered = $('#covered');
-                        $covered.text(covered);
-                        $covered.attr('data-actualValue', coveredVal);
-
-                        let remainingVal = toCoverVal - coveredVal;
+                        let remainingVal = docAmountVal - coveredVal;
                         let remaining = formatterCurrency.format(remainingVal);
                         let $remaining = $('#remaining');
                         $remaining.text(remaining);
@@ -518,14 +529,19 @@
                                 var $reservedAmount = checkInput.parents('tr').find('td:eq(5)');
                                 var reservedAmount = $reservedAmount.attr('data-actualValue');
                                 var reservedAmountVal = parseFloat(reservedAmount);
-                                let availableAmount = amountVal - usedAmountVal;
-
+                                let availableAmount = amountVal - usedAmountVal-reservedAmountVal;
+                                let $docAmount = $('#docAmount');
+                                let docAmountVal = parseFloat($docAmount.attr('data-actualValue'));
+                           
                                 let $toCover = $('#tocover');
                                 let toCoverVal = parseFloat($toCover.attr('data-actualValue'));
+                               
                                 let $covered = $('#covered');
                                 let coveredVal = parseFloat($covered.attr('data-actualValue'));
+                                //let coveredVal = parseFloat('0');
                                 let $remaining = $('#remaining');
-                                let remainingVal = toCoverVal - coveredVal;
+                                //toCoverVal = docAmountVal - coveredVal;
+                                let remainingVal = parseFloat($remaining.attr('data-actualValue'));
                                 if (remainingVal <= 0 && isChecked) {
                                     event.preventDefault();
                                     return;
@@ -535,14 +551,16 @@
                                 }
 
                                 if (isChecked) {
-                                    toCoverVal = toCoverVal - availableAmount;
+                                    //var tcv = toCoverVal;
+                                    //toCoverVal = toCoverVal - availableAmount;
                                     coveredVal = coveredVal + availableAmount;
-                                    remainingVal = remainingVal - availableAmount;
+                                    remainingVal = toCoverVal - coveredVal;
                                     reservedAmountVal = availableAmount;
 
 
                                 } else {
-                                    toCoverVal = toCoverVal + reservedAmountVal;
+                                   // var tcv1 = toCoverVal;
+                                    //toCoverVal = toCoverVal + reservedAmountVal;
                                     coveredVal = coveredVal - reservedAmountVal;
                                     remainingVal = remainingVal + reservedAmountVal;
                                     reservedAmountVal = 0;
@@ -750,6 +768,7 @@
                         .then(function(response) {
                             console.log(response);
                             $('#itemSelector').modal('hide');
+                            refreshTableData();
                         })
                         .fail(function(err) {
                             console.log(err);
