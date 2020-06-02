@@ -234,6 +234,12 @@ namespace GrKouk.Web.ERP.Data
                 entity.HasOne(p => p.Transactor)
                     .WithMany()
                     .OnDelete(DeleteBehavior.Restrict);
+                entity.HasMany(p => p.SalesDocPaymentMappings)
+                    .WithOne(p => p.TransactorTransaction)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasMany(p => p.BuyDocPaymentMappings)
+                    .WithOne(p => p.TransactorTransaction)
+                    .OnDelete(DeleteBehavior.Restrict);
 
             });
             modelBuilder.Entity<TransExpenseDef>(entity =>
@@ -448,12 +454,14 @@ namespace GrKouk.Web.ERP.Data
                     p.TransactorTransactionId
                 })
                     .IsUnique();
-                entity.HasOne(p => p.BuyDocument)
-                    .WithMany()
-                    .OnDelete(DeleteBehavior.Restrict);
+              
                 entity.HasOne(p => p.TransactorTransaction)
-                    .WithMany()
+                    .WithMany(p=>p.BuyDocPaymentMappings)
                     .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(p => p.BuyDocument)
+                    .WithMany(p => p.PaymentMappings)
+                    .OnDelete(DeleteBehavior.Restrict);
+                
             });
            
             modelBuilder.Entity<ProductRecipeLine>(entity =>
@@ -475,15 +483,7 @@ namespace GrKouk.Web.ERP.Data
                     .WithMany()
                     .OnDelete(DeleteBehavior.Restrict);
             });
-            modelBuilder.Entity<BuyDocTransPaymentMapping>(entity =>
-            {
-                entity.HasOne(p => p.BuyDocument)
-                    .WithMany(p => p.PaymentMappings)
-                    .OnDelete(DeleteBehavior.Restrict);
-                entity.HasOne(p => p.TransactorTransaction)
-                    .WithMany()
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
+           
             modelBuilder.Entity<SellDocTransPaymentMapping>(entity =>
             {
                 entity.HasIndex(p => new
@@ -492,23 +492,16 @@ namespace GrKouk.Web.ERP.Data
                         p.TransactorTransactionId
                     })
                     .IsUnique();
-                entity.HasOne(p => p.SellDocument)
-                    .WithMany()
-                    .OnDelete(DeleteBehavior.Restrict);
+               
                 entity.HasOne(p => p.TransactorTransaction)
-                    .WithMany()
+                    .WithMany(p=>p.SalesDocPaymentMappings)
                     .OnDelete(DeleteBehavior.Restrict);
-            });
-            modelBuilder.Entity<SellDocTransPaymentMapping>(entity =>
-            {
                 entity.HasOne(p => p.SellDocument)
                     .WithMany(p => p.PaymentMappings)
                     .OnDelete(DeleteBehavior.Restrict);
-                entity.HasOne(p => p.TransactorTransaction)
-                    .WithMany()
-                    .OnDelete(DeleteBehavior.Restrict);
+               
             });
-
+           
             modelBuilder.Entity<ExchangeRate>(entity =>
             {
                 entity.HasIndex(p => p.ClosingDate);

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace GrKouk.Erp.Dtos.SellDocuments
+namespace GrKouk.Erp.Dtos.BuyDocuments
 {
-    public class SellDocListDto
+    public class BuyDocList2Dto
     {
+        //private ICollection<BuyDocLine> _buyDocLines;
+
         public int Id { get; set; }
 
         [DataType(DataType.Date)]
@@ -22,11 +24,11 @@ namespace GrKouk.Erp.Dtos.SellDocuments
         [Display(Name = "Transactor")]
         public string TransactorName { get; set; }
 
-        public int SellDocSeriesId { get; set; }
+        public int BuyDocSeriesId { get; set; }
         [Display(Name = "Series")]
-        public string SellDocSeriesCode { get; set; }
+        public string BuyDocSeriesCode { get; set; }
         [Display(Name = "Series")]
-        public string SellDocSeriesName { get; set; }
+        public string BuyDocSeriesName { get; set; }
 
         public decimal AmountFpa { get; set; }
         public decimal AmountNet { get; set; }
@@ -42,6 +44,8 @@ namespace GrKouk.Erp.Dtos.SellDocuments
         [Display(Name = "Company")]
         public string CompanyCode { get; set; }
         public int CompanyCurrencyId { get; set; }
-        public int SalesChannelId { get; set; }
+        public decimal PayedOfAmount { get; set; }
+
+        public decimal UncoveredAmount => PayedOfAmount - TotalAmount;
     }
 }

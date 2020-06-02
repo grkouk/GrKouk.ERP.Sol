@@ -2,14 +2,16 @@
 @model IndexModel
 
 @{
-    ViewData["Title"] = "Παραστατικά Αγορών";
+    ViewData["Title"] = "Παραστατικά Αγορών/Εξόδων";
 }
 @section MyCss
 {
     <link rel="stylesheet" href="~/css/custom-checkbox.css" />
     <link rel="stylesheet" href="~/css/searchbar.css" />
+    <link rel="stylesheet" href="~/css/search-modal.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-select/css/bootstrap-select.min.css" />
 }
-<h4>Λίστα Αγορές Υλικών</h4>
+<h4>Λίστα Αγορών/Εξόδων</h4>
 
 
 <div class="container ">
@@ -94,12 +96,9 @@
 <br />
 <table class="table table-bordered table-sm m-0" id="myTable">
     <thead class="thead-light">
-    
+
     </thead>
     <tbody>
-
-     
-
     </tbody>
 </table>
 <div class="row">
@@ -142,65 +141,6 @@
         </nav>
     </div>
 </div>
-<!-- Modal product selector -->
-<div class="modal fade" id="productSelector" tabindex="-1" role="dialog" aria-labelledby="productModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" style="overflow-y: scroll; max-height:85%;  margin-top: 50px; margin-bottom:50px;" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="container-fluid">
-                    <div class="form-row">
-                        <div class="col-6">
-                            <p class="modal-title font-weight-bold" id="productModalLabel">Products</p>
-                        </div>
-                        <div class="col-6 text-right">
-
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="col-10">
-                            @*<form class="form-inline">
-                            *@
-                            <input class="form-control form-control-sm" name="productSearchText" placeholder="Search text" type="text" />
-                            @*
-                                </form>*@
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-            <div class="modal-body ">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-12">
-                            <table class="table table-bordered table-sm" id="productsList">
-                                <thead class="thead-light">
-                                    <tr>
-                                        <th class="small">
-                                            Product
-                                        </th>
-                                        <th class="small">
-                                            col 2
-                                        </th>
-                                        <th></th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Modal -->
 <div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
@@ -215,8 +155,77 @@
         </div>
     </div>
 </div>
+<!-- Modal Item selector for payments -->
+<div class="modal fade" id="itemSelector" tabindex="-1" role="dialog" aria-labelledby="itemsModalLabel" aria-hidden="true" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="overflow-y: scroll; max-height:75%;  margin-top: 50px; margin-bottom:50px;" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="container-fluid">
+                    <div class="form-row mb-1">
+                        <div class="col-6">
+                            <p class="modal-title font-weight-bold" id="itemsModalLabel">Selector</p>
+                        </div>
+                        <div class="col-6 text-right">
+
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-3 text-center">
+                            <h3 id="docAmount">0</h3>
+                            <span class="text-muted">Doc Amount</span>
+                        </div>
+                        <div class="form-group col-md-3 text-center">
+                            <h3 id="tocover">0</h3>
+                            <span class="text-muted">To Cover</span>
+                        </div>
+                        <div class="form-group col-md-3 text-center">
+                            <h3 id="covered">0</h3>
+                            <span class="text-muted">Covered</span>
+                        </div>
+                        <div class="form-group col-md-3 text-center">
+                            <h3 id="remaining">0</h3>
+                            <span class="text-muted">Remaining</span>
+                        </div>
+                    </div>
+                    <div class="form-row text-center">
+                        <div class="col-11">
+                            <input class="form-control form-control-sm" name="itemsSearchText" placeholder="Search text" type="text" />
+
+                        </div>
+                        <div class="col-1">
+                            <span class="spinner-border spinner-border-sm text-primary" id="SpinnerLoader" style="display: none"></span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body ">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <table class="table table-bordered table-sm" id="selectorItemsList">
+                                <thead class="thead-light">
+                                    
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="SaveItemSelector">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts
 {
+    <script src="~/lib/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script src="~/js/moment.min.js"></script>
     <script>
         $(document).ready(function() {
@@ -254,7 +263,528 @@
             var reallyIsNaN = function(x) {
                 return x !== x;
             };
+            //#region items selectors modals
+            $.fn.selectpicker.Constructor.BootstrapVersion = '4';
+            var selectedCompanies = "";
+            var selectedNatures = "";
+            var selectedTransTypes = "";
+            var curSelectorType = "";
+            let selectedDocumentId = 0;
 
+            const setPaymentToSupplierSelectorCurrentSort = (currentSort) => {
+                var filtersArr = [];
+                filtersArr.push({
+                    filterKey: 'currentSort',
+                    filterValue: currentSort
+                });
+                let sessionVal = JSON.stringify(filtersArr);
+
+                localStorage.setItem('PaymentToSupplierSelectorStore', sessionVal);
+            };
+            const getPaymentToSupplierSelectorCurrentSort = () => {
+                var storageItemJs = localStorage.getItem('PaymentToSupplierSelectorStore');
+                if (storageItemJs === undefined || storageItemJs === null) {
+                    return "";
+                } else {
+
+                    var storageItem = JSON.parse(storageItemJs);
+                    try {
+                        let filtersValue = storageItem.find(x => x.filterKey === 'currentSort').filterValue;
+                        return filtersValue;
+                    } catch (e) {
+                        return "";
+                    }
+                }
+            };
+
+            var getPaymentsToSuppliersList = (docId, selCompanies, searchFilter, sortData, pageSize, displayCurrencyId, selectionCallback) => {
+                var timeout;
+                let pageIndex = 1;
+                let uri = '/api/GrKoukInfoApi/GetSelectorPaymentsToSuppliersItems';
+                uri += `?`;
+                uri += `pageIndex=${pageIndex}`;
+                uri += `&pageSize=${pageSize}`;
+                uri += `&companyFilter=${selCompanies}`;
+                uri += `&sortData=${sortData}`;
+                uri += `&documentId=${docId}`;
+                uri += `&searchFilter=${searchFilter}`;
+                uri += `&displayCurrencyId=${displayCurrencyId}`;
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'GET',
+                    url: uri,
+                    beforeSend: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        timeout = setTimeout(function() {
+                                $('#SpinnerLoader').show();
+
+                            },
+                            1000);
+                    },
+                    success: function(result) {
+                        $('#selectorItemsList > tbody').empty();
+                        $('#selectorItemsList > thead').empty();
+                        let colDefs = [
+                            {
+                                key: 'transDate',
+                                responseKey: 'transDate',
+                                sortKey: 'TransDateSort',
+                                sortType: 'numeric',
+                                header: 'Date',
+                                text: '',
+                                actualVal: '',
+                                columnFormat: 'd',
+                                headerClass: 'small text-center d-none d-md-table-cell',
+                                class: 'small d-none d-md-table-cell'
+                            },
+                            {
+                                key: 'docSeriesCode',
+                                responseKey: 'docSeriesCode',
+                                sortKey: 'DocSeriesCodeSort',
+                                sortType: 'alpha',
+                                header: 'Doc Series',
+                                text: '',
+                                actualVal: '',
+                                columnFormat: 't',
+                                headerClass: 'small text-center',
+                                class: 'small'
+                            },
+                            {
+                                key: 'totalAmount',
+                                responseKey: 'totalAmount',
+                                sortKey: '',
+                                sortType: 'numeric',
+                                header: 'Amount',
+                                text: '',
+                                actualVal: '',
+                                columnFormat: 'c',
+                                headerClass: 'small text-center',
+                                class: 'small text-right '
+                            },
+                            {
+                                key: 'amountUsedInPayments',
+                                responseKey: 'amountUsedInPayments',
+                                sortKey: '',
+                                sortType: 'numeric',
+                                header: 'Already Used Amount',
+                                text: '',
+                                actualVal: '',
+                                columnFormat: 'c',
+                                headerClass: 'small text-center',
+                                class: 'small text-right '
+                            },
+                            {
+                                key: 'companyCode',
+                                responseKey: 'companyCode',
+                                sortKey: 'CompanyCodeSort',
+                                sortType: 'alpha',
+                                header: 'Company',
+                                text: '',
+                                actualVal: '',
+                                columnFormat: 't',
+                                headerClass: 'small text-center',
+                                class: 'small'
+                            },
+                            {
+                                key: 'amountReserved',
+                                responseKey: '',
+                                sortKey: '',
+                                sortType: 'numeric',
+                                header: 'Reserved Amount',
+                                text: '',
+                                actualVal: '',
+                                columnFormat: 'c',
+                                headerClass: 'small text-center',
+                                class: 'small text-right text-primary'
+                            }
+                        ];
+                        let curSortUndefined = false;
+                        let curSortAr = [];
+                        var curSort = getPaymentToSupplierSelectorCurrentSort();
+                        if (curSort === undefined || curSort === null || curSort.length === 0) {
+                            curSortUndefined = true;
+                        } else {
+                            curSortAr = curSort.split(':');
+                        }
+                        var $trHead = $('<tr>');
+                        colDefs.forEach(function(item) {
+                            //var $tdColHead = $('<th>').text(item.header).addClass(item.class);
+                            var tdColHead = '';
+                            if (item.sortKey.length !== 0) {
+                                let colHtml = "";
+                                colHtml = `<th class="${item.headerClass}"> `;
+                                colHtml += `<a href="#" role="button" name="SortHeader" tabindex="-1" `;
+                                colHtml += `data-sortkey="${item.sortKey}" data-sorttype="${item.sortType}">  `;
+                                colHtml += `${item.header}  `;
+                                colHtml += `</a>  `;
+                                if (curSortUndefined) {
+                                    colHtml += `<i class="" name="SortIcon"></i>  `;
+                                } else {
+                                    if (curSortAr[0] === item.sortKey) {
+
+                                        var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
+                                        var iconSortType = "fas fa-sort-" + item.sortType + newSortIconType;
+                                        colHtml += `<i class="${iconSortType}" name="SortIcon"></i>  `;
+                                    } else {
+                                        colHtml += `<i class="" name="SortIcon"></i>  `;
+                                    }
+                                }
+
+                                colHtml += `</a>  `;
+                                tdColHead = colHtml;
+                            } else {
+                                tdColHead = $('<th>').text(item.header).addClass(item.headerClass);
+                            }
+                            $trHead.append($(tdColHead));
+                        });
+                        $trHead.append($('<th>'));
+                        $trHead.appendTo('#selectorItemsList > thead');
+                        
+                        let docAmount = formatterCurrency.format(result.sumOfAmount);
+                        let docAmountVal = parseFloat(result.sumOfAmount);
+                        let $docAmount = $('#docAmount');
+                        $docAmount.text(docAmount);
+                        $docAmount.attr('data-actualValue', docAmountVal);
+
+                        let covered = formatterCurrency.format(0);
+                        
+                        let $covered = $('#covered');
+                        $covered.text(covered);
+                        $covered.attr('data-actualValue', 0);
+
+                        let coveredVal = parseFloat(result.sumOfPayedAmount);
+                        let toCoverVal = docAmountVal-coveredVal;
+                        let toCover = formatterCurrency.format(toCoverVal);
+                        let $toCover = $('#tocover');
+                        $toCover.text(toCover);
+                        $toCover.attr('data-actualValue', toCoverVal);
+
+                        let remainingVal = docAmountVal - coveredVal;
+                        let remaining = formatterCurrency.format(remainingVal);
+                        let $remaining = $('#remaining');
+                        $remaining.text(remaining);
+                        $remaining.attr('data-actualValue', remainingVal);
+
+                        $.each(result.data,
+                            function(index, value) {
+                                var itemId = value.id;
+                                var $tr = $('<tr>');
+                                colDefs.forEach(function(col) {
+
+                                    let $tdCol = $('<td>');
+                                    if (col.responseKey) {
+                                        switch (col.columnFormat) {
+                                        case 't':
+                                            $tdCol.text(value[col.responseKey]);
+                                            break;
+                                        case 'd':
+                                            $tdCol.text(moment(value[col.responseKey]).format('DD/MM/YYYY'));
+                                            break;
+                                        case 'c':
+                                            $tdCol.text(formatterCurrency.format(value[col.responseKey]));
+                                            $tdCol.attr('data-actualValue', value[col.responseKey]);
+                                            break;
+                                        default:
+                                        }
+                                    } else {
+                                        switch (col.columnFormat) {
+                                        case 't':
+                                            break;
+                                        case 'd':
+                                            break;
+                                        case 'c':
+                                            $tdCol.attr('data-actualValue', 0);
+                                            break;
+                                        default:
+                                        }
+                                    }
+                                    $tdCol.addClass(col.class);
+                                    $tr.append($tdCol);
+
+                                });
+                                var actionsCol = '<td class="small text-center">';
+                                actionsCol += '<input type="checkbox"  ';
+                                actionsCol += `data-itemId="${itemId}"`;
+                                actionsCol += 'name="selectItem"/>';
+                                //actionsCol +='<span><i class="far fa-check-square fa-lg" style="color:slategray"></i></span>';
+                                actionsCol += '</td>';
+
+                                $tr.append(actionsCol);
+                                $tr.appendTo('#selectorItemsList > tbody');
+
+                            });
+
+                        $('[name=selectItem]').on('click',
+                            function(event) {
+                                var checkInput = $(event.delegateTarget);
+                                var itemId = checkInput.data('itemid');
+                                let isChecked = checkInput.prop('checked');
+                                var amount = checkInput.parents('tr').find('td:eq(2)').attr('data-actualValue');
+                                var amountVal = parseFloat(amount);
+                                var usedAmount = checkInput.parents('tr').find('td:eq(3)').attr('data-actualValue');
+                                var usedAmountVal = parseFloat(usedAmount);
+                                var $reservedAmount = checkInput.parents('tr').find('td:eq(5)');
+                                var reservedAmount = $reservedAmount.attr('data-actualValue');
+                                var reservedAmountVal = parseFloat(reservedAmount);
+                                let availableAmount = amountVal - usedAmountVal-reservedAmountVal;
+                                let $docAmount = $('#docAmount');
+                                let docAmountVal = parseFloat($docAmount.attr('data-actualValue'));
+                           
+                                let $toCover = $('#tocover');
+                                let toCoverVal = parseFloat($toCover.attr('data-actualValue'));
+                               
+                                let $covered = $('#covered');
+                                let coveredVal = parseFloat($covered.attr('data-actualValue'));
+                                //let coveredVal = parseFloat('0');
+                                let $remaining = $('#remaining');
+                                //toCoverVal = docAmountVal - coveredVal;
+                                let remainingVal = parseFloat($remaining.attr('data-actualValue'));
+                                if (remainingVal <= 0 && isChecked) {
+                                    event.preventDefault();
+                                    return;
+                                }
+                                if (availableAmount > toCoverVal && isChecked) {
+                                    availableAmount = toCoverVal;
+                                }
+
+                                if (isChecked) {
+                                    //var tcv = toCoverVal;
+                                    //toCoverVal = toCoverVal - availableAmount;
+                                    coveredVal = coveredVal + availableAmount;
+                                    remainingVal = toCoverVal - coveredVal;
+                                    reservedAmountVal = availableAmount;
+
+
+                                } else {
+                                   // var tcv1 = toCoverVal;
+                                    //toCoverVal = toCoverVal + reservedAmountVal;
+                                    coveredVal = coveredVal - reservedAmountVal;
+                                    remainingVal = remainingVal + reservedAmountVal;
+                                    reservedAmountVal = 0;
+                                }
+                                $toCover.attr('data-actualValue', toCoverVal);
+                                $covered.attr('data-actualValue', coveredVal);
+                                $remaining.attr('data-actualValue', remainingVal);
+                                $reservedAmount.attr('data-actualValue', reservedAmountVal);
+                                $reservedAmount.text(formatterCurrency.format(reservedAmountVal));
+
+                                let toCover = formatterCurrency.format(toCoverVal);
+                                $toCover.text(toCover);
+                                let covered = formatterCurrency.format(coveredVal);
+                                $covered.text(covered);
+                                let remaining = formatterCurrency.format(remainingVal);
+                                $remaining.text(remaining);
+                                console.log('Inside click event handler for selectItem');
+
+                                //selectionCallback(productId);
+                                //$('#itemSelector').modal('hide');
+
+                            });
+                        $('[name=SortHeader]').on('click',
+                            function(event) {
+                                var button = $(event.delegateTarget);
+                                var reqSort = button.data('sortkey');
+                                let reqSortType = button.data('sorttype');
+                                let iconSortType = '';
+                                var newSortVal = '';
+                                var curSort = getPaymentToSupplierSelectorCurrentSort();
+                                if (curSort === undefined || curSort === null || curSort.length === 0) {
+                                    curSort = reqSort + ':desc';
+                                }
+                                var curSortAr = curSort.split(':');
+                                if (curSortAr[0] === reqSort) {
+                                    var newSort = curSortAr[1] === 'asc' ? 'desc' : 'asc';
+                                    var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
+                                    newSortVal = curSortAr[0] + ':' + newSort;
+                                    iconSortType = "fas fa-sort-" + reqSortType + newSortIconType;
+                                } else {
+                                    newSortVal = reqSort + ':asc';
+                                    iconSortType = "fas fa-sort-" + reqSortType + "-up";
+                                }
+                                let $btParent = button.parent();
+                                let $icon = $btParent.find('i:eq(0)');
+                                if ($icon !== null) {
+                                    $icon.removeClass();
+                                    $icon.addClass(iconSortType);
+                                }
+
+                                setPaymentToSupplierSelectorCurrentSort(newSortVal);
+                                //$('#pageIndex').val(1);
+                                var $dcId = $('#CurrencySelector');
+
+                                var displayCurrencyId = $dcId.val() == null || $dcId.val().length == 0
+                                    ? 1
+                                    : parseInt($dcId.val());
+                                getPaymentsToSuppliersList(selectedDocumentId, '', '', newSortVal, 100, displayCurrencyId, '');
+
+
+                            });
+                    },
+                    complete:
+                        function() {
+                            if (timeout) {
+                                clearTimeout(timeout);
+                            }
+                            $("#loadMe").modal("hide");
+                            setTimeout(function() {
+                                    console.log('Checking for open modals');
+                                    //var isOpen = $('#loadMe').hasClass('show');
+                                    var isOpen = $('#SpinnerLoader').is(':visible');
+                                    if (isOpen) {
+                                        console.log('Spinner is showing');
+
+                                        $('#SpinnerLoader').hide();
+                                    } else {
+                                        console.log('No open modal');
+                                    }
+                                },
+                                2000);
+                        },
+                    error: function(e) {
+                        console.log(e);
+
+                    }
+                });
+            };
+
+            $('#itemSelector').on('show.bs.modal',
+                function(event) {
+                    var button = $(event.relatedTarget);
+                    var selectorType = button.data('selectortype');
+                    selectedDocumentId = button.data('docid');
+                    var modal = $(this);
+                    var $dcId = $('#CurrencySelector');
+
+                    var displayCurrencyId = $dcId.val() == null || $dcId.val().length == 0
+                        ? 1
+                        : parseInt($dcId.val());
+                    switch (selectorType) {
+                    case "BuyPaymentsSelector":
+                        modal.find('.modal-title').text("Ευρετήριο Πληρωμών σε Προμηθευτή");
+
+                        curSelectorType = "BuyPaymentsSelector";
+                        getPaymentsToSuppliersList(selectedDocumentId, '', '', '', 100, displayCurrencyId, '');
+                        break;
+
+
+                    default:
+                    }
+
+                });
+
+
+            var timeKey;
+            $('[name=itemsSearchText]').on('keyup',
+                function(event) {
+                    //var button = $(event.relatedTarget);
+
+                    var $this = $(this);
+                    console.log("Inside keyUp event");
+                    //var searchText = $('[name=itemsSearchText]').val();
+                    var searchText = $this.val();
+                    if (searchText.length === 0) {
+                        console.log("search text lenght 0 returning");
+                        return;
+                    }
+                    if (timeKey) {
+                        console.log("Clear timeKey");
+                        clearTimeout(timeKey);
+                    }
+                    timeKey = setTimeout(function() {
+                            console.log("Will execute get request in 1 sec!");
+
+                            switch (curSelectorType) {
+                            case "ProductsSelector":
+                                //var curSort = getProductSelectorCurrentSort();
+                                //if (curSort === undefined || curSort === null || curSort.length === 0) {
+                                //    curSort = '';
+                                //}
+                                //getProductsSelectorList(selectedCompanies, selectedNatures, searchText, curSort, 100,productSelected);
+                                //getPaymentsToSuppliersList
+                                break;
+                            case "SuppliersSelector":
+                                //var curSortTrans = getTransactorSelectorCurrentSort();
+                                //if (curSortTrans === undefined || curSortTrans === null || curSortTrans.length === 0) {
+                                //    curSortTrans = '';
+                                //}
+                                //getTransactorSelectorList(selectedCompanies, selectedTransTypes, searchText,curSortTrans, 100,transactorSelected);
+                                break;
+                            default:
+                            }
+
+                            $('#itemSelector').modal('handleUpdate');
+                        },
+                        1000);
+                });
+            const saveMappings = (data) => {
+                return $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'POST',
+                    url: "/api/Materials/AddBuyPaymentMappingList",
+                    data: data,
+                    
+                    success: function(result) {
+                        toastr.success("Saved Mappings", "Saved Mappings");
+                    },
+                    error: function(e) {
+                        console.log('Error saving ');
+                        console.log(e);
+                        var r = e.responseJSON.error;
+                        toastr.error(r, "saveData");
+                    }
+                });
+            };
+            $('#SaveItemSelector').on('click',
+                function(e) {
+                    console.log('Modal save button clicked');
+
+                    var linesArr = [];
+                    linesArr.length = 0;
+
+                    $.each($("#selectorItemsList tbody tr"),
+                        function() {
+                            var checkbox = $(this).find('td:eq(6)').children('input')[0];
+                            var itemId = $(checkbox).attr('data-itemId');
+                            let isChecked = checkbox.checked;
+                            if (isChecked) {
+                                linesArr.push({
+                                    receiptId: itemId,
+                                    amountUsed: $(this).find('td:eq(5)').attr('data-actualValue')
+                                });
+                            }
+
+                        });
+                    var data = JSON.stringify({
+                        docId: selectedDocumentId,
+
+                        paymentMappingLines: linesArr
+
+                    });
+                    $.when(saveMappings(data))
+                        .then(function(response) {
+                            console.log(response);
+                            $('#itemSelector').modal('hide');
+                            refreshTableData();
+                        })
+                        .fail(function(err) {
+                            console.log(err);
+                           //toastr.error(e.toString(), "when SaveData");
+                        });
+
+                    
+                });
+           
+            const transactorSelected = (transactorId) => {
+
+            };
+            const productSelected = (productId) => {
+
+            };
+            //#endregion
             var handleSelectedRowsUi = () => {
                 var $rowSelectors = $('input[name=checkTableRow]');
                 var $checkAllRows = $('input[name=checkAllRows]');
@@ -272,6 +802,66 @@
                 } else {
                     $checkAllRows.prop('checked', false);
                 }
+            };
+            const payOfDocument = (docId) => {
+                var timeout;
+                let idsToHandle = [];
+                let id = parseInt(docId);
+                idsToHandle.push(id);
+                var dataJs = JSON.stringify({
+                    ids: idsToHandle
+                });
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'POST',
+                    data: dataJs,
+                    url: "/api/materials/AddBuyPaymentMapping",
+                    beforeSend: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        timeout = setTimeout(function() {
+
+                                $("#loadMe").modal({
+                                    backdrop: "static", //remove ability to close modal with click
+                                    keyboard: false, //remove option to close with keyboard
+                                    show: true //Display loader!
+                                });
+                            },
+                            1000);
+
+                    },
+                    success: function(result) {
+                        console.log(result);
+                        toastr.success(result.message);
+                        refreshTableData();
+
+                    },
+                    complete: function() {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        $("#loadMe").modal("hide");
+                        setTimeout(function() {
+                                console.log('Checking for open modals');
+                                var isOpen = $('#loadMe').hasClass('show');
+                                if (isOpen) {
+                                    console.log('There is an open Modal');
+                                    $("#loadMe").modal("hide");
+                                } else {
+                                    console.log('No open modal');
+                                }
+                            },
+                            2000);
+                    },
+                    error: function(e) {
+                        console.log(e);
+                        let message = e.responseJSON.errorMessage;
+                        toastr.error("Error", message);
+
+                    }
+                });
             };
             const setTableCurrentSort = (currentSort) => {
                 $('#currentSort').val(currentSort);
@@ -303,7 +893,7 @@
                     $('#GoToLast, #GoToNext').parent().addClass('disabled');
                 }
             };
-            var getTableData =
+            const getTableData =
                 (pageIndex, pageSize, sortData, dateRange, companyFilter, searchFilter, displayCurrencyId) => {
                     //#region getTableData
                     var timeout;
@@ -355,7 +945,7 @@
                                     sortType: 'numeric',
                                     header: 'Date',
                                     text: '',
-                                    headerClass:'small text-center d-none d-md-table-cell',
+                                    headerClass: 'small text-center d-none d-md-table-cell',
                                     class: 'small d-none d-md-table-cell'
                                 },
                                 {
@@ -366,7 +956,7 @@
                                     sortType: 'alpha',
                                     header: 'Transactor',
                                     text: '',
-                                    headerClass:'small text-center',
+                                    headerClass: 'small text-center',
                                     class: 'small'
                                 },
                                 {
@@ -377,7 +967,7 @@
                                     sortType: 'alpha',
                                     header: 'Series',
                                     text: '',
-                                    headerClass:'small text-center d-none d-md-table-cell',
+                                    headerClass: 'small text-center d-none d-md-table-cell',
                                     class: 'small d-none d-md-table-cell '
                                 },
                                 {
@@ -388,7 +978,7 @@
                                     sortType: '',
                                     header: 'Ref Number',
                                     text: '',
-                                    headerClass:'small text-center d-none d-md-table-cell',
+                                    headerClass: 'small text-center d-none d-md-table-cell',
                                     class: 'small d-none d-md-table-cell '
                                 },
                                 {
@@ -399,7 +989,7 @@
                                     sortType: 'alpha',
                                     header: 'Company',
                                     text: '',
-                                    headerClass:'small text-center',
+                                    headerClass: 'small text-center',
                                     class: 'small '
                                 },
                                 {
@@ -421,7 +1011,18 @@
                                     sortType: '',
                                     header: 'Amount',
                                     text: '',
-                                    headerClass:'small text-center',
+                                    headerClass: 'small text-center',
+                                    class: 'small text-right '
+                                },
+                                {
+                                    totalKey: 'sumOfPayedAmount',
+                                    grandTotalKey: 'grandSumOfPayedAmount',
+                                    totalFormatter: 'currency',
+                                    sortKey: '',
+                                    sortType: '',
+                                    header: 'Payed Amount',
+                                    text: '',
+                                    headerClass: 'small text-center',
                                     class: 'small text-right '
                                 }
                             ];
@@ -472,8 +1073,8 @@
                             $trHead.appendTo('#myTable > thead');
 
                             $.each(result.data,
-                                function (index, value) {
-                                    let i=0;
+                                function(index, value) {
+                                    let i = 0;
                                     colDefs[i++].text = moment(value.transDate).format('DD/MM/YYYY');
                                     colDefs[i++].text = value.transactorName;
                                     colDefs[i++].text = value.buyDocSeriesCode;
@@ -481,8 +1082,11 @@
                                     colDefs[i++].text = value.companyCode;
                                     colDefs[i++].text = formatterCurrency.format(value.totalNetAmount);
                                     colDefs[i++].text = formatterCurrency.format(value.totalAmount);
+                                    colDefs[i++].text = formatterCurrency.format(value.payedOfAmount);
+                                    let totalAmount = parseFloat(value.totalAmount);
+                                    let payedAmount = parseFloat(value.payedOfAmount);
+                                    let outstanding = totalAmount - payedAmount;
 
-//new delete
                                     var itemId = value.id;
                                     var urlEdit = `@Url.Page("./Edit")?id=${itemId}`;
                                     var urlInfo = `@Url.Page("./Details")?id=${itemId}`;
@@ -491,26 +1095,44 @@
                                     var urlKartela = `@Url.Page("./Kartela")?transactorId=${itemId}`;
                                     var urlRecurring = `@Url.Page("/Transactions/RecurringTransactions/Create")?createFromId=${itemId}&createFromType=1`;
 
-                                    var actionsCol = '<td class="small text-center d-none d-md-table-cell">';
-                                    actionsCol += `<a href="${urlEdit
-                                        }"><i class="fas fa-edit fa-lg" style="color:slategray"></i></a> |`;
-                                    actionsCol += `<a href="${urlInfo
-                                        }"><i class="fas fa-info-circle fa-lg" style="color:slategray"></i></a> | `;
-                                    actionsCol += `<a href="${urlDel
-                                        }"><i class="fas fa-trash fa-lg" style="color:slategray"></i></a> | `;
-                                    actionsCol += `<a href="${urlNewLikeThis
-                                        }"><i class="fas fa-clone fa-lg" style="color:slategray"></i>|</a> `;
+                                    var actionsCol = '<td class="small text-center d-none d-lg-table-cell">';
+
+                                    actionsCol += `<a href="${urlEdit}">`;
+                                    actionsCol += `<i class="fas fa-edit fa-lg" style="color:slategray"></i>`;
+                                    actionsCol += `</a> |`;
+
+                                    actionsCol += `<a href="${urlInfo}"> `;
+                                    actionsCol += `<i class="fas fa-info-circle fa-lg" style="color:slategray"></i>`;
+                                    actionsCol += `</a> | `;
+
+                                    actionsCol += `<a href="${urlDel}"> `;
+                                    actionsCol += `<i class="fas fa-trash fa-lg" style="color:slategray"></i>`;
+                                    actionsCol += `</a> | `;
+
+                                    actionsCol += `<a href="${urlNewLikeThis}">`;
+                                    actionsCol += `<i class="fas fa-clone fa-lg" style="color:slategray"></i> `;
+                                    actionsCol += `</a> |`;
+
                                     actionsCol += '<a class=" dropdown-toggle" role="button" id="dropdownMenuButton"';
                                     actionsCol += 'data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
                                     actionsCol += '<i class="fas fa-bars" style="color:slategray"></i></a>';
-                                    actionsCol +=
-                                        ' <div class="dropdown-menu small" aria-labelledby="dropdownMenuButton">';
+                                    actionsCol += '<div class="dropdown-menu small" aria-labelledby="dropdownMenuButton">';
                                     actionsCol += `<a href="${urlKartela}" class="dropdown-item">Καρτέλα</a>`;
                                     actionsCol += ` <a class="dropdown-item" href="${urlRecurring}" target="_blanc">Δημιουργία Συνδρομής</a>`;
+                                    if (outstanding !== 0) {
+                                        actionsCol += `<a class="dropdown-item" href="#" name="PayoffDoc" data-docid="${itemId}">`;
+                                        actionsCol += '<i class="fab fa-amazon-pay fa-lg" style="color:slategray"></i>';
+                                        actionsCol += 'Εξόφληση Παραστατικού</a> ';
+
+                                        actionsCol += `<a class="dropdown-item" href="#" name="AssignPayments" data-docid="${itemId}"`;
+                                        actionsCol += ` data-toggle="modal" data-target="#itemSelector" data-selectorType="BuyPaymentsSelector">`;
+                                        actionsCol += '<i class="fas fa-compress-arrows-alt fa-lg" style="color:slategray"></i>';
+                                        actionsCol += 'Αντιστοίχιση Πληρωμών</a> ';
+                                    }
                                     actionsCol += ' </div>';
                                     actionsCol += '</td>';
                                     var actionColMobile =
-                                        '<td class="small text-center d-table-cell d-sm-table-cell d-md-none">';
+                                        '<td class="small text-center d-table-cell d-sm-table-cell d-md-table-cell d-lg-none">';
                                     actionColMobile +=
                                         '<a class=" dropdown-toggle" role="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" ';
                                     actionColMobile +=
@@ -525,6 +1147,16 @@
                                         }"><i class="fas fa-trash fa-lg" style="color:slategray"></i> Delete</a> `;
                                     actionColMobile += `<a class="dropdown-item" href="${urlNewLikeThis
                                         }"><i class="fas fa-clone fa-lg" style="color:slategray"></i> Duplicate</a> `;
+                                    if (outstanding !== 0) {
+                                        actionColMobile += `<a class="dropdown-item" href="#" name="PayoffDoc" data-docid="${itemId}">`;
+                                        actionColMobile += '<i class="fab fa-amazon-pay fa-lg" style="color:slategray"></i>';
+                                        actionColMobile += 'Εξόφληση Παραστατικού</a> |';
+
+                                        actionColMobile += `<a class="dropdown-item" href="#" name="AssignPayments" data-docid="${itemId}">`;
+                                        actionColMobile += '<i class="fas fa-compress-arrows-alt fa-lg" style="color:slategray"></i>';
+                                        actionColMobile += 'Αντιστοίχιση Πληρωμών</a> |';
+
+                                    }
                                     actionColMobile += '</div></td>';
 
                                     var $tr = $('<tr>');
@@ -544,6 +1176,17 @@
                                     $tr.appendTo('#myTable > tbody');
 
                                 });
+                            $('[name=PayoffDoc').on('click',
+                                function(event) {
+                                    let button = $(event.delegateTarget);
+                                    let docId = button.data('docid');
+                                    payOfDocument(docId);
+                                });
+                            //$('[name=AssignPayments').on('click', function (event) {
+                            //    let button = $(event.delegateTarget);
+                            //    let docId = button.data('docid');
+                            //    //payOfDocument(docId);
+                            //});
                             $('input[name=checkAllRows]').on('change',
                                 function() {
                                     var th = $(this).index();
@@ -881,7 +1524,6 @@
                 });
 
 
-
             var rosSelectorsToggleHandler = () => {
                 var $selectSingleSelectors = $('td[name=selectRowColumn]');
                 var $selectAllSelector = $('th[name=selectAllRowsColumn]');
@@ -907,214 +1549,8 @@
                     $selectedRowsActionsMenu.attr('hidden', 'true');
                 }
             };
-            var saveDocumentPaymentMappings = (docId) => {
-                var $rowSelectors = $('input[name=checkPaymentRow]');
-                var selectedRows = $rowSelectors.filter(':checked');
-                var idsToAssign = [];
-                $.each(selectedRows,
-                    function(key, value) {
-                        console.log(value);
-                        var id = parseInt(value.dataset.itemid);
-                        idsToAssign.push(id);
-                    });
-                if (idsToAssign.length > 0) {
-                    var idsJs = JSON.stringify({
-                        //ToDo: Change this
-                        productId: docId,
-                        mediaIds: idsToAssign
-                    });
-                    var timeout;
 
-                    $.ajax({
-                        contentType: 'application/json; charset=utf-8',
-                        dataType: 'json',
-                        type: 'POST',
-                        data: idsJs,
-                        url: "/api/GrkoukInfoApi/AssignMediaToProduct",
-                        beforeSend: function() {
-                            if (timeout) {
-                                clearTimeout(timeout);
-                            }
-                            timeout = setTimeout(function() {
 
-                                    $("#loadMe").modal({
-                                        backdrop: "static", //remove ability to close modal with click
-                                        keyboard: false, //remove option to close with keyboard
-                                        show: true //Display loader!
-                                    });
-                                },
-                                1000);
-                        },
-                        success: function(result) {
-                            console.log(result);
-                            toastr.success("Assign Media", result.message);
-                            refreshTableData();
-
-                        },
-                        complete: function() {
-                            if (timeout) {
-                                clearTimeout(timeout);
-                            }
-                            $("#loadMe").modal("hide");
-                            setTimeout(function() {
-                                    console.log('Checking for open modals');
-                                    var isOpen = $('#loadMe').hasClass('show');
-                                    if (isOpen) {
-                                        console.log('There is an open Modal');
-                                        $("#loadMe").modal("hide");
-                                    } else {
-                                        console.log('No open modal');
-                                    }
-                                },
-                                2000);
-                        },
-                        error: function(e) {
-                            console.log(e);
-                            toastr.error("Assign Media", e.responseJSON.error);
-                        }
-                    });
-                }
-            };
-            var getProductsSelectorList = (docId, searchFilter, pageSize) => {
-                console.log("Inside getProductsSelectorList");
-                console.log("searchFilter is " + searchFilter);
-
-                var timeout;
-                var pageIndex = 1;
-                var uri = '/api/GrKoukInfoApi/GetIndexTblDataWarehouseItems';
-                uri += `?pageIndex=${pageIndex}`;
-                uri += `&pageSize=${pageSize}`;
-
-                uri += `&searchFilter=${searchFilter}`;
-                $.ajax({
-                    contentType: 'application/json; charset=utf-8',
-
-                    dataType: 'json',
-                    type: 'GET',
-
-                    url: uri,
-                    beforeSend: function() {
-                        if (timeout) {
-                            clearTimeout(timeout);
-                        }
-                        timeout = setTimeout(function() {
-                                $("#loadMe").modal({
-                                    backdrop: "static",
-                                    keyboard: false,
-                                    show: true
-                                });
-                            },
-                            1000);
-                    },
-                    success: function(result) {
-                        $('#productsList > tbody').empty();
-                        $('#productsList > thead').empty();
-                        let colDefs = [
-                            {
-                                header: 'Code',
-                                text: '',
-                                class: 'small d-none d-md-table-cell'
-                            },
-                            {
-                                header: 'Product',
-                                text: '',
-                                class: 'small'
-                            },
-                            {
-                                header: 'Category',
-                                text: '',
-                                class: 'small d-none d-sm-table-cell'
-                            },
-                            {
-                                header: 'Nature',
-                                text: '',
-                                class: 'small'
-                            },
-                            {
-                                header: 'Company',
-                                text: '',
-                                class: 'small'
-                            }
-                        ];
-                        var $trHead = $('<tr>');
-                        colDefs.forEach(function(item) {
-                            var $tdColHead = $('<th>').text(item.header).addClass(item.class);
-                            $trHead.append($tdColHead);
-                        });
-                        $trHead.append($('<th>'));
-                        $trHead.appendTo('#productsList > thead');
-                        $.each(result.data,
-                            function(index, value) {
-                                colDefs[0].text = value.code;
-                                colDefs[1].text = value.name;
-                                colDefs[2].text = value.materialCateroryName;
-                                colDefs[3].text = value.warehouseItemNatureName;
-                                colDefs[4].text = value.companyCode;
-                                var itemId = value.id;
-                                // var urlDel = `@Url.Page("./Delete")?id=${itemId}`;
-
-                                var $tr = $('<tr>');
-
-                                colDefs.forEach(function(item) {
-                                    var $tdCol = $('<td>').text(item.text).addClass(item.class);
-                                    $tr.append($tdCol);
-
-                                });
-                                var actionsCol = '<td class="small text-center">';
-                                actionsCol += '<button type="button" class="btn btn-outline-info btn-sm" ';
-                                actionsCol += `data-itemId="${itemId}"`;
-                                actionsCol += 'name="selectItem">';
-                                actionsCol +=
-                                    '<span><i class="far fa-check-square fa-lg" style="color:slategray"></i></span>';
-                                actionsCol += '</button>';
-                                actionsCol += '</td>';
-
-                                $tr.append(actionsCol);
-                                $tr.appendTo('#productsList > tbody');
-
-                            });
-                        $('[name=selectItem]').on('click',
-                            function(event) {
-                                var button = $(event.delegateTarget);
-                                var productId = button.data('itemid');
-                                console.log('Inside click event handler for selectItem');
-                                if (docId instanceof Array) {
-                                    if (docId.length == 1) {
-                                        assignMediaToProduct(docId[0], productId);
-                                    }
-
-                                    $('#productSelector').modal('hide');
-                                    console.log("Passed array with length " + docId.length);
-
-                                } else {
-                                    console.log("No media selected");
-
-                                }
-                            });
-                    },
-                    complete: function() {
-                        if (timeout) {
-                            clearTimeout(timeout);
-                        }
-                        $("#loadMe").modal("hide");
-                        setTimeout(function() {
-                                console.log('Checking for open modals');
-                                var isOpen = $('#loadMe').hasClass('show');
-                                if (isOpen) {
-                                    console.log('There is an open Modal');
-                                    $("#loadMe").modal("hide");
-                                } else {
-                                    console.log('No open modal');
-                                }
-                            },
-                            2000);
-                    },
-                    error: function(e) {
-                        console.log(e);
-
-                    }
-                });
-            };
             var currencyChanged = () => {
                 let curCurrencySelected = parseInt($('#CurrencySelector').val());
                 var currencyCode;
@@ -1181,17 +1617,17 @@
                     window.location.href = uri;
                 });
             $('.search_icon').on('click',
-                           function() {
-                               icon = $(this).find("svg");
-                               if (icon.hasClass('fa-search')) {
-                                   icon.addClass("fa-times").removeClass("fa-search");
-                               } else {
-                                   icon.addClass("fa-search").removeClass("fa-times");
-                                   $('.search_input').val('');
-                               }
+                function() {
+                    let icon = $(this).find("svg");
+                    if (icon.hasClass('fa-search')) {
+                        icon.addClass("fa-times").removeClass("fa-search");
+                    } else {
+                        icon.addClass("fa-search").removeClass("fa-times");
+                        $('.search_input').val('');
+                    }
 
-                               refreshTableData();
-                           });
+                    refreshTableData();
+                });
 
             $('#FiltersForm').on('submit',
                 function(e) {

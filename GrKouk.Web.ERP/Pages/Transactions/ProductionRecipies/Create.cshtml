@@ -87,7 +87,7 @@
                 </div>
                 <div class="form-group col-md-1">
                     <label class="small" id="priceLabel">Price</label>
-                    <input class="form-control form-control-sm cleave-number" type="number" style="font-size: 0.7rem" placeholder="Price" id="Price" />
+                    <input class="form-control form-control-sm" type="number" style="font-size: 0.7rem" placeholder="Price" id="Price" />
                     <span class="text-danger small"></span>
                 </div>
                 <div class="form-group col-md-1">
@@ -181,7 +181,6 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/lib/jqueryui/jquery-ui.min.js"></script>
     <script src="~/js/jquery.ui.autocomplete.scroll.min.js"></script>
-    <script src="~/lib/cleave.js/cleave.min.js"></script>
     <script>
         $(document).ready(function() {
             console.log("Inside Document ready");

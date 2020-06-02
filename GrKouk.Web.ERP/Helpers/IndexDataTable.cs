@@ -24,6 +24,7 @@ namespace GrKouk.Web.ERP.Helpers
         public string CashRegCategoryFilter { get; set; }
         public int DisplayCurrencyId { get; set; }
         public string CodeToCompute { get; set; }
+        public int DocumentId { get; set; }
     }
 
     public class IndexDataTableResponse<T>
@@ -35,6 +36,7 @@ namespace GrKouk.Web.ERP.Helpers
         public decimal SumOfAmount { get; set; }
         public decimal SumOfNetAmount { get; set; }
         public decimal SumOfVatAmount { get; set; }
+        public decimal SumOfPayedAmount { get; set; }
         public decimal SumOfDebit { get; set; }
         public decimal SumOfCredit { get; set; }
         public decimal SumOfDifference { get; set; }
@@ -45,6 +47,7 @@ namespace GrKouk.Web.ERP.Helpers
         public decimal GrandSumOfAmount { get; set; }
         public decimal GrandSumOfNetAmount { get; set; }
         public decimal GrandSumOfVatAmount { get; set; }
+        public decimal GrandSumOfPayedAmount { get; set; }
         public decimal GrandSumOfDebit { get; set; }
         public decimal GrandSumOfCredit { get; set; }
         public decimal GrandSumOfDifference { get; set; }
