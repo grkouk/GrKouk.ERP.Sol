@@ -5,6 +5,8 @@ namespace GrKouk.Erp.Dtos.TransactorTransactions
     public class PaymentMappingCreateDto
     {
         public int DocId { get; set; }
+        public int DisplayCurrencyId { get; set; }
+
         private IList<PaymentMappingLineCreateDto> _paymentMappingLines;
         public virtual IList<PaymentMappingLineCreateDto> PaymentMappingLines
         {
