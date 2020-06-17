@@ -734,12 +734,28 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpGet("GetIndexTblDataSellDocuments")]
         public async Task<IActionResult> GetIndexTblDataSellDocuments([FromQuery] IndexDataTableRequest request)
         {
-            IQueryable<SellDocument> fullListIq = _context.SellDocuments;
-
-            //fullListIq = fullListIq.Include(f => f.Company)
-            //    .Include(f => f.CostCentre)
-            //    .Include(f => f.FinTransCategory)
-            //    .Include(f => f.Transactor);
+            IQueryable<SellDocList2Dto> fullListIq = _context.SellDocuments
+                .Select(p => new SellDocList2Dto()
+                {
+                    Id = p.Id,
+                    TransDate = p.TransDate,
+                    AmountDiscount = p.AmountDiscount,
+                    AmountFpa = p.AmountFpa,
+                    AmountNet = p.AmountNet,
+                    SellDocSeriesCode = p.SellDocSeries.Code,
+                    SellDocSeriesId = p.SellDocSeriesId,
+                    SellDocSeriesName = p.SellDocSeries.Name,
+                    CompanyCode = p.Company.Code,
+                    CompanyId = p.CompanyId,
+                    CompanyCurrencyId = p.Company.CurrencyId,
+                    SectionCode = p.Section.Code,
+                    SectionId = p.SectionId,
+                    TransactorId = p.TransactorId,
+                    TransactorName = p.Transactor.Name,
+                    TransRefCode = p.TransRefCode,
+                    PayedOfAmount = p.PaymentMappings.Sum(t => t.AmountUsed)
+                });
+            
             if (!string.IsNullOrEmpty(request.SortData))
             {
                 switch (request.SortData.ToLower())
@@ -751,22 +767,23 @@ namespace GrKouk.Web.ERP.Controllers
                         fullListIq = fullListIq.OrderByDescending(p => p.TransDate);
                         break;
                     case "transactornamesort:asc":
-                        fullListIq = fullListIq.OrderBy(p => p.Transactor.Name);
+                        fullListIq = fullListIq.OrderBy(p => p.TransactorName);
                         break;
                     case "transactornamesort:desc":
-                        fullListIq = fullListIq.OrderByDescending(p => p.Transactor.Name);
+                        fullListIq = fullListIq.OrderByDescending(p => p.TransactorName);
                         break;
+
                     case "seriescodesort:asc":
-                        fullListIq = fullListIq.OrderBy(p => p.SellDocSeries.Code);
+                        fullListIq = fullListIq.OrderBy(p => p.SellDocSeriesCode);
                         break;
                     case "seriescodesort:desc":
-                        fullListIq = fullListIq.OrderByDescending(p => p.SellDocSeries.Code);
+                        fullListIq = fullListIq.OrderByDescending(p => p.SellDocSeriesCode);
                         break;
                     case "companycodesort:asc":
-                        fullListIq = fullListIq.OrderBy(p => p.Company.Code);
+                        fullListIq = fullListIq.OrderBy(p => p.CompanyCode);
                         break;
                     case "companycodesort:desc":
-                        fullListIq = fullListIq.OrderByDescending(p => p.Company.Code);
+                        fullListIq = fullListIq.OrderByDescending(p => p.CompanyCode);
                         break;
                 }
             }
@@ -794,15 +811,15 @@ namespace GrKouk.Web.ERP.Controllers
 
             if (!string.IsNullOrEmpty(request.SearchFilter))
             {
-                fullListIq = fullListIq.Where(p => p.Transactor.Name.Contains(request.SearchFilter)
+                fullListIq = fullListIq.Where(p => p.TransactorName.Contains(request.SearchFilter)
                                                    || p.TransRefCode.Contains(request.SearchFilter));
             }
 
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
                 .Take(10)
                 .ToListAsync();
-            var t = fullListIq.ProjectTo<SellDocListDto>(_mapper.ConfigurationProvider);
-            var t1 = await t.Select(p => new SellDocListDto
+            var t = fullListIq;
+            var t1 = await t.Select(p => new SellDocList2Dto
             {
                 Id = p.Id,
                 TransDate = p.TransDate,
@@ -818,20 +835,18 @@ namespace GrKouk.Web.ERP.Controllers
                 AmountNet = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountNet),
                 AmountDiscount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
                     p.AmountDiscount),
-
                 CompanyId = p.CompanyId,
                 CompanyCode = p.CompanyCode,
-                CompanyCurrencyId = p.CompanyCurrencyId,
-                SalesChannelId = p.SalesChannelId
+                PayedOfAmount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                    p.PayedOfAmount),
+                CompanyCurrencyId = p.CompanyCurrencyId
             }).ToListAsync();
-            var gransSumOfAmount = t1.Sum(p => p.TotalAmount);
-            var gransSumOfNetAmount = t1.Sum(p => p.TotalNetAmount);
-
+            var grandSumOfAmountNew = t1.Sum(p => p.TotalAmount);
+            var gransSumOfNetAmountNew = t1.Sum(p => p.TotalNetAmount);
+            var grandSumOfPayedAmount = t1.Sum((p => p.PayedOfAmount));
             var pageIndex = request.PageIndex;
-
             var pageSize = request.PageSize;
-
-            var listItems = await PagedList<SellDocListDto>.CreateAsync(t, pageIndex, pageSize);
+            var listItems = await PagedList<SellDocList2Dto>.CreateAsync(t, pageIndex, pageSize);
             foreach (var listItem in listItems)
             {
                 if (listItem.CompanyCurrencyId != 1)
@@ -860,20 +875,22 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
             decimal sumAmountTotal = listItems.Sum(p => p.TotalAmount);
-            decimal sumAmountNet = listItems.Sum(p => p.TotalNetAmount);
-            var response = new IndexDataTableResponse<SellDocListDto>
+            decimal sumAmountTotalNet = listItems.Sum(p => p.TotalNetAmount);
+            decimal sumAmountTotalPayed = listItems.Sum(p => p.PayedOfAmount);
+            var response = new IndexDataTableResponse<SellDocList2Dto>
             {
                 TotalRecords = listItems.TotalCount,
                 TotalPages = listItems.TotalPages,
                 HasPrevious = listItems.HasPrevious,
                 HasNext = listItems.HasNext,
                 SumOfAmount = sumAmountTotal,
-                SumOfNetAmount = sumAmountNet,
-                GrandSumOfAmount = gransSumOfAmount,
-                GrandSumOfNetAmount = gransSumOfNetAmount,
+                SumOfNetAmount = sumAmountTotalNet,
+                SumOfPayedAmount = sumAmountTotalPayed,
+                GrandSumOfAmount = grandSumOfAmountNew,
+                GrandSumOfNetAmount = gransSumOfNetAmountNew,
+                GrandSumOfPayedAmount = grandSumOfPayedAmount,
                 Data = listItems
             };
-            //return new JsonResult(response);
             return Ok(response);
         }
 
@@ -2390,6 +2407,186 @@ namespace GrKouk.Web.ERP.Controllers
                 TotalPages = 1,
                 SumOfAmount = ConvertAmount(doc.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, docAmount),
                 SumOfPayedAmount=ConvertAmount(doc.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, coveredAmount),
+                HasPrevious = false,
+                HasNext = false,
+                Data = listItems
+            };
+            return Ok(response);
+        }
+        [HttpGet("GetSelectorPaymentsFromCustomersItems")]
+        public async Task<IActionResult> GetSelectorPaymentsFromCustomersItems([FromQuery] IndexDataTableRequest request)
+        {
+           
+            string sectionCode = "SYS-TRANSACTOR-TRANS";
+            //Thread.Sleep(10000);
+            var docId = request.DocumentId;
+            if (docId == 0)
+            {
+                string msg = "No Document Id.";
+                return BadRequest(new
+                {
+                    error = msg
+                });
+            }
+            //Get document to read info.
+            var doc = await _context.SellDocuments.FindAsync(docId);
+            if (doc == null)
+            {
+                string msg = "Sell Document not found";
+                return BadRequest(new
+                {
+                    error = msg
+                });
+            }
+            await _context.Entry(doc)
+                .Reference(t => t.SellDocSeries)
+                .LoadAsync();
+            await _context.Entry(doc)
+                .Reference(t => t.Company)
+                .LoadAsync();
+            var docSeries = doc.SellDocSeries;
+            var payoffSeries = await _context.TransTransactorDocSeriesDefs.FindAsync(docSeries.PayoffSeriesId);
+            if (payoffSeries == null)
+            {
+                string msg = "Payoff series not found";
+                return BadRequest(new
+                {
+                    error = msg
+                });
+            }
+            var section = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == sectionCode);
+            if (section == null)
+            {
+                string msg = "Section not found";
+                return BadRequest(new
+                {
+                    error = msg
+                });
+
+            }
+
+            var sectionId = section.Id;
+            var transactorId = doc.TransactorId;
+            var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
+                .Take(10)
+                .ToListAsync();
+            IQueryable<PaymentTransactionDto> fullListIq1 = _context.TransactorTransactions
+                .Where(p => p.SectionId == sectionId && p.TransactorId == transactorId && p.TransTransactorDocSeriesId == payoffSeries.Id)
+                .Select(p => new PaymentTransactionDto()
+                {
+                    Id = p.Id,
+                    TransDate = p.TransDate,
+                    DocSeriesId = p.TransTransactorDocSeriesId,
+                    DocSeriesName = p.TransTransactorDocSeries.Name,
+                    DocSeriesCode = p.TransTransactorDocSeries.Code,
+                    DocTypeId = p.TransTransactorDocTypeId,
+                    TransRefCode = p.TransRefCode,
+                    TransactorId = p.TransactorId,
+                    TransactorName = p.Transactor.Name,
+                    SectionId = p.SectionId,
+                    SectionCode = p.Section.Code,
+                    FiscalPeriodId = p.FiscalPeriodId,
+                    AmountFpa = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountFpa),
+                    AmountNet = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountNet),
+                    AmountDiscount = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountDiscount),
+                    TransFpaAmount = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.TransFpaAmount),
+                    TransNetAmount = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.TransNetAmount),
+                    TransDiscountAmount = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.TransDiscountAmount),
+                    AmountUsedInPayments = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.BuyDocPaymentMappings.Sum(k => k.AmountUsed)),
+                    CompanyId = p.CompanyId,
+                    CompanyCode = p.Company.Code,
+                    CompanyCurrencyId = p.Company.CurrencyId
+                });
+            if (!string.IsNullOrEmpty(request.SortData))
+            {
+                switch (request.SortData)
+                {
+                    case "TransDateSort:asc":
+                        fullListIq1 = fullListIq1.OrderBy(p => p.TransDate);
+                        break;
+                    case "TransDateSort:desc":
+                        fullListIq1 = fullListIq1.OrderByDescending(p => p.TransDate);
+                        break;
+
+                    case "CompanyCodeSort:asc":
+                        fullListIq1 = fullListIq1.OrderBy(p => p.CompanyCode);
+                        break;
+                    case "CompanyCodeSort:desc":
+                        fullListIq1 = fullListIq1.OrderByDescending(p => p.CompanyCode);
+                        break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.CompanyFilter))
+            {
+                var tagIds = new List<int>(request.CompanyFilter.Split(',').Select(s => int.Parse(s)));
+                // var companiesList = Array.ConvertAll(request.CompanyFilter.Split(","), int.Parse);
+                var allCompCode =
+                    await _context.AppSettings.SingleOrDefaultAsync(
+                        p => p.Code == Constants.AllCompaniesCodeKey);
+                if (allCompCode == null)
+                {
+                    return NotFound("All Companies Code Setting not found");
+                }
+
+                var allCompaniesEntity =
+                    await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+
+                if (allCompaniesEntity != null)
+                {
+                    var allCompaniesId = allCompaniesEntity.Id;
+                    tagIds.Add(allCompaniesId);
+                }
+
+                //fullListIq = fullListIq.Where(p => tagIds.Contains(p.CompanyId));
+                fullListIq1 = fullListIq1.Where(p => tagIds.Contains(p.CompanyId));
+            }
+
+            if (!string.IsNullOrEmpty(request.SearchFilter))
+            {
+                //fullListIq = fullListIq.Where(p => p.Name.Contains(request.SearchFilter)
+                //                                   || p.Code.Contains(request.SearchFilter)
+                //                                   || p.WarehouseItemCodes.Any(t => t.Code == request.SearchFilter)
+                //    // || p.ShortDescription.Contains(request.SearchFilter)
+                // || p.Description.Contains(request.SearchFilter)
+                //|| p.MaterialCaterory.Name.Contains(request.SearchFilter)
+                // );
+            }
+
+            var list1 = await fullListIq1.ToListAsync();
+            var list2 = list1.Where(p =>
+                p.TransFpaAmount + p.TransNetAmount - p.TransDiscountAmount - p.AmountUsedInPayments != 0).ToList();
+
+            List<PaymentTransactionDto> listItems;
+            try
+            {
+
+                listItems = list2;
+            }
+            catch (Exception e)
+            {
+                string msg = string.Empty;
+                if (e.InnerException != null)
+                {
+                    msg = e.InnerException.Message;
+                }
+
+                return BadRequest(new
+                {
+                    error = e.Message + " " + msg
+                });
+            }
+
+            //get Document uncovered amount
+            var coveredAmount = await _context.SellDocTransPaymentMappings.Where(p => p.SellDocumentId == doc.Id)
+                .SumAsync(p => p.AmountUsed);
+            decimal docAmount = doc.AmountNet + doc.AmountFpa - doc.AmountDiscount;
+            var response = new IndexDataTableResponse<PaymentTransactionDto>
+            {
+                TotalRecords = listItems.Count,
+                TotalPages = 1,
+                SumOfAmount = ConvertAmount(doc.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, docAmount),
+                SumOfPayedAmount = ConvertAmount(doc.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, coveredAmount),
                 HasPrevious = false,
                 HasNext = false,
                 Data = listItems

@@ -758,9 +758,14 @@
                             }
 
                         });
+                    var $curSelector = $('#CurrencySelector');
+
+                    var displayCurrencyId = $curSelector.val() == null || $curSelector.val().length == 0
+                        ? 1
+                        : parseInt($curSelector.val());
                     var data = JSON.stringify({
                         docId: selectedDocumentId,
-
+                        displayCurrencyId:displayCurrencyId,
                         paymentMappingLines: linesArr
 
                     });
