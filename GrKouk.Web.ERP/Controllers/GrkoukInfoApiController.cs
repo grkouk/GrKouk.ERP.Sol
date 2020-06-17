@@ -2492,7 +2492,7 @@ namespace GrKouk.Web.ERP.Controllers
                     TransFpaAmount = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.TransFpaAmount),
                     TransNetAmount = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.TransNetAmount),
                     TransDiscountAmount = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.TransDiscountAmount),
-                    AmountUsedInPayments = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.BuyDocPaymentMappings.Sum(k => k.AmountUsed)),
+                    AmountUsedInPayments = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.SalesDocPaymentMappings.Sum(k => k.AmountUsed)),
                     CompanyId = p.CompanyId,
                     CompanyCode = p.Company.Code,
                     CompanyCurrencyId = p.Company.CurrencyId
