@@ -28,7 +28,10 @@ namespace GrKouk.Web.ERP.Pages.Settings
                 new AppSetting {Code = GrKouk.Erp.Definitions.Constants.AllCompaniesCodeKey, Value = "ALLCOMP"},
                 new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfMaterialBuys, Value = ""},
                 new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfExpenseBuys, Value = ""},
-                new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfMaterialSales, Value = ""}
+                new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfServiceBuys, Value = ""},
+                new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfMaterialSales, Value = ""},
+               
+                new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfServiceSales, Value = ""}
             };
         }
         [BindProperty]
