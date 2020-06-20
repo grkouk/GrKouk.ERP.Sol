@@ -71,11 +71,7 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpGet("GetMainDashboardInfo")]
         public async Task<IActionResult> GetMainDashboardInfo([FromQuery] IndexDataTableRequest request)
         {
-            if (request.CodeToCompute == "SumOfExpenseBuysDf")
-            {
-                Debug.Print("Compute SumOfExpenseBuys");
-            }
-
+           
             var codeToComputeDefinition = await
                 _context.AppSettings.FirstOrDefaultAsync(p => p.Code == request.CodeToCompute);
             if (codeToComputeDefinition == null)
@@ -94,8 +90,20 @@ namespace GrKouk.Web.ERP.Controllers
                 .ToListAsync();
             var def = codeToComputeDefinition.Value;
             var defObj = JsonConvert.DeserializeObject<CodeToComputeDefinition>(def);
+            if (defObj.MatNatures==null &&
+                defObj.TransTypes==null &&
+                defObj.DocTypesSelected==null)
+            {
+                    
+                return Ok(new MainDashboardInfoResponse
+                {
+                    RequestedCodeToCompute = request.CodeToCompute,
+                    RequestedCodeSum = 0
+                });
+            }
             if (defObj.SrcType == MainInfoSourceTypeEnum.SourceTypeBuys)
             {
+                
                 IQueryable<BuyDocument> fullListIq = _context.BuyDocuments
                     .Include(p => p.Transactor);
                 if (!string.IsNullOrEmpty(request.CompanyFilter))
@@ -157,6 +165,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             if (defObj.SrcType == MainInfoSourceTypeEnum.SourceTypeSales)
             {
+                
                 IQueryable<SellDocument> fullListIq = _context.SellDocuments
                     .Include(p => p.Transactor);
 

@@ -1183,6 +1183,12 @@
 
 
                             });
+                        $('[name=PayoffDoc').on('click',  
+                           function(event) {
+                                let button = $(event.delegateTarget);
+                                let docId = button.data('docid');
+                                payOfDocument(docId);
+                        });
                         $('input[name=checkAllRows]').on('change',
                                 function() {
                                     var th = $(this).index();
