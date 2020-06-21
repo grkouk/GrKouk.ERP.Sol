@@ -19,6 +19,7 @@ namespace GrKouk.Web.ERP.Pages.Settings
         private readonly ApiDbContext _context;
         private readonly IToastNotification _toastNotification;
         private readonly List<AppSetting> _settingsToUse;
+
         public AppSettingsModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
@@ -30,17 +31,18 @@ namespace GrKouk.Web.ERP.Pages.Settings
                 new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfExpenseBuys, Value = ""},
                 new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfServiceBuys, Value = ""},
                 new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfMaterialSales, Value = ""},
-               
-                new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfServiceSales, Value = ""}
+                new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfServiceSales, Value = ""},
+                new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfIncomeSales, Value = ""}
             };
         }
-        [BindProperty]
-        public List<AppSetting> ItemVm { get; set; }
+
+        [BindProperty] public List<AppSetting> ItemVm { get; set; }
+
         public async Task<IActionResult> OnGetAsync()
         {
             LoadCombos();
-            ItemVm= new List<AppSetting>();
-           
+            ItemVm = new List<AppSetting>();
+
             for (int i = 0; i < _settingsToUse.Count; i++)
             {
                 var setting = await _context.AppSettings.FirstOrDefaultAsync(p => p.Code == _settingsToUse[i].Code);
@@ -62,18 +64,19 @@ namespace GrKouk.Web.ERP.Pages.Settings
                     });
                 }
             }
+
             return Page();
         }
 
         private void LoadCombos()
         {
-            ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(p => p.Name).AsNoTracking(), "Code", "Name");
+            ViewData["CompanyId"] =
+                new SelectList(_context.Companies.OrderBy(p => p.Name).AsNoTracking(), "Code", "Name");
             var sourceTypeList = Enum.GetValues(typeof(MainInfoSourceTypeEnum))
                 .Cast<MainInfoSourceTypeEnum>()
                 .Select(c => new SelectListItem()
                 {
-                    
-                    Value = ((int)c).ToString(),
+                    Value = ((int) c).ToString(),
                     Text = c.GetDescription()
                 }).ToList();
             ViewData["SourceType"] = sourceTypeList;
@@ -81,7 +84,7 @@ namespace GrKouk.Web.ERP.Pages.Settings
 
         public async Task<IActionResult> OnPostAsync()
         {
-            for (int i = 0; i < _settingsToUse.Count ; i++)
+            for (int i = 0; i < _settingsToUse.Count; i++)
             {
                 var setting = await _context.AppSettings.FirstOrDefaultAsync(p => p.Code == _settingsToUse[i].Code);
                 if (setting != null)
@@ -94,11 +97,11 @@ namespace GrKouk.Web.ERP.Pages.Settings
                     _context.AppSettings.Add(_settingsToUse[i]);
                 }
             }
-            
+
             try
             {
-               var iRec= await _context.SaveChangesAsync();
-               var ms = $"Updated {iRec} settings";
+                var iRec = await _context.SaveChangesAsync();
+                var ms = $"Updated {iRec} settings";
                 _toastNotification.AddSuccessToastMessage(ms);
                 return Page();
             }
@@ -108,8 +111,6 @@ namespace GrKouk.Web.ERP.Pages.Settings
                 _toastNotification.AddErrorToastMessage(e.Message);
                 return Page();
             }
-
-           
         }
     }
 }

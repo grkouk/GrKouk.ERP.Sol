@@ -77,6 +77,17 @@
                     </div>
                 </div>
             </div>
+            <div class="form-row">
+                <div class="form-group col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Sum Of Income Sales Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[6].Value" id="SellIncomeValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#itemSelector" data-selectorType="SellIncomeSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary btn-sm" id="saveForm" />
             </div>
@@ -415,6 +426,9 @@
                         case "SellServicesSettings":
                             $('#SellServicesValue').val(jsJSON);
                             break;
+                         case "SellIncomeSettings":
+                            $('#SellIncomeValue').val(jsJSON);
+                            break;
                         default:
                     }
 
@@ -448,6 +462,9 @@
                         case "SellServicesSettings":
                             oldVal = $('#SellServicesValue').val();
                             break;
+                        case "SellIncomeSettings":
+                           oldVal = $('#SellIncomeValue').val();
+                           break;    
                         default:
                     }
                     if (oldVal.length > 0) {
@@ -488,6 +505,9 @@
                         case "SellServicesSettings":
                             modal.find('.modal-title').text("Sell Services Setting");
                             break;
+                        case "SellIncomeSettings":
+                            modal.find('.modal-title').text("Sell Income Setting");
+                            break;    
                         default:
                     }
                 });
