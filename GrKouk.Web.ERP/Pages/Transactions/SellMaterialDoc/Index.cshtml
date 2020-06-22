@@ -972,8 +972,8 @@
                                     sortType: 'numeric',
                                     header: 'Date',
                                     text: '',
-                                    headerClass:'small text-center d-none d-md-table-cell',
-                                    class: 'small d-none d-md-table-cell'
+                                    headerClass:'small text-center',
+                                    class: 'small'
                                 },
                                 {
                                     totalKey: 'label',
@@ -1183,6 +1183,12 @@
 
 
                             });
+                        $('[name=PayoffDoc').on('click',  
+                           function(event) {
+                                let button = $(event.delegateTarget);
+                                let docId = button.data('docid');
+                                payOfDocument(docId);
+                        });
                         $('input[name=checkAllRows]').on('change',
                                 function() {
                                     var th = $(this).index();
