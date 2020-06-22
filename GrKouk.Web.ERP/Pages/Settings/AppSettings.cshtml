@@ -7,14 +7,14 @@
 
 @section MyCss
 {
-    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/material.css"/>
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/material.css" />
 }
 
 <div class="container">
     <form method="post">
         <fieldset id="thisForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" id="CurrentSelectorType"/>
+            <input type="hidden" id="CurrentSelectorType" />
             <div class="form-row">
                 <div class="form-group col-md-10 col-sm-10 col-lg-10">
                     <label small>All Companies Setting</label>
@@ -45,17 +45,40 @@
             </div>
             <div class="form-row">
                 <div class="form-group col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Sum Of Service Buys Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[3].Value" id="BuyServicesValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#itemSelector" data-selectorType="BuyServicesSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-10 col-sm-10 col-lg-10">
                     <label class="" small>Sum Of Material Sales Definition</label>
                     <div class="input-group input-group-sm">
-                        <textarea class="form-control" asp-for="ItemVm[3].Value" id="SellMaterialsValue" rows="2"></textarea>
+                        <textarea class="form-control" asp-for="ItemVm[4].Value" id="SellMaterialsValue" rows="2"></textarea>
                         <div class="input-group-append">
                             <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#itemSelector" data-selectorType="SellMaterialsSettings" type="button">...</button>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Sum Of Service Sales Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[5].Value" id="SellServicesValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#itemSelector" data-selectorType="SellServicesSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary btn-sm" id="saveForm"/>
+                <input type="submit" value="Save" class="btn btn-primary btn-sm" id="saveForm" />
             </div>
         </fieldset>
     </form>
@@ -151,7 +174,7 @@
     <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
     <ejs-scripts></ejs-scripts>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             const getWarehouseItemNatureList = () => {
                 var timeout;
                 var pageIndex = 1;
@@ -162,7 +185,7 @@
                     dataType: 'json',
                     type: 'GET',
                     url: uri,
-                    beforeSend: function() {
+                    beforeSend: function () {
                         //if (timeout) {
                         //    clearTimeout(timeout);
                         // }
@@ -175,12 +198,12 @@
                         //},
                         //    1000);
                     },
-                    success: function(result) {
+                    success: function (result) {
                         var multiSelect = document.getElementById("MultiSelectMaterialNatures").ej2_instances[0];
                         multiSelect.dataSource = result;
 
                     },
-                    complete: function() {
+                    complete: function () {
                         //if (timeout) {
                         //    clearTimeout(timeout);
                         //}
@@ -197,7 +220,7 @@
                         //},
                         //    2000);
                     },
-                    error: function(e) {
+                    error: function (e) {
                         console.log(e);
 
                     }
@@ -212,7 +235,7 @@
                     dataType: 'json',
                     type: 'GET',
                     url: uri,
-                    beforeSend: function() {
+                    beforeSend: function () {
                         //if (timeout) {
                         //    clearTimeout(timeout);
                         //}
@@ -225,11 +248,11 @@
                         //},
                         //    1000);
                     },
-                    success: function(result) {
+                    success: function (result) {
                         var multiSelect = document.getElementById("MultiSelectTransactorTypes").ej2_instances[0];
                         multiSelect.dataSource = result;
                     },
-                    complete: function() {
+                    complete: function () {
                         //if (timeout) {
                         //    clearTimeout(timeout);
                         //}
@@ -246,7 +269,7 @@
                         //},
                         //    2000);
                     },
-                    error: function(e) {
+                    error: function (e) {
                         console.log(e);
 
                     }
@@ -261,7 +284,7 @@
                     dataType: 'json',
                     type: 'GET',
                     url: uri,
-                    beforeSend: function() {
+                    beforeSend: function () {
                         //if (timeout) {
                         //    clearTimeout(timeout);
                         //}
@@ -274,11 +297,11 @@
                         //},
                         //    1000);
                     },
-                    success: function(result) {
+                    success: function (result) {
                         var multiSelect = document.getElementById("MultiSelectCompanies").ej2_instances[0];
                         multiSelect.dataSource = result;
                     },
-                    complete: function() {
+                    complete: function () {
                         //if (timeout) {
                         //    clearTimeout(timeout);
                         //}
@@ -295,13 +318,13 @@
                         //},
                         //    2000);
                     },
-                    error: function(e) {
+                    error: function (e) {
                         console.log(e);
 
                     }
                 });
             };
-            const getDocumentTypeList = (docType,value) => {
+            const getDocumentTypeList = (docType, value) => {
                 var timeout;
                 var uri = '/api/GrKoukInfoApi/GetSelectorDocumentTypes';
                 uri += `?docType=${docType}`;
@@ -310,7 +333,7 @@
                     dataType: 'json',
                     type: 'GET',
                     url: uri,
-                    beforeSend: function() {
+                    beforeSend: function () {
                         //if (timeout) {
                         //    clearTimeout(timeout);
                         //}
@@ -323,15 +346,15 @@
                         //},
                         //    1000);
                     },
-                    success: function(result) {
+                    success: function (result) {
                         var multiSelect = document.getElementById("MultiSelectDocumentTypes").ej2_instances[0];
                         //multiSelect.value = "";
                         multiSelect.dataSource = result;
-                        if(value){
+                        if (value) {
                             multiSelect.value = value;
                         }
                     },
-                    complete: function() {
+                    complete: function () {
                         //if (timeout) {
                         //    clearTimeout(timeout);
                         //}
@@ -348,14 +371,14 @@
                         //},
                         //    2000);
                     },
-                    error: function(e) {
+                    error: function (e) {
                         console.log(e);
 
                     }
                 });
             };
             $('#SaveItemSelector').on('click',
-                function(e) {
+                function (e) {
                     console.log('Modal save button clicked');
                     var sourceType = document.getElementById("SourceType").ej2_instances[0];
                     var materialNatures = document.getElementById("MultiSelectMaterialNatures").ej2_instances[0];
@@ -377,16 +400,22 @@
                     let jsJSON = JSON.stringify(js);
                     let currentSelectorType = $('#CurrentSelectorType').val();
                     switch (currentSelectorType) {
-                    case "BuyMaterialsSettings":
-                        $('#BuyMaterialsValue').val(jsJSON);
-                        break;
-                    case "BuyExpensesSettings":
-                        $('#BuyExpensesValue').val(jsJSON);
-                        break;
-                    case "SellMaterialsSettings":
-                         $('#SellMaterialsValue').val(jsJSON);
-                         break;
-                    default:
+                        case "BuyMaterialsSettings":
+                            $('#BuyMaterialsValue').val(jsJSON);
+                            break;
+                        case "BuyExpensesSettings":
+                            $('#BuyExpensesValue').val(jsJSON);
+                            break;
+                        case "SellMaterialsSettings":
+                            $('#SellMaterialsValue').val(jsJSON);
+                            break;
+                        case "BuyServicesSettings":
+                            $('#BuyServicesValue').val(jsJSON);
+                            break;
+                        case "SellServicesSettings":
+                            $('#SellServicesValue').val(jsJSON);
+                            break;
+                        default:
                     }
 
                     console.log(js);
@@ -394,7 +423,7 @@
                     $('#itemSelector').modal('hide');
                 });
             $('#itemSelector').on('shown.bs.modal',
-                 ()=> {
+                () => {
                     var sourceType = document.getElementById("SourceType").ej2_instances[0];
                     var materialNatures = document.getElementById("MultiSelectMaterialNatures").ej2_instances[0];
                     var transactorTypes = document.getElementById("MultiSelectTransactorTypes").ej2_instances[0];
@@ -403,22 +432,29 @@
                     let currentSelectorType = $('#CurrentSelectorType').val();
                     var oldVal = "";
                     switch (currentSelectorType) {
-                    case "BuyMaterialsSettings":
-                        oldVal = $('#BuyMaterialsValue').val();
-                        break;
-                    case "BuyExpensesSettings":
-                        oldVal = $('#BuyExpensesValue').val();
-                        break;
-                     case "SellMaterialsSettings":
-                        oldVal = $('#SellMaterialsValue').val();
-                        break;    
-                     default:
+                        case "BuyMaterialsSettings":
+                            oldVal = $('#BuyMaterialsValue').val();
+                            break;
+                        case "BuyExpensesSettings":
+                            oldVal = $('#BuyExpensesValue').val();
+                            break;
+                        case "SellMaterialsSettings":
+                            oldVal = $('#SellMaterialsValue').val();
+                            break;
+                        case "BuyServicesSettings":
+                            oldVal = $('#BuyServicesValue').val();
+                           
+                            break;
+                        case "SellServicesSettings":
+                            oldVal = $('#SellServicesValue').val();
+                            break;
+                        default:
                     }
                     if (oldVal.length > 0) {
                         let oldValObj = JSON.parse(oldVal);
                         sourceType.value = oldValObj.srcType;
-                        if (sourceType.value){
-                            getDocumentTypeList(sourceType.value,oldValObj.docTypesSelected);
+                        if (sourceType.value) {
+                            getDocumentTypeList(sourceType.value, oldValObj.docTypesSelected);
                         }
                         materialNatures.value = oldValObj.matNatures;
                         transactorTypes.value = oldValObj.transTypes;
@@ -428,7 +464,7 @@
 
                 });
             $('#itemSelector').on('show.bs.modal',
-                (event)=> {
+                (event) => {
                     var button = $(event.relatedTarget);
                     var selectorType = button.data('selectortype');
                     var modal = $(this);
@@ -437,20 +473,26 @@
                     getWarehouseItemNatureList();
                     getCompanyList();
                     switch (selectorType) {
-                    case "BuyMaterialsSettings":
-                        modal.find('.modal-title').text("Buy Materials Setting");
-                        break;
-                    case "BuyExpensesSettings":
-                        modal.find('.modal-title').text("Buy Expenses Setting");
-                        break;
-                    case "SellMaterialsSettings":
-                        modal.find('.modal-title').text("Sell Materials Setting");
-                        break;
-                    default:
+                        case "BuyMaterialsSettings":
+                            modal.find('.modal-title').text("Buy Materials Setting");
+                            break;
+                        case "BuyExpensesSettings":
+                            modal.find('.modal-title').text("Buy Expenses Setting");
+                            break;
+                        case "SellMaterialsSettings":
+                            modal.find('.modal-title').text("Sell Materials Setting");
+                            break;
+                        case "BuyServicesSettings":
+                            modal.find('.modal-title').text("Buy Services Setting");
+                            break;
+                        case "SellServicesSettings":
+                            modal.find('.modal-title').text("Sell Services Setting");
+                            break;
+                        default:
                     }
                 });
             $('#itemSelector').on('hidden.bs.modal',
-                function(event) {
+                function (event) {
                     var button = $(event.relatedTarget);
                     var modal = $(this);
                     var sourceType = document.getElementById("SourceType").ej2_instances[0];
@@ -463,15 +505,15 @@
                     transactorTypes.value = "";
                     selectedCompanies.value = "";
                     selectedDocTypes.value = "";
-                }); 
+                });
             var sourceType = document.getElementById("SourceType").ej2_instances[0];
             sourceType.addEventListener('change',
-                function(e) {
+                function (e) {
                     console.log(`Source Type changed value is ${e.value}`);
-                    if (e.value){
-                        getDocumentTypeList(e.value);    
+                    if (e.value) {
+                        getDocumentTypeList(e.value);
                     }
-                    
+
                 });
 
         });
