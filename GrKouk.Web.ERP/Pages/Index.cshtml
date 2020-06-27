@@ -362,6 +362,7 @@
                 
             };
             const refreshView = () => {
+                console.log('Inside refreshView')
                 const $selectedCompany = $('.selected-company-text');
                 let selCompanyId = $selectedCompany.data('companyid');
                 const $selectedCurrency = $('.selected-currency-text');
@@ -390,7 +391,7 @@
                     getFinancialData(cd, selPeriodId, selCompanyId, selCurrencyId, $item, loader);
 
                 });
-                
+                //updateBalanceGroup();
 
             };
             //---------------------Periods----------------------------------
@@ -599,6 +600,7 @@
             };
             //--------------------------------------------------------------------------
             const getFinancialData = (codeToCompute, dateRange, selCompany, selCurrency, element, loader, selectionCallback) => {
+                console.log('Inside getFinancialData')
                 var timeout;
                 var uri = '/api/FinancialData/GetMainDashboardInfo?';
                 uri += `codeToCompute=${codeToCompute}`;
@@ -627,7 +629,22 @@
                         let vl = formatterCurrency.format(result.requestedCodeSum);
                         element.text(vl);
                         element.attr('value', vlVal);
+                        let $balanceFieldsToUpdate = $('[name=BalanceCodeValue]');
+                           $balanceFieldsToUpdate.each(function(index) {
+                               let $item = $(this);
+                               let cd = $item.data('dependsoncodes');
+                               if (cd.includes(codeToCompute)){
+                                   console.log(`Storing for code ${codeToCompute} value ${vlVal}`);
+                                   if(codeToCompute.includes('Buys')){
+                                        $item.data('buyvalue',vlVal);    
+                                   }
+                                   if(codeToCompute.includes('Sells')){
+                                       $item.data('sellvalue',vlVal);    
+                                   }
+                               }
+                           });
                         updateSumForGroup(element);
+                        updateBalanceGroup();
                     },
                     complete: function() {
                         if (loader) {
@@ -652,69 +669,18 @@
                     }
                 });
             };
-            const updateSumForGroup = (element) => {
-                console.log(element);
-                let code = element.data('computecode');
-                if (code.includes('Buys')) {
-                    let $fieldsToCompute = $('[name=BuyCodeValue]');
-                    let sumOfGroup = parseFloat('0');
-                    $fieldsToCompute.each(function(index) {
-                        let $item = $(this);
-                        console.log($item.data('computecode'));
-                        let vlText = $item.text();
-                        let vl1 = $item.attr('value');
-                        if (vl1) {
-                            let vl = parseFloat(vl1);
-                            sumOfGroup += vl;
-                            let $balanceBuyFieldsToUpdate = $('[name=BalanceCodeValue]');
-                               $balanceBuyFieldsToUpdate.each(function(index) {
-                                   let $item = $(this);
-                                   let cd = $item.data('dependsoncodes');
-                                   if (cd.includes(code)){
-                                       console.log(`Storing for code ${code} value ${vl}`);
-                                       $item.data('buyvalue',vl);
-                                   }
-                               });
-                        }
-                    });
-                    $('#ExpensesSumValue').text(formatterCurrency.format(sumOfGroup));
-                }
-                if (code.includes('Sales')) {
-                    let $fieldsToCompute = $('[name=SellCodeValue]');
-                    let sumOfGroup = parseFloat('0');
-                    $fieldsToCompute.each(function (index) {
-                        let $item = $(this);
-                        console.log('Sales Fields to compute ')
-                        console.log($item.data('computecode'));
-                        let vlText = $item.text();
-                        let vl1 = $item.attr('value');
-                        if (vl1) {
-                            let vl = parseFloat(vl1);
-                            sumOfGroup += vl;
-                            let $balanceSellFieldsToUpdate = $('[name=BalanceCodeValue]');
-                               $balanceSellFieldsToUpdate.each(function(index) {
-                                   let $item = $(this);
-                                   let cd = $item.data('dependsoncodes');
-                                   if (cd.includes(code)){
-                                       console.log(`Storing for code ${code} value ${vl}`);
-                                       $item.data('sellvalue',vl);
-                                   }
-                               });
-                        }
-                    });
-                    $('#IncomesSumValue').text(formatterCurrency.format(sumOfGroup));
-                }
-                
+            const updateBalanceGroup=()=>{
+                console.log('Inside updateBalanceGroup');
                 let $balanceFieldsToCompute = $('[name=BalanceCodeValue]');
                 let sumOfBalance = parseFloat('0');
                    $balanceFieldsToCompute.each(function(index) {
                        let $item = $(this);
-                       console.log($item.data('dependsoncodes'));
+                       //console.log($item.data('dependsoncodes'));
                        let tbuyVal = $item.data('buyvalue');
                        let buyVal = parseFloat('0');
                        if(tbuyVal) {buyVal = parseFloat(tbuyVal);}
                        
-                       let tSellVal = $item.data('buyvalue');
+                       let tSellVal = $item.data('sellvalue');
                        let sellVal = parseFloat('0');
                        if(tSellVal) {sellVal = parseFloat(tSellVal);}
                                               
@@ -724,6 +690,45 @@
                        $item.text(formatterCurrency.format(difVal));
                    });
                 $('#BalanceSumValue').text(formatterCurrency.format(sumOfBalance));
+            };
+            const updateSumForGroup = (element) => {
+                
+                let code = element.data('computecode');
+                console.log(`Inside updateSumForGroup with code=${code}`);
+                if (code.includes('Buys')) {
+                    let $fieldsToCompute = $('[name=BuyCodeValue]');
+                    let sumOfGroup = parseFloat('0');
+                    $fieldsToCompute.each(function(index) {
+                        let $item = $(this);
+                       
+                        let vlText = $item.text();
+                        let vl1 = $item.attr('value');
+                        if (vl1) {
+                            let vl = parseFloat(vl1);
+                            sumOfGroup += vl;
+                            
+                        }
+                    });
+                    $('#ExpensesSumValue').text(formatterCurrency.format(sumOfGroup));
+                }
+                if (code.includes('Sales')) {
+                    let $fieldsToCompute = $('[name=SellCodeValue]');
+                    let sumOfGroup = parseFloat('0');
+                    $fieldsToCompute.each(function (index) {
+                        let $item = $(this);
+                       
+                        let vlText = $item.text();
+                        let vl1 = $item.attr('value');
+                        if (vl1) {
+                            let vl = parseFloat(vl1);
+                            sumOfGroup += vl;
+                            
+                        }
+                    });
+                    $('#IncomesSumValue').text(formatterCurrency.format(sumOfGroup));
+                }
+                
+                
             };
             const getTransactionsData = (transactorId, dateRange, selCompany, selCurrency, selectionCallback) => {
                 var timeout;
