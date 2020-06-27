@@ -243,6 +243,7 @@
                             <td>Υλικά</td>
                             <td class="text-right">
                                 <span name="BalanceCodeValue"
+                               
                                       data-dependsOnCodes="SumOfMaterialBuysDf;SumOfMaterialSalesDf">
                                     0
                                 </span>
@@ -252,6 +253,7 @@
                             <td>Υπηρεσίες</td>
                             <td class="text-right">
                                 <span name="BalanceCodeValue"
+                               
                                       data-dependsOnCodes="SumOfServiceBuysDf;SumOfServiceSalesDf">
                                     0
                                 </span>
@@ -261,6 +263,7 @@
                             <td>πάγια</td>
                             <td class="text-right">
                                 <span name="BalanceCodeValue"
+                                
                                       data-dependsOnCodes="SumOfFixedAssetBuysDf;SumOfFixedAssetSalesDf">
                                     0
                                 </span>
@@ -271,6 +274,7 @@
 
                             <td class="text-right">
                                 <span name="BalanceCodeValue"
+                                           
                                       data-dependsOnCodes="SumOfExpenseBuysDf;SumOfExpenseSalesDf">
                                     0
                                 </span>
@@ -636,10 +640,13 @@
                                if (cd.includes(codeToCompute)){
                                    console.log(`Storing for code ${codeToCompute} value ${vlVal}`);
                                    if(codeToCompute.includes('Buys')){
-                                        $item.data('buyvalue',vlVal);    
+                                        $item.data('buyvalue',vlVal);
+                                        $item.attr('buyvalue',vlVal);
+                                        
                                    }
                                    if(codeToCompute.includes('Sells')){
-                                       $item.data('sellvalue',vlVal);    
+                                       $item.data('sellvalue',vlVal);
+                                       $item.attr('sellvalue',vlVal);
                                    }
                                }
                            });
@@ -676,11 +683,13 @@
                    $balanceFieldsToCompute.each(function(index) {
                        let $item = $(this);
                        //console.log($item.data('dependsoncodes'));
-                       let tbuyVal = $item.data('buyvalue');
+                       //let tbuyVal = $item.data('buyvalue');
+                       let tbuyVal = $item.attr('buyvalue');
                        let buyVal = parseFloat('0');
                        if(tbuyVal) {buyVal = parseFloat(tbuyVal);}
                        
-                       let tSellVal = $item.data('sellvalue');
+                       //let tSellVal = $item.data('sellvalue');
+                       let tSellVal = $item.attr('sellvalue');
                        let sellVal = parseFloat('0');
                        if(tSellVal) {sellVal = parseFloat(tSellVal);}
                                               
