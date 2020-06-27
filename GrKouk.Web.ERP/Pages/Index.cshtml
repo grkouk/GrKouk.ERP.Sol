@@ -71,176 +71,249 @@
 
         </div>
         <div class="container">
-            <div class="row align-items-center justify-content-between">
-                <div class="col-lg-4 col-sm-12">
-                    <div class="card text-center">
-                        <div class="card-header">
-                            <h5>Income</h5>
-                        </div>
-                        <div class="card-body text-center">
-                            <table class="table-sm w-100">
-                                <tr>
-                                    <td>Πωλήσεις Υλικών</td>
-                                    <td class="text-right">
-                                        <span name="SellCodeValue"
-                                              data-computeCode="SumOfMaterialSalesDf">
-                                            0
-                                        </span>
-
-                                        <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
-                                             data-computeCode="SumOfMaterialSalesDf"
-                                             name="SellCodeLoader"
-                                             style="display: none">
-
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Πωλήσεις υπηρεσιών</td>
-                                    <td class="text-right">
-                                        <span name="SellCodeValue"
-                                              data-computeCode="SumOfServiceSalesDf">
-                                            0
-                                        </span>
-
-                                        <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
-                                             data-computeCode="SumOfServiceSalesDf"
-                                             name="SellCodeLoader"
-                                             style="display: none">
-
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Πωλήσεις παγίων</td>
-                                    <td class="text-right">
-                                        <span name="SellCodeValue"
-                                              data-computeCode="SumOfFixedAssetSalesDf">
-                                            0
-                                        </span>
-
-                                        <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
-                                             data-computeCode="SumOfFixedAssetSalesDf"
-                                             name="SellCodeLoader"
-                                             style="display: none">
-
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Εσοδα</td>
-
-                                    <td class="text-right">
-                                        <span name="SellCodeValue"
-                                              data-computeCode="SumOfExpenseSalesDf">
-                                            0
-                                        </span>
-
-                                        <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
-                                             data-computeCode="SumOfExpenseSalesDf"
-                                             name="SellCodeLoader"
-                                             style="display: none">
-
-                                        </div>
-                                    </td>
-                                </tr>
-                            </table>
-
-                        </div>
-                        <div class="card-footer text-muted">
-                            <p id="IncomesSumValue">0</p>
-                        </div>
-                    </div>
+        <div class="row align-items-center justify-content-between">
+        <div class="col-lg-4 col-sm-12">
+            <div class="card text-center">
+                <div class="card-header">
+                    <h5>Income</h5>
                 </div>
-                <div class="col-lg-4 col-sm-12">
-                    <div class="card text-center">
-                        <div class="card-header">
-                            <h5>Expenses</h5>
-                        </div>
-                        <div class="card-body text-center">
-                            <table class="table-sm w-100">
-                                <tr>
-                                    <td>Αγορές Υλικών</td>
-                                    <td class="text-right">
-                                        <span name="BuyCodeValue"
-                                              data-computeCode="SumOfMaterialBuysDf">
-                                            0
-                                        </span>
+                <div class="card-body text-center">
+                    <table class="table-sm w-100">
+                        <tr>
+                            <td>Πωλήσεις Υλικών</td>
+                            <td class="text-right">
+                                <span name="SellCodeValue"
+                                      data-computeCode="SumOfMaterialSalesDf">
+                                    0
+                                </span>
 
-                                        <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
-                                             data-computeCode="SumOfMaterialBuysDf"
-                                             name="BuyCodeLoader"
-                                             style="display: none">
+                                <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+                                     data-computeCode="SumOfMaterialSalesDf"
+                                     name="SellCodeLoader"
+                                     style="display: none">
 
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Αγορές υπηρεσιών</td>
-                                    <td class="text-right">
-                                        <span name="BuyCodeValue"
-                                              data-computeCode="SumOfServiceBuysDf">
-                                            0
-                                        </span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Πωλήσεις υπηρεσιών</td>
+                            <td class="text-right">
+                                <span name="SellCodeValue"
+                                      data-computeCode="SumOfServiceSalesDf">
+                                    0
+                                </span>
 
-                                        <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
-                                             data-computeCode="SumOfServiceBuysDf"
-                                             name="BuyCodeLoader"
-                                             style="display: none">
+                                <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+                                     data-computeCode="SumOfServiceSalesDf"
+                                     name="SellCodeLoader"
+                                     style="display: none">
 
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Αγορές παγίων</td>
-                                    <td class="text-right">
-                                        <span name="BuyCodeValue"
-                                              data-computeCode="SumOfFixedAssetBuysDf">
-                                            0
-                                        </span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Πωλήσεις παγίων</td>
+                            <td class="text-right">
+                                <span name="SellCodeValue"
+                                      data-computeCode="SumOfFixedAssetSalesDf">
+                                    0
+                                </span>
 
-                                        <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
-                                             data-computeCode="SumOfFixedAssetBuysDf"
-                                             name="BuyCodeLoader"
-                                             style="display: none">
+                                <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+                                     data-computeCode="SumOfFixedAssetSalesDf"
+                                     name="SellCodeLoader"
+                                     style="display: none">
 
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Εξοδα</td>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Εσοδα</td>
 
-                                    <td class="text-right">
-                                        <span name="BuyCodeValue"
-                                              data-computeCode="SumOfExpenseBuysDf">
-                                            0
-                                        </span>
+                            <td class="text-right">
+                                <span name="SellCodeValue"
+                                      data-computeCode="SumOfExpenseSalesDf">
+                                    0
+                                </span>
 
-                                        <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
-                                             data-computeCode="SumOfExpenseBuysDf"
-                                             name="BuyCodeLoader"
-                                             style="display: none">
+                                <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+                                     data-computeCode="SumOfExpenseSalesDf"
+                                     name="SellCodeLoader"
+                                     style="display: none">
 
-                                        </div>
-                                    </td>
-                                </tr>
-                            </table>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
 
-                        </div>
-                        <div class="card-footer text-muted">
-                            <p id="ExpensesSumValue">0</p>
-                        </div>
-                    </div>
                 </div>
-                <div class="col-lg-4 col-sm-12">
-                    <div class="card">
-                        <div class="card-body text-center">
-                            <h3 class="card-text" id="totbalance">10</h3>
-                            <span class="card-text">Balance</span>
-                        </div>
-                    </div>
+                <div class="card-footer text-muted">
+                    <p id="IncomesSumValue">0</p>
                 </div>
             </div>
+        </div>
+        <div class="col-lg-4 col-sm-12">
+            <div class="card text-center">
+                <div class="card-header">
+                    <h5>Expenses</h5>
+                </div>
+                <div class="card-body text-center">
+                    <table class="table-sm w-100">
+                        <tr>
+                            <td>Αγορές Υλικών</td>
+                            <td class="text-right">
+                                <span name="BuyCodeValue"
+                                      data-computeCode="SumOfMaterialBuysDf">
+                                    0
+                                </span>
+
+                                <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+                                     data-computeCode="SumOfMaterialBuysDf"
+                                     name="BuyCodeLoader"
+                                     style="display: none">
+
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Αγορές υπηρεσιών</td>
+                            <td class="text-right">
+                                <span name="BuyCodeValue"
+                                      data-computeCode="SumOfServiceBuysDf">
+                                    0
+                                </span>
+
+                                <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+                                     data-computeCode="SumOfServiceBuysDf"
+                                     name="BuyCodeLoader"
+                                     style="display: none">
+
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Αγορές παγίων</td>
+                            <td class="text-right">
+                                <span name="BuyCodeValue"
+                                      data-computeCode="SumOfFixedAssetBuysDf">
+                                    0
+                                </span>
+
+                                <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+                                     data-computeCode="SumOfFixedAssetBuysDf"
+                                     name="BuyCodeLoader"
+                                     style="display: none">
+
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Εξοδα</td>
+
+                            <td class="text-right">
+                                <span name="BuyCodeValue"
+                                      data-computeCode="SumOfExpenseBuysDf">
+                                    0
+                                </span>
+
+                                <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+                                     data-computeCode="SumOfExpenseBuysDf"
+                                     name="BuyCodeLoader"
+                                     style="display: none">
+
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+                </div>
+                <div class="card-footer text-muted">
+                    <p id="ExpensesSumValue">0</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-12">
+            <div class="card text-center">
+                <div class="card-header">
+                    <h5>Balance</h5>
+                </div>
+                <div class="card-body text-center">
+                    <table class="table-sm w-100">
+                        <tr>
+                            <td>Αγορές Υλικών</td>
+                            <td class="text-right">
+                                <span name="BalanceCodeValue"
+                                      data-computeCode="SumOfMaterialBuysDf">
+                                    0
+                                </span>
+
+                                <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+                                     data-computeCode="SumOfMaterialBuysDf"
+                                     name="BalanceCodeLoader"
+                                     style="display: none">
+
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Αγορές υπηρεσιών</td>
+                            <td class="text-right">
+                                <span name="BalanceCodeValue"
+                                      data-computeCode="SumOfServiceBuysDf">
+                                    0
+                                </span>
+
+                                <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+                                     data-computeCode="SumOfServiceBuysDf"
+                                     name="BalanceCodeLoader"
+                                     style="display: none">
+
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Αγορές παγίων</td>
+                            <td class="text-right">
+                                <span name="BalanceCodeValue"
+                                      data-computeCode="SumOfFixedAssetBuysDf">
+                                    0
+                                </span>
+
+                                <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+                                     data-computeCode="SumOfFixedAssetBuysDf"
+                                     name="BalanceCodeLoader"
+                                     style="display: none">
+
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Εξοδα</td>
+
+                            <td class="text-right">
+                                <span name="BalanceCodeValue"
+                                      data-computeCode="SumOfExpenseBuysDf">
+                                    0
+                                </span>
+
+                                <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+                                     data-computeCode="SumOfExpenseBuysDf"
+                                     name="BalanceCodeLoader"
+                                     style="display: none">
+
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+                </div>
+                <div class="card-footer text-muted">
+                    <p id="BalanceSumValue">0</p>
+                </div>
+                
+            </div>
+        </div>
+        </div>
         </div>
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h5>Transactions</h5>
@@ -254,19 +327,19 @@
             </div>
         </div>
         @* <div class="container"> *@
-            <ejs-chart id="container" title="Εσοδα-Εξοδα-Αποτέλεσμα" width="100%">
-                <e-chart-primaryxaxis valueType="DateTime"
-                                      labelFormat="m"
-                                      intervalType="Months"
-                                      edgeLabelPlacement="Shift">
-                </e-chart-primaryxaxis>
-                <e-series-collection>
-                    <e-series dataSource="ViewBag.dataSource" name="Germany" xName="xValue" width="2"
-                              opacity="1" yName="yValue"
-                              type="@Syncfusion.EJ2.Charts.ChartSeriesType.Line">
-                    </e-series>
-                </e-series-collection>
-            </ejs-chart>
+        <ejs-chart id="container" title="Εσοδα-Εξοδα-Αποτέλεσμα" width="100%">
+            <e-chart-primaryxaxis valueType="DateTime"
+                                  labelFormat="m"
+                                  intervalType="Months"
+                                  edgeLabelPlacement="Shift">
+            </e-chart-primaryxaxis>
+            <e-series-collection>
+                <e-series dataSource="ViewBag.dataSource" name="Germany" xName="xValue" width="2"
+                          opacity="1" yName="yValue"
+                          type="@Syncfusion.EJ2.Charts.ChartSeriesType.Line">
+                </e-series>
+            </e-series-collection>
+        </ejs-chart>
         @* </div> *@
 
 
