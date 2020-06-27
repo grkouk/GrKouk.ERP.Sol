@@ -632,6 +632,12 @@
                            $balanceFieldsToUpdate.each(function(index) {
                                let $item = $(this);
                                let cd = $item.data('dependsoncodes');
+                               if(codeToCompute==='SumOfMaterialBuysDf' && cd.includes('SumOfMaterialBuysDf')){
+                                   console.log('buy materials')
+                               }
+                               if(codeToCompute==='SumOfMaterialSalesDf' && cd.includes('SumOfMaterialSalesDf')){
+                                    console.log('sale materials')                                                                  
+                              }
                                if (cd.includes(codeToCompute)){
                                    console.log(`Storing for code ${codeToCompute} value ${vlVal}`);
                                    if(codeToCompute.includes('Buys')){
@@ -639,7 +645,7 @@
                                         $item.attr('buyvalue',vlVal);
                                         
                                    }
-                                   if(codeToCompute.includes('Sells')){
+                                   if(codeToCompute.includes('Sales')){
                                        $item.data('sellvalue',vlVal);
                                        $item.attr('sellvalue',vlVal);
                                    }
