@@ -240,51 +240,30 @@
                 <div class="card-body text-center">
                     <table class="table-sm w-100">
                         <tr>
-                            <td>Αγορές Υλικών</td>
+                            <td>Υλικά</td>
                             <td class="text-right">
                                 <span name="BalanceCodeValue"
-                                      data-computeCode="SumOfMaterialBuysDf">
+                                      data-dependsOnCodes="SumOfMaterialBuysDf;SumOfMaterialSalesDf">
                                     0
                                 </span>
-
-                                <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
-                                     data-computeCode="SumOfMaterialBuysDf"
-                                     name="BalanceCodeLoader"
-                                     style="display: none">
-
-                                </div>
                             </td>
                         </tr>
                         <tr>
-                            <td>Αγορές υπηρεσιών</td>
+                            <td>Υπηρεσίες</td>
                             <td class="text-right">
                                 <span name="BalanceCodeValue"
-                                      data-computeCode="SumOfServiceBuysDf">
+                                      data-dependsOnCodes="SumOfServiceBuysDf;SumOfServiceSalesDf">
                                     0
                                 </span>
-
-                                <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
-                                     data-computeCode="SumOfServiceBuysDf"
-                                     name="BalanceCodeLoader"
-                                     style="display: none">
-
-                                </div>
                             </td>
                         </tr>
                         <tr>
-                            <td>Αγορές παγίων</td>
+                            <td>πάγια</td>
                             <td class="text-right">
                                 <span name="BalanceCodeValue"
-                                      data-computeCode="SumOfFixedAssetBuysDf">
+                                      data-dependsOnCodes="SumOfFixedAssetBuysDf;SumOfFixedAssetSalesDf">
                                     0
                                 </span>
-
-                                <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
-                                     data-computeCode="SumOfFixedAssetBuysDf"
-                                     name="BalanceCodeLoader"
-                                     style="display: none">
-
-                                </div>
                             </td>
                         </tr>
                         <tr>
@@ -292,16 +271,9 @@
 
                             <td class="text-right">
                                 <span name="BalanceCodeValue"
-                                      data-computeCode="SumOfExpenseBuysDf">
+                                      data-dependsOnCodes="SumOfExpenseBuysDf;SumOfExpenseSalesDf">
                                     0
                                 </span>
-
-                                <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
-                                     data-computeCode="SumOfExpenseBuysDf"
-                                     name="BalanceCodeLoader"
-                                     style="display: none">
-
-                                </div>
                             </td>
                         </tr>
                     </table>
@@ -386,6 +358,9 @@
             const currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
             const companyListJs = @Html.Raw(Json.Serialize(ViewBag.CompanyListJs));
             const datePeriodListJs = @Html.Raw(Json.Serialize(ViewBag.DatePeriodListJs));
+            const computeLineSum= (dependentCodes)=>{
+                
+            };
             const refreshView = () => {
                 const $selectedCompany = $('.selected-company-text');
                 let selCompanyId = $selectedCompany.data('companyid');
@@ -415,8 +390,7 @@
                     getFinancialData(cd, selPeriodId, selCompanyId, selCurrencyId, $item, loader);
 
                 });
-
-                //getTransactionsData(transactorId, selPeriodId, selCompanyId, selCurrencyId);
+                
 
             };
             //---------------------Periods----------------------------------
@@ -685,14 +659,22 @@
                     let $fieldsToCompute = $('[name=BuyCodeValue]');
                     let sumOfGroup = parseFloat('0');
                     $fieldsToCompute.each(function(index) {
-
                         let $item = $(this);
                         console.log($item.data('computecode'));
                         let vlText = $item.text();
                         let vl1 = $item.attr('value');
                         if (vl1) {
                             let vl = parseFloat(vl1);
-                            sumOfGroup += vl;    
+                            sumOfGroup += vl;
+                            let $balanceBuyFieldsToUpdate = $('[name=BalanceCodeValue]');
+                               $balanceBuyFieldsToUpdate.each(function(index) {
+                                   let $item = $(this);
+                                   let cd = $item.data('dependsoncodes');
+                                   if (cd.includes(code)){
+                                       console.log(`Storing for code ${code} value ${vl}`);
+                                       $item.data('buyvalue',vl);
+                                   }
+                               });
                         }
                     });
                     $('#ExpensesSumValue').text(formatterCurrency.format(sumOfGroup));
@@ -701,19 +683,47 @@
                     let $fieldsToCompute = $('[name=SellCodeValue]');
                     let sumOfGroup = parseFloat('0');
                     $fieldsToCompute.each(function (index) {
-
                         let $item = $(this);
+                        console.log('Sales Fields to compute ')
                         console.log($item.data('computecode'));
                         let vlText = $item.text();
                         let vl1 = $item.attr('value');
                         if (vl1) {
                             let vl = parseFloat(vl1);
                             sumOfGroup += vl;
+                            let $balanceSellFieldsToUpdate = $('[name=BalanceCodeValue]');
+                               $balanceSellFieldsToUpdate.each(function(index) {
+                                   let $item = $(this);
+                                   let cd = $item.data('dependsoncodes');
+                                   if (cd.includes(code)){
+                                       console.log(`Storing for code ${code} value ${vl}`);
+                                       $item.data('sellvalue',vl);
+                                   }
+                               });
                         }
                     });
                     $('#IncomesSumValue').text(formatterCurrency.format(sumOfGroup));
                 }
-               
+                
+                let $balanceFieldsToCompute = $('[name=BalanceCodeValue]');
+                let sumOfBalance = parseFloat('0');
+                   $balanceFieldsToCompute.each(function(index) {
+                       let $item = $(this);
+                       console.log($item.data('dependsoncodes'));
+                       let tbuyVal = $item.data('buyvalue');
+                       let buyVal = parseFloat('0');
+                       if(tbuyVal) {buyVal = parseFloat(tbuyVal);}
+                       
+                       let tSellVal = $item.data('buyvalue');
+                       let sellVal = parseFloat('0');
+                       if(tSellVal) {sellVal = parseFloat(tSellVal);}
+                                              
+                      
+                       let difVal = sellVal-buyVal;
+                       sumOfBalance += difVal;
+                       $item.text(formatterCurrency.format(difVal));
+                   });
+                $('#BalanceSumValue').text(formatterCurrency.format(sumOfBalance));
             };
             const getTransactionsData = (transactorId, dateRange, selCompany, selCurrency, selectionCallback) => {
                 var timeout;
