@@ -666,4 +666,10 @@ namespace GrKouk.Web.ERP.Controllers
             return Ok(response);
         }
     }
+    public class LineChartData
+    {
+        public DateTime XValue;
+        public double YValue;
+        public double YValue1;
+    }
 }
