@@ -964,116 +964,128 @@
                         $('#myTable > tbody').empty();
                         $('#myTable > thead').empty();
                          let colDefs = [
-                                {
-                                    key: 'transactionDate',
-                                    responseKey: 'transactionDate',
-                                    actualVal: '',
-                                    columnFormat: 'd',
-                                    totalKey: '',
-                                    grandTotalKey: '',
-                                    totalFormatter: '',
-                                    sortKey: 'TransactionDateSort',
-                                    sortType: 'numeric',
-                                    header: 'Date',
-                                    text: '',
-                                    headerClass:'small text-center',
-                                    class: 'small'
-                                },
-                                {
-                                    key: 'transactorName',
-                                    responseKey: 'transactorName',
-                                    actualVal: '',
-                                    columnFormat: 't',
-                                    totalKey: 'label',
-                                    grandTotalKey: 'label',
-                                    totalFormatter: '',
-                                    sortKey: 'TransactorNameSort',
-                                    sortType: 'alpha',
-                                    header: 'Transactor',
-                                    text: '',
-                                    headerClass:'small text-center',
-                                    class: 'small'
-                                },
-                                {
-                                    key: 'seriesCode',
-                                    responseKey: 'seriesCode',
-                                    actualVal: '',
-                                    columnFormat: 't',
-                                    totalKey: '',
-                                    grandTotalKey: '',
-                                    totalFormatter: '',
-                                    sortKey: 'SeriesCodeSort',
-                                    sortType: 'alpha',
-                                    header: 'Series',
-                                    text: '',
-                                    headerClass:'small text-center d-none d-md-table-cell',
-                                    class: 'small d-none d-md-table-cell '
-                                },
-                                {
-                                    key: 'refNumber',
-                                    responseKey: 'refNumber',
-                                    actualVal: '',
-                                    columnFormat: 't',
-                                    totalKey: '',
-                                    grandTotalKey: '',
-                                    totalFormatter: '',
-                                    sortKey: '',
-                                    sortType: '',
-                                    header: 'Ref Number',
-                                    text: '',
-                                    headerClass:'small text-center d-none d-md-table-cell',
-                                    class: 'small d-none d-md-table-cell '
-                                },
-                                {
-                                     key: 'CompanyCode',
-                                    responseKey: 'CompanyCode',
-                                    actualVal: '',
-                                    columnFormat: 't',
-                                    totalKey: '',
-                                    grandTotalKey: '',
-                                    totalFormatter: '',
-                                    sortKey: 'CompanyCodeSort',
-                                    sortType: 'alpha',
-                                    header: 'Company',
-                                    text: '',
-                                    headerClass:'small text-center',
-                                    class: 'small '
-                             },
-                             {
-                                 totalKey: 'sumOfNetAmount',
-                                 grandTotalKey: 'grandSumOfNetAmount',
-                                 totalFormatter: 'currency',
-                                 sortKey: '',
-                                 sortType: '',
-                                 header: 'Net Amount',
-                                 text: '',
-                                 headerClass:'small text-center',
-                                 class: 'small text-right '
-                             },
-                                {
-                                    totalKey: 'sumOfAmount',
-                                    grandTotalKey: 'grandSumOfAmount',
-                                    totalFormatter: 'currency',
-                                    sortKey: '',
-                                    sortType: '',
-                                    header: 'Amount',
-                                    text: '',
-                                    headerClass:'small text-center',
-                                    class: 'small text-right '
-                                },
-                             {
-                                 totalKey: 'sumOfPayedAmount',
-                                 grandTotalKey: 'grandSumOfPayedAmount',
-                                 totalFormatter: 'currency',
-                                 sortKey: '',
-                                 sortType: '',
-                                 header: 'Payed Amount',
-                                 text: '',
-                                 headerClass: 'small text-center',
-                                 class: 'small text-right '
-                             }
+                            {
+                                key: 'transDate',
+                                responseKey: 'transDate',
+                                actualVal: '',
+                                columnFormat: 'd',
+                                totalKey: '',
+                                grandTotalKey: '',
+                                totalFormatter: '',
+                                sortKey: 'TransactionDateSort',
+                                sortType: 'numeric',
+                                header: 'Date',
+                                text: '',
+                                headerClass:'small text-center',
+                                class: 'small'
+                            },
+                            {
+                                key: 'transactorName',
+                                responseKey: 'transactorName',
+                                actualVal: '',
+                                columnFormat: 't',
+                                totalKey: 'label',
+                                grandTotalKey: 'label',
+                                totalFormatter: '',
+                                sortKey: 'TransactorNameSort',
+                                sortType: 'alpha',
+                                header: 'Transactor',
+                                text: '',
+                                headerClass:'small text-center',
+                                class: 'small'
+                            },
+                            {
+                                key: 'sellDocSeriesCode',
+                                responseKey: 'sellDocSeriesCode',
+                                actualVal: '',
+                                columnFormat: 't',
+                                totalKey: '',
+                                grandTotalKey: '',
+                                totalFormatter: '',
+                                sortKey: 'SeriesCodeSort',
+                                sortType: 'alpha',
+                                header: 'Series',
+                                text: '',
+                                headerClass:'small text-center d-none d-md-table-cell',
+                                class: 'small d-none d-md-table-cell '
+                            },
+                            {
+                                key: 'transRefCode',
+                                responseKey: 'transRefCode',
+                                actualVal: '',
+                                columnFormat: 't',
+                                totalKey: '',
+                                grandTotalKey: '',
+                                totalFormatter: '',
+                                sortKey: '',
+                                sortType: '',
+                                header: 'Ref Number',
+                                text: '',
+                                headerClass:'small text-center d-none d-md-table-cell',
+                                class: 'small d-none d-md-table-cell '
+                            },
+                            {
+                                key: 'companyCode',
+                                responseKey: 'companyCode',
+                                actualVal: '',
+                                columnFormat: 't',
+                                totalKey: '',
+                                grandTotalKey: '',
+                                totalFormatter: '',
+                                sortKey: 'CompanyCodeSort',
+                                sortType: 'alpha',
+                                header: 'Company',
+                                text: '',
+                                headerClass:'small text-center',
+                                class: 'small '
+                            },
+                            {
+                                key: 'totalNetAmount',
+                                responseKey: 'totalNetAmount',
+                                actualVal: '',
+                                columnFormat: 'c',
+                                totalKey: 'sumOfNetAmount',
+                                grandTotalKey: 'grandSumOfNetAmount',
+                                totalFormatter: 'currency',
+                                sortKey: '',
+                                sortType: '',
+                                header: 'Net Amount',
+                                text: '',
+                                headerClass:'small text-center',
+                                class: 'small text-right '
+                            },
+                            {
+                                key: 'totalAmount',
+                                responseKey: 'totalAmount',
+                                actualVal: '',
+                                columnFormat: 'c',
+                                totalKey: 'sumOfAmount',
+                                grandTotalKey: 'grandSumOfAmount',
+                                totalFormatter: 'currency',
+                                sortKey: '',
+                                sortType: '',
+                                header: 'Amount',
+                                text: '',
+                                headerClass:'small text-center',
+                                class: 'small text-right '
+                            },
+                            {
+                                key: 'payedOfAmount',
+                                responseKey: 'payedOfAmount',
+                                actualVal: '',
+                                columnFormat: 'c',
+                                totalKey: 'sumOfPayedAmount',
+                                grandTotalKey: 'grandSumOfPayedAmount',
+                                totalFormatter: 'currency',
+                                sortKey: '',
+                                sortType: '',
+                                header: 'Payed Amount',
+                                text: '',
+                                headerClass: 'small text-center',
+                                class: 'small text-right '
+                            }
                         ];
-                         let curSortUndefined = false;
+                        let curSortUndefined = false;
                             let curSortAr = [];
                             var curSort = getTableCurrentSort();
                             if (curSort === undefined || curSort === null || curSort.length === 0) {
@@ -1166,40 +1178,40 @@
                                     actionsCol += 'Αντιστοίχιση Πληρωμών</a> ';
                                 }    
                                 actionsCol += ' </div>';
-                                    actionsCol += '</td>';
-                                    var actionColMobile =
-                                        '<td class="small text-center d-table-cell d-sm-table-cell d-md-none">';
-                                    actionColMobile +=
-                                        '<a class=" dropdown-toggle" role="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" ';
-                                    actionColMobile +=
-                                        'aria-expanded="false"><i class="fas fa-bars fa-lg" style="color:slategray"></i></a>';
-                                    actionColMobile +=
-                                        '<div class="dropdown-menu small" aria-labelledby="dropdownMenuButton">';
-                                    actionColMobile += `<a class="dropdown-item" href="${urlEdit
-                                        }"><i class="fas fa-edit fa-lg" style="color:slategray"></i>  Edit</a> `;
-                                    actionColMobile += `<a class="dropdown-item" href="${urlInfo
-                                        }"><i class="fas fa-info-circle fa-lg" style="color:slategray"></i> Details</a> `;
-                                    actionColMobile += `<a class="dropdown-item" href="${urlDel
-                                        }"><i class="fas fa-trash fa-lg" style="color:slategray"></i> Delete</a> `;
-                                    actionColMobile += `<a class="dropdown-item" href="${urlNewLikeThis
-                                        }"><i class="fas fa-clone fa-lg" style="color:slategray"></i> Duplicate</a> `;
-                                    actionColMobile += '</div></td>';
+                                actionsCol += '</td>';
+                                var actionColMobile =
+                                    '<td class="small text-center d-table-cell d-sm-table-cell d-md-none">';
+                                actionColMobile +=
+                                    '<a class=" dropdown-toggle" role="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" ';
+                                actionColMobile +=
+                                    'aria-expanded="false"><i class="fas fa-bars fa-lg" style="color:slategray"></i></a>';
+                                actionColMobile +=
+                                    '<div class="dropdown-menu small" aria-labelledby="dropdownMenuButton">';
+                                actionColMobile += `<a class="dropdown-item" href="${urlEdit
+                                    }"><i class="fas fa-edit fa-lg" style="color:slategray"></i>  Edit</a> `;
+                                actionColMobile += `<a class="dropdown-item" href="${urlInfo
+                                    }"><i class="fas fa-info-circle fa-lg" style="color:slategray"></i> Details</a> `;
+                                actionColMobile += `<a class="dropdown-item" href="${urlDel
+                                    }"><i class="fas fa-trash fa-lg" style="color:slategray"></i> Delete</a> `;
+                                actionColMobile += `<a class="dropdown-item" href="${urlNewLikeThis
+                                    }"><i class="fas fa-clone fa-lg" style="color:slategray"></i> Duplicate</a> `;
+                                actionColMobile += '</div></td>';
 
-                                    var $tr = $('<tr>');
+                                var $tr = $('<tr>');
 
-                                    var $td = $(
-                                        '<td name="selectRowColumn"> <label class="custom-control custom-checkbox">  ' +
-                                        ' <input type="checkbox" class="custom-control-input" name="checkTableRow" ' +
-                                        `data-itemId="${itemId}">` +
-                                        '<span class="custom-control-indicator"></span></label></td>');
-                                    $tr.append($td);
-                                    colDefs.forEach(function(item) {
-                                        var $tdCol = $('<td>').text(item.text).addClass(item.class);
-                                        $tr.append($tdCol);
-                                    });
-                                    $tr.append(actionsCol);
-                                    $tr.append(actionColMobile);
-                                    $tr.appendTo('#myTable > tbody');
+                                var $td = $(
+                                    '<td name="selectRowColumn"> <label class="custom-control custom-checkbox">  ' +
+                                    ' <input type="checkbox" class="custom-control-input" name="checkTableRow" ' +
+                                    `data-itemId="${itemId}">` +
+                                    '<span class="custom-control-indicator"></span></label></td>');
+                                $tr.append($td);
+                                colDefs.forEach(function(item) {
+                                    var $tdCol = $('<td>').text(item.text).addClass(item.class);
+                                    $tr.append($tdCol);
+                                });
+                                $tr.append(actionsCol);
+                                $tr.append(actionColMobile);
+                                $tr.appendTo('#myTable > tbody');
 
 
                             });
