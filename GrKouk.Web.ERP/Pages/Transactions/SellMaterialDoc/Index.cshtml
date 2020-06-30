@@ -963,7 +963,7 @@
 
                         $('#myTable > tbody').empty();
                         $('#myTable > thead').empty();
-                         let colDefs = [
+                        let colDefs = [
                             {
                                 key: 'transDate',
                                 responseKey: 'transDate',
@@ -1086,50 +1086,50 @@
                             }
                         ];
                         let curSortUndefined = false;
-                            let curSortAr = [];
-                            var curSort = getTableCurrentSort();
-                            if (curSort === undefined || curSort === null || curSort.length === 0) {
-                                curSortUndefined = true;
-                            } else {
-                                curSortAr = curSort.split(':');
-                            }
-                            var $trHead = $('<tr>');
-                            var $tdSelectCol = $(
-                                '<th name="selectAllRowsColumn"> <label class="custom-control custom-checkbox">  ' +
-                                ' <input type="checkbox" class="custom-control-input" name="checkAllRows" >' +
-                                '<span class="custom-control-indicator"></span></label></th>');
-                            $trHead.append($tdSelectCol);
-                            colDefs.forEach(function(item) {
-                                var tdColHead = '';
-                                if (item.sortKey.length !== 0) {
-                                    let colHtml = "";
-                                    colHtml = `<th class="${item.headerClass}"> `;
-                                    colHtml += `<a href="#" role="button" name="SortHeader" tabindex="-1" `;
-                                    colHtml += `data-sortkey="${item.sortKey}" data-sorttype="${item.sortType}">  `;
-                                    colHtml += `${item.header}  `;
-                                    colHtml += `</a>  `;
-                                    if (curSortUndefined) {
-                                        colHtml += `<i class="" name="SortIcon"></i>  `;
-                                    } else {
-                                        if (curSortAr[0] === item.sortKey) {
-
-                                            var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
-                                            var iconSortType = "fas fa-sort-" + item.sortType + newSortIconType;
-                                            colHtml += `<i class="${iconSortType}" name="SortIcon"></i>  `;
-                                        } else {
-                                            colHtml += `<i class="" name="SortIcon"></i>  `;
-                                        }
-                                    }
-
-                                    colHtml += `</a>  `;
-                                    tdColHead = colHtml;
+                        let curSortAr = [];
+                        var curSort = getTableCurrentSort();
+                        if (curSort === undefined || curSort === null || curSort.length === 0) {
+                            curSortUndefined = true;
+                        } else {
+                            curSortAr = curSort.split(':');
+                        }
+                        var $trHead = $('<tr>');
+                        var $tdSelectCol = $(
+                            '<th name="selectAllRowsColumn"> <label class="custom-control custom-checkbox">  ' +
+                            ' <input type="checkbox" class="custom-control-input" name="checkAllRows" >' +
+                            '<span class="custom-control-indicator"></span></label></th>');
+                        $trHead.append($tdSelectCol);
+                        colDefs.forEach(function(item) {
+                            var tdColHead = '';
+                            if (item.sortKey.length !== 0) {
+                                let colHtml = "";
+                                colHtml = `<th class="${item.headerClass}"> `;
+                                colHtml += `<a href="#" role="button" name="SortHeader" tabindex="-1" `;
+                                colHtml += `data-sortkey="${item.sortKey}" data-sorttype="${item.sortType}">  `;
+                                colHtml += `${item.header}  `;
+                                colHtml += `</a>  `;
+                                if (curSortUndefined) {
+                                    colHtml += `<i class="" name="SortIcon"></i>  `;
                                 } else {
-                                    tdColHead = $('<th>').text(item.header).addClass(item.headerClass);
+                                    if (curSortAr[0] === item.sortKey) {
+    
+                                        var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
+                                        var iconSortType = "fas fa-sort-" + item.sortType + newSortIconType;
+                                        colHtml += `<i class="${iconSortType}" name="SortIcon"></i>  `;
+                                    } else {
+                                        colHtml += `<i class="" name="SortIcon"></i>  `;
+                                    }
                                 }
-                                $trHead.append($(tdColHead));
-                            });
-                            $trHead.append($('<th>'));
-                            $trHead.appendTo('#myTable > thead');
+    
+                                colHtml += `</a>  `;
+                                tdColHead = colHtml;
+                            } else {
+                                tdColHead = $('<th>').text(item.header).addClass(item.headerClass);
+                            }
+                            $trHead.append($(tdColHead));
+                        });
+                        $trHead.append($('<th>'));
+                        $trHead.appendTo('#myTable > thead');
                         $.each(result.data,
                             function (index, value) {
                                 let i = 0;
@@ -1150,7 +1150,7 @@
                                 var urlDel = `@Url.Page("./Delete")?id=${itemId}`;
                                 var urlNewLikeThis = `@Url.Page("./Create")?copyFromId=${itemId}`;
                                 var urlKartela = `@Url.Page("./Kartela")?transactorId=${itemId}`;
-                                 var urlRecurring = `@Url.Page("/Transactions/RecurringTransactions/Create")?createFromId=${itemId}&createFromType=2`;
+                                var urlRecurring = `@Url.Page("/Transactions/RecurringTransactions/Create")?createFromId=${itemId}&createFromType=2`;
                                 var actionsCol = '<td class="small text-center d-none d-md-table-cell">';
                                 actionsCol += `<a href="${urlEdit
                                     }"><i class="fas fa-edit fa-lg" style="color:slategray"></i></a> |`;
