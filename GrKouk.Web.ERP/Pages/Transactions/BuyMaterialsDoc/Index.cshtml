@@ -943,6 +943,10 @@
                             $('#myTable > thead').empty();
                             let colDefs = [
                                 {
+                                    key: 'transDate',
+                                    responseKey: 'transDate',
+                                    actualVal: '',
+                                    columnFormat: 'd',
                                     totalKey: '',
                                     grandTotalKey: '',
                                     totalFormatter: '',
@@ -954,6 +958,10 @@
                                     class: 'small'
                                 },
                                 {
+                                    key: 'transactorName',
+                                    responseKey: 'transactorName',
+                                    actualVal: '',
+                                    columnFormat: 't',
                                     totalKey: 'label',
                                     grandTotalKey: 'label',
                                     totalFormatter: '',
@@ -965,6 +973,10 @@
                                     class: 'small'
                                 },
                                 {
+                                    key: 'sellDocSeriesCode',
+                                    responseKey: 'sellDocSeriesCode',
+                                    actualVal: '',
+                                    columnFormat: 't',
                                     totalKey: '',
                                     grandTotalKey: '',
                                     totalFormatter: '',
@@ -976,6 +988,10 @@
                                     class: 'small d-none d-md-table-cell '
                                 },
                                 {
+                                    key: 'transRefCode',
+                                    responseKey: 'transRefCode',
+                                    actualVal: '',
+                                    columnFormat: 't',
                                     totalKey: '',
                                     grandTotalKey: '',
                                     totalFormatter: '',
@@ -987,6 +1003,10 @@
                                     class: 'small d-none d-md-table-cell '
                                 },
                                 {
+                                    key: 'companyCode',
+                                    responseKey: 'companyCode',
+                                    actualVal: '',
+                                    columnFormat: 't',
                                     totalKey: '',
                                     grandTotalKey: '',
                                     totalFormatter: '',
@@ -998,6 +1018,10 @@
                                     class: 'small '
                                 },
                                 {
+                                    key: 'totalNetAmount',
+                                    responseKey: 'totalNetAmount',
+                                    actualVal: '',
+                                    columnFormat: 'c',
                                     totalKey: 'sumOfNetAmount',
                                     grandTotalKey: 'grandSumOfNetAmount',
                                     totalFormatter: 'currency',
@@ -1009,6 +1033,10 @@
                                     class: 'small text-right '
                                 },
                                 {
+                                    key: 'totalAmount',
+                                    responseKey: 'totalAmount',
+                                    actualVal: '',
+                                    columnFormat: 'c',
                                     totalKey: 'sumOfAmount',
                                     grandTotalKey: 'grandSumOfAmount',
                                     totalFormatter: 'currency',
@@ -1020,6 +1048,10 @@
                                     class: 'small text-right '
                                 },
                                 {
+                                    key: 'payedOfAmount',
+                                    responseKey: 'payedOfAmount',
+                                    actualVal: '',
+                                    columnFormat: 'c',
                                     totalKey: 'sumOfPayedAmount',
                                     grandTotalKey: 'grandSumOfPayedAmount',
                                     totalFormatter: 'currency',
@@ -1173,8 +1205,19 @@
                                         '<span class="custom-control-indicator"></span></label></td>');
                                     $tr.append($td);
                                     colDefs.forEach(function(item) {
-                                        var $tdCol = $('<td>').text(item.text).addClass(item.class);
-                                        $tr.append($tdCol);
+                                        if(item.key==='transactorName'){
+                                            var $tdCol = $('<td>').addClass(item.class);
+                                            var transactorId= value.transactorId;
+                                            var urlTransactor = `@Url.Page("/mainentities/transactors/details")?id=${transactorId}`;
+                                            var $aLink = `<a href="${urlTransactor}" target="_blank">${item.text}</a>  `;
+                                            //$tdCol.innerhtml ($aLink);
+                                            //$($aLink).appendTo($tdCol);
+                                            $tdCol.html ($aLink);
+                                            $tr.append($tdCol);
+                                        }else{
+                                            var $tdCol = $('<td>').text(item.text).addClass(item.class);
+                                            $tr.append($tdCol);
+                                        }
                                     });
                                     $tr.append(actionsCol);
                                     $tr.append(actionColMobile);

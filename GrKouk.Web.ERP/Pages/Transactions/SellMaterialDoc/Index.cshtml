@@ -1206,8 +1206,20 @@
                                     '<span class="custom-control-indicator"></span></label></td>');
                                 $tr.append($td);
                                 colDefs.forEach(function(item) {
-                                    var $tdCol = $('<td>').text(item.text).addClass(item.class);
-                                    $tr.append($tdCol);
+                                    if(item.key==='transactorName'){
+                                        var $tdCol = $('<td>').addClass(item.class);
+                                        var transactorId= value.transactorId;
+                                        var urlTransactor = `@Url.Page("/mainentities/transactors/details")?id=${transactorId}`;
+                                        var $aLink = `<a href="${urlTransactor}" target="_blank">${item.text}</a>  `;
+                                        //$tdCol.innerhtml ($aLink);
+                                        //$($aLink).appendTo($tdCol);
+                                        $tdCol.html ($aLink);
+                                        $tr.append($tdCol);
+                                    }else{
+                                        var $tdCol = $('<td>').text(item.text).addClass(item.class);
+                                        $tr.append($tdCol);
+                                    }
+                                    
                                 });
                                 $tr.append(actionsCol);
                                 $tr.append(actionColMobile);
