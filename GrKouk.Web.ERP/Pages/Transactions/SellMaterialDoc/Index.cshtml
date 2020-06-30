@@ -963,141 +963,173 @@
 
                         $('#myTable > tbody').empty();
                         $('#myTable > thead').empty();
-                         let colDefs = [
-                                {
-                                    totalKey: '',
-                                    grandTotalKey: '',
-                                    totalFormatter: '',
-                                    sortKey: 'TransactionDateSort',
-                                    sortType: 'numeric',
-                                    header: 'Date',
-                                    text: '',
-                                    headerClass:'small text-center',
-                                    class: 'small'
-                                },
-                                {
-                                    totalKey: 'label',
-                                    grandTotalKey: 'label',
-                                    totalFormatter: '',
-                                    sortKey: 'TransactorNameSort',
-                                    sortType: 'alpha',
-                                    header: 'Transactor',
-                                    text: '',
-                                    headerClass:'small text-center',
-                                    class: 'small'
-                                },
-                                {
-                                    totalKey: '',
-                                    grandTotalKey: '',
-                                    totalFormatter: '',
-                                    sortKey: 'SeriesCodeSort',
-                                    sortType: 'alpha',
-                                    header: 'Series',
-                                    text: '',
-                                    headerClass:'small text-center d-none d-md-table-cell',
-                                    class: 'small d-none d-md-table-cell '
-                                },
-                                {
-                                    totalKey: '',
-                                    grandTotalKey: '',
-                                    totalFormatter: '',
-                                    sortKey: '',
-                                    sortType: '',
-                                    header: 'Ref Number',
-                                    text: '',
-                                    headerClass:'small text-center d-none d-md-table-cell',
-                                    class: 'small d-none d-md-table-cell '
-                                },
-                                {
-                                    totalKey: '',
-                                    grandTotalKey: '',
-                                    totalFormatter: '',
-                                    sortKey: 'CompanyCodeSort',
-                                    sortType: 'alpha',
-                                    header: 'Company',
-                                    text: '',
-                                    headerClass:'small text-center',
-                                    class: 'small '
-                             },
-                             {
-                                 totalKey: 'sumOfNetAmount',
-                                 grandTotalKey: 'grandSumOfNetAmount',
-                                 totalFormatter: 'currency',
-                                 sortKey: '',
-                                 sortType: '',
-                                 header: 'Net Amount',
-                                 text: '',
-                                 headerClass:'small text-center',
-                                 class: 'small text-right '
-                             },
-                                {
-                                    totalKey: 'sumOfAmount',
-                                    grandTotalKey: 'grandSumOfAmount',
-                                    totalFormatter: 'currency',
-                                    sortKey: '',
-                                    sortType: '',
-                                    header: 'Amount',
-                                    text: '',
-                                    headerClass:'small text-center',
-                                    class: 'small text-right '
-                                },
-                             {
-                                 totalKey: 'sumOfPayedAmount',
-                                 grandTotalKey: 'grandSumOfPayedAmount',
-                                 totalFormatter: 'currency',
-                                 sortKey: '',
-                                 sortType: '',
-                                 header: 'Payed Amount',
-                                 text: '',
-                                 headerClass: 'small text-center',
-                                 class: 'small text-right '
-                             }
-                        ];
-                         let curSortUndefined = false;
-                            let curSortAr = [];
-                            var curSort = getTableCurrentSort();
-                            if (curSort === undefined || curSort === null || curSort.length === 0) {
-                                curSortUndefined = true;
-                            } else {
-                                curSortAr = curSort.split(':');
+                        let colDefs = [
+                            {
+                                key: 'transDate',
+                                responseKey: 'transDate',
+                                actualVal: '',
+                                columnFormat: 'd',
+                                totalKey: '',
+                                grandTotalKey: '',
+                                totalFormatter: '',
+                                sortKey: 'TransactionDateSort',
+                                sortType: 'numeric',
+                                header: 'Date',
+                                text: '',
+                                headerClass:'small text-center',
+                                class: 'small'
+                            },
+                            {
+                                key: 'transactorName',
+                                responseKey: 'transactorName',
+                                actualVal: '',
+                                columnFormat: 't',
+                                totalKey: 'label',
+                                grandTotalKey: 'label',
+                                totalFormatter: '',
+                                sortKey: 'TransactorNameSort',
+                                sortType: 'alpha',
+                                header: 'Transactor',
+                                text: '',
+                                headerClass:'small text-center',
+                                class: 'small'
+                            },
+                            {
+                                key: 'sellDocSeriesCode',
+                                responseKey: 'sellDocSeriesCode',
+                                actualVal: '',
+                                columnFormat: 't',
+                                totalKey: '',
+                                grandTotalKey: '',
+                                totalFormatter: '',
+                                sortKey: 'SeriesCodeSort',
+                                sortType: 'alpha',
+                                header: 'Series',
+                                text: '',
+                                headerClass:'small text-center d-none d-md-table-cell',
+                                class: 'small d-none d-md-table-cell '
+                            },
+                            {
+                                key: 'transRefCode',
+                                responseKey: 'transRefCode',
+                                actualVal: '',
+                                columnFormat: 't',
+                                totalKey: '',
+                                grandTotalKey: '',
+                                totalFormatter: '',
+                                sortKey: '',
+                                sortType: '',
+                                header: 'Ref Number',
+                                text: '',
+                                headerClass:'small text-center d-none d-md-table-cell',
+                                class: 'small d-none d-md-table-cell '
+                            },
+                            {
+                                key: 'companyCode',
+                                responseKey: 'companyCode',
+                                actualVal: '',
+                                columnFormat: 't',
+                                totalKey: '',
+                                grandTotalKey: '',
+                                totalFormatter: '',
+                                sortKey: 'CompanyCodeSort',
+                                sortType: 'alpha',
+                                header: 'Company',
+                                text: '',
+                                headerClass:'small text-center',
+                                class: 'small '
+                            },
+                            {
+                                key: 'totalNetAmount',
+                                responseKey: 'totalNetAmount',
+                                actualVal: '',
+                                columnFormat: 'c',
+                                totalKey: 'sumOfNetAmount',
+                                grandTotalKey: 'grandSumOfNetAmount',
+                                totalFormatter: 'currency',
+                                sortKey: '',
+                                sortType: '',
+                                header: 'Net Amount',
+                                text: '',
+                                headerClass:'small text-center',
+                                class: 'small text-right '
+                            },
+                            {
+                                key: 'totalAmount',
+                                responseKey: 'totalAmount',
+                                actualVal: '',
+                                columnFormat: 'c',
+                                totalKey: 'sumOfAmount',
+                                grandTotalKey: 'grandSumOfAmount',
+                                totalFormatter: 'currency',
+                                sortKey: '',
+                                sortType: '',
+                                header: 'Amount',
+                                text: '',
+                                headerClass:'small text-center',
+                                class: 'small text-right '
+                            },
+                            {
+                                key: 'payedOfAmount',
+                                responseKey: 'payedOfAmount',
+                                actualVal: '',
+                                columnFormat: 'c',
+                                totalKey: 'sumOfPayedAmount',
+                                grandTotalKey: 'grandSumOfPayedAmount',
+                                totalFormatter: 'currency',
+                                sortKey: '',
+                                sortType: '',
+                                header: 'Payed Amount',
+                                text: '',
+                                headerClass: 'small text-center',
+                                class: 'small text-right '
                             }
-                            var $trHead = $('<tr>');
-                            var $tdSelectCol = $(
-                                '<th name="selectAllRowsColumn"> <label class="custom-control custom-checkbox">  ' +
-                                ' <input type="checkbox" class="custom-control-input" name="checkAllRows" >' +
-                                '<span class="custom-control-indicator"></span></label></th>');
-                            $trHead.append($tdSelectCol);
-                            colDefs.forEach(function(item) {
-                                var tdColHead = '';
-                                if (item.sortKey.length !== 0) {
-                                    let colHtml = "";
-                                    colHtml = `<th class="${item.headerClass}"> `;
-                                    colHtml += `<a href="#" role="button" name="SortHeader" tabindex="-1" `;
-                                    colHtml += `data-sortkey="${item.sortKey}" data-sorttype="${item.sortType}">  `;
-                                    colHtml += `${item.header}  `;
-                                    colHtml += `</a>  `;
-                                    if (curSortUndefined) {
-                                        colHtml += `<i class="" name="SortIcon"></i>  `;
-                                    } else {
-                                        if (curSortAr[0] === item.sortKey) {
-
-                                            var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
-                                            var iconSortType = "fas fa-sort-" + item.sortType + newSortIconType;
-                                            colHtml += `<i class="${iconSortType}" name="SortIcon"></i>  `;
-                                        } else {
-                                            colHtml += `<i class="" name="SortIcon"></i>  `;
-                                        }
-                                    }
-
-                                    colHtml += `</a>  `;
-                                    tdColHead = colHtml;
+                        ];
+                        let curSortUndefined = false;
+                        let curSortAr = [];
+                        var curSort = getTableCurrentSort();
+                        if (curSort === undefined || curSort === null || curSort.length === 0) {
+                            curSortUndefined = true;
+                        } else {
+                            curSortAr = curSort.split(':');
+                        }
+                        var $trHead = $('<tr>');
+                        var $tdSelectCol = $(
+                            '<th name="selectAllRowsColumn"> <label class="custom-control custom-checkbox">  ' +
+                            ' <input type="checkbox" class="custom-control-input" name="checkAllRows" >' +
+                            '<span class="custom-control-indicator"></span></label></th>');
+                        $trHead.append($tdSelectCol);
+                        colDefs.forEach(function(item) {
+                            var tdColHead = '';
+                            if (item.sortKey.length !== 0) {
+                                let colHtml = "";
+                                colHtml = `<th class="${item.headerClass}"> `;
+                                colHtml += `<a href="#" role="button" name="SortHeader" tabindex="-1" `;
+                                colHtml += `data-sortkey="${item.sortKey}" data-sorttype="${item.sortType}">  `;
+                                colHtml += `${item.header}  `;
+                                colHtml += `</a>  `;
+                                if (curSortUndefined) {
+                                    colHtml += `<i class="" name="SortIcon"></i>  `;
                                 } else {
-                                    tdColHead = $('<th>').text(item.header).addClass(item.headerClass);
+                                    if (curSortAr[0] === item.sortKey) {
+    
+                                        var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
+                                        var iconSortType = "fas fa-sort-" + item.sortType + newSortIconType;
+                                        colHtml += `<i class="${iconSortType}" name="SortIcon"></i>  `;
+                                    } else {
+                                        colHtml += `<i class="" name="SortIcon"></i>  `;
+                                    }
                                 }
-                                $trHead.append($(tdColHead));
-                            });
-                            $trHead.append($('<th>'));
-                            $trHead.appendTo('#myTable > thead');
+    
+                                colHtml += `</a>  `;
+                                tdColHead = colHtml;
+                            } else {
+                                tdColHead = $('<th>').text(item.header).addClass(item.headerClass);
+                            }
+                            $trHead.append($(tdColHead));
+                        });
+                        $trHead.append($('<th>'));
+                        $trHead.appendTo('#myTable > thead');
                         $.each(result.data,
                             function (index, value) {
                                 let i = 0;
@@ -1118,7 +1150,7 @@
                                 var urlDel = `@Url.Page("./Delete")?id=${itemId}`;
                                 var urlNewLikeThis = `@Url.Page("./Create")?copyFromId=${itemId}`;
                                 var urlKartela = `@Url.Page("./Kartela")?transactorId=${itemId}`;
-                                 var urlRecurring = `@Url.Page("/Transactions/RecurringTransactions/Create")?createFromId=${itemId}&createFromType=2`;
+                                var urlRecurring = `@Url.Page("/Transactions/RecurringTransactions/Create")?createFromId=${itemId}&createFromType=2`;
                                 var actionsCol = '<td class="small text-center d-none d-md-table-cell">';
                                 actionsCol += `<a href="${urlEdit
                                     }"><i class="fas fa-edit fa-lg" style="color:slategray"></i></a> |`;
@@ -1146,40 +1178,52 @@
                                     actionsCol += 'Αντιστοίχιση Πληρωμών</a> ';
                                 }    
                                 actionsCol += ' </div>';
-                                    actionsCol += '</td>';
-                                    var actionColMobile =
-                                        '<td class="small text-center d-table-cell d-sm-table-cell d-md-none">';
-                                    actionColMobile +=
-                                        '<a class=" dropdown-toggle" role="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" ';
-                                    actionColMobile +=
-                                        'aria-expanded="false"><i class="fas fa-bars fa-lg" style="color:slategray"></i></a>';
-                                    actionColMobile +=
-                                        '<div class="dropdown-menu small" aria-labelledby="dropdownMenuButton">';
-                                    actionColMobile += `<a class="dropdown-item" href="${urlEdit
-                                        }"><i class="fas fa-edit fa-lg" style="color:slategray"></i>  Edit</a> `;
-                                    actionColMobile += `<a class="dropdown-item" href="${urlInfo
-                                        }"><i class="fas fa-info-circle fa-lg" style="color:slategray"></i> Details</a> `;
-                                    actionColMobile += `<a class="dropdown-item" href="${urlDel
-                                        }"><i class="fas fa-trash fa-lg" style="color:slategray"></i> Delete</a> `;
-                                    actionColMobile += `<a class="dropdown-item" href="${urlNewLikeThis
-                                        }"><i class="fas fa-clone fa-lg" style="color:slategray"></i> Duplicate</a> `;
-                                    actionColMobile += '</div></td>';
+                                actionsCol += '</td>';
+                                var actionColMobile =
+                                    '<td class="small text-center d-table-cell d-sm-table-cell d-md-none">';
+                                actionColMobile +=
+                                    '<a class=" dropdown-toggle" role="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" ';
+                                actionColMobile +=
+                                    'aria-expanded="false"><i class="fas fa-bars fa-lg" style="color:slategray"></i></a>';
+                                actionColMobile +=
+                                    '<div class="dropdown-menu small" aria-labelledby="dropdownMenuButton">';
+                                actionColMobile += `<a class="dropdown-item" href="${urlEdit
+                                    }"><i class="fas fa-edit fa-lg" style="color:slategray"></i>  Edit</a> `;
+                                actionColMobile += `<a class="dropdown-item" href="${urlInfo
+                                    }"><i class="fas fa-info-circle fa-lg" style="color:slategray"></i> Details</a> `;
+                                actionColMobile += `<a class="dropdown-item" href="${urlDel
+                                    }"><i class="fas fa-trash fa-lg" style="color:slategray"></i> Delete</a> `;
+                                actionColMobile += `<a class="dropdown-item" href="${urlNewLikeThis
+                                    }"><i class="fas fa-clone fa-lg" style="color:slategray"></i> Duplicate</a> `;
+                                actionColMobile += '</div></td>';
 
-                                    var $tr = $('<tr>');
+                                var $tr = $('<tr>');
 
-                                    var $td = $(
-                                        '<td name="selectRowColumn"> <label class="custom-control custom-checkbox">  ' +
-                                        ' <input type="checkbox" class="custom-control-input" name="checkTableRow" ' +
-                                        `data-itemId="${itemId}">` +
-                                        '<span class="custom-control-indicator"></span></label></td>');
-                                    $tr.append($td);
-                                    colDefs.forEach(function(item) {
+                                var $td = $(
+                                    '<td name="selectRowColumn"> <label class="custom-control custom-checkbox">  ' +
+                                    ' <input type="checkbox" class="custom-control-input" name="checkTableRow" ' +
+                                    `data-itemId="${itemId}">` +
+                                    '<span class="custom-control-indicator"></span></label></td>');
+                                $tr.append($td);
+                                colDefs.forEach(function(item) {
+                                    if(item.key==='transactorName'){
+                                        var $tdCol = $('<td>').addClass(item.class);
+                                        var transactorId= value.transactorId;
+                                        var urlTransactor = `@Url.Page("/mainentities/transactors/details")?id=${transactorId}`;
+                                        var $aLink = `<a href="${urlTransactor}" target="_blank">${item.text}</a>  `;
+                                        //$tdCol.innerhtml ($aLink);
+                                        //$($aLink).appendTo($tdCol);
+                                        $tdCol.html ($aLink);
+                                        $tr.append($tdCol);
+                                    }else{
                                         var $tdCol = $('<td>').text(item.text).addClass(item.class);
                                         $tr.append($tdCol);
-                                    });
-                                    $tr.append(actionsCol);
-                                    $tr.append(actionColMobile);
-                                    $tr.appendTo('#myTable > tbody');
+                                    }
+                                    
+                                });
+                                $tr.append(actionsCol);
+                                $tr.append(actionColMobile);
+                                $tr.appendTo('#myTable > tbody');
 
 
                             });
@@ -1201,106 +1245,106 @@
                                         $selectedRowsActionsLink.addClass('disabled');
                                     }
                                 });
-                            $('input[name=checkTableRow]').on('change',
-                                function() {
-                                    handleSelectedRowsUi();
-                                });
-                            $('[name=SortHeader]').on('click',
-                                function(event) {
-                                    var button = $(event.delegateTarget);
-                                    var reqSort = button.data('sortkey');
-                                    let reqSortType = button.data('sorttype');
-                                    let iconSortType = '';
-                                    var newSortVal = '';
-                                    var curSort = getTableCurrentSort();
-                                    if (curSort === undefined || curSort === null || curSort.length === 0) {
-                                        curSort = reqSort + ':desc';
-                                    }
-                                    var curSortAr = curSort.split(':');
-                                    if (curSortAr[0] === reqSort) {
-                                        var newSort = curSortAr[1] === 'asc' ? 'desc' : 'asc';
-                                        var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
-                                        newSortVal = curSortAr[0] + ':' + newSort;
-                                        iconSortType = "fas fa-sort-" + reqSortType + newSortIconType;
-                                    } else {
-                                        newSortVal = reqSort + ':asc';
-                                        iconSortType = "fas fa-sort-" + reqSortType + "-up";
-                                    }
-                                    let $btParent = button.parent();
-                                    let $icon = $btParent.find('i:eq(0)');
-                                    if ($icon !== null) {
-                                        $icon.removeClass();
-                                        $icon.addClass(iconSortType);
-                                    }
+                        $('input[name=checkTableRow]').on('change',
+                            function() {
+                                handleSelectedRowsUi();
+                            });
+                        $('[name=SortHeader]').on('click',
+                            function(event) {
+                                var button = $(event.delegateTarget);
+                                var reqSort = button.data('sortkey');
+                                let reqSortType = button.data('sorttype');
+                                let iconSortType = '';
+                                var newSortVal = '';
+                                var curSort = getTableCurrentSort();
+                                if (curSort === undefined || curSort === null || curSort.length === 0) {
+                                    curSort = reqSort + ':desc';
+                                }
+                                var curSortAr = curSort.split(':');
+                                if (curSortAr[0] === reqSort) {
+                                    var newSort = curSortAr[1] === 'asc' ? 'desc' : 'asc';
+                                    var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
+                                    newSortVal = curSortAr[0] + ':' + newSort;
+                                    iconSortType = "fas fa-sort-" + reqSortType + newSortIconType;
+                                } else {
+                                    newSortVal = reqSort + ':asc';
+                                    iconSortType = "fas fa-sort-" + reqSortType + "-up";
+                                }
+                                let $btParent = button.parent();
+                                let $icon = $btParent.find('i:eq(0)');
+                                if ($icon !== null) {
+                                    $icon.removeClass();
+                                    $icon.addClass(iconSortType);
+                                }
 
-                                    setTableCurrentSort(newSortVal);
-                                    //$('#pageIndex').val(1);
-                                    refreshTableData();
-                                });
+                                setTableCurrentSort(newSortVal);
+                                //$('#pageIndex').val(1);
+                                refreshTableData();
+                            });
                         //console.log();
                         let pageSummaryCount = 0;
-                            let totalSummaryCount = 0;
-                            let $pageSummaryRow = $('<tr class="table-info">');
-                            $pageSummaryRow.append('<td name="selectRowColumn"> </td> ');
-                            let $totalSummaryRow = $('<tr class="table-info">');
-                            $totalSummaryRow.append('<td name="selectRowColumn"> </td> ');
+                        let totalSummaryCount = 0;
+                        let $pageSummaryRow = $('<tr class="table-info">');
+                        $pageSummaryRow.append('<td name="selectRowColumn"> </td> ');
+                        let $totalSummaryRow = $('<tr class="table-info">');
+                        $totalSummaryRow.append('<td name="selectRowColumn"> </td> ');
 
-                            colDefs.forEach(function(item) {
-                                var tdColPage = '';
-                                var tdColTotal = '';
-                                if (item.totalKey.length !== 0) {
-                                    if (item.totalKey === "label") {
-                                        tdColPage = $('<td>').text('Σύνολα Σελίδας').addClass('small font-weight-bold');
-                                    } else {
-                                        if (item.totalFormatter === "currency") {
-                                            try {
-                                                let fAmount = formatterCurrency.format(result[item.totalKey]);
-                                                tdColPage = `<td class="${item.class} font-weight-bold"> `;
-                                                tdColPage += `${fAmount} </td> `;
-                                                pageSummaryCount++;
-                                            } catch (e) {
-                                                tdColPage = `<td class="${item.class}"> `;
-                                                tdColPage += `#Err </td> `;
-                                            }
-
-                                        }
-                                    }
+                        colDefs.forEach(function(item) {
+                            var tdColPage = '';
+                            var tdColTotal = '';
+                            if (item.totalKey.length !== 0) {
+                                if (item.totalKey === "label") {
+                                    tdColPage = $('<td>').text('Σύνολα Σελίδας').addClass('small font-weight-bold');
                                 } else {
-                                    tdColPage = `<td class="${item.class}"> `;
-                                    tdColPage += ` </td> `;
-                                }
-                                if (item.grandTotalKey.length !== 0) {
-                                    if (item.grandTotalKey === "label") {
-                                        tdColTotal = $('<td>').text('Γενικό Σύνολο').addClass('small font-weight-bold');
-                                    } else {
-                                        if (item.totalFormatter === "currency") {
-                                            try {
-                                                let fAmount = formatterCurrency.format(result[item.grandTotalKey]);
-                                                tdColTotal = `<td class="${item.class} font-weight-bold"> `;
-                                                tdColTotal += `${fAmount} </td> `;
-                                                totalSummaryCount++;
-                                            } catch (e) {
-                                                tdColTotal = `<td class="${item.class}"> `;
-                                                tdColTotal += `#Err </td> `;
-                                            }
-
+                                    if (item.totalFormatter === "currency") {
+                                        try {
+                                            let fAmount = formatterCurrency.format(result[item.totalKey]);
+                                            tdColPage = `<td class="${item.class} font-weight-bold"> `;
+                                            tdColPage += `${fAmount} </td> `;
+                                            pageSummaryCount++;
+                                        } catch (e) {
+                                            tdColPage = `<td class="${item.class}"> `;
+                                            tdColPage += `#Err </td> `;
                                         }
+
                                     }
-                                } else {
-                                    tdColTotal = `<td class="${item.class}"> `;
-                                    tdColTotal += ` </td> `;
                                 }
-                                $pageSummaryRow.append($(tdColPage));
-                                $totalSummaryRow.append($(tdColTotal));
-                            });
-                            if (pageSummaryCount > 0) {
-                                $pageSummaryRow.append($('<td>'));
-                                $pageSummaryRow.appendTo('#myTable >  tbody:last');
+                            } else {
+                                tdColPage = `<td class="${item.class}"> `;
+                                tdColPage += ` </td> `;
                             }
-                            if (totalSummaryCount > 0) {
-                                $totalSummaryRow.append($('<td>'));
-                                $totalSummaryRow.appendTo('#myTable >  tbody:last');
+                            if (item.grandTotalKey.length !== 0) {
+                                if (item.grandTotalKey === "label") {
+                                    tdColTotal = $('<td>').text('Γενικό Σύνολο').addClass('small font-weight-bold');
+                                } else {
+                                    if (item.totalFormatter === "currency") {
+                                        try {
+                                            let fAmount = formatterCurrency.format(result[item.grandTotalKey]);
+                                            tdColTotal = `<td class="${item.class} font-weight-bold"> `;
+                                            tdColTotal += `${fAmount} </td> `;
+                                            totalSummaryCount++;
+                                        } catch (e) {
+                                            tdColTotal = `<td class="${item.class}"> `;
+                                            tdColTotal += `#Err </td> `;
+                                        }
+
+                                    }
+                                }
+                            } else {
+                                tdColTotal = `<td class="${item.class}"> `;
+                                tdColTotal += ` </td> `;
                             }
+                            $pageSummaryRow.append($(tdColPage));
+                            $totalSummaryRow.append($(tdColTotal));
+                        });
+                        if (pageSummaryCount > 0) {
+                            $pageSummaryRow.append($('<td>'));
+                            $pageSummaryRow.appendTo('#myTable >  tbody:last');
+                        }
+                        if (totalSummaryCount > 0) {
+                            $totalSummaryRow.append($('<td>'));
+                            $totalSummaryRow.appendTo('#myTable >  tbody:last');
+                        }
                         rowSelectorsUi();
 
                     },
