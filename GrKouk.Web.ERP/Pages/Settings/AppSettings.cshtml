@@ -7,14 +7,14 @@
 
 @section MyCss
 {
-    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/material.css" />
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/material.css"/>
 }
 
 <div class="container">
     <form method="post">
         <fieldset id="thisForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" id="CurrentSelectorType" />
+            <input type="hidden" id="CurrentSelectorType"/>
             <div class="form-row">
                 <div class="form-group col-md-10 col-sm-10 col-lg-10">
                     <label small>All Companies Setting</label>
@@ -89,7 +89,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary btn-sm" id="saveForm" />
+                <input type="submit" value="Save" class="btn btn-primary btn-sm" id="saveForm"/>
             </div>
         </fieldset>
     </form>
@@ -125,17 +125,7 @@
 
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group col-12">
-                            <label>Select Companies</label>
-                            <ejs-multiselect id="MultiSelectCompanies" placeholder="Select Companies" mode="CheckBox"
-                                             showDropDownIcon="true"
-                                             showSelectAll="true" selectAllText="Select All" unSelectAllText="unSelect All">
-                                <e-multiselect-fields text="title" value="value"></e-multiselect-fields>
-                            </ejs-multiselect>
 
-                        </div>
-                    </div>
                     <div class="form-row">
                         <div class="form-group col-12" id="MaterialNatureTypesDiv">
                             <label>Select Material Natures</label>
@@ -169,7 +159,17 @@
                         </div>
 
                     </div>
+                    <div class="form-row">
+                        <div class="form-group col-12">
+                            <label>Select Companies</label>
+                            <ejs-multiselect id="MultiSelectCompanies" placeholder="Select Companies" mode="CheckBox"
+                                             showDropDownIcon="true"
+                                             showSelectAll="true" selectAllText="Select All" unSelectAllText="unSelect All">
+                                <e-multiselect-fields text="title" value="value"></e-multiselect-fields>
+                            </ejs-multiselect>
 
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
