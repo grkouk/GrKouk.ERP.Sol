@@ -71,7 +71,10 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpGet("GetMainDashboardInfo")]
         public async Task<IActionResult> GetMainDashboardInfo([FromQuery] IndexDataTableRequest request)
         {
-           
+            if (request.CodeToCompute=="SumOfIncomeSalesDf")
+            {
+                Debug.WriteLine("");
+            }
             var codeToComputeDefinition = await
                 _context.AppSettings.FirstOrDefaultAsync(p => p.Code == request.CodeToCompute);
             if (codeToComputeDefinition == null)
@@ -223,8 +226,12 @@ namespace GrKouk.Web.ERP.Controllers
                 }).ToListAsync();
                 //var grandSumOfAmount = t1.Sum(p => p.TotalAmount);
                 r = t1.Sum(p => p.TotalNetAmount);
+                // if (request.CodeToCompute=="SumOfIncomeSalesDf")
+                // {
+                //     Debug.WriteLine($"Code was SumOfincomeSalesDf doc count was {t1.Count} and value is {r}");
+                // }
             }
-
+            
             var response = new MainDashboardInfoResponse
             {
                 RequestedCodeToCompute = request.CodeToCompute,

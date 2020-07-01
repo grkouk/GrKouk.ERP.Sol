@@ -132,12 +132,12 @@
 
                             <td class="text-right">
                                 <span name="SellCodeValue"
-                                      data-computeCode="SumOfExpenseSalesDf">
+                                      data-computeCode="SumOfIncomeSalesDf">
                                     0
                                 </span>
 
                                 <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
-                                     data-computeCode="SumOfExpenseSalesDf"
+                                     data-computeCode="SumOfIncomeSalesDf"
                                      name="SellCodeLoader"
                                      style="display: none">
 
@@ -275,7 +275,7 @@
                             <td class="text-right">
                                 <span name="BalanceCodeValue"
                                            
-                                      data-dependsOnCodes="SumOfExpenseBuysDf;SumOfExpenseSalesDf">
+                                      data-dependsOnCodes="SumOfExpenseBuysDf;SumOfIncomeSalesDf">
                                     0
                                 </span>
                             </td>
@@ -624,6 +624,9 @@
                         }
                     },
                     success: function(result) {
+                        // if (result.requestedCodeToCompute==='SumOfIncomeSalesDf'){
+                        //     console.log(`success codetocompute=${result.requestedCodeToCompute} value=${result.requestedCodeSum}`)
+                        // }
                         let vlVal = parseFloat(result.requestedCodeSum);
                         let vl = formatterCurrency.format(result.requestedCodeSum);
                         element.text(vl);
@@ -637,13 +640,15 @@
                                }
                                if(codeToCompute==='SumOfMaterialSalesDf' && cd.includes('SumOfMaterialSalesDf')){
                                     console.log('sale materials')                                                                  
-                              }
+                               }
+                               if(codeToCompute==='SumOfIncomeSalesDf' && cd.includes('SumOfIncomeSalesDf')){
+                                   console.log('sale income')                                                                  
+                               }
                                if (cd.includes(codeToCompute)){
                                    console.log(`Storing for code ${codeToCompute} value ${vlVal}`);
                                    if(codeToCompute.includes('Buys')){
                                         $item.data('buyvalue',vlVal);
                                         $item.attr('buyvalue',vlVal);
-                                        
                                    }
                                    if(codeToCompute.includes('Sales')){
                                        $item.data('sellvalue',vlVal);
