@@ -117,8 +117,8 @@
                 </div>
             </div>
             <div id="transGrid"></div>
-            <ejs-grid id="Grid" allowPaging="true" allowResizing="true" enablePersistence="true">
-                 @* <e-data-manager url="@Url.Action("GetTransactions2", "FinancialData")" adaptor="UrlAdaptor"></e-data-manager> *@
+            <ejs-grid id="Grid" allowPaging="true" allowResizing="true" allowSorting="true" enablePersistence="true">
+                  <e-data-manager url="@Url.Action("GetTrTransTest", "FinancialData")" adaptor="UrlAdaptor"></e-data-manager> 
                 <e-grid-aggregates>
                     <e-grid-aggregate>
                         <e-aggregate-columns>
@@ -186,7 +186,7 @@
                 let selPeriodId = $selectedPeriod.data('periodid');
 
                 getFinancialData(transactorId, selPeriodId, selCompanyId, selCurrencyId);
-                getTransactionsData(transactorId, selPeriodId, selCompanyId, selCurrencyId);
+                //getTransactionsData(transactorId, selPeriodId, selCompanyId, selCurrencyId);
 
             };
             //---------------------Grid-------------------
@@ -202,9 +202,22 @@
                     console.log(args);
                 });
             grd.addEventListener("dataBound",
-            function(args){
-                console.log('dataBound')
+            function(args) {
+                console.log('event dataBound');
                 console.log(args);
+                var transactorId = 10;
+                var selCompany = 12;
+                var dateRange = 11;
+                var selCurrency = 1;
+
+                var grid = document.getElementById("Grid").ej2_instances[0];
+               
+                var uri = '/api/FinancialData/GetTrTransTest?';
+                uri += `&transactorId=${transactorId}`;
+                uri += `&companyFilter=${selCompany}`;
+                uri += `&dateRange=${dateRange}`;
+                uri += `&displayCurrencyId=${selCurrency}`;
+                grid.dataSource.dataSource.url = uri;
             });
              grd.addEventListener("dataSourceChanged",
                         function(args){
@@ -217,90 +230,9 @@
                             console.log(args);
                         });
                         
-            const secondGrid = (appendToElement,data) => {
-                var grd = new ejs.grids.Grid({
-                    "dataSource": data,
-                    "aggregates": [
-                        {
-                            "columns": [
-                                {
-                                    "field": "debit",
-                                    "footerTemplate": "${Sum}",
-                                    "format": "C2",
-                                    "type": "Sum"
-                                },
-                                {
-                                    "field": "credit",
-                                    "footerTemplate": "${Sum}",
-                                    "format": "C2",
-                                    "type": "Sum"
-                                }
-                            ]
-                        }
-                    ],
-                    "allowPaging": true,
-                    "allowResizing": true,
-                    "columns": [
-                        {
-                            "field": "transDate",
-                            "format": "dd/MM/yyyy",
-                            "headerText": "TransDate",
-                            "textAlign": "Right",
-                            "type": "date",
-                            "width": "50"
-                        },
-                        {
-                            "field": "docSeriesCode",
-                            "headerText": "DocSeriesCode",
-                            "width": "60"
-                        },
-                        {
-                            "field": "refCode",
-                            "headerText": "RefCode",
-                            "textAlign": "Right",
-                            "width": "60"
-                        },
-                        {
-                            "field": "companyCode",
-                            "headerText": "CompanyCode",
-                            "width": "60"
-                        },
-                        {
-                            "field": "debit",
-                            "format": "C2",
-                            "headerText": "Debit",
-                            "textAlign": "Right",
-                            "type": "number",
-                            "width": "50"
-                        },
-                        {
-                            "field": "credit",
-                            "format": "C2",
-                            "headerText": "Credit",
-                            "textAlign": "Right",
-                            "type": "number",
-                            "width": "50"
-                        },
-                        {
-                            "field": "runningTotal",
-                            "format": "C2",
-                            "headerText": "RunningTotal",
-                            "textAlign": "Right",
-                            "type": "number",
-                            "width": "50"
-                        }
-                    ],
-                    "enablePersistence": true,
-                    "frozenColumns": 0.0,
-                    "frozenRows": 0.0,
-                    "pageSettings": {
-                        "currentPage": 1.0,
-                        "pageCount": 8.0,
-                        "pageSize": 12.0,
-                        "pageSizes": true
-                    },
-                    "selectedRowIndex": -1.0
-                }).appendTo(appendToElement); 
+            const secondGrid = (appendToElement, data) => {
+               
+                
             };
             //---------------------Periods----------------------------------
             const loadPeriodSelector = (availablePeriods) => {

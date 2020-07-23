@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -340,6 +341,17 @@ namespace GrKouk.Web.ERP.Controllers
         {
             Debug.Print(request.ToJson());
             return new JsonResult(new {result = "", count = 0});
+        }
+
+        [HttpPost("GetTrTransTest")]
+        public async Task<IActionResult> GetTrTransTest([FromBody] DataManagerRequest dm, [FromQuery] IndexDataTableRequest request)
+        {
+            IQueryable<TransactorTransaction> transactionsList = _context.TransactorTransactions;
+            var dbTrans = transactionsList.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
+            IEnumerable resultList = await dbTrans.ToListAsync();
+            var resultCount = resultList.Cast<TransactorTransListDto>().Count();
+
+            return dm.RequiresCounts ? Ok(new { result = resultList, count = resultCount }) : Ok(new{ result = resultList });
         }
 
         [HttpGet("GetTransactorTransactions")]
