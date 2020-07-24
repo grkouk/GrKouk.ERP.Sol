@@ -1,4 +1,5 @@
 ﻿@page
+@using Syncfusion.EJ2.Linq
 @model GrKouk.Web.Erp.Pages.MainEntities.Transactors.DetailsModel
 
 @{
@@ -117,7 +118,27 @@
                 </div>
             </div>
             <div id="transGrid"></div>
-            <ejs-grid id="Grid" query="new ej.data.Query().addParams('transactorId', '1')" 
+            <input type="hidden" asp-for="Item.Id" id="TransactorId" />
+            <input type="hidden" id="CompanyId" />
+            <input type="hidden" id="CurrencyId" />
+            <input type="hidden" id="PeriodId" />
+            <script>
+                function getTransactorId() {
+                    var transactorId = document.getElementById("TransactorId");
+                    if (transactorId) {
+                        return transactorId.value;
+                    }
+                    return 0;
+                }
+                function getSelectedCurrencyId() {
+                    var currencyId = document.getElementById("CurrencyId");
+                    if (currencyId) {
+                        return currencyId.value;
+                    }
+                    return 0;
+                } 
+            </script>
+            <ejs-grid id="Grid" query="new ej.data.Query().addParams('transactorId', getTransactorId()).addParams('displayCurrencyId', getSelectedCurrencyId())" 
                       allowPaging="true" allowResizing="true" allowSorting="true" enablePersistence="true">
                   <e-data-manager url="@Url.Action("GetTrTransTest", "FinancialData")" adaptor="UrlAdaptor"></e-data-manager> 
                 <e-grid-aggregates>
@@ -158,6 +179,8 @@
     @* <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.9.0/feather.min.js"></script> *@
 
     <script>
+       
+
         (function() {
             //feather.replace();
             const sessionKey = 'TransactorDetailsPage';
@@ -183,6 +206,8 @@
                 let selCompanyId = $selectedCompany.data('companyid');
                 const $selectedCurrency = $('.selected-currency-text');
                 let selCurrencyId = $selectedCurrency.data('currencyid');
+                const $selectedCurrencyInputField = $('#CurrencyId');
+                $selectedCurrencyInputField.val(selCurrencyId);
                 const $selectedPeriod = $('.selected-period-text');
                 let selPeriodId = $selectedPeriod.data('periodid');
 
@@ -203,35 +228,35 @@
                     console.log(args);
                 });
             grd.addEventListener("dataBound",
-            function(args) {
-                console.log('event dataBound');
-                console.log(args);
-                //var transactorId = 10;
-                //var selCompany = 12;
-                //var dateRange = 11;
-                //var selCurrency = 1;
+                function(args) {
+                    console.log('event dataBound');
+                    console.log(args);
+                    //var transactorId = 10;
+                    //var selCompany = 12;
+                    //var dateRange = 11;
+                    //var selCurrency = 1;
 
-                //var grid = document.getElementById("Grid").ej2_instances[0];
-               
-                //var uri = '/api/FinancialData/GetTrTransTest?';
-                //uri += `&transactorId=${transactorId}`;
-                //uri += `&companyFilter=${selCompany}`;
-                //uri += `&dateRange=${dateRange}`;
-                //uri += `&displayCurrencyId=${selCurrency}`;
-                //grid.dataSource.dataSource.url = uri;
-            });
-             grd.addEventListener("dataSourceChanged",
-                        function(args){
-                            console.log('dataSourceChanged')
-                            console.log(args);
-                        });
+                    //var grid = document.getElementById("Grid").ej2_instances[0];
+
+                    //var uri = '/api/FinancialData/GetTrTransTest?';
+                    //uri += `&transactorId=${transactorId}`;
+                    //uri += `&companyFilter=${selCompany}`;
+                    //uri += `&dateRange=${dateRange}`;
+                    //uri += `&displayCurrencyId=${selCurrency}`;
+                    //grid.dataSource.dataSource.url = uri;
+                });
+            grd.addEventListener("dataSourceChanged",
+                function(args) {
+                    console.log('dataSourceChanged')
+                    console.log(args);
+                });
             grd.addEventListener("dataStateChange",
-                        function(args) {
-                            console.log('event dataStateChange');
-                            console.log(args);
-                        });
-                        
-           
+                function(args) {
+                    console.log('event dataStateChange');
+                    console.log(args);
+                });
+
+
             //---------------------Periods----------------------------------
             const loadPeriodSelector = (availablePeriods) => {
                 let $periodMenu = $('[name=PeriodSelector]');
@@ -354,7 +379,7 @@
                         let currencyCode = button.data('currencycode');
                         let currencyLocale = button.data('currencylocale');
                         console.log(`Currency Id=${currencyId} currency Code=${currencyCode}`);
-                       
+
                         setCurrency(currencyId, currencyCode, currencyLocale);
                         refreshView();
 

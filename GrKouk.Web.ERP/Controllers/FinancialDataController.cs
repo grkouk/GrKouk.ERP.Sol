@@ -344,7 +344,7 @@ namespace GrKouk.Web.ERP.Controllers
         }
 
         [HttpPost("GetTrTransTest")]
-        public async Task<IActionResult> GetTrTransTest([FromBody] DataManagerRequest dm, [FromQuery] IndexDataTableRequest request)
+        public async Task<IActionResult> GetTrTransTest([FromBody] ExtendedDataManagerRequest dm)
         {
             IQueryable<TransactorTransaction> transactionsList = _context.TransactorTransactions;
             var dbTrans = transactionsList.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);

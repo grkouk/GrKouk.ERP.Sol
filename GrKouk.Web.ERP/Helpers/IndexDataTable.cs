@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GrKouk.Erp.Definitions;
+using Newtonsoft.Json;
+using Syncfusion.EJ2.Base;
 
 namespace GrKouk.Web.ERP.Helpers
 {
@@ -69,4 +71,14 @@ namespace GrKouk.Web.ERP.Helpers
         public int[] DocTypesSelected { get; set; }
 
     }
+
+    public class ExtendedDataManagerRequest : DataManagerRequest
+    {
+      
+        [JsonProperty(PropertyName = "transactorId", Required = Required.Default)]
+        public int? TransactorId { get; set; }
+        [JsonProperty(PropertyName = "displayCurrencyId", Required = Required.Default)]
+        public int? DisplayCurrencyId { get; set; }
+    }
+
 }
