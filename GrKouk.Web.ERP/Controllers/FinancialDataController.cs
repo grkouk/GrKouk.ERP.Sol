@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -344,14 +345,146 @@ namespace GrKouk.Web.ERP.Controllers
         }
 
         [HttpPost("GetTrTransTest")]
-        public async Task<IActionResult> GetTrTransTest([FromBody] ExtendedDataManagerRequest dm)
+        public async Task<IActionResult> GetTrTransTest([FromBody] ExtendedDataManagerRequest request)
         {
-            IQueryable<TransactorTransaction> transactionsList = _context.TransactorTransactions;
-            var dbTrans = transactionsList.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
-            IEnumerable resultList = await dbTrans.ToListAsync();
-            var resultCount = resultList.Cast<TransactorTransListDto>().Count();
+            if (request.TransactorId ==null)
+            {
+                return BadRequest(new
+                {
+                    Error = "No valid transactor id specified"
+                });
+            }
+            if (request.DisplayCurrencyId == null)
+            {
+                return BadRequest(new
+                {
+                    Error = "No valid Currency specified"
+                });
+            }
+            if (request.DateRange == null)
+            {
+                return BadRequest(new
+                {
+                    Error = "No valid date range specified"
+                });
+            }
+            var transactor = await _context.Transactors.FirstOrDefaultAsync(x => x.Id == request.TransactorId);
+            if (transactor == null)
+            {
+                return NotFound(new
+                {
+                    Error = "Transactor not found"
+                });
+            }
 
-            return dm.RequiresCounts ? Ok(new { result = resultList, count = resultCount }) : Ok(new{ result = resultList });
+            var transactorType = await _context.TransactorTypes.Where(c => c.Id == transactor.TransactorTypeId)
+                .FirstOrDefaultAsync();
+
+            IQueryable<TransactorTransaction> transactionsList = _context.TransactorTransactions
+                .Where(p => p.TransactorId == request.TransactorId);
+            IQueryable<TransactorTransaction> transListBeforePeriod = _context.TransactorTransactions
+                .Where(p => p.TransactorId == request.TransactorId);
+            IQueryable<TransactorTransaction> transListAll = _context.TransactorTransactions
+                .Where(p => p.TransactorId == request.TransactorId);
+           
+
+            DateTime beforePeriodDate = DateTime.Today;
+            if (!string.IsNullOrEmpty(request.DateRange))
+            {
+                var datePeriodFilter = request.DateRange;
+                DateFilterDates dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
+                DateTime fromDate = dfDates.FromDate;
+                beforePeriodDate = fromDate.AddDays(-1);
+                DateTime toDate = dfDates.ToDate;
+
+                transactionsList = transactionsList.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
+                transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
+            }
+
+            if (!string.IsNullOrEmpty(request.CompanyFilter))
+            {
+                if (int.TryParse(request.CompanyFilter, out var companyId))
+                {
+                    if (companyId > 0)
+                    {
+                        transactionsList = transactionsList.Where(p => p.CompanyId == companyId);
+                        transListBeforePeriod = transListBeforePeriod.Where(p => p.CompanyId == companyId);
+                        transListAll = transListAll.Where(p => p.CompanyId == companyId);
+                    }
+                }
+            }
+            var dbTrans = transactionsList.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
+
+            var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
+                .Take(10)
+                .ToListAsync();
+            //IEnumerable<TransactorTransListDto> dbTransactions = await dbTrans.ToListAsync();
+           
+            //--------------------------
+            IEnumerable<KartelaLine> dbTransactions = await dbTrans.Select(p => new KartelaLine
+            {
+                TransDate = p.TransDate,
+                DocSeriesCode = p.TransTransactorDocSeriesCode,
+                RefCode = p.TransRefCode,
+                CompanyCode = p.CompanyCode,
+                SectionCode = p.SectionCode,
+                CreatorId = p.SectionCode == "SCNTRANSACTORTRANS"
+                    ? p.Id
+                    : p.CreatorId,
+                RunningTotal = 0,
+                TransactorName = p.TransactorName,
+                Debit =  ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.DebitAmount),
+                Credit = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.CreditAmount),
+            }).ToListAsync();
+            //--------------------------
+
+            DataOperations operation = new DataOperations();
+            if (request.Search != null && request.Search.Count > 0)
+            {
+                dbTransactions =  operation.PerformSearching(dbTransactions, request.Search);  //Search
+            }
+           
+            if (request.Where != null && request.Where.Count > 0) //Filtering
+            {
+                dbTransactions =  operation.PerformFiltering(dbTransactions, request.Where, request.Where[0].Operator);
+            }
+            if (request.Sorted != null && request.Sorted.Count > 0) //Sorting
+            {
+                dbTransactions = operation.PerformSorting(dbTransactions, request.Sorted);
+                decimal runningTotal = 0;
+                foreach (var dbTransaction in dbTransactions)
+                {
+                    switch (transactorType.Code)
+                    {
+                        case "SYS.DTRANSACTOR":
+
+                            break;
+                        case "SYS.CUSTOMER":
+                            runningTotal = dbTransaction.Debit - dbTransaction.Credit + runningTotal;
+                            break;
+                        case "SYS.SUPPLIER":
+                            runningTotal = dbTransaction.Credit - dbTransaction.Debit + runningTotal;
+                            break;
+                        default:
+                            runningTotal = dbTransaction.Credit - dbTransaction.Debit + runningTotal;
+                            break;
+                    }
+                    dbTransaction.RunningTotal = runningTotal;
+                }
+
+            }
+            var resultCount = dbTransactions.Count();
+            if (request.Skip != 0)
+            {
+                dbTransactions =  operation.PerformSkip(dbTransactions, request.Skip);   //Paging
+            }
+            if (request.Take != 0)
+            {
+                dbTransactions =  operation.PerformTake(dbTransactions, request.Take);
+            }
+            
+
+            return request.RequiresCounts ? Ok(new { result = dbTransactions, count = resultCount }) : Ok(new{ result = dbTransactions });
         }
 
         [HttpGet("GetTransactorTransactions")]

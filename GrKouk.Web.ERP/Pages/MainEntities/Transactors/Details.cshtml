@@ -122,29 +122,14 @@
             <input type="hidden" id="CompanyId" />
             <input type="hidden" id="CurrencyId" />
             <input type="hidden" id="PeriodId" />
-            <script>
-                function getTransactorId() {
-                    var transactorId = document.getElementById("TransactorId");
-                    if (transactorId) {
-                        return transactorId.value;
-                    }
-                    return 0;
-                }
-                function getSelectedCurrencyId() {
-                    var currencyId = document.getElementById("CurrencyId");
-                    if (currencyId) {
-                        return currencyId.value;
-                    }
-                    return 0;
-                } 
-            </script>
-            <ejs-grid id="Grid" query="new ej.data.Query().addParams('transactorId', getTransactorId()).addParams('displayCurrencyId', getSelectedCurrencyId())" 
+            
+            <ejs-grid id="Grid"  
                       allowPaging="true" allowResizing="true" allowSorting="true" enablePersistence="true">
                   <e-data-manager url="@Url.Action("GetTrTransTest", "FinancialData")" adaptor="UrlAdaptor"></e-data-manager> 
                 <e-grid-aggregates>
                     <e-grid-aggregate>
                         <e-aggregate-columns>
-                            <e-aggregate-column field="debit" type="Sum" format="C2" footerTemplate="Sum:${Sum}"></e-aggregate-column>
+                            <e-aggregate-column field="debit" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
                             <e-aggregate-column field="credit" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
 
                         </e-aggregate-columns>
@@ -213,48 +198,53 @@
 
                 getFinancialData(transactorId, selPeriodId, selCompanyId, selCurrencyId);
                 //getTransactionsData(transactorId, selPeriodId, selCompanyId, selCurrencyId);
-
+                let grd = document.getElementById("Grid").ej2_instances[0];
+                grd.query = new ej.data.Query()
+                    .addParams('transactorId', transactorId)
+                    .addParams('dateRange', selPeriodId)
+                    .addParams('companyFilter', selCompanyId)
+                    .addParams('displayCurrencyId', selCurrencyId);  
             };
             //---------------------Grid-------------------
-            const iam = function() {
-                //this.aggregates[0].columns[0].setPropertiesSilent({ customAggregate: customAggregateFn, type: ['Sum', 'Custom'] });
-                console.log('Grid Load function called');
-                console.log(this.aggregates[0].columns[0]);
-            };
-            let grd = document.getElementById("Grid").ej2_instances[0];
-            grd.addEventListener("actionBegin",
-                function(args) {
-                    console.log('actionBegin event called');
-                    console.log(args);
-                });
-            grd.addEventListener("dataBound",
-                function(args) {
-                    console.log('event dataBound');
-                    console.log(args);
-                    //var transactorId = 10;
-                    //var selCompany = 12;
-                    //var dateRange = 11;
-                    //var selCurrency = 1;
+            //const iam = function() {
+            //    //this.aggregates[0].columns[0].setPropertiesSilent({ customAggregate: customAggregateFn, type: ['Sum', 'Custom'] });
+            //    console.log('Grid Load function called');
+            //    console.log(this.aggregates[0].columns[0]);
+            //};
+            //let grd = document.getElementById("Grid").ej2_instances[0];
+            //grd.addEventListener("actionBegin",
+            //    function(args) {
+            //        console.log('actionBegin event called');
+            //        console.log(args);
+            //    });
+            //grd.addEventListener("dataBound",
+            //    function(args) {
+            //        console.log('event dataBound');
+            //        console.log(args);
+            //        //var transactorId = 10;
+            //        //var selCompany = 12;
+            //        //var dateRange = 11;
+            //        //var selCurrency = 1;
 
-                    //var grid = document.getElementById("Grid").ej2_instances[0];
+            //        //var grid = document.getElementById("Grid").ej2_instances[0];
 
-                    //var uri = '/api/FinancialData/GetTrTransTest?';
-                    //uri += `&transactorId=${transactorId}`;
-                    //uri += `&companyFilter=${selCompany}`;
-                    //uri += `&dateRange=${dateRange}`;
-                    //uri += `&displayCurrencyId=${selCurrency}`;
-                    //grid.dataSource.dataSource.url = uri;
-                });
-            grd.addEventListener("dataSourceChanged",
-                function(args) {
-                    console.log('dataSourceChanged')
-                    console.log(args);
-                });
-            grd.addEventListener("dataStateChange",
-                function(args) {
-                    console.log('event dataStateChange');
-                    console.log(args);
-                });
+            //        //var uri = '/api/FinancialData/GetTrTransTest?';
+            //        //uri += `&transactorId=${transactorId}`;
+            //        //uri += `&companyFilter=${selCompany}`;
+            //        //uri += `&dateRange=${dateRange}`;
+            //        //uri += `&displayCurrencyId=${selCurrency}`;
+            //        //grid.dataSource.dataSource.url = uri;
+            //    });
+            //grd.addEventListener("dataSourceChanged",
+            //    function(args) {
+            //        console.log('dataSourceChanged')
+            //        console.log(args);
+            //    });
+            //grd.addEventListener("dataStateChange",
+            //    function(args) {
+            //        console.log('event dataStateChange');
+            //        console.log(args);
+            //    });
 
 
             //---------------------Periods----------------------------------
