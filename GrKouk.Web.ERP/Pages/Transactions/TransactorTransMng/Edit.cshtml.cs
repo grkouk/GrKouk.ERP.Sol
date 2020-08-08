@@ -61,8 +61,8 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
                 return BadRequest();
             }
             //If section is not our section the canot update disable input controls
-            NotUpdatable = transactionToModify.SectionId != section.Id;
-
+            //NotUpdatable = transactionToModify.SectionId != section.Id;
+            NotUpdatable=transactionToModify.CreatorId!=0;
             ItemVm = _mapper.Map<TransactorTransModifyDto>(transactionToModify);
             LoadCombos();
             return Page();
@@ -108,9 +108,26 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
                 .Reference(t => t.TransTransactorDef)
                 .Load();
             var transTransactorDef = docTypeDef.TransTransactorDef;
+            #region Section Management
+            int sectionId = 0;
+            if (docTypeDef.SectionId == 0)
+            {
+                var sectn = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == _sectionCode);
+                if (sectn == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Δεν υπάρχει το Section");
+                    LoadCombos();
+                    return Page();
+                }
 
-
-            //spTransaction.SectionId = section.Id;
+                sectionId = sectn.Id;
+            }
+            else
+            {
+                sectionId = docTypeDef.SectionId;
+            }
+            #endregion
+            spTransactionToAttach.SectionId = sectionId;
             spTransactionToAttach.TransTransactorDocTypeId = docSeries.TransTransactorDocTypeDefId;
             spTransactionToAttach.FinancialAction = transTransactorDef.FinancialTransAction;
             switch (transTransactorDef.FinancialTransAction)

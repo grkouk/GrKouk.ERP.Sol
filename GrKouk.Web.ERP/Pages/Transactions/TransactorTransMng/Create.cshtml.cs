@@ -87,17 +87,30 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
 
             var transTransactorDef = docTypeDef.TransTransactorDef;
 
+            #region Section Management
 
-            var section = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == _sectionCode);
-            if (section == null)
+            int sectionId = 0;
+            if (docTypeDef.SectionId == 0)
             {
+                var sectn = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == _sectionCode);
+                if (sectn == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Δεν υπάρχει το Section");
+                    LoadCombos();
+                    return Page();
+                }
 
-                ModelState.AddModelError(string.Empty, "Δεν υπάρχει το Section");
-                LoadCombos();
-                return Page();
+                sectionId = sectn.Id;
+            }
+            else
+            {
+                sectionId = docTypeDef.SectionId;
             }
 
-            spTransaction.SectionId = section.Id;
+            #endregion
+
+
+            spTransaction.SectionId = sectionId;
             spTransaction.TransTransactorDocTypeId = docSeries.TransTransactorDocTypeDefId;
             spTransaction.FiscalPeriodId = fiscalPeriod.Id;
             spTransaction.FinancialAction = transTransactorDef.FinancialTransAction;
