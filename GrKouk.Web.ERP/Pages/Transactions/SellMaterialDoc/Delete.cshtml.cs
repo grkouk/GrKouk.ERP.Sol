@@ -57,7 +57,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
             if (SaleDocument != null)
             {
                 _context.SellDocLines.RemoveRange(_context.SellDocLines.Where(p => p.SellDocumentId == id));
-                _context.TransactorTransactions.RemoveRange(_context.TransactorTransactions.Where(p => p.SectionId == SaleDocument.SectionId && p.CreatorId == id));
+                _context.TransactorTransactions.RemoveRange(_context.TransactorTransactions.Where(p => p.CreatorSectionId == SaleDocument.SectionId && p.CreatorId == id));
                 _context.WarehouseTransactions.RemoveRange(_context.WarehouseTransactions.Where(p => p.SectionId == SaleDocument.SectionId && p.CreatorId == id));
                 _context.SellDocTransPaymentMappings.RemoveRange(_context.SellDocTransPaymentMappings.Where(p=>p.SellDocumentId==id));
                 _context.SellDocuments.Remove(SaleDocument);

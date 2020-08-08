@@ -339,6 +339,7 @@ namespace GrKouk.Web.ERP.Controllers
                         sTransactorTransaction.FiscalPeriodId = fiscalPeriod.Id;
                         sTransactorTransaction.Etiology = "AutoPayOff";
                         sTransactorTransaction.CreatorId = docId;
+                        sTransactorTransaction.CreatorSectionId = sectionId;
                         await _context.Entry(transTransactorPayOffSeries)
                             .Reference(t => t.TransTransactorDocTypeDef)
                             .LoadAsync();
@@ -758,6 +759,7 @@ namespace GrKouk.Web.ERP.Controllers
                         sTransactorTransaction.FiscalPeriodId = fiscalPeriod.Id;
                         sTransactorTransaction.Etiology = "AutoPayOff";
                         sTransactorTransaction.CreatorId = docId;
+                        sTransactorTransaction.CreatorSectionId = sectionId;
                         await _context.Entry(transTransactorPayOffSeries)
                             .Reference(t => t.TransTransactorDocTypeDef)
                             .LoadAsync();
