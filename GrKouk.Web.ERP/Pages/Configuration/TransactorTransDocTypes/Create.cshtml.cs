@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using GrKouk.Erp.Domain.DocDefinitions;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -28,7 +29,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.TransactorTransDocTypes
         }
 
         [BindProperty]
-        public TransTransactorDocTypeDef TransTransactorDocTypeDef { get; set; }
+        public TransTransactorDocTypeDef ItemVm { get; set; }
 
         public async Task<IActionResult> OnPostAsync()
         {
@@ -37,7 +38,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.TransactorTransDocTypes
                 return Page();
             }
 
-            _context.TransTransactorDocTypeDefs.Add(TransTransactorDocTypeDef);
+            _context.TransTransactorDocTypeDefs.Add(ItemVm);
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");
@@ -46,6 +47,8 @@ namespace GrKouk.Web.Erp.Pages.Configuration.TransactorTransDocTypes
         {
             ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
             ViewData["TransTransactorDefId"] = new SelectList(_context.TransTransactorDefs.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
+            ViewData["SectionList"] = SelectListHelpers.GetSectionsList(_context);
+
         }
     }
 }

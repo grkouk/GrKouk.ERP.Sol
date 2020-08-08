@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using GrKouk.Erp.Domain.DocDefinitions;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -19,7 +20,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.TransactorTransDocTypes
         }
 
         [BindProperty]
-        public TransTransactorDocTypeDef TransTransactorDocTypeDef { get; set; }
+        public TransTransactorDocTypeDef ItemVm { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -28,16 +29,17 @@ namespace GrKouk.Web.Erp.Pages.Configuration.TransactorTransDocTypes
                 return NotFound();
             }
 
-            TransTransactorDocTypeDef = await _context.TransTransactorDocTypeDefs
+            ItemVm = await _context.TransTransactorDocTypeDefs
                 .Include(t => t.Company)
                 .Include(t => t.TransTransactorDef).FirstOrDefaultAsync(m => m.Id == id);
 
-            if (TransTransactorDocTypeDef == null)
+            if (ItemVm == null)
             {
                 return NotFound();
             }
-           ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Code");
-           ViewData["TransTransactorDefId"] = new SelectList(_context.TransTransactorDefs, "Id", "Name");
+            ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Code");
+            ViewData["TransTransactorDefId"] = new SelectList(_context.TransTransactorDefs, "Id", "Name");
+            ViewData["SectionList"] = SelectListHelpers.GetSectionsList(_context);
             return Page();
         }
 
@@ -48,7 +50,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.TransactorTransDocTypes
                 return Page();
             }
 
-            _context.Attach(TransTransactorDocTypeDef).State = EntityState.Modified;
+            _context.Attach(ItemVm).State = EntityState.Modified;
 
             try
             {
@@ -56,7 +58,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.TransactorTransDocTypes
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TransTransactorDocTypeDefExists(TransTransactorDocTypeDef.Id))
+                if (!TransTransactorDocTypeDefExists(ItemVm.Id))
                 {
                     return NotFound();
                 }

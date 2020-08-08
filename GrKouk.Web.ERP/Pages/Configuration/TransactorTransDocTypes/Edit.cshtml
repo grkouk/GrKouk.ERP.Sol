@@ -12,35 +12,40 @@
 <div class="container">
     <form method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <input type="hidden" asp-for="TransTransactorDocTypeDef.Id" />
+        <input type="hidden" asp-for="ItemVm.Id" />
         <div class="form-row">
             <div class="form-group col-md-3">
-                <label asp-for="TransTransactorDocTypeDef.Code" class="control-label"></label>
-                <input asp-for="TransTransactorDocTypeDef.Code" class="form-control form-control-sm" />
-                <span asp-validation-for="TransTransactorDocTypeDef.Code" class="text-danger"></span>
+                <label asp-for="ItemVm.Code" class="control-label"></label>
+                <input asp-for="ItemVm.Code" class="form-control form-control-sm" />
+                <span asp-validation-for="ItemVm.Code" class="text-danger"></span>
             </div>
             <div class="form-group col-md-7">
-                <label asp-for="TransTransactorDocTypeDef.Name" class="control-label"></label>
-                <input asp-for="TransTransactorDocTypeDef.Name" class="form-control form-control-sm" />
-                <span asp-validation-for="TransTransactorDocTypeDef.Name" class="text-danger"></span>
+                <label asp-for="ItemVm.Name" class="control-label"></label>
+                <input asp-for="ItemVm.Name" class="form-control form-control-sm" />
+                <span asp-validation-for="ItemVm.Name" class="text-danger"></span>
             </div>
             <div class="form-group col-md-2 ">
 
-                <label asp-for="TransTransactorDocTypeDef.Active"></label>
-                <input asp-for="TransTransactorDocTypeDef.Active" class="form-check form-control-sm" />
+                <label asp-for="ItemVm.Active"></label>
+                <input asp-for="ItemVm.Active" class="form-check form-control-sm" />
 
             </div>
         </div>
         <div class="form-row">
-            <div class="form-group col-md-6">
-                <label asp-for="TransTransactorDocTypeDef.TransTransactorDefId" class="control-label"></label>
-                <select asp-for="TransTransactorDocTypeDef.TransTransactorDefId" class="form-control form-control-sm" asp-items="ViewBag.TransTransactorDefId"></select>
-                <span asp-validation-for="TransTransactorDocTypeDef.TransTransactorDefId" class="text-danger"></span>
+            <div class="form-group col-md-3">
+                <label asp-for="ItemVm.SectionId" class="control-label small"></label>
+                <select asp-for="ItemVm.SectionId" class="form-control form-control-sm" asp-items="ViewBag.SectionList"></select>
+                <span asp-validation-for="ItemVm.SectionId" class="text-danger small"></span>
             </div>
-            <div class="form-group col-md-6">
-                <label asp-for="TransTransactorDocTypeDef.CompanyId" class="control-label"></label>
-                <select asp-for="TransTransactorDocTypeDef.CompanyId" class="form-control form-control-sm" asp-items="ViewBag.CompanyId"></select>
-                <span asp-validation-for="TransTransactorDocTypeDef.CompanyId" class="text-danger"></span>
+            <div class="form-group col-md-3">
+                <label asp-for="ItemVm.TransTransactorDefId" class="control-label"></label>
+                <select asp-for="ItemVm.TransTransactorDefId" class="form-control form-control-sm" asp-items="ViewBag.TransTransactorDefId"></select>
+                <span asp-validation-for="ItemVm.TransTransactorDefId" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-3">
+                <label asp-for="ItemVm.CompanyId" class="control-label"></label>
+                <select asp-for="ItemVm.CompanyId" class="form-control form-control-sm" asp-items="ViewBag.CompanyId"></select>
+                <span asp-validation-for="ItemVm.CompanyId" class="text-danger"></span>
             </div>
         </div>
 
