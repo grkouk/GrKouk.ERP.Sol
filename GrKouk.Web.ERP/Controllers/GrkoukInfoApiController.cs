@@ -3426,9 +3426,18 @@ namespace GrKouk.Web.ERP.Controllers
             };
 
             var beforePeriod = new KartelaLine();
-
-            beforePeriod.Credit = bl1.Credit;
-            beforePeriod.Debit = bl1.Debit;
+            if (bl1.Credit>=bl1.Debit)
+            {
+                var amnt = bl1.Credit - bl1.Debit;
+                beforePeriod.Credit = amnt;
+                beforePeriod.Debit = 0;
+            }
+            else
+            {
+                var amnt = bl1.Debit - bl1.Credit;
+                beforePeriod.Credit = 0;
+                beforePeriod.Debit = amnt;
+            }
             switch (transactorType.Code)
             {
                 case "SYS.DTRANSACTOR":
