@@ -29,7 +29,7 @@ namespace GrKouk.Erp.Domain.Shared
         public int SectionId { get; set; }
         public virtual Section Section { get; set; }
         public int CreatorId { get; set; }
-
+        public int CreatorSectionId { get; set; }
         public int FiscalPeriodId { get; set; }
         public virtual FiscalPeriod FiscalPeriod { get; set; }
       
