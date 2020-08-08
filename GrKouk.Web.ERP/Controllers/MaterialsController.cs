@@ -1688,6 +1688,7 @@ namespace GrKouk.Web.ERP.Controllers
                     var sTransactorTransaction = _mapper.Map<TransactorTransaction>(data);
                     sTransactorTransaction.TransactorId = data.TransactorId;
                     sTransactorTransaction.SectionId = sectionId;
+                    sTransactorTransaction.CreatorSectionId = sectionId;
                     sTransactorTransaction.TransTransactorDocTypeId =
                         transTransactorDefaultSeries.TransTransactorDocTypeDefId;
                     sTransactorTransaction.TransTransactorDocSeriesId = transTransactorDefaultSeries.Id;
@@ -2083,6 +2084,7 @@ namespace GrKouk.Web.ERP.Controllers
 
                         sTransactorTransaction.TransactorId = data.TransactorId;
                         sTransactorTransaction.SectionId = sectionId;
+                        sTransactorTransaction.CreatorSectionId = sectionId;
                         sTransactorTransaction.TransTransactorDocTypeId =
                             transTransactorDefaultSeries.TransTransactorDocTypeDefId;
                         sTransactorTransaction.TransTransactorDocSeriesId = transTransactorDefaultSeries.Id;
@@ -2513,6 +2515,7 @@ namespace GrKouk.Web.ERP.Controllers
                     var sTransactorTransaction = _mapper.Map<TransactorTransaction>(data);
                     sTransactorTransaction.TransactorId = data.TransactorId;
                     sTransactorTransaction.SectionId = sectionId;
+                    sTransactorTransaction.CreatorSectionId = sectionId;
                     sTransactorTransaction.TransTransactorDocTypeId =
                         transTransactorDefaultSeries.TransTransactorDocTypeDefId;
                     sTransactorTransaction.TransTransactorDocSeriesId = transTransactorDefaultSeries.Id;
@@ -2910,6 +2913,7 @@ namespace GrKouk.Web.ERP.Controllers
 
                     sTransactorTransaction.TransactorId = data.TransactorId;
                     sTransactorTransaction.SectionId = sectionId;
+                    sTransactorTransaction.CreatorSectionId = sectionId;
                     sTransactorTransaction.TransTransactorDocTypeId =
                         transTransactorDefaultSeries.TransTransactorDocTypeDefId;
                     sTransactorTransaction.TransTransactorDocSeriesId = transTransactorDefaultSeries.Id;
