@@ -88,7 +88,6 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
             var transTransactorDef = docTypeDef.TransTransactorDef;
 
             #region Section Management
-
             int sectionId = 0;
             if (docTypeDef.SectionId == 0)
             {
@@ -106,7 +105,6 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
             {
                 sectionId = docTypeDef.SectionId;
             }
-
             #endregion
 
 
