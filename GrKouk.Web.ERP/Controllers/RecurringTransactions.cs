@@ -120,7 +120,7 @@ namespace GrKouk.Web.ERP.Controllers
                     throw new ArgumentOutOfRangeException();
             }
 
-            var rsJson = actionResult.ToJson();
+           // var rsJson = actionResult.ToJson();
 
             return Ok(actionResult);
         }
@@ -346,14 +346,7 @@ namespace GrKouk.Web.ERP.Controllers
                             .LoadAsync();
                         var transTransactorDocTypeDef = transTransactorPayOffSeries.TransTransactorDocTypeDef;
                         #region Section Management
-                        if (transTransactorDocTypeDef.SectionId == 0)
-                        {
-                            sTransactorTransaction.SectionId = sectionId;
-                        }
-                        else
-                        {
-                            sTransactorTransaction.SectionId = transTransactorDocTypeDef.SectionId;
-                        }
+                        sTransactorTransaction.SectionId = transTransactorDocTypeDef.SectionId == 0 ? sectionId : transTransactorDocTypeDef.SectionId;
                         #endregion
                         await _context.Entry(transTransactorDocTypeDef)
                             .Reference(t => t.TransTransactorDef)
