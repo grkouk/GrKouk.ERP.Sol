@@ -6,137 +6,119 @@
 }
 
 <h2>Delete</h2>
+@{
+    var formDisabled = Model.NotUpdatable ? "disabled" : "";
+    if (Model.NotUpdatable)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>Not updateable!</strong> This transaction is created from other section and cannot be updated.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+}
 
-<h3>Are you sure you want to delete this?</h3>
 <div>
-    <h4>TransactorTransaction</h4>
+    <h4>Transactor Transaction</h4>
     <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.TransactorTransaction.TransDate)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.TransactorTransaction.TransDate)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.TransactorTransaction.TransTransactorDocSeries)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.TransactorTransaction.TransTransactorDocSeries.Id)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.TransactorTransaction.TransTransactorDocType)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.TransactorTransaction.TransTransactorDocType.Id)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.TransactorTransaction.TransRefCode)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.TransactorTransaction.TransRefCode)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.TransactorTransaction.Transactor)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.TransactorTransaction.Transactor.Id)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.TransactorTransaction.Section)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.TransactorTransaction.Section.Code)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.TransactorTransaction.CreatorId)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.TransactorTransaction.CreatorId)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.TransactorTransaction.FiscalPeriod)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.TransactorTransaction.FiscalPeriod.Id)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.TransactorTransaction.FinancialAction)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.TransactorTransaction.FinancialAction)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.TransactorTransaction.FpaRate)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.TransactorTransaction.FpaRate)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.TransactorTransaction.DiscountRate)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.TransactorTransaction.DiscountRate)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.TransactorTransaction.AmountFpa)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.TransactorTransaction.AmountFpa)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.TransactorTransaction.AmountNet)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.TransactorTransaction.AmountNet)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.TransactorTransaction.AmountDiscount)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.TransactorTransaction.AmountDiscount)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.TransactorTransaction.TransFpaAmount)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.TransactorTransaction.TransFpaAmount)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.TransactorTransaction.TransNetAmount)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.TransactorTransaction.TransNetAmount)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.TransactorTransaction.TransDiscountAmount)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.TransactorTransaction.TransDiscountAmount)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.TransactorTransaction.Etiology)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.TransactorTransaction.Etiology)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.TransactorTransaction.Company)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.TransactorTransaction.Company.Code)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.TransactorTransaction.Timestamp)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.TransactorTransaction.Timestamp)
-        </dd>
-    </dl>
-    
+    <div class="container">
+
     <form method="post">
-        <input type="hidden" asp-for="TransactorTransaction.Id" />
-        <input type="submit" value="Delete" class="btn btn-default" /> |
-        <a asp-page="./Index">Back to List</a>
+        <fieldset >
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ItemVm.Id" />
+            <input type="hidden" asp-for="ItemVm.Timestamp" />
+            <input type="hidden" asp-for="ItemVm.SectionId" />
+            <input type="hidden" asp-for="ItemVm.TransTransactorDocTypeId" />
+         
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label asp-for="ItemVm.TransDate" class="small"></label>
+                    <input asp-for="ItemVm.TransDate" class="form-control form-control-sm small" disabled />
+                   
+                </div>
+                <div class="form-group col-md-6">
+                    <label asp-for="ItemVm.TransTransactorDocSeriesId" class="small"></label>
+                    <select disabled asp-for="ItemVm.TransTransactorDocSeriesId" class="form-control form-control-sm small" asp-items="ViewBag.TransTransactorDocSeriesId"></select>
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label asp-for="ItemVm.TransRefCode" class="small"></label>
+                    <input disabled asp-for="ItemVm.TransRefCode" class="form-control form-control-sm small" />
+                   
+                </div>
+
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label asp-for="ItemVm.TransactorId" class="small"></label>
+                    <select disabled asp-for="ItemVm.TransactorId" class="form-control form-control-sm small" asp-items="ViewBag.TransactorId"></select>
+                </div>
+                <div class="form-group col-md-3">
+                    <label asp-for="ItemVm.FiscalPeriodId" class="small"></label>
+                    <select disabled asp-for="ItemVm.FiscalPeriodId" class="form-control form-control-sm small" asp-items="ViewBag.FiscalPeriodId" readonly></select>
+                </div>
+                <div class="form-group col-md-3">
+                    <label asp-for="ItemVm.CompanyId" class="small"></label>
+                    <select disabled asp-for="ItemVm.CompanyId" class="form-control form-control-sm small" asp-items="ViewBag.CompanyId"></select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-1">
+                    <label asp-for="ItemVm.FpaRate" class="small"></label>
+                    <input disabled asp-for="ItemVm.FpaRate" class="form-control form-control-sm small" />
+                   
+                </div>
+                <div class="form-group col-md-2">
+                    <label asp-for="ItemVm.AmountNet" class="small"></label>
+                    <input disabled asp-for="ItemVm.AmountNet" class="form-control form-control-sm small" />
+                   
+                </div>
+                <div class="form-group col-md-2">
+                    <label asp-for="ItemVm.AmountFpa" class="small"></label>
+                    <input disabled asp-for="ItemVm.AmountFpa" class="form-control form-control-sm small" />
+                   
+                </div>
+                <div class="form-group col-md-2">
+                    <label asp-for="ItemVm.AmountDiscount" class="small"></label>
+                    <input disabled asp-for="ItemVm.AmountDiscount" class="form-control form-control-sm small" />
+                   
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label asp-for="ItemVm.AmountSum" class="small">Sum</label>
+                    <input disabled asp-for="ItemVm.AmountSum" class="form-control form-control-sm small" disabled />
+
+                </div>
+
+
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <label asp-for="ItemVm.Etiology" class="small"></label>
+                    <textarea disabled asp-for="ItemVm.Etiology" class="form-control form-control-sm small" placeholder="Αιτιολογία Κίνησης"> </textarea>
+                    
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <input type="submit" value="Delete" class="btn btn-default" @formDisabled/>
+                </div>
+            </div>
+        </fieldset>
     </form>
+</div>
+    
+    
+    
+    
+    
+    
+    
+
+   
+    
+   
 </div>
