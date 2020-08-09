@@ -120,7 +120,7 @@ namespace GrKouk.Web.ERP.Controllers
                     throw new ArgumentOutOfRangeException();
             }
 
-            var rsJson = actionResult.ToJson();
+           // var rsJson = actionResult.ToJson();
 
             return Ok(actionResult);
         }
@@ -275,6 +275,7 @@ namespace GrKouk.Web.ERP.Controllers
                     var sTransactorTransaction = _mapper.Map<TransactorTransaction>(data);
                     sTransactorTransaction.TransactorId = data.TransactorId;
                     sTransactorTransaction.SectionId = sectionId;
+                    sTransactorTransaction.CreatorSectionId = sectionId;
                     sTransactorTransaction.TransTransactorDocTypeId =
                         transTransactorDefaultSeries.TransTransactorDocTypeDefId;
                     sTransactorTransaction.TransTransactorDocSeriesId = transTransactorDefaultSeries.Id;
@@ -332,18 +333,21 @@ namespace GrKouk.Web.ERP.Controllers
 
                         var sTransactorTransaction = _mapper.Map<TransactorTransaction>(data);
                         sTransactorTransaction.TransactorId = data.TransactorId;
-                        sTransactorTransaction.SectionId = sectionId;
+                        
                         sTransactorTransaction.TransTransactorDocTypeId =
                             transTransactorPayOffSeries.TransTransactorDocTypeDefId;
                         sTransactorTransaction.TransTransactorDocSeriesId = transTransactorPayOffSeries.Id;
                         sTransactorTransaction.FiscalPeriodId = fiscalPeriod.Id;
                         sTransactorTransaction.Etiology = "AutoPayOff";
                         sTransactorTransaction.CreatorId = docId;
+                        sTransactorTransaction.CreatorSectionId = sectionId;
                         await _context.Entry(transTransactorPayOffSeries)
                             .Reference(t => t.TransTransactorDocTypeDef)
                             .LoadAsync();
                         var transTransactorDocTypeDef = transTransactorPayOffSeries.TransTransactorDocTypeDef;
-
+                        #region Section Management
+                        sTransactorTransaction.SectionId = transTransactorDocTypeDef.SectionId == 0 ? sectionId : transTransactorDocTypeDef.SectionId;
+                        #endregion
                         await _context.Entry(transTransactorDocTypeDef)
                             .Reference(t => t.TransTransactorDef)
                             .LoadAsync();
@@ -683,6 +687,7 @@ namespace GrKouk.Web.ERP.Controllers
                     var sTransactorTransaction = _mapper.Map<TransactorTransaction>(data);
                     sTransactorTransaction.TransactorId = data.TransactorId;
                     sTransactorTransaction.SectionId = sectionId;
+                    sTransactorTransaction.CreatorSectionId = sectionId;
                     sTransactorTransaction.TransTransactorDocTypeId =
                         transTransactorDefaultSeries.TransTransactorDocTypeDefId;
                     sTransactorTransaction.TransTransactorDocSeriesId = transTransactorDefaultSeries.Id;
@@ -742,18 +747,28 @@ namespace GrKouk.Web.ERP.Controllers
 
                         var sTransactorTransaction = _mapper.Map<TransactorTransaction>(data);
                         sTransactorTransaction.TransactorId = data.TransactorId;
-                        sTransactorTransaction.SectionId = sectionId;
+                        
                         sTransactorTransaction.TransTransactorDocTypeId =
                             transTransactorPayOffSeries.TransTransactorDocTypeDefId;
                         sTransactorTransaction.TransTransactorDocSeriesId = transTransactorPayOffSeries.Id;
                         sTransactorTransaction.FiscalPeriodId = fiscalPeriod.Id;
                         sTransactorTransaction.Etiology = "AutoPayOff";
                         sTransactorTransaction.CreatorId = docId;
+                        sTransactorTransaction.CreatorSectionId = sectionId;
                         await _context.Entry(transTransactorPayOffSeries)
                             .Reference(t => t.TransTransactorDocTypeDef)
                             .LoadAsync();
                         var transTransactorDocTypeDef = transTransactorPayOffSeries.TransTransactorDocTypeDef;
-
+                        #region Section Management
+                        if (transTransactorDocTypeDef.SectionId == 0)
+                        {
+                            sTransactorTransaction.SectionId = sectionId;
+                        }
+                        else
+                        {
+                            sTransactorTransaction.SectionId = transTransactorDocTypeDef.SectionId;
+                        }
+                        #endregion
                         await _context.Entry(transTransactorDocTypeDef)
                             .Reference(t => t.TransTransactorDef)
                             .LoadAsync();

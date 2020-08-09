@@ -4,14 +4,16 @@ using GrKouk.Web.ERP.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GrKouk.Web.ERP.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200808085922_addsectionintransactortypedef")]
+    partial class addsectionintransactortypedef
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1821,9 +1823,6 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("CreatorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CreatorSectionId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("DiscountRate")

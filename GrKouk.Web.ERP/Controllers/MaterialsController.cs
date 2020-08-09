@@ -1125,7 +1125,9 @@ namespace GrKouk.Web.ERP.Controllers
                 .Reference(t => t.TransTransactorDef)
                 .LoadAsync();
             var payoffTransactorTransactionDef = payoffSeriesType.TransTransactorDef;
-
+            #region Section Management
+            var scnId = payoffSeriesType.SectionId == 0 ? doc.SectionId : payoffSeriesType.SectionId;
+            #endregion
             var payoffTransaction = new TransactorTransaction
             {
                 TransDate = DateTime.Today,
@@ -1133,13 +1135,14 @@ namespace GrKouk.Web.ERP.Controllers
                 TransTransactorDocTypeId = payoffSeries.TransTransactorDocTypeDefId,
                 TransRefCode = doc.TransRefCode,
                 TransactorId = doc.TransactorId,
-                SectionId = doc.SectionId,
+                SectionId = scnId,
                 CreatorId = doc.Id,
+                CreatorSectionId = doc.SectionId,
                 FiscalPeriodId = doc.FiscalPeriodId,
                 AmountFpa = doc.AmountFpa,
                 AmountNet = doc.AmountNet,
                 AmountDiscount = doc.AmountDiscount,
-                Etiology = $"Payoff doc {doc.TransRefCode}",
+                Etiology = $"Εξοφληση παραστατικού με αριθμό {doc.TransRefCode}",
                 CompanyId = doc.CompanyId
             };
             ActionHandlers.TransactorFinAction(payoffTransactorTransactionDef.FinancialTransAction, payoffTransaction);
@@ -1262,7 +1265,9 @@ namespace GrKouk.Web.ERP.Controllers
                 .Reference(t => t.TransTransactorDef)
                 .LoadAsync();
             var payoffTransactorTransactionDef = payoffSeriesType.TransTransactorDef;
-
+            #region Section Management
+            var scnId = payoffSeriesType.SectionId == 0 ? doc.SectionId : payoffSeriesType.SectionId;
+            #endregion
             var payoffTransaction = new TransactorTransaction
             {
                 TransDate = DateTime.Today,
@@ -1270,13 +1275,14 @@ namespace GrKouk.Web.ERP.Controllers
                 TransTransactorDocTypeId = payoffSeries.TransTransactorDocTypeDefId,
                 TransRefCode = doc.TransRefCode,
                 TransactorId = doc.TransactorId,
-                SectionId = doc.SectionId,
+                SectionId = scnId,
                 CreatorId = doc.Id,
+                CreatorSectionId = doc.SectionId,
                 FiscalPeriodId = doc.FiscalPeriodId,
                 AmountFpa = doc.AmountFpa,
                 AmountNet = doc.AmountNet,
                 AmountDiscount = doc.AmountDiscount,
-                Etiology = $"Payoff doc {doc.TransRefCode}",
+                Etiology = $"Εξοφληση παραστατικού με αριθμό {doc.TransRefCode}",
                 CompanyId = doc.CompanyId
             };
             ActionHandlers.TransactorFinAction(payoffTransactorTransactionDef.FinancialTransAction, payoffTransaction);
@@ -1688,6 +1694,7 @@ namespace GrKouk.Web.ERP.Controllers
                     var sTransactorTransaction = _mapper.Map<TransactorTransaction>(data);
                     sTransactorTransaction.TransactorId = data.TransactorId;
                     sTransactorTransaction.SectionId = sectionId;
+                    sTransactorTransaction.CreatorSectionId = sectionId;
                     sTransactorTransaction.TransTransactorDocTypeId =
                         transTransactorDefaultSeries.TransTransactorDocTypeDefId;
                     sTransactorTransaction.TransTransactorDocSeriesId = transTransactorDefaultSeries.Id;
@@ -1745,18 +1752,28 @@ namespace GrKouk.Web.ERP.Controllers
 
                         var sTransactorTransaction = _mapper.Map<TransactorTransaction>(data);
                         sTransactorTransaction.TransactorId = data.TransactorId;
-                        sTransactorTransaction.SectionId = sectionId;
+                       
                         sTransactorTransaction.TransTransactorDocTypeId =
                             transTransactorPayOffSeries.TransTransactorDocTypeDefId;
                         sTransactorTransaction.TransTransactorDocSeriesId = transTransactorPayOffSeries.Id;
                         sTransactorTransaction.FiscalPeriodId = fiscalPeriod.Id;
                         sTransactorTransaction.Etiology = "AutoPayOff";
                         sTransactorTransaction.CreatorId = docId;
+                        sTransactorTransaction.CreatorSectionId = sectionId;
                         await _context.Entry(transTransactorPayOffSeries)
                             .Reference(t => t.TransTransactorDocTypeDef)
                             .LoadAsync();
                         var transTransactorDocTypeDef = transTransactorPayOffSeries.TransTransactorDocTypeDef;
-
+                        #region Section Management
+                        if (transTransactorDocTypeDef.SectionId == 0)
+                        {
+                            sTransactorTransaction.SectionId = sectionId;
+                        }
+                        else
+                        {
+                            sTransactorTransaction.SectionId = transTransactorDocTypeDef.SectionId;
+                        }
+                        #endregion
                         await _context.Entry(transTransactorDocTypeDef)
                             .Reference(t => t.TransTransactorDef)
                             .LoadAsync();
@@ -1971,7 +1988,7 @@ namespace GrKouk.Web.ERP.Controllers
                 _context.BuyDocLines.RemoveRange(_context.BuyDocLines.Where(p => p.BuyDocumentId == data.Id));
                 _context.TransactorTransactions.RemoveRange(
                     _context.TransactorTransactions.Where(p =>
-                        p.SectionId == data.SectionId && p.CreatorId == data.Id));
+                        p.CreatorSectionId == data.SectionId && p.CreatorId == data.Id));
                 _context.WarehouseTransactions.RemoveRange(
                     _context.WarehouseTransactions.Where(p => p.SectionId == data.SectionId && p.CreatorId == data.Id));
                 _context.BuyDocTransPaymentMappings.RemoveRange(
@@ -2073,6 +2090,7 @@ namespace GrKouk.Web.ERP.Controllers
 
                         sTransactorTransaction.TransactorId = data.TransactorId;
                         sTransactorTransaction.SectionId = sectionId;
+                        sTransactorTransaction.CreatorSectionId = sectionId;
                         sTransactorTransaction.TransTransactorDocTypeId =
                             transTransactorDefaultSeries.TransTransactorDocTypeDefId;
                         sTransactorTransaction.TransTransactorDocSeriesId = transTransactorDefaultSeries.Id;
@@ -2130,18 +2148,28 @@ namespace GrKouk.Web.ERP.Controllers
                         var sTransactorTransaction = _mapper.Map<TransactorTransaction>(spTransactorCreateDto);
 
                         sTransactorTransaction.TransactorId = data.TransactorId;
-                        sTransactorTransaction.SectionId = sectionId;
                         sTransactorTransaction.TransTransactorDocTypeId =
                             transTransactorPayOffSeries.TransTransactorDocTypeDefId;
+                        
                         sTransactorTransaction.TransTransactorDocSeriesId = transTransactorPayOffSeries.Id;
                         sTransactorTransaction.FiscalPeriodId = fiscalPeriod.Id;
                         sTransactorTransaction.Etiology = "AutoPayOff";
                         sTransactorTransaction.CreatorId = docId;
+                        sTransactorTransaction.CreatorSectionId = sectionId;
                         await _context.Entry(transTransactorPayOffSeries)
                             .Reference(t => t.TransTransactorDocTypeDef)
                             .LoadAsync();
                         var transTransactorDocTypeDef = transTransactorPayOffSeries.TransTransactorDocTypeDef;
-
+                        #region Section Management
+                        if (transTransactorDocTypeDef.SectionId == 0)
+                        {
+                            sTransactorTransaction.SectionId = sectionId;
+                        }
+                        else
+                        {
+                            sTransactorTransaction.SectionId = transTransactorDocTypeDef.SectionId;
+                        }
+                        #endregion
                         await _context.Entry(transTransactorDocTypeDef)
                             .Reference(t => t.TransTransactorDef)
                             .LoadAsync();
@@ -2493,6 +2521,7 @@ namespace GrKouk.Web.ERP.Controllers
                     var sTransactorTransaction = _mapper.Map<TransactorTransaction>(data);
                     sTransactorTransaction.TransactorId = data.TransactorId;
                     sTransactorTransaction.SectionId = sectionId;
+                    sTransactorTransaction.CreatorSectionId = sectionId;
                     sTransactorTransaction.TransTransactorDocTypeId =
                         transTransactorDefaultSeries.TransTransactorDocTypeDefId;
                     sTransactorTransaction.TransTransactorDocSeriesId = transTransactorDefaultSeries.Id;
@@ -2552,18 +2581,28 @@ namespace GrKouk.Web.ERP.Controllers
 
                         var sTransactorTransaction = _mapper.Map<TransactorTransaction>(data);
                         sTransactorTransaction.TransactorId = data.TransactorId;
-                        sTransactorTransaction.SectionId = sectionId;
+                        
                         sTransactorTransaction.TransTransactorDocTypeId =
                             transTransactorPayOffSeries.TransTransactorDocTypeDefId;
                         sTransactorTransaction.TransTransactorDocSeriesId = transTransactorPayOffSeries.Id;
                         sTransactorTransaction.FiscalPeriodId = fiscalPeriod.Id;
                         sTransactorTransaction.Etiology = "AutoPayOff";
                         sTransactorTransaction.CreatorId = docId;
+                        sTransactorTransaction.CreatorSectionId = sectionId;
                         await _context.Entry(transTransactorPayOffSeries)
                             .Reference(t => t.TransTransactorDocTypeDef)
                             .LoadAsync();
                         var transTransactorDocTypeDef = transTransactorPayOffSeries.TransTransactorDocTypeDef;
-
+                        #region Section Management
+                        if (transTransactorDocTypeDef.SectionId == 0)
+                        {
+                            sTransactorTransaction.SectionId = sectionId;
+                        }
+                        else
+                        {
+                            sTransactorTransaction.SectionId = transTransactorDocTypeDef.SectionId;
+                        }
+                        #endregion
                         await _context.Entry(transTransactorDocTypeDef)
                             .Reference(t => t.TransTransactorDef)
                             .LoadAsync();
@@ -2778,7 +2817,7 @@ namespace GrKouk.Web.ERP.Controllers
                 _context.SellDocLines.RemoveRange(_context.SellDocLines.Where(p => p.SellDocumentId == data.Id));
                 _context.TransactorTransactions.RemoveRange(
                     _context.TransactorTransactions.Where(p =>
-                        p.SectionId == data.SectionId && p.CreatorId == data.Id));
+                        p.CreatorSectionId == data.SectionId && p.CreatorId == data.Id));
                 _context.WarehouseTransactions.RemoveRange(
                     _context.WarehouseTransactions.Where(p => p.SectionId == data.SectionId && p.CreatorId == data.Id));
                 _context.SellDocTransPaymentMappings.RemoveRange(
@@ -2880,6 +2919,7 @@ namespace GrKouk.Web.ERP.Controllers
 
                     sTransactorTransaction.TransactorId = data.TransactorId;
                     sTransactorTransaction.SectionId = sectionId;
+                    sTransactorTransaction.CreatorSectionId = sectionId;
                     sTransactorTransaction.TransTransactorDocTypeId =
                         transTransactorDefaultSeries.TransTransactorDocTypeDefId;
                     sTransactorTransaction.TransTransactorDocSeriesId = transTransactorDefaultSeries.Id;
@@ -2926,18 +2966,28 @@ namespace GrKouk.Web.ERP.Controllers
                         //Ετσι δεν μεταφέρει το Id απο το data
                         var sTransactorTransaction = _mapper.Map<TransactorTransaction>(spTransactorCreateDto);
                         sTransactorTransaction.TransactorId = data.TransactorId;
-                        sTransactorTransaction.SectionId = sectionId;
+                        
                         sTransactorTransaction.TransTransactorDocTypeId =
                             transTransactorPayOffSeries.TransTransactorDocTypeDefId;
                         sTransactorTransaction.TransTransactorDocSeriesId = transTransactorPayOffSeries.Id;
                         sTransactorTransaction.FiscalPeriodId = fiscalPeriod.Id;
                         sTransactorTransaction.Etiology = "AutoPayOff";
                         sTransactorTransaction.CreatorId = docId;
+                        sTransactorTransaction.CreatorSectionId = sectionId;
                         await _context.Entry(transTransactorPayOffSeries)
                             .Reference(t => t.TransTransactorDocTypeDef)
                             .LoadAsync();
                         var transTransactorDocTypeDef = transTransactorPayOffSeries.TransTransactorDocTypeDef;
-
+                        #region Section Management
+                        if (transTransactorDocTypeDef.SectionId == 0)
+                        {
+                            sTransactorTransaction.SectionId = sectionId;
+                        }
+                        else
+                        {
+                            sTransactorTransaction.SectionId = transTransactorDocTypeDef.SectionId;
+                        }
+                        #endregion
                         await _context.Entry(transTransactorDocTypeDef)
                             .Reference(t => t.TransTransactorDef)
                             .LoadAsync();

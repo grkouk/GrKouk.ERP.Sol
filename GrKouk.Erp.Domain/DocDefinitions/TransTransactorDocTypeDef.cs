@@ -23,5 +23,7 @@ namespace GrKouk.Erp.Domain.DocDefinitions
 
         public int CompanyId { get; set; }
         public virtual Company Company { get; set; }
+        [Display(Name = "Default Section")]
+        public int SectionId { get; set; }
     }
 }
