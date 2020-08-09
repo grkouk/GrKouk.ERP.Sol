@@ -1142,7 +1142,7 @@ namespace GrKouk.Web.ERP.Controllers
                 AmountFpa = doc.AmountFpa,
                 AmountNet = doc.AmountNet,
                 AmountDiscount = doc.AmountDiscount,
-                Etiology = $"Payoff doc {doc.TransRefCode}",
+                Etiology = $"Εξοφληση παραστατικού με αριθμό {doc.TransRefCode}",
                 CompanyId = doc.CompanyId
             };
             ActionHandlers.TransactorFinAction(payoffTransactorTransactionDef.FinancialTransAction, payoffTransaction);
@@ -1282,7 +1282,7 @@ namespace GrKouk.Web.ERP.Controllers
                 AmountFpa = doc.AmountFpa,
                 AmountNet = doc.AmountNet,
                 AmountDiscount = doc.AmountDiscount,
-                Etiology = $"Payoff doc {doc.TransRefCode}",
+                Etiology = $"Εξοφληση παραστατικού με αριθμό {doc.TransRefCode}",
                 CompanyId = doc.CompanyId
             };
             ActionHandlers.TransactorFinAction(payoffTransactorTransactionDef.FinancialTransAction, payoffTransaction);
