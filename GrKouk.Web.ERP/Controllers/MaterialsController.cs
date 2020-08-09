@@ -1125,7 +1125,9 @@ namespace GrKouk.Web.ERP.Controllers
                 .Reference(t => t.TransTransactorDef)
                 .LoadAsync();
             var payoffTransactorTransactionDef = payoffSeriesType.TransTransactorDef;
-
+            #region Section Management
+            var scnId = payoffSeriesType.SectionId == 0 ? doc.SectionId : payoffSeriesType.SectionId;
+            #endregion
             var payoffTransaction = new TransactorTransaction
             {
                 TransDate = DateTime.Today,
@@ -1133,8 +1135,9 @@ namespace GrKouk.Web.ERP.Controllers
                 TransTransactorDocTypeId = payoffSeries.TransTransactorDocTypeDefId,
                 TransRefCode = doc.TransRefCode,
                 TransactorId = doc.TransactorId,
-                SectionId = doc.SectionId,
+                SectionId = scnId,
                 CreatorId = doc.Id,
+                CreatorSectionId = doc.SectionId,
                 FiscalPeriodId = doc.FiscalPeriodId,
                 AmountFpa = doc.AmountFpa,
                 AmountNet = doc.AmountNet,
@@ -1262,7 +1265,9 @@ namespace GrKouk.Web.ERP.Controllers
                 .Reference(t => t.TransTransactorDef)
                 .LoadAsync();
             var payoffTransactorTransactionDef = payoffSeriesType.TransTransactorDef;
-
+            #region Section Management
+            var scnId = payoffSeriesType.SectionId == 0 ? doc.SectionId : payoffSeriesType.SectionId;
+            #endregion
             var payoffTransaction = new TransactorTransaction
             {
                 TransDate = DateTime.Today,
@@ -1270,8 +1275,9 @@ namespace GrKouk.Web.ERP.Controllers
                 TransTransactorDocTypeId = payoffSeries.TransTransactorDocTypeDefId,
                 TransRefCode = doc.TransRefCode,
                 TransactorId = doc.TransactorId,
-                SectionId = doc.SectionId,
+                SectionId = scnId,
                 CreatorId = doc.Id,
+                CreatorSectionId = doc.SectionId,
                 FiscalPeriodId = doc.FiscalPeriodId,
                 AmountFpa = doc.AmountFpa,
                 AmountNet = doc.AmountNet,
