@@ -15,6 +15,10 @@ const indexPageLib = {
                     if (pagerAction === undefined) {
                         return;
                     }
+                    var pageIndex = document.getElementById('pageIndex');
+                    var pageSize = document.getElementById('PageSize');
+                    var totalPages = document.getElementById('totalPages');
+                    var totalRecords = document.getElementById('totalRecords');
                     switch (pagerAction) {
                         case 'GoToFirst':
                             break;
