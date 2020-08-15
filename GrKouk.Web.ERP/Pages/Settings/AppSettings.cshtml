@@ -88,6 +88,28 @@
                     </div>
                 </div>
             </div>
+            <div class="form-row">
+                <div class="form-group col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Sum Of Fixed Asset Buys Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[7].Value" id="BuyFixedValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#itemSelector" data-selectorType="BuyFixedSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Sum Of Fixed Asset Sales Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[8].Value" id="SellFixedValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#itemSelector" data-selectorType="SellFixedSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary btn-sm" id="saveForm"/>
             </div>
@@ -429,6 +451,12 @@
                          case "SellIncomeSettings":
                             $('#SellIncomeValue').val(jsJSON);
                             break;
+                        case "SellFixedSettings":
+                            $('#SellFixedValue').val(jsJSON);
+                            break;
+                        case "BuyFixedSettings":
+                            $('#BuyFixedValue').val(jsJSON);
+                            break;
                         default:
                     }
 
@@ -464,7 +492,13 @@
                             break;
                         case "SellIncomeSettings":
                            oldVal = $('#SellIncomeValue').val();
-                           break;    
+                           break;  
+                        case "SellFixedSettings":
+                            oldVal = $('#SellFixedValue').val();
+                            break;
+                        case "BuyFixedSettings":
+                            oldVal = $('#BuyFixedValue').val();
+                            break;     
                         default:
                     }
                     if (oldVal.length > 0) {
@@ -507,6 +541,12 @@
                             break;
                         case "SellIncomeSettings":
                             modal.find('.modal-title').text("Sell Income Setting");
+                            break;    
+                        case "SellFixedSettings":
+                            modal.find('.modal-title').text("Sell Fixed Assets Setting");
+                            break;    
+                        case "BuyFixedSettings":
+                            modal.find('.modal-title').text("Buy Fixed Assets Setting");
                             break;    
                         default:
                     }

@@ -32,7 +32,9 @@ namespace GrKouk.Web.ERP.Pages.Settings
                 new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfServiceBuys, Value = ""},
                 new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfMaterialSales, Value = ""},
                 new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfServiceSales, Value = ""},
-                new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfIncomeSales, Value = ""}
+                new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfIncomeSales, Value = ""},
+                new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfFixedAssetBuys, Value = ""},
+                new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfFixedAssetSales, Value = ""}
             };
         }
 
