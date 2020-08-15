@@ -354,7 +354,7 @@ namespace GrKouk.Web.ERP.Controllers
                     Error = "No valid transactor id specified"
                 });
             }
-            if (request.DisplayCurrencyId == null)
+            if (request.DisplayCurrencyId == 0)
             {
                 return BadRequest(new
                 {
@@ -388,13 +388,13 @@ namespace GrKouk.Web.ERP.Controllers
                 .Where(p => p.TransactorId == request.TransactorId);
            
 
-            DateTime beforePeriodDate = DateTime.Today;
+            //DateTime beforePeriodDate = DateTime.Today;
             if (!string.IsNullOrEmpty(request.DateRange))
             {
                 var datePeriodFilter = request.DateRange;
                 DateFilterDates dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
                 DateTime fromDate = dfDates.FromDate;
-                beforePeriodDate = fromDate.AddDays(-1);
+                //beforePeriodDate = fromDate.AddDays(-1);
                 DateTime toDate = dfDates.ToDate;
 
                 transactionsList = transactionsList.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
