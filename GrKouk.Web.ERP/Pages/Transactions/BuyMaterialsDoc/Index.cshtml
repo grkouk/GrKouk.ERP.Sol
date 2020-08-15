@@ -109,14 +109,14 @@
         <nav aria-label="Page navigation example">
             <ul class="pagination pagination-sm justify-content-end">
                 <li class="page-item ">
-                    <a href="#" id="GoToFirst"
+                    <a href="#" id="GoToFirst" data-pageraction="GoToFirst" 
                        class="page-link" aria-label="First">
                         @*<span aria-hidden="true">;</span>*@
                         First
                     </a>
                 </li>
                 <li class="page-item ">
-                    <a href="#" id="GoToPrevious"
+                    <a href="#" id="GoToPrevious" data-pageraction="GoToPrevious"
                        class="page-link" aria-label="Previous">
                         @*<span aria-hidden="true">&laquo;</span>*@
                         Previous
@@ -124,14 +124,14 @@
                 </li>
 
                 <li class="page-item ">
-                    <a href="#" id="GoToNext"
+                    <a href="#" id="GoToNext" data-pageraction="GoToNext"
                        class="page-link" aria-label="Next">
                         @*<span aria-hidden="true">&raquo;</span>*@
                         Next
                     </a>
                 </li>
                 <li class="page-item  ">
-                    <a href="#" id="GoToLast"
+                    <a href="#" id="GoToLast" data-pageraction="GoToLast"
                        class="page-link" aria-label="Last">
                         @*<span aria-hidden="true">;</span>*@
                         Last
@@ -227,6 +227,7 @@
 {
     <script src="~/lib/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script src="~/js/moment.min.js"></script>
+    <script src="~/js/indexpage.lib.js"></script>
     <script>
         $(document).ready(function() {
             var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
@@ -1690,6 +1691,9 @@
                     }
                     refreshTableData();
                 });
+            //New pagerElements Handling
+            indexPageLib.addPagerElementEventListener();
+            //----------------
             var storageItemJs = localStorage.getItem('BuyDocIndexView');
             if (storageItemJs === undefined || storageItemJs === null) {
                 $('#pageIndex').val(1);
