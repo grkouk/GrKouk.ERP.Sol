@@ -271,7 +271,128 @@
             var selectedTransTypes = "";
             var curSelectorType = "";
             let selectedDocumentId = 0;
-
+            let colDefs = [
+                                {
+                                    key: 'transDate',
+                                    responseKey: 'transDate',
+                                    actualVal: '',
+                                    columnFormat: 'd',
+                                    totalKey: '',
+                                    grandTotalKey: '',
+                                    totalFormatter: '',
+                                    sortKey: 'TransactionDateSort',
+                                    sortType: 'numeric',
+                                    header: 'Date',
+                                    text: '',
+                                    headerClass: 'small text-center ',
+                                    class: 'small'
+                                },
+                                {
+                                    key: 'transactorName',
+                                    responseKey: 'transactorName',
+                                    actualVal: '',
+                                    columnFormat: 't',
+                                    totalKey: 'label',
+                                    grandTotalKey: 'label',
+                                    totalFormatter: '',
+                                    sortKey: 'TransactorNameSort',
+                                    sortType: 'alpha',
+                                    header: 'Transactor',
+                                    text: '',
+                                    headerClass: 'small text-center',
+                                    class: 'small'
+                                },
+                                {
+                                    key: 'sellDocSeriesCode',
+                                    responseKey: 'sellDocSeriesCode',
+                                    actualVal: '',
+                                    columnFormat: 't',
+                                    totalKey: '',
+                                    grandTotalKey: '',
+                                    totalFormatter: '',
+                                    sortKey: 'SeriesCodeSort',
+                                    sortType: 'alpha',
+                                    header: 'Series',
+                                    text: '',
+                                    headerClass: 'small text-center d-none d-md-table-cell',
+                                    class: 'small d-none d-md-table-cell '
+                                },
+                                {
+                                    key: 'transRefCode',
+                                    responseKey: 'transRefCode',
+                                    actualVal: '',
+                                    columnFormat: 't',
+                                    totalKey: '',
+                                    grandTotalKey: '',
+                                    totalFormatter: '',
+                                    sortKey: '',
+                                    sortType: '',
+                                    header: 'Ref Number',
+                                    text: '',
+                                    headerClass: 'small text-center d-none d-md-table-cell',
+                                    class: 'small d-none d-md-table-cell '
+                                },
+                                {
+                                    key: 'companyCode',
+                                    responseKey: 'companyCode',
+                                    actualVal: '',
+                                    columnFormat: 't',
+                                    totalKey: '',
+                                    grandTotalKey: '',
+                                    totalFormatter: '',
+                                    sortKey: 'CompanyCodeSort',
+                                    sortType: 'alpha',
+                                    header: 'Company',
+                                    text: '',
+                                    headerClass: 'small text-center',
+                                    class: 'small '
+                                },
+                                {
+                                    key: 'totalNetAmount',
+                                    responseKey: 'totalNetAmount',
+                                    actualVal: '',
+                                    columnFormat: 'c',
+                                    totalKey: 'sumOfNetAmount',
+                                    grandTotalKey: 'grandSumOfNetAmount',
+                                    totalFormatter: 'currency',
+                                    sortKey: '',
+                                    sortType: '',
+                                    header: 'Net Amount',
+                                    text: '',
+                                    headerClass: 'small text-center',
+                                    class: 'small text-right '
+                                },
+                                {
+                                    key: 'totalAmount',
+                                    responseKey: 'totalAmount',
+                                    actualVal: '',
+                                    columnFormat: 'c',
+                                    totalKey: 'sumOfAmount',
+                                    grandTotalKey: 'grandSumOfAmount',
+                                    totalFormatter: 'currency',
+                                    sortKey: '',
+                                    sortType: '',
+                                    header: 'Amount',
+                                    text: '',
+                                    headerClass: 'small text-center',
+                                    class: 'small text-right '
+                                },
+                                {
+                                    key: 'payedOfAmount',
+                                    responseKey: 'payedOfAmount',
+                                    actualVal: '',
+                                    columnFormat: 'c',
+                                    totalKey: 'sumOfPayedAmount',
+                                    grandTotalKey: 'grandSumOfPayedAmount',
+                                    totalFormatter: 'currency',
+                                    sortKey: '',
+                                    sortType: '',
+                                    header: 'Payed Amount',
+                                    text: '',
+                                    headerClass: 'small text-center',
+                                    class: 'small text-right '
+                                }
+                            ];
             const setPaymentToSupplierSelectorCurrentSort = (currentSort) => {
                 var filtersArr = [];
                 filtersArr.push({
@@ -1403,7 +1524,7 @@
                     $selectedRowsActionsMenu.attr('hidden', 'true');
                 }
             };
-            var refreshTableData = () => {
+            var refreshTableData1 = () => {
                 var pageIndexVal = parseInt($('#pageIndex').val());
 
                 var pageIndex = reallyIsNaN(pageIndexVal)
@@ -1627,6 +1748,7 @@
                 function() {
                     currencyChanged();
                     refreshTableData();
+                    indexPageLib.refreshTableData('/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',colDefs );
                 });
             $('#DatePeriodFilter').on('change',
                 function() {
@@ -1736,8 +1858,8 @@
             }
             handleFiltersUi();
             currencyChanged();
-            refreshTableData();
-
+            //refreshTableData();
+            indexPageLib.refreshTableData('/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',colDefs );
             rowSelectorsUi();
         });
 
