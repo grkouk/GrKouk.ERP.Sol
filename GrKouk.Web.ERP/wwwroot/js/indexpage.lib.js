@@ -1,5 +1,6 @@
 ﻿//Index Page library functions
 const indexPageLib = {
+
   reallyIsNaN: function (x) {
     return x !== x;
   },
