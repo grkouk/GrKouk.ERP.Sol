@@ -228,6 +228,7 @@
     <script src="~/lib/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script src="~/js/moment.min.js"></script>
     <script src="~/js/indexpage.lib.js"></script>
+    @* <script src="~/js/indexPageIIFE.lib.js"></script> *@
     <script>
         $(document).ready(function() {
             var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
@@ -1560,19 +1561,20 @@
 
                 $pageIndex.val(curPageIndex);
                 refreshTableData();
+                indexPageLib.refreshTableData('/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',colDefs)
             };
             var gotoNextPage = () => {
                 var curPageIndex = parseInt($pageIndex.val());
                 curPageIndex += 1;
                 $pageIndex.val(curPageIndex);
-                refreshTableData();
+                indexPageLib.refreshTableData('/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',colDefs)
 
             };
             var gotoPreviousPage = () => {
                 var curPageIndex = parseInt($pageIndex.val());
                 curPageIndex -= 1;
                 $pageIndex.val(curPageIndex);
-                refreshTableData();
+                indexPageLib.refreshTableData('/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',colDefs)
 
             };
             var deleteSelectedRows = () => {
@@ -1748,22 +1750,26 @@
                 function() {
                     currencyChanged();
                     refreshTableData();
-                    indexPageLib.refreshTableData('/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',colDefs );
+                    //indPgLib.refreshData('/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',colDefs );
+                     indexPageLib.refreshTableData('/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',colDefs)
                 });
             $('#DatePeriodFilter').on('change',
                 function() {
                     $('#pageIndex').val(1);
-                    refreshTableData();
+                    //indPgLib.refreshData('/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',colDefs );
+                     indexPageLib.refreshTableData('/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',colDefs)
                 });
             $('#CompanyFilter').on('change',
                 function() {
                     $('#pageIndex').val(1);
-                    refreshTableData();
+                    //indPgLib.refreshData('/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',colDefs );
+                     indexPageLib.refreshTableData('/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',colDefs)
                 });
             $('#PageSize').on('change',
                 function() {
                     $('#pageIndex').val(1);
-                    refreshTableData();
+                    //indPgLib.refreshData('/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',colDefs );
+                     indexPageLib.refreshTableData('/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',colDefs)
                 });
             $('#GoToLast').on('click',
                 function() {
@@ -1814,7 +1820,8 @@
                     refreshTableData();
                 });
             //New pagerElements Handling
-            indexPageLib.addPagerElementEventListener();
+            //indPgLib.addPagerElementEventListeners();
+            indexPageLib.addPagerElementEventListeners();
             //----------------
             var storageItemJs = localStorage.getItem('BuyDocIndexView');
             if (storageItemJs === undefined || storageItemJs === null) {
@@ -1859,7 +1866,9 @@
             handleFiltersUi();
             currencyChanged();
             //refreshTableData();
-            indexPageLib.refreshTableData('/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',colDefs );
+            
+            //indPgLib.refreshData('/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',colDefs );
+            indexPageLib.refreshTableData('/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',colDefs)
             rowSelectorsUi();
         });
 
