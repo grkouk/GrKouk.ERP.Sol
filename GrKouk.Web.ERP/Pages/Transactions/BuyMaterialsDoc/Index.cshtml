@@ -1455,47 +1455,9 @@
            
             indPgLib.addPagerElementEventListeners();
             indPgLib.registerPageHandlers();
+            indPgLib.loadSettings('BuyDocIndexView');
             //----------------
-            var storageItemJs = localStorage.getItem('BuyDocIndexView');
-            if (storageItemJs === undefined || storageItemJs === null) {
-                $('#pageIndex').val(1);
-                $('#filtersVisible').val(true);
-                $('#rowSelectorsVisible').val(true);
-                // $rowSelectorsToggle.text('Hide Row Selectors');
-                // $filtersToggle.text('Hide Filters');
-                $('#DatePeriodFilter').val('CURMONTH');
-                $('#CompanyFilter').val(0);
-                $('#currentSort').val('transactiondate:desc');
-            } else {
-                var storageItem = JSON.parse(storageItemJs);
-                var filtersValue = storageItem.find(x => x.filterKey === 'filtersVisible').filterValue;
-                if (filtersValue === true) {
-                    $filtersToggle.text('Hide Filters');
-                } else {
-                    $filtersToggle.text('Show Filters');
-                }
-                $('#filtersVisible').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'rowSelectorsVisible').filterValue;
-                $('#rowSelectorsVisible').val(filtersValue);
-
-                filtersValue = storageItem.find(x => x.filterKey === 'dateRangeFilter').filterValue;
-                $('#DatePeriodFilter').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'currentSort').filterValue;
-                $('#currentSort').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'companyFilter').filterValue;
-                $('#CompanyFilter').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'pageSize').filterValue;
-                $('#PageSize').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'pageIndex').filterValue;
-                $('#pageIndex').val(filtersValue);
-
-                try {
-                    filtersValue = storageItem.find(x => x.filterKey === 'currentCurrency').filterValue;
-                    $('#CurrencySelector').val(filtersValue);
-                } catch (e) {
-
-                }
-            }
+           
             indPgLib.handleFiltersUi();
             currencyChanged();
             indPgLib.refreshData();
@@ -1504,61 +1466,7 @@
 
         $(window).on('beforeunload',
             function(e) {
-                //#region CommentOut
-                //#region Variables
-                var filtersVisible = $('#filterCollapse').hasClass('show');
-                var $rowSelectorsColumn = $('th[name=selectAllRowsColumn]');
-
-                var rowSelectorsNotVisible = $rowSelectorsColumn.is(':hidden');
-                var rowSelectorsVisible = (rowSelectorsNotVisible) ? false : true;
-
-                var pageSize = $('#PageSize').val();
-                var dateRange = $('#DatePeriodFilter').val();
-                var currentSort = $('#currentSort').val();
-                var companyFilter = $('#CompanyFilter').val();
-                var pageIndex = $('#pageIndex').val();
-                var currentCurrency = $('#CurrencySelector').val();
-                var filtersArr = [];
-                //#endregion
-                filtersArr.push({
-                    filterKey: 'filtersVisible',
-                    filterValue: filtersVisible
-                });
-                filtersArr.push({
-                    filterKey: 'rowSelectorsVisible',
-                    filterValue: rowSelectorsVisible
-                });
-                filtersArr.push({
-                    filterKey: 'pageIndex',
-                    filterValue: pageIndex
-                });
-                filtersArr.push({
-                    filterKey: 'pageSize',
-                    filterValue: pageSize
-                });
-                filtersArr.push({
-                    filterKey: 'dateRangeFilter',
-                    filterValue: dateRange
-                });
-                filtersArr.push({
-                    filterKey: 'currentSort',
-                    filterValue: currentSort
-                });
-                filtersArr.push({
-                    filterKey: 'companyFilter',
-                    filterValue: companyFilter
-                });
-                filtersArr.push({
-                    filterKey: 'currentCurrency',
-                    filterValue: currentCurrency
-                });
-
-
-                var sessionVal = JSON.stringify(filtersArr);
-
-                localStorage.setItem('BuyDocIndexView', sessionVal);
-                //#endregion
-
+                indPgLib.saveSettings('BuyDocIndexView');
             });
     </script>
 }
