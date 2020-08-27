@@ -619,7 +619,7 @@
                 },
                 {
                     selector:'[name=SortHeader]',
-                    event:'change',
+                    event:'click',
                     handler: function(event) {
                                     var button = $(event.delegateTarget);
                                     var reqSort = button.data('sortkey');
@@ -1248,32 +1248,9 @@
                 });
             };
            
-            var gotoFirstPage = () => {
-                var curPageIndex = 1;
-                $pageIndex.val(curPageIndex);
-                indPgLib.refreshData();
-            };
-            var gotoLastPage = () => {
-                var curPageIndex = parseInt($totalPages.val());
-
-                $pageIndex.val(curPageIndex);
-                refreshTableData();
-                indPgLib.refreshData();
-            };
-            var gotoNextPage = () => {
-                var curPageIndex = parseInt($pageIndex.val());
-                curPageIndex += 1;
-                $pageIndex.val(curPageIndex);
-                indPgLib.refreshData();
-
-            };
-            var gotoPreviousPage = () => {
-                var curPageIndex = parseInt($pageIndex.val());
-                curPageIndex -= 1;
-                $pageIndex.val(curPageIndex);
-                indPgLib.refreshData();
-
-            };
+           
+           
+           
             var deleteSelectedRows = () => {
                 var $rowSelectors = $('input[name=checkTableRow]');
                 var selectedRows = $rowSelectors.filter(':checked');
@@ -1432,22 +1409,7 @@
                     $('#pageIndex').val(1);
                     indPgLib.refreshData();
                 });
-            $('#GoToLast').on('click',
-                function() {
-                    gotoLastPage();
-                });
-            $('#GoToFirst').on('click',
-                function() {
-                    gotoFirstPage();
-                });
-            $('#GoToNext').on('click',
-                function() {
-                    gotoNextPage();
-                });
-            $('#GoToPrevious').on('click',
-                function() {
-                    gotoPreviousPage();
-                });
+           
 
             $('#CreateNew').on('click',
                 function() {

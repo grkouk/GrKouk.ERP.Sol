@@ -1,4 +1,4 @@
-var indPgLib = (function () {
+﻿var indPgLib = (function () {
     let indexPageDefinition;
     let colDefs;
     let actionColDefs;
@@ -505,6 +505,70 @@ var indPgLib = (function () {
             $(item.selector).on(item.event, item.handler);
 
         });  
+        let pageSummaryCount = 0;
+        let totalSummaryCount = 0;
+        let $pageSummaryRow = $('<tr class="table-info">');
+        $pageSummaryRow.append('<td name="selectRowColumn"> </td> ');
+        let $totalSummaryRow = $('<tr class="table-info">');
+        $totalSummaryRow.append('<td name="selectRowColumn"> </td> ');
+
+        colDefs.forEach(function (item) {
+            var tdColPage = '';
+            var tdColTotal = '';
+            if (item.totalKey.length !== 0) {
+                if (item.totalKey === "label") {
+                    tdColPage = $('<td>').text('Σύνολα Σελίδας').addClass('small font-weight-bold');
+                } else {
+                    if (item.totalFormatter === "currency") {
+                        try {
+                            let fAmount = currencyFormatter.format(result[item.totalKey]);
+                            tdColPage = `<td class="${item.class} font-weight-bold"> `;
+                            tdColPage += `${fAmount} </td> `;
+                            pageSummaryCount++;
+                        } catch (e) {
+                            tdColPage = `<td class="${item.class}"> `;
+                            tdColPage += `#Err </td> `;
+                        }
+
+                    }
+                }
+            } else {
+                tdColPage = `<td class="${item.class}"> `;
+                tdColPage += ` </td> `;
+            }
+            if (item.grandTotalKey.length !== 0) {
+                if (item.grandTotalKey === "label") {
+                    tdColTotal = $('<td>').text('Γενικό Σύνολο').addClass('small font-weight-bold');
+                } else {
+                    if (item.totalFormatter === "currency") {
+                        try {
+                            let fAmount = currencyFormatter.format(result[item.grandTotalKey]);
+                            tdColTotal = `<td class="${item.class} font-weight-bold"> `;
+                            tdColTotal += `${fAmount} </td> `;
+                            totalSummaryCount++;
+                        } catch (e) {
+                            tdColTotal = `<td class="${item.class}"> `;
+                            tdColTotal += `#Err </td> `;
+                        }
+
+                    }
+                }
+            } else {
+                tdColTotal = `<td class="${item.class}"> `;
+                tdColTotal += ` </td> `;
+            }
+            $pageSummaryRow.append($(tdColPage));
+            $totalSummaryRow.append($(tdColTotal));
+        });
+        if (pageSummaryCount > 0) {
+            $pageSummaryRow.append($('<td>'));
+            $pageSummaryRow.appendTo('#myTable >  tbody:last');
+        }
+        if (totalSummaryCount > 0) {
+            $totalSummaryRow.append($('<td>'));
+            $totalSummaryRow.appendTo('#myTable >  tbody:last');
+        }
+        rowSelectorsUi();
     };
 
     const refreshTableData = () => {
@@ -547,20 +611,24 @@ var indPgLib = (function () {
                 switch (pagerAction) {
                     case "GoToFirst":
                         $pageIndex.val(1);
+                        refreshTableData();
                         break;
                     case "GoToPrevious":
                         curPageIndex = parseInt($pageIndex.val());
                         curPageIndex -= 1;
                         $pageIndex.val(curPageIndex);
+                        refreshTableData();
                         break;
                     case "GoToNext":
                         curPageIndex = parseInt($pageIndex.val());
                         curPageIndex += 1;
                         $pageIndex.val(curPageIndex);
+                        refreshTableData();
                         break;
                     case "GoToLast":
                         curPageIndex = parseInt($totalPages.val());
                         $pageIndex.val(curPageIndex);
+                        refreshTableData();
                         break;
                     default:
                 }
