@@ -4,7 +4,8 @@
     let actionColDefs;
     let actionColSubDefs;
     let actionMobileColDefs;
-    let handlersToRegister;
+    let tableHandlersToRegister;
+    let pageHandlersToRegister;
     let currencyFormatter;
     let numberFormatter;
 
@@ -140,7 +141,11 @@
         return Object.keys(inputObject).length === 0;
     };
     //================================================================
-
+    const registerHandlers = (handlerDefinitions) => {
+        handlerDefinitions.forEach(function (item) {
+            $(item.selector).on(item.event, item.handler);
+        });  
+    };
     const createHeaderColumn = (item) => {
         let curSortUndefined = false;
         let curSortAr = [];
@@ -359,7 +364,8 @@
         currencyFormatter = pgDefinition.currencyFormatter;
         numberFormatter = pgDefinition.numberFormatter;
         actionColSubDefs = pgDefinition.actionColSubDefs;
-        handlersToRegister = pgDefinition.handlersToRegister;
+        tableHandlersToRegister = pgDefinition.tableHandlersToRegister;
+        pageHandlersToRegister = pgDefinition.pageHandlersToRegister;
         actionMobileColDefs = pgDefinition.actionMobileColDefs;
     };
 
@@ -500,11 +506,8 @@
                 $tr.append(mobileCol);
                 $tr.appendTo('#myTable > tbody');
             });
-        handlersToRegister.forEach(function (item) {
-
-            $(item.selector).on(item.event, item.handler);
-
-        });  
+        registerHandlers(tableHandlersToRegister);
+       //====================
         let pageSummaryCount = 0;
         let totalSummaryCount = 0;
         let $pageSummaryRow = $('<tr class="table-info">');
@@ -635,7 +638,9 @@
             });
         });
     };
-
+    const registerPageHandlers = () => {
+        registerHandlers(pageHandlersToRegister);
+    };
     return {
         getIndexPageDefinition: getIndexPageDefinition,
         setIndexPageDefinition: setIndexPageDefinition,
@@ -647,6 +652,7 @@
         rowSelectorsUi: rowSelectorsUi,
         handleSelectedRowsUi: handleSelectedRowsUi,
         rowSelectorsToggleHandler: rowSelectorsToggleHandler,
+        registerPageHandlers: registerPageHandlers,
         handleFiltersUi: handleFiltersUi
 
     };

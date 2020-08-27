@@ -265,13 +265,7 @@
             var reallyIsNaN = function(x) {
                 return x !== x;
             };
-            //#region items selectors modals
-            $.fn.selectpicker.Constructor.BootstrapVersion = '4';
-            var selectedCompanies = "";
-            var selectedNatures = "";
-            var selectedTransTypes = "";
-            var curSelectorType = "";
-            let selectedDocumentId = 0;
+            //#region Index page definition objects
             let colDefs = [
                 {
                     key: 'transDate',
@@ -585,7 +579,7 @@
                     url: ''
                 }
             ];
-            let handlersToRegister = [
+            let tableHandlersToRegister = [
                 {
                     selector:'[name=PayoffDoc]',
                     event:'click',
@@ -654,6 +648,57 @@
                 }
                
             ];
+             let pageHandlersToRegister = [
+                {
+                    selector:'#CurrencySelector',
+                    event:'change',
+                    handler: function(event) {
+                        currencyChanged();
+                        indPgLib.refreshData();
+                    }
+                },
+                 {
+                     selector:'#DatePeriodFilter',
+                     event:'change',
+                     handler: function(event) {
+                         $('#pageIndex').val(1);
+                         indPgLib.refreshData();
+                     }
+                 },
+                 {
+                     selector:'#CompanyFilter',
+                     event:'change',
+                     handler: function(event) {
+                         $('#pageIndex').val(1);
+                         indPgLib.refreshData();
+                     }
+                 },
+                 {
+                     selector:'#PageSize',
+                     event:'change',
+                     handler: function(event) {
+                         $('#pageIndex').val(1);
+                         indPgLib.refreshData();
+                     }
+                 },
+                 {
+                     selector:'.search_icon',
+                     event:'click',
+                     handler: function(event) {
+                         let icon = $(this).find("svg");
+                         if (icon.hasClass('fa-search')) {
+                             icon.addClass("fa-times").removeClass("fa-search");
+                         } else {
+                             icon.addClass("fa-search").removeClass("fa-times");
+                             $('.search_input').val('');
+                         }
+
+                         indPgLib.refreshData();
+                     }
+                 }
+
+               
+            ];
             const indexPageDef = {
                 uri: '/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',
                 currencyFormatter: formatterCurrency,
@@ -662,10 +707,21 @@
                 actionColDefs: actionColDefs,
                 actionColSubDefs: actionColSubDefs,
                 actionMobileColDefs: actionMobileColDefs,
-                handlersToRegister:handlersToRegister
+                tableHandlersToRegister:tableHandlersToRegister,
+                pageHandlersToRegister:pageHandlersToRegister
             };
 
             indPgLib.setIndexPageDefinition(indexPageDef);
+            //#endregion
+
+            //#region items selectors modals
+            $.fn.selectpicker.Constructor.BootstrapVersion = '4';
+            var selectedCompanies = "";
+            var selectedNatures = "";
+            var selectedTransTypes = "";
+            var curSelectorType = "";
+            let selectedDocumentId = 0;
+            
 
             const setPaymentToSupplierSelectorCurrentSort = (currentSort) => {
                 var filtersArr = [];
@@ -812,7 +868,7 @@
                             if (item.sortKey.length !== 0) {
                                 let colHtml = "";
                                 colHtml = `<th class="${item.headerClass}"> `;
-                                colHtml += `<a href="#" role="button" name="SortHeader" tabindex="-1" `;
+                                colHtml += `<a href="#" role="button" name="SelectorSortHeader" tabindex="-1" `;
                                 colHtml += `data-sortkey="${item.sortKey}" data-sorttype="${item.sortType}">  `;
                                 colHtml += `${item.header}  `;
                                 colHtml += `</a>  `;
@@ -979,7 +1035,7 @@
                                 //$('#itemSelector').modal('hide');
 
                             });
-                        $('[name=SortHeader]').on('click',
+                        $('[name=SelectorSortHeader]').on('click',
                             function(event) {
                                 var button = $(event.delegateTarget);
                                 var reqSort = button.data('sortkey');
@@ -1248,9 +1304,6 @@
                 });
             };
            
-           
-           
-           
             var deleteSelectedRows = () => {
                 var $rowSelectors = $('input[name=checkTableRow]');
                 var selectedRows = $rowSelectors.filter(':checked');
@@ -1359,11 +1412,6 @@
 
                     $filtersVisible.val(true);
                 });
-
-
-           
-
-
             var currencyChanged = () => {
                 let curCurrencySelected = parseInt($('#CurrencySelector').val());
                 var currencyCode;
@@ -1387,47 +1435,13 @@
                 function() {
                    indPgLib.rowSelectorsToggleHandler();
                 });
-
-            $('#CurrencySelector').on('change',
-                function() {
-                    currencyChanged();
-                    indPgLib.refreshData();
-                });
-            $('#DatePeriodFilter').on('change',
-                function() {
-                    $('#pageIndex').val(1);
-                    indPgLib.refreshData();
-
-                });
-            $('#CompanyFilter').on('change',
-                function() {
-                    $('#pageIndex').val(1);
-                    indPgLib.refreshData();
-                });
-            $('#PageSize').on('change',
-                function() {
-                    $('#pageIndex').val(1);
-                    indPgLib.refreshData();
-                });
            
-
             $('#CreateNew').on('click',
                 function() {
                     var uri = '@Url.Page("Create")';
                     window.location.href = uri;
                 });
-            $('.search_icon').on('click',
-                function() {
-                    let icon = $(this).find("svg");
-                    if (icon.hasClass('fa-search')) {
-                        icon.addClass("fa-times").removeClass("fa-search");
-                    } else {
-                        icon.addClass("fa-search").removeClass("fa-times");
-                        $('.search_input').val('');
-                    }
-
-                    indPgLib.refreshData();
-                });
+            
 
             $('#FiltersForm').on('submit',
                 function(e) {
@@ -1444,6 +1458,7 @@
                 });
            
             indPgLib.addPagerElementEventListeners();
+            indPgLib.registerPageHandlers();
             //----------------
             var storageItemJs = localStorage.getItem('BuyDocIndexView');
             if (storageItemJs === undefined || storageItemJs === null) {
