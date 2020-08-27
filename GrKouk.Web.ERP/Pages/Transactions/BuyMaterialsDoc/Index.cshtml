@@ -465,7 +465,7 @@
                 {
                     actionType: 'newWindowAction',
                     visibility: 'always',
-                    elementName:'',
+                    elementName: '',
                     condition: {},
                     text: 'Νέα Συνδρομή',
                     valueKey: 'id',
@@ -475,17 +475,45 @@
                 {
                     actionType: 'eventAction',
                     visibility: 'condition',
-                    elementName:'PayoffDoc',
+                    elementName: 'PayoffDoc',
+                    condition: {
+                        val1Key: 'totalAmount',
+                        val2Key: 'payedOfAmount',
+                        operator: 'notZero'
+                    },
+                    text: 'Εξόφληση Παραστατικού',
+                    valueKey: 'id',
+                    icon: '<i class="fab fa-amazon-pay fa-lg" style="color:slategray"></i>',
+                    url: ''
+                },
+                {
+                    actionType: 'modalSelectorEventAction',
+                    selectorType: 'BuyPaymentsSelector',
+                    selectorTarget: '#itemSelector',
+                    visibility: 'condition',
+                    elementName:'AssignPayments',
                     condition: {
                         val1Key:'totalAmount',
                         val2Key:'payedOfAmount',
                         operator:'notZero'
                     },
-                    text: 'Εξόφληση Παραστατικού',
+                    text: 'Αντιστοίχιση Πληρωμών',
                     valueKey: 'id',
-                    icon: '<i class="fab fa-amazon-pay fa-lg" style="color:slategray"></i>',
-                    url: '<a class="dropdown-item" href="#" name="PayoffDoc" data-docid='
+                    icon: '<i class="fas fa-compress-arrows-alt fa-lg" style="color:slategray"></i>',
+                    url: ''
                 }
+            ];
+            let handlersToRegister = [
+                {
+                    selector:'[name=PayoffDoc]',
+                    event:'click',
+                    handler: function(event) {
+                        let button = $(event.delegateTarget);
+                        let docId = button.data('docid');
+                        payOfDocument(docId);
+                    }
+                }
+               
             ];
             const indexPageDef = {
                 uri: '/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',
@@ -493,7 +521,8 @@
                 numberFormatter: formatterNumber,
                 colDefs: colDefs,
                 actionColDefs: actionColDefs,
-                actionColSubDefs: actionColSubDefs
+                actionColSubDefs: actionColSubDefs,
+                handlersToRegister:handlersToRegister
             };
 
             indPgLib.setIndexPageDefinition(indexPageDef);

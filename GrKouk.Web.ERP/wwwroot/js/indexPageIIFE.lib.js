@@ -3,6 +3,7 @@ var indPgLib = (function () {
     let colDefs;
     let actionColDefs;
     let actionColSubDefs;
+    let handlersToRegister;
     let currencyFormatter;
     let numberFormatter;
 
@@ -165,7 +166,26 @@ var indPgLib = (function () {
                     actionHtml += `<a class="dropdown-item" target="_blanc" href="${col.url}${value[col.valueKey]}">`;
                     break;
                 case 'eventAction':
-
+                    actionHtml += `<a class="dropdown-item" href="#"`;
+                    if (col.elementName) {
+                        actionHtml += ` name=${col.elementName}`;
+                    }
+                    actionHtml += ` data-docid=${value[col.valueKey]}`;
+                    actionHtml += '>';
+                    break;
+                case 'modalSelectorEventAction':
+                    actionHtml += `<a class="dropdown-item" href="#" data-toggle="modal"`;
+                    if (col.elementName) {
+                        actionHtml += ` name=${col.elementName}`;
+                    }
+                    if (col.selectorTarget) {
+                        actionHtml += ` data-target=${col.selectorTarget}`;
+                    }
+                    if (col.selectorType) {
+                        actionHtml += ` data-selectorType=${col.selectorType}`;
+                    }
+                    actionHtml += ` data-docid=${value[col.valueKey]}`;
+                    actionHtml += '>';
                     break;
                 default:
             }
@@ -187,6 +207,7 @@ var indPgLib = (function () {
         currencyFormatter = pgDefinition.currencyFormatter;
         numberFormatter = pgDefinition.numberFormatter;
         actionColSubDefs = pgDefinition.actionColSubDefs;
+        handlersToRegister = pgDefinition.handlersToRegister;
     };
     const handlePagingUi = (totalPages, totalRecords, pageIndex, hasPrevious, hasNext) => {
         $totalPages.val(totalPages);
@@ -310,6 +331,11 @@ var indPgLib = (function () {
                 $tr.append(actionsCol);
                 $tr.appendTo('#myTable > tbody');
             });
+        handlersToRegister.forEach(function (item) {
+
+            $(item.selector).on(item.event, item.handler);
+
+        });  
     };
 
     const refreshTableData = () => {
