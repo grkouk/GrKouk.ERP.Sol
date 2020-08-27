@@ -3,16 +3,19 @@ var indPgLib = (function () {
     let colDefs;
     let actionColDefs;
     let actionColSubDefs;
+    let actionMobileColDefs;
     let handlersToRegister;
     let currencyFormatter;
     let numberFormatter;
 
     //cached references=================================
-    var $pageIndex = $('#pageIndex');
-    var $pageSize = $('#PageSize');
-    var $totalPages = $('#totalPages');
-    var $totalRecords = $('#totalRecords');
-    var $pagingInfo = $("[name=PagingInfo]");
+    const $pageIndex = $('#pageIndex');
+    const $pageSize = $('#PageSize');
+    const $totalPages = $('#totalPages');
+    const $totalRecords = $('#totalRecords');
+    const $pagingInfo = $("[name=PagingInfo]");
+    const $filtersVisible = $('#filtersVisible');
+    const $filterCollapse = $('#filterCollapse');
     //Support functions===============================================
     const selectAllRowsColumnHtml = () => {
         let cl = '<th name="selectAllRowsColumn"> <label class="custom-control custom-checkbox"> ';
@@ -34,6 +37,100 @@ var indPgLib = (function () {
             return cSort;
         } catch (e) {
             return "";
+        }
+    };
+    const setTableCurrentSort = (currentSort) => {
+        $('#currentSort').val(currentSort);
+    };
+    const countSelectedRows = () => {
+        const $rowSelectors = $('input[name=checkTableRow]');
+        var selectedRows = $rowSelectors.filter(':checked');
+        return selectedRows.length;
+    };
+    const rowSelectorsUi = () => {
+        var $selectSingleSelectors = $('td[name=selectRowColumn]');
+        var $selectAllSelector = $('th[name=selectAllRowsColumn]');
+        var $selectedRowsActionsMenu = $('#SelectedRowsActionsMenu');
+        var $selectedRowsActionsLink = $('#ddSelectedRowsActions');
+        var $rowSelectorsToggle = $('#rowSelectorsToggle');
+        var $rowSelectorsVisible = $('#rowSelectorsVisible');
+
+        var selectorsVisible = $rowSelectorsVisible.val();
+        var newSelectorsVisible =
+            (selectorsVisible == 'True' || selectorsVisible == 'true' || selectorsVisible === true)
+                ? 'True'
+                : 'False';
+        if (newSelectorsVisible == 'True') {
+            $selectAllSelector.removeAttr('hidden');
+            $selectSingleSelectors.removeAttr('hidden');
+            $selectAllSelector.show();
+            $selectSingleSelectors.show();
+            $rowSelectorsVisible.val(true);
+            $rowSelectorsToggle.text('Hide Row Selectors');
+            $selectedRowsActionsMenu.removeAttr('hidden');
+            $selectedRowsActionsLink.addClass('disabled');
+        } else {
+            $selectAllSelector.hide();
+            $selectSingleSelectors.hide();
+            $rowSelectorsVisible.val(false);
+            $rowSelectorsToggle.text('Show Row Selectors');
+            $selectedRowsActionsMenu.attr('hidden', 'true');
+        }
+    };
+    const handleSelectedRowsUi = () => {
+        var $rowSelectors = $('input[name=checkTableRow]');
+        var $checkAllRows = $('input[name=checkAllRows]');
+        var $selectedRowsActionsLink = $('#ddSelectedRowsActions');
+        var allRows = $rowSelectors.length;
+        var selectedRowsCount = $rowSelectors.filter(':checked').length;
+        if (selectedRowsCount > 0) {
+            $selectedRowsActionsLink.removeClass('disabled');
+            //$selectedRowsActionsLink.prop('disabled', 'false');
+        } else {
+            $selectedRowsActionsLink.addClass('disabled');
+        }
+        if (selectedRowsCount == allRows) {
+            $checkAllRows.prop('checked', true);
+        } else {
+            $checkAllRows.prop('checked', false);
+        }
+    };
+    const rowSelectorsToggleHandler = () => {
+        const $selectSingleSelectors = $('td[name=selectRowColumn]');
+        const $selectAllSelector = $('th[name=selectAllRowsColumn]');
+        const $rowSelectorsVisible = $('#rowSelectorsVisible');
+        const $rowSelectorsToggle = $('#rowSelectorsToggle');
+        const $selectedRowsActionsMenu = $('#SelectedRowsActionsMenu');
+        const $selectedRowsActionsLink = $('#ddSelectedRowsActions');
+
+        var selectorsVisible = $rowSelectorsVisible.val();
+        var newSelectorsVisible =
+            (selectorsVisible == 'True' || selectorsVisible == 'true' || selectorsVisible === true)
+                ? 'False'
+                : 'True';
+        if (newSelectorsVisible == 'True') {
+            $selectAllSelector.removeAttr('hidden');
+            $selectSingleSelectors.removeAttr('hidden');
+            $selectAllSelector.show();
+            $selectSingleSelectors.show();
+            $rowSelectorsVisible.val(true);
+            $rowSelectorsToggle.text('Hide Row Selectors');
+            $selectedRowsActionsMenu.removeAttr('hidden');
+            $selectedRowsActionsLink.addClass('disabled');
+        } else {
+            $selectAllSelector.hide();
+            $selectSingleSelectors.hide();
+            $rowSelectorsVisible.val(false);
+            $rowSelectorsToggle.text('Show Row Selectors');
+            $selectedRowsActionsMenu.attr('hidden', 'true');
+        }
+    };
+    const handleFiltersUi = () => {
+        var filterVisible = $filtersVisible.val();
+        if (filterVisible === 'True' || filterVisible === 'true') {
+            $filterCollapse.collapse('show');
+        } else {
+            $filterCollapse.collapse('hide');
         }
     };
     const reallyIsNaN = (x) => {
@@ -193,8 +290,63 @@ var indPgLib = (function () {
             actionHtml += col.text;
             actionHtml += '</a>';
         }
-
-
+        return actionHtml;
+    };
+    const createMobileColumnAction = (col, value) => {
+        let actionHtml = '';
+        let visibility = true;
+        if (col.visibility === 'condition') {
+            visibility = false;
+            if (!isEmpty(col.condition)) {
+                let amnt1 = parseFloat(value[col.condition.val1Key]);
+                let amnt2 = parseFloat(value[col.condition.val2Key]);
+                let diffAmount = amnt1 - amnt2;
+                switch (col.condition.operator) {
+                    case 'notZero':
+                        if (diffAmount !== 0) {
+                            visibility = true;
+                        }
+                        break;
+                    default:
+                }
+            }
+        }
+        if (visibility) {
+            switch (col.actionType) {
+                case 'defaultAction':
+                    actionHtml += `<a class="dropdown-item" href="${col.url}${value[col.valueKey]}">`;
+                    break;
+                case 'newWindowAction':
+                    actionHtml += `<a class="dropdown-item" target="_blanc" href="${col.url}${value[col.valueKey]}">`;
+                    break;
+                case 'eventAction':
+                    actionHtml += `<a class="dropdown-item" href="#"`;
+                    if (col.elementName) {
+                        actionHtml += ` name=${col.elementName}`;
+                    }
+                    actionHtml += ` data-docid=${value[col.valueKey]}`;
+                    actionHtml += '>';
+                    break;
+                case 'modalSelectorEventAction':
+                    actionHtml += `<a class="dropdown-item" href="#" data-toggle="modal"`;
+                    if (col.elementName) {
+                        actionHtml += ` name=${col.elementName}`;
+                    }
+                    if (col.selectorTarget) {
+                        actionHtml += ` data-target=${col.selectorTarget}`;
+                    }
+                    if (col.selectorType) {
+                        actionHtml += ` data-selectorType=${col.selectorType}`;
+                    }
+                    actionHtml += ` data-docid=${value[col.valueKey]}`;
+                    actionHtml += '>';
+                    break;
+                default:
+            }
+            actionHtml += col.icon;
+            actionHtml += col.text;
+            actionHtml += '</a>';
+        }
         return actionHtml;
     };
     const getIndexPageDefinition = () => {
@@ -208,7 +360,9 @@ var indPgLib = (function () {
         numberFormatter = pgDefinition.numberFormatter;
         actionColSubDefs = pgDefinition.actionColSubDefs;
         handlersToRegister = pgDefinition.handlersToRegister;
+        actionMobileColDefs = pgDefinition.actionMobileColDefs;
     };
+
     const handlePagingUi = (totalPages, totalRecords, pageIndex, hasPrevious, hasNext) => {
         $totalPages.val(totalPages);
         $totalRecords.val(totalRecords);
@@ -282,8 +436,7 @@ var indPgLib = (function () {
         });
     };
     const bindDataToTable = (result, pgIndex) => {
-        console.log("inside bindDataToTable");
-        console.log(result);
+       
         handlePagingUi(result.totalPages, result.totalRecords, pgIndex, result.hasPrevious, result.hasNext);
 
         $("#myTable > tbody").empty();
@@ -327,8 +480,24 @@ var indPgLib = (function () {
                     });
                     actionHtml += '</div>';
                 }
+                let mobileHtml = '';
+                if (actionMobileColDefs.length > 0) {
+                   
+                    mobileHtml += '<a class="dropdown-toggle" role="button" id="dropdownMenuButton"';
+                    mobileHtml += 'data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                    mobileHtml += '<i class="fas fa-bars" style="color:slategray"></i></a>';
+                    mobileHtml += '<div class="dropdown-menu small" aria-labelledby="dropdownMenuButton">';
+
+                    actionMobileColDefs.forEach(function (col) {
+                        mobileHtml += createMobileColumnAction (col, value);
+
+                    });
+                    mobileHtml += '</div>';
+                }
                 var actionsCol = `<td class="small text-center d-none d-lg-table-cell">${actionHtml}</td>`;
+                var mobileCol = `<td class="small text-center d-table-cell d-sm-table-cell d-md-table-cell d-lg-none">${mobileHtml}</td>`;
                 $tr.append(actionsCol);
+                $tr.append(mobileCol);
                 $tr.appendTo('#myTable > tbody');
             });
         handlersToRegister.forEach(function (item) {
@@ -403,7 +572,14 @@ var indPgLib = (function () {
         getIndexPageDefinition: getIndexPageDefinition,
         setIndexPageDefinition: setIndexPageDefinition,
         refreshData: refreshTableData,
-        addPagerElementEventListeners: addPagerElementEventListeners
+        addPagerElementEventListeners: addPagerElementEventListeners,
+        getTableCurrentSort: getTableCurrentSort,
+        setTableCurrentSort: setTableCurrentSort,
+        countSelectedRows: countSelectedRows,
+        rowSelectorsUi: rowSelectorsUi,
+        handleSelectedRowsUi: handleSelectedRowsUi,
+        rowSelectorsToggleHandler: rowSelectorsToggleHandler,
+        handleFiltersUi: handleFiltersUi
 
     };
 })();
