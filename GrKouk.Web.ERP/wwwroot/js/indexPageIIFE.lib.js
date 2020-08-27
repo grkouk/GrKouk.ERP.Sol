@@ -2,6 +2,7 @@ var indPgLib = (function () {
     let indexPageDefinition;
     let colDefs;
     let actionColDefs;
+    let actionColSubDefs;
     let currencyFormatter;
     let numberFormatter;
 
@@ -37,8 +38,11 @@ var indPgLib = (function () {
     const reallyIsNaN = (x) => {
         return x !== x;
     };
+    const isEmpty = inputObject => {
+        return Object.keys(inputObject).length === 0;
+    };
     //================================================================
-   
+
     const createHeaderColumn = (item) => {
         let curSortUndefined = false;
         let curSortAr = [];
@@ -76,7 +80,7 @@ var indPgLib = (function () {
         }
         return tdColHead;
     };
-    const createValueColumn = (col,value) => {
+    const createValueColumn = (col, value) => {
         let $tdCol = $('<td>');
         if (col.responseKey) {
             if (col.remoteReference.isRemoteReference) {
@@ -89,50 +93,91 @@ var indPgLib = (function () {
                 $tdCol.html($aLink);
             } else {
                 switch (col.columnFormat) {
-                case 't':
-                    $tdCol.text(value[col.responseKey]);
-                    break;
-                case 'd':
-                    $tdCol.text(moment(value[col.responseKey]).format('DD/MM/YYYY'));
-                    break;
-                case 'c':
-                    $tdCol.text(currencyFormatter.format(value[col.responseKey]));
-                    $tdCol.attr('data-actualValue', value[col.responseKey]);
-                    break;
-                default:
+                    case 't':
+                        $tdCol.text(value[col.responseKey]);
+                        break;
+                    case 'd':
+                        $tdCol.text(moment(value[col.responseKey]).format('DD/MM/YYYY'));
+                        break;
+                    case 'c':
+                        $tdCol.text(currencyFormatter.format(value[col.responseKey]));
+                        $tdCol.attr('data-actualValue', value[col.responseKey]);
+                        break;
+                    default:
                 }
             }
-            
+
         } else {
             switch (col.columnFormat) {
-            case 't':
-                break;
-            case 'd':
-                break;
-            case 'c':
-                $tdCol.attr('data-actualValue', 0);
-                break;
-            default:
+                case 't':
+                    break;
+                case 'd':
+                    break;
+                case 'c':
+                    $tdCol.attr('data-actualValue', 0);
+                    break;
+                default:
             }
         }
         $tdCol.addClass(col.class);
         return $tdCol;
     };
-    const createColumnAction = (col,value) => {
+    const createColumnAction = (col, value) => {
         let actionHtml = '';
         switch (col.actionType) {
-            case 'actionEdit':
+            case 'defaultAction':
                 actionHtml += `<a href="${col.url}${value[col.valueKey]}">`;
                 actionHtml += col.icon;
                 actionHtml += '</a> |';
                 break;
-            
-        default:
+
+            default:
         }
         return actionHtml;
     };
-    const getIndexPageDefinition=()=>
-    {
+    const createColumnSubAction = (col, value) => {
+        let actionHtml = '';
+        let visibility = true;
+        if (col.visibility === 'condition') {
+            visibility = false;
+            if (!isEmpty(col.condition)) {
+
+
+                let amnt1 = parseFloat(value[col.condition.val1Key]);
+                let amnt2 = parseFloat(value[col.condition.val2Key]);
+                let diffAmount = amnt1 - amnt2;
+                switch (col.condition.operator) {
+                    case 'notZero':
+                        if (diffAmount !== 0) {
+                            visibility = true;
+                        }
+                        break;
+                    default:
+                }
+            }
+        }
+        if(visibility) {
+            switch (col.actionType) {
+                case 'defaultAction':
+                    actionHtml += `<a class="dropdown-item" href="${col.url}${value[col.valueKey]}">`;
+                    break;
+                case 'newWindowAction':
+                    actionHtml += `<a class="dropdown-item" target="_blanc" href="${col.url}${value[col.valueKey]}">`;
+                    break;
+                case 'eventAction':
+
+                    break;
+                default:
+            }
+            actionHtml += col.icon;
+            actionHtml += col.text;
+            actionHtml += '</a>';
+        }
+
+
+        return actionHtml;
+    };
+    const getIndexPageDefinition = () => {
         return indexPageDefinition;
     };
     const setIndexPageDefinition = (pgDefinition) => {
@@ -141,6 +186,7 @@ var indPgLib = (function () {
         actionColDefs = pgDefinition.actionColDefs;
         currencyFormatter = pgDefinition.currencyFormatter;
         numberFormatter = pgDefinition.numberFormatter;
+        actionColSubDefs = pgDefinition.actionColSubDefs;
     };
     const handlePagingUi = (totalPages, totalRecords, pageIndex, hasPrevious, hasNext) => {
         $totalPages.val(totalPages);
@@ -214,25 +260,25 @@ var indPgLib = (function () {
             });
         });
     };
-    const bindDataToTable = (result,pgIndex) => {
+    const bindDataToTable = (result, pgIndex) => {
         console.log("inside bindDataToTable");
         console.log(result);
         handlePagingUi(result.totalPages, result.totalRecords, pgIndex, result.hasPrevious, result.hasNext);
 
         $("#myTable > tbody").empty();
         $("#myTable > thead").empty();
-       
+
         var $trHead = $("<tr>");
         var $tdSelectCol = $(selectAllRowsColumnHtml());
         $trHead.append($tdSelectCol);
         colDefs.forEach(function (item) {
-            
+
             $trHead.append($(createHeaderColumn(item)));
 
         });
         $trHead.append($('<th>'));
         $trHead.appendTo('#myTable > thead');
-       
+
         $.each(result.data,
             function (index, value) {
                 var itemId = value.id;
@@ -240,14 +286,26 @@ var indPgLib = (function () {
                 var $tdSelectRowCol = $(selectOneRowColumnHtml(itemId));
                 $tr.append($tdSelectRowCol);
                 colDefs.forEach(function (col) {
-                    $tr.append(createValueColumn(col,value));
+                    $tr.append(createValueColumn(col, value));
                 });
-                
+
                 let actionHtml = '';
-                actionColDefs.forEach(function(col) {
-                    actionHtml += createColumnAction(col,value);
-                    
+                actionColDefs.forEach(function (col) {
+                    actionHtml += createColumnAction(col, value);
+
                 });
+                if (actionColSubDefs.length > 0) {
+                    actionHtml += '<a class="dropdown-toggle" role="button" id="dropdownMenuButton"';
+                    actionHtml += 'data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                    actionHtml += '<i class="fas fa-bars" style="color:slategray"></i></a>';
+                    actionHtml += '<div class="dropdown-menu small" aria-labelledby="dropdownMenuButton">';
+
+                    actionColSubDefs.forEach(function (col) {
+                        actionHtml += createColumnSubAction(col, value);
+
+                    });
+                    actionHtml += '</div>';
+                }
                 var actionsCol = `<td class="small text-center d-none d-lg-table-cell">${actionHtml}</td>`;
                 $tr.append(actionsCol);
                 $tr.appendTo('#myTable > tbody');
@@ -271,15 +329,15 @@ var indPgLib = (function () {
 
         var currencyFlt = $dcId.val() == null || $dcId.val().length == 0 ? 1 : parseInt($dcId.val());
 
-        getTableData( pageIndex, pageSize, sortData, datePeriod, companyFlt, searchFlt, currencyFlt)
+        getTableData(pageIndex, pageSize, sortData, datePeriod, companyFlt, searchFlt, currencyFlt)
             .then((data) => {
-                bindDataToTable(data,pageIndex);
+                bindDataToTable(data, pageIndex);
             })
             .catch((error) => {
                 console.log(error);
             });
     }
-   
+
     const addPagerElementEventListeners = () => {
         let pagerElements = document.getElementsByClassName("page-link");
         Array.from(pagerElements).forEach((item) => {
@@ -314,10 +372,10 @@ var indPgLib = (function () {
             });
         });
     };
-   
+
     return {
         getIndexPageDefinition: getIndexPageDefinition,
-        setIndexPageDefinition:setIndexPageDefinition,
+        setIndexPageDefinition: setIndexPageDefinition,
         refreshData: refreshTableData,
         addPagerElementEventListeners: addPagerElementEventListeners
 
