@@ -227,7 +227,6 @@
 {
     <script src="~/lib/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script src="~/js/moment.min.js"></script>
-    <script src="~/js/indexpage.lib.js"></script>
     <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
         $(document).ready(function() {
@@ -262,9 +261,7 @@
             var $totalRecords = $('#totalRecords');
             var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
             //#endregion
-            var reallyIsNaN = function(x) {
-                return x !== x;
-            };
+           
             //#region Index page definition objects
             let colDefs = [
                 {
@@ -428,7 +425,6 @@
                     }
                 }
             ];
-
             let actionColDefs = [
                 {
                     actionType: 'defaultAction',
@@ -646,7 +642,6 @@
                                     indPgLib.refreshData();
                                 }
                 }
-               
             ];
              let pageHandlersToRegister = [
                 {
@@ -695,9 +690,31 @@
 
                          indPgLib.refreshData();
                      }
-                 }
+                 },
+                 {
+                     selector:'#CreateNew',
+                     event:'click',
+                     handler: function(event) {
+                         var uri = '@Url.Page("Create")';
+                         window.location.href = uri;
+                     }
+                 },
+                 {
+                     selector:'#FiltersForm',
+                     event:'submit',
+                     handler:  function(e) {
+                         e.preventDefault();
+                         var $icon = $('.search_icon').find("svg");
+                         if ($icon.hasClass('fa-search')) {
+                             $icon.addClass("fa-times").removeClass("fa-search");
 
-               
+                         } else {
+                             $icon.addClass("fa-search").removeClass("fa-times");
+
+                         }
+                         indPgLib.refreshData();
+                     }
+                 }
             ];
             const indexPageDef = {
                 uri: '/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',
@@ -1425,7 +1442,7 @@
                             currency: currencyCode,
                             minimumFractionDigits: 2
                         });
-
+                    indPgLib.setCurrencyFormatter(formatterCurrency);
                 } catch (e) {
                     //not found keep old formater or maybe create a default one
                     console.log('Not found currency code for this id');
@@ -1434,27 +1451,6 @@
             $rowSelectorsToggle.on('click',
                 function() {
                    indPgLib.rowSelectorsToggleHandler();
-                });
-           
-            $('#CreateNew').on('click',
-                function() {
-                    var uri = '@Url.Page("Create")';
-                    window.location.href = uri;
-                });
-            
-
-            $('#FiltersForm').on('submit',
-                function(e) {
-                    e.preventDefault();
-                    var $icon = $('.search_icon').find("svg");
-                    if ($icon.hasClass('fa-search')) {
-                        $icon.addClass("fa-times").removeClass("fa-search");
-
-                    } else {
-                        $icon.addClass("fa-search").removeClass("fa-times");
-
-                    }
-                    indPgLib.refreshData();
                 });
            
             indPgLib.addPagerElementEventListeners();

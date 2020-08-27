@@ -368,7 +368,9 @@
         pageHandlersToRegister = pgDefinition.pageHandlersToRegister;
         actionMobileColDefs = pgDefinition.actionMobileColDefs;
     };
-
+    const setCurrencyFormatter = (formatter) => {
+        currencyFormatter = formatter;
+    };
     const handlePagingUi = (totalPages, totalRecords, pageIndex, hasPrevious, hasNext) => {
         $totalPages.val(totalPages);
         $totalRecords.val(totalRecords);
@@ -653,7 +655,8 @@
         handleSelectedRowsUi: handleSelectedRowsUi,
         rowSelectorsToggleHandler: rowSelectorsToggleHandler,
         registerPageHandlers: registerPageHandlers,
-        handleFiltersUi: handleFiltersUi
+        handleFiltersUi: handleFiltersUi,
+        setCurrencyFormatter: setCurrencyFormatter
 
     };
 })();
