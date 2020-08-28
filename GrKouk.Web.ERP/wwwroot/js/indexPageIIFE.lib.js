@@ -186,7 +186,7 @@
     const createValueColumn = (col, value) => {
         let $tdCol = $('<td>');
         if (col.responseKey) {
-            if (col.remoteReference.isRemoteReference) {
+            if (!isEmpty( col.remoteReference)) {
                 let valueKey = col.remoteReference.valueKey;
                 var remoteId = value[valueKey];
                 let remoteUrl = `${col.remoteReference.url}${remoteId}`;
