@@ -13,9 +13,9 @@ namespace GrKouk.Web.ERP.Pages.MediaMng
     public class CreateModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
-        public CreateModel(ApiDbContext context, IHostingEnvironment hostingEnvironment)
+        public CreateModel(ApiDbContext context, IWebHostEnvironment hostingEnvironment)
         {
             _context = context;
             _hostingEnvironment = hostingEnvironment;

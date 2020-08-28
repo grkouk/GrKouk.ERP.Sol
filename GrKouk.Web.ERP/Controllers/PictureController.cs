@@ -17,9 +17,9 @@ namespace GrKouk.Web.ERP.Controllers
     public class PictureController : ControllerBase
     {
         private readonly ApiDbContext _context;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
-        public PictureController(ApiDbContext context, IHostingEnvironment hostingEnvironment)
+        public PictureController(ApiDbContext context, IWebHostEnvironment hostingEnvironment)
         {
             _context = context;
             _hostingEnvironment = hostingEnvironment;

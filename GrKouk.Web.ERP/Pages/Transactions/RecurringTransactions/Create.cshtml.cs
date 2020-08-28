@@ -278,7 +278,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.RecurringTransactions
         public RecurringDocModifyDto CopyFromItemVm { get; set; }
         public RecurringDocModifyDto ExistingRecTransDoc { get; private set; }
         public bool ThereIsAnotherDoc { get; set; }
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
             if (!ModelState.IsValid)
             {
