@@ -230,7 +230,6 @@
     <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
         $(document).ready(function() {
-            const indexPageKey='BuyDocIndexView';
             var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
             let baseCulture = '@System.Globalization.CultureInfo.CurrentCulture.';
             currentCulture = 'el-GR';
@@ -1442,7 +1441,7 @@
            
             indPgLib.addPagerElementEventListeners();
             indPgLib.registerPageHandlers();
-            indPgLib.loadSettings(indexPageKey);
+            indPgLib.loadSettings('BuyDocIndexView');
             //----------------
            
             indPgLib.handleFiltersUi();
@@ -1453,7 +1452,7 @@
 
         $(window).on('beforeunload',
             function(e) {
-                indPgLib.saveSettings(indexPageKey);
+                indPgLib.saveSettings('BuyDocIndexView');
             });
     </script>
 }
