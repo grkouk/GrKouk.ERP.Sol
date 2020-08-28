@@ -230,6 +230,7 @@
     <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
         $(document).ready(function() {
+            const indexPageKey='BuyDocIndexView';
             var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
             let baseCulture = '@System.Globalization.CultureInfo.CurrentCulture.';
             currentCulture = 'el-GR';
@@ -638,13 +639,13 @@
                         indPgLib.refreshData();
                     }
                 },
-                 {
-                     selector:'#DatePeriodFilter',
-                     event:'change',
-                     handler: function(event) {
-                         $('#pageIndex').val(1);
-                         indPgLib.refreshData();
-                     }
+                {
+                    selector:'#DatePeriodFilter',
+                    event:'change',
+                    handler: function(event) {
+                        $('#pageIndex').val(1);
+                        indPgLib.refreshData();
+                    }
                  },
                  {
                      selector:'#CompanyFilter',
@@ -699,6 +700,22 @@
 
                          }
                          indPgLib.refreshData();
+                     }
+                 },
+                  {
+                     selector:'#filterCollapse',
+                     event:'hidden.bs.collapse',
+                     handler: function(event) {
+                        $filtersToggle.text('Show Filters');
+                        $filtersVisible.val(false);
+                     }
+                 },
+                  {
+                     selector:'#filterCollapse',
+                     event:'shown.bs.collapse',
+                     handler: function(event) {
+                        $filtersToggle.text('Hide Filters');
+                        $filtersVisible.val(true);
                      }
                  }
             ];
@@ -1398,23 +1415,7 @@
                 });
 
 
-            $filterCollapse.on('hidden.bs.collapse',
-                function() {
-                    console.log('Filters Hidden');
-                    $filtersToggle.text('Show Filters');
 
-
-                    $filtersVisible.val(false);
-                });
-
-            $filterCollapse.on('shown.bs.collapse',
-                function() {
-                    console.log('Filters Shown');
-                    $filtersToggle.text('Hide Filters');
-                    // var alist = $('a[href*="&filtersVisible"]');
-
-                    $filtersVisible.val(true);
-                });
             var currencyChanged = () => {
                 let curCurrencySelected = parseInt($('#CurrencySelector').val());
                 var currencyCode;
@@ -1441,7 +1442,7 @@
            
             indPgLib.addPagerElementEventListeners();
             indPgLib.registerPageHandlers();
-            indPgLib.loadSettings('BuyDocIndexView');
+            indPgLib.loadSettings(indexPageKey);
             //----------------
            
             indPgLib.handleFiltersUi();
@@ -1452,7 +1453,7 @@
 
         $(window).on('beforeunload',
             function(e) {
-                indPgLib.saveSettings('BuyDocIndexView');
+                indPgLib.saveSettings(indexPageKey);
             });
     </script>
 }
