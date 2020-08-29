@@ -263,7 +263,7 @@
             //#endregion
            
             //#region Index page definition objects
-            let colDefs = [
+            const colDefs = [
                 {
                     key: 'transDate',
                     responseKey: 'transDate',
@@ -411,7 +411,7 @@
                     }
                 }
             ];
-            let actionColDefs = [
+            const actionColDefs = [
                 {
                     actionType: 'defaultAction',
                     valueKey: 'id',
@@ -437,7 +437,7 @@
                     url: '@Url.Page("./Create")?copyFromId='
                 }
             ];
-            let actionColSubDefs = [
+            const actionColSubDefs = [
                 {
                     actionType: 'newWindowAction',
                     visibility: 'always',
@@ -479,7 +479,7 @@
                     url: ''
                 }
             ];
-            let actionMobileColDefs = [
+            const actionMobileColDefs = [
                 {
                     actionType: 'defaultAction',
                     visibility: 'always',
@@ -561,7 +561,7 @@
                     url: ''
                 }
             ];
-            let tableHandlersToRegister = [
+            const tableHandlersToRegister = [
                 {
                     selector:'[name=PayoffDoc]',
                     event:'click',
@@ -574,7 +574,7 @@
                
                
             ];
-             let pageHandlersToRegister = [
+            const pageHandlersToRegister = [
                 {
                     selector:'#CurrencySelector',
                     event:'change',
@@ -1234,7 +1234,7 @@
                         success: function(result) {
                             console.log(result);
                             toastr.success("Delete", result.message);
-                            refreshTableData();
+                            indPgLib.refreshData();
 
                         },
                         complete: function() {
