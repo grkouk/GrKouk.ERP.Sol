@@ -78,22 +78,59 @@
                     <select id="PageSize" class="form-control form-control-sm small"
                             asp-items="ViewBag.PageFilterSize"></select>
                 </div>
-                <div class="form-group col-md-auto">
-                    <small>
-                        <label name="PagingInfo"> </label>
-
-                    </small>
-                </div>
+               
                 <div class="form-group col-md-auto">
                     <label class="small"> Currency:</label>
                     <select id="CurrencySelector" class="form-control form-control-sm small"
                             asp-items="ViewBag.CurrencySelector"></select>
                 </div>
             </div>
+           
         </div>
     </form>
+
+     <div class="row mt-1">
+        <div class="col-5">
+            <label class="small text-left" name="PagingInfo"> </label>
+        </div>
+        <div class="col-7">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination pagination-sm justify-content-end">
+                    <li class="page-item ">
+                        <a href="#" id="GoToFirst" data-pageraction="GoToFirst" 
+                           class="page-link" aria-label="First">
+                            @*<span aria-hidden="true">;</span>*@
+                            First
+                        </a>
+                    </li>
+                    <li class="page-item ">
+                        <a href="#" id="GoToPrevious" data-pageraction="GoToPrevious"
+                           class="page-link" aria-label="Previous">
+                            @*<span aria-hidden="true">&laquo;</span>*@
+                            Previous
+                        </a>
+                    </li>
+
+                    <li class="page-item ">
+                        <a href="#" id="GoToNext" data-pageraction="GoToNext"
+                           class="page-link" aria-label="Next">
+                            @*<span aria-hidden="true">&raquo;</span>*@
+                            Next
+                        </a>
+                    </li>
+                    <li class="page-item  ">
+                        <a href="#" id="GoToLast" data-pageraction="GoToLast"
+                           class="page-link" aria-label="Last">
+                            @*<span aria-hidden="true">;</span>*@
+                            Last
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
 </div>
-<br />
+
 <table class="table table-bordered table-sm m-0" id="myTable">
     <thead class="thead-light">
 
@@ -102,10 +139,10 @@
     </tbody>
 </table>
 <div class="row">
-    <div class="col-3">
+    <div class="col-5">
         <label class="small" name="PagingInfo"> </label>
     </div>
-    <div class="col-9">
+    <div class="col-7">
         <nav aria-label="Page navigation example">
             <ul class="pagination pagination-sm justify-content-end">
                 <li class="page-item ">
