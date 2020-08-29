@@ -74,12 +74,7 @@
                     <select id="PageSize" class="form-control form-control-sm small"
                             asp-items="ViewBag.PageFilterSize"></select>
                 </div>
-                <div class="form-group col-md-auto">
-                    <small>
-                        <label name="PagingInfo"> </label>
-
-                    </small>
-                </div>
+                
                 <div class="form-group col-md-auto">
                     <label class="small"> Currency:</label>
                     <select id="CurrencySelector" class="form-control form-control-sm small"
@@ -89,46 +84,86 @@
         </div>
     </form>
 </div>
-<br />
-<table class="table table-bordered table-sm" id="myTable">
-    <thead class="thead-light">
-     
-    </thead>
-    <tbody>
-       
-
-    </tbody>
-</table>
-
-<div class="row">
-    <div class="col-3">
-        <label class="small" name="PagingInfo"> </label>
+<div class="row mt-1">
+    <div class="col-5">
+        <label class="small text-left" name="PagingInfo"> </label>
     </div>
-    <div class="col-9">
+    <div class="col-7">
         <nav aria-label="Page navigation example">
             <ul class="pagination pagination-sm justify-content-end">
                 <li class="page-item ">
-                    <a href="#" id="GoToFirst"
+                    <a href="#" id="GoToFirst" data-pageraction="GoToFirst" 
                        class="page-link" aria-label="First">
+                        @*<span aria-hidden="true">;</span>*@
                         First
                     </a>
                 </li>
                 <li class="page-item ">
-                    <a href="#" id="GoToPrevious"
+                    <a href="#" id="GoToPrevious" data-pageraction="GoToPrevious"
                        class="page-link" aria-label="Previous">
+                        @*<span aria-hidden="true">&laquo;</span>*@
                         Previous
                     </a>
                 </li>
 
                 <li class="page-item ">
-                    <a href="#" id="GoToNext"
+                    <a href="#" id="GoToNext" data-pageraction="GoToNext"
                        class="page-link" aria-label="Next">
+                        @*<span aria-hidden="true">&raquo;</span>*@
                         Next
                     </a>
                 </li>
                 <li class="page-item  ">
-                    <a href="#" id="GoToLast"
+                    <a href="#" id="GoToLast" data-pageraction="GoToLast"
                        class="page-link" aria-label="Last">
+                        @*<span aria-hidden="true">;</span>*@
+                        Last
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+<table class="table table-bordered table-sm" id="myTable">
+    <thead class="thead-light">
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<div class="row">
+    <div class="col-5">
+        <label class="small" name="PagingInfo"> </label>
+    </div>
+    <div class="col-7">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination pagination-sm justify-content-end">
+                <li class="page-item ">
+                    <a href="#" id="GoToFirst" data-pageraction="GoToFirst" 
+                       class="page-link" aria-label="First">
+                        @*<span aria-hidden="true">;</span>*@
+                        First
+                    </a>
+                </li>
+                <li class="page-item ">
+                    <a href="#" id="GoToPrevious" data-pageraction="GoToPrevious"
+                       class="page-link" aria-label="Previous">
+                        @*<span aria-hidden="true">&laquo;</span>*@
+                        Previous
+                    </a>
+                </li>
+
+                <li class="page-item ">
+                    <a href="#" id="GoToNext" data-pageraction="GoToNext"
+                       class="page-link" aria-label="Next">
+                        @*<span aria-hidden="true">&raquo;</span>*@
+                        Next
+                    </a>
+                </li>
+                <li class="page-item  ">
+                    <a href="#" id="GoToLast" data-pageraction="GoToLast"
+                       class="page-link" aria-label="Last">
+                        @*<span aria-hidden="true">;</span>*@
                         Last
                     </a>
                 </li>
@@ -154,10 +189,11 @@
 @section Scripts
     {
     <script src="~/js/moment.min.js"></script>
+    <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
         $(document).ready(function () {
             var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
-            //currentCulture = 'el-GR';
+            let baseCulture = '@System.Globalization.CultureInfo.CurrentCulture.';
             var formatterCurrency = new Intl.NumberFormat(currentCulture,
                 {
                     style: 'currency',
@@ -186,6 +222,344 @@
             var $totalPages = $('#totalPages');
             var $totalRecords = $('#totalRecords');
             var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
+            //#endregion
+              //#region Index page definition objects
+            const colDefs = [
+                {
+                    key: 'transDate',
+                    responseKey: 'transDate',
+                    actualVal: '',
+                    columnFormat: 'd',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: 'TransactionDateSort',
+                    sortType: 'numeric',
+                    header: 'Date',
+                    text: '',
+                    headerClass: 'small text-center ',
+                    class: 'small',
+                    remoteReference: {
+                        
+                    }
+                },
+                {
+                    key: 'transactorName',
+                    responseKey: 'transactorName',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: 'label',
+                    grandTotalKey: 'label',
+                    totalFormatter: '',
+                    sortKey: 'TransactorNameSort',
+                    sortType: 'alpha',
+                    header: 'Transactor',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small',
+                    remoteReference: {
+                        isRemoteReference: true,
+                        valueKey: 'transactorId',
+                        url: '@Url.Page("/mainentities/transactors/details")?id='
+                    }
+                },
+                {
+                    key: 'buyDocSeriesCode',
+                    responseKey: 'buyDocSeriesCode',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: 'SeriesCodeSort',
+                    sortType: 'alpha',
+                    header: 'Series',
+                    text: '',
+                    headerClass: 'small text-center d-none d-md-table-cell',
+                    class: 'small d-none d-md-table-cell ',
+                    remoteReference: {
+                       
+                    }
+                },
+                {
+                    key: 'transRefCode',
+                    responseKey: 'transRefCode',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: '',
+                    sortType: '',
+                    header: 'Ref Number',
+                    text: '',
+                    headerClass: 'small text-center d-none d-md-table-cell',
+                    class: 'small d-none d-md-table-cell ',
+                    remoteReference: {
+                       
+                    }
+                },
+                {
+                    key: 'companyCode',
+                    responseKey: 'companyCode',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: 'CompanyCodeSort',
+                    sortType: 'alpha',
+                    header: 'Company',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small ',
+                    remoteReference: {
+                       
+                    }
+                },
+                {
+                    key: 'totalNetAmount',
+                    responseKey: 'totalNetAmount',
+                    actualVal: '',
+                    columnFormat: 'c',
+                    totalKey: 'sumOfNetAmount',
+                    grandTotalKey: 'grandSumOfNetAmount',
+                    totalFormatter: 'currency',
+                    sortKey: '',
+                    sortType: '',
+                    header: 'Net Amount',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small text-right ',
+                    remoteReference: {
+                       
+                    }
+                },
+                {
+                    key: 'totalAmount',
+                    responseKey: 'totalAmount',
+                    actualVal: '',
+                    columnFormat: 'c',
+                    totalKey: 'sumOfAmount',
+                    grandTotalKey: 'grandSumOfAmount',
+                    totalFormatter: 'currency',
+                    sortKey: '',
+                    sortType: '',
+                    header: 'Amount',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small text-right ',
+                    remoteReference: {
+                       
+                    }
+                },
+                {
+                    key: 'payedOfAmount',
+                    responseKey: 'payedOfAmount',
+                    actualVal: '',
+                    columnFormat: 'c',
+                    totalKey: 'sumOfPayedAmount',
+                    grandTotalKey: 'grandSumOfPayedAmount',
+                    totalFormatter: 'currency',
+                    sortKey: '',
+                    sortType: '',
+                    header: 'Payed Amount',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small text-right ',
+                    remoteReference: {
+                       
+                    }
+                }
+            ];
+            const actionColDefs = [
+                {
+                    actionType: 'defaultAction',
+                    valueKey: 'id',
+                    icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
+                    url: '@Url.Page("./Edit")?id='
+                },
+                {
+                    actionType: 'defaultAction',
+                    valueKey: 'id',
+                    icon: '<i class="fas fa-info-circle fa-lg" style="color:slategray"></i>',
+                    url: '@Url.Page("./Details")?id='
+                },
+                {
+                    actionType: 'defaultAction',
+                    valueKey: 'id',
+                    icon: '<i class="fas fa-trash fa-lg" style="color:slategray"></i>',
+                    url: '@Url.Page("./Delete")?id='
+                },
+                {
+                    actionType: 'defaultAction',
+                    valueKey: 'id',
+                    icon: '<i class="fas fa-clone fa-lg" style="color:slategray"></i>',
+                    url: '@Url.Page("./Create")?copyFromId='
+                }
+            ];
+            const actionColSubDefs = [
+                {
+                    actionType: 'newWindowAction',
+                    visibility: 'always',
+                    elementName: '',
+                    condition: {},
+                    text: 'Νέα Συνδρομή',
+                    valueKey: 'id',
+                    icon: '<i class="fas fa-info-circle fa-lg" style="color:slategray"></i>',
+                    url: '@Url.Page("/Transactions/RecurringTransactions/Create")?createFromType=1&createFromId='
+                },
+                {
+                    actionType: 'eventAction',
+                    visibility: 'condition',
+                    elementName: 'PayoffDoc',
+                    condition: {
+                        val1Key: 'totalAmount',
+                        val2Key: 'payedOfAmount',
+                        operator: 'notZero'
+                    },
+                    text: 'Εξόφληση Παραστατικού',
+                    valueKey: 'id',
+                    icon: '<i class="fab fa-amazon-pay fa-lg" style="color:slategray"></i>',
+                    url: ''
+                },
+                {
+                    actionType: 'modalSelectorEventAction',
+                    selectorType: 'BuyPaymentsSelector',
+                    selectorTarget: '#itemSelector',
+                    visibility: 'condition',
+                    elementName:'AssignPayments',
+                    condition: {
+                        val1Key:'totalAmount',
+                        val2Key:'payedOfAmount',
+                        operator:'notZero'
+                    },
+                    text: 'Αντιστοίχιση Πληρωμών',
+                    valueKey: 'id',
+                    icon: '<i class="fas fa-compress-arrows-alt fa-lg" style="color:slategray"></i>',
+                    url: ''
+                }
+            ];
+            const actionMobileColDefs = [
+                {
+                    actionType: 'defaultAction',
+                    visibility: 'always',
+                    elementName: '',
+                    condition: {},
+                    text: 'Edit',
+                    valueKey: 'id',
+                    icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
+                    url: '@Url.Page("./Edit")?id='
+                },
+                {
+                    actionType: 'defaultAction',
+                    visibility: 'always',
+                    elementName: '',
+                    condition: {},
+                    text: 'Details',
+                    valueKey: 'id',
+                    icon: '<i class="fas fa-info-circle fa-lg" style="color:slategray"></i>',
+                    url: '@Url.Page("./Details")?id='
+                },
+                {
+                    actionType: 'defaultAction',
+                    visibility: 'always',
+                    elementName: '',
+                    condition: {},
+                    text: 'Delete',
+                    valueKey: 'id',
+                    icon: '<i class="fas fa-trash fa-lg" style="color:slategray"></i>',
+                    url: '@Url.Page("./Delete")?id='
+                },
+                {
+                    actionType: 'defaultAction',
+                    visibility: 'always',
+                    elementName: '',
+                    condition: {},
+                    text: 'Duplicate',
+                    valueKey: 'id',
+                    icon: '<i class="fas fa-clone fa-lg" style="color:slategray"></i>',
+                    url: '@Url.Page("./Create")?copyFromId='
+                },
+                {
+                    actionType: 'newWindowAction',
+                    visibility: 'always',
+                    elementName: '',
+                    condition: {},
+                    text: 'Νέα Συνδρομή',
+                    valueKey: 'id',
+                    icon: '<i class="fas fa-info-circle fa-lg" style="color:slategray"></i>',
+                    url: '@Url.Page("/Transactions/RecurringTransactions/Create")?createFromType=1&createFromId='
+                },
+                {
+                    actionType: 'eventAction',
+                    visibility: 'condition',
+                    elementName: 'PayoffDoc',
+                    condition: {
+                        val1Key: 'totalAmount',
+                        val2Key: 'payedOfAmount',
+                        operator: 'notZero'
+                    },
+                    text: 'Εξόφληση Παραστατικού',
+                    valueKey: 'id',
+                    icon: '<i class="fab fa-amazon-pay fa-lg" style="color:slategray"></i>',
+                    url: ''
+                },
+                {
+                    actionType: 'modalSelectorEventAction',
+                    selectorType: 'BuyPaymentsSelector',
+                    selectorTarget: '#itemSelector',
+                    visibility: 'condition',
+                    elementName:'AssignPayments',
+                    condition: {
+                        val1Key:'totalAmount',
+                        val2Key:'payedOfAmount',
+                        operator:'notZero'
+                    },
+                    text: 'Αντιστοίχιση Πληρωμών',
+                    valueKey: 'id',
+                    icon: '<i class="fas fa-compress-arrows-alt fa-lg" style="color:slategray"></i>',
+                    url: ''
+                }
+            ];
+            const tableHandlersToRegister = [
+                {
+                    selector:'[name=PayoffDoc]',
+                    event:'click',
+                    handler: function(event) {
+                        let button = $(event.delegateTarget);
+                        let docId = button.data('docid');
+                        payOfDocument(docId);
+                    }
+                },
+               
+               
+            ];
+            const pageHandlersToRegister = [
+                {
+                    selector:'#CurrencySelector',
+                    event:'change',
+                    handler: function(event) {
+                        currencyChanged();
+                        indPgLib.refreshData();
+                    }
+                }
+               
+                
+            ];
+            const indexPageDef = {
+                uri: '/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',
+                currencyFormatter: formatterCurrency,
+                numberFormatter: formatterNumber,
+                colDefs: colDefs,
+                actionColDefs: actionColDefs,
+                actionColSubDefs: actionColSubDefs,
+                actionMobileColDefs: actionMobileColDefs,
+                tableHandlersToRegister:tableHandlersToRegister,
+                pageHandlersToRegister:pageHandlersToRegister
+            };
+
+            indPgLib.setIndexPageDefinition(indexPageDef);
             //#endregion
             var reallyIsNaN = function(x) {
                 return x !== x;
