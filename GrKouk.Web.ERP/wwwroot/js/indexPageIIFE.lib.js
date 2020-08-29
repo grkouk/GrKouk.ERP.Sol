@@ -18,6 +18,77 @@
     const $filtersVisible = $("#filtersVisible");
     const $filterCollapse = $("#filterCollapse");
     var $selectedRowsActionsLink = $("#ddSelectedRowsActions");
+    const commonTableHandlers = [
+        {
+            selector: "input[name=checkAllRows]",
+            event: "change",
+            handler: function () {
+                var th = $(this).index();
+                var isChecked = $(this).prop("checked");
+                $("input[name=checkTableRow]").prop("checked", isChecked);
+                var selectedRowsCount = indPgLib.countSelectedRows();
+                if (selectedRowsCount > 0) {
+                    $selectedRowsActionsLink.removeClass("disabled");
+                } else {
+                    $selectedRowsActionsLink.addClass("disabled");
+                }
+            },
+        },
+        {
+            selector: "input[name=checkTableRow]",
+            event: "click",
+            handler: function () {
+                //indPgLib.handleSelectedRowsUi();
+                handleSelectedRowsUi();
+            },
+        },
+        {
+            selector: "#rowSelectorsToggle",
+            event: "click",
+            handler: function () {
+                //indPgLib.handleSelectedRowsUi();
+                rowSelectorsToggleHandler();
+                //handleSelectedRowsUi();
+            },
+        },
+        {
+            selector: "[name=SortHeader]",
+            event: "click",
+            handler: function (event) {
+                var button = $(event.delegateTarget);
+                var reqSort = button.data("sortkey");
+                let reqSortType = button.data("sorttype");
+                let iconSortType = "";
+                var newSortVal = "";
+                //var curSort = indPgLib.getTableCurrentSort();
+                var curSort = getTableCurrentSort();
+                if (curSort === undefined || curSort === null || curSort.length === 0) {
+                    curSort = reqSort + ":desc";
+                }
+                var curSortAr = curSort.split(":");
+                if (curSortAr[0] === reqSort) {
+                    var newSort = curSortAr[1] === "asc" ? "desc" : "asc";
+                    var newSortIconType = curSortAr[1] === "asc" ? "-down" : "-up";
+                    newSortVal = curSortAr[0] + ":" + newSort;
+                    iconSortType = "fas fa-sort-" + reqSortType + newSortIconType;
+                } else {
+                    newSortVal = reqSort + ":asc";
+                    iconSortType = "fas fa-sort-" + reqSortType + "-up";
+                }
+                let $btParent = button.parent();
+                let $icon = $btParent.find("i:eq(0)");
+                if ($icon !== undefined) {
+                    $icon.removeClass();
+                    $icon.addClass(iconSortType);
+                }
+
+                //indPgLib.setTableCurrentSort(newSortVal);
+                //indPgLib.refreshData();
+                setTableCurrentSort(newSortVal);
+                refreshTableData();
+            },
+         }
+    ];
 
     const commonHandlers = [
         {
@@ -100,30 +171,6 @@
                 $("#pageIndex").val(1);
                 //indPgLib.refreshData();
                 refreshTableData();
-            },
-        },
-        
-        {
-            selector: "input[name=checkAllRows]",
-            event: "change",
-            handler: function () {
-                var th = $(this).index();
-                var isChecked = $(this).prop("checked");
-                $("input[name=checkTableRow]").prop("checked", isChecked);
-                var selectedRowsCount = indPgLib.countSelectedRows();
-                if (selectedRowsCount > 0) {
-                    $selectedRowsActionsLink.removeClass("disabled");
-                } else {
-                    $selectedRowsActionsLink.addClass("disabled");
-                }
-            },
-        },
-        {
-            selector: "input[name=checkTableRow]",
-            event: "click",
-            handler: function () {
-                //indPgLib.handleSelectedRowsUi();
-                handleSelectedRowsUi();
             },
         },
     ];
@@ -602,6 +649,7 @@
             $tr.append(mobileCol);
             $tr.appendTo("#myTable > tbody");
         });
+        registerHandlers(commonTableHandlers);
         registerHandlers(tableHandlersToRegister);
         //====================
         let pageSummaryCount = 0;

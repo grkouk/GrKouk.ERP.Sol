@@ -571,42 +571,7 @@
                         payOfDocument(docId);
                     }
                 },
-                {
-            selector: "[name=SortHeader]",
-            event: "click",
-            handler: function (event) {
-                var button = $(event.delegateTarget);
-                var reqSort = button.data("sortkey");
-                let reqSortType = button.data("sorttype");
-                let iconSortType = "";
-                var newSortVal = "";
-                var curSort = indPgLib.getTableCurrentSort();
-                if (curSort === undefined || curSort === null || curSort.length === 0) {
-                    curSort = reqSort + ":desc";
-                }
-                var curSortAr = curSort.split(":");
-                if (curSortAr[0] === reqSort) {
-                    var newSort = curSortAr[1] === "asc" ? "desc" : "asc";
-                    var newSortIconType = curSortAr[1] === "asc" ? "-down" : "-up";
-                    newSortVal = curSortAr[0] + ":" + newSort;
-                    iconSortType = "fas fa-sort-" + reqSortType + newSortIconType;
-                } else {
-                    newSortVal = reqSort + ":asc";
-                    iconSortType = "fas fa-sort-" + reqSortType + "-up";
-                }
-                let $btParent = button.parent();
-                let $icon = $btParent.find("i:eq(0)");
-                if ($icon !== undefined) {
-                    $icon.removeClass();
-                    $icon.addClass(iconSortType);
-                }
-
-                indPgLib.setTableCurrentSort(newSortVal);
-                indPgLib.refreshData();
-                //setTableCurrentSort(newSortVal);
-                //refreshTableData();
-            },
-        },
+               
                
             ];
              let pageHandlersToRegister = [
@@ -1299,7 +1264,7 @@
                 }
 
             };
-            
+            /*
             var handleFiltersUi = () => {
                 var filterVisible = $filtersVisible.val();
                 if (filterVisible === 'True' || filterVisible === 'true') {
@@ -1311,6 +1276,7 @@
             var showFiltersUi = () => {
 
             };
+            */
             $deleteSelectedRowsLink.on('click',
                 () => {
                     deleteSelectedRows();
@@ -1337,11 +1303,12 @@
                     console.log('Not found currency code for this id');
                 }
             };
+            /*
             $rowSelectorsToggle.on('click',
                 function() {
                    indPgLib.rowSelectorsToggleHandler();
                 });
-           
+           */
             indPgLib.addPagerElementEventListeners();
             indPgLib.registerPageHandlers();
             indPgLib.loadSettings('BuyDocIndexView');
