@@ -515,7 +515,7 @@ namespace GrKouk.Web.ERP.Controllers
                     var usedBuyPrice = buyTypeDef.UsedPrice;
                     Debug.Print("Inside GetBuySeriesData Returning usedPrice " + usedBuyPrice.ToString());
                     return Ok(new { UsedPrice = usedBuyPrice });
-                    break;
+                    //break;
                 case RecurringDocTypeEnum.SellType:
                     Debug.Print("Inside GetSalesSeriesData " + seriesId.ToString());
                     var salesSeriesDef = await _context.SellDocSeriesDefs.SingleOrDefaultAsync(p => p.Id == seriesId);
@@ -535,7 +535,7 @@ namespace GrKouk.Web.ERP.Controllers
                     var usedSellPrice = salesTypeDef.UsedPrice;
                     Debug.Print("Inside GetSalesSeriesData Returning usedPrice " + usedSellPrice.ToString());
                     return Ok(new { UsedPrice = usedSellPrice });
-                    break;
+                    //break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(docType), docType, null);
             }

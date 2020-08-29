@@ -338,7 +338,7 @@ namespace GrKouk.Web.ERP.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("GetTransactions2")]
-        public async Task<IActionResult> GetTransactions2([FromBody] DataManagerRequest request)
+        public IActionResult GetTransactions2([FromBody] DataManagerRequest request)
         {
             Debug.Print(request.ToJson());
             return new JsonResult(new {result = "", count = 0});

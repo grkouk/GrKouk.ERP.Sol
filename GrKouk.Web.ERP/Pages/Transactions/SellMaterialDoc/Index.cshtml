@@ -417,7 +417,7 @@
                             if (item.sortKey.length !== 0) {
                                 let colHtml = "";
                                 colHtml = `<th class="${item.headerClass}"> `;
-                                colHtml += `<a href="#" role="button" name="SortHeader" tabindex="-1" `;
+                                colHtml += `<a href="#" role="button" name="SelectorSortHeader" tabindex="-1" `;
                                 colHtml += `data-sortkey="${item.sortKey}" data-sorttype="${item.sortType}">  `;
                                 colHtml += `${item.header}  `;
                                 colHtml += `</a>  `;
@@ -584,7 +584,7 @@
                                 //$('#itemSelector').modal('hide');
 
                             });
-                        $('[name=SortHeader]').on('click',
+                        $('[name=SelectorSortHeader]').on('click',
                             function (event) {
                                 var button = $(event.delegateTarget);
                                 var reqSort = button.data('sortkey');

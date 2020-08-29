@@ -93,7 +93,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
         [BindProperty]
         public BuyDocCreateAjaxDto ItemVm { get; set; }
         public BuyDocModifyDto CopyFromItemVm { get; set; }
-        public async Task<IActionResult> OnPostAsync()
+        public  IActionResult OnPost()
         {
             if (!ModelState.IsValid)
             {

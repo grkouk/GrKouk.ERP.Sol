@@ -1334,21 +1334,21 @@ namespace GrKouk.Web.ERP.Controllers
             var isozigioType = "FREE";
             var transactorType =
                 await _context.TransactorTypes.Where(c => c.Id == transactorTypeId).FirstOrDefaultAsync();
-            var isozigioName = "";
+            //var isozigioName = "";
             if (transactorType != null)
             {
                 switch (transactorType.Code)
                 {
                     case "SYS.DTRANSACTOR":
-                        isozigioName = "Συναλλασόμενων Ημερολογίου";
+                        //isozigioName = "Συναλλασόμενων Ημερολογίου";
                         isozigioType = "SUPPLIER";
                         break;
                     case "SYS.CUSTOMER":
-                        isozigioName = "Πελατών";
+                        //isozigioName = "Πελατών";
                         isozigioType = "CUSTOMER";
                         break;
                     case "SYS.SUPPLIER":
-                        isozigioName = "Προμηθευτών";
+                        //isozigioName = "Προμηθευτών";
                         isozigioType = "SUPPLIER";
                         break;
                 }
