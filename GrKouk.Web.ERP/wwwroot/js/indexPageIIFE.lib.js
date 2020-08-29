@@ -17,7 +17,9 @@
     const $pagingInfo = $("[name=PagingInfo]");
     const $filtersVisible = $("#filtersVisible");
     const $filterCollapse = $("#filterCollapse");
-    var $selectedRowsActionsLink = $("#ddSelectedRowsActions");
+    const $selectedRowsActionsLink = $("#ddSelectedRowsActions");
+    const $filtersToggle = $('#filtersToggle');
+    
     const commonTableHandlers = [
         {
             selector: "input[name=checkAllRows]",
@@ -26,7 +28,7 @@
                 var th = $(this).index();
                 var isChecked = $(this).prop("checked");
                 $("input[name=checkTableRow]").prop("checked", isChecked);
-                var selectedRowsCount = indPgLib.countSelectedRows();
+                var selectedRowsCount = countSelectedRows();
                 if (selectedRowsCount > 0) {
                     $selectedRowsActionsLink.removeClass("disabled");
                 } else {
