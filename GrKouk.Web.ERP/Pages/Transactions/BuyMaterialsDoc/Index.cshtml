@@ -572,62 +572,42 @@
                     }
                 },
                 {
-                    selector:'input[name=checkAllRows]',
-                    event:'change',
-                    handler: function() {
-                        var th = $(this).index();
-                        var isChecked = $(this).prop('checked');
-                        $('input[name=checkTableRow]').prop('checked', isChecked);
-                        var selectedRowsCount = indPgLib.countSelectedRows();
-                        if (selectedRowsCount > 0) {
-                            $selectedRowsActionsLink.removeClass('disabled');
-                        } else {
-                            $selectedRowsActionsLink.addClass('disabled');
-                        }
-                    }
-                },
-                {
-                    selector:'input[name=checkTableRow]',
-                    event:'click',
-                    handler: function() {
-                        indPgLib.handleSelectedRowsUi();
-                    }
-                },
-                {
-                    selector:'[name=SortHeader]',
-                    event:'click',
-                    handler: function(event) {
-                                    var button = $(event.delegateTarget);
-                                    var reqSort = button.data('sortkey');
-                                    let reqSortType = button.data('sorttype');
-                                    let iconSortType = '';
-                                    var newSortVal = '';
-                                    var curSort = indPgLib.getTableCurrentSort();
-                                    if (curSort === undefined || curSort === null || curSort.length === 0) {
-                                        curSort = reqSort + ':desc';
-                                    }
-                                    var curSortAr = curSort.split(':');
-                                    if (curSortAr[0] === reqSort) {
-                                        var newSort = curSortAr[1] === 'asc' ? 'desc' : 'asc';
-                                        var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
-                                        newSortVal = curSortAr[0] + ':' + newSort;
-                                        iconSortType = "fas fa-sort-" + reqSortType + newSortIconType;
-                                    } else {
-                                        newSortVal = reqSort + ':asc';
-                                        iconSortType = "fas fa-sort-" + reqSortType + "-up";
-                                    }
-                                    let $btParent = button.parent();
-                                    let $icon = $btParent.find('i:eq(0)');
-                                    if ($icon !== undefined ) {
-                                        $icon.removeClass();
-                                        $icon.addClass(iconSortType);
-                                    }
-
-                                    indPgLib.setTableCurrentSort(newSortVal);
-                                    
-                                    indPgLib.refreshData();
-                                }
+            selector: "[name=SortHeader]",
+            event: "click",
+            handler: function (event) {
+                var button = $(event.delegateTarget);
+                var reqSort = button.data("sortkey");
+                let reqSortType = button.data("sorttype");
+                let iconSortType = "";
+                var newSortVal = "";
+                var curSort = indPgLib.getTableCurrentSort();
+                if (curSort === undefined || curSort === null || curSort.length === 0) {
+                    curSort = reqSort + ":desc";
                 }
+                var curSortAr = curSort.split(":");
+                if (curSortAr[0] === reqSort) {
+                    var newSort = curSortAr[1] === "asc" ? "desc" : "asc";
+                    var newSortIconType = curSortAr[1] === "asc" ? "-down" : "-up";
+                    newSortVal = curSortAr[0] + ":" + newSort;
+                    iconSortType = "fas fa-sort-" + reqSortType + newSortIconType;
+                } else {
+                    newSortVal = reqSort + ":asc";
+                    iconSortType = "fas fa-sort-" + reqSortType + "-up";
+                }
+                let $btParent = button.parent();
+                let $icon = $btParent.find("i:eq(0)");
+                if ($icon !== undefined) {
+                    $icon.removeClass();
+                    $icon.addClass(iconSortType);
+                }
+
+                indPgLib.setTableCurrentSort(newSortVal);
+                indPgLib.refreshData();
+                //setTableCurrentSort(newSortVal);
+                //refreshTableData();
+            },
+        },
+               
             ];
              let pageHandlersToRegister = [
                 {
@@ -637,86 +617,9 @@
                         currencyChanged();
                         indPgLib.refreshData();
                     }
-                },
-                {
-                    selector:'#DatePeriodFilter',
-                    event:'change',
-                    handler: function(event) {
-                        $('#pageIndex').val(1);
-                        indPgLib.refreshData();
-                    }
-                 },
-                 {
-                     selector:'#CompanyFilter',
-                     event:'change',
-                     handler: function(event) {
-                         $('#pageIndex').val(1);
-                         indPgLib.refreshData();
-                     }
-                 },
-                 {
-                     selector:'#PageSize',
-                     event:'change',
-                     handler: function(event) {
-                         $('#pageIndex').val(1);
-                         indPgLib.refreshData();
-                     }
-                 },
-                 {
-                     selector:'.search_icon',
-                     event:'click',
-                     handler: function(event) {
-                         let icon = $(this).find("svg");
-                         if (icon.hasClass('fa-search')) {
-                             icon.addClass("fa-times").removeClass("fa-search");
-                         } else {
-                             icon.addClass("fa-search").removeClass("fa-times");
-                             $('.search_input').val('');
-                         }
-
-                         indPgLib.refreshData();
-                     }
-                 },
-                 {
-                     selector:'#CreateNew',
-                     event:'click',
-                     handler: function(event) {
-                         var uri = '@Url.Page("Create")';
-                         window.location.href = uri;
-                     }
-                 },
-                 {
-                     selector:'#FiltersForm',
-                     event:'submit',
-                     handler:  function(e) {
-                         e.preventDefault();
-                         var $icon = $('.search_icon').find("svg");
-                         if ($icon.hasClass('fa-search')) {
-                             $icon.addClass("fa-times").removeClass("fa-search");
-
-                         } else {
-                             $icon.addClass("fa-search").removeClass("fa-times");
-
-                         }
-                         indPgLib.refreshData();
-                     }
-                 },
-                  {
-                     selector:'#filterCollapse',
-                     event:'hidden.bs.collapse',
-                     handler: function(event) {
-                        $filtersToggle.text('Show Filters');
-                        $filtersVisible.val(false);
-                     }
-                 },
-                  {
-                     selector:'#filterCollapse',
-                     event:'shown.bs.collapse',
-                     handler: function(event) {
-                        $filtersToggle.text('Hide Filters');
-                        $filtersVisible.val(true);
-                     }
-                 }
+                }
+               
+                
             ];
             const indexPageDef = {
                 uri: '/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',
