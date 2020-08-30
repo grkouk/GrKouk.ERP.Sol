@@ -1185,7 +1185,7 @@
                     success: function (result) {
                         console.log(result);
                         toastr.success(result.message);
-                        refreshTableData();
+                        indPgLib.refreshData();
 
                     },
                     complete: function () {
@@ -1318,7 +1318,7 @@
             indPgLib.addPagerElementEventListeners();
             indPgLib.registerPageHandlers();
             indPgLib.loadSettings('SellDocIndexView');
-             indPgLib.handleFiltersUi();
+            indPgLib.handleFiltersUi();
             currencyChanged();
             indPgLib.refreshData();
             indPgLib.rowSelectorsUi();
