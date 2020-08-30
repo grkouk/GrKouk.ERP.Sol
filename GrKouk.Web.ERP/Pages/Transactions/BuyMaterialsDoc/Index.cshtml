@@ -316,6 +316,8 @@
                     text: '',
                     headerClass: 'small text-center ',
                     class: 'small',
+                    classWhenCondition: '',
+                    classCondition: {},
                     remoteReference: {
                         
                     }
@@ -334,6 +336,8 @@
                     text: '',
                     headerClass: 'small text-center',
                     class: 'small',
+                    classWhenCondition: '',
+                    classCondition: {},
                     remoteReference: {
                         isRemoteReference: true,
                         valueKey: 'transactorId',
@@ -354,6 +358,8 @@
                     text: '',
                     headerClass: 'small text-center d-none d-md-table-cell',
                     class: 'small d-none d-md-table-cell ',
+                    classWhenCondition: '',
+                    classCondition: {},
                     remoteReference: {
                        
                     }
@@ -372,6 +378,8 @@
                     text: '',
                     headerClass: 'small text-center d-none d-md-table-cell',
                     class: 'small d-none d-md-table-cell ',
+                    classWhenCondition: '',
+                    classCondition: {},
                     remoteReference: {
                        
                     }
@@ -390,6 +398,8 @@
                     text: '',
                     headerClass: 'small text-center',
                     class: 'small ',
+                    classWhenCondition: '',
+                    classCondition: {},
                     remoteReference: {
                        
                     }
@@ -408,6 +418,8 @@
                     text: '',
                     headerClass: 'small text-center',
                     class: 'small text-right ',
+                    classWhenCondition: '',
+                    classCondition: {},
                     remoteReference: {
                        
                     }
@@ -426,6 +438,8 @@
                     text: '',
                     headerClass: 'small text-center',
                     class: 'small text-right ',
+                    classWhenCondition: '',
+                    classCondition: {},
                     remoteReference: {
                        
                     }
@@ -444,6 +458,8 @@
                     text: '',
                     headerClass: 'small text-center',
                     class: 'small text-right ',
+                    classWhenCondition: '',
+                    classCondition: {},
                     remoteReference: {
                        
                     }
@@ -491,9 +507,13 @@
                     visibility: 'condition',
                     elementName: 'PayoffDoc',
                     condition: {
-                        val1Key: 'totalAmount',
-                        val2Key: 'payedOfAmount',
-                        operator: 'notZero'
+                        val1Type:'key',
+                        val1Value: 'totalAmount',
+                        val2Type:'key',
+                        val2Value: 'payedOfAmount',
+                        //val1Key: 'totalAmount',
+                        //val2Key: 'payedOfAmount',
+                        operator: 'notZeroDiff'
                     },
                     text: 'Εξόφληση Παραστατικού',
                     valueKey: 'id',
@@ -507,9 +527,13 @@
                     visibility: 'condition',
                     elementName:'AssignPayments',
                     condition: {
-                        val1Key:'totalAmount',
-                        val2Key:'payedOfAmount',
-                        operator:'notZero'
+                        val1Type:'key',
+                        val1Value: 'totalAmount',
+                        val2Type:'key',
+                        val2Value: 'payedOfAmount',
+                       // val1Key:'totalAmount',
+                       // val2Key:'payedOfAmount',
+                        operator:'notZeroDiff'
                     },
                     text: 'Αντιστοίχιση Πληρωμών',
                     valueKey: 'id',
@@ -573,9 +597,11 @@
                     visibility: 'condition',
                     elementName: 'PayoffDoc',
                     condition: {
-                        val1Key: 'totalAmount',
-                        val2Key: 'payedOfAmount',
-                        operator: 'notZero'
+                        val1Type:'key',
+                        val1Value: 'totalAmount',
+                        val2Type:'key',
+                        val2Value: 'payedOfAmount',
+                        operator: 'notZeroDiff'
                     },
                     text: 'Εξόφληση Παραστατικού',
                     valueKey: 'id',
@@ -589,9 +615,11 @@
                     visibility: 'condition',
                     elementName:'AssignPayments',
                     condition: {
-                        val1Key:'totalAmount',
-                        val2Key:'payedOfAmount',
-                        operator:'notZero'
+                        val1Type:'key',
+                        val1Value: 'totalAmount',
+                        val2Type:'key',
+                        val2Value: 'payedOfAmount',
+                        operator: 'notZeroDiff'
                     },
                     text: 'Αντιστοίχιση Πληρωμών',
                     valueKey: 'id',

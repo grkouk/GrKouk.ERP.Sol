@@ -313,9 +313,9 @@
                     text: '',
                     headerClass: 'small text-center ',
                     class: 'small',
-                    remoteReference: {
-                        
-                    }
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {}
                 },
                 {
                     key: 'transactorName',
@@ -331,6 +331,8 @@
                     text: '',
                     headerClass: 'small text-center',
                     class: 'small',
+                    classWhenCondition: '',
+                    classCondition: {},
                     remoteReference: {
                         isRemoteReference: true,
                         valueKey: 'transactorId',
@@ -351,9 +353,9 @@
                     text: '',
                     headerClass: 'small text-center d-none d-md-table-cell',
                     class: 'small d-none d-md-table-cell ',
-                    remoteReference: {
-                       
-                    }
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {}
                 },
                 {
                     key: 'transRefCode',
@@ -369,9 +371,9 @@
                     text: '',
                     headerClass: 'small text-center d-none d-md-table-cell',
                     class: 'small d-none d-md-table-cell ',
-                    remoteReference: {
-                       
-                    }
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {}
                 },
                 {
                     key: 'companyCode',
@@ -387,9 +389,9 @@
                     text: '',
                     headerClass: 'small text-center',
                     class: 'small ',
-                    remoteReference: {
-                       
-                    }
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {}
                 },
                 {
                     key: 'totalNetAmount',
@@ -405,9 +407,9 @@
                     text: '',
                     headerClass: 'small text-center',
                     class: 'small text-right ',
-                    remoteReference: {
-                       
-                    }
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {}
                 },
                 {
                     key: 'totalAmount',
@@ -423,9 +425,9 @@
                     text: '',
                     headerClass: 'small text-center',
                     class: 'small text-right ',
-                    remoteReference: {
-                       
-                    }
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {}
                 },
                 {
                     key: 'payedOfAmount',
@@ -441,9 +443,9 @@
                     text: '',
                     headerClass: 'small text-center',
                     class: 'small text-right ',
-                    remoteReference: {
-                       
-                    }
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {}
                 }
             ];
             const actionColDefs = [
@@ -488,9 +490,11 @@
                     visibility: 'condition',
                     elementName: 'PayoffDoc',
                     condition: {
-                        val1Key: 'totalAmount',
-                        val2Key: 'payedOfAmount',
-                        operator: 'notZero'
+                        val1Type:'key',
+                        val1Value: 'totalAmount',
+                        val2Type:'key',
+                        val2Value: 'payedOfAmount',
+                        operator: 'notZeroDiff'
                     },
                     text: 'Εξόφληση Παραστατικού',
                     valueKey: 'id',
@@ -504,9 +508,11 @@
                     visibility: 'condition',
                     elementName:'AssignPayments',
                     condition: {
-                        val1Key:'totalAmount',
-                        val2Key:'payedOfAmount',
-                        operator:'notZero'
+                        val1Type:'key',
+                        val1Value: 'totalAmount',
+                        val2Type:'key',
+                        val2Value: 'payedOfAmount',
+                        operator: 'notZeroDiff'
                     },
                     text: 'Αντιστοίχιση Εισπράξεων',
                     valueKey: 'id',
@@ -570,9 +576,11 @@
                     visibility: 'condition',
                     elementName: 'PayoffDoc',
                     condition: {
-                        val1Key: 'totalAmount',
-                        val2Key: 'payedOfAmount',
-                        operator: 'notZero'
+                        val1Type:'key',
+                        val1Value: 'totalAmount',
+                        val2Type:'key',
+                        val2Value: 'payedOfAmount',
+                        operator: 'notZeroDiff'
                     },
                     text: 'Εξόφληση Παραστατικού',
                     valueKey: 'id',
@@ -586,9 +594,11 @@
                     visibility: 'condition',
                     elementName:'AssignPayments',
                     condition: {
-                        val1Key:'totalAmount',
-                        val2Key:'payedOfAmount',
-                        operator:'notZero'
+                        val1Type:'key',
+                        val1Value: 'totalAmount',
+                        val2Type:'key',
+                        val2Value: 'payedOfAmount',
+                        operator: 'notZeroDiff'
                     },
                     text: 'Αντιστοίχιση Εισπράξεων',
                     valueKey: 'id',

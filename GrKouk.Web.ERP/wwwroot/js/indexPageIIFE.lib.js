@@ -297,6 +297,42 @@
         return Object.keys(inputObject).length === 0;
     };
     //================================================================
+    const getConditionValue = (itemType, itemValue, value) => {
+        let returnValue = '';
+
+        switch (itemType) {
+        case 'key':
+            returnValue = value[itemValue];
+            break;
+        case 'func':
+            returnValue = itemValue();
+            break;
+        default:
+        }
+        return returnValue;
+    };
+    const evaluateCondition = (cond, valueSource) => {
+        let evaluationResult = true;
+        let val1 = getConditionValue(cond.val1Type, cond.val1Value, valueSource);
+        let val2 = getConditionValue(cond.val2Type, cond.val2Value, valueSource);
+        if (cond.operator === 'notZeroDiff') {
+            let diffAmount = parseFloat(val1) - parseFloat(val2);
+            if (diffAmount !== 0) {
+                evaluationResult = true;
+            } else {
+                evaluationResult = false;
+            }
+        }
+        if (cond.operator === 'isGraterThan') {
+            if (val1 > val2) {
+                evaluationResult = true;
+            } else {
+                evaluationResult = false;
+            }
+
+        }
+        return evaluationResult;
+    };
     const registerHandlers = (handlerDefinitions) => {
         handlerDefinitions.forEach(function (item) {
             $(item.selector).on(item.event, item.handler);
@@ -376,7 +412,16 @@
                 default:
             }
         }
-        $tdCol.addClass(col.class);
+        if (isEmpty(col.classCondition)) {
+            $tdCol.addClass(col.class);
+        } else {
+            if (evaluateCondition(col.classCondition, value)) {
+                $tdCol.addClass(col.classWhenCondition);
+            } else {
+                $tdCol.addClass(col.class);
+            }
+        }
+       
         return $tdCol;
     };
     const createColumnAction = (col, value) => {
@@ -398,17 +443,10 @@
         if (col.visibility === "condition") {
             visibility = false;
             if (!isEmpty(col.condition)) {
-                let amnt1 = parseFloat(value[col.condition.val1Key]);
-                let amnt2 = parseFloat(value[col.condition.val2Key]);
-                let diffAmount = amnt1 - amnt2;
-                switch (col.condition.operator) {
-                    case "notZero":
-                        if (diffAmount !== 0) {
-                            visibility = true;
-                        }
-                        break;
-                    default:
+                if (evaluateCondition(col.condition, value)) {
+                    visibility = true;
                 }
+               
             }
         }
         if (visibility) {
@@ -449,12 +487,18 @@
         }
         return actionHtml;
     };
+    
+   
     const createMobileColumnAction = (col, value) => {
         let actionHtml = "";
         let visibility = true;
         if (col.visibility === "condition") {
             visibility = false;
             if (!isEmpty(col.condition)) {
+                if (evaluateCondition(col.condition,value)) {
+                    visibility = true;
+                }
+                /*
                 let amnt1 = parseFloat(value[col.condition.val1Key]);
                 let amnt2 = parseFloat(value[col.condition.val2Key]);
                 let diffAmount = amnt1 - amnt2;
@@ -466,6 +510,7 @@
                         break;
                     default:
                 }
+                */
             }
         }
         if (visibility) {
