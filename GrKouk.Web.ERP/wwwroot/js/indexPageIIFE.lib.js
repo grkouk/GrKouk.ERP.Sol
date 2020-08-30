@@ -297,15 +297,15 @@
         return Object.keys(inputObject).length === 0;
     };
     //================================================================
-    const getConditionValue = (itemType, itemValue, value) => {
+    const getConditionValue = (itemType, itemValue, valueSource) => {
         let returnValue = '';
 
         switch (itemType) {
         case 'key':
-            returnValue = value[itemValue];
+                returnValue = valueSource[itemValue];
             break;
         case 'func':
-            returnValue = itemValue();
+                returnValue = itemValue(valueSource);
             break;
         default:
         }
@@ -432,7 +432,18 @@
                 actionHtml += col.icon;
                 actionHtml += "</a> |";
                 break;
-
+            case "eventAction":
+                actionHtml += `<a  href="#"`;
+                if (col.elementName) {
+                    actionHtml += ` name=${col.elementName}`;
+                }
+                actionHtml += ` data-${col.dataKey}=${value[col.valueKey]}`;
+                //actionHtml += ` data-docid=${value[col.valueKey]}`;
+                //actionHtml += ` data-itemid=${value[col.valueKey]}`;
+                actionHtml += ">";
+                actionHtml += col.icon;
+                actionHtml += "</a> |";
+                break;
             default:
         }
         return actionHtml;
@@ -462,7 +473,8 @@
                     if (col.elementName) {
                         actionHtml += ` name=${col.elementName}`;
                     }
-                    actionHtml += ` data-docid=${value[col.valueKey]}`;
+                    
+                    actionHtml += ` data-${col.dataKey}=${value[col.valueKey]}`;
                     actionHtml += ">";
                     break;
                 case "modalSelectorEventAction":
@@ -759,6 +771,9 @@
         if (totalSummaryCount > 0) {
             $totalSummaryRow.append($("<td>"));
             $totalSummaryRow.appendTo("#myTable >  tbody:last");
+        }
+        if (!isEmpty(indexPageDefinition.afterTableLoad)) {
+            indexPageDefinition.afterTableLoad.callback(result);
         }
         rowSelectorsUi();
     };

@@ -517,6 +517,7 @@
                     },
                     text: 'Εξόφληση Παραστατικού',
                     valueKey: 'id',
+                    dataKey:'docid',
                     icon: '<i class="fab fa-amazon-pay fa-lg" style="color:slategray"></i>',
                     url: ''
                 },
@@ -605,6 +606,7 @@
                     },
                     text: 'Εξόφληση Παραστατικού',
                     valueKey: 'id',
+                    dataKey:'docid',
                     icon: '<i class="fab fa-amazon-pay fa-lg" style="color:slategray"></i>',
                     url: ''
                 },
@@ -1178,7 +1180,7 @@
                         .then(function(response) {
                             console.log(response);
                             $('#itemSelector').modal('hide');
-                            refreshTableData();
+                            indPgLib.refreshData();
                         })
                         .fail(function(err) {
                             console.log(err);
@@ -1228,7 +1230,7 @@
                     success: function(result) {
                         console.log(result);
                         toastr.success(result.message);
-                        refreshTableData();
+                        indPgLib.refreshData();
 
                     },
                     complete: function() {
@@ -1330,19 +1332,7 @@
                 }
 
             };
-            /*
-            var handleFiltersUi = () => {
-                var filterVisible = $filtersVisible.val();
-                if (filterVisible === 'True' || filterVisible === 'true') {
-                    $filterCollapse.collapse('show');
-                } else {
-                    $filterCollapse.collapse('hide');
-                }
-            };
-            var showFiltersUi = () => {
-
-            };
-            */
+           
             $deleteSelectedRowsLink.on('click',
                 () => {
                     deleteSelectedRows();
@@ -1369,12 +1359,7 @@
                     console.log('Not found currency code for this id');
                 }
             };
-            /*
-            $rowSelectorsToggle.on('click',
-                function() {
-                   indPgLib.rowSelectorsToggleHandler();
-                });
-           */
+           
             indPgLib.addPagerElementEventListeners();
             indPgLib.registerPageHandlers();
             indPgLib.loadSettings('BuyDocIndexView');

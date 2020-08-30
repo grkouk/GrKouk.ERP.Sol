@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="~/css/custom-checkbox.css" />
     <link rel="stylesheet" href="~/css/searchbar.css" />
     <style>
-        .delayed:{
+        .delayed {
             color:red;
         }
     </style>
@@ -304,10 +304,10 @@
                     class: 'small',
                     classWhenCondition: 'small delayed',
                     classCondition: {
-                        val1Type:'func',
-                        val1Value: function(){return new Date();},
-                        val2Type:'key',
-                        val2Value: 'nextTransDate',
+                        val1Type: 'func',
+                        val1Value: function() { return new Date().getTime(); },
+                        val2Type: 'func',
+                        val2Value: function(valueSource) { return new Date(valueSource['nextTransDate']).getTime(); },
                         operator: 'isGraterThan'
                     },
                     remoteReference: {
@@ -329,10 +329,10 @@
                     class: 'small d-none d-md-table-cell',
                     classWhenCondition: 'small small d-none d-md-table-cell delayed',
                     classCondition: {
-                        val1Type:'func',
-                        val1Value: function(){return new Date();},
-                        val2Type:'key',
-                        val2Value: 'nextTransDate',
+                        val1Type: 'func',
+                        val1Value: function() { return new Date().getTime(); },
+                        val2Type: 'func',
+                        val2Value: function(valueSource) { return new Date(valueSource['nextTransDate']).getTime(); },
                         operator: 'isGraterThan'
                     },
                     remoteReference: {
@@ -354,10 +354,10 @@
                     class: 'small d-none d-md-table-cell',
                     classWhenCondition: 'small d-none d-md-table-cell delayed',
                     classCondition: {
-                        val1Type:'func',
-                        val1Value: function(){return new Date();},
-                        val2Type:'key',
-                        val2Value: 'nextTransDate',
+                        val1Type: 'func',
+                        val1Value: function() { return new Date().getTime(); },
+                        val2Type: 'func',
+                        val2Value: function(valueSource) { return new Date(valueSource['nextTransDate']).getTime(); },
                         operator: 'isGraterThan'
                     },
                     remoteReference: {
@@ -377,13 +377,8 @@
                     text: '',
                     headerClass: 'small text-center',
                     class: 'small',
-                    classWhenCondition: 'small delayed',
+                    classWhenCondition: '',
                     classCondition: {
-                        val1Type:'func',
-                        val1Value: function(){return new Date();},
-                        val2Type:'key',
-                        val2Value: 'nextTransDate',
-                        operator: 'isGraterThan'
                     },
                     remoteReference: {
                         isRemoteReference: true,
@@ -407,10 +402,10 @@
                     class: 'small d-none d-md-table-cell ',
                     classWhenCondition: 'small d-none d-md-table-cell delayed',
                     classCondition: {
-                        val1Type:'func',
-                        val1Value: function(){return new Date();},
-                        val2Type:'key',
-                        val2Value: 'nextTransDate',
+                        val1Type: 'func',
+                        val1Value: function() { return new Date().getTime(); },
+                        val2Type: 'func',
+                        val2Value: function(valueSource) { return new Date(valueSource['nextTransDate']).getTime(); },
                         operator: 'isGraterThan'
                     },
                     remoteReference: {
@@ -432,10 +427,10 @@
                     class: 'small ',
                     classWhenCondition: 'small delayed',
                     classCondition: {
-                        val1Type:'func',
-                        val1Value: function(){return new Date();},
-                        val2Type:'key',
-                        val2Value: 'nextTransDate',
+                        val1Type: 'func',
+                        val1Value: function() { return new Date(); },
+                        val2Type: 'func',
+                        val2Value: function(valueSource) { return new Date(valueSource['nextTransDate']); },
                         operator: 'isGraterThan'
                     },
                     remoteReference: {
@@ -457,10 +452,10 @@
                     class: 'small text-right ',
                     classWhenCondition: 'small text-right delayed',
                     classCondition: {
-                        val1Type:'func',
-                        val1Value: function(){return new Date();},
-                        val2Type:'key',
-                        val2Value: 'nextTransDate',
+                        val1Type: 'func',
+                        val1Value: function() { return new Date().getTime(); },
+                        val2Type: 'func',
+                        val2Value: function(valueSource) { return new Date(valueSource['nextTransDate']).getTime(); },
                         operator: 'isGraterThan'
                     },
                     remoteReference: {
@@ -495,7 +490,7 @@
                     valueKey: 'id',
                     icon: '<i class="fas fa-check fa-lg" style="color:slategray"></i>',
                     url: ''
-                },
+                }
             ];
             const actionColSubDefs = [
             ];
@@ -537,6 +532,7 @@
                     condition: {},
                     text: 'Εφαρμογή',
                     valueKey: 'id',
+                    dataKey:'itemid',
                     icon: '<i class="fas fa-check fa-lg" style="color:slategray"></i>',
                     url: ''
                 }
@@ -680,7 +676,7 @@
                         success: function(result) {
                             console.log(result);
                             toastr.success("Delete", result.message);
-                            refreshTableData();
+                            indPgLib.refreshData();
 
                         },
                         complete: function() {

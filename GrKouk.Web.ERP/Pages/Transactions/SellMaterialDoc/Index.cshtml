@@ -498,6 +498,7 @@
                     },
                     text: 'Εξόφληση Παραστατικού',
                     valueKey: 'id',
+                    dataKey:'docid',
                     icon: '<i class="fab fa-amazon-pay fa-lg" style="color:slategray"></i>',
                     url: ''
                 },
@@ -584,6 +585,7 @@
                     },
                     text: 'Εξόφληση Παραστατικού',
                     valueKey: 'id',
+                    dataKey:'docid',
                     icon: '<i class="fab fa-amazon-pay fa-lg" style="color:slategray"></i>',
                     url: ''
                 },
@@ -1146,7 +1148,7 @@
                         .then(function (response) {
                             console.log(response);
                             $('#itemSelector').modal('hide');
-                            refreshTableData();
+                            indPgLib.refreshData();
                         })
                         .fail(function (err) {
                             console.log(err);
