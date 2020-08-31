@@ -597,7 +597,7 @@
             $("#GoToLast, #GoToNext").parent().addClass("disabled");
         }
     };
-    const getTableData = function (pgIndex, pgSize, sortData, dateRange, companyFlt, searchFlt, currencyFlt) {
+    const getTableData = function (pgIndex, pgSize, sortData, dateRange, companyFlt, searchFlt, currencyFlt, transTypeFlt, wrItmNatureFlt) {
         let uri = indexPageDefinition.uri;
         uri += `?pageIndex=${pgIndex}`;
         uri += `&pageSize=${pgSize}`;
@@ -605,6 +605,8 @@
         uri += `&dateRange=${dateRange}`;
         uri += `&sortData=${sortData}`;
         uri += `&searchFilter=${searchFlt}`;
+        uri += `&transactorTypeFilter=${transTypeFlt}`;
+        uri += `&warehouseItemNatureFilter=${wrItmNatureFlt}`;
         uri += `&displayCurrencyId=${currencyFlt}`;
         var timeout;
         return new Promise((resolve, reject) => {
@@ -792,10 +794,17 @@
         var sortData = $("#currentSort").val();
         var searchFlt = $(".search_input").val();
         var $dcId = $("#CurrencySelector");
-
+        var transTypeFlt='';
+        if (!($('#TransactorTypeFilter').val()===undefined)) {
+            transTypeFlt = $('#TransactorTypeFilter').val();
+        }
+        var wrItmNatureFlt = '';
+        if (!($('#WarehouseItemNatureFilter').val() === undefined)) {
+            wrItmNatureFlt = $('#WarehouseItemNatureFilter').val();
+        }
         var currencyFlt = $dcId.val() == null || $dcId.val().length == 0 ? 1 : parseInt($dcId.val());
 
-        getTableData(pageIndex, pageSize, sortData, datePeriod, companyFlt, searchFlt, currencyFlt)
+        getTableData(pageIndex, pageSize, sortData, datePeriod, companyFlt, searchFlt, currencyFlt, transTypeFlt, wrItmNatureFlt)
             .then((data) => {
                 bindDataToTable(data, pageIndex);
             })
