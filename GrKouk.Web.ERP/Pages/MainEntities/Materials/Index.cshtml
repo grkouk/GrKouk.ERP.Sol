@@ -102,27 +102,31 @@
             <nav aria-label="Page navigation example">
                 <ul class="pagination pagination-sm justify-content-end">
                     <li class="page-item ">
-                        <a href="#" id="GoToFirst"
+                        <a href="#" id="GoToFirst" data-pageraction="GoToFirst" 
                            class="page-link" aria-label="First">
+                            @*<span aria-hidden="true">;</span>*@
                             First
                         </a>
                     </li>
                     <li class="page-item ">
-                        <a href="#" id="GoToPrevious"
+                        <a href="#" id="GoToPrevious" data-pageraction="GoToPrevious"
                            class="page-link" aria-label="Previous">
+                            @*<span aria-hidden="true">&laquo;</span>*@
                             Previous
                         </a>
                     </li>
 
                     <li class="page-item ">
-                        <a href="#" id="GoToNext"
+                        <a href="#" id="GoToNext" data-pageraction="GoToNext"
                            class="page-link" aria-label="Next">
+                            @*<span aria-hidden="true">&raquo;</span>*@
                             Next
                         </a>
                     </li>
                     <li class="page-item  ">
-                        <a href="#" id="GoToLast"
+                        <a href="#" id="GoToLast" data-pageraction="GoToLast"
                            class="page-link" aria-label="Last">
+                            @*<span aria-hidden="true">;</span>*@
                             Last
                         </a>
                     </li>
@@ -473,41 +477,12 @@
                     visibility: 'always',
                     elementName: '',
                     condition: {},
-                    text: 'Νέα Συνδρομή',
+                    text: 'Καρτέλλα',
                     valueKey: 'id',
-                    icon: '<i class="fas fa-info-circle fa-lg" style="color:slategray"></i>',
-                    url: '@Url.Page("/Transactions/RecurringTransactions/Create")?createFromType=1&createFromId='
-                },
-                {
-                    actionType: 'eventAction',
-                    visibility: 'condition',
-                    elementName: 'PayoffDoc',
-                    condition: {
-                        val1Key: 'totalAmount',
-                        val2Key: 'payedOfAmount',
-                        operator: 'notZero'
-                    },
-                    text: 'Εξόφληση Παραστατικού',
-                    valueKey: 'id',
-                    icon: '<i class="fab fa-amazon-pay fa-lg" style="color:slategray"></i>',
-                    url: ''
-                },
-                {
-                    actionType: 'modalSelectorEventAction',
-                    selectorType: 'BuyPaymentsSelector',
-                    selectorTarget: '#itemSelector',
-                    visibility: 'condition',
-                    elementName: 'AssignPayments',
-                    condition: {
-                        val1Key: 'totalAmount',
-                        val2Key: 'payedOfAmount',
-                        operator: 'notZero'
-                    },
-                    text: 'Αντιστοίχιση Πληρωμών',
-                    valueKey: 'id',
-                    icon: '<i class="fas fa-compress-arrows-alt fa-lg" style="color:slategray"></i>',
-                    url: ''
+                    icon: '<i class="fas fa-receipt fa-lg" style="color:slategray"></i>',
+                    url: '@Url.Page("./Kartela")?warehouseItemId='
                 }
+                
             ];
             const actionMobileColDefs = [
                 {
