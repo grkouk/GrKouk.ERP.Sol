@@ -19,7 +19,7 @@
     const $filterCollapse = $("#filterCollapse");
     const $selectedRowsActionsLink = $("#ddSelectedRowsActions");
     const $filtersToggle = $('#filtersToggle');
-    
+
     const commonTableHandlers = [
         {
             selector: "input[name=checkAllRows]",
@@ -89,7 +89,7 @@
                 setTableCurrentSort(newSortVal);
                 refreshTableData();
             },
-         }
+        }
     ];
 
     const commonHandlers = [
@@ -301,13 +301,13 @@
         let returnValue = '';
 
         switch (itemType) {
-        case 'key':
+            case 'key':
                 returnValue = valueSource[itemValue];
-            break;
-        case 'func':
+                break;
+            case 'func':
                 returnValue = itemValue(valueSource);
-            break;
-        default:
+                break;
+            default:
         }
         return returnValue;
     };
@@ -378,9 +378,9 @@
         let $tdCol = $("<td>");
         if (col.hasOwnProperty('colType')) {
             if (col.colType === 'imageViewer') {
-                let vrLink = '< a href = "#" role = "button" data-toggle="modal"';
+                let vrLink = '<a href = "#" role = "button" data-toggle="modal"';
                 vrLink += ` data-target="${col.imageViewer.target}"`;
-                col.imageViewer.dataAttributes.forEach(function(item) {
+                col.imageViewer.dataAttributes.forEach(function (item) {
                     vrLink += ` data-${item.key}="${value[item.valueKey]}"`;
                 });
                 vrLink += ">";
@@ -391,16 +391,16 @@
             }
         }
         if (col.responseKey) {
-                if (!isEmpty(col.remoteReference)) {
-                    let valueKey = col.remoteReference.valueKey;
-                    var remoteId = value[valueKey];
-                    let remoteUrl = `${col.remoteReference.url}${remoteId}`;
-                    var $aLink = `<a href="${remoteUrl}" target="_blank">${value[col.responseKey]}</a>  `;
-                    //$tdCol.innerhtml ($aLink);
-                    //$($aLink).appendTo($tdCol);
-                    $tdCol.html($aLink);
-                } else {
-                    switch (col.columnFormat) {
+            if (!isEmpty(col.remoteReference)) {
+                let valueKey = col.remoteReference.valueKey;
+                var remoteId = value[valueKey];
+                let remoteUrl = `${col.remoteReference.url}${remoteId}`;
+                var $aLink = `<a href="${remoteUrl}" target="_blank">${value[col.responseKey]}</a>  `;
+                //$tdCol.innerhtml ($aLink);
+                //$($aLink).appendTo($tdCol);
+                $tdCol.html($aLink);
+            } else {
+                switch (col.columnFormat) {
                     case "t":
                         $tdCol.text(value[col.responseKey]);
                         break;
@@ -413,10 +413,10 @@
                         break;
 
                     default:
-                    }
                 }
-            } else {
-                switch (col.columnFormat) {
+            }
+        } else {
+            switch (col.columnFormat) {
                 case "t":
                     break;
                 case "d":
@@ -425,9 +425,9 @@
                     $tdCol.attr("data-actualValue", 0);
                     break;
                 default:
-                }
             }
-        
+        }
+
         if (isEmpty(col.classCondition)) {
             $tdCol.addClass(col.class);
         } else {
@@ -437,7 +437,7 @@
                 $tdCol.addClass(col.class);
             }
         }
-       
+
         return $tdCol;
     };
     const createColumnAction = (col, value) => {
@@ -473,7 +473,7 @@
                 if (evaluateCondition(col.condition, value)) {
                     visibility = true;
                 }
-               
+
             }
         }
         if (visibility) {
@@ -489,7 +489,7 @@
                     if (col.elementName) {
                         actionHtml += ` name=${col.elementName}`;
                     }
-                    
+
                     actionHtml += ` data-${col.dataKey}=${value[col.valueKey]}`;
                     actionHtml += ">";
                     break;
@@ -515,15 +515,15 @@
         }
         return actionHtml;
     };
-    
-   
+
+
     const createMobileColumnAction = (col, value) => {
         let actionHtml = "";
         let visibility = true;
         if (col.visibility === "condition") {
             visibility = false;
             if (!isEmpty(col.condition)) {
-                if (evaluateCondition(col.condition,value)) {
+                if (evaluateCondition(col.condition, value)) {
                     visibility = true;
                 }
                 /*
@@ -810,8 +810,8 @@
         var sortData = $("#currentSort").val();
         var searchFlt = $(".search_input").val();
         var $dcId = $("#CurrencySelector");
-        var transTypeFlt='';
-        if (!($('#TransactorTypeFilter').val()===undefined)) {
+        var transTypeFlt = '';
+        if (!($('#TransactorTypeFilter').val() === undefined)) {
             transTypeFlt = $('#TransactorTypeFilter').val();
         }
         var wrItmNatureFlt = '';
@@ -907,7 +907,7 @@
             try {
                 filtersValue = storageItem.find((x) => x.filterKey === "currentCurrency").filterValue;
                 $("#CurrencySelector").val(filtersValue);
-            } catch (e) {}
+            } catch (e) { }
         }
     };
     const saveSettings = (localStorageKey) => {
