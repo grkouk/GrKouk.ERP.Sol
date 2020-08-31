@@ -440,6 +440,45 @@
 
         return $tdCol;
     };
+    const createActionHtml = (col, value) => {
+        let actionHtml = "";
+        switch (col.actionType) {
+        case "defaultAction":
+            actionHtml += `<a class="dropdown-item" href="${col.url}${value[col.valueKey]}">`;
+            break;
+        case "newWindowAction":
+            actionHtml += `<a class="dropdown-item" target="_blanc" href="${col.url}${value[col.valueKey]}">`;
+            break;
+        case "eventAction":
+            actionHtml += `<a class="dropdown-item" href="#"`;
+            if (col.elementName) {
+                actionHtml += ` name=${col.elementName}`;
+            }
+
+            actionHtml += ` data-${col.dataKey}=${value[col.valueKey]}`;
+            actionHtml += ">";
+            break;
+        case "modalSelectorEventAction":
+            actionHtml += `<a class="dropdown-item" href="#" data-toggle="modal"`;
+            if (col.elementName) {
+                actionHtml += ` name=${col.elementName}`;
+            }
+            if (col.selectorTarget) {
+                actionHtml += ` data-target=${col.selectorTarget}`;
+            }
+            if (col.selectorType) {
+                actionHtml += ` data-selectorType=${col.selectorType}`;
+            }
+            actionHtml += ` data-docid=${value[col.valueKey]}`;
+            actionHtml += ">";
+            break;
+        default:
+        }
+        actionHtml += col.icon;
+        actionHtml += col.text;
+        actionHtml += "</a>";
+        return actionHtml;
+    };
     const createColumnAction = (col, value) => {
         let actionHtml = "";
         switch (col.actionType) {
@@ -465,7 +504,7 @@
         return actionHtml;
     };
     const createColumnSubAction = (col, value) => {
-        let actionHtml = "";
+        let actionHtml = '';
         let visibility = true;
         if (col.visibility === "condition") {
             visibility = false;
@@ -477,41 +516,7 @@
             }
         }
         if (visibility) {
-            switch (col.actionType) {
-                case "defaultAction":
-                    actionHtml += `<a class="dropdown-item" href="${col.url}${value[col.valueKey]}">`;
-                    break;
-                case "newWindowAction":
-                    actionHtml += `<a class="dropdown-item" target="_blanc" href="${col.url}${value[col.valueKey]}">`;
-                    break;
-                case "eventAction":
-                    actionHtml += `<a class="dropdown-item" href="#"`;
-                    if (col.elementName) {
-                        actionHtml += ` name=${col.elementName}`;
-                    }
-
-                    actionHtml += ` data-${col.dataKey}=${value[col.valueKey]}`;
-                    actionHtml += ">";
-                    break;
-                case "modalSelectorEventAction":
-                    actionHtml += `<a class="dropdown-item" href="#" data-toggle="modal"`;
-                    if (col.elementName) {
-                        actionHtml += ` name=${col.elementName}`;
-                    }
-                    if (col.selectorTarget) {
-                        actionHtml += ` data-target=${col.selectorTarget}`;
-                    }
-                    if (col.selectorType) {
-                        actionHtml += ` data-selectorType=${col.selectorType}`;
-                    }
-                    actionHtml += ` data-docid=${value[col.valueKey]}`;
-                    actionHtml += ">";
-                    break;
-                default:
-            }
-            actionHtml += col.icon;
-            actionHtml += col.text;
-            actionHtml += "</a>";
+            actionHtml = createActionHtml(col,value);
         }
         return actionHtml;
     };
@@ -526,56 +531,11 @@
                 if (evaluateCondition(col.condition, value)) {
                     visibility = true;
                 }
-                /*
-                let amnt1 = parseFloat(value[col.condition.val1Key]);
-                let amnt2 = parseFloat(value[col.condition.val2Key]);
-                let diffAmount = amnt1 - amnt2;
-                switch (col.condition.operator) {
-                    case "notZero":
-                        if (diffAmount !== 0) {
-                            visibility = true;
-                        }
-                        break;
-                    default:
-                }
-                */
+               
             }
         }
         if (visibility) {
-            switch (col.actionType) {
-                case "defaultAction":
-                    actionHtml += `<a class="dropdown-item" href="${col.url}${value[col.valueKey]}">`;
-                    break;
-                case "newWindowAction":
-                    actionHtml += `<a class="dropdown-item" target="_blanc" href="${col.url}${value[col.valueKey]}">`;
-                    break;
-                case "eventAction":
-                    actionHtml += `<a class="dropdown-item" href="#"`;
-                    if (col.elementName) {
-                        actionHtml += ` name=${col.elementName}`;
-                    }
-                    actionHtml += ` data-docid=${value[col.valueKey]}`;
-                    actionHtml += ">";
-                    break;
-                case "modalSelectorEventAction":
-                    actionHtml += `<a class="dropdown-item" href="#" data-toggle="modal"`;
-                    if (col.elementName) {
-                        actionHtml += ` name=${col.elementName}`;
-                    }
-                    if (col.selectorTarget) {
-                        actionHtml += ` data-target=${col.selectorTarget}`;
-                    }
-                    if (col.selectorType) {
-                        actionHtml += ` data-selectorType=${col.selectorType}`;
-                    }
-                    actionHtml += ` data-docid=${value[col.valueKey]}`;
-                    actionHtml += ">";
-                    break;
-                default:
-            }
-            actionHtml += col.icon;
-            actionHtml += col.text;
-            actionHtml += "</a>";
+            actionHtml = createActionHtml(col, value);
         }
         return actionHtml;
     };

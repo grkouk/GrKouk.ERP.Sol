@@ -472,7 +472,18 @@
                     text:'Καρτέλλα',
                     icon: '<i class="fas fa-receipt fa-lg" style="color:slategray"></i>',
                     url: '@Url.Page("/mainentities/transactors/Kartela")?transactorId='
-                }
+                },
+                {
+                    actionType: 'eventAction',
+                    visibility: 'always',
+                    elementName: 'EditPrototype',
+                    condition: {},
+                    text: 'Edit Prototype',
+                    valueKey: 'id',
+                    dataKey:'docid',
+                    icon: '<i class="fab fa-amazon-pay fa-lg" style="color:slategray"></i>',
+                    url: ''
+                },
                 
                 
             ];
