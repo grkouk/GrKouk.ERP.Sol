@@ -656,14 +656,15 @@
                     }
                     $("#loadMe").modal("hide");
                     setTimeout(function () {
-                        console.log("Checking for open modals");
+                        //console.log("Checking for open modals");
                         var isOpen = $("#loadMe").hasClass("show");
                         if (isOpen) {
-                            console.log("There is an open Modal");
+                            //console.log("There is an open Modal");
                             $("#loadMe").modal("hide");
-                        } else {
-                            console.log("No open modal");
                         }
+                        /*else {
+                            //console.log("No open modal");
+                        }*/
                     }, 2000);
                 },
             });
