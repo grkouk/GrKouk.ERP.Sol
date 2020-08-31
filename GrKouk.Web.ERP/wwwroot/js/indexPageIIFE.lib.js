@@ -376,17 +376,31 @@
     };
     const createValueColumn = (col, value) => {
         let $tdCol = $("<td>");
+        if (col.hasOwnProperty('colType')) {
+            if (col.colType === 'imageViewer') {
+                let vrLink = '< a href = "#" role = "button" data-toggle="modal"';
+                vrLink += ` data-target="${col.imageViewer.target}"`;
+                col.imageViewer.dataAttributes.forEach(function(item) {
+                    vrLink += ` data-${item.key}="${value[item.valueKey]}"`;
+                });
+                vrLink += ">";
+                vrLink += `<img src="${value[col.key]}" style="${col.imageViewer.style}" />`;
+                vrLink += "</a>";
+                $tdCol.html(vrLink);
+                return $tdCol;
+            }
+        }
         if (col.responseKey) {
-            if (!isEmpty(col.remoteReference)) {
-                let valueKey = col.remoteReference.valueKey;
-                var remoteId = value[valueKey];
-                let remoteUrl = `${col.remoteReference.url}${remoteId}`;
-                var $aLink = `<a href="${remoteUrl}" target="_blank">${value[col.responseKey]}</a>  `;
-                //$tdCol.innerhtml ($aLink);
-                //$($aLink).appendTo($tdCol);
-                $tdCol.html($aLink);
-            } else {
-                switch (col.columnFormat) {
+                if (!isEmpty(col.remoteReference)) {
+                    let valueKey = col.remoteReference.valueKey;
+                    var remoteId = value[valueKey];
+                    let remoteUrl = `${col.remoteReference.url}${remoteId}`;
+                    var $aLink = `<a href="${remoteUrl}" target="_blank">${value[col.responseKey]}</a>  `;
+                    //$tdCol.innerhtml ($aLink);
+                    //$($aLink).appendTo($tdCol);
+                    $tdCol.html($aLink);
+                } else {
+                    switch (col.columnFormat) {
                     case "t":
                         $tdCol.text(value[col.responseKey]);
                         break;
@@ -397,11 +411,12 @@
                         $tdCol.text(currencyFormatter.format(value[col.responseKey]));
                         $tdCol.attr("data-actualValue", value[col.responseKey]);
                         break;
+
                     default:
+                    }
                 }
-            }
-        } else {
-            switch (col.columnFormat) {
+            } else {
+                switch (col.columnFormat) {
                 case "t":
                     break;
                 case "d":
@@ -410,8 +425,9 @@
                     $tdCol.attr("data-actualValue", 0);
                     break;
                 default:
+                }
             }
-        }
+        
         if (isEmpty(col.classCondition)) {
             $tdCol.addClass(col.class);
         } else {
