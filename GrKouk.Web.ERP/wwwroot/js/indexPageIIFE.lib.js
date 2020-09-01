@@ -93,14 +93,7 @@
     ];
 
     const commonHandlers = [
-        {
-            selector: "#CreateNew",
-            event: "click",
-            handler: function (event) {
-                var uri = '@Url.Page("Create")';
-                window.location.href = uri;
-            },
-        },
+       
         {
             selector: "#FiltersForm",
             event: "submit",
@@ -178,6 +171,10 @@
     ];
 
     //Support functions===============================================
+    const setupCreateNewElement = () => {
+        let el = document.getElementById("CreateNew");
+        el.href = `${window.location.href}/Create`;
+    };
     const selectAllRowsColumnHtml = () => {
         let cl = '<th name="selectAllRowsColumn"> <label class="custom-control custom-checkbox"> ';
         cl += ' <input type="checkbox" class="custom-control-input" name="checkAllRows" >';
@@ -951,6 +948,7 @@
         //#endregion
     };
     //register common handlers
+    setupCreateNewElement();
     registerHandlers(commonHandlers);
     return {
         getIndexPageDefinition: getIndexPageDefinition,
