@@ -443,35 +443,61 @@
     const createActionHtml = (col, value) => {
         let actionHtml = "";
         switch (col.actionType) {
-        case "defaultAction":
-            actionHtml += `<a class="dropdown-item" href="${col.url}${value[col.valueKey]}">`;
-            break;
-        case "newWindowAction":
-            actionHtml += `<a class="dropdown-item" target="_blanc" href="${col.url}${value[col.valueKey]}">`;
-            break;
-        case "eventAction":
-            actionHtml += `<a class="dropdown-item" href="#"`;
-            if (col.elementName) {
-                actionHtml += ` name=${col.elementName}`;
-            }
+            case "defaultAction2":
+                switch (col.uriType) {
+                    case "funcHref":
+                        let u = col.uriFunc(col, value);
+                        actionHtml += `<a class="dropdown-item" href="${u}" target="${col.target}">`;
+                        break;
+                    case "funcUrl":
+                        break;
+                    case "staticHref":
+                        var params = '';
+                        for (var i = 0; i < col.urlKeys.length - 1; i++) {
+                            if (i > 0) {
+                                params += "&";
+                            } else {
+                                params += "?";
+                            }
+                            params += `${col.urlKeys[i].key}=${col.urlKeys[i].key}`;
+                        }
+                        
+                        actionHtml += `<a class="dropdown-item" href="${col.uri}${params}" target="${col.target}">`;
+                        break;
+                    case "staticUrl":
+                        break;
+                default:
+                }
+                break;
+            case "defaultAction":
+                actionHtml += `<a class="dropdown-item" href="${col.url}${value[col.valueKey]}">`;
+                break;
+            case "newWindowAction":
+                actionHtml += `<a class="dropdown-item" target="_blanc" href="${col.url}${value[col.valueKey]}">`;
+                break;
+            case "eventAction":
+                actionHtml += `<a class="dropdown-item" href="#"`;
+                if (col.elementName) {
+                    actionHtml += ` name=${col.elementName}`;
+                }
 
-            actionHtml += ` data-${col.dataKey}=${value[col.valueKey]}`;
-            actionHtml += ">";
-            break;
-        case "modalSelectorEventAction":
-            actionHtml += `<a class="dropdown-item" href="#" data-toggle="modal"`;
-            if (col.elementName) {
-                actionHtml += ` name=${col.elementName}`;
-            }
-            if (col.selectorTarget) {
-                actionHtml += ` data-target=${col.selectorTarget}`;
-            }
-            if (col.selectorType) {
-                actionHtml += ` data-selectorType=${col.selectorType}`;
-            }
-            actionHtml += ` data-docid=${value[col.valueKey]}`;
-            actionHtml += ">";
-            break;
+                actionHtml += ` data-${col.dataKey}=${value[col.valueKey]}`;
+                actionHtml += ">";
+                break;
+            case "modalSelectorEventAction":
+                actionHtml += `<a class="dropdown-item" href="#" data-toggle="modal"`;
+                if (col.elementName) {
+                    actionHtml += ` name=${col.elementName}`;
+                }
+                if (col.selectorTarget) {
+                    actionHtml += ` data-target=${col.selectorTarget}`;
+                }
+                if (col.selectorType) {
+                    actionHtml += ` data-selectorType=${col.selectorType}`;
+                }
+                actionHtml += ` data-docid=${value[col.valueKey]}`;
+                actionHtml += ">";
+                break;
         default:
         }
         actionHtml += col.icon;
@@ -520,8 +546,6 @@
         }
         return actionHtml;
     };
-
-
     const createMobileColumnAction = (col, value) => {
         let actionHtml = "";
         let visibility = true;

@@ -223,7 +223,7 @@
             var $totalRecords = $('#totalRecords');
             var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
             //#endregion
-              //#region Index page definition objects
+            //#region Index page definition objects
             const colDefs = [
                 {
                     key: 'transDate',
@@ -242,7 +242,6 @@
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
-                        
                     }
                 },
                 {
@@ -284,7 +283,6 @@
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
-                       
                     }
                 },
                 {
@@ -304,7 +302,6 @@
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
-                       
                     }
                 },
                 {
@@ -324,7 +321,6 @@
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
-                       
                     }
                 },
                 {
@@ -344,7 +340,6 @@
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
-                       
                     }
                 },
                 {
@@ -364,7 +359,6 @@
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
-                       
                     }
                 },
                 {
@@ -384,7 +378,6 @@
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
-                       
                     }
                 }
             ];
@@ -418,7 +411,7 @@
                 {
                     actionType: 'newWindowAction',
                     valueKey: 'transactorId',
-                    text:'Καρτέλλα',
+                    text: 'Καρτέλλα',
                     icon: '<i class="fas fa-clone fa-lg" style="color:slategray"></i>',
                     url: '@Url.Page("/mainentities/transactors/Kartela")?transactorId='
                 }
@@ -469,40 +462,71 @@
                     visibility: 'always',
                     condition: {},
                     valueKey: 'transactorId',
-                    text:'Καρτέλλα',
+                    text: 'Καρτέλλα',
                     icon: '<i class="fas fa-receipt fa-lg" style="color:slategray"></i>',
                     url: '@Url.Page("/mainentities/transactors/Kartela")?transactorId='
                 },
+                
                 {
-                    actionType: 'eventAction',
+                    actionType: 'defaultAction2',
                     visibility: 'always',
-                    elementName: 'EditPrototype',
+                    target: '_blanc',
                     condition: {},
                     text: 'Edit Prototype',
-                    valueKey: 'id',
-                    dataKey:'docid',
-                    icon: '<i class="fab fa-amazon-pay fa-lg" style="color:slategray"></i>',
-                    url: ''
+
+                    dataAttributes: [
+                        {
+                            key: 'docid',
+                            valueKey: 'docid'
+                        }
+                    ],
+                    icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
+                    uriType: 'funcHref', //funcUrl staticHref, staticUrl
+                    urlKeys: [
+                        { key: 'id', valueKey: 'id' }
+                    ],
+                    uriFunc: function(col, valueSource) {
+                        let retUri = '';
+                        if (valueSource.creatorSectionId > 0 ) {
+                            switch (valueSource.creatorSectionCode) {
+                                case "SCNSELLCOMBINED":
+                                    retUri = `/transactions/sellmaterialdoc/Edit?id=${valueSource["creatorId"]}`;
+                                    break;
+                                case "SCNBUYMATTRANS":
+                                    retUri = `/transactions/buymaterialsdoc/Edit?id=${valueSource["creatorId"]}`;
+                                    break;
+                            default:
+                            }
+
+                        } else {
+                            /*
+                            var params = '';
+                            for (var i = 0; i < col.urlKeys.length - 1; i++) {
+                                if (i > 0) {
+                                    params += "&";
+                                }
+                                params += `${col.urlKeys[i].key}=${col.urlKeys[i].key}`;
+                            }
+                            */
+                            var itemId = valueSource["id"];
+                            retUri = `@Url.Page("./Edit")?id=${itemId}`;
+                        }
+                        return retUri;
+                    },
+                    uri: ''
                 },
-                
-                
             ];
             const tableHandlersToRegister = [
-               
-               
-               
             ];
             const pageHandlersToRegister = [
                 {
-                    selector:'#CurrencySelector',
-                    event:'change',
+                    selector: '#CurrencySelector',
+                    event: 'change',
                     handler: function(event) {
                         currencyChanged();
                         indPgLib.refreshData();
                     }
                 }
-               
-                
             ];
             const indexPageDef = {
                 uri: '/api/GrKoukInfoApi/GetIndexTblDataTransactorTrans',
@@ -512,14 +536,14 @@
                 actionColDefs: actionColDefs,
                 actionColSubDefs: actionColSubDefs,
                 actionMobileColDefs: actionMobileColDefs,
-                tableHandlersToRegister:tableHandlersToRegister,
-                pageHandlersToRegister:pageHandlersToRegister,
+                tableHandlersToRegister: tableHandlersToRegister,
+                pageHandlersToRegister: pageHandlersToRegister,
                 afterTableLoad: {}
             };
 
             indPgLib.setIndexPageDefinition(indexPageDef);
             //#endregion
-           
+
             var deleteSelectedRows = () => {
                 var $rowSelectors = $('input[name=checkTableRow]');
                 var selectedRows = $rowSelectors.filter(':checked');
@@ -593,7 +617,7 @@
                 }
 
             };
-           
+
             $deleteSelectedRowsLink.on('click',
                 () => {
                     deleteSelectedRows();
@@ -621,12 +645,12 @@
             indPgLib.registerPageHandlers();
             indPgLib.loadSettings('TransactorTransIndexView');
             //----------------
-           
+
             indPgLib.handleFiltersUi();
             currencyChanged();
             indPgLib.refreshData();
             indPgLib.rowSelectorsUi();
-           
+
 
         });
 
