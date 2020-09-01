@@ -414,6 +414,54 @@
                     text: 'Καρτέλλα',
                     icon: '<i class="fas fa-clone fa-lg" style="color:slategray"></i>',
                     url: '@Url.Page("/mainentities/transactors/Kartela")?transactorId='
+                },
+                {
+                    actionType: 'defaultAction2',
+                    visibility: 'always',
+                    target: '_blanc',
+                    condition: {},
+                    text: 'Edit Prototype',
+
+                    dataAttributes: [
+                        {
+                            key: 'docid',
+                            valueKey: 'docid'
+                        }
+                    ],
+                    icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
+                    uriType: 'funcHref', //funcUrl staticHref, staticUrl
+                    urlKeys: [
+                        { key: 'id', valueKey: 'id' }
+                    ],
+                    uriFunc: function(col, valueSource) {
+                        let retUri = '';
+                        if (valueSource.creatorSectionId > 0 ) {
+                            switch (valueSource.creatorSectionCode) {
+                                case "SCNSELLCOMBINED":
+                                    retUri = `/transactions/sellmaterialdoc/Edit?id=${valueSource["creatorId"]}`;
+                                    break;
+                                case "SCNBUYMATTRANS":
+                                    retUri = `/transactions/buymaterialsdoc/Edit?id=${valueSource["creatorId"]}`;
+                                    break;
+                            default:
+                            }
+
+                        } else {
+                            /*
+                            var params = '';
+                            for (var i = 0; i < col.urlKeys.length - 1; i++) {
+                                if (i > 0) {
+                                    params += "&";
+                                }
+                                params += `${col.urlKeys[i].key}=${col.urlKeys[i].key}`;
+                            }
+                            */
+                            var itemId = valueSource["id"];
+                            retUri = `@Url.Page("./Edit")?id=${itemId}`;
+                        }
+                        return retUri;
+                    },
+                    uri: ''
                 }
             ];
             const actionMobileColDefs = [
