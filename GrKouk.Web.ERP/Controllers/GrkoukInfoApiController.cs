@@ -367,6 +367,11 @@ namespace GrKouk.Web.ERP.Controllers
         public async Task<IActionResult> GetIndexTblDataBuyDocuments([FromQuery] IndexDataTableRequest request)
         {
             IQueryable<BuyDocList2Dto> fullListIq = _context.BuyDocuments
+                .Include(p=>p.BuyDocSeries)
+                .Include(p=>p.BuyDocType)
+                .Include(p=>p.Company)
+                .Include(p=>p.Section)
+                .Include(p=>p.Transactor)
                 .Select(p => new BuyDocList2Dto()
                 {
                     Id = p.Id, 
@@ -736,6 +741,11 @@ namespace GrKouk.Web.ERP.Controllers
         public async Task<IActionResult> GetIndexTblDataSellDocuments([FromQuery] IndexDataTableRequest request)
         {
             IQueryable<SellDocList2Dto> fullListIq = _context.SellDocuments
+                .Include(p => p.SellDocSeries)
+                .Include(p => p.SellDocType)
+                .Include(p => p.Company)
+                .Include(p => p.Section)
+                .Include(p => p.Transactor)
                 .Select(p => new SellDocList2Dto()
                 {
                     Id = p.Id,
@@ -859,6 +869,7 @@ namespace GrKouk.Web.ERP.Controllers
                         listItem.AmountFpa /= r.Rate;
                         listItem.AmountNet /= r.Rate;
                         listItem.AmountDiscount /= r.Rate;
+                        listItem.PayedOfAmount /= r.Rate;
                     }
                 }
 
@@ -868,9 +879,10 @@ namespace GrKouk.Web.ERP.Controllers
                         .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
                     if (r != null)
                     {
-                        listItem.AmountFpa = listItem.AmountFpa * r.Rate;
-                        listItem.AmountNet = listItem.AmountNet * r.Rate;
-                        listItem.AmountDiscount = listItem.AmountDiscount * r.Rate;
+                        listItem.AmountFpa *= r.Rate;
+                        listItem.AmountNet *= r.Rate;
+                        listItem.AmountDiscount *= r.Rate;
+                        listItem.PayedOfAmount *= r.Rate;
                     }
                 }
             }
