@@ -1056,7 +1056,7 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
-        [HttpGet("GetIndexTblDataTransactorTransOld")]
+        [HttpGet("GetIndexTblDataTransactorTransV1")]
         public async Task<IActionResult> GetIndexTblDataTransactorTrans([FromQuery] IndexDataTableRequest request)
         {
             IQueryable<TransactorTransaction> fullListIq = _context.TransactorTransactions;
