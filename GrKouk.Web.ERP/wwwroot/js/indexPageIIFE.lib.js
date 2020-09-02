@@ -173,7 +173,10 @@
     //Support functions===============================================
     const setupCreateNewElement = () => {
         let el = document.getElementById("CreateNew");
-        el.href = `${window.location.href}/Create`;
+        if (el) {
+            el.href = `${window.location.href}/Create`;    
+        }
+        
     };
     const selectAllRowsColumnHtml = () => {
         let cl = '<th name="selectAllRowsColumn"> <label class="custom-control custom-checkbox"> ';
@@ -600,7 +603,7 @@
             $("#GoToLast, #GoToNext").parent().addClass("disabled");
         }
     };
-    const getTableData = function (pgIndex, pgSize, sortData, dateRange, companyFlt, searchFlt, currencyFlt, transTypeFlt, wrItmNatureFlt) {
+    const getTableData = function (pgIndex, pgSize, sortData, dateRange, companyFlt, searchFlt, currencyFlt, transTypeFlt, wrItmNatureFlt, transactorId) {
         let uri = indexPageDefinition.uri;
         uri += `?pageIndex=${pgIndex}`;
         uri += `&pageSize=${pgSize}`;
@@ -610,6 +613,7 @@
         uri += `&searchFilter=${searchFlt}`;
         uri += `&transactorTypeFilter=${transTypeFlt}`;
         uri += `&warehouseItemNatureFilter=${wrItmNatureFlt}`;
+        uri += `&transactorId=${transactorId}`;
         uri += `&displayCurrencyId=${currencyFlt}`;
         var timeout;
         return new Promise((resolve, reject) => {
@@ -821,8 +825,12 @@
         var searchFlt = $(".search_input").val();
         var $dcId = $("#CurrencySelector");
         var transTypeFlt = '';
+        var transactorId = '';
         if (!($('#TransactorTypeFilter').val() === undefined)) {
             transTypeFlt = $('#TransactorTypeFilter').val();
+        }
+        if (!($('#TransactorId').val() === undefined)) {
+            transactorId = $('#TransactorId').val();
         }
         var wrItmNatureFlt = '';
         if (!($('#WarehouseItemNatureFilter').val() === undefined)) {
@@ -830,7 +838,7 @@
         }
         var currencyFlt = $dcId.val() == null || $dcId.val().length == 0 ? 1 : parseInt($dcId.val());
 
-        getTableData(pageIndex, pageSize, sortData, datePeriod, companyFlt, searchFlt, currencyFlt, transTypeFlt, wrItmNatureFlt)
+        getTableData(pageIndex, pageSize, sortData, datePeriod, companyFlt, searchFlt, currencyFlt, transTypeFlt, wrItmNatureFlt,transactorId)
             .then((data) => {
                 bindDataToTable(data, pageIndex);
             })
