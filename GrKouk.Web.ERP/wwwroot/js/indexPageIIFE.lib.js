@@ -408,7 +408,10 @@
                         $tdCol.text(currencyFormatter.format(value[col.responseKey]));
                         $tdCol.attr("data-actualValue", value[col.responseKey]);
                         break;
-
+                    case "n":
+                        $tdCol.text(numberFormatter.format(value[col.responseKey]));
+                        $tdCol.attr("data-actualValue", value[col.responseKey]);
+                        break;
                     default:
                 }
             }
@@ -577,6 +580,9 @@
     const setCurrencyFormatter = (formatter) => {
         currencyFormatter = formatter;
     };
+    const setNumberFormatter = (formatter) => {
+        numberFormatter = formatter;
+    };
     const handlePagingUi = (totalPages, totalRecords, pageIndex, hasPrevious, hasNext) => {
         $totalPages.val(totalPages);
         $totalRecords.val(totalRecords);
@@ -725,17 +731,28 @@
                 if (item.totalKey === "label") {
                     tdColPage = $("<td>").text("Σύνολα Σελίδας").addClass("small font-weight-bold");
                 } else {
-                    if (item.totalFormatter === "currency") {
-                        try {
-                            let fAmount = currencyFormatter.format(result[item.totalKey]);
-                            tdColPage = `<td class="${item.class} font-weight-bold"> `;
-                            tdColPage += `${fAmount} </td> `;
-                            pageSummaryCount++;
-                        } catch (e) {
-                            tdColPage = `<td class="${item.class}"> `;
-                            tdColPage += `#Err </td> `;
-                        }
+                    let tmpAmount = 0;
+                    switch (item.totalFormatter) {
+                    case "currency":
+                            tmpAmount = currencyFormatter.format(result[item.totalKey]);
+                        break;
+                    case "number":
+                            tmpAmount = numberFormatter.format(result[item.totalKey]);
+                        break;
+                    default:
+                            tmpAmount = numberFormatter.format(result[item.totalKey]);
+                        break;
                     }
+                    try {
+
+                        tdColPage = `<td class="${item.class} font-weight-bold"> `;
+                        tdColPage += `${tmpAmount} </td> `;
+                        pageSummaryCount++;
+                    } catch (e) {
+                        tdColPage = `<td class="${item.class}"> `;
+                        tdColPage += `#Err </td> `;
+                    }
+                    
                 }
             } else {
                 tdColPage = `<td class="${item.class}"> `;
@@ -745,17 +762,28 @@
                 if (item.grandTotalKey === "label") {
                     tdColTotal = $("<td>").text("Γενικό Σύνολο").addClass("small font-weight-bold");
                 } else {
-                    if (item.totalFormatter === "currency") {
-                        try {
-                            let fAmount = currencyFormatter.format(result[item.grandTotalKey]);
-                            tdColTotal = `<td class="${item.class} font-weight-bold"> `;
-                            tdColTotal += `${fAmount} </td> `;
-                            totalSummaryCount++;
-                        } catch (e) {
-                            tdColTotal = `<td class="${item.class}"> `;
-                            tdColTotal += `#Err </td> `;
-                        }
+                    let tmpAmount = 0;
+                    switch (item.totalFormatter) {
+                    case "currency":
+                            tmpAmount = currencyFormatter.format(result[item.grandTotalKey]);
+                        break;
+                    case "number":
+                            tmpAmount = numberFormatter.format(result[item.grandTotalKey]);
+                        break;
+                    default:
+                            tmpAmount = numberFormatter.format(result[item.grandTotalKey]);
+                        break;
                     }
+                    try {
+
+                        tdColTotal = `<td class="${item.class} font-weight-bold"> `;
+                        tdColTotal += `${tmpAmount} </td> `;
+                        totalSummaryCount++;
+                    } catch (e) {
+                        tdColTotal = `<td class="${item.class}"> `;
+                        tdColTotal += `#Err </td> `;
+                    }
+                   
                 }
             } else {
                 tdColTotal = `<td class="${item.class}"> `;
@@ -964,6 +992,7 @@
         registerPageHandlers: registerPageHandlers,
         handleFiltersUi: handleFiltersUi,
         setCurrencyFormatter: setCurrencyFormatter,
+        setNumberFormatter: setNumberFormatter,
         loadSettings: loadSettings,
         saveSettings: saveSettings,
     };
