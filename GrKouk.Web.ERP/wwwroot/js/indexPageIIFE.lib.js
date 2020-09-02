@@ -825,7 +825,7 @@
         var searchFlt = $(".search_input").val();
         var $dcId = $("#CurrencySelector");
         var transTypeFlt = '';
-        var transactorId = '';
+        var transactorId = 0;
         if (!($('#TransactorTypeFilter').val() === undefined)) {
             transTypeFlt = $('#TransactorTypeFilter').val();
         }

@@ -84,47 +84,47 @@
             </div>
         </div>
     </form>
-<div class="row mt-1">
-    <div class="col-5">
-        <label class="small text-left" name="PagingInfo"> </label>
-    </div>
-    <div class="col-7">
-        <nav aria-label="Page navigation example">
-            <ul class="pagination pagination-sm justify-content-end">
-                <li class="page-item ">
-                    <a href="#" id="GoToFirst" data-pageraction="GoToFirst" 
-                       class="page-link" aria-label="First">
-                        @*<span aria-hidden="true">;</span>*@
-                        First
-                    </a>
-                </li>
-                <li class="page-item ">
-                    <a href="#" id="GoToPrevious" data-pageraction="GoToPrevious"
-                       class="page-link" aria-label="Previous">
-                        @*<span aria-hidden="true">&laquo;</span>*@
-                        Previous
-                    </a>
-                </li>
+    <div class="row mt-1">
+        <div class="col-5">
+            <label class="small text-left" name="PagingInfo"> </label>
+        </div>
+        <div class="col-7">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination pagination-sm justify-content-end">
+                    <li class="page-item ">
+                        <a href="#" id="GoToFirst" data-pageraction="GoToFirst" 
+                           class="page-link" aria-label="First">
+                            @*<span aria-hidden="true">;</span>*@
+                            First
+                        </a>
+                    </li>
+                    <li class="page-item ">
+                        <a href="#" id="GoToPrevious" data-pageraction="GoToPrevious"
+                           class="page-link" aria-label="Previous">
+                            @*<span aria-hidden="true">&laquo;</span>*@
+                            Previous
+                        </a>
+                    </li>
 
-                <li class="page-item ">
-                    <a href="#" id="GoToNext" data-pageraction="GoToNext"
-                       class="page-link" aria-label="Next">
-                        @*<span aria-hidden="true">&raquo;</span>*@
-                        Next
-                    </a>
-                </li>
-                <li class="page-item  ">
-                    <a href="#" id="GoToLast" data-pageraction="GoToLast"
-                       class="page-link" aria-label="Last">
-                        @*<span aria-hidden="true">;</span>*@
-                        Last
-                    </a>
-                </li>
-            </ul>
-        </nav>
+                    <li class="page-item ">
+                        <a href="#" id="GoToNext" data-pageraction="GoToNext"
+                           class="page-link" aria-label="Next">
+                            @*<span aria-hidden="true">&raquo;</span>*@
+                            Next
+                        </a>
+                    </li>
+                    <li class="page-item  ">
+                        <a href="#" id="GoToLast" data-pageraction="GoToLast"
+                           class="page-link" aria-label="Last">
+                            @*<span aria-hidden="true">;</span>*@
+                            Last
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </div>
 </div>
-
 <table class="table table-bordered table-sm" id="myTable">
     <thead class="thead-light">
        
@@ -208,7 +208,7 @@
             var $pageIndex = $('#pageIndex');
             var $pageSize = $('#PageSize');
             var $totalPages = $('#totalPages');
-              var $totalRecords = $('#totalRecords');
+            var $totalRecords = $('#totalRecords');
             var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
             //#endregion
              //#region Index page definition objects
@@ -385,10 +385,6 @@
 
             indPgLib.setIndexPageDefinition(indexPageDef);
             //#endregion
-          
-
-          
-          
             var currencyChanged = () => {
                 let curCurrencySelected = parseInt($('#CurrencySelector').val());
                 var currencyCode;
