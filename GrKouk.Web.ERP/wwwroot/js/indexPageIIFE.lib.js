@@ -443,14 +443,28 @@
 
         return $tdCol;
     };
-    const createActionHtml = (col, value) => {
+    const createActionHtml = (col, value,actionSection) => {
         let actionHtml = "";
+        let classText="";
+        if (actionSection!==undefined){
+            switch (actionSection) {
+                case "sectionActions":
+                    classText=`class="mr-1"`;
+                    break;
+                case "sectionSubActions":
+                    classText=`class="dropdown-item"`;
+                    break
+                default:
+                    classText="";
+    
+            }
+        }
         switch (col.actionType) {
             case "defaultAction2":
                 switch (col.uriType) {
                     case "funcHref":
                         let u = col.uriFunc(col, value);
-                        actionHtml += `<a class="dropdown-item" href="${u}" target="${col.target}">`;
+                        actionHtml += `<a ${classText} href="${u}" target="${col.target}">`;
                         break;
                     case "funcUrl":
                         break;
@@ -465,7 +479,7 @@
                             params += `${col.urlKeys[i].key}=${col.urlKeys[i].key}`;
                         }
                         
-                        actionHtml += `<a class="dropdown-item" href="${col.uri}${params}" target="${col.target}">`;
+                        actionHtml += `<a ${classText} href="${col.uri}${params}" target="${col.target}">`;
                         break;
                     case "staticUrl":
                         break;
@@ -473,13 +487,13 @@
                 }
                 break;
             case "defaultAction":
-                actionHtml += `<a class="dropdown-item" href="${col.url}${value[col.valueKey]}">`;
+                actionHtml += `<a ${classText} href="${col.url}${value[col.valueKey]}">`;
                 break;
             case "newWindowAction":
-                actionHtml += `<a class="dropdown-item" target="_blanc" href="${col.url}${value[col.valueKey]}">`;
+                actionHtml += `<a ${classText} target="_blanc" href="${col.url}${value[col.valueKey]}">`;
                 break;
             case "eventAction":
-                actionHtml += `<a class="dropdown-item" href="#"`;
+                actionHtml += `<a ${classText} href="#"`;
                 if (col.elementName) {
                     actionHtml += ` name=${col.elementName}`;
                 }
@@ -488,7 +502,7 @@
                 actionHtml += ">";
                 break;
             case "modalSelectorEventAction":
-                actionHtml += `<a class="dropdown-item" href="#" data-toggle="modal"`;
+                actionHtml += `<a ${classText} href="#" data-toggle="modal"`;
                 if (col.elementName) {
                     actionHtml += ` name=${col.elementName}`;
                 }
@@ -503,13 +517,22 @@
                 break;
         default:
         }
-        actionHtml += col.icon;
-        actionHtml += col.text;
+        if (!(col.icon===undefined)){
+            actionHtml += col.icon;    
+        }
+        if (!(col.text===undefined)) {
+            if (actionSection!==undefined){
+                if (actionSection==="sectionSubActions"){
+                    actionHtml += col.text;
+                }
+            }
+            
+        }
         actionHtml += "</a>";
         return actionHtml;
     };
     const createColumnAction = (col, value) => {
-        let actionHtml = "";
+        /*
         switch (col.actionType) {
             case "defaultAction2":
                 switch (col.uriType) {
@@ -536,6 +559,8 @@
                         break;
                     default:
                 }
+                actionHtml += col.icon;
+                actionHtml += "</a> |";
                 break;
             case "defaultAction":
                 actionHtml += `<a href="${col.url}${value[col.valueKey]}">`;
@@ -556,7 +581,9 @@
                 break;
             default:
         }
-        return actionHtml;
+        */
+        return createActionHtml(col, value, "sectionActions");
+         
     };
     const createColumnSubAction = (col, value) => {
         let actionHtml = '';
@@ -571,7 +598,7 @@
             }
         }
         if (visibility) {
-            actionHtml = createActionHtml(col,value);
+            actionHtml = createActionHtml(col,value,"sectionSubActions");
         }
         return actionHtml;
     };

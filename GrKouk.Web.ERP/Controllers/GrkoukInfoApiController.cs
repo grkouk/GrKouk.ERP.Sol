@@ -3944,6 +3944,7 @@ namespace GrKouk.Web.ERP.Controllers
 
                 listWithTotal.Add(new KartelaLine
                 {
+                    Id = dbTransaction.Id,
                     TransDate = dbTransaction.TransDate,
                     DocSeriesCode = dbTransaction.TransTransactorDocSeriesCode,
                     RefCode = dbTransaction.TransRefCode,
