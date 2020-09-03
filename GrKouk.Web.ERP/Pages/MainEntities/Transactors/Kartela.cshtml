@@ -195,20 +195,7 @@
 
                 });
             //#region variables
-            var $filtersVisible = $('#filtersVisible');
-            var $filterCollapse = $('#filterCollapse');
-            var $checkAllRows = $('input[name=checkAllRows]');
-            var $filtersToggle = $('#filtersToggle');
-            var $rowSelectorsToggle = $('#rowSelectorsToggle');
-            var $rowSelectorsVisible = $('#rowSelectorsVisible');
-            var $selectAllSelector = $('th[name=selectAllRowsColumn]');
-            var $selectedRowsActionsMenu = $('#SelectedRowsActionsMenu');
-            var $selectedRowsActionsLink = $('#ddSelectedRowsActions');
-            var $deleteSelectedRowsLink = $('#deleteSelectedRows');
-            var $pageIndex = $('#pageIndex');
-            var $pageSize = $('#PageSize');
-            var $totalPages = $('#totalPages');
-            var $totalRecords = $('#totalRecords');
+           
             var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
             //#endregion
              //#region Index page definition objects
@@ -348,13 +335,91 @@
                 }
             ];
             const actionColDefs = [
-               
+               {
+                   actionType: 'defaultAction2',
+                   visibility: 'always',
+                   target: '_blanc',
+                   condition: {},
+                   text: 'Edit Prototype',
+
+                   dataAttributes: [
+                       {
+                           key: 'docid',
+                           valueKey: 'docid'
+                       }
+                   ],
+                   icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
+                   uriType: 'funcHref', //funcUrl staticHref, staticUrl
+                   urlKeys: [
+                       { key: 'id', valueKey: 'id' }
+                   ],
+                   uriFunc: function(col, valueSource) {
+                       let retUri = '';
+                       if (valueSource.creatorSectionId > 0 ) {
+                           switch (valueSource.creatorSectionCode) {
+                               case "SCNSELLCOMBINED":
+                                   retUri = `/transactions/sellmaterialdoc/Edit?id=${valueSource["creatorId"]}`;
+                                   break;
+                               case "SCNBUYMATTRANS":
+                                   retUri = `/transactions/buymaterialsdoc/Edit?id=${valueSource["creatorId"]}`;
+                                   break;
+                           default:
+                           }
+
+                       } else {
+                          
+                           var itemId = valueSource["id"];
+                           retUri = `@Url.Page("~/transaction/transactortransmng/Edit")?id=${itemId}`;
+                       }
+                       return retUri;
+                   },
+                   uri: ''
+               }
             ];
             const actionColSubDefs = [
                
             ];
             const actionMobileColDefs = [
-               
+               {
+                   actionType: 'defaultAction2',
+                   visibility: 'always',
+                   target: '_blanc',
+                   condition: {},
+                   text: 'Edit Prototype',
+
+                   dataAttributes: [
+                       {
+                           key: 'docid',
+                           valueKey: 'docid'
+                       }
+                   ],
+                   icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
+                   uriType: 'funcHref', //funcUrl staticHref, staticUrl
+                   urlKeys: [
+                       { key: 'id', valueKey: 'id' }
+                   ],
+                   uriFunc: function(col, valueSource) {
+                       let retUri = '';
+                       if (valueSource.creatorSectionId > 0 ) {
+                           switch (valueSource.creatorSectionCode) {
+                               case "SCNSELLCOMBINED":
+                                   retUri = `/transactions/sellmaterialdoc/Edit?id=${valueSource["creatorId"]}`;
+                                   break;
+                               case "SCNBUYMATTRANS":
+                                   retUri = `/transactions/buymaterialsdoc/Edit?id=${valueSource["creatorId"]}`;
+                                   break;
+                           default:
+                           }
+
+                       } else {
+                          
+                           var itemId = valueSource["id"];
+                           retUri = `@Url.Page("./Edit")?id=${itemId}`;
+                       }
+                       return retUri;
+                   },
+                   uri: ''
+               }
             ];
             const tableHandlersToRegister = [
                 
