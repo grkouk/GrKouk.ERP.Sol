@@ -354,24 +354,24 @@
                        { key: 'id', valueKey: 'id' }
                    ],
                    uriFunc: function(col, valueSource) {
-                       let retUri = '';
-                       if (valueSource.creatorSectionId > 0 ) {
-                           switch (valueSource.creatorSectionCode) {
-                               case "SCNSELLCOMBINED":
-                                   retUri = `/transactions/sellmaterialdoc/Edit?id=${valueSource["creatorId"]}`;
-                                   break;
-                               case "SCNBUYMATTRANS":
-                                   retUri = `/transactions/buymaterialsdoc/Edit?id=${valueSource["creatorId"]}`;
-                                   break;
-                           default:
-                           }
+                      let retUri = '';
+                     if (valueSource.creatorSectionId > 0 ) {
+                         switch (valueSource.creatorSectionCode) {
+                             case "SCNSELLCOMBINED":
+                                 retUri = `/transactions/sellmaterialdoc/Edit?id=${valueSource["creatorId"]}`;
+                                 break;
+                             case "SCNBUYMATTRANS":
+                                 retUri = `/transactions/buymaterialsdoc/Edit?id=${valueSource["creatorId"]}`;
+                                 break;
+                         default:
+                         }
 
-                       } else {
-                          
-                           var itemId = valueSource["id"];
-                           retUri = `@Url.Page("~/transaction/transactortransmng/Edit")?id=${itemId}`;
-                       }
-                       return retUri;
+                     } else {
+                        
+                         var itemId = valueSource["id"];
+                         retUri = `./Edit?id=${itemId}`;
+                     }
+                     return retUri;
                    },
                    uri: ''
                }
@@ -414,7 +414,7 @@
                        } else {
                           
                            var itemId = valueSource["id"];
-                           retUri = `@Url.Page("./Edit")?id=${itemId}`;
+                           retUri = `./Edit?id=${itemId}`;
                        }
                        return retUri;
                    },

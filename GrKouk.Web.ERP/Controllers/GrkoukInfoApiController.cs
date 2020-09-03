@@ -3774,6 +3774,8 @@ namespace GrKouk.Web.ERP.Controllers
                 SectionId = p.SectionId,
                 SectionCode = p.SectionCode,
                 CreatorId = p.CreatorId,
+                CreatorSectionId = p.CreatorSectionId,
+                CreatorSectionCode = "",
                 FiscalPeriodId = p.FiscalPeriodId,
                 FinancialAction = p.FinancialAction,
                 FpaRate = p.FpaRate,
@@ -3824,6 +3826,14 @@ namespace GrKouk.Web.ERP.Controllers
                         listItem.TransFpaAmount = listItem.TransFpaAmount * r.Rate;
                         listItem.TransNetAmount = listItem.TransNetAmount * r.Rate;
                         listItem.TransDiscountAmount = listItem.TransDiscountAmount * r.Rate;
+                    }
+                }
+                if (listItem.CreatorSectionId>=0)
+                {
+                    var creatorSection = await _context.Sections.FindAsync(listItem.CreatorSectionId);
+                    if (creatorSection!=null)
+                    {
+                        listItem.CreatorSectionCode = creatorSection.Code;
                     }
                 }
             }
@@ -3939,9 +3949,9 @@ namespace GrKouk.Web.ERP.Controllers
                     RefCode = dbTransaction.TransRefCode,
                     CompanyCode = dbTransaction.CompanyCode,
                     SectionCode = dbTransaction.SectionCode,
-                    CreatorId = dbTransaction.SectionCode == "SCNTRANSACTORTRANS"
-                        ? dbTransaction.Id
-                        : dbTransaction.CreatorId,
+                    CreatorId =  dbTransaction.CreatorId,
+                    CreatorSectionId = dbTransaction.CreatorSectionId,
+                    CreatorSectionCode = dbTransaction.CreatorSectionCode,
                     RunningTotal = runningTotal,
                     TransactorName = dbTransaction.TransactorName,
                     Debit = dbTransaction.DebitAmount,
