@@ -30,7 +30,8 @@ namespace GrKouk.Erp.Dtos.TransactorTransactions
         [Display(Name = "Section")]
         public string SectionCode { get; set; }
         public int CreatorId { get; set; }
-
+        public int CreatorSectionId { get; set; }
+        public string CreatorSectionCode { get; set; }
         public int FiscalPeriodId { get; set; }
 
         public FinActionsEnum FinancialAction { get; set; }

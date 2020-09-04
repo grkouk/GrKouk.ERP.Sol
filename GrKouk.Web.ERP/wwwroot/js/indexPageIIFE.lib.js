@@ -19,7 +19,7 @@
     const $filterCollapse = $("#filterCollapse");
     const $selectedRowsActionsLink = $("#ddSelectedRowsActions");
     const $filtersToggle = $('#filtersToggle');
-    
+
     const commonTableHandlers = [
         {
             selector: "input[name=checkAllRows]",
@@ -89,18 +89,11 @@
                 setTableCurrentSort(newSortVal);
                 refreshTableData();
             },
-         }
+        }
     ];
 
     const commonHandlers = [
-        {
-            selector: "#CreateNew",
-            event: "click",
-            handler: function (event) {
-                var uri = '@Url.Page("Create")';
-                window.location.href = uri;
-            },
-        },
+       
         {
             selector: "#FiltersForm",
             event: "submit",
@@ -178,6 +171,13 @@
     ];
 
     //Support functions===============================================
+    const setupCreateNewElement = () => {
+        let el = document.getElementById("CreateNew");
+        if (el) {
+            el.href = `${window.location.href}/Create`;    
+        }
+        
+    };
     const selectAllRowsColumnHtml = () => {
         let cl = '<th name="selectAllRowsColumn"> <label class="custom-control custom-checkbox"> ';
         cl += ' <input type="checkbox" class="custom-control-input" name="checkAllRows" >';
@@ -297,6 +297,42 @@
         return Object.keys(inputObject).length === 0;
     };
     //================================================================
+    const getConditionValue = (itemType, itemValue, valueSource) => {
+        let returnValue = '';
+
+        switch (itemType) {
+            case 'key':
+                returnValue = valueSource[itemValue];
+                break;
+            case 'func':
+                returnValue = itemValue(valueSource);
+                break;
+            default:
+        }
+        return returnValue;
+    };
+    const evaluateCondition = (cond, valueSource) => {
+        let evaluationResult = true;
+        let val1 = getConditionValue(cond.val1Type, cond.val1Value, valueSource);
+        let val2 = getConditionValue(cond.val2Type, cond.val2Value, valueSource);
+        if (cond.operator === 'notZeroDiff') {
+            let diffAmount = parseFloat(val1) - parseFloat(val2);
+            if (diffAmount !== 0) {
+                evaluationResult = true;
+            } else {
+                evaluationResult = false;
+            }
+        }
+        if (cond.operator === 'isGraterThan') {
+            if (val1 > val2) {
+                evaluationResult = true;
+            } else {
+                evaluationResult = false;
+            }
+
+        }
+        return evaluationResult;
+    };
     const registerHandlers = (handlerDefinitions) => {
         handlerDefinitions.forEach(function (item) {
             $(item.selector).on(item.event, item.handler);
@@ -340,6 +376,20 @@
     };
     const createValueColumn = (col, value) => {
         let $tdCol = $("<td>");
+        if (col.hasOwnProperty('colType')) {
+            if (col.colType === 'imageViewer') {
+                let vrLink = '<a href = "#" role = "button" data-toggle="modal"';
+                vrLink += ` data-target="${col.imageViewer.target}"`;
+                col.imageViewer.dataAttributes.forEach(function (item) {
+                    vrLink += ` data-${item.key}="${value[item.valueKey]}"`;
+                });
+                vrLink += ">";
+                vrLink += `<img src="${value[col.key]}" style="${col.imageViewer.style}" />`;
+                vrLink += "</a>";
+                $tdCol.html(vrLink);
+                return $tdCol;
+            }
+        }
         if (col.responseKey) {
             if (!isEmpty(col.remoteReference)) {
                 let valueKey = col.remoteReference.valueKey;
@@ -361,6 +411,10 @@
                         $tdCol.text(currencyFormatter.format(value[col.responseKey]));
                         $tdCol.attr("data-actualValue", value[col.responseKey]);
                         break;
+                    case "n":
+                        $tdCol.text(numberFormatter.format(value[col.responseKey]));
+                        $tdCol.attr("data-actualValue", value[col.responseKey]);
+                        break;
                     default:
                 }
             }
@@ -376,76 +430,176 @@
                 default:
             }
         }
-        $tdCol.addClass(col.class);
+
+        if (isEmpty(col.classCondition)) {
+            $tdCol.addClass(col.class);
+        } else {
+            if (evaluateCondition(col.classCondition, value)) {
+                $tdCol.addClass(col.classWhenCondition);
+            } else {
+                $tdCol.addClass(col.class);
+            }
+        }
+
         return $tdCol;
     };
-    const createColumnAction = (col, value) => {
+    const createActionHtml = (col, value,actionSection) => {
         let actionHtml = "";
+        let classText="";
+        debugger
+        if (actionSection!==undefined){
+            switch (actionSection) {
+                case "sectionActions":
+                    classText=`class="mr-1"`;
+                    break;
+                case "sectionSubActions":
+                    classText=`class="dropdown-item"`;
+                    break
+                default:
+                    classText="";
+    
+            }
+        }
         switch (col.actionType) {
+            case "defaultAction2":
+                switch (col.uriType) {
+                    case "funcHref":
+                        let u = col.uriFunc(col, value);
+                        actionHtml += `<a ${classText} href="${u}" target="${col.target}">`;
+                        break;
+                    case "funcUrl":
+                        break;
+                    case "staticHref":
+                        var params = '';
+                        for (var i = 0; i < col.urlKeys.length - 1; i++) {
+                            if (i > 0) {
+                                params += "&";
+                            } else {
+                                params += "?";
+                            }
+                            params += `${col.urlKeys[i].key}=${col.urlKeys[i].key}`;
+                        }
+                        
+                        actionHtml += `<a ${classText} href="${col.uri}${params}" target="${col.target}">`;
+                        break;
+                    case "staticUrl":
+                        break;
+                default:
+                }
+                break;
+            case "defaultAction":
+                actionHtml += `<a ${classText} href="${col.url}${value[col.valueKey]}">`;
+                break;
+            case "newWindowAction":
+                actionHtml += `<a ${classText} target="_blanc" href="${col.url}${value[col.valueKey]}">`;
+                break;
+            case "eventAction":
+                actionHtml += `<a ${classText} href="#"`;
+                if (col.elementName) {
+                    actionHtml += ` name=${col.elementName}`;
+                }
+
+                actionHtml += ` data-${col.dataKey}=${value[col.valueKey]}`;
+                actionHtml += ">";
+                break;
+            case "modalSelectorEventAction":
+                actionHtml += `<a ${classText} href="#" data-toggle="modal"`;
+                if (col.elementName) {
+                    actionHtml += ` name=${col.elementName}`;
+                }
+                if (col.selectorTarget) {
+                    actionHtml += ` data-target=${col.selectorTarget}`;
+                }
+                if (col.selectorType) {
+                    actionHtml += ` data-selectorType=${col.selectorType}`;
+                }
+                actionHtml += ` data-docid=${value[col.valueKey]}`;
+                actionHtml += ">";
+                break;
+        default:
+        }
+        if (!(col.icon===undefined)){
+            actionHtml += col.icon;    
+        }
+        if (!(col.text===undefined)) {
+            if (actionSection!==undefined){
+                if (actionSection==="sectionSubActions"){
+                    actionHtml += col.text;
+                }
+            }
+            
+        }
+        actionHtml += "</a>";
+        return actionHtml;
+    };
+    const createColumnAction = (col, value) => {
+        /*
+        switch (col.actionType) {
+            case "defaultAction2":
+                switch (col.uriType) {
+                    case "funcHref":
+                        let u = col.uriFunc(col, value);
+                        actionHtml += `<a href="${u}" target="${col.target}">`;
+                        break;
+                    case "funcUrl":
+                        break;
+                    case "staticHref":
+                        var params = '';
+                        for (var i = 0; i < col.urlKeys.length - 1; i++) {
+                            if (i > 0) {
+                                params += "&";
+                            } else {
+                                params += "?";
+                            }
+                            params += `${col.urlKeys[i].key}=${col.urlKeys[i].key}`;
+                        }
+
+                        actionHtml += `<a href="${col.uri}${params}" target="${col.target}">`;
+                        break;
+                    case "staticUrl":
+                        break;
+                    default:
+                }
+                actionHtml += col.icon;
+                actionHtml += "</a> |";
+                break;
             case "defaultAction":
                 actionHtml += `<a href="${col.url}${value[col.valueKey]}">`;
                 actionHtml += col.icon;
                 actionHtml += "</a> |";
                 break;
-
+            case "eventAction":
+                actionHtml += `<a  href="#"`;
+                if (col.elementName) {
+                    actionHtml += ` name=${col.elementName}`;
+                }
+                actionHtml += ` data-${col.dataKey}=${value[col.valueKey]}`;
+                //actionHtml += ` data-docid=${value[col.valueKey]}`;
+                //actionHtml += ` data-itemid=${value[col.valueKey]}`;
+                actionHtml += ">";
+                actionHtml += col.icon;
+                actionHtml += "</a> |";
+                break;
             default:
         }
-        return actionHtml;
+        */
+        return createActionHtml(col, value, "sectionActions");
+         
     };
     const createColumnSubAction = (col, value) => {
-        let actionHtml = "";
+        let actionHtml = '';
         let visibility = true;
         if (col.visibility === "condition") {
             visibility = false;
             if (!isEmpty(col.condition)) {
-                let amnt1 = parseFloat(value[col.condition.val1Key]);
-                let amnt2 = parseFloat(value[col.condition.val2Key]);
-                let diffAmount = amnt1 - amnt2;
-                switch (col.condition.operator) {
-                    case "notZero":
-                        if (diffAmount !== 0) {
-                            visibility = true;
-                        }
-                        break;
-                    default:
+                if (evaluateCondition(col.condition, value)) {
+                    visibility = true;
                 }
+
             }
         }
         if (visibility) {
-            switch (col.actionType) {
-                case "defaultAction":
-                    actionHtml += `<a class="dropdown-item" href="${col.url}${value[col.valueKey]}">`;
-                    break;
-                case "newWindowAction":
-                    actionHtml += `<a class="dropdown-item" target="_blanc" href="${col.url}${value[col.valueKey]}">`;
-                    break;
-                case "eventAction":
-                    actionHtml += `<a class="dropdown-item" href="#"`;
-                    if (col.elementName) {
-                        actionHtml += ` name=${col.elementName}`;
-                    }
-                    actionHtml += ` data-docid=${value[col.valueKey]}`;
-                    actionHtml += ">";
-                    break;
-                case "modalSelectorEventAction":
-                    actionHtml += `<a class="dropdown-item" href="#" data-toggle="modal"`;
-                    if (col.elementName) {
-                        actionHtml += ` name=${col.elementName}`;
-                    }
-                    if (col.selectorTarget) {
-                        actionHtml += ` data-target=${col.selectorTarget}`;
-                    }
-                    if (col.selectorType) {
-                        actionHtml += ` data-selectorType=${col.selectorType}`;
-                    }
-                    actionHtml += ` data-docid=${value[col.valueKey]}`;
-                    actionHtml += ">";
-                    break;
-                default:
-            }
-            actionHtml += col.icon;
-            actionHtml += col.text;
-            actionHtml += "</a>";
+            actionHtml = createActionHtml(col,value,"sectionSubActions");
         }
         return actionHtml;
     };
@@ -455,54 +609,14 @@
         if (col.visibility === "condition") {
             visibility = false;
             if (!isEmpty(col.condition)) {
-                let amnt1 = parseFloat(value[col.condition.val1Key]);
-                let amnt2 = parseFloat(value[col.condition.val2Key]);
-                let diffAmount = amnt1 - amnt2;
-                switch (col.condition.operator) {
-                    case "notZero":
-                        if (diffAmount !== 0) {
-                            visibility = true;
-                        }
-                        break;
-                    default:
+                if (evaluateCondition(col.condition, value)) {
+                    visibility = true;
                 }
+               
             }
         }
         if (visibility) {
-            switch (col.actionType) {
-                case "defaultAction":
-                    actionHtml += `<a class="dropdown-item" href="${col.url}${value[col.valueKey]}">`;
-                    break;
-                case "newWindowAction":
-                    actionHtml += `<a class="dropdown-item" target="_blanc" href="${col.url}${value[col.valueKey]}">`;
-                    break;
-                case "eventAction":
-                    actionHtml += `<a class="dropdown-item" href="#"`;
-                    if (col.elementName) {
-                        actionHtml += ` name=${col.elementName}`;
-                    }
-                    actionHtml += ` data-docid=${value[col.valueKey]}`;
-                    actionHtml += ">";
-                    break;
-                case "modalSelectorEventAction":
-                    actionHtml += `<a class="dropdown-item" href="#" data-toggle="modal"`;
-                    if (col.elementName) {
-                        actionHtml += ` name=${col.elementName}`;
-                    }
-                    if (col.selectorTarget) {
-                        actionHtml += ` data-target=${col.selectorTarget}`;
-                    }
-                    if (col.selectorType) {
-                        actionHtml += ` data-selectorType=${col.selectorType}`;
-                    }
-                    actionHtml += ` data-docid=${value[col.valueKey]}`;
-                    actionHtml += ">";
-                    break;
-                default:
-            }
-            actionHtml += col.icon;
-            actionHtml += col.text;
-            actionHtml += "</a>";
+            actionHtml = createActionHtml(col, value);
         }
         return actionHtml;
     };
@@ -523,6 +637,9 @@
     const setCurrencyFormatter = (formatter) => {
         currencyFormatter = formatter;
     };
+    const setNumberFormatter = (formatter) => {
+        numberFormatter = formatter;
+    };
     const handlePagingUi = (totalPages, totalRecords, pageIndex, hasPrevious, hasNext) => {
         $totalPages.val(totalPages);
         $totalRecords.val(totalRecords);
@@ -540,7 +657,7 @@
             $("#GoToLast, #GoToNext").parent().addClass("disabled");
         }
     };
-    const getTableData = function (pgIndex, pgSize, sortData, dateRange, companyFlt, searchFlt, currencyFlt) {
+    const getTableData = function (pgIndex, pgSize, sortData, dateRange, companyFlt, searchFlt, currencyFlt, transTypeFlt, wrItmNatureFlt, transactorId) {
         let uri = indexPageDefinition.uri;
         uri += `?pageIndex=${pgIndex}`;
         uri += `&pageSize=${pgSize}`;
@@ -548,6 +665,9 @@
         uri += `&dateRange=${dateRange}`;
         uri += `&sortData=${sortData}`;
         uri += `&searchFilter=${searchFlt}`;
+        uri += `&transactorTypeFilter=${transTypeFlt}`;
+        uri += `&warehouseItemNatureFilter=${wrItmNatureFlt}`;
+        uri += `&transactorId=${transactorId}`;
         uri += `&displayCurrencyId=${currencyFlt}`;
         var timeout;
         return new Promise((resolve, reject) => {
@@ -581,14 +701,15 @@
                     }
                     $("#loadMe").modal("hide");
                     setTimeout(function () {
-                        console.log("Checking for open modals");
+                        //console.log("Checking for open modals");
                         var isOpen = $("#loadMe").hasClass("show");
                         if (isOpen) {
-                            console.log("There is an open Modal");
+                            //console.log("There is an open Modal");
                             $("#loadMe").modal("hide");
-                        } else {
-                            console.log("No open modal");
                         }
+                        /*else {
+                            //console.log("No open modal");
+                        }*/
                     }, 2000);
                 },
             });
@@ -668,17 +789,28 @@
                 if (item.totalKey === "label") {
                     tdColPage = $("<td>").text("Σύνολα Σελίδας").addClass("small font-weight-bold");
                 } else {
-                    if (item.totalFormatter === "currency") {
-                        try {
-                            let fAmount = currencyFormatter.format(result[item.totalKey]);
-                            tdColPage = `<td class="${item.class} font-weight-bold"> `;
-                            tdColPage += `${fAmount} </td> `;
-                            pageSummaryCount++;
-                        } catch (e) {
-                            tdColPage = `<td class="${item.class}"> `;
-                            tdColPage += `#Err </td> `;
-                        }
+                    let tmpAmount = 0;
+                    switch (item.totalFormatter) {
+                    case "currency":
+                            tmpAmount = currencyFormatter.format(result[item.totalKey]);
+                        break;
+                    case "number":
+                            tmpAmount = numberFormatter.format(result[item.totalKey]);
+                        break;
+                    default:
+                            tmpAmount = numberFormatter.format(result[item.totalKey]);
+                        break;
                     }
+                    try {
+
+                        tdColPage = `<td class="${item.class} font-weight-bold"> `;
+                        tdColPage += `${tmpAmount} </td> `;
+                        pageSummaryCount++;
+                    } catch (e) {
+                        tdColPage = `<td class="${item.class}"> `;
+                        tdColPage += `#Err </td> `;
+                    }
+                    
                 }
             } else {
                 tdColPage = `<td class="${item.class}"> `;
@@ -688,17 +820,28 @@
                 if (item.grandTotalKey === "label") {
                     tdColTotal = $("<td>").text("Γενικό Σύνολο").addClass("small font-weight-bold");
                 } else {
-                    if (item.totalFormatter === "currency") {
-                        try {
-                            let fAmount = currencyFormatter.format(result[item.grandTotalKey]);
-                            tdColTotal = `<td class="${item.class} font-weight-bold"> `;
-                            tdColTotal += `${fAmount} </td> `;
-                            totalSummaryCount++;
-                        } catch (e) {
-                            tdColTotal = `<td class="${item.class}"> `;
-                            tdColTotal += `#Err </td> `;
-                        }
+                    let tmpAmount = 0;
+                    switch (item.totalFormatter) {
+                    case "currency":
+                            tmpAmount = currencyFormatter.format(result[item.grandTotalKey]);
+                        break;
+                    case "number":
+                            tmpAmount = numberFormatter.format(result[item.grandTotalKey]);
+                        break;
+                    default:
+                            tmpAmount = numberFormatter.format(result[item.grandTotalKey]);
+                        break;
                     }
+                    try {
+
+                        tdColTotal = `<td class="${item.class} font-weight-bold"> `;
+                        tdColTotal += `${tmpAmount} </td> `;
+                        totalSummaryCount++;
+                    } catch (e) {
+                        tdColTotal = `<td class="${item.class}"> `;
+                        tdColTotal += `#Err </td> `;
+                    }
+                   
                 }
             } else {
                 tdColTotal = `<td class="${item.class}"> `;
@@ -714,6 +857,9 @@
         if (totalSummaryCount > 0) {
             $totalSummaryRow.append($("<td>"));
             $totalSummaryRow.appendTo("#myTable >  tbody:last");
+        }
+        if (!isEmpty(indexPageDefinition.afterTableLoad)) {
+            indexPageDefinition.afterTableLoad.callback(result);
         }
         rowSelectorsUi();
     };
@@ -732,10 +878,21 @@
         var sortData = $("#currentSort").val();
         var searchFlt = $(".search_input").val();
         var $dcId = $("#CurrencySelector");
-
+        var transTypeFlt = '';
+        var transactorId = 0;
+        if (!($('#TransactorTypeFilter').val() === undefined)) {
+            transTypeFlt = $('#TransactorTypeFilter').val();
+        }
+        if (!($('#TransactorId').val() === undefined)) {
+            transactorId = $('#TransactorId').val();
+        }
+        var wrItmNatureFlt = '';
+        if (!($('#WarehouseItemNatureFilter').val() === undefined)) {
+            wrItmNatureFlt = $('#WarehouseItemNatureFilter').val();
+        }
         var currencyFlt = $dcId.val() == null || $dcId.val().length == 0 ? 1 : parseInt($dcId.val());
 
-        getTableData(pageIndex, pageSize, sortData, datePeriod, companyFlt, searchFlt, currencyFlt)
+        getTableData(pageIndex, pageSize, sortData, datePeriod, companyFlt, searchFlt, currencyFlt, transTypeFlt, wrItmNatureFlt,transactorId)
             .then((data) => {
                 bindDataToTable(data, pageIndex);
             })
@@ -822,7 +979,7 @@
             try {
                 filtersValue = storageItem.find((x) => x.filterKey === "currentCurrency").filterValue;
                 $("#CurrencySelector").val(filtersValue);
-            } catch (e) {}
+            } catch (e) { }
         }
     };
     const saveSettings = (localStorageKey) => {
@@ -881,6 +1038,7 @@
         //#endregion
     };
     //register common handlers
+    setupCreateNewElement();
     registerHandlers(commonHandlers);
     return {
         getIndexPageDefinition: getIndexPageDefinition,
@@ -896,6 +1054,7 @@
         registerPageHandlers: registerPageHandlers,
         handleFiltersUi: handleFiltersUi,
         setCurrencyFormatter: setCurrencyFormatter,
+        setNumberFormatter: setNumberFormatter,
         loadSettings: loadSettings,
         saveSettings: saveSettings,
     };

@@ -282,20 +282,7 @@
 
                 });
             //#region variables
-           // var $filtersVisible = $('#filtersVisible');
-           // var $filterCollapse = $('#filterCollapse');
-
-            //var $filtersToggle = $('#filtersToggle');
-            //var $rowSelectorsToggle = $('#rowSelectorsToggle');
-            //var $rowSelectorsVisible = $('#rowSelectorsVisible');
-
-           // var $selectedRowsActionsMenu = $('#SelectedRowsActionsMenu');
-           // var $selectedRowsActionsLink = $('#ddSelectedRowsActions');
-            
-           // var $pageIndex = $('#pageIndex');
-           // var $pageSize = $('#PageSize');
-           // var $totalPages = $('#totalPages');
-           // var $totalRecords = $('#totalRecords');
+          
             var $deleteSelectedRowsLink = $('#deleteSelectedRows');
             var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
             //#endregion
@@ -316,6 +303,8 @@
                     text: '',
                     headerClass: 'small text-center ',
                     class: 'small',
+                    classWhenCondition: '',
+                    classCondition: {},
                     remoteReference: {
                         
                     }
@@ -334,6 +323,8 @@
                     text: '',
                     headerClass: 'small text-center',
                     class: 'small',
+                    classWhenCondition: '',
+                    classCondition: {},
                     remoteReference: {
                         isRemoteReference: true,
                         valueKey: 'transactorId',
@@ -354,6 +345,8 @@
                     text: '',
                     headerClass: 'small text-center d-none d-md-table-cell',
                     class: 'small d-none d-md-table-cell ',
+                    classWhenCondition: '',
+                    classCondition: {},
                     remoteReference: {
                        
                     }
@@ -372,6 +365,8 @@
                     text: '',
                     headerClass: 'small text-center d-none d-md-table-cell',
                     class: 'small d-none d-md-table-cell ',
+                    classWhenCondition: '',
+                    classCondition: {},
                     remoteReference: {
                        
                     }
@@ -390,6 +385,8 @@
                     text: '',
                     headerClass: 'small text-center',
                     class: 'small ',
+                    classWhenCondition: '',
+                    classCondition: {},
                     remoteReference: {
                        
                     }
@@ -408,6 +405,8 @@
                     text: '',
                     headerClass: 'small text-center',
                     class: 'small text-right ',
+                    classWhenCondition: '',
+                    classCondition: {},
                     remoteReference: {
                        
                     }
@@ -426,6 +425,8 @@
                     text: '',
                     headerClass: 'small text-center',
                     class: 'small text-right ',
+                    classWhenCondition: '',
+                    classCondition: {},
                     remoteReference: {
                        
                     }
@@ -444,6 +445,8 @@
                     text: '',
                     headerClass: 'small text-center',
                     class: 'small text-right ',
+                    classWhenCondition: '',
+                    classCondition: {},
                     remoteReference: {
                        
                     }
@@ -491,12 +494,17 @@
                     visibility: 'condition',
                     elementName: 'PayoffDoc',
                     condition: {
-                        val1Key: 'totalAmount',
-                        val2Key: 'payedOfAmount',
-                        operator: 'notZero'
+                        val1Type:'key',
+                        val1Value: 'totalAmount',
+                        val2Type:'key',
+                        val2Value: 'payedOfAmount',
+                        //val1Key: 'totalAmount',
+                        //val2Key: 'payedOfAmount',
+                        operator: 'notZeroDiff'
                     },
                     text: 'Εξόφληση Παραστατικού',
                     valueKey: 'id',
+                    dataKey:'docid',
                     icon: '<i class="fab fa-amazon-pay fa-lg" style="color:slategray"></i>',
                     url: ''
                 },
@@ -507,9 +515,13 @@
                     visibility: 'condition',
                     elementName:'AssignPayments',
                     condition: {
-                        val1Key:'totalAmount',
-                        val2Key:'payedOfAmount',
-                        operator:'notZero'
+                        val1Type:'key',
+                        val1Value: 'totalAmount',
+                        val2Type:'key',
+                        val2Value: 'payedOfAmount',
+                       // val1Key:'totalAmount',
+                       // val2Key:'payedOfAmount',
+                        operator:'notZeroDiff'
                     },
                     text: 'Αντιστοίχιση Πληρωμών',
                     valueKey: 'id',
@@ -573,12 +585,15 @@
                     visibility: 'condition',
                     elementName: 'PayoffDoc',
                     condition: {
-                        val1Key: 'totalAmount',
-                        val2Key: 'payedOfAmount',
-                        operator: 'notZero'
+                        val1Type:'key',
+                        val1Value: 'totalAmount',
+                        val2Type:'key',
+                        val2Value: 'payedOfAmount',
+                        operator: 'notZeroDiff'
                     },
                     text: 'Εξόφληση Παραστατικού',
                     valueKey: 'id',
+                    dataKey:'docid',
                     icon: '<i class="fab fa-amazon-pay fa-lg" style="color:slategray"></i>',
                     url: ''
                 },
@@ -589,9 +604,11 @@
                     visibility: 'condition',
                     elementName:'AssignPayments',
                     condition: {
-                        val1Key:'totalAmount',
-                        val2Key:'payedOfAmount',
-                        operator:'notZero'
+                        val1Type:'key',
+                        val1Value: 'totalAmount',
+                        val2Type:'key',
+                        val2Value: 'payedOfAmount',
+                        operator: 'notZeroDiff'
                     },
                     text: 'Αντιστοίχιση Πληρωμών',
                     valueKey: 'id',
@@ -633,7 +650,8 @@
                 actionColSubDefs: actionColSubDefs,
                 actionMobileColDefs: actionMobileColDefs,
                 tableHandlersToRegister:tableHandlersToRegister,
-                pageHandlersToRegister:pageHandlersToRegister
+                pageHandlersToRegister:pageHandlersToRegister,
+                afterTableLoad: {}
             };
 
             indPgLib.setIndexPageDefinition(indexPageDef);
@@ -1150,7 +1168,7 @@
                         .then(function(response) {
                             console.log(response);
                             $('#itemSelector').modal('hide');
-                            refreshTableData();
+                            indPgLib.refreshData();
                         })
                         .fail(function(err) {
                             console.log(err);
@@ -1200,7 +1218,7 @@
                     success: function(result) {
                         console.log(result);
                         toastr.success(result.message);
-                        refreshTableData();
+                        indPgLib.refreshData();
 
                     },
                     complete: function() {
@@ -1302,19 +1320,7 @@
                 }
 
             };
-            /*
-            var handleFiltersUi = () => {
-                var filterVisible = $filtersVisible.val();
-                if (filterVisible === 'True' || filterVisible === 'true') {
-                    $filterCollapse.collapse('show');
-                } else {
-                    $filterCollapse.collapse('hide');
-                }
-            };
-            var showFiltersUi = () => {
-
-            };
-            */
+           
             $deleteSelectedRowsLink.on('click',
                 () => {
                     deleteSelectedRows();
@@ -1341,12 +1347,7 @@
                     console.log('Not found currency code for this id');
                 }
             };
-            /*
-            $rowSelectorsToggle.on('click',
-                function() {
-                   indPgLib.rowSelectorsToggleHandler();
-                });
-           */
+           
             indPgLib.addPagerElementEventListeners();
             indPgLib.registerPageHandlers();
             indPgLib.loadSettings('BuyDocIndexView');

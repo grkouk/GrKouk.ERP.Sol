@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -81,6 +82,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
                 LoadCombos();
                 return Page();
             }
+
             var spTransactionToAttach = _mapper.Map<TransactorTransaction>(ItemVm);
             #region Fiscal Period
             //var dateOfTrans = ItemVm.TransDate;
@@ -127,58 +129,75 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
                 sectionId = docTypeDef.SectionId;
             }
             #endregion
-            spTransactionToAttach.SectionId = sectionId;
-            spTransactionToAttach.TransTransactorDocTypeId = docSeries.TransTransactorDocTypeDefId;
-            spTransactionToAttach.FinancialAction = transTransactorDef.FinancialTransAction;
-            switch (transTransactorDef.FinancialTransAction)
-            {
-                case FinActionsEnum.FinActionsEnumNoChange:
-                    spTransactionToAttach.TransDiscountAmount = 0;
-                    spTransactionToAttach.TransFpaAmount = 0;
-                    spTransactionToAttach.TransNetAmount = 0;
-                    break;
-                case FinActionsEnum.FinActionsEnumDebit:
-                    spTransactionToAttach.TransDiscountAmount = spTransactionToAttach.AmountDiscount;
-                    spTransactionToAttach.TransFpaAmount = spTransactionToAttach.AmountFpa;
-                    spTransactionToAttach.TransNetAmount = spTransactionToAttach.AmountNet;
-                    break;
-                case FinActionsEnum.FinActionsEnumCredit:
-                    spTransactionToAttach.TransDiscountAmount = spTransactionToAttach.AmountDiscount;
-                    spTransactionToAttach.TransFpaAmount = spTransactionToAttach.AmountFpa;
-                    spTransactionToAttach.TransNetAmount = spTransactionToAttach.AmountNet;
-                    break;
-                case FinActionsEnum.FinActionsEnumNegativeDebit:
-                    spTransactionToAttach.TransNetAmount = spTransactionToAttach.AmountNet * -1;
-                    spTransactionToAttach.TransFpaAmount = spTransactionToAttach.AmountFpa * -1;
-                    spTransactionToAttach.TransDiscountAmount = spTransactionToAttach.AmountDiscount * -1;
-                    break;
-                case FinActionsEnum.FinActionsEnumNegativeCredit:
-                    spTransactionToAttach.TransNetAmount = spTransactionToAttach.AmountNet * -1;
-                    spTransactionToAttach.TransFpaAmount = spTransactionToAttach.AmountFpa * -1;
-                    spTransactionToAttach.TransDiscountAmount = spTransactionToAttach.AmountDiscount * -1;
-                    break;
-                default:
-                    break;
-            }
 
-
-            _context.Attach(spTransactionToAttach).State = EntityState.Modified;
-
-            try
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TransactorTransactionExists(ItemVm.Id))
+                spTransactionToAttach.SectionId = sectionId;
+                spTransactionToAttach.TransTransactorDocTypeId = docSeries.TransTransactorDocTypeDefId;
+                spTransactionToAttach.FinancialAction = transTransactorDef.FinancialTransAction;
+                switch (transTransactorDef.FinancialTransAction)
                 {
-                    return NotFound();
+                    case FinActionsEnum.FinActionsEnumNoChange:
+                        spTransactionToAttach.TransDiscountAmount = 0;
+                        spTransactionToAttach.TransFpaAmount = 0;
+                        spTransactionToAttach.TransNetAmount = 0;
+                        break;
+                    case FinActionsEnum.FinActionsEnumDebit:
+                        spTransactionToAttach.TransDiscountAmount = spTransactionToAttach.AmountDiscount;
+                        spTransactionToAttach.TransFpaAmount = spTransactionToAttach.AmountFpa;
+                        spTransactionToAttach.TransNetAmount = spTransactionToAttach.AmountNet;
+                        break;
+                    case FinActionsEnum.FinActionsEnumCredit:
+                        spTransactionToAttach.TransDiscountAmount = spTransactionToAttach.AmountDiscount;
+                        spTransactionToAttach.TransFpaAmount = spTransactionToAttach.AmountFpa;
+                        spTransactionToAttach.TransNetAmount = spTransactionToAttach.AmountNet;
+                        break;
+                    case FinActionsEnum.FinActionsEnumNegativeDebit:
+                        spTransactionToAttach.TransNetAmount = spTransactionToAttach.AmountNet * -1;
+                        spTransactionToAttach.TransFpaAmount = spTransactionToAttach.AmountFpa * -1;
+                        spTransactionToAttach.TransDiscountAmount = spTransactionToAttach.AmountDiscount * -1;
+                        break;
+                    case FinActionsEnum.FinActionsEnumNegativeCredit:
+                        spTransactionToAttach.TransNetAmount = spTransactionToAttach.AmountNet * -1;
+                        spTransactionToAttach.TransFpaAmount = spTransactionToAttach.AmountFpa * -1;
+                        spTransactionToAttach.TransDiscountAmount = spTransactionToAttach.AmountDiscount * -1;
+                        break;
+                    default:
+                        break;
                 }
-                else
+
+               
+
+                try
                 {
-                    throw;
+                    _context.Attach(spTransactionToAttach).State = EntityState.Modified;
+                    var docId = spTransactionToAttach.Id;
+                    _context.BuyDocTransPaymentMappings.RemoveRange(
+                        _context.BuyDocTransPaymentMappings
+                            .Where(p => p.TransactorTransactionId == docId));
+                    _context.SellDocTransPaymentMappings.RemoveRange(
+                        _context.SellDocTransPaymentMappings
+                            .Where(p => p.TransactorTransactionId == docId));
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    await transaction.RollbackAsync();
+                    ModelState.AddModelError(string.Empty, "Concurrency error");
+                    LoadCombos();
+                    return Page();
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    string msg = $"Error  {ex.Message} inner exception->{ex.InnerException?.Message}";
+                    ModelState.AddModelError(string.Empty,msg );
+                    LoadCombos();
+                    return Page();
                 }
             }
+           
 
             return RedirectToPage("./Index");
 
