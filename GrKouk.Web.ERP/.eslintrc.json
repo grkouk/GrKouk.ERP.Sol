@@ -1,0 +1,18 @@
+{
+    "env": {
+        "browser": true,
+        "es2020": true,
+        "jquery": true
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "ecmaVersion": 12,
+        "sourceType": "module"
+    },
+    "plugins": ["html"],
+    "globals": {
+        "moment": true
+      },
+    "rules": {
+    }
+}
