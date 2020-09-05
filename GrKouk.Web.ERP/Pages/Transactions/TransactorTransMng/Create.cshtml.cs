@@ -6,12 +6,14 @@ using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NToastNotify;
+
 
 namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
 {
@@ -51,17 +53,10 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
             //_context.TransactorTransactions.Add(TransactorTransaction);
 
             #region Fiscal Period
-            //if (ItemVm.FiscalPeriodId <= 0)
-            //{
-            //    ModelState.AddModelError(string.Empty, "No Fiscal Period covers Transaction Date");
-            //    LoadCombos();
-            //    return Page();
-            //}
-            var fiscalPeriod = await _context.FiscalPeriods.FirstOrDefaultAsync(p =>
-                ItemVm.TransDate >= p.StartDate && ItemVm.TransDate <= p.EndDate);
+           
+            var fiscalPeriod = await HelperFunctions.GetFiscalPeriod(_context, ItemVm.TransDate);
             if (fiscalPeriod == null)
             {
-               
                 ModelState.AddModelError(string.Empty, "No Fiscal Period covers Transaction Date");
                 return Page();
             }
@@ -151,6 +146,8 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
 
 
             return RedirectToPage("./Index");
+
+           
         }
         private void LoadCombos()
         {
