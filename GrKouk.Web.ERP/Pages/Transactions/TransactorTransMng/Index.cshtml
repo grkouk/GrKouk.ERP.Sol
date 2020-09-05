@@ -26,12 +26,15 @@
 
             </a>
         </li>
+        <li class="nav-item">
+             <a class="nav-link" href="@Url.Page("./addcrossentry")" >Αντιλογισμός</a>
+        </li>
         <li class="nav-item dropdown " id="SelectedRowsActionsMenu">
             <a class="nav-link dropdown-toggle disabled" role="button" id="ddSelectedRowsActions" data-toggle="dropdown"
                aria-haspopup="true" aria-expanded="false">Actions</a>
             <div class="dropdown-menu small">
                 <a class="dropdown-item" href="#" id="deleteSelectedRows">Delete Selected</a>
-                <a class="dropdown-item" href="#">Another action</a>
+                <a class="dropdown-item" href="./AddCrossEntry" id="lnkAntilogismos">Αντιλογισμός</a>
                 <a class="dropdown-item" href="#">Something else here</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="#">Separated link</a>
@@ -646,6 +649,7 @@
 
             };
 
+            
             $deleteSelectedRowsLink.on('click',
                 () => {
                     deleteSelectedRows();
