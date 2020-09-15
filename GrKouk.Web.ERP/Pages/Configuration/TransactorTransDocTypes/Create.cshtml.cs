@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using GrKouk.Erp.Domain.DocDefinitions;
+using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +25,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.TransactorTransDocTypes
 
         public IActionResult OnGet()
         {
-       LoadCombos();
+            LoadCombos();
             return Page();
         }
 
@@ -48,7 +49,14 @@ namespace GrKouk.Web.Erp.Pages.Configuration.TransactorTransDocTypes
             ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
             ViewData["TransTransactorDefId"] = new SelectList(_context.TransTransactorDefs.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
             ViewData["SectionList"] = SelectListHelpers.GetSectionsList(_context);
-
+            var transactorTypesListJs = _context.TransactorTypes.OrderBy(p => p.Name)
+                           .Select(p => new DiaryDocTypeItem()
+                           {
+                               Title = p.Name,
+                               Value = p.Id
+                           }).ToList();
+            ViewData["TransactorTypesListJs"] = transactorTypesListJs;
+            
         }
     }
 }

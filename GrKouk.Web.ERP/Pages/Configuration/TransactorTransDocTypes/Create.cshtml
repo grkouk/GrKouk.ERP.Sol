@@ -33,20 +33,29 @@
             </div>
         </div>
         <div class="form-row">
-            <div class="form-group col-md-3">
+            <div class="form-group col-md-2">
                 <label asp-for="ItemVm.SectionId" class="control-label small"></label>
                 <select asp-for="ItemVm.SectionId" class="form-control form-control-sm" asp-items="ViewBag.SectionList"></select>
                 <span asp-validation-for="ItemVm.SectionId" class="text-danger small"></span>
             </div>
-            <div class="form-group col-md-3">
+            <div class="form-group col-md-2">
                 <label asp-for="ItemVm.TransTransactorDefId" class="control-label"></label>
                 <select asp-for="ItemVm.TransTransactorDefId" class="form-control form-control-sm" asp-items="ViewBag.TransTransactorDefId"></select>
                 <span asp-validation-for="ItemVm.TransTransactorDefId" class="text-danger"></span>
             </div>
-            <div class="form-group col-md-3">
+            <div class="form-group col-md-2">
                 <label asp-for="ItemVm.CompanyId" class="control-label"></label>
                 <select asp-for="ItemVm.CompanyId" class="form-control form-control-sm" asp-items="ViewBag.CompanyId"></select>
                 <span asp-validation-for="ItemVm.CompanyId" class="text-danger"></span>
+            </div>
+            <div class=" form-group col-md-2">
+                <label class="form-control-label small">Allowed Transactor Types</label>
+                <ejs-multiselect id="allowedTransactorTypes" dataSource="@ViewBag.TransactorTypesListJs" placeholder="Select Transactor Types" mode="CheckBox"
+                                 showDropDownIcon="true" 
+                                 showSelectAll="true" selectAllText="Select All" unSelectAllText="unSelect All"
+                                 >
+                    <e-multiselect-fields text="Title" value="Value"></e-multiselect-fields>
+                </ejs-multiselect>
             </div>
         </div>
 
