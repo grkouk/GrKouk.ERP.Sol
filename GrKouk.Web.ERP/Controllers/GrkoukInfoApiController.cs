@@ -1208,10 +1208,10 @@ namespace GrKouk.Web.ERP.Controllers
             {
                 switch (request.SortData.ToLower())
                 {
-                    case "transactiondatesort:asc":
+                    case "datesort:asc":
                         fullListIq = fullListIq.OrderBy(p => p.TransDate);
                         break;
-                    case "transactiondatesort:desc":
+                    case "datesort:desc":
                         fullListIq = fullListIq.OrderByDescending(p => p.TransDate);
                         break;
                     case "transactornamesort:asc":

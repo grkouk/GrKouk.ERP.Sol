@@ -56,7 +56,6 @@
                 <label class="form-control-label small">Allowed Transactor Types</label>
                 <ejs-multiselect id="AllowedTransactorTypes" dataSource="@ViewBag.TransactorTypesListJs" placeholder="Select Transactor Types" mode="CheckBox"
                                  showDropDownIcon="true" 
-                                 showSelectAll="true" selectAllText="Select All" unSelectAllText="unSelect All"
                                  >
                     <e-multiselect-fields text="Title" value="Value"></e-multiselect-fields>
                 </ejs-multiselect>
@@ -85,8 +84,7 @@
             const allowedTransactorTypes = document.getElementById("AllowedTransactorTypes").ej2_instances[0];
             allowedTransactorTypes.changeOnBlur=false;
             allowedTransactorTypes.addEventListener("change",(event)=>{
-                console.log('Inside event listener');
-                console.log(event);
+                
                 var selected = JSON.stringify(event.value);
                 $('#ItemVm_AllowedTransactorTypes').val(selected);
             });

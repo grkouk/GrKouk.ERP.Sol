@@ -73,7 +73,11 @@
                     <select id="CompanyFilter" class="form-control form-control-sm small"
                             asp-items="ViewBag.CompanyFilter"></select>
                 </div>
-               
+                <div class="form-group col-md-auto">
+                    <label class="small"> Page Size:</label>
+                    <select id="PageSize" class="form-control form-control-sm small"
+                            asp-items="ViewBag.PageFilterSize"></select>
+                </div>
                 <div class="form-group col-md-auto">
                     <label class="small"> Currency:</label>
                     <select id="CurrencySelector" class="form-control form-control-sm small"
@@ -196,6 +200,25 @@
              //#region Index page definition objects
             const colDefs = [
                 {
+                    key: 'companyCode',
+                    responseKey: 'companyCode',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: 'CompanyCodeSort',
+                    sortType: 'alpha',
+                    header: 'Company',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small ',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {
+                    }
+                },
+                {
                     key: 'materialName',
                     responseKey: 'materialName',
                     actualVal: '',
@@ -312,28 +335,10 @@
                    remoteReference: {
                       
                    }
-               },
+               }
                 
               
-                {
-                    key: 'companyCode',
-                    responseKey: 'companyCode',
-                    actualVal: '',
-                    columnFormat: 't',
-                    totalKey: '',
-                    grandTotalKey: '',
-                    totalFormatter: '',
-                    sortKey: 'CompanyCodeSort',
-                    sortType: 'alpha',
-                    header: 'Company',
-                    text: '',
-                    headerClass: 'small text-center',
-                    class: 'small ',
-                    classWhenCondition: '',
-                    classCondition: {},
-                    remoteReference: {
-                    }
-                }
+               
             ];
             const actionColDefs = [
                {
