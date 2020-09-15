@@ -1939,6 +1939,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             if (!string.IsNullOrEmpty(request.CompanyFilter))
             {
+                //.Where(tx => Array.ConvertAll(tx.CompanyFilter.Split(","), int.Parse).Contains(tf))
                 if (int.TryParse(request.CompanyFilter, out var companyId))
                 {
                     if (companyId > 0)
