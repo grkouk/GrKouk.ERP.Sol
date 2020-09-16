@@ -12,6 +12,8 @@
     <form method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="hidden" asp-for="@Model.InitialLoad" id="IsInitialLoad" />
+        <input type="hidden" asp-for="@Model.CopyFromId" id="CopyFromId" />
+        <input type="hidden" asp-for="@Model.CopyFromTransactorId" id="CopyFromTransactorId" />
         <div class="form-row">
             <div class="form-group col-md-3">
                 <label asp-for="ItemVm.TransDate" class="small"></label>
@@ -216,8 +218,20 @@
                 console.log("Inside Discount Amount Change");
                 calculateAmounts();
             });
-
-
+            var copyFromId =parseInt( $('#CopyFromId').val());
+            let selectTransactor=0;
+             if (copyFromId===0) {
+                $fpaRate.val(0);
+                $amountDic.val(0);
+                $amountFpa.val(0);
+                $amountNet.val(0);
+                 $('#ItemVm_TransDate').val(new Date().toISOString().slice(0, 10));
+                 transactionDataChanged();
+            } else {
+                  $('#ItemVm_TransDate').val(new Date().toISOString().slice(0, 10));
+                 selectTransactor= parseInt( $('#CopyFromTransactorId').val())
+                 }
+             /*
             if ($initialLoad.val()=='True') {
                 console.log("Initial load is true setting initial values");
                 $fpaRate.val(0);
@@ -229,10 +243,15 @@
                 transactionDataChanged();
 
             }
+            */
+              
             console.log("After initial load check");
 
             $initialLoad.val(false);
             docSeriesChanged();
+            if (selectTransactor!==0){
+                $('#ItemVm_TransactorId').val(selectTransactor)
+                }
         });
 
 
