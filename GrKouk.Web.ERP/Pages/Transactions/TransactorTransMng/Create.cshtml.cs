@@ -166,7 +166,26 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
             ViewData["FiscalPeriodId"] = new SelectList(_context.FiscalPeriods.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
             ViewData["TransactorId"] = new SelectList(transactorsList, "Value", "Text");
             ViewData["TransTransactorDocSeriesId"] = new SelectList(_context.TransTransactorDocSeriesDefs.OrderBy(s => s.Name).AsNoTracking(), "Id", "Name");
+            var transactorsListJs = _context.Transactors
+                            .Include(p=>p.TransactorType)
+                            .Where(p=>p.TransactorType.Code != "SYS.DTRANSACTOR")
+                            .Select(p=> new TransactorSelectListItem()
+                            {
+                                Id = p.Id,
+                                TransactorName = p.Name,
+                                TransactorTypeId = p.TransactorType.Id,
+                                TransactorTypeCode = p.TransactorType.Code,
+                                Value = p.Id.ToString(),
+                                Text = $"{p.Name} {{{p.TransactorType.Code}}}"
+                            })
+                            .AsNoTracking()
+                            .ToList();
+            ViewData["transactorsListJs"] = transactorsListJs;
+            
             //ViewData["SectionId"] = new SelectList(_context.Sections, "Id", "Code");
         }
+        
     }
+
+  
 }
