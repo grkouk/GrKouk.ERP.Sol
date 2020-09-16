@@ -181,8 +181,15 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
                             .AsNoTracking()
                             .ToList();
             ViewData["transactorsListJs"] = transactorsListJs;
-            
-            //ViewData["SectionId"] = new SelectList(_context.Sections, "Id", "Code");
+            var docTypeAllowedTransactorTypesListJs = _context.TransTransactorDocTypeDefs
+                .Select(p => new TransactorDocTypeAllowedTransactorTypes()
+                {
+                    DocTypeId = p.Id,
+                    AllowedTypes = p.AllowedTransactorTypes
+                })
+                .AsNoTracking()
+                .ToList();
+            ViewData["docTypeAllowedTransactorTypesListJs"] = docTypeAllowedTransactorTypesListJs;
         }
         
     }

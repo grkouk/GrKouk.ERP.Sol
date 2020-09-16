@@ -9,4 +9,11 @@
         public string Value { get; set; }
         public string Text { get; set; }
     }
+
+    public class TransactorDocTypeAllowedTransactorTypes
+    {
+        public int DocTypeId { get; set; }
+        public string[] AllowedTypesArray { get; set; }
+        public string AllowedTypes { get; set; }
+    }
 }
