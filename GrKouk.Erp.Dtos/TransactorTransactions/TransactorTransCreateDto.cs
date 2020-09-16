@@ -12,12 +12,14 @@ namespace GrKouk.Erp.Dtos.TransactorTransactions
         [Display(Name = "Trans Date")]
         public DateTime TransDate { get; set; }
         [Display(Name = "Doc Series")]
+        [Required]
         public int TransTransactorDocSeriesId { get; set; }
 
         public int TransTransactorDocTypeId { get; set; }
         [Display(Name = "Ref Code")]
         public string TransRefCode { get; set; }
-        [Display(Name = "Transactor")] 
+        [Display(Name = "Transactor")]
+        [Required]
         public int TransactorId { get; set; }
         [Display(Name = "Sector")]
         public int SectionId { get; set; }
@@ -45,7 +47,7 @@ namespace GrKouk.Erp.Dtos.TransactorTransactions
 
         [MaxLength(500)]
         public string Etiology { get; set; }
-
+        [Required]
         public int CompanyId { get; set; }
 
         //[Timestamp]

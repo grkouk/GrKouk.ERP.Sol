@@ -33,7 +33,8 @@
         <div class="form-row">
             <div class="form-group col-md-6">
                 <label asp-for="ItemVm.TransactorId" class="small"></label>
-                <select asp-for="ItemVm.TransactorId" class="form-control form-control-sm small" asp-items="ViewBag.TransactorId"></select>
+                <select asp-for="ItemVm.TransactorId" class="form-control form-control-sm small" ></select>
+                 <span asp-validation-for="ItemVm.TransactorId" class="text-danger"></span>
             </div>
             <div class="form-group col-md-3">
                     <label asp-for="ItemVm.FiscalPeriodId" class="small"></label>
@@ -231,6 +232,7 @@
             console.log("After initial load check");
 
             $initialLoad.val(false);
+            docSeriesChanged();
         });
 
 
