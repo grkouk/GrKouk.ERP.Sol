@@ -97,8 +97,7 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
         $(document).ready(function () {
-            console.log("Inside Document ready");
-            console.log("Initial Load value is " + $('#IsInitialLoad').val() );
+           
             var $initialLoad = $('#IsInitialLoad');
 
             //if (!$initialLoad.val()) return;
@@ -110,7 +109,11 @@
             var $amountSum = $('#ItemVm_AmountSum');
             var $fiscalPeriod = $('#ItemVm_FiscalPeriodId');
             var fiscalPeriodDom = document.getElementById("ItemVm_FiscalPeriodId");
-
+            const $docSeriesEl=$('#ItemVm_TransTransactorDocSeriesId');
+            const $transactorListEl = $('#ItemVm_TransactorId');
+            var transactorsListJs = @Html.Raw(Json.Serialize(ViewBag.transactorsListJs));
+            var allowedTypesListJs = @Html.Raw(Json.Serialize(ViewBag.docTypeAllowedTransactorTypesListJs));
+            
             var calculateAmounts = () => {
                 console.log("Calculate Values called");
 
@@ -126,7 +129,7 @@
             };
 
             var transactionDataChanged = () => {
-                console.log("Inside transDate Changed");
+                //console.log("Inside transDate Changed");
 
                 var forDate = $transDate.val();
                 //var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
@@ -141,11 +144,11 @@
 
                     })
                     .then(function(myJson) {
-                        console.log("Inside fetch then with myJson" + JSON.stringify(myJson));
+                        //console.log("Inside fetch then with myJson" + JSON.stringify(myJson));
                         if (myJson) {
 
                             var fiscalPeriodId = myJson.periodId;
-                            console.log("Returned PeriodId=" + fiscalPeriodId);
+                           // console.log("Returned PeriodId=" + fiscalPeriodId);
                             //var fId = parseInt(fiscalPeriodId);
                             //$fiscalPeriod.val(fiscalPeriodId).trigger("chosen:updated");
                             fiscalPeriodDom.value = fiscalPeriodId;
@@ -159,6 +162,44 @@
                         }
                     );
             };
+            const docSeriesChanged=()=>{
+               const docSeriesId=$('#ItemVm_TransTransactorDocSeriesId').val();
+               //locate inside list selected docseriesid
+               let a = allowedTypesListJs.find(o=>o.docSeriesId==docSeriesId);
+               if (a){
+                   console.log('Found');
+                   let allowed = JSON.parse(a.allowedTypes);
+                   if (allowed){
+                        let  lst = transactorsListJs.filter(function(item){
+                                return allowed.indexOf(item.transactorTypeId) !== -1;
+                              });
+                         $transactorListEl.empty();
+                                                                                 
+                        $.each(lst, function(index, item) {
+                            $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
+                        }); 
+                   } else {
+                     $transactorListEl.empty();
+                                                         
+                    $.each(transactorsListJs, function(index, item) {
+                        $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
+                    }); 
+                   }
+                  
+               } else {
+                   console.log('Not Found');
+                   $transactorListEl.empty();
+                                   
+                  $.each(transactorsListJs, function(index, item) {
+                      $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
+                  });
+               }
+              
+            };
+            $docSeriesEl.change((e)=>{
+                console.log(e)
+                docSeriesChanged();
+            });
             $transDate.change(() => {
                 transactionDataChanged();
             });

@@ -12,6 +12,7 @@
 
     public class TransactorDocTypeAllowedTransactorTypes
     {
+        public int DocSeriesId { get; set; }
         public int DocTypeId { get; set; }
         public string[] AllowedTypesArray { get; set; }
         public string AllowedTypes { get; set; }
