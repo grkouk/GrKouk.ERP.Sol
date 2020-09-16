@@ -62,6 +62,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.TransactorTransDocTypes
         {
             if (!ModelState.IsValid)
             {
+                LoadCombos();
                 return Page();
             }
 

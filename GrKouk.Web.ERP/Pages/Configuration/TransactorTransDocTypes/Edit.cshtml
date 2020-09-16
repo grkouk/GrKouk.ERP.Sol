@@ -83,7 +83,10 @@
             const allowedTransactorTypes = document.getElementById("AllowedTransactorTypes").ej2_instances[0];
            
             var oldSel =  $('#ItemVm_AllowedTransactorTypes').val();
-            allowedTransactorTypes.value=JSON.parse(oldSel);
+            if (oldSel.length>0) {
+                allowedTransactorTypes.value=JSON.parse(oldSel);    
+            }
+            
             allowedTransactorTypes.changeOnBlur=false;
             allowedTransactorTypes.addEventListener("change",(event)=>{
                 
