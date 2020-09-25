@@ -56,6 +56,7 @@ namespace GrKouk.Web.ERP
             {
                 // Cookie settings
                 options.Cookie.HttpOnly = true;
+                options.Cookie.SameSite = SameSiteMode.Lax;
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
 
                 options.LoginPath = "/Identity/Account/Login";
