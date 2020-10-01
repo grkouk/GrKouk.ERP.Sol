@@ -47,7 +47,7 @@
         <input type="hidden" id="totalPages" />
         <input type="hidden" id="totalRecords" />
         <input type="hidden" id="pageIndex" />
-       
+
         <div class="container">
             <div class="form-row">
                 <div class="form-group col-md-auto">
@@ -94,7 +94,7 @@
             <nav aria-label="Page navigation example">
                 <ul class="pagination pagination-sm justify-content-end">
                     <li class="page-item ">
-                        <a href="#" id="GoToFirst" data-pageraction="GoToFirst" 
+                        <a href="#" id="GoToFirst" data-pageraction="GoToFirst"
                            class="page-link" aria-label="First">
                             @*<span aria-hidden="true">;</span>*@
                             First
@@ -129,7 +129,7 @@
 </div>
 <table class="table table-bordered table-sm" id="myTable">
     <thead class="thead-light">
-       
+
     </thead>
     <tbody></tbody>
 </table>
@@ -141,7 +141,7 @@
         <nav aria-label="Page navigation example">
             <ul class="pagination pagination-sm justify-content-end">
                 <li class="page-item ">
-                    <a href="#" id="GoToFirst" data-pageraction="GoToFirst" 
+                    <a href="#" id="GoToFirst" data-pageraction="GoToFirst"
                        class="page-link" aria-label="First">
                         @*<span aria-hidden="true">;</span>*@
                         First
@@ -194,7 +194,7 @@
 
                 });
             //#region variables
-           
+
             var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
             //#endregion
              //#region Index page definition objects
@@ -294,7 +294,7 @@
                    classWhenCondition: '',
                    classCondition: {},
                    remoteReference: {
-                      
+
                    }
                },
                {
@@ -315,7 +315,7 @@
                    classCondition: {},
                    remoteReference: {}
                },
-              
+
                {
                    key: 'exportValue',
                    responseKey: 'exportValue',
@@ -333,102 +333,24 @@
                    classWhenCondition: '',
                    classCondition: {},
                    remoteReference: {
-                      
+
                    }
                }
-                
-              
-               
+
+
+
             ];
             const actionColDefs = [
-               {
-                   actionType: 'defaultAction2',
-                   visibility: 'always',
-                   target: '_blank',
-                   condition: {},
-                   text: 'Edit Prototype',
 
-                   dataAttributes: [
-                       {
-                           key: 'docid',
-                           valueKey: 'docid'
-                       }
-                   ],
-                   icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
-                   uriType: 'funcHref', //funcUrl staticHref, staticUrl
-                   urlKeys: [
-                       { key: 'id', valueKey: 'id' }
-                   ],
-                   uriFunc: function(col, valueSource) {
-                      let retUri = '';
-                     if (valueSource.creatorSectionId > 0 ) {
-                         switch (valueSource.creatorSectionCode) {
-                             case "SCNSELLCOMBINED":
-                                 retUri = `/transactions/sellmaterialdoc/Edit?id=${valueSource["creatorId"]}`;
-                                 break;
-                             case "SCNBUYMATTRANS":
-                                 retUri = `/transactions/buymaterialsdoc/Edit?id=${valueSource["creatorId"]}`;
-                                 break;
-                         default:
-                         }
-
-                     } else {
-                        
-                         var itemId = valueSource["id"];
-                         retUri = `/transactions/transactortransmng/Edit?id=${itemId}`;
-                     }
-                     return retUri;
-                   },
-                   uri: ''
-               }
             ];
             const actionColSubDefs = [
-               
+
             ];
             const actionMobileColDefs = [
-               {
-                   actionType: 'defaultAction2',
-                   visibility: 'always',
-                   target: '_blank',
-                   condition: {},
-                   text: 'Edit Prototype',
 
-                   dataAttributes: [
-                       {
-                           key: 'docid',
-                           valueKey: 'docid'
-                       }
-                   ],
-                   icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
-                   uriType: 'funcHref', //funcUrl staticHref, staticUrl
-                   urlKeys: [
-                       { key: 'id', valueKey: 'id' }
-                   ],
-                   uriFunc: function(col, valueSource) {
-                       let retUri = '';
-                       if (valueSource.creatorSectionId > 0 ) {
-                           switch (valueSource.creatorSectionCode) {
-                               case "SCNSELLCOMBINED":
-                                   retUri = `/transactions/sellmaterialdoc/Edit?id=${valueSource["creatorId"]}`;
-                                   break;
-                               case "SCNBUYMATTRANS":
-                                   retUri = `/transactions/buymaterialsdoc/Edit?id=${valueSource["creatorId"]}`;
-                                   break;
-                           default:
-                           }
-
-                       } else {
-                          
-                           var itemId = valueSource["id"];
-                           retUri = `/transactions/transactortransmng/Edit?id=${itemId}`;
-                       }
-                       return retUri;
-                   },
-                   uri: ''
-               }
             ];
             const tableHandlersToRegister = [
-                
+
             ];
             const pageHandlersToRegister = [
                 {
@@ -439,14 +361,14 @@
                         indPgLib.refreshData();
                     }
                 } ,
-                 {
-                                    selector: '#WarehouseItemNatureFilter',
-                                    event: 'change',
-                                    handler: function(event) {
-                                        $('#pageIndex').val(1);
-                                        indPgLib.refreshData();
-                                    }
-                                }
+                {
+                    selector: '#WarehouseItemNatureFilter',
+                    event: 'change',
+                    handler: function(event) {
+                        $('#pageIndex').val(1);
+                        indPgLib.refreshData();
+                    }
+                }
             ];
             const indexPageDef = {
                 uri: '/api/GrKoukInfoApi/GetIndexTblDataSalesDiary',
@@ -458,7 +380,7 @@
                 actionMobileColDefs: actionMobileColDefs,
                 tableHandlersToRegister: tableHandlersToRegister,
                 pageHandlersToRegister: pageHandlersToRegister,
-                afterTableLoad: { 
+                afterTableLoad: {
                 }
             };
 
@@ -482,8 +404,8 @@
                     console.log('Not found currency code for this id');
                 }
             };
-          
-           
+
+
 
             var storageItemJs = localStorage.getItem('SalesDiaryIndexPage');
             if (storageItemJs === undefined || storageItemJs === null) {
