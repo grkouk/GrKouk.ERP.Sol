@@ -34,7 +34,7 @@
                 } else {
                     $selectedRowsActionsLink.addClass("disabled");
                 }
-            },
+            }
         },
         {
             selector: "input[name=checkTableRow]",
@@ -42,17 +42,9 @@
             handler: function () {
                 //indPgLib.handleSelectedRowsUi();
                 handleSelectedRowsUi();
-            },
+            }
         },
-        {
-            selector: "#rowSelectorsToggle",
-            event: "click",
-            handler: function () {
-                //indPgLib.handleSelectedRowsUi();
-                rowSelectorsToggleHandler();
-                //handleSelectedRowsUi();
-            },
-        },
+        
         {
             selector: "[name=SortHeader]",
             event: "click",
@@ -88,7 +80,7 @@
                 //indPgLib.refreshData();
                 setTableCurrentSort(newSortVal);
                 refreshTableData();
-            },
+            }
         }
     ];
 
@@ -130,7 +122,6 @@
             event: "change",
             handler: function (event) {
                 $("#pageIndex").val(1);
-                //indPgLib.refreshData();
                 refreshTableData();
             },
         },
@@ -166,6 +157,13 @@
                 $("#pageIndex").val(1);
                 //indPgLib.refreshData();
                 refreshTableData();
+            },
+        },
+        {
+            selector: "#rowSelectorsToggle",
+            event: "click",
+            handler: function () {
+                rowSelectorsToggleHandler();
             },
         },
     ];
