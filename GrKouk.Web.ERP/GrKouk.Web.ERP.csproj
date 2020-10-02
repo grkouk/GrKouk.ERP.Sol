@@ -43,7 +43,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove=".eslintrc.json" />
+    <Content Remove="package.json" />
     <Content Remove="Pages\_MainInfo.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include=".eslintrc.json" />
+    <None Include="package.json" />
   </ItemGroup>
 
 </Project>
