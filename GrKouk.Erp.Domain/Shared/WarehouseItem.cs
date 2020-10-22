@@ -73,6 +73,13 @@ namespace GrKouk.Erp.Domain.Shared
             get => _warehouseItemCodes ?? (_warehouseItemCodes = new List<WrItemCode>());
             set => _warehouseItemCodes = value;
         }
+
+        private ICollection<CompanyWarehouseItemMapping> _companyWarehouseItemMappings;
+        public virtual ICollection<CompanyWarehouseItemMapping> CompanyMappings
+        {
+            get => _companyWarehouseItemMappings ?? (_companyWarehouseItemMappings = new List<CompanyWarehouseItemMapping>());
+            set => _companyWarehouseItemMappings = value;
+        }
         [Timestamp]
         public byte[] Timestamp { get; set; }
     }

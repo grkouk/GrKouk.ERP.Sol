@@ -73,6 +73,7 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<AppSetting> AppSettings { get; set; }
         public DbSet<RecurringTransDocLine>  RecurringTransDocLines        { get; set; }
         public DbSet<RecurringTransDoc> RecurringTransDocs { get; set; }
+        public DbSet<CompanyWarehouseItemMapping> CompanyWarehouseItemMappings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -183,6 +184,10 @@ namespace GrKouk.Web.ERP.Data
                     .WithOne(p => p.WarehouseItem)
                     .OnDelete(DeleteBehavior.Restrict)
                     .HasForeignKey(p => p.WarehouseItemId);
+                entity.HasMany(p => p.CompanyMappings)
+                    .WithOne(p => p.WarehouseItem)
+                    .HasForeignKey(p=>p.WarehouseItemId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
 
@@ -410,7 +415,14 @@ namespace GrKouk.Web.ERP.Data
                 entity.HasIndex(p => p.Code);
 
             });
-
+            modelBuilder.Entity<CompanyWarehouseItemMapping>(entity =>
+            {
+                entity.HasKey(p => new
+                {
+                    p.CompanyId,
+                    p.WarehouseItemId,
+                });
+            });
             modelBuilder.Entity<CrCatWarehouseItem>(entity =>
             {
                 entity.HasIndex(p => new
