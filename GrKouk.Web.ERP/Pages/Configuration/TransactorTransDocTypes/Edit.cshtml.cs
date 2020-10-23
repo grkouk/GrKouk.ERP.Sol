@@ -38,10 +38,8 @@ namespace GrKouk.Web.Erp.Pages.Configuration.TransactorTransDocTypes
             {
                 return NotFound();
             }
-            // ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Code");
-            // ViewData["TransTransactorDefId"] = new SelectList(_context.TransTransactorDefs, "Id", "Name");
-            // ViewData["SectionList"] = SelectListHelpers.GetSectionsList(_context);
-           LoadCombos();
+
+            LoadCombos();
             return Page();
         }
         private void LoadCombos()

@@ -4,13 +4,17 @@
 @{
     ViewData["Title"] = "WarehouseItem Create";
 }
-
+@section MyCss
+{
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/bootstrap4.css" />
+}
 <h4>Create WarehouseItem</h4>
 <hr />
 <div class="container">
     <form method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="hidden" asp-for="@Model.CopyFromId" id="CopyFromId" />
+        <input type="hidden" asp-for="WarehouseItemVm.SelectedCompanies" />
         <div class="form-row">
             <div class="form-group col-md-2">
                 <label asp-for="WarehouseItemVm.Code" class="control-label small"></label>
@@ -22,7 +26,7 @@
                 <input asp-for="WarehouseItemVm.Name" class="form-control form-control-sm small" />
                 <span asp-validation-for="WarehouseItemVm.Name" class="text-danger small"></span>
             </div>
-           
+
             <div class="form-group col-md-3">
                 <label asp-for="WarehouseItemVm.WarehouseItemNature" class="control-label small"></label>
                 <select asp-for="WarehouseItemVm.WarehouseItemNature" class="form-control form-control-sm small" asp-items="ViewBag.MaterialNatures"></select>
@@ -50,11 +54,11 @@
         <div class="form-row">
             <div class="form-group col-md-4">
                 <label asp-for="WarehouseItemVm.MainMeasureUnitId" class="control-label small"></label>
-                <select asp-for="WarehouseItemVm.MainMeasureUnitId" class ="form-control form-control-sm small" asp-items="ViewBag.MainMeasureUnitId"></select>
+                <select asp-for="WarehouseItemVm.MainMeasureUnitId" class="form-control form-control-sm small" asp-items="ViewBag.MainMeasureUnitId"></select>
             </div>
             <div class="form-group col-md-3">
                 <label asp-for="WarehouseItemVm.SecondaryMeasureUnitId" class="control-label small"></label>
-                <select asp-for="WarehouseItemVm.SecondaryMeasureUnitId" class ="form-control form-control-sm small" asp-items="ViewBag.SecondaryMeasureUnitId"></select>
+                <select asp-for="WarehouseItemVm.SecondaryMeasureUnitId" class="form-control form-control-sm small" asp-items="ViewBag.SecondaryMeasureUnitId"></select>
             </div>
             <div class="form-group col-md-1">
                 <label asp-for="WarehouseItemVm.SecondaryUnitToMainRate" class="control-label small"></label>
@@ -63,7 +67,7 @@
             </div>
             <div class="form-group col-md-3">
                 <label asp-for="WarehouseItemVm.BuyMeasureUnitId" class="control-label small"></label>
-                <select asp-for="WarehouseItemVm.BuyMeasureUnitId" class ="form-control form-control-sm small" asp-items="ViewBag.BuyMeasureUnitId"></select>
+                <select asp-for="WarehouseItemVm.BuyMeasureUnitId" class="form-control form-control-sm small" asp-items="ViewBag.BuyMeasureUnitId"></select>
             </div>
             <div class="form-group col-md-1">
                 <label asp-for="WarehouseItemVm.BuyUnitToMainRate" class="control-label small"></label>
@@ -74,7 +78,7 @@
         <div class="form-row">
             <div class="form-group col-md-2">
                 <label asp-for="WarehouseItemVm.FpaDefId" class="control-label small"></label>
-                <select asp-for="WarehouseItemVm.FpaDefId" class ="form-control form-control-sm small" asp-items="ViewBag.FpaDefId"></select>
+                <select asp-for="WarehouseItemVm.FpaDefId" class="form-control form-control-sm small" asp-items="ViewBag.FpaDefId"></select>
             </div>
             <div class="form-group col-md-3">
                 <label asp-for="WarehouseItemVm.BarCode" class="control-label small"></label>
@@ -107,10 +111,18 @@
                 <label asp-for="WarehouseItemVm.MaterialCategoryId" class="control-label small"></label>
                 <select asp-for="WarehouseItemVm.MaterialCategoryId" class="form-control form-control-sm small" asp-items="ViewBag.MaterialCategoryId"></select>
             </div>
-           
+
             <div class="form-group col-md-3">
                 <label asp-for="WarehouseItemVm.CompanyId" class="control-label small"></label>
                 <select asp-for="WarehouseItemVm.CompanyId" class="form-control form-control-sm small" asp-items="ViewBag.CompanyId"></select>
+            </div>
+            <div class=" form-group col-md-3">
+                <label class="form-control-label small">Companies</label>
+                <ejs-multiselect id="SelectedCompanies" dataSource="@ViewBag.CompaniesListJs" placeholder="Select Companies" mode="CheckBox"
+                                 showDropDownIcon="true"
+                                 showSelectAll="true" selectAllText="Select All" unSelectAllText="unSelect All">
+                    <e-multiselect-fields text="Title" value="Value"></e-multiselect-fields>
+                </ejs-multiselect>
             </div>
         </div>
         <div class="form-row">
@@ -129,24 +141,33 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
+    <ejs-scripts></ejs-scripts>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
         $(document).ready(function () {
-            console.log("Inside Document ready");
-           
+            //console.log("Inside Document ready");
+
             //$('#SupplierTransactionDto_AmountFpa').change((event) => {
             //    //console.log(event.toString());
             //    console.log("Inside Fpa Change");
             //});
-            var copyFromId =parseInt( $('#CopyFromId').val());
+            var copyFromId = parseInt($('#CopyFromId').val());
 
-            if (copyFromId===0) {
+            if (copyFromId === 0) {
                 $('#WarehouseItemVm_SecondaryUnitToMainRate').val("1");
                 $('#WarehouseItemVm_BuyUnitToMainRate').val("1");
                 $('#WarehouseItemVm_PriceBrutto').val("0");
                 $('#WarehouseItemVm_PriceNetto').val("0");
             }
-           
+            const selectedCompanies = document.getElementById("SelectedCompanies").ej2_instances[0];
+            selectedCompanies.changeOnBlur=false;
+            selectedCompanies.addEventListener("change",(event)=>{
+               // console.log('Inside event listener');
+                //console.log(event);
+                var selected = JSON.stringify(event.value);
+                $('#WarehouseItemVm_SelectedCompanies').val(selected);
+            });
         });
     </script>
 }

@@ -56,7 +56,7 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors
                 return Page();
             }
 
-            
+            //ToDo: enclose in transaction
             var transactorToAdd = _mapper.Map<Transactor>(ItemVm);
             
             _context.Transactors.Add(transactorToAdd);

@@ -62,21 +62,24 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors
                 }
                 catch (Exception ex)
                 {
-                    if (ex.GetBaseException().GetType() == typeof(SqlException))
+                    if (ex.GetBaseException() is SqlException)
                     {
-                        Int32 ErrorCode = ((SqlException)ex.InnerException).Number;
-                        switch (ErrorCode)
+                        if (ex.InnerException != null)
                         {
-                            case 2627:  // Unique constraint error
-                                break;
-                            case 547:   // Constraint check violation
-                                _toastNotification.AddErrorToastMessage("Ο συν/νος έχει κινήσεις και δεν μπορεί να διαγραφεί");
+                            int errorCode = ((SqlException)ex.InnerException).Number;
+                            switch (errorCode)
+                            {
+                                case 2627:  // Unique constraint error
+                                    break;
+                                case 547:   // Constraint check violation
+                                    _toastNotification.AddErrorToastMessage("Ο συν/νος έχει κινήσεις και δεν μπορεί να διαγραφεί");
 
-                                break;
-                            case 2601:  // Duplicated key row error
-                                break;
-                            default:
-                                break;
+                                    break;
+                                case 2601:  // Duplicated key row error
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
                     }
                     else
