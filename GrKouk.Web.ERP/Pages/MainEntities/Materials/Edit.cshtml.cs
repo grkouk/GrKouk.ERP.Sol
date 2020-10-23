@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.Shared;
+using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Erp.Dtos.WarehouseItems;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
@@ -13,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
 using NToastNotify;
 
 namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
@@ -32,7 +35,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
         }
 
         [BindProperty]
-        public WarehouseItemModifyDto WarehouseItemVm { get; set; }
+        public WarehouseItemModifyDto ItemVm { get; set; }
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (id == null)
@@ -40,22 +43,25 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
                 return NotFound();
             }
 
-           var  materialToModify = await _context.WarehouseItems
-                .Include(m => m.BuyMeasureUnit)
-                .Include(m => m.Company)
-                .Include(m => m.FpaDef)
-                .Include(m => m.MainMeasureUnit)
-                .Include(m => m.MaterialCaterory)
-                .Include(m => m.SecondaryMeasureUnit).FirstOrDefaultAsync(m => m.Id == id);
+            var materialToModify = await _context.WarehouseItems
+                 .Include(m => m.BuyMeasureUnit)
+                 .Include(m => m.Company)
+                 .Include(m => m.FpaDef)
+                 .Include(m => m.MainMeasureUnit)
+                 .Include(m => m.MaterialCaterory)
+                 .Include(p => p.CompanyMappings)
+                 .Include(m => m.SecondaryMeasureUnit).FirstOrDefaultAsync(m => m.Id == id);
 
             if (materialToModify == null)
             {
                 return NotFound();
             }
 
-            WarehouseItemVm = _mapper.Map<WarehouseItemModifyDto>(materialToModify);
-           LoadCombos();
-          // _toastNotification.AddInfoToastMessage("Welcome to edit page");
+            ItemVm = _mapper.Map<WarehouseItemModifyDto>(materialToModify);
+            int[] selectedCompanies = materialToModify.CompanyMappings.Select(x => x.CompanyId).ToArray();
+            ItemVm.SelectedCompanies = JsonSerializer.Serialize(selectedCompanies);
+            LoadCombos();
+            // _toastNotification.AddInfoToastMessage("Welcome to edit page");
             return Page();
         }
         private void LoadCombos()
@@ -83,7 +89,14 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
             ViewData["MaterialCategoryId"] = new SelectList(_context.MaterialCategories.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
             ViewData["SecondaryMeasureUnitId"] = new SelectList(_context.MeasureUnits.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
             ViewData["MaterialType"] = new SelectList(materialTypes, "Value", "Text");
-           // ViewData["CashRegCategoryId"] = new SelectList(_context.CashRegCategories.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
+            // ViewData["CashRegCategoryId"] = new SelectList(_context.CashRegCategories.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
+            var companiesListJs = _context.Companies.OrderBy(p => p.Name)
+                .Select(p => new DiaryDocTypeItem()
+                {
+                    Title = p.Name,
+                    Value = p.Id
+                }).ToList();
+            ViewData["CompaniesListJs"] = companiesListJs;
         }
         public async Task<IActionResult> OnPostAsync()
         {
@@ -92,19 +105,36 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
                 _toastNotification.AddAlertToastMessage("Please see errors");
                 return Page();
             }
-
-            var materialToAttach = _mapper.Map<WarehouseItem>(WarehouseItemVm);
-
-            _context.Attach(materialToAttach).State = EntityState.Modified;
-
+            await using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                var materialToAttach = _mapper.Map<WarehouseItem>(ItemVm);
+                _context.Attach(materialToAttach).State = EntityState.Modified;
+                _context.CompanyWarehouseItemMappings.RemoveRange(_context.CompanyWarehouseItemMappings.Where(p => p.WarehouseItemId == materialToAttach.Id));
+                
+                int[] companiesSelected = JsonSerializer.Deserialize<int[]>(ItemVm.SelectedCompanies);
+                foreach (var i in companiesSelected)
+                {
+
+                    materialToAttach.CompanyMappings.Add(new CompanyWarehouseItemMapping
+                    {
+                        CompanyId = i,
+                        WarehouseItemId = materialToAttach.Id
+                    });
+                }
+
+               
+
+
                 await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
                 _toastNotification.AddSuccessToastMessage("WarehouseItem changes saved");
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!MaterialExists(WarehouseItemVm.Id))
+                await transaction.RollbackAsync();
+                ModelState.AddModelError("", "Concurency error");
+                if (!MaterialExists(ItemVm.Id))
                 {
                     _toastNotification.AddErrorToastMessage("WarehouseItem was not found");
                     return NotFound();
@@ -112,8 +142,17 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
                 else
                 {
                     _toastNotification.AddErrorToastMessage("Concurency error");
-                    throw;
+                    LoadCombos();
+                    return Page();
                 }
+            }
+            catch (Exception e)
+            {
+                await transaction.RollbackAsync();
+                ModelState.AddModelError("", e.Message);
+                _toastNotification.AddErrorToastMessage(e.Message);
+                LoadCombos();
+                return Page();
             }
 
             return RedirectToPage("./Index");
