@@ -1,10 +1,14 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Web.ERP.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using NToastNotify;
 
 namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
 {
@@ -12,10 +16,11 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
     public class DeleteModel : PageModel
     {
         private readonly ApiDbContext _context;
-
-        public DeleteModel(ApiDbContext context)
+        private readonly IToastNotification _toastNotification;
+        public DeleteModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
+            _toastNotification = toastNotification;
         }
 
         [BindProperty]
@@ -54,8 +59,41 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
 
             if (WarehouseItem != null)
             {
+                _context.CompanyWarehouseItemMappings.RemoveRange(_context.CompanyWarehouseItemMappings.Where(p => p.WarehouseItemId == WarehouseItem.Id));
                 _context.WarehouseItems.Remove(WarehouseItem);
-                await _context.SaveChangesAsync();
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    if (ex.GetBaseException() is SqlException)
+                    {
+                        if (ex.InnerException != null)
+                        {
+                            int errorCode = ((SqlException)ex.InnerException).Number;
+                            switch (errorCode)
+                            {
+                                case 2627:  // Unique constraint error
+                                    break;
+                                case 547:   // Constraint check violation
+                                    _toastNotification.AddErrorToastMessage("Το είδος έχει κινήσεις και δεν μπορεί να διαγραφεί");
+
+                                    break;
+                                case 2601:  // Duplicated key row error
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //ToDo handle normal exception
+                        throw;
+                    }
+                    
+                }
             }
 
             return RedirectToPage("./Index");
