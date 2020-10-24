@@ -38,16 +38,16 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
         }
         private void LoadFilters()
         {
-            var datePeriods = DateFilter.GetDateFiltersSelectList();
+            //var datePeriods = DateFilter.GetDateFiltersSelectList();
             // var datePeriodsJs = DateFilter.GetDateFiltersSelectList();
 
-            ViewData["DataFilterValues"] = new SelectList(datePeriods, "Value", "Text");
-            var pageFilterSize = PageFilter.GetPageSizeFiltersSelectList();
-            ViewData["PageFilterSize"] = new SelectList(pageFilterSize, "Value", "Text");
+           // ViewData["DataFilterValues"] = new SelectList(datePeriods, "Value", "Text");
+            //var pageFilterSize = PageFilter.GetPageSizeFiltersSelectList();
+            //ViewData["PageFilterSize"] = new SelectList(pageFilterSize, "Value", "Text");
 
-            var companiesList = FiltersHelper.GetCompaniesFilterList(_context);
-            ViewData["CompanyFilter"] = new SelectList(companiesList, "Value", "Text");
-            ViewData["CurrencySelector"] = new SelectList(FiltersHelper.GetCurrenciesFilterList(_context), "Value", "Text");
+            //var companiesList = FiltersHelper.GetCompaniesFilterList(_context);
+            //ViewData["CompanyFilter"] = new SelectList(companiesList, "Value", "Text");
+            //ViewData["CurrencySelector"] = new SelectList(FiltersHelper.GetCurrenciesFilterList(_context), "Value", "Text");
             var currencyListJs = _context.Currencies.OrderBy(p => p.Id).AsNoTracking().ToList();
             ViewData["CurrencyListJs"] = currencyListJs;
         }
