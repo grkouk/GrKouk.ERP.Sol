@@ -53,4 +53,8 @@
     <None Include="package.json" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pages\Components\" />
+  </ItemGroup>
+
 </Project>
