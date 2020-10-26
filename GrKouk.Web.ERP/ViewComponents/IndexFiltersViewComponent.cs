@@ -15,23 +15,36 @@ namespace GrKouk.Web.ERP.ViewComponents
             _context = context;
         }
         
-        public async Task<IViewComponentResult> InvokeAsync( IndexFiltersToShow filtersToShow
-            )
+        public async Task<IViewComponentResult> InvokeAsync( IndexFiltersToShow filtersToShow)
         {
-            // Console.WriteLine(showDateFlt);
-            // Console.WriteLine(showMaterialNatureFlt);
-            // Console.WriteLine(showTransactorTypeFlt);
-            Console.WriteLine(filtersToShow.ShowDateFlt);
-            Console.WriteLine(filtersToShow.ShowMaterialNatureFlt);
-            Console.WriteLine(filtersToShow.ShowTransactorTypeFlt);
-            
-            var indexFiltersResult = new IndexFilterResult
+
+            var indexFiltersResult = new IndexFilterResult();
+            if (filtersToShow.ShowCompaniesFlt)
             {
-                CompanyFilter = FiltersHelper.GetCompaniesFilterList(_context),
-                CurrencySelector = FiltersHelper.GetCurrenciesFilterList(_context),
-                DataFilterValues = DateFilter.GetDateFiltersSelectList(),
-                PageFilterSize = FiltersHelper.GetPageSizeFiltersSelectList()
-            };
+                indexFiltersResult.CompanyFilterValues = await FiltersHelper.GetCompaniesFilterListAsync(_context);
+            }
+            if (filtersToShow.ShowCurrencyFlt)
+            {
+                indexFiltersResult.CurrencyFilterValues = await FiltersHelper.GetCurrenciesFilterListAsync(_context);
+            }
+            if (filtersToShow.ShowDateFlt)
+            {
+                indexFiltersResult.DateFilterValues = DateFilter.GetDateFiltersSelectList();
+            }
+            if (filtersToShow.ShowPageSizeFlt)
+            {
+                indexFiltersResult.PageSizeFilterValues = FiltersHelper.GetPageSizeFiltersSelectList();
+            }
+            if (filtersToShow.ShowMaterialNatureFlt)
+            {
+                indexFiltersResult.MaterialNaturesFilterValues = FiltersHelper.GetWarehouseItemNaturesList();
+            }
+            if (filtersToShow.ShowTransactorTypeFlt)
+            {
+                indexFiltersResult.TransactorTypeFilterValues = await FiltersHelper.GetTransactorTypeFilterListAsync(_context);
+            }
+
+            indexFiltersResult.FiltersToShow = filtersToShow;
             return View(indexFiltersResult);
         }
     }

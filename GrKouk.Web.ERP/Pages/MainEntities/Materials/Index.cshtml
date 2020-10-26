@@ -1,4 +1,5 @@
 ﻿@page
+@using GrKouk.Web.ERP.Helpers
 @model IndexModel
 
 @{
@@ -56,46 +57,10 @@
     </ul>
 </div>
 <div class="collapse show" id="filterCollapse">
-    <form class="form-inline" id="FiltersForm" method="get">
-        <input type="hidden" id="filtersVisible" />
-        <input type="hidden" id="rowSelectorsVisible" />
-        <input type="hidden" id="currentSort" />
-        <input type="hidden" id="currentFilter" />
-        <input type="hidden" id="totalPages" />
-        <input type="hidden" id="totalRecords" />
-        <input type="hidden" id="pageIndex" />
-        <div class="container">
-            <div class="form-row">
-                <div class="form-group col-md-auto">
-                    <div class="searchbar">
-                        <input class="search_input" type="text" name="" placeholder="Search...">
-                        <a href="#" class="search_icon"><i class="fas fa-search fa-xs"></i></a>
-                    </div>
-                </div>
-
-                <div class="form-group col-md-auto">
-                    <label class="small"> WarehouseItem Nature:</label>
-                    <select id="WarehouseItemNatureFilter" class="form-control form-control-sm small"
-                            asp-items="ViewBag.MaterialNatureValues"></select>
-
-                </div>
-                <div class="form-group col-md-auto">
-                    <label class="small">Company:</label>
-                    <select id="CompanyFilter" class="form-control form-control-sm small"
-                            asp-items="ViewBag.CompanyFilter"></select>
-
-                </div>
-                <div class="form-group col-md-auto">
-                    <label class="small"> Page Size:</label>
-                    <select id="PageSize" class="form-control form-control-sm small"
-                            asp-items="ViewBag.PageFilterSize"></select>
-                </div>
-               
-            </div>
-        </div>
-    </form>
+     @await Component.InvokeAsync("IndexFilters",new IndexFiltersToShow {ShowMaterialNatureFlt= true,ShowDateFlt = false,ShowCurrencyFlt = false})
+   
     <div class="row">
-        <partial name="_PagerPartial" />
+        <partial name="_PagerPartial"/>
     </div>
 </div>
 <table class="table table-bordered table-sm" id="myTable">
