@@ -1,4 +1,5 @@
 ﻿@page
+@using GrKouk.Web.ERP.Helpers
 @model IndexModel
 
 @{
@@ -45,51 +46,9 @@
 </div>
 
 <div class="collapse show" id="filterCollapse">
-    <form class="form-inline" id="FiltersForm" method="get">
-        <input type="hidden" id="filtersVisible" />
-        <input type="hidden" id="rowSelectorsVisible" />
-        <input type="hidden" id="currentSort" />
-        <input type="hidden" id="currentFilter" />
-        <input type="hidden" id="totalPages" />
-        <input type="hidden" id="totalRecords" />
-        <input type="hidden" id="pageIndex" />
-        <div class="container">
-            <div class="form-row">
-                <div class="form-group col-md-auto">
-                    <div class="searchbar">
-                        <input class="search_input" type="text" name="" placeholder="Search...">
-                        <a href="#" class="search_icon"><i class="fas fa-search fa-xs"></i></a>
-                    </div>
-                </div>
+    @await Component.InvokeAsync("IndexFilters",new IndexFiltersToShow {ShowDateFlt=true})
 
-                <div class="form-group col-md-auto">
-                    <label class="small"> Period:</label>
-                    <select name="DatePeriodFilter" id="DatePeriodFilter" class="form-control form-control-sm small"
-                            asp-items="ViewBag.DataFilterValues"></select>
-                </div>
-                <div class="form-group col-md-auto">
-                    <label class="small">Company:</label>
-                    <select id="CompanyFilter" class="form-control form-control-sm small"
-                            asp-items="ViewBag.CompanyFilter"></select>
-
-                </div>
-                <div class="form-group col-md-auto">
-                    <label class="small"> Page Size:</label>
-                    <select id="PageSize" class="form-control form-control-sm small"
-                            asp-items="ViewBag.PageFilterSize"></select>
-                </div>
-               
-                <div class="form-group col-md-auto">
-                    <label class="small"> Currency:</label>
-                    <select id="CurrencySelector" class="form-control form-control-sm small"
-                            asp-items="ViewBag.CurrencySelector"></select>
-                </div>
-            </div>
-           
-        </div>
-    </form>
-
-     <div class="row mt-1">
+    <div class="row mt-1">
          <partial name="_PagerPartial" />
     </div>
 </div>

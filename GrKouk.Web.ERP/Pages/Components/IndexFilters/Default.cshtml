@@ -1,0 +1,105 @@
+﻿@model GrKouk.Web.ERP.Helpers.IndexFilterResult
+
+@{
+    Layout = null;
+}
+
+<form class="form-inline" id="FiltersForm" method="get">
+    <input type="hidden" id="filtersVisible"/>
+    <input type="hidden" id="rowSelectorsVisible"/>
+    <input type="hidden" id="currentSort"/>
+    <input type="hidden" id="currentFilter"/>
+    <input type="hidden" id="totalPages"/>
+    <input type="hidden" id="totalRecords"/>
+    <input type="hidden" id="pageIndex"/>
+    <div class="container">
+        <div class="form-row">
+            <div class="form-group col-md-auto">
+                <div class="searchbar">
+                    <input class="search_input" type="text" name="" placeholder="Search...">
+                    <a href="#" class="search_icon">
+                        <i class="fas fa-search fa-xs"></i>
+                    </a>
+                </div>
+            </div>
+            @{
+                if (Model.FiltersToShow.ShowDateFlt)
+                {
+                    <div class="form-group col-md-auto">
+                        <label class="small"> Period:</label>
+                        <select name="DatePeriodFilter" id="DatePeriodFilter" class="form-control form-control-sm small"
+                                asp-items="Model.DateFilterValues">
+                        </select>
+                    </div>
+                }
+
+            }
+            @{
+                if (Model.FiltersToShow.ShowMaterialNatureFlt)
+                {
+                    <div class="form-group col-md-auto">
+                        <label class="small">Material Nature:</label>
+                        <select id="WarehouseItemNatureFilter" class="form-control form-control-sm small"
+                                asp-items="Model.MaterialNaturesFilterValues">
+                        </select>
+
+                    </div>
+                }
+
+            }
+            @{
+                if (Model.FiltersToShow.ShowTransactorTypeFlt)
+                {
+                    <div class="form-group col-md-auto">
+                        <label class="small">Transactor Type:</label>
+                        <select id="TransactorTypeFilter" class="form-control form-control-sm small"
+                                asp-items="Model.TransactorTypeFilterValues">
+                        </select>
+
+                    </div>
+                }
+
+            }
+            @{
+                if (Model.FiltersToShow.ShowCompaniesFlt)
+                {
+                    <div class="form-group col-md-auto">
+                        <label class="small">Company:</label>
+                        <select id="CompanyFilter" class="form-control form-control-sm small"
+                                asp-items="Model.CompanyFilterValues">
+                        </select>
+
+                    </div>
+                }
+
+            }
+            @{
+                if (Model.FiltersToShow.ShowPageSizeFlt)
+                {
+                    <div class="form-group col-md-auto">
+                        <label class="small"> Page Size:</label>
+                        <select id="PageSize" class="form-control form-control-sm small"
+                                asp-items="Model.PageSizeFilterValues">
+                        </select>
+                    </div>
+                }
+
+            }
+            @{
+                if (Model.FiltersToShow.ShowCurrencyFlt)
+                {
+                    <div class="form-group col-md-auto">
+                        <label class="small"> Currency:</label>
+                        <select id="CurrencySelector" class="form-control form-control-sm small"
+                                asp-items="Model.CurrencyFilterValues">
+                        </select>
+                    </div>
+                }
+
+            }
+
+
+        </div>
+
+    </div>
+</form>
