@@ -109,6 +109,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
             try
             {
                 var materialToAttach = _mapper.Map<WarehouseItem>(ItemVm);
+                materialToAttach.DateLastModified=DateTime.Today;
                 _context.Attach(materialToAttach).State = EntityState.Modified;
                 _context.CompanyWarehouseItemMappings.RemoveRange(_context.CompanyWarehouseItemMappings.Where(p => p.WarehouseItemId == materialToAttach.Id));
                 
@@ -122,9 +123,6 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
                         WarehouseItemId = materialToAttach.Id
                     });
                 }
-
-               
-
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
