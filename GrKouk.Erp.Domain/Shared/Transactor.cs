@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace GrKouk.Erp.Domain.Shared
@@ -43,6 +44,11 @@ namespace GrKouk.Erp.Domain.Shared
             get => _transactorCompanyMappings ?? (_transactorCompanyMappings = new List<TransactorCompanyMapping>());
             set => _transactorCompanyMappings = value;
         }
+        [DataType(DataType.Date)]
+        public DateTime DateCreated { get; set; }
+
+        [DataType(DataType.Date)]
+        public DateTime DateLastModified { get; set; }
 
       
         [Timestamp]

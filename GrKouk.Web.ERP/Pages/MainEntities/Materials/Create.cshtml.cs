@@ -110,7 +110,8 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
             await using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                   
+                materialToAttach.DateCreated=DateTime.Today;
+                materialToAttach.DateLastModified=DateTime.Today;
                 int[] companiesSelected = JsonSerializer.Deserialize<int[]>(WarehouseItemVm.SelectedCompanies);
                 foreach (var i in companiesSelected)
                 {

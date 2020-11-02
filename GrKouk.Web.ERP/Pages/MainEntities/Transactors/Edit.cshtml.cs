@@ -91,6 +91,7 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors
                 return Page();
             }
             var transactorToAdd = _mapper.Map<Transactor>(ItemVm);
+            transactorToAdd.DateLastModified=DateTime.Today;
             _context.Attach(transactorToAdd).State = EntityState.Modified;
             //transactorToAdd.TransactorCompanyMappings.Clear();
             _context.TransactorCompanyMappings.RemoveRange(_context.TransactorCompanyMappings.Where(p => p.TransactorId == transactorToAdd.Id));
