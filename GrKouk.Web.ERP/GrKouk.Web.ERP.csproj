@@ -15,6 +15,8 @@
   <ItemGroup>
     <Compile Remove="Data\Migrations\20200531135638_trans.cs" />
     <Compile Remove="Data\Migrations\20200531135638_trans.Designer.cs" />
+    <Compile Remove="Data\Migrations\20201105105344_CashFlowSectionEntities.cs" />
+    <Compile Remove="Data\Migrations\20201105105344_CashFlowSectionEntities.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

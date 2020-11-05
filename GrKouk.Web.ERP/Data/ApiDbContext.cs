@@ -80,6 +80,7 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<CashFlowDocTypeDef> CashFlowDocTypeDefs { get; set; }
         public DbSet<CashFlowDocSeriesDef> CashFlowDocSeriesDefs { get; set; }
         public DbSet<CashFlowAccountTransaction> CashFlowAccountTransactions { get; set; }
+        public DbSet<CashFlowAccountCompanyMapping> CashFlowAccountCompanyMappings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -618,6 +619,10 @@ namespace GrKouk.Web.ERP.Data
             modelBuilder.Entity<CashFlowAccount>(entity =>
             {
                 entity.HasIndex(c => c.Code).IsUnique();
+                entity.HasMany(p => p.CompanyMappings)
+                    .WithOne(p => p.CashFlowAccount)
+                    .HasForeignKey(p => p.CashFlowAccountId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
             });
             modelBuilder.Entity<CashFlowAccountTransaction>(entity =>
@@ -644,6 +649,22 @@ namespace GrKouk.Web.ERP.Data
                 entity.HasOne(p => p.CashFlowAccount)
                     .WithMany()
                     .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<CashFlowAccountCompanyMapping>(entity =>
+            {
+                entity.HasKey(p => new
+                {
+                    p.CompanyId,
+                    p.CashFlowAccountId
+                });
+                entity.HasOne(p => p.Company)
+                    .WithMany(p => p.CashFlowAccountCompanyMappings)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasForeignKey(p => p.CompanyId);
+                entity.HasOne(p => p.CashFlowAccount)
+                    .WithMany(p => p.CompanyMappings)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasForeignKey(p => p.CashFlowAccountId);
             });
         }
     }
