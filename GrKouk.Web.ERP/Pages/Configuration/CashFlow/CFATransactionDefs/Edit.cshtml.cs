@@ -10,29 +10,39 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using NToastNotify;
 
 namespace GrKouk.Web.ERP.Pages.Configuration.CashFlow.CFATransactionDefs
 {
-    public class CreateModel : PageModel
+    public class EditModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IToastNotification _toastNotification;
 
-        public CreateModel(ApiDbContext context, IToastNotification toastNotification)
+        public EditModel(ApiDbContext context)
         {
             _context = context;
-            _toastNotification = toastNotification;
-        }
-
-        public IActionResult OnGet()
-        {
-       LoadCombos();
-            return Page();
         }
 
         [BindProperty]
         public CashFlowTransactionDef ItemVm { get; set; }
+
+        public async Task<IActionResult> OnGetAsync(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            ItemVm = await _context.CashFlowTransactionDefs
+                .Include(t => t.Company)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (ItemVm == null)
+            {
+                return NotFound();
+            }
+            LoadCombos();
+            return Page();
+        }
 
         public async Task<IActionResult> OnPostAsync()
         {
@@ -41,21 +51,39 @@ namespace GrKouk.Web.ERP.Pages.Configuration.CashFlow.CFATransactionDefs
                 return Page();
             }
 
-            _context.CashFlowTransactionDefs.Add(ItemVm);
-            await _context.SaveChangesAsync();
+            _context.Attach(ItemVm).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ItemExists(ItemVm.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
             return RedirectToPage("./Index");
         }
 
+        private bool ItemExists(int id)
+        {
+            return _context.CashFlowDocSeriesDefs.Any(e => e.Id == id);
+        }
         private void LoadCombos()
         {
             var financialActions = FiltersHelper.GetFinancialActionsList();
-           
             ViewData["FinancialActions"] = new SelectList(financialActions, "Value", "Text");
             ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
-          
+            
 
-            var dbSeriesList = _context.CashFlowDocSeriesDefs.OrderBy(p => p.Name).AsNoTracking();
+            var dbSeriesList = _context.TransTransactorDocSeriesDefs.OrderBy(p => p.Name).AsNoTracking();
             List<SelectListItem> seriesList = new List<SelectListItem>();
             seriesList.Add(new SelectListItem() { Value = 0.ToString(), Text = "{No Default series}" });
             foreach (var dbSeriesItem in dbSeriesList)
