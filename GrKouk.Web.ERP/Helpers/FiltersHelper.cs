@@ -42,6 +42,19 @@ namespace GrKouk.Web.ERP.Helpers
             };
             return filtersSelectList;
         }
+        public static List<SelectListItem> GetFinancialActionsList()
+        {
+            var listItems = Enum.GetValues(typeof(FinActionsEnum))
+                .Cast<FinActionsEnum>()
+                .Select(c => new SelectListItem()
+                {
+                    Value = ((int)c).ToString(),
+                    Text = c.GetDescription()
+                }).ToList();
+            //Αλλαγή του στοιχείου 0 από απροσδιόριστο σε {Ολές οι φύσεις είδους}
+           
+            return listItems;
+        }
         public static List<SelectListItem> GetWarehouseItemNaturesList()
         {
             var materialNatures = Enum.GetValues(typeof(WarehouseItemNatureEnum))
