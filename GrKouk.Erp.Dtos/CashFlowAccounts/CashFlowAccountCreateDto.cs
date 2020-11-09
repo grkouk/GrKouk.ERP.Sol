@@ -9,8 +9,7 @@ namespace GrKouk.Erp.Dtos.CashFlowAccounts
 
         [MaxLength(200)]
         public string Name { get; set; }
-        [Display(Name = "Ενεργό")]
-        public bool Active { get; set; }
+       
         public string SelectedCompanies { get; set; }
     }
 }

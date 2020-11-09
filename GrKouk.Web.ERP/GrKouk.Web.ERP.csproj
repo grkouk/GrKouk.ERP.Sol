@@ -57,6 +57,8 @@
 
   <ItemGroup>
     <Folder Include="Pages\Components\" />
+    <Folder Include="Pages\Configuration\CashFlow\CFADocTypeDefs\" />
+    <Folder Include="Pages\Configuration\CashFlow\CFADocSeriesDefs\" />
   </ItemGroup>
 
 </Project>
