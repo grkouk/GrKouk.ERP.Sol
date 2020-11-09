@@ -10,11 +10,13 @@ using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using GrKouk.Erp.Definitions;
+using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.DocDefinitions;
 using GrKouk.Erp.Domain.MediaEntities;
 using GrKouk.Erp.Domain.RecurringTransactions;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.BuyDocuments;
+using GrKouk.Erp.Dtos.CashFlowAccounts;
 using GrKouk.Erp.Dtos.CashRegister;
 using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Erp.Dtos.DiaryTransactions;
@@ -2320,6 +2322,127 @@ namespace GrKouk.Web.ERP.Controllers
             return Ok(response);
         }
 
+        [HttpGet("GetIndexTblDataCashFlowAccounts")]
+        public async Task<IActionResult> GetIndexTblDataCashFlowAccounts([FromQuery] IndexDataTableRequest request)
+        {
+            var fullListIq = _context.CashFlowAccountCompanyMappings
+                .Select(t => new CashFlowAccountBigClass()
+                {
+                    Id = t.CashFlowAccount.Id,
+                    Code = t.CashFlowAccount.Code,
+                    Name = t.CashFlowAccount.Name,
+                    CompanyId = t.Company.Id,
+                    CompanyCode = t.Company.Code
+                });
+
+
+            //int transactorTypeId = 0;
+            //if (!string.IsNullOrEmpty(request.TransactorTypeFilter))
+            //{
+            //    if (int.TryParse(request.TransactorTypeFilter, out transactorTypeId))
+            //    {
+            //        if (transactorTypeId > 0)
+            //        {
+            //            fullListIq = fullListIq.Where(p => p.TransactorTypeId == transactorTypeId);
+            //        }
+            //    }
+            //}
+
+            if (!string.IsNullOrEmpty(request.SortData))
+            {
+                switch (request.SortData.ToLower())
+                {
+                    case "codesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.Code);
+                        break;
+                    case "codesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.Code);
+                        break;
+                    case "namesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.Name);
+                        break;
+                    case "namesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.Name);
+                        break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.CompanyFilter))
+            {
+                if (int.TryParse(request.CompanyFilter, out var companyId))
+                {
+                    if (companyId > 0)
+                    {
+                        var allCompCode =
+                            await _context.AppSettings.SingleOrDefaultAsync(
+                                p => p.Code == Constants.AllCompaniesCodeKey);
+                        if (allCompCode == null)
+                        {
+                            return NotFound("All Companies Code Setting not found");
+                        }
+
+                        var allCompaniesEntity =
+                            await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+                        if (allCompaniesEntity != null)
+                        {
+                            var allCompaniesId = allCompaniesEntity.Id;
+                            fullListIq =
+                                fullListIq.Where(t => t.CompanyId == companyId || t.CompanyId == allCompaniesId);
+                        }
+                        else
+                        {
+                            fullListIq = fullListIq.Where(t => t.CompanyId == companyId);
+                        }
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.SearchFilter))
+            {
+                fullListIq = fullListIq.Where(p => p.Name.Contains(request.SearchFilter)
+                                                  
+                                                   || p.Code.Contains(request.SearchFilter)
+                                                  
+                                                  );
+            }
+
+            var testList = fullListIq.ToList();
+            var projectedList = testList.GroupBy(g => new
+                {
+                    g.Id,
+                    g.Name,
+                    g.Code
+                   
+                })
+                .Select(f => new CashFlowAccountListDto()
+                {
+                    Id = f.Key.Id,
+                    Name = f.Key.Name,
+                    Code = f.Key.Code,
+                    
+                    CompanyCodes = string.Join(",", f.Select(n => n.CompanyCode))
+                });
+            var pageIndex = request.PageIndex;
+
+            var pageSize = request.PageSize;
+            var listItems = PagedList<CashFlowAccountListDto>.Create(projectedList.AsQueryable(), pageIndex, pageSize);
+            //var relevantDiarys = new List<SearchListItem>();
+            //var dList = await _context.DiaryDefs.Where(p => p.DiaryType == DiaryTypeEnum.DiaryTypeEnumTransactors)
+            //    .ToListAsync();
+           
+
+            var response = new IndexDataTableResponse<CashFlowAccountListDto>
+            {
+                TotalRecords = listItems.TotalCount,
+                TotalPages = listItems.TotalPages,
+                HasPrevious = listItems.HasPrevious,
+                HasNext = listItems.HasNext,
+               // Diaries = relevantDiarys,
+                Data = listItems
+            };
+            return Ok(response);
+        }
+
         [HttpGet("GetIndexTblDataTransactors")]
         public async Task<IActionResult> GetIndexTblDataTransactors([FromQuery] IndexDataTableRequest request)
         {
@@ -2708,7 +2831,7 @@ namespace GrKouk.Web.ERP.Controllers
             }
             catch (Exception e)
             {
-                string msg = e.InnerException.Message;
+                string msg = e.InnerException?.Message;
                 return BadRequest(new
                 {
                     error = e.Message + " " + msg
@@ -2752,6 +2875,108 @@ namespace GrKouk.Web.ERP.Controllers
             return Ok(response);
         }
 
+         [HttpGet("GetIndexTblDataCfaTransactionDefs")]
+        public async Task<IActionResult> GetIndexTblDataCfaTransactionDefs([FromQuery] IndexDataTableRequest request)
+        {
+            //Thread.Sleep(10000);
+            IQueryable<CashFlowTransactionDef> fullListIq = _context.CashFlowTransactionDefs;
+           
+
+            if (!string.IsNullOrEmpty(request.SortData))
+            {
+                switch (request.SortData.ToLower())
+                {
+                    case "namesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.Name);
+                        break;
+                    case "namesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.Name);
+                        break;
+                    case "codesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.Code);
+                        break;
+                    case "codesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.Code);
+                        break;
+                    
+                    case "companycodesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.Company.Code);
+                        break;
+                    case "companycodesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.Company.Code);
+                        break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.CompanyFilter))
+            {
+                if (int.TryParse(request.CompanyFilter, out var companyId))
+                {
+                    if (companyId > 0)
+                    {
+                        var allCompCode =
+                            await _context.AppSettings.SingleOrDefaultAsync(
+                                p => p.Code == Constants.AllCompaniesCodeKey);
+                        if (allCompCode == null)
+                        {
+                            return NotFound("All Companies Code Setting not found");
+                        }
+
+                        var allCompaniesEntity =
+                            await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+                        if (allCompaniesEntity != null)
+                        {
+                            var allCompaniesId = allCompaniesEntity.Id;
+                            fullListIq =
+                                fullListIq.Where(p => p.CompanyId == companyId || p.CompanyId == allCompaniesId);
+                        }
+                        else
+                        {
+                            fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
+                        }
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.SearchFilter))
+            {
+                fullListIq = fullListIq.Where(p => p.Name.Contains(request.SearchFilter)
+                                                   || p.Code.Contains(request.SearchFilter)
+                                                  );
+            }
+
+            PagedList<CFATransactionDefListDto> listItems;
+            try
+            {
+                var projectedList = fullListIq.ProjectTo<CFATransactionDefListDto>(_mapper.ConfigurationProvider);
+                var pageIndex = request.PageIndex;
+
+                var pageSize = request.PageSize;
+
+                listItems = await PagedList<CFATransactionDefListDto>.CreateAsync(projectedList, pageIndex, pageSize);
+            }
+            catch (Exception e)
+            {
+                string msg = e.InnerException?.Message;
+                return BadRequest(new
+                {
+                    error = e.Message + " " + msg
+                });
+            }
+
+           
+
+            var response = new IndexDataTableResponse<CFATransactionDefListDto>
+            {
+                TotalRecords = listItems.TotalCount,
+                TotalPages = listItems.TotalPages,
+                HasPrevious = listItems.HasPrevious,
+                HasNext = listItems.HasNext,
+                // Diaries = relevantDiarys,
+                Data = listItems
+            };
+            return Ok(response);
+        }
         [HttpGet("GetSelectorTransactors")]
         public async Task<IActionResult> GetSelectorTransactors([FromQuery] IndexDataTableRequest request)
         {

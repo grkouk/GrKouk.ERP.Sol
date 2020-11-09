@@ -3,34 +3,21 @@
 @model IndexModel
 
 @{
-    ViewData["Title"] = "CashFlow Account List";
+    ViewData["Title"] = "CashFlow Transaction Type Definitions";
 }
 @section MyCss
 {
     <link rel="stylesheet" href="~/css/custom-checkbox.css" />
     <link rel="stylesheet" href="~/css/searchbar.css" />
 }
-<h4>Cash Flow Accounts</h4>
+<h4>CashFlow Transaction Type Definitions</h4>
 <div class="container mb-2">
     <ul class="nav small justify-content-end ">
         <li class="nav-item">
             <a href="#" role="button" class="btn btn-sm btn-outline-secondary " id="CreateNew">Create New</a>
 
         </li>
-        <li class="nav-item">
-            <a asp-page="./Isozigio" class="btn btn-sm btn-outline-secondary" role="button">Ισοζύγιο</a>
-        </li>
-
-        <li class="nav-item dropdown ">
-            <a class="btn btn-sm btn-outline-secondary dropdown-toggle" role="button" id="ddDiarys" data-toggle="dropdown"
-               aria-haspopup="true" aria-expanded="false">Ημερολόγια</a>
-
-            <div class="dropdown-menu small " name="diaryDropDownMenu">
-                <h6 class="dropdown-header">Σχετικά Ημερολόγια</h6>
-                <a class="dropdown-item small diaryLink">
-                </a>
-            </div>
-        </li>
+       
         <li class="nav-item">
             <a class="btn btn-sm btn-outline-secondary" data-toggle="collapse" href="#filterCollapse" role="button" id="filtersToggle"
                aria-expanded="false" aria-controls="filterCollapse">
@@ -56,37 +43,20 @@
     </ul>
 </div>
 <div class="collapse show" id="filterCollapse">
-     @await Component.InvokeAsync("IndexFilters",new IndexFiltersToShow {ShowDateFlt = false,ShowCurrencyFlt = false})
+    @await Component.InvokeAsync("IndexFilters",new IndexFiltersToShow {ShowDateFlt = false,ShowCurrencyFlt = false})
   
     <div class="row mt-1">
         <partial name="_PagerPartial"/>
     </div>
 
 </div>
-<table class="table table-bordered table-sm" id="myTable">
-    <thead class="thead-light">
+<partial name="Shared/_DataTable" />
 
-    </thead>
-    <tbody>
-    </tbody>
-</table>
 <div class="row">
     <partial name="_PagerPartial" />
 </div>
+<partial name="_PendingRequestModal" />
 
-<!-- Modal -->
-<div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <div class="loader"></div>
-                <div>
-                    <p>Executing request. <br><br><small>Please wait...</small></p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 
 @section Scripts {
@@ -142,7 +112,7 @@
                     totalFormatter: '',
                     sortKey: 'NameSort',
                     sortType: 'alpha',
-                    header: 'Account',
+                    header: 'Name',
                     text: '',
                     headerClass: 'small text-center',
                     class: 'small',
@@ -153,8 +123,8 @@
                 },
                 
                 {
-                    key: 'companyCodes',
-                    responseKey: 'companyCodes',
+                    key: 'companyCode',
+                    responseKey: 'companyCode',
                     actualVal: '',
                     columnFormat: 't',
                     totalKey: '',
@@ -250,16 +220,6 @@
                     valueKey: 'id',
                     icon: '<i class="fas fa-clone fa-lg" style="color:slategray"></i>',
                     url: '@Url.Page("./Create")?copyFromId='
-                },
-                {
-                    actionType: 'newWindowAction',
-                    visibility: 'always',
-                    elementName: '',
-                    condition: {},
-                    text: 'Καρτέλλα',
-                    valueKey: 'id',
-                    icon: '<i class="fas fa-receipt fa-lg" style="color:slategray"></i>',
-                    url: '@Url.Page("./Kartela")?transactorId='
                 }
             ];
             const tableHandlersToRegister = [
@@ -269,7 +229,7 @@
                
             ];
             const indexPageDef = {
-                uri: '/api/GrKoukInfoApi/GetIndexTblDataCashFlowAccounts',
+                uri: '/api/GrKoukInfoApi/GetIndexTblDataCfaTransactionDefs',
                 currencyFormatter: formatterCurrency,
                 numberFormatter: formatterNumber,
                 colDefs: colDefs,
