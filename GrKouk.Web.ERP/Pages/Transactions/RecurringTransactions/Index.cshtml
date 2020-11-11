@@ -1,4 +1,5 @@
 ﻿@page
+@using GrKouk.Web.ERP.Helpers
 @model GrKouk.Web.ERP.Pages.Transactions.RecurringTransactions.IndexModel
 
 @{
@@ -48,87 +49,10 @@
 </div>
 
 <div class="collapse show" id="filterCollapse">
-    <form class="form-inline" id="FiltersForm" method="get">
-        <input type="hidden" id="filtersVisible" />
-        <input type="hidden" id="rowSelectorsVisible" />
-        <input type="hidden" id="currentSort" />
-        <input type="hidden" id="currentFilter" />
-        <input type="hidden" id="totalPages" />
-        <input type="hidden" id="totalRecords" />
-        <input type="hidden" id="pageIndex" />
-        <div class="container">
-            <div class="form-row">
-                <div class="form-group col-md-auto">
-                    <div class="searchbar">
-                        <input class="search_input" type="text" name="" placeholder="Search...">
-                        <a href="#" class="search_icon"><i class="fas fa-search fa-xs"></i></a>
-                    </div>
-                </div>
-
-                <div class="form-group col-md-auto">
-                    <label class="small"> Period:</label>
-                    <select name="DatePeriodFilter" id="DatePeriodFilter" class="form-control form-control-sm small"
-                            asp-items="ViewBag.DataFilterValues"></select>
-                </div>
-                <div class="form-group col-md-auto">
-                    <label class="small">Company:</label>
-                    <select id="CompanyFilter" class="form-control form-control-sm small"
-                            asp-items="ViewBag.CompanyFilter"></select>
-
-                </div>
-                <div class="form-group col-md-auto">
-                    <label class="small"> Page Size:</label>
-                    <select id="PageSize" class="form-control form-control-sm small"
-                            asp-items="ViewBag.PageFilterSize"></select>
-                </div>
-              
-                <div class="form-group col-md-auto">
-                    <label class="small"> Currency:</label>
-                    <select id="CurrencySelector" class="form-control form-control-sm small"
-                            asp-items="ViewBag.CurrencySelector"></select>
-                </div>
-            </div>
-        </div>
-    </form>
+    @await Component.InvokeAsync("IndexFilters",new IndexFiltersToShow {ShowDateFlt=true})
+  
     <div class="row mt-1">
-        <div class="col-5">
-            <label class="small text-left" name="PagingInfo"> </label>
-        </div>
-        <div class="col-7">
-            <nav aria-label="Page navigation example">
-                <ul class="pagination pagination-sm justify-content-end">
-                    <li class="page-item ">
-                        <a href="#" id="GoToFirst" data-pageraction="GoToFirst" 
-                           class="page-link" aria-label="First">
-                            @*<span aria-hidden="true">;</span>*@
-                            First
-                        </a>
-                    </li>
-                    <li class="page-item ">
-                        <a href="#" id="GoToPrevious" data-pageraction="GoToPrevious"
-                           class="page-link" aria-label="Previous">
-                            @*<span aria-hidden="true">&laquo;</span>*@
-                            Previous
-                        </a>
-                    </li>
-
-                    <li class="page-item ">
-                        <a href="#" id="GoToNext" data-pageraction="GoToNext"
-                           class="page-link" aria-label="Next">
-                            @*<span aria-hidden="true">&raquo;</span>*@
-                            Next
-                        </a>
-                    </li>
-                    <li class="page-item  ">
-                        <a href="#" id="GoToLast" data-pageraction="GoToLast"
-                           class="page-link" aria-label="Last">
-                            @*<span aria-hidden="true">;</span>*@
-                            Last
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
+        <partial name="_PagerPartial"/>
     </div>
 </div>
 <table class="table table-bordered table-sm m-0" id="myTable">
@@ -138,44 +62,7 @@
     </tbody>
 </table>
 <div class="row">
-    <div class="col-5">
-        <label class="small" name="PagingInfo"> </label>
-    </div>
-    <div class="col-7">
-        <nav aria-label="Page navigation example">
-            <ul class="pagination pagination-sm justify-content-end">
-                <li class="page-item ">
-                    <a href="#" id="GoToFirst"
-                       class="page-link" aria-label="First">
-                        @*<span aria-hidden="true">;</span>*@
-                        First
-                    </a>
-                </li>
-                <li class="page-item ">
-                    <a href="#" id="GoToPrevious"
-                       class="page-link" aria-label="Previous">
-                        @*<span aria-hidden="true">&laquo;</span>*@
-                        Previous
-                    </a>
-                </li>
-
-                <li class="page-item ">
-                    <a href="#" id="GoToNext"
-                       class="page-link" aria-label="Next">
-                        @*<span aria-hidden="true">&raquo;</span>*@
-                        Next
-                    </a>
-                </li>
-                <li class="page-item  ">
-                    <a href="#" id="GoToLast"
-                       class="page-link" aria-label="Last">
-                        @*<span aria-hidden="true">;</span>*@
-                        Last
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
+    <partial name="_PagerPartial" />
 </div>
 <!-- Modal product selector -->
 <div class="modal fade" id="productSelector" tabindex="-1" role="dialog" aria-labelledby="productModalLabel" aria-hidden="true">
