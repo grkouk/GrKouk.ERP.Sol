@@ -146,12 +146,7 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
         $(document).ready(function () {
-            //console.log("Inside Document ready");
-
-            //$('#SupplierTransactionDto_AmountFpa').change((event) => {
-            //    //console.log(event.toString());
-            //    console.log("Inside Fpa Change");
-            //});
+           
             var copyFromId = parseInt($('#CopyFromId').val());
 
             if (copyFromId === 0) {
@@ -163,8 +158,7 @@
             const selectedCompanies = document.getElementById("SelectedCompanies").ej2_instances[0];
             selectedCompanies.changeOnBlur=false;
             selectedCompanies.addEventListener("change",(event)=>{
-               // console.log('Inside event listener');
-                //console.log(event);
+              
                 var selected = JSON.stringify(event.value);
                 $('#WarehouseItemVm_SelectedCompanies').val(selected);
             });

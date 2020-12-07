@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.DocDefinitions;
 using GrKouk.Erp.Domain.MediaEntities;
 using GrKouk.Erp.Domain.RecurringTransactions;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.BuyDocuments;
+using GrKouk.Erp.Dtos.CashFlowAccounts;
 using GrKouk.Erp.Dtos.CashRegister;
 using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Erp.Dtos.FinDiary;
@@ -193,8 +195,49 @@ namespace GrKouk.Web.ERP.Automapper
                     opt => opt.MapFrom(src => src.UnitPrice));
             CreateMap<Transactor, TransactorDetailDto>()
                 .ForMember(x => x.Companies, opt => opt.Ignore());
+            CreateMap<CashFlowAccount, CashFlowAccountCreateDto>().ReverseMap();
+            CreateMap<CashFlowAccount, CashFlowAccountModifyDto>().ReverseMap();
+            CreateMap<CashFlowTransactionDef, CfaTransactionDefCreateDto>().ReverseMap();
+            CreateMap<CashFlowTransactionDef, CfaTransactionDefModifyDto>().ReverseMap();
+            CreateMap<CashFlowDocTypeDef, CfaDocTypeDefCreateDto>().ReverseMap();
+            CreateMap<CashFlowDocTypeDef, CfaDocTypeDefModifyDto>().ReverseMap();
+            CreateMap<CashFlowDocSeriesDef, CfaDocSeriesDefCreateDto>().ReverseMap();
+            CreateMap<CashFlowDocSeriesDef, CfaDocSeriesDefModifyDto>().ReverseMap();
+            CreateMap<CashFlowTransactionDef, CFATransactionDefListDto>()
+                .ForMember(dest => dest.CompanyName,
+                    opt => 
+                        opt.MapFrom(src => src.Company.Name))
+                .ForMember(dest => dest.CompanyCode,
+                    opt => 
+                        opt.MapFrom(src => src.Company.Code));
+            
+            CreateMap<CashFlowDocTypeDef, CfaDocTypeDefListDto>()
+                .ForMember(dest => dest.CfaTransactionDefName,
+                    opt => 
+                        opt.MapFrom(src => src.CashFlowTransactionDefinition.Name))
+                .ForMember(dest => dest.CfaTransactionDefCode,
+                    opt => 
+                        opt.MapFrom(src => src.CashFlowTransactionDefinition.Code))
+                .ForMember(dest => dest.CompanyName,
+                    opt => 
+                        opt.MapFrom(src => src.Company.Name))
+                .ForMember(dest => dest.CompanyCode,
+                    opt => 
+                        opt.MapFrom(src => src.Company.Code));
 
-
+            CreateMap<CashFlowDocSeriesDef, CfaDocSeriesDefListDto>()
+                .ForMember(dest => dest.CfaDocTypeDefName,
+                    opt => 
+                        opt.MapFrom(src => src.CashFlowDocTypeDefinition.Name))
+                .ForMember(dest => dest.CfaDocTypeDefCode,
+                    opt => 
+                        opt.MapFrom(src => src.CashFlowDocTypeDefinition.Code))
+                .ForMember(dest => dest.CompanyName,
+                    opt => 
+                        opt.MapFrom(src => src.Company.Name))
+                .ForMember(dest => dest.CompanyCode,
+                    opt => 
+                        opt.MapFrom(src => src.Company.Code));
         }
     }
 }

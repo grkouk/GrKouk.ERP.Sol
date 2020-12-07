@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.DocDefinitions;
 using GrKouk.Erp.Domain.MediaEntities;
 using GrKouk.Erp.Domain.RecurringTransactions;
@@ -16,7 +17,7 @@ namespace GrKouk.Web.ERP.Data
             : base(options)
         {
         }
-         public DbSet<Company> Companies { get; set; }
+        public DbSet<Company> Companies { get; set; }
         public DbSet<Transactor> Transactors { get; set; }
         public DbSet<FinDiaryTransaction> FinDiaryTransactions { get; set; }
         public DbSet<FinTransCategory> FinTransCategories { get; set; }
@@ -52,7 +53,7 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<SellDocSeriesDef> SellDocSeriesDefs { get; set; }
         public DbSet<SellDocLine> SellDocLines { get; set; }
         public DbSet<SellDocument> SellDocuments { get; set; }
-       // public DbSet<WarehouseItemCode> WarehouseItemsCodes { get; set; }
+        // public DbSet<WarehouseItemCode> WarehouseItemsCodes { get; set; }
         public DbSet<DiaryDef> DiaryDefs { get; set; }
         public DbSet<CashRegCategory> CashRegCategories { get; set; }
         public DbSet<ClientProfile> ClientProfiles { get; set; }
@@ -71,9 +72,15 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<SalesChannel> SalesChannels { get; set; }
         public DbSet<WrItemCode> WrItemCodes { get; set; }
         public DbSet<AppSetting> AppSettings { get; set; }
-        public DbSet<RecurringTransDocLine>  RecurringTransDocLines        { get; set; }
+        public DbSet<RecurringTransDocLine> RecurringTransDocLines { get; set; }
         public DbSet<RecurringTransDoc> RecurringTransDocs { get; set; }
         public DbSet<CompanyWarehouseItemMapping> CompanyWarehouseItemMappings { get; set; }
+        public DbSet<CashFlowAccount> CashFlowAccounts { get; set; }
+        public DbSet<CashFlowTransactionDef> CashFlowTransactionDefs { get; set; }
+        public DbSet<CashFlowDocTypeDef> CashFlowDocTypeDefs { get; set; }
+        public DbSet<CashFlowDocSeriesDef> CashFlowDocSeriesDefs { get; set; }
+        public DbSet<CashFlowAccountTransaction> CashFlowAccountTransactions { get; set; }
+        public DbSet<CashFlowAccountCompanyMapping> CashFlowAccountCompanyMappings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -186,7 +193,7 @@ namespace GrKouk.Web.ERP.Data
                     .HasForeignKey(p => p.WarehouseItemId);
                 entity.HasMany(p => p.CompanyMappings)
                     .WithOne(p => p.WarehouseItem)
-                    .HasForeignKey(p=>p.WarehouseItemId)
+                    .HasForeignKey(p => p.WarehouseItemId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
@@ -219,6 +226,7 @@ namespace GrKouk.Web.ERP.Data
             modelBuilder.Entity<TransactorTransaction>(entity =>
             {
                 entity.HasIndex(p => p.CreatorId);
+                entity.HasIndex(p => p.CreatorSectionId);
                 entity.HasIndex(p => p.TransDate);
                 entity.HasOne(p => p.Company)
                     .WithMany()
@@ -401,7 +409,7 @@ namespace GrKouk.Web.ERP.Data
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
-           
+
             modelBuilder.Entity<WrItemCode>(entity =>
             {
                 entity.HasIndex(p => new
@@ -466,16 +474,16 @@ namespace GrKouk.Web.ERP.Data
                     p.TransactorTransactionId
                 })
                     .IsUnique();
-              
+
                 entity.HasOne(p => p.TransactorTransaction)
-                    .WithMany(p=>p.BuyDocPaymentMappings)
+                    .WithMany(p => p.BuyDocPaymentMappings)
                     .OnDelete(DeleteBehavior.Restrict);
                 entity.HasOne(p => p.BuyDocument)
                     .WithMany(p => p.PaymentMappings)
                     .OnDelete(DeleteBehavior.Restrict);
-                
+
             });
-           
+
             modelBuilder.Entity<ProductRecipeLine>(entity =>
             {
                 entity.HasOne(p => p.Product)
@@ -495,33 +503,33 @@ namespace GrKouk.Web.ERP.Data
                     .WithMany()
                     .OnDelete(DeleteBehavior.Restrict);
             });
-           
+
             modelBuilder.Entity<SellDocTransPaymentMapping>(entity =>
             {
                 entity.HasIndex(p => new
-                    {
-                        p.SellDocumentId,
-                        p.TransactorTransactionId
-                    })
+                {
+                    p.SellDocumentId,
+                    p.TransactorTransactionId
+                })
                     .IsUnique();
-               
+
                 entity.HasOne(p => p.TransactorTransaction)
-                    .WithMany(p=>p.SalesDocPaymentMappings)
+                    .WithMany(p => p.SalesDocPaymentMappings)
                     .OnDelete(DeleteBehavior.Restrict);
                 entity.HasOne(p => p.SellDocument)
                     .WithMany(p => p.PaymentMappings)
                     .OnDelete(DeleteBehavior.Restrict);
-               
+
             });
-           
+
             modelBuilder.Entity<ExchangeRate>(entity =>
             {
                 entity.HasIndex(p => p.ClosingDate);
                 entity.HasOne(p => p.Currency)
                     .WithMany()
                     .OnDelete(DeleteBehavior.Restrict);
-                entity.HasOne(p=>p.Currency)
-                    .WithMany(p=>p.Rates)
+                entity.HasOne(p => p.Currency)
+                    .WithMany(p => p.Rates)
                     .OnDelete(DeleteBehavior.Restrict)
                     .HasForeignKey(p => p.CurrencyId);
             });
@@ -581,6 +589,82 @@ namespace GrKouk.Web.ERP.Data
                     .WithMany()
                     .OnDelete(DeleteBehavior.Restrict);
 
+            });
+
+            modelBuilder.Entity<CashFlowTransactionDef>(entity =>
+            {
+                entity.HasOne(bd => bd.Company)
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(c => c.Code)
+                    .IsUnique();
+            });
+            modelBuilder.Entity<CashFlowDocTypeDef>(entity =>
+            {
+                entity.HasIndex(c => c.Code).IsUnique();
+
+                entity.HasOne(bd => bd.CashFlowTransactionDefinition)
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<CashFlowDocSeriesDef>(entity =>
+            {
+                entity.HasIndex(c => c.Code).IsUnique();
+
+                entity.HasOne(bd => bd.CashFlowDocTypeDefinition)
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<CashFlowAccount>(entity =>
+            {
+                entity.HasIndex(c => c.Code).IsUnique();
+                entity.HasMany(p => p.CompanyMappings)
+                    .WithOne(p => p.CashFlowAccount)
+                    .HasForeignKey(p => p.CashFlowAccountId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+            });
+            modelBuilder.Entity<CashFlowAccountTransaction>(entity =>
+            {
+                entity.HasIndex(p => p.CreatorId);
+                entity.HasIndex(p => p.CreatorSectionId);
+                entity.HasIndex(p => p.TransDate);
+                entity.HasOne(p => p.Company)
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(p => p.DocumentType)
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(p => p.DocumentSeries)
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(p => p.FiscalPeriod)
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(p => p.Section)
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(p => p.CashFlowAccount)
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<CashFlowAccountCompanyMapping>(entity =>
+            {
+                entity.HasKey(p => new
+                {
+                    p.CompanyId,
+                    p.CashFlowAccountId
+                });
+                entity.HasOne(p => p.Company)
+                    .WithMany(p => p.CashFlowAccountCompanyMappings)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasForeignKey(p => p.CompanyId);
+                entity.HasOne(p => p.CashFlowAccount)
+                    .WithMany(p => p.CompanyMappings)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasForeignKey(p => p.CashFlowAccountId);
             });
         }
     }

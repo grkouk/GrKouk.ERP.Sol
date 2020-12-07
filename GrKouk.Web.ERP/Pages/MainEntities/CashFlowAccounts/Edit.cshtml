@@ -1,0 +1,80 @@
+﻿@page
+@model EditModel
+@section MyCss
+{
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/bootstrap4.css" />
+}
+@{
+    ViewData["Title"] = "Cash Flow Account Edit";
+}
+
+<h4>Edit Cash Flow Account</h4>
+<hr />
+
+<div class="container">
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="ItemVm.Id" />
+       
+        <input type="hidden" asp-for="ItemVm.SelectedCompanies" />
+        <div class="form-row">
+            <div class="form-group col-md-2">
+                <label asp-for="ItemVm.Code" class="control-label small"></label>
+                <input asp-for="ItemVm.Code" class="form-control form-control-sm small" />
+                <span asp-validation-for="ItemVm.Code" class="text-danger small"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="ItemVm.Name" class="control-label small"></label>
+                <input asp-for="ItemVm.Name" class="form-control form-control-sm small" />
+                <span asp-validation-for="ItemVm.Name" class="text-danger small"></span>
+            </div>
+
+           
+           
+        </div>
+       
+        
+        <div class="form-row">
+            <div class=" form-group col-md-3">
+                <label class="form-control-label small">Companies</label>
+                <ejs-multiselect id="SelectedCompanies" dataSource="@ViewBag.CompaniesListJs" placeholder="Select Companies" mode="CheckBox"
+                                 showDropDownIcon="true"
+                                 showSelectAll="false" selectAllText="Select All" unSelectAllText="unSelect All">
+                    <e-multiselect-fields text="Title" value="Value"></e-multiselect-fields>
+                </ejs-multiselect>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <input type="submit" value="Update" class="btn btn-primary btn-sm" />
+            </div>
+        </div>
+    </form>
+</div>
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function() {
+            const selectedCompanies = document.getElementById("SelectedCompanies").ej2_instances[0];
+           
+            var oldSel = $('#ItemVm_SelectedCompanies').val();
+            if (oldSel.length>0) {
+                selectedCompanies.value=JSON.parse(oldSel);    
+            }
+            
+            selectedCompanies.changeOnBlur=false;
+            selectedCompanies.addEventListener("change",(event)=>{
+                
+                var selected = JSON.stringify(event.value);
+                $('#ItemVm_SelectedCompanies').val(selected);
+            });
+        });
+    </script>
+}
