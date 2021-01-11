@@ -22,6 +22,8 @@ namespace GrKouk.Erp.Domain.Shared
         public int TransactionUnitId { get; set; }
         public double TransactionQuantity { get; set; }
         public Single TransactionUnitFactor { get; set; }
+        [Column(TypeName = "decimal(18, 4)")]
+        public decimal TransUnitPrice { get; set; }
         public Single Factor { get; set; }
         /// <summary>
         /// Ποσότητα σε μονάδα μέτρησης 1
@@ -35,10 +37,6 @@ namespace GrKouk.Erp.Domain.Shared
         public decimal DiscountRate { get; set; }
         [Column(TypeName = "decimal(18, 4)")]
         public decimal UnitPrice { get; set; }
-    
-        [Column(TypeName = "decimal(18, 4)")]
-        public decimal TransUnitPrice { get; set; }
-    
         [Column(TypeName = "decimal(18, 4)")]
         public decimal AmountFpa { get; set; }
         [Column(TypeName = "decimal(18, 4)")]

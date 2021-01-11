@@ -74,6 +74,8 @@ namespace GrKouk.Erp.Domain.Shared
         [Column(TypeName = "decimal(18, 4)")]
         public decimal AmountDiscount { get; set; }
         [Column(TypeName = "decimal(18, 4)")]
+        public decimal AmountExpenses { get; set; }
+        [Column(TypeName = "decimal(18, 4)")]
         public decimal TransQ1 { get; set; }
         [Column(TypeName = "decimal(18, 4)")]
         public decimal TransQ2 { get; set; }
@@ -83,6 +85,8 @@ namespace GrKouk.Erp.Domain.Shared
         public decimal TransNetAmount { get; set; }
         [Column(TypeName = "decimal(18, 4)")]
         public decimal TransDiscountAmount { get; set; }
+        [Column(TypeName = "decimal(18, 4)")]
+        public decimal TransExpensesAmount { get; set; }
         [MaxLength(500)]
         public string Etiology { get; set; }
 

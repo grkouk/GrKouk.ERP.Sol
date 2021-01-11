@@ -56,6 +56,8 @@ namespace GrKouk.Erp.Dtos.WarehouseTransactions
         public decimal AmountNet { get; set; }
         [Display(Name = "Discount Amount")]
         public decimal AmountDiscount { get; set; }
+        [Display(Name = "Amount Expenses")]
+        public decimal AmountExpenses { get; set; }
         [DisplayFormat(DataFormatString = "{0:C}")]
         [Display(Name = "Sum Amount")]
         public decimal AmountSum => (AmountNet+AmountFpa-AmountDiscount);
