@@ -25,6 +25,7 @@ namespace GrKouk.Web.ERP.Helpers
         public string UnitName { get; set; }
         public string UnitCode { get; set; }
         public double UnitFactor { get; set; }
+        public int TransactorId { get; set; }
     }
 
     public enum UnitTypeEnum

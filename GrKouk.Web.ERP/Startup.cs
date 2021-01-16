@@ -33,7 +33,7 @@ namespace GrKouk.Web.ERP
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
+                options.CheckConsentNeeded = context => false;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
                 
             });
@@ -63,7 +63,15 @@ namespace GrKouk.Web.ERP
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied";
                 options.SlidingExpiration = true;
             });
-            services.AddSession(options => { options.IdleTimeout = TimeSpan.FromMinutes(30); });
+            //services.AddSession(options => { options.IdleTimeout = TimeSpan.FromMinutes(30); });
+            services.AddDistributedMemoryCache();
+
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(10);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
             services.AddAutoMapper(typeof(Startup));
             services.AddRazorPages();
             services.AddControllers().AddNewtonsoftJson();

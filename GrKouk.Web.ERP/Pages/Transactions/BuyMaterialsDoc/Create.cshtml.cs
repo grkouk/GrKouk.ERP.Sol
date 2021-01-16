@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Dtos.BuyDocuments;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -78,8 +81,8 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
             List<SelectListItem> seekTypes = new List<SelectListItem>
             {
                 new SelectListItem() {Value = "NAME", Text = "Name"},
-                new SelectListItem() {Value ="CODE", Text = "Code"},
-                new SelectListItem() {Value = "BARCODE", Text = "Barcode"}
+                new SelectListItem() {Value = "BARCODE", Text = "Barcode"},
+                new SelectListItem() {Value ="CODE", Text = "Supplier Code"}
             };
             ViewData["SeekType"] = new SelectList(seekTypes, "Value", "Text");
 
@@ -88,6 +91,8 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
             ViewData["BuyDocSeriesId"] = new SelectList(_context.BuyDocSeriesDefs.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
             ViewData["TransactorId"] = new SelectList(supplierList, "Id", "Name");
             ViewData["PaymentMethodId"] = new SelectList(_context.PaymentMethods.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
+            var codeUnitsJs = HelperFunctions.EnumToJson<WarehouseItemCodeUsedUnitEnum>();
+            ViewData["codeUnitsJs"] = codeUnitsJs;
         }
 
         [BindProperty]
