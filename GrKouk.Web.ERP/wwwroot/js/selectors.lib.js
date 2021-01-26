@@ -8,7 +8,16 @@
     let selectorDef;
     let seekItems;
     let itemSelected;
-   
+    //Spinner loader stuff
+    const spinnerLoaderShow = ($spinnerElement) => {
+        $spinnerElement.show();
+    };
+    const spinnerLoaderHide = ($spinnerElement) => {
+        $spinnerElement.hide();
+    };
+    const spinnerLoaderIsVisible = ($spinnerElement) => {
+        return($spinnerElement.is(':visible'));
+    };
     var timeKey;
     let transactorTypesSelected="";
     let companiesSelected="";
@@ -361,6 +370,26 @@
         setTableCurrentSort: setSupplierSelectorSortData,
         getFilterValues : getFilterValues
     };
+    const customerSelectorDef = {
+        uri : '/api/GrKoukInfoApi/GetSelectorTransactorsV2',
+        //uri: '/api/GrKoukInfoApi/GetIndexTblDataTransactors',
+        currencyFormatter: formatterCurrency,
+        numberFormatter: formatterNumber,
+        colDefs: colDefsTransactors,
+        actionColDefs: actionColDefs,
+        actionColSubDefs: actionColSubDefs,
+        actionMobileColDefs: actionMobileColDefs,
+        tableHandlersToRegister: tableHandlersToRegister,
+        pageHandlersToRegister: pageHandlersToRegister,
+        tableElementId:"selectorItemsList",
+        indexPageType:definitionsLib.IndexPageTypeEnum.CustomerSelector,
+        afterTableLoad: {
+           
+        },
+        getTableCurrentSort: getCustomerSelectorSortData,
+        setTableCurrentSort: setCustomerSelectorSortData,
+        getFilterValues : getFilterValues
+    };
     const transactorSelectorDef = {
         uri: '/api/GrKoukInfoApi/GetIndexTblDataTransactors',
         currencyFormatter: formatterCurrency,
@@ -403,6 +432,10 @@
    const seekSuppliers = () => {
        indPgLib.refreshData();
    };
+   const seekCustomers = () => {
+       indPgLib.refreshData();
+   };
+
    const seekProducts = () => {
        indPgLib.refreshData();
    };
@@ -416,8 +449,8 @@
    };
    //---------------------------------------
   
-
-   const makeAjaxCall = (uri) => {
+   
+   const makeAjaxCall = (uri,$SpElement) => {
         var timeout;
         return new Promise((resolve, reject) => {
             $.ajax({
@@ -433,33 +466,24 @@
                     reject(error);
                 },
                 beforeSend: function () {
-                    //if (timeout) {
-                    //    clearTimeout(timeout);
-                    //}
-                    //timeout = setTimeout(function () {
-                    //    $("#loadMe").modal({
-                    //        backdrop: "static", //remove ability to close modal with click
-                    //        keyboard: false, //remove option to close with keyboard
-                    //        show: true, //Display loader!
-                    //    });
-                    //}, 1000);
+                    if (timeout) {
+                        clearTimeout(timeout);
+                    }
+                    timeout = setTimeout(function () {
+                        spinnerLoaderShow($SpElement);
+                    }, 1000);
                 },
                 complete: function () {
-                    //if (timeout) {
-                    //    clearTimeout(timeout);
-                    //}
-                    //$("#loadMe").modal("hide");
-                    //setTimeout(function () {
-                    //    //console.log("Checking for open modals");
-                    //    var isOpen = $("#loadMe").hasClass("show");
-                    //    if (isOpen) {
-                    //        //console.log("There is an open Modal");
-                    //        $("#loadMe").modal("hide");
-                    //    }
-                    //    /*else {
-                    //        //console.log("No open modal");
-                    //    }*/
-                    //}, 2000);
+                    if (timeout) {
+                        clearTimeout(timeout);
+                    }
+                    $("#loadMe").modal("hide");
+                    setTimeout(function () {
+                        var isOpen = spinnerLoaderIsVisible($SpElement);
+                        if (isOpen) {
+                            spinnerLoaderHide($SpElement);
+                        }
+                    }, 2000);
                 },
             });
         });
@@ -467,7 +491,7 @@
     const getWarehouseItemNatureList = () => {
         let uri = "/api/GrKoukInfoApi/GetSelectorMaterialNatures";
 
-        makeAjaxCall(uri)
+        makeAjaxCall(uri,$("#SpinnerLoaderMaterialNatures"))
             .then((data) => {
                 var multiSelect = document.getElementById("MaterialNatureTypes").ej2_instances[0];
                 multiSelect.dataSource = data;
@@ -488,7 +512,7 @@
     };
     const getTransactorTypeList = () => {
         var uri = '/api/GrKoukInfoApi/GetSelectorTransactorTypes';
-        makeAjaxCall(uri)
+        makeAjaxCall(uri,$("#SpinnerLoaderTransactorTypes"))
             .then((data) => {
                 var multiSelect = document.getElementById("TransactorTypes").ej2_instances[0];
                 multiSelect.dataSource = data;
@@ -510,7 +534,7 @@
    
     const getCompanyList = () => {
         var uri = '/api/GrKoukInfoApi/GetSelectorCompanies';
-        makeAjaxCall(uri)
+        makeAjaxCall(uri,$("#SpinnerLoaderCompanies"))
             .then((data) => {
                 var multiSelect = document.getElementById("CompaniesList").ej2_instances[0];
                 multiSelect.dataSource = data;
@@ -578,6 +602,25 @@
         itemSelected = transactorSelected;
         // getTransactorTypeList();
     };
+    const showCustomerSelector = () => {
+        selectorDef = customerSelectorDef;
+        indPgLib.setIndexPageDefinition(selectorDef);
+        let $modal = $('#itemSelector');
+        $modal.find('.modal-title').text("Customer selector");
+        $('#TransactorSelectorTypesDiv').show();
+        $('#MaterialNatureTypesDiv').hide();
+        let currentCompany = $('#ItemVm_CompanyId').val();
+        $searchTextElement.val("");
+        clearTable();
+        var multiSelect = document.getElementById("TransactorTypes").ej2_instances[0];
+        let sl = [1];
+        transactorTypesSelected = JSON.stringify(sl);
+        multiSelect.value = sl;
+        multiSelect.refresh();
+        seekItems = seekCustomers;
+        itemSelected = transactorSelected;
+        // getTransactorTypeList();
+    };
     const showProductSelector = (productSelectionCallback) => {
         selectorDef = materialSelectorDef;
         indPgLib.setIndexPageDefinition(selectorDef);
@@ -596,6 +639,7 @@
         initializeSelector:initializeSelector,
         showTransactorSelector: showTransactorSelector,
         showSupplierSelector:showSupplierSelector,
+        showCustomerSelector:showCustomerSelector,
         showProductSelector: showProductSelector
     };
 })();

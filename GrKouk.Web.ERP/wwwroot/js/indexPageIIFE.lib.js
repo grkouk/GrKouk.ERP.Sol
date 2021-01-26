@@ -38,7 +38,9 @@
         $('#SpinnerLoader').show();
     };
     const selectorSpinnerHide = () => { $('#SpinnerLoader').hide(); };
-    const selectorSpinnerIsVisible = () => { $('#SpinnerLoader').is(':visible'); };
+    const selectorSpinnerIsVisible = () => {
+        return( $('#SpinnerLoader').is(':visible'));
+    };
     //cached references=================================
     let $pageIndex = $("#pageIndex");
     let $pageSize = $("#PageSize");
