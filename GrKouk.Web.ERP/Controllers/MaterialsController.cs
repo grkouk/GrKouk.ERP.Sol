@@ -547,6 +547,8 @@ namespace GrKouk.Web.ERP.Controllers
                 FpaId = materialData.FpaDefId,
                 FpaRate = materialData.FpaDef.Rate,
                 LastPrice = lastPrice,
+                PriceNetto = materialData.PriceNetto,
+                PriceBrutto = materialData.PriceBrutto,
                 ProductUnits = unitList
             };
             return Ok(response);
