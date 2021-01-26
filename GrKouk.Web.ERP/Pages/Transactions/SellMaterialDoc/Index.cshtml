@@ -9,10 +9,10 @@
 
 @section MyCss
 {
-    <link rel="stylesheet" href="~/css/custom-checkbox.css"/>
-    <link rel="stylesheet" href="~/css/searchbar.css"/>
-    <link rel="stylesheet" href="~/css/search-modal.css"/>
-    <link rel="stylesheet" href="~/lib/bootstrap-select/css/bootstrap-select.min.css"/>
+    <link rel="stylesheet" href="~/css/custom-checkbox.css" />
+    <link rel="stylesheet" href="~/css/searchbar.css" />
+    <link rel="stylesheet" href="~/css/search-modal.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-select/css/bootstrap-select.min.css" />
 }
 
 <h4>Λίστα Παραστατικών Πώλησης</h4>
@@ -64,10 +64,10 @@
 </div>
 
 <div class="collapse show" id="filterCollapse">
-     @await Component.InvokeAsync("IndexFilters",new IndexFiltersToShow {})
-   
+    @await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { })
+
     <div class="row mt-1">
-        <partial name="_PagerPartial"/>
+        <partial name="_PagerPartial" />
     </div>
 </div>
 <table class="table table-bordered table-sm" id="myTable">
@@ -131,7 +131,7 @@
                     </div>
                     <div class="form-row text-center">
                         <div class="col-11">
-                            <input class="form-control form-control-sm" name="itemsSearchText" placeholder="Search text" type="text"/>
+                            <input class="form-control form-control-sm" name="itemsSearchText" placeholder="Search text" type="text" />
 
                         </div>
                         <div class="col-1">
@@ -167,12 +167,13 @@
 {
     <script src="~/lib/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script src="~/js/moment.min.js"></script>
+    <script src="~/js/definitions.js"></script>
     <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
         $(document).ready(function () {
             var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
             let baseCulture = '@System.Globalization.CultureInfo.CurrentCulture.';
-            
+
             var formatterCurrency = new Intl.NumberFormat(currentCulture,
                 {
                     style: 'currency',
@@ -185,7 +186,7 @@
 
                 });
             //#region variables
-          
+
             var $deleteSelectedRowsLink = $('#deleteSelectedRows');
             var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
             //#endregion
@@ -510,8 +511,8 @@
                         payOfDocument(docId);
                     }
                 },
-               
-               
+
+
             ];
             const pageHandlersToRegister = [
                 {
@@ -522,8 +523,8 @@
                         indPgLib.refreshData();
                     }
                 }
-               
-                
+
+
             ];
             const indexPageDef = {
                 uri: '/api/GrKoukInfoApi/GetIndexTblDataSellDocuments',
@@ -540,7 +541,7 @@
 
             indPgLib.setIndexPageDefinition(indexPageDef);
             //#endregion
-           
+
             //#region items selectors modals
             $.fn.selectpicker.Constructor.BootstrapVersion = '4';
             var selectedCompanies = "";
@@ -976,7 +977,7 @@
 
                         switch (curSelectorType) {
                             case "ProductsSelector":
-                                
+
                                 break;
                             case "SuppliersSelector":
                                 break;
@@ -1118,8 +1119,8 @@
                     }
                 });
             };
-           
-           
+
+
             var deleteSelectedRows = () => {
                 var $rowSelectors = $('input[name=checkTableRow]');
                 var selectedRows = $rowSelectors.filter(':checked');
@@ -1193,13 +1194,13 @@
                 }
 
             };
-           
+
             $deleteSelectedRowsLink.on('click',
                 () => {
                     deleteSelectedRows();
                 });
 
-           
+
             var currencyChanged = () => {
                 let curCurrencySelected = parseInt($('#CurrencySelector').val());
                 var currencyCode;
@@ -1213,7 +1214,7 @@
                             currency: currencyCode,
                             minimumFractionDigits: 2
                         });
-                     indPgLib.setCurrencyFormatter(formatterCurrency);    
+                     indPgLib.setCurrencyFormatter(formatterCurrency);
                 } catch (e) {
                     //not found keep old formater or maybe create a default one
                     console.log('Not found currency code for this id');
@@ -1231,7 +1232,7 @@
 
         $(window).on('beforeunload',
             function(e) {
-                indPgLib.saveSettings('SellDocIndexView');               
+                indPgLib.saveSettings('SellDocIndexView');
             });
     </script>
 }

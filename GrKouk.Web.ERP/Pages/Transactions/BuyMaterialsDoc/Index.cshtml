@@ -46,10 +46,10 @@
 </div>
 
 <div class="collapse show" id="filterCollapse">
-    @await Component.InvokeAsync("IndexFilters",new IndexFiltersToShow {ShowDateFlt=true})
+    @await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowDateFlt = true })
 
     <div class="row mt-1">
-         <partial name="_PagerPartial" />
+        <partial name="_PagerPartial" />
     </div>
 </div>
 
@@ -130,7 +130,7 @@
                         <div class="col-12">
                             <table class="table table-bordered table-sm" id="selectorItemsList">
                                 <thead class="thead-light">
-                                    
+
                                 </thead>
                                 <tbody></tbody>
                             </table>
@@ -149,6 +149,7 @@
 {
     <script src="~/lib/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script src="~/js/moment.min.js"></script>
+    <script src="~/js/definitions.js"></script>
     <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
         $(document).ready(function() {
@@ -167,11 +168,11 @@
 
                 });
             //#region variables
-          
+
             var $deleteSelectedRowsLink = $('#deleteSelectedRows');
             var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
             //#endregion
-           
+
             //#region Index page definition objects
             const colDefs = [
                 {
@@ -191,7 +192,7 @@
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
-                        
+
                     }
                 },
                 {
@@ -233,7 +234,7 @@
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
-                       
+
                     }
                 },
                 {
@@ -253,7 +254,7 @@
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
-                       
+
                     }
                 },
                 {
@@ -273,7 +274,7 @@
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
-                       
+
                     }
                 },
                 {
@@ -293,7 +294,7 @@
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
-                       
+
                     }
                 },
                 {
@@ -313,7 +314,7 @@
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
-                       
+
                     }
                 },
                 {
@@ -333,7 +334,7 @@
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
-                       
+
                     }
                 }
             ];
@@ -511,8 +512,8 @@
                         payOfDocument(docId);
                     }
                 },
-               
-               
+
+
             ];
             const pageHandlersToRegister = [
                 {
@@ -523,8 +524,8 @@
                         indPgLib.refreshData();
                     }
                 }
-               
-                
+
+
             ];
             const indexPageDef = {
                 uri: '/api/GrKoukInfoApi/GetIndexTblDataBuyDocuments',
@@ -549,7 +550,7 @@
             var selectedTransTypes = "";
             var curSelectorType = "";
             let selectedDocumentId = 0;
-            
+
 
             const setPaymentToSupplierSelectorCurrentSort = (currentSort) => {
                 var filtersArr = [];
@@ -1070,7 +1071,7 @@
 
             };
             //#endregion
-            
+
             const payOfDocument = (docId) => {
                 var timeout;
                 let idsToHandle = [];
@@ -1131,7 +1132,7 @@
                     }
                 });
             };
-           
+
             var deleteSelectedRows = () => {
                 var $rowSelectors = $('input[name=checkTableRow]');
                 var selectedRows = $rowSelectors.filter(':checked');
@@ -1205,7 +1206,7 @@
                 }
 
             };
-           
+
             $deleteSelectedRowsLink.on('click',
                 () => {
                     deleteSelectedRows();
@@ -1232,12 +1233,12 @@
                     console.log('Not found currency code for this id');
                 }
             };
-           
+
             indPgLib.addPagerElementEventListeners();
             indPgLib.registerPageHandlers();
             indPgLib.loadSettings('BuyDocIndexView');
             //----------------
-           
+
             indPgLib.handleFiltersUi();
             currencyChanged();
             indPgLib.refreshData();

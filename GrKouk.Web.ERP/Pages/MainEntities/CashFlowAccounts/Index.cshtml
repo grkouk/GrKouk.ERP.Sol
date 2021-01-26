@@ -56,10 +56,10 @@
     </ul>
 </div>
 <div class="collapse show" id="filterCollapse">
-     @await Component.InvokeAsync("IndexFilters",new IndexFiltersToShow {ShowDateFlt = false,ShowCurrencyFlt = false})
-  
+    @await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowDateFlt = false, ShowCurrencyFlt = false })
+
     <div class="row mt-1">
-        <partial name="_PagerPartial"/>
+        <partial name="_PagerPartial" />
     </div>
 
 </div>
@@ -90,6 +90,7 @@
 
 
 @section Scripts {
+    <script src="~/js/definitions.js"></script>
     <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
         $(document).ready(function() {
@@ -109,7 +110,7 @@
             //#region variables
             var $filtersToggle = $('#filtersToggle');
             var $deleteSelectedRowsLink = $('#deleteSelectedRows');
-           
+
             //#endregion
             //#region Index page definition objects
             const colDefs = [
@@ -151,7 +152,7 @@
                     remoteReference: {
                     }
                 },
-                
+
                 {
                     key: 'companyCodes',
                     responseKey: 'companyCodes',
@@ -263,10 +264,10 @@
                 }
             ];
             const tableHandlersToRegister = [
-                
+
             ];
             const pageHandlersToRegister = [
-               
+
             ];
             const indexPageDef = {
                 uri: '/api/GrKoukInfoApi/GetIndexTblDataCashFlowAccounts',
@@ -279,14 +280,14 @@
                 tableHandlersToRegister: tableHandlersToRegister,
                 pageHandlersToRegister: pageHandlersToRegister,
                 afterTableLoad: {
-                   
+
                 }
             };
 
             indPgLib.setIndexPageDefinition(indexPageDef);
             //#endregion
 
-           
+
 
 
             var deleteSelectedRows = () => {
@@ -401,12 +402,12 @@
                 filtersValue = storageItem.find(x => x.filterKey === 'transactorTypeFilter').filterValue;
                 $('#TransactorTypeFilter').val(filtersValue);
             }
-           
+
             indPgLib.addPagerElementEventListeners();
             indPgLib.registerPageHandlers();
-           
+
             indPgLib.handleFiltersUi();
-           
+
             indPgLib.refreshData();
             indPgLib.rowSelectorsUi();
         });
