@@ -613,7 +613,7 @@
         $searchTextElement.val("");
         clearTable();
         var multiSelect = document.getElementById("TransactorTypes").ej2_instances[0];
-        let sl = [1];
+        let sl = [2];
         transactorTypesSelected = JSON.stringify(sl);
         multiSelect.value = sl;
         multiSelect.refresh();
