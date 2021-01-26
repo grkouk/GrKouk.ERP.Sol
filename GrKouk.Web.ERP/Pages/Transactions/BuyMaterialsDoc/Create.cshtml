@@ -10,9 +10,13 @@
 }
 @section MyCss
 {
+    <!--Begin syncfusion integration-->
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/bootstrap4.css" />
+    <!--End syncfusion integration-->
     <link rel="stylesheet" href="~/css/search-modal.css" />
     <link rel="stylesheet" href="~/lib/bootstrap-select/css/bootstrap-select.min.css" />
 }
+
 <style>
     .ui-autocomplete-loading {
         background: white url('@Url.Content("~/images/ui-anim_basic_16x16.gif")') right center no-repeat;
@@ -292,79 +296,7 @@
         </div>
     </div>
 </div>
-<!-- Modal Item selector -->
-<div class="modal fade" id="itemSelector" tabindex="-1" role="dialog" aria-labelledby="itemsModalLabel" aria-hidden="true" data-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered modal-lg" style="overflow-y: scroll; max-height:75%;  margin-top: 50px; margin-bottom:50px;" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="container-fluid">
-                    <div class="form-row">
-                        <div class="col-6">
-                            <p class="modal-title font-weight-bold" id="itemsModalLabel">Selector</p>
-                        </div>
-                        <div class="col-6 text-right">
 
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-3">
-                            <select class="selectpicker form-control form-control-sm small " id="CompaniesList" multiple
-                                    title="Companies" data-actions-box="true" data-selected-text-format="count > 1"></select>
-                        </div>
-                        <div class="form-group col-md-3" id="MaterialNatureTypesDiv">
-                            <select class="selectpicker form-control form-control-sm small " id="MaterialNatureTypes" multiple
-                                    title="Item Natures" data-actions-box="true" data-selected-text-format="count > 1"></select>
-                        </div>
-                        <div class="form-group col-md-3" id="TransactorSelectorTypesDiv">
-                            <select class="selectpicker form-control form-control-sm small " id="TransactorTypes" multiple
-                                    title="Item Natures" data-actions-box="true" data-selected-text-format="count > 1"></select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="col-10">
-                            <input class="form-control form-control-sm" name="itemsSearchText" placeholder="Search text" type="text" />
-
-                        </div>
-                        <div class="col-2">
-                            <span class="spinner-border spinner-border-sm text-primary" id="SpinnerLoader" style="display: none"></span>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-            <div class="modal-body ">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-12">
-                            <table class="table table-bordered table-sm" id="selectorItemsList">
-                                <thead class="thead-light">
-                                    <tr>
-                                        <th class="small">
-                                            Product
-                                        </th>
-                                        <th class="small">
-                                            col 2
-                                        </th>
-                                        <th></th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Modal -->
 <div class="modal fade modal-topmost" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
@@ -379,13 +311,22 @@
         </div>
     </div>
 </div>
-
+<partial name="_ItemSelector" />
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/lib/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script src="~/lib/jqueryui/jquery-ui.min.js"></script>
     <script src="~/js/jquery.ui.autocomplete.scroll.min.js"></script>
+    <!--Begin syncfusion integration-->
+    <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+    <!--End syncfusion integration-->
+    <!-- Begin For Modal selector -->
+    <script src="~/js/definitions.js"></script>
+    <script src="~/js/indexPageIIFE.lib.js"></script>
+    <script src="~/js/selectors.lib.js"></script>
     <script src="~/js/product.lib.js"></script>
+    <!-- End For Modal selector -->
     <script>
         $(document).ready(function() {
             console.log("Inside Document ready");
@@ -404,6 +345,7 @@
                     maximumFractionDigits: 3
 
                 });
+
             //#region variables
             var $transDate = $('#ItemVm_TransDate');
             var securityToken = $('[name=__RequestVerificationToken]').val();
@@ -441,624 +383,9 @@
             //#endregion
 
             //#region items selectors modals
+            selectorsLib.initializeSelector();
             $.fn.selectpicker.Constructor.BootstrapVersion = '4';
-            var selectedCompanies = "";
-            var selectedNatures = "";
-            var selectedTransTypes = "";
-            var curSelectorType = "";
-            const setProductSelectorCurrentSort = (currentSort) => {
-                var filtersArr = [];
-                filtersArr.push({
-                    filterKey: 'currentSort',
-                    filterValue: currentSort
-                });
-                let sessionVal = JSON.stringify(filtersArr);
 
-                localStorage.setItem('ProductSelectorStore', sessionVal);
-            };
-            const getProductSelectorCurrentSort = () => {
-                var storageItemJs = localStorage.getItem('ProductSelectorStore');
-                if (storageItemJs === undefined || storageItemJs === null) {
-                    return "";
-                } else {
-
-                    var storageItem = JSON.parse(storageItemJs);
-                    try {
-                        let filtersValue = storageItem.find(x => x.filterKey === 'currentSort').filterValue;
-                        return filtersValue;
-                    } catch (e) {
-                        return "";
-                    }
-                }
-            };
-            const setTransactorSelectorCurrentSort = (currentSort) => {
-                var filtersArr = [];
-                filtersArr.push({
-                    filterKey: 'currentSort',
-                    filterValue: currentSort
-                });
-                let sessionVal = JSON.stringify(filtersArr);
-
-                localStorage.setItem('TransactorSelectorStore', sessionVal);
-            };
-            const getTransactorSelectorCurrentSort = () => {
-                var storageItemJs = localStorage.getItem('TransactorSelectorStore');
-                if (storageItemJs === undefined || storageItemJs === null) {
-                    return "";
-                } else {
-
-                    var storageItem = JSON.parse(storageItemJs);
-                    try {
-                        let filtersValue = storageItem.find(x => x.filterKey === 'currentSort').filterValue;
-                        return filtersValue;
-                    } catch (e) {
-                        return "";
-                    }
-                }
-            };
-            var getWarehouseItemNatureList = () => {
-                var timeout;
-                var pageIndex = 1;
-                var uri = '/api/GrKoukInfoApi/GetSelectorMaterialNatures';
-                $.ajax({
-                    contentType: 'application/json; charset=utf-8',
-                    dataType: 'json',
-                    type: 'GET',
-                    url: uri,
-                    beforeSend: function() {
-                        if (timeout) {
-                            clearTimeout(timeout);
-                        }
-                        timeout = setTimeout(function() {
-                                $("#loadMe").modal({
-                                    backdrop: "static",
-                                    keyboard: false,
-                                    show: true
-                                });
-                            },
-                            1000);
-                    },
-                    success: function(result) {
-                        $.each(result,
-                            function(index, item) {
-                                $('#MaterialNatureTypes').append($('<option></option>').attr('value', item.valueInt)
-                                    .text(item.title));
-                            });
-                        $('#MaterialNatureTypes').selectpicker('refresh');
-                    },
-                    complete: function() {
-                        if (timeout) {
-                            clearTimeout(timeout);
-                        }
-                        $("#loadMe").modal("hide");
-                        setTimeout(function() {
-                                console.log('Checking for open modals');
-                                var isOpen = $('#loadMe').hasClass('show');
-                                if (isOpen) {
-                                    console.log('There is an open Modal');
-                                    $("#loadMe").modal("hide");
-                                } else {
-                                    console.log('No open modal');
-                                }
-                            },
-                            2000);
-                    },
-                    error: function(e) {
-                        console.log(e);
-
-                    }
-                });
-            };
-            var getTransactorTypeList = () => {
-                var timeout;
-                var pageIndex = 1;
-                var uri = '/api/GrKoukInfoApi/GetSelectorTransactorTypes';
-                $.ajax({
-                    contentType: 'application/json; charset=utf-8',
-                    dataType: 'json',
-                    type: 'GET',
-                    url: uri,
-                    beforeSend: function() {
-                        if (timeout) {
-                            clearTimeout(timeout);
-                        }
-                        timeout = setTimeout(function() {
-                                $("#loadMe").modal({
-                                    backdrop: "static",
-                                    keyboard: false,
-                                    show: true
-                                });
-                            },
-                            1000);
-                    },
-                    success: function(result) {
-                        $.each(result,
-                            function(index, item) {
-                                $('#TransactorTypes').append($('<option></option>').attr('value', item.valueInt)
-                                    .text(item.title));
-                            });
-                        $('#TransactorTypes').selectpicker('refresh');
-                    },
-                    complete: function() {
-                        if (timeout) {
-                            clearTimeout(timeout);
-                        }
-                        $("#loadMe").modal("hide");
-                        setTimeout(function() {
-                                console.log('Checking for open modals');
-                                var isOpen = $('#loadMe').hasClass('show');
-                                if (isOpen) {
-                                    console.log('There is an open Modal');
-                                    $("#loadMe").modal("hide");
-                                } else {
-                                    console.log('No open modal');
-                                }
-                            },
-                            2000);
-                    },
-                    error: function(e) {
-                        console.log(e);
-
-                    }
-                });
-            };
-            var getCompanyList = () => {
-                var timeout;
-                var pageIndex = 1;
-                var uri = '/api/GrKoukInfoApi/GetSelectorCompanies';
-                $.ajax({
-                    contentType: 'application/json; charset=utf-8',
-                    dataType: 'json',
-                    type: 'GET',
-                    url: uri,
-                    beforeSend: function() {
-                        if (timeout) {
-                            clearTimeout(timeout);
-                        }
-                        timeout = setTimeout(function() {
-                                $("#loadMe").modal({
-                                    backdrop: "static",
-                                    keyboard: false,
-                                    show: true
-                                });
-                            },
-                            1000);
-                    },
-                    success: function(result) {
-                        $.each(result,
-                            function(index, item) {
-                                $('#CompaniesList')
-                                    .append($('<option></option>').attr('value', item.value).text(item.title));
-                            });
-                        $('#CompaniesList').selectpicker('refresh');
-                    },
-                    complete: function() {
-                        if (timeout) {
-                            clearTimeout(timeout);
-                        }
-                        $("#loadMe").modal("hide");
-                        setTimeout(function() {
-                                console.log('Checking for open modals');
-                                var isOpen = $('#loadMe').hasClass('show');
-                                if (isOpen) {
-                                    console.log('There is an open Modal');
-                                    $("#loadMe").modal("hide");
-                                } else {
-                                    console.log('No open modal');
-                                }
-                            },
-                            2000);
-                    },
-                    error: function(e) {
-                        console.log(e);
-
-                    }
-                });
-            };
-            var getProductsSelectorList = (selCompanies, selNatures, searchFilter, sortData, pageSize, selectionCallback) => {
-                var timeout;
-                var pageIndex = 1;
-                var uri = '/api/GrKoukInfoApi/GetSelectorWareHouseItems';
-                uri += `?pageIndex=${pageIndex}`;
-                uri += `&pageSize=${pageSize}`;
-                uri += `&warehouseItemNatureFilter=${selNatures}`;
-                uri += `&companyFilter=${selCompanies}`;
-                uri += `&sortData=${sortData}`;
-                uri += `&searchFilter=${searchFilter}`;
-                $.ajax({
-                    contentType: 'application/json; charset=utf-8',
-                    dataType: 'json',
-                    type: 'GET',
-                    url: uri,
-                    beforeSend: function() {
-                        if (timeout) {
-                            clearTimeout(timeout);
-                        }
-                        timeout = setTimeout(function() {
-                                $('#SpinnerLoader').show();
-
-                            },
-                            1000);
-                    },
-                    success: function(result) {
-                        $('#selectorItemsList > tbody').empty();
-                        $('#selectorItemsList > thead').empty();
-                        let colDefs = [
-                            {
-                                sortKey: 'ProductCodeSort',
-                                sortType: 'alpha',
-                                header: 'Code',
-                                text: '',
-                                class: 'small d-none d-md-table-cell'
-                            },
-                            {
-                                sortKey: 'ProductNameSort',
-                                sortType: 'alpha',
-                                header: 'Product',
-                                text: '',
-                                class: 'small'
-                            },
-                            {
-                                sortKey: '',
-                                sortType: '',
-                                header: 'Nature',
-                                text: '',
-                                class: 'small'
-                            },
-                            {
-                                sortKey: 'CompanyNameSort',
-                                sortType: 'alpha',
-                                header: 'Company',
-                                text: '',
-                                class: 'small'
-                            }
-                        ];
-                        let curSortUndefined = false;
-                        let curSortAr = [];
-                        var curSort = getProductSelectorCurrentSort();
-                        if (curSort === undefined || curSort === null || curSort.length === 0) {
-                            curSortUndefined = true;
-                        } else {
-                            curSortAr = curSort.split(':');
-                        }
-                        var $trHead = $('<tr>');
-                        colDefs.forEach(function(item) {
-                            //var $tdColHead = $('<th>').text(item.header).addClass(item.class);
-                            var tdColHead = '';
-                            if (item.sortKey.length !== 0) {
-                                let colHtml = "";
-                                colHtml = `<th class="${item.class}"> `;
-                                colHtml += `<a href="#" role="button" name="SortHeader" tabindex="-1" `;
-                                colHtml += `data-sortkey="${item.sortKey}" data-sorttype="${item.sortType}">  `;
-                                colHtml += `${item.header}  `;
-                                colHtml += `</a>  `;
-                                if (curSortUndefined) {
-                                    colHtml += `<i class="" name="SortIcon"></i>  `;
-                                } else {
-                                    if (curSortAr[0] === item.sortKey) {
-
-                                        var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
-                                        var iconSortType = "fas fa-sort-" + item.sortType + newSortIconType;
-                                        colHtml += `<i class="${iconSortType}" name="SortIcon"></i>  `;
-                                    } else {
-                                        colHtml += `<i class="" name="SortIcon"></i>  `;
-                                    }
-                                }
-
-                                colHtml += `</a>  `;
-                                tdColHead = colHtml;
-                            } else {
-                                tdColHead = $('<th>').text(item.header).addClass(item.class);
-                            }
-                            $trHead.append($(tdColHead));
-                        });
-                        $trHead.append($('<th>'));
-                        $trHead.appendTo('#selectorItemsList > thead');
-
-                        $.each(result.data,
-                            function(index, value) {
-                                //colDefs[0].text = value.url;
-                                colDefs[0].text = value.code;
-                                colDefs[1].text = value.name;
-                                //colDefs[2].text = value.materialCateroryName;
-                                colDefs[2].text = value.warehouseItemNatureName;
-                                colDefs[3].text = value.companyCode;
-                                var itemId = value.id;
-                                // var urlDel = `@Url.Page("./Delete")?id=${itemId}`;
-
-                                var $tr = $('<tr>');
-
-                                colDefs.forEach(function(item) {
-                                    var $tdCol = $('<td>').text(item.text).addClass(item.class);
-                                    $tr.append($tdCol);
-
-                                });
-                                var actionsCol = '<td class="small text-center">';
-                                actionsCol += '<button type="button" class="btn btn-outline-info btn-sm" ';
-                                actionsCol += `data-itemId="${itemId}"`;
-                                actionsCol += 'name="selectItem">';
-                                actionsCol +=
-                                    '<span><i class="far fa-check-square fa-lg" style="color:slategray"></i></span>';
-                                actionsCol += '</button>';
-                                actionsCol += '</td>';
-
-                                $tr.append(actionsCol);
-                                $tr.appendTo('#selectorItemsList > tbody');
-
-                            });
-
-                        $('[name=selectItem]').on('click',
-                            function(event) {
-                                var button = $(event.delegateTarget);
-                                var productId = button.data('itemid');
-                                console.log('Inside click event handler for selectItem');
-                                selectionCallback(productId);
-                                $('#itemSelector').modal('hide');
-
-                            });
-                        $('[name=SortHeader]').on('click',
-                            function(event) {
-                                var button = $(event.delegateTarget);
-                                var reqSort = button.data('sortkey');
-                                let reqSortType = button.data('sorttype');
-                                let iconSortType = '';
-                                var newSortVal = '';
-                                var curSort = getProductSelectorCurrentSort();
-                                if (curSort === undefined || curSort === null || curSort.length === 0) {
-                                    curSort = reqSort + ':desc';
-                                }
-                                var curSortAr = curSort.split(':');
-                                if (curSortAr[0] === reqSort) {
-                                    var newSort = curSortAr[1] === 'asc' ? 'desc' : 'asc';
-                                    var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
-                                    newSortVal = curSortAr[0] + ':' + newSort;
-                                    iconSortType = "fas fa-sort-" + reqSortType + newSortIconType;
-                                } else {
-                                    newSortVal = reqSort + ':asc';
-                                    iconSortType = "fas fa-sort-" + reqSortType + "-up";
-                                }
-                                let $btParent = button.parent();
-                                let $icon = $btParent.find('i:eq(0)');
-                                if ($icon !== null) {
-                                    $icon.removeClass();
-                                    $icon.addClass(iconSortType);
-                                }
-
-                                setProductSelectorCurrentSort(newSortVal);
-                                //$('#pageIndex').val(1);
-                                getProductsSelectorList(selCompanies, selNatures, searchFilter, newSortVal, 1000, productSelected);
-
-
-                            });
-                    },
-                    complete: function() {
-                        if (timeout) {
-                            clearTimeout(timeout);
-                        }
-                        $("#loadMe").modal("hide");
-                        setTimeout(function() {
-                                console.log('Checking for open modals');
-                                //var isOpen = $('#loadMe').hasClass('show');
-                                var isOpen = $('#SpinnerLoader').is(':visible');
-                                if (isOpen) {
-                                    console.log('Spinner is showing');
-
-                                    $('#SpinnerLoader').hide();
-                                } else {
-                                    console.log('No open modal');
-                                }
-                            },
-                            2000);
-                    },
-                    error: function(e) {
-                        console.log(e);
-
-                    }
-                });
-            };
-
-            var getTransactorSelectorList = (selCompanies, selTransTypes, searchFilter, sortData, pageSize, selectionCallback) => {
-                var timeout;
-                var pageIndex = 1;
-                var uri = '/api/GrKoukInfoApi/GetSelectorTransactors';
-                uri += `?pageIndex=${pageIndex}`;
-                uri += `&pageSize=${pageSize}`;
-                uri += `&transactorTypeFilter=${selTransTypes}`;
-                uri += `&sortData=${sortData}`;
-                uri += `&companyFilter=${selCompanies}`;
-                uri += `&searchFilter=${searchFilter}`;
-                $.ajax({
-                    contentType: 'application/json; charset=utf-8',
-
-                    dataType: 'json',
-                    type: 'GET',
-
-                    url: uri,
-                    beforeSend: function() {
-                        if (timeout) {
-                            clearTimeout(timeout);
-                        }
-                        timeout = setTimeout(function() {
-                                $('#SpinnerLoader').show();
-
-                            },
-                            1000);
-                    },
-                    success: function(result) {
-                        $('#selectorItemsList > tbody').empty();
-                        $('#selectorItemsList > thead').empty();
-                        let colDefs = [
-                            {
-                                sortKey: 'TransactorCodeSort',
-                                sortType: 'alpha',
-                                header: 'Code',
-                                text: '',
-                                class: 'small d-none d-md-table-cell'
-                            },
-                            {
-                                sortKey: 'TransactorNameSort',
-                                sortType: 'alpha',
-                                header: 'Transactor',
-                                text: '',
-                                class: 'small'
-                            },
-                            {
-                                sortKey: '',
-                                sortType: '',
-                                header: 'Type',
-                                text: '',
-                                class: 'small'
-                            },
-                            {
-                                sortKey: 'CompanyCodeSort',
-                                sortType: 'alpha',
-                                header: 'Company',
-                                text: '',
-                                class: 'small'
-                            }
-                        ];
-                        let curSortUndefined = false;
-                        let curSortAr = [];
-                        var curSort = getTransactorSelectorCurrentSort();
-                        if (curSort === undefined || curSort === null || curSort.length === 0) {
-                            curSortUndefined = true;
-                        } else {
-                            curSortAr = curSort.split(':');
-                        }
-                        var $trHead = $('<tr>');
-                        colDefs.forEach(function(item) {
-                            var tdColHead = '';
-                            if (item.sortKey.length !== 0) {
-                                let colHtml = "";
-                                colHtml = `<th class="${item.class}"> `;
-                                colHtml += `<a href="#" role="button" name="SortHeader" tabindex="-1" `;
-                                colHtml += `data-sortkey="${item.sortKey}" data-sorttype="${item.sortType}">  `;
-                                colHtml += `${item.header}  `;
-                                colHtml += `</a>  `;
-                                if (curSortUndefined) {
-                                    colHtml += `<i class="" name="SortIcon"></i>  `;
-                                } else {
-                                    if (curSortAr[0] === item.sortKey) {
-
-                                        var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
-                                        var iconSortType = "fas fa-sort-" + item.sortType + newSortIconType;
-                                        colHtml += `<i class="${iconSortType}" name="SortIcon"></i>  `;
-                                    } else {
-                                        colHtml += `<i class="" name="SortIcon"></i>  `;
-                                    }
-                                }
-
-                                colHtml += `</a>  `;
-                                tdColHead = colHtml;
-                            } else {
-                                tdColHead = $('<th>').text(item.header).addClass(item.class);
-                            }
-                            $trHead.append($(tdColHead));
-                        });
-                        $trHead.append($('<th>'));
-                        $trHead.appendTo('#selectorItemsList > thead');
-                        $.each(result.data,
-                            function(index, value) {
-                                //colDefs[0].text = value.url;
-                                colDefs[0].text = value.code;
-                                colDefs[1].text = value.name;
-                                //colDefs[2].text = value.materialCateroryName;
-                                colDefs[2].text = value.transactorTypeName;
-                                colDefs[3].text = value.companyCode;
-                                var itemId = value.id;
-                                // var urlDel = `@Url.Page("./Delete")?id=${itemId}`;
-
-                                var $tr = $('<tr>');
-
-                                colDefs.forEach(function(item) {
-                                    var $tdCol = $('<td>').text(item.text).addClass(item.class);
-                                    $tr.append($tdCol);
-
-                                });
-                                var actionsCol = '<td class="small text-center">';
-                                actionsCol += '<button type="button" class="btn btn-outline-info btn-sm" ';
-                                actionsCol += `data-itemId="${itemId}"`;
-                                actionsCol += 'name="selectItem">';
-                                actionsCol +=
-                                    '<span><i class="far fa-check-square fa-lg" style="color:slategray"></i></span>';
-                                actionsCol += '</button>';
-                                actionsCol += '</td>';
-
-                                $tr.append(actionsCol);
-                                $tr.appendTo('#selectorItemsList > tbody');
-
-                            });
-
-                        $('[name=selectItem]').on('click',
-                            function(event) {
-                                var button = $(event.delegateTarget);
-                                var transactorId = button.data('itemid');
-                                console.log('Inside click event handler for selectItem');
-                                // $('#ItemVm_TransactorId').val(transactorId);
-                                selectionCallback(transactorId);
-                                $('#itemSelector').modal('hide');
-
-                            });
-                        $('[name=SortHeader]').on('click',
-                            function(event) {
-                                var button = $(event.delegateTarget);
-                                var reqSort = button.data('sortkey');
-                                let reqSortType = button.data('sorttype');
-                                let iconSortType = '';
-                                var newSortVal = '';
-                                var curSort = getTransactorSelectorCurrentSort();
-                                if (curSort === undefined || curSort === null || curSort.length === 0) {
-                                    curSort = reqSort + ':desc';
-                                }
-                                var curSortAr = curSort.split(':');
-                                if (curSortAr[0] === reqSort) {
-                                    var newSort = curSortAr[1] === 'asc' ? 'desc' : 'asc';
-                                    var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
-                                    newSortVal = curSortAr[0] + ':' + newSort;
-                                    iconSortType = "fas fa-sort-" + reqSortType + newSortIconType;
-                                } else {
-                                    newSortVal = reqSort + ':asc';
-                                    iconSortType = "fas fa-sort-" + reqSortType + "-up";
-                                }
-                                let $btParent = button.parent();
-                                let $icon = $btParent.find('i:eq(0)');
-                                if ($icon !== null) {
-                                    $icon.removeClass();
-                                    $icon.addClass(iconSortType);
-                                }
-
-                                setTransactorSelectorCurrentSort(newSortVal);
-                                //$('#pageIndex').val(1);
-                                getTransactorSelectorList(selCompanies, selTransTypes, searchFilter, newSortVal, 1000, selectionCallback);
-
-
-                            });
-                    },
-                    complete: function() {
-                        if (timeout) {
-                            clearTimeout(timeout);
-                        }
-                        $("#loadMe").modal("hide");
-                        setTimeout(function() {
-                                console.log('Checking for open modals');
-                                //var isOpen = $('#loadMe').hasClass('show');
-                                var isOpen = $('#SpinnerLoader').is(':visible');
-                                if (isOpen) {
-                                    console.log('Spinner is showing');
-
-                                    $('#SpinnerLoader').hide();
-                                } else {
-                                    console.log('No open modal');
-                                }
-                            },
-                            2000);
-                    },
-                    error: function(e) {
-                        console.log(e);
-
-                    }
-                });
-            };
             $('#imageViewer').on('show.bs.modal',
                 function(event) {
                     var button = $(event.relatedTarget);
@@ -1070,144 +397,30 @@
                 });
             $('#itemSelector').on('shown.bs.modal',
                 function() {
-                    let currentCompany = $('#ItemVm_CompanyId').val();
-                    $('[name=itemsSearchText]').val("");
-                    $('#selectorItemsList > tbody').empty();
-                    $('#selectorItemsList > thead').empty();
-                    // $('#MaterialNatureTypes').selectpicker('deselectall');
-                    // $('#TransactorTypes').selectpicker('deselectall');
-                    var $compList = $('#CompaniesList');
-                    $compList.selectpicker('val', currentCompany);
-                    $compList.selectpicker('render');
-                    var $transList = $('#TransactorTypes');
-
-                    $transList.selectpicker('val', 3);
-                    $transList.selectpicker('render');
-
+                    selectorsLib.updateFilterControls();
                     $('[name=itemsSearchText]').trigger('focus');
-                    //$compList.selectpicker('refresh');
+                    return;
+
 
                 });
             $('#itemSelector').on('show.bs.modal',
                 function(event) {
                     var button = $(event.relatedTarget);
                     var selectorType = button.data('selectortype');
-                    var modal = $(this);
+                    //var modal = $(this);
                     switch (selectorType) {
                     case "ProductsSelector":
-                        modal.find('.modal-title').text("Ευρετήριο Προιόντων");
-                        $('#TransactorSelectorTypesDiv').hide();
-                        $('#MaterialNatureTypesDiv').show();
-                        curSelectorType = "ProductsSelector";
-                        var $matNatures = $('#MaterialNatureTypes');
-                        if ($matNatures.children('option').length === 0) {
-                            getWarehouseItemNatureList();
-                        }
+                        selectorsLib.showProductSelector(handleProductSelection);
+
                         break;
-                    case "SuppliersSelector":
-                        modal.find('.modal-title').text("Supplier selector");
-                        $('#TransactorSelectorTypesDiv').show();
-                        $('#MaterialNatureTypesDiv').hide();
-                        curSelectorType = "SuppliersSelector";
-                        var $transTypes = $('#TransactorTypes');
-                        if ($transTypes.children('option').length === 0) {
-                            getTransactorTypeList();
-                        }
+                        case "SuppliersSelector":
+                        selectorsLib.showSupplierSelector();
+
                         break;
                     default:
                     }
-
-
-                    var $compList = $('#CompaniesList');
-                    if ($compList.children('option').length === 0) {
-                        getCompanyList();
-                    }
-                });
-            $('#TransactorTypes').on('changed.bs.select',
-                function(e, clickedIndex, isSelected, previousValue) {
-                    var sel = $('#TransactorTypes option:selected');
-                    var selected = [];
-                    $(sel).each(function(index, item) {
-                        selected.push([$(this).val()]);
-                    });
-
-                    var sItem = selected.toString();
-
-                    selectedTransTypes = sItem;
-                });
-            $('#MaterialNatureTypes').on('changed.bs.select',
-                function(e, clickedIndex, isSelected, previousValue) {
-                    var sel = $('#MaterialNatureTypes option:selected');
-                    var selected = [];
-                    $(sel).each(function(index, item) {
-                        selected.push([$(this).val()]);
-                    });
-
-                    var sItem = selected.toString();
-
-                    selectedNatures = sItem;
                 });
 
-            $('#CompaniesList').on('changed.bs.select',
-                function(e, clickedIndex, isSelected, previousValue) {
-                    var sel = $('#CompaniesList option:selected');
-                    var selected = [];
-                    $(sel).each(function(index, item) {
-                        selected.push([$(this).val()]);
-                    });
-
-                    var sItem = selected.toString();
-
-                    selectedCompanies = sItem;
-                });
-            var timeKey;
-            $('[name=itemsSearchText]').on('keyup',
-                function(event) {
-                    //var button = $(event.relatedTarget);
-
-                    var $this = $(this);
-                    console.log("Inside keyUp event");
-                    //var searchText = $('[name=itemsSearchText]').val();
-                    var searchText = $this.val();
-                    if (searchText.length === 0) {
-                        console.log("search text lenght 0 returning");
-                        return;
-                    }
-                    if (timeKey) {
-                        console.log("Clear timeKey");
-                        clearTimeout(timeKey);
-                    }
-                    timeKey = setTimeout(function() {
-                            console.log("Will execute get request in 1 sec!");
-
-                            switch (curSelectorType) {
-                            case "ProductsSelector":
-                                var curSort = getProductSelectorCurrentSort();
-                                if (curSort === undefined || curSort === null || curSort.length === 0) {
-                                    curSort = '';
-                                }
-                                getProductsSelectorList(selectedCompanies, selectedNatures, searchText, curSort, 100, productSelected);
-                                break;
-                            case "SuppliersSelector":
-                                var curSortTrans = getTransactorSelectorCurrentSort();
-                                if (curSortTrans === undefined || curSortTrans === null || curSortTrans.length === 0) {
-                                    curSortTrans = '';
-                                }
-                                getTransactorSelectorList(selectedCompanies, selectedTransTypes, searchText, curSortTrans, 100, transactorSelected);
-                                break;
-                            default:
-                            }
-
-                            $('#itemSelector').modal('handleUpdate');
-                        },
-                        1000);
-                });
-            const transactorSelected = (transactorId) => {
-                $('#ItemVm_TransactorId').val(transactorId);
-            };
-            const productSelected = (productId) => {
-                getWarehouseItemInfo(productId);
-            };
             //#endregion
             var priceChanged = () => {
                 var priceValue = parseFloat($price.val());
@@ -1562,7 +775,7 @@
                 const $transactorId = $('#ItemVm_TransactorId');
                 productLib.getProductItemInfo(itemId, $transactorId.val(), $companyId.val())
                     .then((data) => {
-                        $materialId.val(ui.item.value);
+                        $materialId.val(itemId);
                         var rate = data.fpaRate;
                         var lastPrice = data.lastPrice;
                         var fpaId = data.fpaId;
@@ -1578,7 +791,7 @@
                     .catch((error) => {
                         $lookupValueValid.val('ERROR');
                         console.log(error);
-                    });;
+                    });
             };
             var autoCompleteNameDef = {
                 source: '/api/materials/SearchWarehouseItemsForBuy',
