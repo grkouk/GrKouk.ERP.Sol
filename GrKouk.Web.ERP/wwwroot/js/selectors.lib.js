@@ -553,6 +553,24 @@
                 console.log(error);
             });
     };
+    const updateFilterControls = () => {
+        var trTypes = document.getElementById("TransactorTypes").ej2_instances[0];
+        var natures = document.getElementById("MaterialNatureTypes").ej2_instances[0];
+        var companies = document.getElementById("CompaniesList").ej2_instances[0];
+        if (transactorTypesSelected) {
+            let sl = JSON.parse(transactorTypesSelected);
+            trTypes.value = sl;
+        }
+        if (productNaturesSelected) {
+            let sl = JSON.parse(productNaturesSelected);
+            natures.value = sl;
+        }
+        if (companiesSelected) {
+            let sl = JSON.parse(companiesSelected);
+            companies.value = sl;
+        }
+
+    };
     const initializeSelector = () => {
         getCompanyList();
         getTransactorTypeList();
@@ -593,11 +611,11 @@
         let currentCompany = $('#ItemVm_CompanyId').val();
         $searchTextElement.val("");
         clearTable();
-        var multiSelect = document.getElementById("TransactorTypes").ej2_instances[0];
+        //var multiSelect = document.getElementById("TransactorTypes").ej2_instances[0];
         let sl = [3];
         transactorTypesSelected = JSON.stringify(sl);
-        multiSelect.value = sl;
-        multiSelect.refresh();
+        //multiSelect.value = sl;
+        //multiSelect.refresh();
         seekItems = seekSuppliers;
         itemSelected = transactorSelected;
         // getTransactorTypeList();
@@ -612,11 +630,11 @@
         let currentCompany = $('#ItemVm_CompanyId').val();
         $searchTextElement.val("");
         clearTable();
-        var multiSelect = document.getElementById("TransactorTypes").ej2_instances[0];
+       // var multiSelect = document.getElementById("TransactorTypes").ej2_instances[0];
         let sl = [2];
         transactorTypesSelected = JSON.stringify(sl);
-        multiSelect.value = sl;
-        multiSelect.refresh();
+        //multiSelect.value = sl;
+        //multiSelect.refresh();
         seekItems = seekCustomers;
         itemSelected = transactorSelected;
         // getTransactorTypeList();
@@ -631,7 +649,7 @@
         let currentCompany = $('#ItemVm_CompanyId').val();
         $searchTextElement.val("");
         clearTable();
-        var multiSelect = document.getElementById("MaterialNatureTypes").ej2_instances[0];
+        //var multiSelect = document.getElementById("MaterialNatureTypes").ej2_instances[0];
         seekItems = seekProducts;
         itemSelected = productSelectionCallback;
     };
@@ -640,6 +658,7 @@
         showTransactorSelector: showTransactorSelector,
         showSupplierSelector:showSupplierSelector,
         showCustomerSelector:showCustomerSelector,
-        showProductSelector: showProductSelector
+        showProductSelector: showProductSelector,
+        updateFilterControls: updateFilterControls
     };
 })();
