@@ -50,7 +50,12 @@ namespace GrKouk.Web.ERP.Controllers
             HttpContext.Session.SetString("CompanyId", companyId);
             return Ok(new { });
         }
-
+        [HttpGet("SetTransactorInSession")]
+        public IActionResult TransactorInSession(string transactorId)
+        {
+            HttpContext.Session.SetString("TransactorId", transactorId);
+            return Ok(new { });
+        }
         [HttpGet("SetBuySeriesInSession")]
         public IActionResult BuySeriesInSession(string seriesId)
         {
@@ -305,9 +310,63 @@ namespace GrKouk.Web.ERP.Controllers
 
             fullListIq = fullListIq.Where(p => p.Active);
             fullListIq = fullListIq.Where(p => p.Name.Contains(term) || p.Code.Contains(term));
+            var m = await fullListIq
+                .ProjectTo<WarehouseItemSearchListDto>(_mapper.ConfigurationProvider)
+                .Select(p => new { label = p.Label, value = p.Id })
+               
+                .ToListAsync();
+
+            var materials = m.OrderBy(p => p.label);
+           
+
+            return Ok(materials);
+        }
+        [HttpGet("AutoCompleteProductsBySupplierCode")]
+        public async Task<IActionResult> GetAutoCompleteProductsBySupplierCode(string term)
+        {
+            var sessionCompanyId = HttpContext.Session.GetString("CompanyId");
+            var sessionSeriesId = HttpContext.Session.GetString("BuySeriesId");
+            var sessionTransactorId = HttpContext.Session.GetString("TransactorId");
+            IQueryable<WarehouseItem> fullListIq = _context.WarehouseItems.Include(x => x.WarehouseItemCodes);
+            int companyId = 0;
+            if (sessionCompanyId != null)
+            {
+                int.TryParse(sessionCompanyId, out companyId);
+            }
+
+
+            if (sessionTransactorId != null)
+            {
+                int.TryParse(sessionTransactorId, out int transactorId);
+
+                if (transactorId > 1)
+                {
+                    //var transactorsList = Array.ConvertAll(transactorId.ToString().Split(","), int.Parse);
+                    if (companyId > 0)
+                    {
+                        fullListIq = fullListIq
+                            .Where(m => m.WarehouseItemCodes
+                                .Any(x => x.TransactorId == transactorId && x.CompanyId == companyId && x.Code.Contains(term)));
+
+                    }
+                    else
+                    {
+                        fullListIq = fullListIq
+                            .Where(m => m.WarehouseItemCodes
+                                .Any(x => x.TransactorId == transactorId && x.Code.Contains(term)));
+
+                    }
+
+                }
+
+            }
+            fullListIq = fullListIq.Where(p => p.Active);
+            //fullListIq = fullListIq.Where(p => p.Name.Contains(term) || p.Code.Contains(term));
+
             var materials = await fullListIq
                 .ProjectTo<WarehouseItemSearchListDto>(_mapper.ConfigurationProvider)
-                .Select(p => new { label = p.Label, value = p.Id }).ToListAsync();
+                .Select(p => new { label = p.Label, value = p.Id })
+                .ToListAsync();
 
             if (materials == null)
             {
@@ -316,7 +375,6 @@ namespace GrKouk.Web.ERP.Controllers
 
             return Ok(materials);
         }
-
         [HttpGet("SearchWarehouseItemsForSale")]
         public async Task<IActionResult> GetWarehouseItemsForSale(string term)
         {
@@ -401,7 +459,139 @@ namespace GrKouk.Web.ERP.Controllers
 
             return Ok(materials);
         }
+         [HttpGet("companyBaseCurrencyInfo")]
+        public async Task<IActionResult> CompanyBaseCurrencyInfoAsync(int companyId)
+        {
+            if (companyId == 0)
+            {
+                return BadRequest(new
+                {
+                    error = "No company Id provided "
+                });
+            }
+            var theCompany = await _context.Companies
+                .Include(p=>p.Currency)
+                .Where(p => p.Id == companyId)
+                .SingleOrDefaultAsync();
+            
+            if (theCompany == null)
+            {
+                return NotFound(new
+                {
+                    error = "Company not found "
+                });
+            }
+           
+            var response = new 
+            {
+                CurrencyCode = theCompany.Currency.Code,
+                CurrencyLocale = theCompany.Currency.DisplayLocale
+               
+                
+            };
+            return Ok(response);
+        }
+        [HttpGet("productdata")]
+        public async Task<IActionResult> GetProductDataAsync(int warehouseItemId, int transactorId, int companyId)
+        {
+            if (warehouseItemId == 0)
+            {
+                return BadRequest(new
+                {
+                    error = "No warehouse item Id provided "
+                });
+            }
+            //Get last price for product 
+            IQueryable<WarehouseTransaction> lastPriceQr = _context.WarehouseTransactions;
+            lastPriceQr = lastPriceQr.Where(m => m.WarehouseItemId == warehouseItemId);
+            if (companyId > 0)
+            {
+                lastPriceQr = lastPriceQr.Where(m => m.CompanyId == companyId);
+            }
 
+            var lastPr = await lastPriceQr
+                .OrderByDescending(p => p.TransDate)
+                .Select(k => new
+                {
+                    LastPrice = k.UnitPrice
+                })
+                .FirstOrDefaultAsync();
+
+            var lastPrice = lastPr?.LastPrice ?? 0;
+            var materialData = await _context.WarehouseItems
+                .Include(p=>p.BuyMeasureUnit)
+                .Include(p=>p.MainMeasureUnit)
+                .Include(p=>p.SecondaryMeasureUnit)
+                .Include(p=>p.FpaDef)
+                .Include(p=>p.WarehouseItemCodes)
+                .Where(p => p.Id == warehouseItemId && p.Active)
+                .FirstOrDefaultAsync();
+           
+
+            if (materialData == null)
+            {
+                return NotFound(new
+                {
+                    error = "WarehouseItem not found "
+                });
+            }
+            var unitList = new List<ProductUnit>();
+            unitList.Add(new ProductUnit()
+            {
+                UnitId = materialData.MainMeasureUnitId,
+                UnitCode = materialData.MainMeasureUnit.Code,
+                UnitName = materialData.MainMeasureUnit.Name,
+                UnitType = UnitTypeEnum.BaseUnitType,
+                IsDefault = false,
+                UnitFactor = 1
+            });
+            unitList.Add(new ProductUnit()
+            {
+                UnitId = materialData.SecondaryMeasureUnitId,
+                UnitCode = materialData.SecondaryMeasureUnit.Code,
+                UnitName = materialData.SecondaryMeasureUnit.Name,
+                UnitType = UnitTypeEnum.SecondaryUnitType,
+                IsDefault = false,
+                UnitFactor = materialData.SecondaryUnitToMainRate
+            });
+            unitList.Add(new ProductUnit()
+            {
+                UnitId = materialData.BuyMeasureUnitId,
+                UnitCode = materialData.BuyMeasureUnit.Code,
+                UnitName = materialData.BuyMeasureUnit.Name,
+                UnitType = UnitTypeEnum.BuyUnitType,
+                IsDefault = true,
+                UnitFactor = materialData.BuyUnitToMainRate
+            });
+            //get special codes
+            //foreach (var spCode in materialData.WarehouseItemCodes)
+            //{
+            //    unitList.Add(new ProductUnit()
+            //    {
+            //        UnitId = spCode.Id,
+            //        UnitCode = spCode.BuyMeasureUnit.Code,
+            //        UnitName = spCode.BuyMeasureUnit.Name,
+            //        UnitType = UnitTypeEnum.BuyUnitType,
+            //        UnitFactor = spCode.BuyUnitToMainRate
+            //    });
+            //}
+            var response = new ProductInfoResponse()
+            {
+                WarehouseItemName = materialData.Name,
+                FpaId = materialData.FpaDefId,
+                FpaRate = materialData.FpaDef.Rate,
+                LastPrice = lastPrice,
+                PriceNetto = materialData.PriceNetto,
+                PriceBrutto = materialData.PriceBrutto,
+                MainUnitId = materialData.MainMeasureUnitId,
+                MainUnitCode = materialData.MainMeasureUnit.Code,
+                SecondaryUnitId = materialData.SecondaryMeasureUnitId,
+                SecondaryUnitCode =  materialData.SecondaryMeasureUnit.Code,
+                SecondaryFactor = materialData.SecondaryUnitToMainRate,
+                ProductUnits = unitList
+            };
+            return Ok(response);
+        }
         [HttpGet("materialdata")]
         public async Task<IActionResult> GetMaterialData(int warehouseItemId)
         {
@@ -415,7 +605,8 @@ namespace GrKouk.Web.ERP.Controllers
 
             var lastPrice = lastPr?.LastPrice ?? 0;
 
-            var materialData = await _context.WarehouseItems.Where(p => p.Id == warehouseItemId && p.Active)
+            var materialData = await _context.WarehouseItems
+                .Where(p => p.Id == warehouseItemId && p.Active)
                 .Select(p => new
                 {
                     mainUnitId = p.MainMeasureUnitId,
@@ -515,7 +706,7 @@ namespace GrKouk.Web.ERP.Controllers
                     var usedBuyPrice = buyTypeDef.UsedPrice;
                     Debug.Print("Inside GetBuySeriesData Returning usedPrice " + usedBuyPrice.ToString());
                     return Ok(new { UsedPrice = usedBuyPrice });
-                    //break;
+                //break;
                 case RecurringDocTypeEnum.SellType:
                     Debug.Print("Inside GetSalesSeriesData " + seriesId.ToString());
                     var salesSeriesDef = await _context.SellDocSeriesDefs.SingleOrDefaultAsync(p => p.Id == seriesId);
@@ -535,7 +726,7 @@ namespace GrKouk.Web.ERP.Controllers
                     var usedSellPrice = salesTypeDef.UsedPrice;
                     Debug.Print("Inside GetSalesSeriesData Returning usedPrice " + usedSellPrice.ToString());
                     return Ok(new { UsedPrice = usedSellPrice });
-                    //break;
+                //break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(docType), docType, null);
             }
@@ -1752,7 +1943,7 @@ namespace GrKouk.Web.ERP.Controllers
 
                         var sTransactorTransaction = _mapper.Map<TransactorTransaction>(data);
                         sTransactorTransaction.TransactorId = data.TransactorId;
-                       
+
                         sTransactorTransaction.TransTransactorDocTypeId =
                             transTransactorPayOffSeries.TransTransactorDocTypeDefId;
                         sTransactorTransaction.TransTransactorDocSeriesId = transTransactorPayOffSeries.Id;
@@ -1865,8 +2056,13 @@ namespace GrKouk.Web.ERP.Controllers
                     #region MaterialLine
 
                     var buyMaterialLine = new BuyDocLine();
-                    decimal unitPrice = dataBuyDocLine.Price;
+                    var transUnitId = dataBuyDocLine.TransactionUnitId;
+                    var transUnitFactor = dataBuyDocLine.TransactionUnitFactor;
+                   // var factor = dataBuyDocLine.Factor;
+                    decimal transPrice = dataBuyDocLine.TransUnitPrice;
+                    double transUnits = dataBuyDocLine.TransactionQuantity;
                     decimal units = (decimal)dataBuyDocLine.Q1;
+                    decimal unitPrice = dataBuyDocLine.Price;
                     decimal fpaRate = (decimal)dataBuyDocLine.FpaRate;
                     decimal discountRate = (decimal)dataBuyDocLine.DiscountRate;
                     decimal lineNetAmount = unitPrice * units;
@@ -1886,6 +2082,10 @@ namespace GrKouk.Web.ERP.Controllers
                     buyMaterialLine.Factor = dataBuyDocLine.Factor;
                     buyMaterialLine.BuyDocumentId = docId;
                     buyMaterialLine.Etiology = transToAttach.Etiology;
+                    buyMaterialLine.TransactionUnitId = transUnitId;
+                    buyMaterialLine.TransactionQuantity = transUnits;
+                    buyMaterialLine.TransUnitPrice = transPrice;
+                    buyMaterialLine.TransactionUnitFactor = transUnitFactor;
                     //_context.Entry(transToAttach).Entity
                     transToAttach.BuyDocLines.Add(buyMaterialLine);
 
@@ -2150,7 +2350,7 @@ namespace GrKouk.Web.ERP.Controllers
                         sTransactorTransaction.TransactorId = data.TransactorId;
                         sTransactorTransaction.TransTransactorDocTypeId =
                             transTransactorPayOffSeries.TransTransactorDocTypeDefId;
-                        
+
                         sTransactorTransaction.TransTransactorDocSeriesId = transTransactorPayOffSeries.Id;
                         sTransactorTransaction.FiscalPeriodId = fiscalPeriod.Id;
                         sTransactorTransaction.Etiology = "AutoPayOff";
@@ -2262,8 +2462,12 @@ namespace GrKouk.Web.ERP.Controllers
                     #region MaterialLine
 
                     var warehouseItemLine = new BuyDocLine();
-                    decimal unitPrice = dataBuyDocLine.Price;
+                    var transUnitId = dataBuyDocLine.TransactionUnitId;
+                    var transUnitFactor = dataBuyDocLine.TransactionUnitFactor;
+                    decimal transPrice = dataBuyDocLine.TransUnitPrice;
+                    double transUnits = dataBuyDocLine.TransactionQuantity;
                     decimal units = (decimal)dataBuyDocLine.Q1;
+                    decimal unitPrice = dataBuyDocLine.Price;
                     decimal fpaRate = (decimal)dataBuyDocLine.FpaRate;
                     decimal discountRate = (decimal)dataBuyDocLine.DiscountRate;
                     decimal lineNetAmount = unitPrice * units;
@@ -2283,6 +2487,11 @@ namespace GrKouk.Web.ERP.Controllers
                     warehouseItemLine.Factor = dataBuyDocLine.Factor;
                     warehouseItemLine.BuyDocumentId = docId;
                     warehouseItemLine.Etiology = transToAttach.Etiology;
+                    warehouseItemLine.TransactionUnitId = transUnitId;
+                    warehouseItemLine.TransactionQuantity = transUnits;
+                    warehouseItemLine.TransUnitPrice = transPrice;
+                    warehouseItemLine.TransactionUnitFactor = transUnitFactor;
+                   
                     //_context.Entry(transToAttach).Entity
 
                     try
@@ -2581,7 +2790,7 @@ namespace GrKouk.Web.ERP.Controllers
 
                         var sTransactorTransaction = _mapper.Map<TransactorTransaction>(data);
                         sTransactorTransaction.TransactorId = data.TransactorId;
-                        
+
                         sTransactorTransaction.TransTransactorDocTypeId =
                             transTransactorPayOffSeries.TransTransactorDocTypeDefId;
                         sTransactorTransaction.TransTransactorDocSeriesId = transTransactorPayOffSeries.Id;
@@ -2966,7 +3175,7 @@ namespace GrKouk.Web.ERP.Controllers
                         //Ετσι δεν μεταφέρει το Id απο το data
                         var sTransactorTransaction = _mapper.Map<TransactorTransaction>(spTransactorCreateDto);
                         sTransactorTransaction.TransactorId = data.TransactorId;
-                        
+
                         sTransactorTransaction.TransTransactorDocTypeId =
                             transTransactorPayOffSeries.TransTransactorDocTypeDefId;
                         sTransactorTransaction.TransTransactorDocSeriesId = transTransactorPayOffSeries.Id;

@@ -57,10 +57,10 @@
     </ul>
 </div>
 <div class="collapse show" id="filterCollapse">
-     @await Component.InvokeAsync("IndexFilters",new IndexFiltersToShow {ShowMaterialNatureFlt= true,ShowDateFlt = false,ShowCurrencyFlt = false})
-   
+    @await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowMaterialNatureFlt = true, ShowDateFlt = false, ShowCurrencyFlt = false })
+
     <div class="row">
-        <partial name="_PagerPartial"/>
+        <partial name="_PagerPartial" />
     </div>
 </div>
 <table class="table table-bordered table-sm" id="myTable">
@@ -108,6 +108,7 @@
 </div>
 
 @section Scripts {
+    <script src="~/js/definitions.js"></script>
     <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
         $(document).ready(function() {
@@ -125,7 +126,7 @@
 
                 });
             //#region variables
-           
+
             var $filtersToggle = $('#filtersToggle');
             var $deleteSelectedRowsLink = $('#deleteSelectedRows');
             //#endregion
@@ -210,8 +211,8 @@
                         url: '@Url.Page("/mainentities/materials/details")?id='
                     }
                 },
-               
-               
+
+
                 {
                     key: 'warehouseItemNatureName',
                     responseKey: 'warehouseItemNatureName',
@@ -326,7 +327,7 @@
                     icon: '<i class="fas fa-receipt fa-lg" style="color:slategray"></i>',
                     url: '@Url.Page("./Kartela")?warehouseItemId='
                 }
-                
+
             ];
             const actionMobileColDefs = [
                 {
@@ -379,7 +380,7 @@
                     icon: '<i class="fas fa-receipt fa-lg" style="color:slategray"></i>',
                     url: '@Url.Page("./Kartela")?warehouseItemId='
                 }
-                
+
             ];
             const tableHandlersToRegister = [
                 {
@@ -433,7 +434,7 @@
 
             indPgLib.setIndexPageDefinition(indexPageDef);
             //#endregion
-           
+
             var unlinkProductImages = (productId) => {
                 console.log("Inside unlinkProductImages");
                 var timeout;
@@ -568,7 +569,7 @@
                 () => {
                     deleteSelectedRows();
                 });
-           
+
             var storageItemJs = localStorage.getItem('WarehouseItemsIndexView');
             if (storageItemJs === undefined || storageItemJs === null) {
                 $('#pageIndex').val(1);

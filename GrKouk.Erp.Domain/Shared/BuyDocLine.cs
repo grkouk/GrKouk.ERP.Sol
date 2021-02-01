@@ -17,6 +17,13 @@ namespace GrKouk.Erp.Domain.Shared
         //public virtual MeasureUnit PrimaryUnit { get; set; }
         public int SecondaryUnitId { get; set; }
         //public virtual MeasureUnit SecondaryUnit { get; set; }
+        //Αλλαγή της εισαγωγής σε νουμερα στην μοναδα κίνησης.
+        //Δηλ 10 συσκευασίες με τιμή συσκευασίας και απο αυτά υπολογισμός σε μοναδα βάσης
+        public int TransactionUnitId { get; set; }
+        public double TransactionQuantity { get; set; }
+        public Single TransactionUnitFactor { get; set; }
+        [Column(TypeName = "decimal(18, 4)")]
+        public decimal TransUnitPrice { get; set; }
         public Single Factor { get; set; }
         /// <summary>
         /// Ποσότητα σε μονάδα μέτρησης 1
@@ -31,13 +38,14 @@ namespace GrKouk.Erp.Domain.Shared
         [Column(TypeName = "decimal(18, 4)")]
         public decimal UnitPrice { get; set; }
         [Column(TypeName = "decimal(18, 4)")]
-        public decimal UnitExpenses { get; set; }
-        [Column(TypeName = "decimal(18, 4)")]
         public decimal AmountFpa { get; set; }
         [Column(TypeName = "decimal(18, 4)")]
         public decimal AmountNet { get; set; }
         [Column(TypeName = "decimal(18, 4)")]
         public decimal AmountDiscount { get; set; }
+        [Column(TypeName = "decimal(18, 4)")]
+        public decimal AmountExpenses { get; set; }
+    
         [MaxLength(500)]
         public string Etiology { get; set; }
     }

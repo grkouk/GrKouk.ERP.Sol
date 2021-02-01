@@ -74,7 +74,7 @@
                     <select id="PageSize" class="form-control form-control-sm small"
                             asp-items="ViewBag.PageFilterSize"></select>
                 </div>
-                
+
                 <div class="form-group col-md-auto">
                     <label class="small"> Currency:</label>
                     <select id="CurrencySelector" class="form-control form-control-sm small"
@@ -115,6 +115,7 @@
 @section Scripts
     {
     <script src="~/js/moment.min.js"></script>
+    <script src="~/js/definitions.js"></script>
     <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
         $(document).ready(function () {
@@ -133,12 +134,12 @@
 
                 });
             //#region variables
-           
+
 
             var $filtersToggle = $('#filtersToggle');
-          
+
             var $deleteSelectedRowsLink = $('#deleteSelectedRows');
-           
+
             var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
             //#endregion
               //#region Index page definition objects
@@ -160,7 +161,7 @@
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
-                        
+
                     }
                 },
                 {
@@ -202,7 +203,7 @@
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
-                       
+
                     }
                 },
                 {
@@ -222,7 +223,7 @@
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
-                       
+
                     }
                 },
                 {
@@ -242,7 +243,7 @@
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
-                       
+
                     }
                 },
                 {
@@ -262,7 +263,7 @@
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
-                       
+
                     }
                 },
                 {
@@ -300,7 +301,7 @@
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
-                       
+
                     }
                 },
                 {
@@ -321,7 +322,7 @@
                     classCondition: {},
                     remoteReference: {}
                 },
-               
+
                 {
                     key: 'exportAmount',
                     responseKey: 'exportAmount',
@@ -339,7 +340,7 @@
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
-                       
+
                     }
                 }
             ];
@@ -493,9 +494,9 @@
                 }
             ];
             const tableHandlersToRegister = [
-               
-               
-               
+
+
+
             ];
             const pageHandlersToRegister = [
                 {
@@ -506,8 +507,8 @@
                         indPgLib.refreshData();
                     }
                 }
-               
-                
+
+
             ];
             const indexPageDef = {
                 uri: '/api/GrKoukInfoApi/GetIndexTblDataWarehouseTrans',
@@ -524,7 +525,7 @@
 
             indPgLib.setIndexPageDefinition(indexPageDef);
             //#endregion
-           
+
             var deleteSelectedRows = () => {
                 var $rowSelectors = $('input[name=checkTableRow]');
                 var selectedRows = $rowSelectors.filter(':checked');
@@ -598,7 +599,7 @@
                 }
 
             };
-            
+
             $deleteSelectedRowsLink.on('click',
                 () => {
                     deleteSelectedRows();
@@ -622,9 +623,9 @@
                     console.log('Not found currency code for this id');
                 }
             };
-            
 
-       
+
+
             var storageItemJs = localStorage.getItem('WarehouseTransIndexView');
             if (storageItemJs === undefined || storageItemJs === null) {
                 $('#pageIndex').val(1);
@@ -668,7 +669,7 @@
             indPgLib.registerPageHandlers();
             //indPgLib.loadSettings('BuyDocIndexView');
             //----------------
-           
+
             indPgLib.handleFiltersUi();
             currencyChanged();
             indPgLib.refreshData();

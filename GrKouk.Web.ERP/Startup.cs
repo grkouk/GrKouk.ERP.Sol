@@ -33,7 +33,7 @@ namespace GrKouk.Web.ERP
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
+                options.CheckConsentNeeded = context => false;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
                 
             });
@@ -63,7 +63,15 @@ namespace GrKouk.Web.ERP
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied";
                 options.SlidingExpiration = true;
             });
-            services.AddSession(options => { options.IdleTimeout = TimeSpan.FromMinutes(30); });
+            //services.AddSession(options => { options.IdleTimeout = TimeSpan.FromMinutes(30); });
+            services.AddDistributedMemoryCache();
+
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(10);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
             services.AddAutoMapper(typeof(Startup));
             services.AddRazorPages();
             services.AddControllers().AddNewtonsoftJson();
@@ -99,9 +107,9 @@ namespace GrKouk.Web.ERP
                 endpoints.MapRazorPages();
                 endpoints.MapDefaultControllerRoute();
             });
-            //Mjk1NzE1QDMxMzgyZTMyMmUzMGptdzZXVG10THo1clhENjR6S0QrOGNoeHNIakpEZXVNSzkzcDYxM3B6ZEE9
-          //  Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MjUzODczQDMxMzgyZTMxMmUzMG5UNHArR2l3MlJYaklGMlI5aTJXVnRuNnJuN1JLQVk5V1lUV0xaTDVxeGM9;MjUzODc0QDMxMzgyZTMxMmUzMFd6SVAveHB3cVZBQ0RsMUM3MXlhL0JKWjlUbU00R1ladTRlN2RsbGJXWmM9;MjUzODc1QDMxMzgyZTMxMmUzMGVIR01rLzlHYWsvUVlIYXJoSzF5RWQ3dnBxdEtmYjB2YTZRVHROQ0VnRlE9;MjUzODc2QDMxMzgyZTMxMmUzMGJ3aEw0RTBFWDBLUjFxcWIzQk0yRlNEaFdpWExYc2s4aWJIbmFxeE1aNW89;MjUzODc3QDMxMzgyZTMxMmUzMFBiSjkzSHVqMVVhRUNETmE0V1hTZG9PTTF5NDBQYTJicUVXQ2V0WXJRVlE9;MjUzODc4QDMxMzgyZTMxMmUzMGVPS0JHRmlTaTVYRm1lVWdsdTd0YnhuaHVhUnIvblM1OGt4R3g3N0o5Q289;MjUzODc5QDMxMzgyZTMxMmUzMGJuS3REbjJwV3haSWpyb29wT0ZzL2U2bXJmZ0NDaWs2R20xNERtNHVqQ1U9;MjUzODgwQDMxMzgyZTMxMmUzMEJLc2NUWGZjUC84Yms3TDJFdm9iY1BCeTJESDlYVkZvbDVsazFmUTlEYXc9;MjUzODgxQDMxMzgyZTMxMmUzMG15d2c3dXUwZEdEakhyUlMyZ0FYdGRPWHZKM05aNHdXeEN6amVVdU1ralU9;NT8mJyc2IWhia31ifWN9Z2FoYmF8YGJ8ampqanNiYmlmamlmanMDHmg0Njg8JjgTOzwnPjI6P30wPD4=;MjUzODgyQDMxMzgyZTMxMmUzMEJmeXlUUlFUelg0Wnpsa1VCS0FZaDllQkJoSzF4TWp4NVRDbFZIZDNTTWM9");
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Mjk1NzE1QDMxMzgyZTMyMmUzMGptdzZXVG10THo1clhENjR6S0QrOGNoeHNIakpEZXVNSzkzcDYxM3B6ZEE9");
+            //Mzg4NTI5QDMxMzgyZTM0MmUzMEtBYjNBQ055dFJPVjhKcHJDbW5pWHJadC9OSWp5d3BDc2MxZ3JxcUpnWTA9
+            //Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Mjk1NzE1QDMxMzgyZTMyMmUzMGptdzZXVG10THo1clhENjR6S0QrOGNoeHNIakpEZXVNSzkzcDYxM3B6ZEE9");
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Mzg4NTI5QDMxMzgyZTM0MmUzMEtBYjNBQ055dFJPVjhKcHJDbW5pWHJadC9OSWp5d3BDc2MxZ3JxcUpnWTA9");
         }
     }
 }

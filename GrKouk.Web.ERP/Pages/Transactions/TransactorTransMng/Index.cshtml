@@ -28,7 +28,7 @@
             </a>
         </li>
         <li class="nav-item">
-             <a class="nav-link" href="@Url.Page("./addcrossentry")" >Αντιλογισμός</a>
+            <a class="nav-link" href="@Url.Page("./addcrossentry")">Αντιλογισμός</a>
         </li>
         <li class="nav-item dropdown " id="SelectedRowsActionsMenu">
             <a class="nav-link dropdown-toggle disabled" role="button" id="ddSelectedRowsActions" data-toggle="dropdown"
@@ -44,9 +44,9 @@
         </li>
     </ul>
 </div>
- @await Component.InvokeAsync("IndexFilters",new IndexFiltersToShow {})
+@await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { })
 <div class="collapse show" id="filterCollapse">
-   
+
     <div class="row mt-1">
         <partial name="_PagerPartial" />
     </div>
@@ -80,6 +80,7 @@
 @section Scripts
 {
     <script src="~/js/moment.min.js"></script>
+    <script src="~/js/definitions.js"></script>
     <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
         $(document).ready(function() {
@@ -97,7 +98,7 @@
 
                 });
             //#region variables
-           
+
             var $deleteSelectedRowsLink = $('#deleteSelectedRows');
             var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
             //#endregion
@@ -325,7 +326,7 @@
                             }
 
                         } else {
-                           
+
                             var itemId = valueSource["id"];
                             retUri = `@Url.Page("./Edit")?id=${itemId}`;
                         }
@@ -384,7 +385,7 @@
                     icon: '<i class="fas fa-receipt fa-lg" style="color:slategray"></i>',
                     url: '@Url.Page("/mainentities/transactors/Kartela")?transactorId='
                 },
-                
+
                 {
                     actionType: 'defaultAction2',
                     visibility: 'always',
@@ -536,7 +537,7 @@
 
             };
 
-            
+
             $deleteSelectedRowsLink.on('click',
                 () => {
                     deleteSelectedRows();

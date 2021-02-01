@@ -8,18 +8,144 @@
     let pageHandlersToRegister;
     let currencyFormatter;
     let numberFormatter;
+    let tableElementId;
+    let currentTableSort;
+    //Index page or selector 
+    //if selector then there should not be a 1st column for selection 
+    //Valid values are Index, TransactorSelector, ProductSelector
+    let indexPageType;
+    let spinnerLoaderShow;
+    let spinnerLoaderHide;
+    let spinnerLoaderIsVisible;
 
+    let getTableCurrentSort;
+    let setTableCurrentSort;
+    const indexPageSpinnerShow = () => {
+        $("#loadMe").modal({
+            backdrop: "static",
+            keyboard: false,
+            show: true
+        });
+    };
+
+    const indexPageSpinnerHide = () => {
+        $("#loadMe").modal("hide");
+    };
+    const indexPageSpinnerIsVisible = () => {
+        return $("#loadMe").hasClass("show");
+    };
+    const selectorSpinnerShow = () => {
+        $('#SpinnerLoader').show();
+    };
+    const selectorSpinnerHide = () => { $('#SpinnerLoader').hide(); };
+    const selectorSpinnerIsVisible = () => {
+        return( $('#SpinnerLoader').is(':visible'));
+    };
     //cached references=================================
-    const $pageIndex = $("#pageIndex");
-    const $pageSize = $("#PageSize");
-    const $totalPages = $("#totalPages");
-    const $totalRecords = $("#totalRecords");
-    const $pagingInfo = $("[name=PagingInfo]");
-    const $filtersVisible = $("#filtersVisible");
-    const $filterCollapse = $("#filterCollapse");
-    const $selectedRowsActionsLink = $("#ddSelectedRowsActions");
-    const $filtersToggle = $('#filtersToggle');
+    let $pageIndex = $("#pageIndex");
+    let $pageSize = $("#PageSize");
+    let $totalPages = $("#totalPages");
+    let $companyFilter = $("#CompanyFilter");
+    let $totalRecords = $("#totalRecords");
+    let $pagingInfo = $("[name=PagingInfo]");
+    let $filtersVisible = $("#filtersVisible");
+    let $filterCollapse = $("#filterCollapse");
+    let $selectedRowsActionsLink = $("#ddSelectedRowsActions");
+    let $filtersToggle = $('#filtersToggle');
+    let $datePeriodFilter = $("#DatePeriodFilter");
+    let $currentSort = $("#currentSort");
+    let $transactorTypeFilter = $('#TransactorTypeFilter');
+    let $transactorId = $('#TransactorId');
+    let $warehouseItemNatureFilter = $('#WarehouseItemNatureFilter');
+    let $currencySelector = $("#CurrencySelector");
+    //-------------------------------------------------------
+    let companyFilterElement;
+    let datePeriodFilterElement;
+    let pageIndexElement;
+    let pageSizeElement;
+    let searchTextElement;
+    let currencyFilterElement;
+    let transactorTypeFilterElement;
+    let transactorIdFilterElement;
+    let productNatureFilterElement;
+    let tableCurrentSortElement;
 
+    let setFilterValues;
+    const setSelectorFilterValues = () => {
+        let flt = indexPageDefinition.getFilterValues();
+
+        pageIndexElement = flt.pageIndexElement;
+        pageSizeElement = flt.pageSizeElement;
+        companyFilterElement = flt.companyFilterElement;
+        datePeriodFilterElement = flt.datePeriodFilterElement;
+        var sortData = getTableCurrentSort();
+
+        tableCurrentSortElement = sortData;
+        searchTextElement = flt.searchTextElement;
+        currencyFilterElement = flt.currencyFilterElement;
+        transactorTypeFilterElement = flt.transactorTypeFilterElement;
+        transactorIdFilterElement = flt.transactorIdFilterElement;
+        productNatureFilterElement = flt.productNatureFilterElement;
+    };
+    const setIndexPageFilterValues = () => {
+        var pageIndexVal = parseInt($pageIndex.val());
+
+        var pageIndex = reallyIsNaN(pageIndexVal) ? 1 : pageIndexVal;
+        $pageIndex.val(pageIndex);
+
+        pageIndexElement = pageIndex;
+
+        var pageSize =
+            $pageSize.val() == null || $pageSize.val().length == 0 ? 10 : parseInt($pageSize.val());
+
+        pageSizeElement = pageSize;
+
+        var companyFlt = $companyFilter.val();
+
+        companyFilterElement = companyFlt;
+
+        var datePeriod = $datePeriodFilter.val();
+
+        datePeriodFilterElement = datePeriod;
+
+        var sortData = getTableCurrentSort();
+
+        tableCurrentSortElement = sortData;
+
+        var searchFlt = $(".search_input").val();
+
+        searchTextElement = searchFlt;
+
+        var $dcId = $currencySelector;
+        var currencyFlt = $dcId.val() == null || $dcId.val().length == 0 ? 1 : parseInt($dcId.val());
+
+        currencyFilterElement = currencyFlt;
+
+        var transTypeFlt = '';
+        var transactorId = 0;
+        if (!($transactorTypeFilter.val() === undefined)) {
+            transTypeFlt = $transactorTypeFilter.val();
+            transactorIdFilterElement = transTypeFlt;
+        } else {
+            transactorIdFilterElement = "";
+        }
+
+        if (!($transactorId.val() === undefined)) {
+            transactorId = $transactorId.val();
+            transactorIdFilterElement = transactorId;
+        } else {
+            transactorIdFilterElement = 0;
+        }
+        var wrItmNatureFlt = '';
+        if (!($warehouseItemNatureFilter.val() === undefined)) {
+            wrItmNatureFlt = $warehouseItemNatureFilter.val();
+            productNatureFilterElement = wrItmNatureFlt;
+        } else {
+            productNatureFilterElement = "";
+        }
+
+
+    };
     const commonTableHandlers = [
         {
             selector: "input[name=checkAllRows]",
@@ -44,7 +170,7 @@
                 handleSelectedRowsUi();
             }
         },
-        
+
         {
             selector: "[name=SortHeader]",
             event: "click",
@@ -75,9 +201,6 @@
                     $icon.removeClass();
                     $icon.addClass(iconSortType);
                 }
-
-                //indPgLib.setTableCurrentSort(newSortVal);
-                //indPgLib.refreshData();
                 setTableCurrentSort(newSortVal);
                 refreshTableData();
             }
@@ -85,7 +208,7 @@
     ];
 
     const commonHandlers = [
-       
+
         {
             selector: "#FiltersForm",
             event: "submit",
@@ -121,7 +244,7 @@
             selector: "#PageSize",
             event: "change",
             handler: function (event) {
-                $("#pageIndex").val(1);
+                $pageIndex.val(1);
                 refreshTableData();
             },
         },
@@ -145,7 +268,7 @@
             selector: "#DatePeriodFilter",
             event: "change",
             handler: function (event) {
-                $("#pageIndex").val(1);
+                $pageIndex.val(1);
                 //indPgLib.refreshData();
                 refreshTableData();
             },
@@ -154,7 +277,7 @@
             selector: "#CompanyFilter",
             event: "change",
             handler: function (event) {
-                $("#pageIndex").val(1);
+                $pageIndex.val(1);
                 //indPgLib.refreshData();
                 refreshTableData();
             },
@@ -172,9 +295,9 @@
     const setupCreateNewElement = () => {
         let el = document.getElementById("CreateNew");
         if (el) {
-            el.href = `${window.location.href}/Create`;    
+            el.href = `${window.location.href}/Create`;
         }
-        
+
     };
     const selectAllRowsColumnHtml = () => {
         let cl = '<th name="selectAllRowsColumn"> <label class="custom-control custom-checkbox"> ';
@@ -189,18 +312,20 @@
         cl += '<span class="custom-control-indicator"></span></label></td>';
         return cl;
     };
-    const getTableCurrentSort = () => {
+    const getIndexTableCurrentSort = () => {
         try {
-            let cSort = $("#currentSort").val();
-
+            //let cSort = currentTableSort;
+            let cSort = $currentSort.val();
             return cSort;
         } catch (e) {
             return "";
         }
     };
-    const setTableCurrentSort = (currentSort) => {
-        $("#currentSort").val(currentSort);
+    const setIndexTableCurrentSort = (currentSort) => {
+        //currentTableSort= currentSort;
+        $currentSort.val(currentSort);
     };
+
     const countSelectedRows = () => {
         const $rowSelectors = $("input[name=checkTableRow]");
         var selectedRows = $rowSelectors.filter(":checked");
@@ -441,21 +566,21 @@
 
         return $tdCol;
     };
-    const createActionHtml = (col, value,actionSection) => {
+    const createActionHtml = (col, value, actionSection) => {
         let actionHtml = "";
-        let classText="";
-        
-        if (actionSection!==undefined){
+        let classText = "";
+
+        if (actionSection !== undefined) {
             switch (actionSection) {
                 case "sectionActions":
-                    classText=`class="mr-1"`;
+                    classText = `class="mr-1"`;
                     break;
                 case "sectionSubActions":
-                    classText=`class="dropdown-item"`;
+                    classText = `class="dropdown-item"`;
                     break
                 default:
-                    classText="";
-    
+                    classText = "";
+
             }
         }
         switch (col.actionType) {
@@ -477,12 +602,12 @@
                             }
                             params += `${col.urlKeys[i].key}=${col.urlKeys[i].key}`;
                         }
-                        
+
                         actionHtml += `<a ${classText} href="${col.uri}${params}" target="${col.target}">`;
                         break;
                     case "staticUrl":
                         break;
-                default:
+                    default:
                 }
                 break;
             case "defaultAction":
@@ -494,7 +619,7 @@
             case "eventAction":
                 actionHtml += `<a ${classText} href="#"`;
                 if (col.elementName) {
-                    actionHtml += ` name=${col.elementName}`;
+                    actionHtml += `name=${col.elementName}`;
                 }
 
                 actionHtml += ` data-${col.dataKey}=${value[col.valueKey]}`;
@@ -514,75 +639,26 @@
                 actionHtml += ` data-docid=${value[col.valueKey]}`;
                 actionHtml += ">";
                 break;
-        default:
+            default:
         }
-        if (!(col.icon===undefined)){
-            actionHtml += col.icon;    
+        if (!(col.icon === undefined)) {
+            actionHtml += col.icon;
         }
-        if (!(col.text===undefined)) {
-            if (actionSection!==undefined){
-                if (actionSection==="sectionSubActions"){
+        if (!(col.text === undefined)) {
+            if (actionSection !== undefined) {
+                if (actionSection === "sectionSubActions") {
                     actionHtml += col.text;
                 }
             }
-            
+
         }
         actionHtml += "</a>";
         return actionHtml;
     };
     const createColumnAction = (col, value) => {
-        /*
-        switch (col.actionType) {
-            case "defaultAction2":
-                switch (col.uriType) {
-                    case "funcHref":
-                        let u = col.uriFunc(col, value);
-                        actionHtml += `<a href="${u}" target="${col.target}">`;
-                        break;
-                    case "funcUrl":
-                        break;
-                    case "staticHref":
-                        var params = '';
-                        for (var i = 0; i < col.urlKeys.length - 1; i++) {
-                            if (i > 0) {
-                                params += "&";
-                            } else {
-                                params += "?";
-                            }
-                            params += `${col.urlKeys[i].key}=${col.urlKeys[i].key}`;
-                        }
-
-                        actionHtml += `<a href="${col.uri}${params}" target="${col.target}">`;
-                        break;
-                    case "staticUrl":
-                        break;
-                    default:
-                }
-                actionHtml += col.icon;
-                actionHtml += "</a> |";
-                break;
-            case "defaultAction":
-                actionHtml += `<a href="${col.url}${value[col.valueKey]}">`;
-                actionHtml += col.icon;
-                actionHtml += "</a> |";
-                break;
-            case "eventAction":
-                actionHtml += `<a  href="#"`;
-                if (col.elementName) {
-                    actionHtml += ` name=${col.elementName}`;
-                }
-                actionHtml += ` data-${col.dataKey}=${value[col.valueKey]}`;
-                //actionHtml += ` data-docid=${value[col.valueKey]}`;
-                //actionHtml += ` data-itemid=${value[col.valueKey]}`;
-                actionHtml += ">";
-                actionHtml += col.icon;
-                actionHtml += "</a> |";
-                break;
-            default:
-        }
-        */
+       
         return createActionHtml(col, value, "sectionActions");
-         
+
     };
     const createColumnSubAction = (col, value) => {
         let actionHtml = '';
@@ -597,7 +673,7 @@
             }
         }
         if (visibility) {
-            actionHtml = createActionHtml(col,value,"sectionSubActions");
+            actionHtml = createActionHtml(col, value, "sectionSubActions");
         }
         return actionHtml;
     };
@@ -610,7 +686,7 @@
                 if (evaluateCondition(col.condition, value)) {
                     visibility = true;
                 }
-               
+
             }
         }
         if (visibility) {
@@ -631,6 +707,23 @@
         tableHandlersToRegister = pgDefinition.tableHandlersToRegister;
         pageHandlersToRegister = pgDefinition.pageHandlersToRegister;
         actionMobileColDefs = pgDefinition.actionMobileColDefs;
+        tableElementId = pgDefinition.tableElementId === undefined ? "myTable" : pgDefinition.tableElementId;
+        indexPageType = pgDefinition.indexPageType === undefined ? definitionsLib.IndexPageTypeEnum.IndexPage : pgDefinition.indexPageType;
+        if (indexPageType === definitionsLib.IndexPageTypeEnum.IndexPage) {
+            spinnerLoaderShow = indexPageSpinnerShow;
+            spinnerLoaderHide = indexPageSpinnerHide;
+            spinnerLoaderIsVisible = indexPageSpinnerIsVisible;
+            getTableCurrentSort = getIndexTableCurrentSort;
+            setTableCurrentSort = setIndexTableCurrentSort;
+            setFilterValues = setIndexPageFilterValues;
+        } else {
+            spinnerLoaderShow = selectorSpinnerShow;
+            spinnerLoaderHide = selectorSpinnerHide;
+            spinnerLoaderIsVisible = selectorSpinnerIsVisible;
+            getTableCurrentSort = pgDefinition.getTableCurrentSort;
+            setTableCurrentSort = pgDefinition.setTableCurrentSort;
+            setFilterValues = setSelectorFilterValues;
+        }
     };
     const setCurrencyFormatter = (formatter) => {
         currencyFormatter = formatter;
@@ -686,11 +779,7 @@
                         clearTimeout(timeout);
                     }
                     timeout = setTimeout(function () {
-                        $("#loadMe").modal({
-                            backdrop: "static", //remove ability to close modal with click
-                            keyboard: false, //remove option to close with keyboard
-                            show: true, //Display loader!
-                        });
+                        spinnerLoaderShow();
                     }, 1000);
                 },
                 complete: function () {
@@ -699,15 +788,10 @@
                     }
                     $("#loadMe").modal("hide");
                     setTimeout(function () {
-                        //console.log("Checking for open modals");
-                        var isOpen = $("#loadMe").hasClass("show");
+                        var isOpen = spinnerLoaderIsVisible();
                         if (isOpen) {
-                            //console.log("There is an open Modal");
-                            $("#loadMe").modal("hide");
+                            spinnerLoaderHide();
                         }
-                        /*else {
-                            //console.log("No open modal");
-                        }*/
                     }, 2000);
                 },
             });
@@ -716,23 +800,31 @@
     const bindDataToTable = (result, pgIndex) => {
         handlePagingUi(result.totalPages, result.totalRecords, pgIndex, result.hasPrevious, result.hasNext);
 
-        $("#myTable > tbody").empty();
-        $("#myTable > thead").empty();
+
+        $(`#${tableElementId} > tbody`).empty();
+        $(`#${tableElementId} > thead`).empty();
 
         var $trHead = $("<tr>");
-        var $tdSelectCol = $(selectAllRowsColumnHtml());
-        $trHead.append($tdSelectCol);
+        if (indexPageType === definitionsLib.IndexPageTypeEnum.IndexPage) {
+            var $tdSelectCol = $(selectAllRowsColumnHtml());
+            $trHead.append($tdSelectCol);
+        }
+
         colDefs.forEach(function (item) {
             $trHead.append($(createHeaderColumn(item)));
         });
         $trHead.append($("<th>"));
-        $trHead.appendTo("#myTable > thead");
+        $trHead.appendTo(`#${tableElementId} > thead`);
 
         $.each(result.data, function (index, value) {
             var itemId = value.id;
             var $tr = $("<tr>");
-            var $tdSelectRowCol = $(selectOneRowColumnHtml(itemId));
-            $tr.append($tdSelectRowCol);
+            if (indexPageType === definitionsLib.IndexPageTypeEnum.IndexPage) {
+                var $tdSelectRowCol = $(selectOneRowColumnHtml(itemId));
+                $tr.append($tdSelectRowCol);
+            }
+
+
             colDefs.forEach(function (col) {
                 $tr.append(createValueColumn(col, value));
             });
@@ -768,7 +860,7 @@
             var mobileCol = `<td class="small text-center d-table-cell d-sm-table-cell d-md-table-cell d-lg-none">${mobileHtml}</td>`;
             $tr.append(actionsCol);
             $tr.append(mobileCol);
-            $tr.appendTo("#myTable > tbody");
+            $tr.appendTo(`#${tableElementId} > tbody`);
         });
         registerHandlers(commonTableHandlers);
         registerHandlers(tableHandlersToRegister);
@@ -778,8 +870,9 @@
         let $pageSummaryRow = $('<tr class="table-info">');
         $pageSummaryRow.append('<td name="selectRowColumn"> </td> ');
         let $totalSummaryRow = $('<tr class="table-info">');
-        $totalSummaryRow.append('<td name="selectRowColumn"> </td> ');
-
+        if (indexPageType === definitionsLib.IndexPageTypeEnum.IndexPage) {
+            $totalSummaryRow.append('<td name="selectRowColumn"> </td> ');
+        }
         colDefs.forEach(function (item) {
             var tdColPage = "";
             var tdColTotal = "";
@@ -789,15 +882,15 @@
                 } else {
                     let tmpAmount = 0;
                     switch (item.totalFormatter) {
-                    case "currency":
+                        case "currency":
                             tmpAmount = currencyFormatter.format(result[item.totalKey]);
-                        break;
-                    case "number":
+                            break;
+                        case "number":
                             tmpAmount = numberFormatter.format(result[item.totalKey]);
-                        break;
-                    default:
+                            break;
+                        default:
                             tmpAmount = numberFormatter.format(result[item.totalKey]);
-                        break;
+                            break;
                     }
                     try {
 
@@ -808,7 +901,7 @@
                         tdColPage = `<td class="${item.class}"> `;
                         tdColPage += `#Err </td> `;
                     }
-                    
+
                 }
             } else {
                 tdColPage = `<td class="${item.class}"> `;
@@ -820,15 +913,15 @@
                 } else {
                     let tmpAmount = 0;
                     switch (item.totalFormatter) {
-                    case "currency":
+                        case "currency":
                             tmpAmount = currencyFormatter.format(result[item.grandTotalKey]);
-                        break;
-                    case "number":
+                            break;
+                        case "number":
                             tmpAmount = numberFormatter.format(result[item.grandTotalKey]);
-                        break;
-                    default:
+                            break;
+                        default:
                             tmpAmount = numberFormatter.format(result[item.grandTotalKey]);
-                        break;
+                            break;
                     }
                     try {
 
@@ -839,7 +932,7 @@
                         tdColTotal = `<td class="${item.class}"> `;
                         tdColTotal += `#Err </td> `;
                     }
-                   
+
                 }
             } else {
                 tdColTotal = `<td class="${item.class}"> `;
@@ -850,49 +943,23 @@
         });
         if (pageSummaryCount > 0) {
             $pageSummaryRow.append($("<td>"));
-            $pageSummaryRow.appendTo("#myTable >  tbody:last");
+            $pageSummaryRow.appendTo(`#${tableElementId} >  tbody:last`);
         }
         if (totalSummaryCount > 0) {
             $totalSummaryRow.append($("<td>"));
-            $totalSummaryRow.appendTo("#myTable >  tbody:last");
+            $totalSummaryRow.appendTo(`#${tableElementId} >  tbody:last`);
         }
         if (!isEmpty(indexPageDefinition.afterTableLoad)) {
             indexPageDefinition.afterTableLoad.callback(result);
         }
         rowSelectorsUi();
     };
-
+  
     const refreshTableData = () => {
-        var pageIndexVal = parseInt($("#pageIndex").val());
-
-        var pageIndex = reallyIsNaN(pageIndexVal) ? 1 : pageIndexVal;
-        $("#pageIndex").val(pageIndex);
-
-        var pageSize =
-            $("#PageSize").val() == null || $("#PageSize").val().length == 0 ? 10 : parseInt($("#PageSize").val());
-
-        var companyFlt = $("#CompanyFilter").val();
-        var datePeriod = $("#DatePeriodFilter").val();
-        var sortData = $("#currentSort").val();
-        var searchFlt = $(".search_input").val();
-        var $dcId = $("#CurrencySelector");
-        var transTypeFlt = '';
-        var transactorId = 0;
-        if (!($('#TransactorTypeFilter').val() === undefined)) {
-            transTypeFlt = $('#TransactorTypeFilter').val();
-        }
-        if (!($('#TransactorId').val() === undefined)) {
-            transactorId = $('#TransactorId').val();
-        }
-        var wrItmNatureFlt = '';
-        if (!($('#WarehouseItemNatureFilter').val() === undefined)) {
-            wrItmNatureFlt = $('#WarehouseItemNatureFilter').val();
-        }
-        var currencyFlt = $dcId.val() == null || $dcId.val().length == 0 ? 1 : parseInt($dcId.val());
-
-        getTableData(pageIndex, pageSize, sortData, datePeriod, companyFlt, searchFlt, currencyFlt, transTypeFlt, wrItmNatureFlt,transactorId)
+        setFilterValues();
+        getTableData(pageIndexElement, pageSizeElement, tableCurrentSortElement, datePeriodFilterElement, companyFilterElement, searchTextElement, currencyFilterElement, transactorTypeFilterElement, productNatureFilterElement, transactorIdFilterElement)
             .then((data) => {
-                bindDataToTable(data, pageIndex);
+                bindDataToTable(data, pageIndexElement);
             })
             .catch((error) => {
                 console.log(error);
@@ -943,15 +1010,16 @@
     const loadSettings = (localStorageKey) => {
         var storageItemJs = localStorage.getItem(localStorageKey);
         if (storageItemJs === undefined || storageItemJs === null) {
-            $("#pageIndex").val(1);
+            $pageIndex.val(1);
             $("#filtersVisible").val(true);
             $("#rowSelectorsVisible").val(true);
             // $rowSelectorsToggle.text('Hide Row Selectors');
             // $filtersToggle.text('Hide Filters');
-            $("#DatePeriodFilter").val("CURMONTH");
-            $("#CompanyFilter").val(0);
-            $("#currentSort").val("transactiondate:desc");
-        } else {
+            $datePeriodFilter.val("CURMONTH");
+            $companyFilter.val(0);
+            $currentSort.val("transactiondate:desc");
+        }
+        else {
             var storageItem = JSON.parse(storageItemJs);
             var filtersValue = storageItem.find((x) => x.filterKey === "filtersVisible").filterValue;
             if (filtersValue === true) {
@@ -964,19 +1032,19 @@
             $("#rowSelectorsVisible").val(filtersValue);
 
             filtersValue = storageItem.find((x) => x.filterKey === "dateRangeFilter").filterValue;
-            $("#DatePeriodFilter").val(filtersValue);
+            $datePeriodFilter.val(filtersValue);
             filtersValue = storageItem.find((x) => x.filterKey === "currentSort").filterValue;
-            $("#currentSort").val(filtersValue);
+            $currentSort.val(filtersValue);
             filtersValue = storageItem.find((x) => x.filterKey === "companyFilter").filterValue;
-            $("#CompanyFilter").val(filtersValue);
+            $companyFilter.val(filtersValue);
             filtersValue = storageItem.find((x) => x.filterKey === "pageSize").filterValue;
-            $("#PageSize").val(filtersValue);
+            $pageSize.val(filtersValue);
             filtersValue = storageItem.find((x) => x.filterKey === "pageIndex").filterValue;
-            $("#pageIndex").val(filtersValue);
+            $pageIndex.val(filtersValue);
 
             try {
                 filtersValue = storageItem.find((x) => x.filterKey === "currentCurrency").filterValue;
-                $("#CurrencySelector").val(filtersValue);
+                $currencySelector.val(filtersValue);
             } catch (e) { }
         }
     };
@@ -989,12 +1057,12 @@
         var rowSelectorsNotVisible = $rowSelectorsColumn.is(":hidden");
         var rowSelectorsVisible = rowSelectorsNotVisible ? false : true;
 
-        var pageSize = $("#PageSize").val();
-        var dateRange = $("#DatePeriodFilter").val();
-        var currentSort = $("#currentSort").val();
-        var companyFilter = $("#CompanyFilter").val();
-        var pageIndex = $("#pageIndex").val();
-        var currentCurrency = $("#CurrencySelector").val();
+        var pageSize = $pageSize.val();
+        var dateRange = $datePeriodFilter.val();
+        var currentSort = $currentSort.val();
+        var companyFilter = $companyFilter.val();
+        var pageIndex = $pageIndex.val();
+        var currentCurrency = $currencySelector.val();
         var filtersArr = [];
         //#endregion
         filtersArr.push({
@@ -1054,6 +1122,7 @@
         setCurrencyFormatter: setCurrencyFormatter,
         setNumberFormatter: setNumberFormatter,
         loadSettings: loadSettings,
-        saveSettings: saveSettings,
+        saveSettings: saveSettings
+        
     };
 })();
