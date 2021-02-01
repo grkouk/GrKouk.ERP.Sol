@@ -2881,7 +2881,7 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpGet("GetIndexTblDataWarehouseItemsV2")]
         public async Task<IActionResult> GetIndexTblDataWarehouseItemsV2([FromQuery] IndexDataTableRequest request)
         {
-            Thread.Sleep(10000);
+            //Thread.Sleep(10000);
             var fullListIq = _context.CompanyWarehouseItemMappings
                 .Include(p=>p.WarehouseItem)
                 .Include(p=>p.Company)
@@ -3053,7 +3053,7 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpGet("GetIndexTblDataCfaTransactionDefs")]
         public async Task<IActionResult> GetIndexTblDataCfaTransactionDefs([FromQuery] IndexDataTableRequest request)
         {
-            Thread.Sleep(10000);
+            //Thread.Sleep(10000);
             IQueryable<CashFlowTransactionDef> fullListIq = _context.CashFlowTransactionDefs;
 
 
@@ -3799,7 +3799,7 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpGet("GetSelectorWareHouseItems")]
         public async Task<IActionResult> GetSelectorWareHouseItems([FromQuery] IndexDataTableRequest request)
         {
-            Thread.Sleep(10000);
+            //Thread.Sleep(10000);
             IQueryable<WarehouseItem> fullListIq = _context.WarehouseItems;
 
             if (!string.IsNullOrEmpty(request.WarehouseItemNatureFilter))
@@ -3942,7 +3942,7 @@ namespace GrKouk.Web.ERP.Controllers
         public async Task<IActionResult> GetIndexTblDataWareHouseSelectorItems(
             [FromQuery] IndexDataTableRequest request)
         {
-            Thread.Sleep(10000);
+            //Thread.Sleep(10000);
             IQueryable<WarehouseItem> fullListIq = _context.WarehouseItems;
             if (!string.IsNullOrEmpty(request.WarehouseItemNatureFilter))
             {
