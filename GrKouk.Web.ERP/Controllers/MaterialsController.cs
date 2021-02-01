@@ -2462,8 +2462,12 @@ namespace GrKouk.Web.ERP.Controllers
                     #region MaterialLine
 
                     var warehouseItemLine = new BuyDocLine();
-                    decimal unitPrice = dataBuyDocLine.Price;
+                    var transUnitId = dataBuyDocLine.TransactionUnitId;
+                    var transUnitFactor = dataBuyDocLine.TransactionUnitFactor;
+                    decimal transPrice = dataBuyDocLine.TransUnitPrice;
+                    double transUnits = dataBuyDocLine.TransactionQuantity;
                     decimal units = (decimal)dataBuyDocLine.Q1;
+                    decimal unitPrice = dataBuyDocLine.Price;
                     decimal fpaRate = (decimal)dataBuyDocLine.FpaRate;
                     decimal discountRate = (decimal)dataBuyDocLine.DiscountRate;
                     decimal lineNetAmount = unitPrice * units;
@@ -2483,6 +2487,11 @@ namespace GrKouk.Web.ERP.Controllers
                     warehouseItemLine.Factor = dataBuyDocLine.Factor;
                     warehouseItemLine.BuyDocumentId = docId;
                     warehouseItemLine.Etiology = transToAttach.Etiology;
+                    warehouseItemLine.TransactionUnitId = transUnitId;
+                    warehouseItemLine.TransactionQuantity = transUnits;
+                    warehouseItemLine.TransUnitPrice = transPrice;
+                    warehouseItemLine.TransactionUnitFactor = transUnitFactor;
+                   
                     //_context.Entry(transToAttach).Entity
 
                     try

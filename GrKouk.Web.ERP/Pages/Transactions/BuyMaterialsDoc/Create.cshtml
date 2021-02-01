@@ -142,14 +142,14 @@
             <div class="form-row">
                 <div class="form-group col-sm-1">
                     <label class="small" id="q1Label">Q1</label>
-                    <input class="form-control form-control-sm small input-doc-line text-right" type="number" placeholder="Q 1" id="Q1" tabindex="-1" readonly />
+                    <input class="form-control form-control-sm small input-doc-line text-right" type="text" placeholder="Q 1" id="Q1" tabindex="-1" readonly />
                     <div class="invalid-feedback">
                         Please enter a valid Q1.
                     </div>
                 </div>
                 <div class="form-group col-sm-1">
                     <label class="small" id="q2Label">Q2</label>
-                    <input class="form-control form-control-sm small input-doc-line text-right" type="number" placeholder="Q 2" id="Q2" tabindex="-1" readonly />
+                    <input class="form-control form-control-sm small input-doc-line text-right" type="text" placeholder="Q 2" id="Q2" tabindex="-1" readonly />
                     <span class="text-danger small"></span>
                 </div>
                 <div class="form-group col-md-1">
@@ -1255,7 +1255,7 @@
                         var lineDiscAmount = $colDiscAmount.attr('data-actualValue');
                         var lineVatAmount = $colFpaAmount.attr('data-actualValue');
                         var lineGrosAmount = $colGrossAmount.attr('data-actualValue');
-                       
+                        var priceOnBaseUnit = transPrice / transUnitFactor;
                         const $transactorId = $('#ItemVm_TransactorId');
                         let transactorId = $transactorId.val();
                         let companyId = $companyId.val();
@@ -1287,6 +1287,7 @@
                                 $mainUnitId.val(mainUnitId);
                                 $secUnitId.val(secUnitId);
                                 $factor.val(factor);
+                                $price.val(priceOnBaseUnit);
                                 $lookupValueValid.val('OK');
                             })
                             .catch((error) => {

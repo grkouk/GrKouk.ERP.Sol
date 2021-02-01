@@ -55,7 +55,20 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
             {
                 return NotFound();
             }
+            //check for new values or old values
+            var vmLines = ItemVm.BuyDocLines;
+            foreach (var vmLine in vmLines)
+            {
+                if (vmLine.TransactionUnitId==0)
+                {
+                    vmLine.TransactionUnitId = vmLine.PrimaryUnitId;
+                    vmLine.TransactionUnitFactor = 1;
+                    vmLine.TransUnitPrice = vmLine.UnitPrice;
+                    vmLine.TransactionQuantity = vmLine.Quontity1;
+                }
 
+            }
+            
             LoadCombos();
             return Page();
         }
