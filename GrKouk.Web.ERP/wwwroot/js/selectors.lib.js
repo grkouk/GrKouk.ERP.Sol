@@ -252,7 +252,9 @@
             classWhenCondition: '',
             classCondition: {},
             remoteReference: {
-               
+                isRemoteReference: true,
+                valueKey: 'id',
+                url: '@Url.Page("/mainentities/materials/details")?id='
             }
         },
 

@@ -64,7 +64,19 @@
     <partial name="_PagerPartial" />
 </div>
 
-<partial name="_LoadMePartial"/>
+<!-- Modal -->
+<div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="loader"></div>
+                <div>
+                    <p>Executing request. <br><br><small>Please wait...</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Modal Item selector for payments -->
 <div class="modal fade" id="itemSelector" tabindex="-1" role="dialog" aria-labelledby="itemsModalLabel" aria-hidden="true" data-keyboard="false">
     <div class="modal-dialog modal-dialog-centered modal-lg" style="overflow-y: scroll; max-height:75%;  margin-top: 50px; margin-bottom:50px;" role="document">

@@ -14,11 +14,6 @@ namespace GrKouk.Web.ERP.Helpers
         public decimal PriceBrutto { get; set; }
         public string WarehouseItemName { get; set; }
         public float FpaRate { get; set; }
-        public int MainUnitId { get; set; }
-        public string MainUnitCode { get; set; }
-        public int SecondaryUnitId { get; set; }
-        public string SecondaryUnitCode { get; set; }
-        public double SecondaryFactor { get; set; }
         public IList<ProductUnit> ProductUnits { get; set; }
 
     }
@@ -31,7 +26,6 @@ namespace GrKouk.Web.ERP.Helpers
         public string UnitCode { get; set; }
         public double UnitFactor { get; set; }
         public int TransactorId { get; set; }
-        public bool IsDefault { get; set; }
     }
 
     public enum UnitTypeEnum
@@ -39,10 +33,10 @@ namespace GrKouk.Web.ERP.Helpers
         [Description("Base Unit")]
         BaseUnitType = 1,
         [Description("Secondary Unit")]
-        SecondaryUnitType = 2,
+        SecondaryUnitType = 3,
         [Description("Buy Unit")]
         BuyUnitType = 3,
         [Description("Supplier Buy Unit")]
-        SupplierBuyUnitType = 4
+        SupplierBuyUnitType = 4,
     }
 }

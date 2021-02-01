@@ -459,38 +459,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             return Ok(materials);
         }
-         [HttpGet("companyBaseCurrencyInfo")]
-        public async Task<IActionResult> CompanyBaseCurrencyInfoAsync(int companyId)
-        {
-            if (companyId == 0)
-            {
-                return BadRequest(new
-                {
-                    error = "No company Id provided "
-                });
-            }
-            var theCompany = await _context.Companies
-                .Include(p=>p.Currency)
-                .Where(p => p.Id == companyId)
-                .SingleOrDefaultAsync();
-            
-            if (theCompany == null)
-            {
-                return NotFound(new
-                {
-                    error = "Company not found "
-                });
-            }
-           
-            var response = new 
-            {
-                CurrencyCode = theCompany.Currency.Code,
-                CurrencyLocale = theCompany.Currency.DisplayLocale
-               
-                
-            };
-            return Ok(response);
-        }
+
         [HttpGet("productdata")]
         public async Task<IActionResult> GetProductDataAsync(int warehouseItemId, int transactorId, int companyId)
         {
@@ -542,7 +511,6 @@ namespace GrKouk.Web.ERP.Controllers
                 UnitCode = materialData.MainMeasureUnit.Code,
                 UnitName = materialData.MainMeasureUnit.Name,
                 UnitType = UnitTypeEnum.BaseUnitType,
-                IsDefault = false,
                 UnitFactor = 1
             });
             unitList.Add(new ProductUnit()
@@ -551,7 +519,6 @@ namespace GrKouk.Web.ERP.Controllers
                 UnitCode = materialData.SecondaryMeasureUnit.Code,
                 UnitName = materialData.SecondaryMeasureUnit.Name,
                 UnitType = UnitTypeEnum.SecondaryUnitType,
-                IsDefault = false,
                 UnitFactor = materialData.SecondaryUnitToMainRate
             });
             unitList.Add(new ProductUnit()
@@ -560,7 +527,6 @@ namespace GrKouk.Web.ERP.Controllers
                 UnitCode = materialData.BuyMeasureUnit.Code,
                 UnitName = materialData.BuyMeasureUnit.Name,
                 UnitType = UnitTypeEnum.BuyUnitType,
-                IsDefault = true,
                 UnitFactor = materialData.BuyUnitToMainRate
             });
             //get special codes
@@ -583,11 +549,6 @@ namespace GrKouk.Web.ERP.Controllers
                 LastPrice = lastPrice,
                 PriceNetto = materialData.PriceNetto,
                 PriceBrutto = materialData.PriceBrutto,
-                MainUnitId = materialData.MainMeasureUnitId,
-                MainUnitCode = materialData.MainMeasureUnit.Code,
-                SecondaryUnitId = materialData.SecondaryMeasureUnitId,
-                SecondaryUnitCode =  materialData.SecondaryMeasureUnit.Code,
-                SecondaryFactor = materialData.SecondaryUnitToMainRate,
                 ProductUnits = unitList
             };
             return Ok(response);
@@ -2056,13 +2017,8 @@ namespace GrKouk.Web.ERP.Controllers
                     #region MaterialLine
 
                     var buyMaterialLine = new BuyDocLine();
-                    var transUnitId = dataBuyDocLine.TransactionUnitId;
-                    var transUnitFactor = dataBuyDocLine.TransactionUnitFactor;
-                   // var factor = dataBuyDocLine.Factor;
-                    decimal transPrice = dataBuyDocLine.TransUnitPrice;
-                    double transUnits = dataBuyDocLine.TransactionQuantity;
-                    decimal units = (decimal)dataBuyDocLine.Q1;
                     decimal unitPrice = dataBuyDocLine.Price;
+                    decimal units = (decimal)dataBuyDocLine.Q1;
                     decimal fpaRate = (decimal)dataBuyDocLine.FpaRate;
                     decimal discountRate = (decimal)dataBuyDocLine.DiscountRate;
                     decimal lineNetAmount = unitPrice * units;
@@ -2082,10 +2038,6 @@ namespace GrKouk.Web.ERP.Controllers
                     buyMaterialLine.Factor = dataBuyDocLine.Factor;
                     buyMaterialLine.BuyDocumentId = docId;
                     buyMaterialLine.Etiology = transToAttach.Etiology;
-                    buyMaterialLine.TransactionUnitId = transUnitId;
-                    buyMaterialLine.TransactionQuantity = transUnits;
-                    buyMaterialLine.TransUnitPrice = transPrice;
-                    buyMaterialLine.TransactionUnitFactor = transUnitFactor;
                     //_context.Entry(transToAttach).Entity
                     transToAttach.BuyDocLines.Add(buyMaterialLine);
 
