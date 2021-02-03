@@ -59,6 +59,7 @@
     <Folder Include="Pages\Components\" />
     <Folder Include="Pages\Configuration\CashFlow\CFADocTypeDefs\" />
     <Folder Include="Pages\Configuration\CashFlow\CFADocSeriesDefs\" />
+    <Folder Include="wwwroot\productimages\" />
   </ItemGroup>
 
 </Project>

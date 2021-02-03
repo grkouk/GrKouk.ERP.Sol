@@ -45,7 +45,7 @@
         <input type="hidden" id="totalPages" />
         <input type="hidden" id="totalRecords" />
         <input type="hidden" id="pageIndex" />
-        <input type="hidden" asp-for="TransactorId"/>
+        <input type="hidden" asp-for="TransactorId" />
         <div class="container">
             <div class="form-row">
                 <div class="form-group col-md-auto">
@@ -92,7 +92,7 @@
             <nav aria-label="Page navigation example">
                 <ul class="pagination pagination-sm justify-content-end">
                     <li class="page-item ">
-                        <a href="#" id="GoToFirst" data-pageraction="GoToFirst" 
+                        <a href="#" id="GoToFirst" data-pageraction="GoToFirst"
                            class="page-link" aria-label="First">
                             @*<span aria-hidden="true">;</span>*@
                             First
@@ -127,7 +127,7 @@
 </div>
 <table class="table table-bordered table-sm" id="myTable">
     <thead class="thead-light">
-       
+
     </thead>
     <tbody></tbody>
 </table>
@@ -139,7 +139,7 @@
         <nav aria-label="Page navigation example">
             <ul class="pagination pagination-sm justify-content-end">
                 <li class="page-item ">
-                    <a href="#" id="GoToFirst" data-pageraction="GoToFirst" 
+                    <a href="#" id="GoToFirst" data-pageraction="GoToFirst"
                        class="page-link" aria-label="First">
                         @*<span aria-hidden="true">;</span>*@
                         First
@@ -179,6 +179,7 @@
 @section Scripts
 {
     <script src="~/js/moment.min.js"></script>
+    <script src="~/js/definitions.js"></script>
     <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
           $(document).ready(function() {
@@ -195,7 +196,7 @@
 
                 });
             //#region variables
-           
+
             var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
             //#endregion
              //#region Index page definition objects
@@ -367,7 +368,7 @@
                          }
 
                      } else {
-                        
+
                          var itemId = valueSource["id"];
                          retUri = `/transactions/transactortransmng/Edit?id=${itemId}`;
                      }
@@ -377,7 +378,7 @@
                }
             ];
             const actionColSubDefs = [
-               
+
             ];
             const actionMobileColDefs = [
                {
@@ -412,7 +413,7 @@
                            }
 
                        } else {
-                          
+
                            var itemId = valueSource["id"];
                            retUri = `/transactions/transactortransmng/Edit?id=${itemId}`;
                        }
@@ -422,7 +423,7 @@
                }
             ];
             const tableHandlersToRegister = [
-                
+
             ];
             const pageHandlersToRegister = [
                 {
@@ -432,7 +433,7 @@
                         currencyChanged();
                         indPgLib.refreshData();
                     }
-                } 
+                }
             ];
             const indexPageDef = {
                 uri: '/api/GrKoukInfoApi/GetIndexTblDataTransactorAccountTab',
@@ -444,7 +445,7 @@
                 actionMobileColDefs: actionMobileColDefs,
                 tableHandlersToRegister: tableHandlersToRegister,
                 pageHandlersToRegister: pageHandlersToRegister,
-                afterTableLoad: { 
+                afterTableLoad: {
                 }
             };
 
@@ -468,8 +469,8 @@
                     console.log('Not found currency code for this id');
                 }
             };
-          
-           
+
+
 
             var storageItemJs = localStorage.getItem('TransactorAccountTab');
             if (storageItemJs === undefined || storageItemJs === null) {
