@@ -125,9 +125,9 @@
         var transactorId = 0;
         if (!($transactorTypeFilter.val() === undefined)) {
             transTypeFlt = $transactorTypeFilter.val();
-            transactorIdFilterElement = transTypeFlt;
+            transactorTypeFilterElement = transTypeFlt;
         } else {
-            transactorIdFilterElement = "";
+            transactorTypeFilterElement = "";
         }
 
         if (!($transactorId.val() === undefined)) {
