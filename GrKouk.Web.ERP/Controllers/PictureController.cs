@@ -54,17 +54,34 @@ namespace GrKouk.Web.ERP.Controllers
                 //</ Filename >
                 //< Copy File to Target >
 
-                using (FileStream stream = new FileStream(newFilenameOnServer, FileMode.Create))
+                await using (FileStream stream = new FileStream(newFilenameOnServer, FileMode.Create))
                 {
-                    await uploadedFile.CopyToAsync(stream);
+                    try
+                    {
+                        await uploadedFile.CopyToAsync(stream);
+                    }
+                    catch (DirectoryNotFoundException e)
+                    {
+                        return StatusCode(StatusCodes.Status409Conflict, new {message=e.Message });
+                    }
+                    catch (UnauthorizedAccessException  e)
+                    {
+                        return StatusCode(StatusCodes.Status403Forbidden, new {message=e.Message });
+                    }
+                    catch (Exception e)
+                    {
+
+                        return StatusCode(StatusCodes.Status409Conflict, new {message=e.Message });
+                    }
+                    
                 }
             }
 
             //------</ @Loop: Uploaded Files >------
 
 
-
-            return new JsonResult(listFiles);
+            return Ok(listFiles);
+            //return new JsonResult(listFiles);
         }
     }
 }
