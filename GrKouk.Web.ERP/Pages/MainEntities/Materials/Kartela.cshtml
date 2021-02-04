@@ -907,6 +907,7 @@
                             currency: currencyCode,
                             minimumFractionDigits: 2
                         });
+                    indPgLib.setCurrencyFormatter(formatterCurrency);
                 } catch (e) {
                     //not found keep old formater or maybe create a default one
                     console.log('Not found currency code for this id');

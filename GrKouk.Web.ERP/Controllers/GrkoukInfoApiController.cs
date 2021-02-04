@@ -1748,8 +1748,8 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
             var dbTrans = transactionsList.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
-
-            var dbTransactions = dbTrans.GroupBy(g => new
+            var intem = dbTrans.ToList();
+            var dbTransactions = intem.GroupBy(g => new
             {
                 g.CompanyCode,
                 g.CompanyCurrencyId,
@@ -2150,8 +2150,9 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
             var dbTrans = transactionsList.ProjectTo<WarehouseTransListDto>(_mapper.ConfigurationProvider);
+            var intem = dbTrans.ToList();
 
-            var dbTransactions = dbTrans.GroupBy(g => new
+            var dbTransactions = intem.GroupBy(g => new
             {
                 g.CompanyId,
                 g.CompanyCode,
