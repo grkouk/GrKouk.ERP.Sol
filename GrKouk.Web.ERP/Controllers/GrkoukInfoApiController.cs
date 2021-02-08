@@ -184,17 +184,23 @@ namespace GrKouk.Web.ERP.Controllers
             {
                 switch (request.SortData.ToLower())
                 {
-                    case "transactiondate:asc":
+                    case "transactiondatesort:asc":
                         expensesIq = expensesIq.OrderBy(p => p.TransactionDate);
                         break;
-                    case "transactiondate:desc":
+                    case "transactiondatesort:desc":
                         expensesIq = expensesIq.OrderByDescending(p => p.TransactionDate);
                         break;
-                    case "transactorname:asc":
+                    case "transactornamesort:asc":
                         expensesIq = expensesIq.OrderBy(p => p.Transactor.Name);
                         break;
-                    case "transactorname:desc":
+                    case "transactornamesort:desc":
                         expensesIq = expensesIq.OrderByDescending(p => p.Transactor.Name);
+                        break;
+                    case "companycodesort:asc":
+                        expensesIq = expensesIq.OrderBy(p => p.Company.Name);
+                        break;
+                    case "companycodesort:desc":
+                        expensesIq = expensesIq.OrderByDescending(p => p.Company.Name);
                         break;
                 }
             }
@@ -226,39 +232,56 @@ namespace GrKouk.Web.ERP.Controllers
                                                    || p.ReferenceCode.Contains(request.SearchFilter)
                                                    || p.FinTransCategory.Name.Contains(request.SearchFilter));
             }
-
-            var t = expensesIq.ProjectTo<FinDiaryExpenseTransactionDto>(_mapper.ConfigurationProvider);
+            var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
+                .Take(10)
+                .ToListAsync();
+            var t = expensesIq.Select(p => new FinDiaryExpenseTransactionDto
+            {
+                Id = p.Id,
+                TransactionDate = p.TransactionDate,
+                ReferenceCode = p.ReferenceCode,
+                TransactorId = p.TransactorId,
+                TransactorName = p.Transactor.Name,
+                FinTransCategoryName = p.FinTransCategory.Name,
+                AmountTotal = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountFpa+p.AmountNet),
+                CompanyId = p.CompanyId,
+                CompanyCode = p.Company.Code,
+                CompanyCurrencyId = p.Company.CurrencyId
+            });
+            //var t2 = expensesIq.ProjectTo<FinDiaryExpenseTransactionDto>(_mapper.ConfigurationProvider);
+            var t1 = await t.ToListAsync();
+            var grandSumOfAmountNew = t1.Sum(p => p.AmountTotal);
             var pageIndex = request.PageIndex;
 
             var pageSize = request.PageSize;
 
             var listItems = await PagedList<FinDiaryExpenseTransactionDto>.CreateAsync(t, pageIndex, pageSize);
-            foreach (var listItem in listItems)
-            {
-                if (listItem.CompanyCurrencyId != 1)
-                {
-                    var r = await _context.ExchangeRates.Where(p => p.CurrencyId == listItem.CompanyCurrencyId)
-                        .OrderByDescending(p => p.ClosingDate).FirstOrDefaultAsync();
-                    if (r != null)
-                    {
-                        listItem.AmountFpa /= r.Rate;
-                        listItem.AmountNet /= r.Rate;
-                        listItem.AmountTotal /= r.Rate;
-                    }
-                }
-
-                if (request.DisplayCurrencyId != 1)
-                {
-                    var r = await _context.ExchangeRates.Where(p => p.CurrencyId == request.DisplayCurrencyId)
-                        .OrderByDescending(p => p.ClosingDate).FirstOrDefaultAsync();
-                    if (r != null)
-                    {
-                        listItem.AmountFpa *= r.Rate;
-                        listItem.AmountNet *= r.Rate;
-                        listItem.AmountTotal *= r.Rate;
-                    }
-                }
-            }
+            // foreach (var listItem in listItems)
+            // {
+            //     if (listItem.CompanyCurrencyId != 1)
+            //     {
+            //         var r = await _context.ExchangeRates.Where(p => p.CurrencyId == listItem.CompanyCurrencyId)
+            //             .OrderByDescending(p => p.ClosingDate).FirstOrDefaultAsync();
+            //         if (r != null)
+            //         {
+            //             listItem.AmountFpa /= r.Rate;
+            //             listItem.AmountNet /= r.Rate;
+            //             listItem.AmountTotal /= r.Rate;
+            //         }
+            //     }
+            //
+            //     if (request.DisplayCurrencyId != 1)
+            //     {
+            //         var r = await _context.ExchangeRates.Where(p => p.CurrencyId == request.DisplayCurrencyId)
+            //             .OrderByDescending(p => p.ClosingDate).FirstOrDefaultAsync();
+            //         if (r != null)
+            //         {
+            //             listItem.AmountFpa *= r.Rate;
+            //             listItem.AmountNet *= r.Rate;
+            //             listItem.AmountTotal *= r.Rate;
+            //         }
+            //     }
+            // }
 
             decimal sumAmountTotal = listItems.Sum(p => p.AmountTotal);
 
@@ -269,6 +292,7 @@ namespace GrKouk.Web.ERP.Controllers
                 HasPrevious = listItems.HasPrevious,
                 HasNext = listItems.HasNext,
                 SumOfAmount = sumAmountTotal,
+                GrandSumOfAmount = grandSumOfAmountNew,
                 Data = listItems
             };
             return Ok(response);
