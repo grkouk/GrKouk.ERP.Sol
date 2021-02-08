@@ -1,4 +1,5 @@
 ﻿@page
+@using GrKouk.Web.ERP.Helpers
 @model GrKouk.Web.Erp.Pages.Expenses.IndexModel
 @{
     ViewData["Title"] = "List of Expences";
@@ -39,178 +40,35 @@
         </li>
     </ul>
 </div>
-
 <div class="collapse show" id="filterCollapse">
-    <form class="form-inline" id="FiltersForm" method="get">
-        <input type="hidden" id="filtersVisible" />
-        <input type="hidden" id="rowSelectorsVisible" />
-        <input type="hidden" id="currentSort" />
-        <input type="hidden" id="currentFilter" />
-        <input type="hidden" id="totalPages" />
-        <input type="hidden" id="totalRecords" />
-        <input type="hidden" id="pageIndex" />
-      
-        <div class="container">
-            <div class="form-row">
+    @await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowDateFlt = true })
 
-                <div class="form-group col-md-auto">
-                    <div class="searchbar">
-                        <input class="search_input" type="text" name="" placeholder="Search...">
-                        <a href="#" class="search_icon"><i class="fas fa-search fa-xs"></i></a>
-                    </div>
-                </div>
-               
-                <div class="form-group col-md-auto">
-                    <label class="small"> Period:</label>
-                    <select name="DatePeriodFilter" id="DatePeriodFilter" class="form-control form-control-sm small"
-                            asp-items="ViewBag.DataFilterValues"></select>
-                </div>
-                <div class="form-group col-md-auto">
-                    <label class="small">Company:</label>
-                    <select id="CompanyFilter" class="form-control form-control-sm small"
-                            asp-items="ViewBag.CompanyFilter"></select>
-
-                </div>
-                <div class="form-group col-md-auto">
-                    <label class="small"> Page Size:</label>
-                    <select id="PageSize" class="form-control form-control-sm small"
-                            asp-items="ViewBag.PageFilterSize"></select>
-                </div>
-                <div class="form-group col-md-auto">
-                    <small>
-                        <label name="PagingInfo"> </label>
-
-                    </small>
-                </div>
-
-            </div>
-        </div>
-    </form>
+    <div class="row mt-1">
+        <partial name="_PagerPartial" />
+    </div>
 </div>
-<br />
-<table class="table table-bordered table-sm" id="myTable">
+
+<table class="table table-bordered table-sm m-0" id="myTable">
     <thead class="thead-light">
-        <tr>
-            <th name="selectAllRowsColumn">
-                <label class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" name="checkAllRows">
-                    <span class="custom-control-indicator"></span>
-                </label>
-            </th>
-            <th class="small text-center">
-                <a href="#" id="TransDateHeader" role="button">
-                    Date
 
-                </a>
-                <i class="fas fa-sort-numeric-down" id="TransDateHeaderIcon" name="SortIcon"></i>
-            </th>
-            <th class="small d-none d-sm-table-cell">
-                Reference Code
-
-            </th>
-            <th class="small">
-                <a href="#" id="TransactorNameHeader">
-                    Transactor
-                </a>
-
-                <i class="fas fa-sort-alpha-down" id="TransactorNameHeaderIcon" name="SortIcon"></i>
-            </th>
-            <th class="small d-none d-lg-table-cell ">
-                Category
-            </th>
-            <th class="small d-none  d-md-table-cell">
-                Company
-            </th>
-
-            <th class="small ">
-                Amount Total
-            </th>
-            <th class="small d-none d-md-table-cell">Actions</th>
-            <th class="small d-table-cell d-sm-table-cell d-md-none"></th>
-        </tr>
     </thead>
     <tbody>
-
-        <tr>
-            <td name="selectRowColumn">
-                <label class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" name="checkTableRow">
-                    <span class="custom-control-indicator"></span>
-                </label>
-            </td>
-            <td class="text-right small"></td>
-            <td class="small"></td>
-            <td class="small"></td>
-            <td class="small"></td>
-            <td class="small"></td>
-
-            <td class="text-right small"></td>
-            <td class="text-right small"></td>
-
-            <td class="small"></td>
-
-            <td class="small"></td>
-        </tr>
-
     </tbody>
 </table>
 
 <div class="row">
-    <div class="col-3">
-        <label class="small" name="PagingInfo"> </label>
-    </div>
-    <div class="col-9">
-        <nav aria-label="Page navigation example">
-            <ul class="pagination pagination-sm justify-content-end">
-                <li class="page-item ">
-                    <a href="#" id="GoToFirst"
-                       class="page-link" aria-label="First">
-                        First
-                    </a>
-                </li>
-                <li class="page-item ">
-                    <a href="#" id="GoToPrevious"
-                       class="page-link" aria-label="Previous">
-                        Previous
-                    </a>
-                </li>
-
-                <li class="page-item ">
-                    <a href="#" id="GoToNext"
-                       class="page-link" aria-label="Next">
-                        Next
-                    </a>
-                </li>
-                <li class="page-item  ">
-                    <a href="#" id="GoToLast"
-                       class="page-link" aria-label="Last">
-                        Last
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
+    <partial name="_PagerPartial" />
 </div>
 
 
-<!-- Modal -->
-<div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <div class="loader"></div>
-                <div>
-                    <p>Executing request. <br><br><small>Please wait...</small></p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<partial name="_LoadMePartial"/>
 
 
 @section Scripts
 {
     <script src="~/js/moment.min.js"></script>
+    <script src="~/js/definitions.js"></script>
+    <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
         $(document).ready(function() {
             var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
@@ -225,288 +83,234 @@
                     maximumFractionDigits: 3
 
                 });
+             var $deleteSelectedRowsLink = $('#deleteSelectedRows');
+            var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
             //#region variables
-            var $filtersVisible = $('#filtersVisible');
-            var $filterCollapse = $('#filterCollapse');
-            //var $alist = $('a[href*="&filtersVisible"]');
-            var $checkAllRows = $('input[name=checkAllRows]');
-            var $filtersToggle = $('#filtersToggle');
-            var $rowSelectorsToggle = $('#rowSelectorsToggle');
-            var $rowSelectorsVisible = $('#rowSelectorsVisible');
-            var $selectAllSelector = $('th[name=selectAllRowsColumn]');
-            //var $selectSingleSelectors = $('td[name=selectRowColumn]');
-            var $selectedRowsActionsMenu = $('#SelectedRowsActionsMenu');
-            var $selectedRowsActionsLink = $('#ddSelectedRowsActions');
-
-            var $deleteSelectedRowsLink = $('#deleteSelectedRows');
-
-            var $pageIndex = $('#pageIndex');
-            var $pageSize = $('#PageSize');
-            var $totalPages = $('#totalPages');
-            var $totalRecords = $('#totalRecords');
+            
             //#endregion
-            var reallyIsNaN = function(x) {
-                return x !== x;
-            };
-            var handleSortUi = () => {
-
-                var curSort = $('#currentSort').val();
-
-                $('[name=SortIcon]').hide();
-                if (curSort === undefined || curSort === null || curSort.length === 0) {
-                    //hide all icons
-                    return;
-
-                }
-                var curSortAr = curSort.split(':');
-                switch (curSortAr[0]) {
-                case 'transactiondate':
-                    if (curSortAr[1] === 'asc') {
-                        $('#TransDateHeaderIcon').addClass('fas fa-sort-numeric-up').show();
-                    } else {
-                        $('#TransDateHeaderIcon').addClass('fas fa-sort-numeric-down').show();
-                    }
-                    break;
-                case 'transactorname':
-                    if (curSortAr[1] === 'asc') {
-                        $('#TransactorNameHeaderIcon').addClass('fas fa-sort-alpha-up').show();
-                    } else {
-                        $('#TransactorNameHeaderIcon').addClass('fas fa-sort-alpha-down').show();
-                    }
-                    break;
-                default:
-                }
-
-            };
-            var handleSelectedRowsUi = () => {
-                var $rowSelectors = $('input[name=checkTableRow]');
-                var $selectedRowsActionsLink = $('#ddSelectedRowsActions');
-                var allRows = $rowSelectors.length;
-                var selectedRowsCount = $rowSelectors.filter(':checked').length;
-                if (selectedRowsCount > 0) {
-                    $selectedRowsActionsLink.removeClass('disabled');
-                    //$selectedRowsActionsLink.prop('disabled', 'false');
-                } else {
-                    $selectedRowsActionsLink.addClass('disabled');
-                }
-                if (selectedRowsCount == allRows) {
-                    $checkAllRows.prop('checked', true);
-                } else {
-                    $checkAllRows.prop('checked', false);
-                }
-            };
-            var getTableData = (pageIndex, pageSize, sortData, dateRange, companyFilter, searchFilter,displayCurrencyId) => {
-                //#region getTableData
-                var timeout;
-
-                var uri =
-                    `/api/GrKoukInfoApi/GetIndexTblDataExpenses?pageIndex=${pageIndex}&pageSize=${pageSize}&companyFilter=${companyFilter}&dateRange=${dateRange}&sortData=${sortData}&searchFilter=${searchFilter}&displayCurrencyId=${displayCurrencyId}`;
-                $.ajax({
-                    contentType: 'application/json; charset=utf-8',
-
-                    dataType: 'json',
-                    type: 'GET',
-
-                    url: uri,
-                    beforeSend: function() {
-                        if (timeout) {
-                            clearTimeout(timeout);
-                        }
-                        timeout = setTimeout(function() {
-
-                                $("#loadMe").modal({
-                                    backdrop: "static", //remove ability to close modal with click
-                                    keyboard: false, //remove option to close with keyboard
-                                    show: true //Display loader!
-                                });
-                            },
-                            1000);
-
-                    },
-                    success: function(result) {
-                        var totalRecords = result.totalRecords;
-                        var totalPages = result.totalPages;
-
-                        $totalPages.val(totalPages);
-                        $totalRecords.val(totalRecords);
-                        var pagingInfo = `Page:${pageIndex} of ${totalPages} Total Items ${totalRecords}`;
-                        $('[name=PagingInfo]').text(pagingInfo);
-                        var hasPrevious = result.hasPrevious;
-                        var hasNext = result.hasNext;
-                        if (hasPrevious) {
-                            $('#GoToFirst, #GoToPrevious').parent().removeClass('disabled');
-                        } else {
-                            $('#GoToFirst, #GoToPrevious').parent().addClass('disabled');
-                        }
-                        if (hasNext) {
-                            $('#GoToLast, #GoToNext').parent().removeClass('disabled');
-                        } else {
-                            $('#GoToLast, #GoToNext').parent().addClass('disabled');
-                        }
-                        $('#myTable > tbody').empty();
-
-                        $.each(result.data,
-                            function(index, value) {
-                                var tDate = moment(value.transactionDate).format('DD/MM/YYYY');
-                                var refCode = value.referenceCode;
-                                var transName = value.transactorName;
-                                var categoryName = value.finTransCategoryName;
-                                var compName = value.companyName;
-                                var amountTotal = formatterCurrency.format(value.amountTotal);
-                                var itemId = value.id;
-                                var urlEdit = `@Url.Page("./Edit")?id=${itemId}`;
-                                var urlInfo = `@Url.Page("./Details")?id=${itemId}`;
-                                var urlDel = `@Url.Page("./Delete")?id=${itemId}`;
-                                var urlNewLikeThis = `@Url.Page("./Create")?copyFromId=${itemId}`;
-                                var actionsCol = '<td class="small text-center d-none d-md-table-cell">';
-                                actionsCol += `<a href="${urlEdit
-                                    }"><i class="fas fa-edit fa-lg" style="color:slategray"></i></a> |`;
-                                actionsCol += `<a href="${urlInfo
-                                    }"><i class="fas fa-info-circle fa-lg" style="color:slategray"></i></a> | `;
-                                actionsCol += `<a href="${urlDel
-                                    }"><i class="fas fa-trash fa-lg" style="color:slategray"></i></a> | `;
-                                actionsCol += `<a href="${urlNewLikeThis
-                                    }"><i class="fas fa-clone fa-lg" style="color:slategray"></i></a> `;
-                                actionsCol += '</td>';
-                                var actionColMobile =
-                                    '<td class="small text-center d-table-cell d-sm-table-cell d-md-none">';
-                                actionColMobile +=
-                                    '<a class=" dropdown-toggle" role="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" ';
-                                actionColMobile +=
-                                    'aria-expanded="false"><i class="fas fa-bars fa-lg" style="color:slategray"></i></a>';
-                                actionColMobile +=
-                                    '<div class="dropdown-menu small" aria-labelledby="dropdownMenuButton">';
-                                actionColMobile += `<a class="dropdown-item" href="${urlEdit
-                                    }"><i class="fas fa-edit fa-lg" style="color:slategray"></i>  Edit</a> `;
-                                actionColMobile += `<a class="dropdown-item" href="${urlInfo
-                                    }"><i class="fas fa-info-circle fa-lg" style="color:slategray"></i> Details</a> `;
-                                actionColMobile += `<a class="dropdown-item" href="${urlDel
-                                    }"><i class="fas fa-trash fa-lg" style="color:slategray"></i> Delete</a> `;
-                                actionColMobile += `<a class="dropdown-item" href="${urlNewLikeThis
-                                    }"><i class="fas fa-clone fa-lg" style="color:slategray"></i> Duplicate</a> `;
-                                actionColMobile += '</div></td>';
-
-                                var $tr = $('<tr>').append(
-                                    $(
-                                        '<td name="selectRowColumn"> <label class="custom-control custom-checkbox">  ' +
-                                        ' <input type="checkbox" class="custom-control-input" name="checkTableRow" ' +
-                                        `data-itemId="${itemId}">` +
-                                        '<span class="custom-control-indicator"></span></label></td>'),
-                                    $('<td>').text(tDate).addClass('text-right small'),
-                                    $('<td>').text(refCode).addClass('small d-none d-sm-table-cell'),
-                                    $('<td>').text(transName).addClass('small '),
-                                    $('<td>').text(categoryName).addClass('small d-none d-lg-table-cell'),
-                                    $('<td>').text(compName).addClass('small d-none d-md-table-cell'),
-                                    $('<td>').text(amountTotal).addClass('small text-right'),
-                                    $(actionsCol),
-                                    $(actionColMobile)
-                                ).appendTo('#myTable > tbody');
-
-                            });
-                        $('input[name=checkTableRow]').on('change',
-                            function() {
-                                handleSelectedRowsUi();
-                            });
-                        //console.log();
-                        rowSelectorsUi();
-                        handleSortUi();
-                    },
-                    complete: function() {
-                        if (timeout) {
-                            clearTimeout(timeout);
-                        }
-                        $("#loadMe").modal("hide");
-                        setTimeout(function() {
-                                console.log('Checking for open modals');
-                                var isOpen = $('#loadMe').hasClass('show');
-                                if (isOpen) {
-                                    console.log('There is an open Modal');
-                                    $("#loadMe").modal("hide");
-                                } else {
-                                    console.log('No open modal');
-                                }
-                            },
-                            2000);
-                    },
-                    error: function(e) {
-                        console.log(e);
-
-                    }
-                });
-                //#endregion
-            };
-
-            var rowSelectorsUi = () => {
-                var $selectSingleSelectors = $('td[name=selectRowColumn]');
-                var selectorsVisible = $rowSelectorsVisible.val();
-                var newSelectorsVisible =
-                    (selectorsVisible == 'True' || selectorsVisible == 'true' || selectorsVisible === true)
-                        ? 'True'
-                        : 'False';
-                if (newSelectorsVisible == 'True') {
-                    $selectAllSelector.removeAttr('hidden');
-                    $selectSingleSelectors.removeAttr('hidden');
-                    $selectAllSelector.show();
-                    $selectSingleSelectors.show();
-                    $rowSelectorsVisible.val(true);
-                    $rowSelectorsToggle.text('Hide Row Selectors');
-                    $selectedRowsActionsMenu.removeAttr('hidden');
-                    $selectedRowsActionsLink.addClass('disabled');
-                } else {
-                    $selectAllSelector.hide();
-                    $selectSingleSelectors.hide();
-                    $rowSelectorsVisible.val(false);
-                    $rowSelectorsToggle.text('Show Row Selectors');
-                    $selectedRowsActionsMenu.attr('hidden', 'true');
-                }
-            };
-            var refreshTableData = () => {
-                var pageIndexVal = parseInt($('#pageIndex').val());
-
-                var pageIndex = reallyIsNaN(pageIndexVal)
-                    ? 1
-                    : pageIndexVal;
-                $('#pageIndex').val(pageIndex);
-
-                var pageSize = $('#PageSize').val() == null || $('#PageSize').val().length == 0
-                    ? 10
-                    : parseInt($('#PageSize').val());
+             //#region Index page definition objects
+           const colDefs = [
+               {
+                   key: 'transactionDate',
+                   responseKey: 'transactionDate',
+                   actualVal: '',
+                   columnFormat: 'd',
+                   totalKey: '',
+                   grandTotalKey: '',
+                   totalFormatter: '',
+                   sortKey: 'TransactionDateSort',
+                   sortType: 'numeric',
+                   header: 'Date',
+                   text: '',
+                   headerClass: 'small text-center ',
+                   class: 'small',
+                   classWhenCondition: '',
+                   classCondition: {},
+                   remoteReference: {}
+               },
+               {
+                   key: 'transactorName',
+                   responseKey: 'transactorName',
+                   actualVal: '',
+                   columnFormat: 't',
+                   totalKey: 'label',
+                   grandTotalKey: 'label',
+                   totalFormatter: '',
+                   sortKey: 'TransactorNameSort',
+                   sortType: 'alpha',
+                   header: 'Transactor',
+                   text: '',
+                   headerClass: 'small text-center',
+                   class: 'small',
+                   classWhenCondition: '',
+                   classCondition: {},
+                   remoteReference: {
+                       isRemoteReference: true,
+                       valueKey: 'transactorId',
+                       url: '@Url.Page("/mainentities/transactors/details")?id='
+                   }
+               },
+                {
+                   key: 'finTransCategoryName',
+                   responseKey: 'finTransCategoryName',
+                   actualVal: '',
+                   columnFormat: 't',
+                   totalKey: '',
+                   grandTotalKey: '',
+                   totalFormatter: '',
+                   sortKey: '',
+                   sortType: 'alpha',
+                   header: 'Category',
+                   text: '',
+                   headerClass: 'small text-center d-none d-md-table-cell',
+                   class: 'small d-none d-md-table-cell ',
+                   classWhenCondition: '',
+                   classCondition: {},
+                   remoteReference: {}
+               },
+               {
+                   key: 'transRefCode',
+                   responseKey: 'transRefCode',
+                   actualVal: '',
+                   columnFormat: 't',
+                   totalKey: '',
+                   grandTotalKey: '',
+                   totalFormatter: '',
+                   sortKey: '',
+                   sortType: '',
+                   header: 'Ref Number',
+                   text: '',
+                   headerClass: 'small text-center d-none d-md-table-cell',
+                   class: 'small d-none d-md-table-cell ',
+                   classWhenCondition: '',
+                   classCondition: {},
+                   remoteReference: {}
+               },
+               {
+                   key: 'companyCode',
+                   responseKey: 'companyCode',
+                   actualVal: '',
+                   columnFormat: 't',
+                   totalKey: '',
+                   grandTotalKey: '',
+                   totalFormatter: '',
+                   sortKey: 'CompanyCodeSort',
+                   sortType: 'alpha',
+                   header: 'Company',
+                   text: '',
+                   headerClass: 'small text-center',
+                   class: 'small ',
+                   classWhenCondition: '',
+                   classCondition: {},
+                   remoteReference: {}
+               },
+               
+               {
+                   key: 'totalAmount',
+                   responseKey: 'amountTotal',
+                   actualVal: '',
+                   columnFormat: 'c',
+                   totalKey: 'sumOfAmount',
+                   grandTotalKey: 'grandSumOfAmount',
+                   totalFormatter: 'currency',
+                   sortKey: '',
+                   sortType: '',
+                   header: 'Amount',
+                   text: '',
+                   headerClass: 'small text-center',
+                   class: 'small text-right ',
+                   classWhenCondition: '',
+                   classCondition: {},
+                   remoteReference: {}
+               },
+               
+           ];
+           const actionColDefs = [
+               {
+                   actionType: 'defaultAction',
+                   valueKey: 'id',
+                   icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
+                   url: '@Url.Page("./Edit")?id='
+               },
+               {
+                   actionType: 'defaultAction',
+                   valueKey: 'id',
+                   icon: '<i class="fas fa-info-circle fa-lg" style="color:slategray"></i>',
+                   url: '@Url.Page("./Details")?id='
+               },
+               {
+                   actionType: 'defaultAction',
+                   valueKey: 'id',
+                   icon: '<i class="fas fa-trash fa-lg" style="color:slategray"></i>',
+                   url: '@Url.Page("./Delete")?id='
+               },
+               {
+                   actionType: 'defaultAction',
+                   valueKey: 'id',
+                   icon: '<i class="fas fa-clone fa-lg" style="color:slategray"></i>',
+                   url: '@Url.Page("./Create")?copyFromId='
+               }
+           ];
+           const actionColSubDefs = [
+               
+           ];
+           const actionMobileColDefs = [
+               {
+                   actionType: 'defaultAction',
+                   visibility: 'always',
+                   elementName: '',
+                   condition: {},
+                   text: 'Edit',
+                   valueKey: 'id',
+                   icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
+                   url: '@Url.Page("./Edit")?id='
+               },
+               {
+                   actionType: 'defaultAction',
+                   visibility: 'always',
+                   elementName: '',
+                   condition: {},
+                   text: 'Details',
+                   valueKey: 'id',
+                   icon: '<i class="fas fa-info-circle fa-lg" style="color:slategray"></i>',
+                   url: '@Url.Page("./Details")?id='
+               },
+               {
+                   actionType: 'defaultAction',
+                   visibility: 'always',
+                   elementName: '',
+                   condition: {},
+                   text: 'Delete',
+                   valueKey: 'id',
+                   icon: '<i class="fas fa-trash fa-lg" style="color:slategray"></i>',
+                   url: '@Url.Page("./Delete")?id='
+               },
+               {
+                   actionType: 'defaultAction',
+                   visibility: 'always',
+                   elementName: '',
+                   condition: {},
+                   text: 'Duplicate',
+                   valueKey: 'id',
+                   icon: '<i class="fas fa-clone fa-lg" style="color:slategray"></i>',
+                   url: '@Url.Page("./Create")?copyFromId='
+               }
+               
+               
+           ];
+           const tableHandlersToRegister = [
+              
+           ];
+           const pageHandlersToRegister = [
+               {
+                   selector:'#CurrencySelector',
+                   event:'change',
+                   handler: function(event) {
+                       currencyChanged();
+                       indPgLib.refreshData();
+                   }
+               }
 
 
-                var companyFilter = $('#CompanyFilter').val();
-                var datePeriod = $('#DatePeriodFilter').val();
-                var sortData = $('#currentSort').val();
-                var searchVal = $('.search_input').val();
-                var displayCurrencyId = 1;
+           ];
+           const indexPageDef = {
+               uri: '/api/GrKoukInfoApi/GetIndexTblDataExpenses',
+               currencyFormatter: formatterCurrency,
+               numberFormatter: formatterNumber,
+               colDefs: colDefs,
+               actionColDefs: actionColDefs,
+               actionColSubDefs: actionColSubDefs,
+               actionMobileColDefs: actionMobileColDefs,
+               tableHandlersToRegister:tableHandlersToRegister,
+               pageHandlersToRegister:pageHandlersToRegister,
+               afterTableLoad: {}
+           };
 
-                getTableData(pageIndex, pageSize, sortData, datePeriod, companyFilter, searchVal,displayCurrencyId);
+           indPgLib.setIndexPageDefinition(indexPageDef);
+           //#endregion
+          
 
-            };
-            var gotoFirstPage = () => {
-                var curPageIndex = 1;
-                $pageIndex.val(curPageIndex);
-                refreshTableData();
-            };
-            var gotoLastPage = () => {
-                var curPageIndex = parseInt($totalPages.val());
-
-                $pageIndex.val(curPageIndex);
-                refreshTableData();
-            };
-            var gotoNextPage = () => {
-                var curPageIndex = parseInt($pageIndex.val());
-                curPageIndex += 1;
-                $pageIndex.val(curPageIndex);
-                refreshTableData();
-
-            };
-            var gotoPreviousPage = () => {
-                var curPageIndex = parseInt($pageIndex.val());
-                curPageIndex -= 1;
-                $pageIndex.val(curPageIndex);
-                refreshTableData();
-
-            };
+            
             var deleteSelectedRows = () => {
                 var $rowSelectors = $('input[name=checkTableRow]');
                 var selectedRows = $rowSelectors.filter(':checked');
@@ -580,28 +384,7 @@
                 }
 
             };
-            var getSelectedRows = () => {
-                var $rowSelectors = $('input[name=checkTableRow]');
-                var selectedRows = $rowSelectors.filter(':checked');
-                console.log('Selected table rows=' + selectedRows);
-
-            };
-            var countSelectedRows = () => {
-                var $rowSelectors = $('input[name=checkTableRow]');
-                var selectedRows = $rowSelectors.filter(':checked');
-                return selectedRows.length;
-            };
-            var handleFiltersUi = () => {
-                var filterVisible = $filtersVisible.val();
-                if (filterVisible === 'True' || filterVisible === 'true') {
-                    $filterCollapse.collapse('show');
-                } else {
-                    $filterCollapse.collapse('hide');
-                }
-            };
-            var showFiltersUi = () => {
-
-            };
+           
             $deleteSelectedRowsLink.on('click',
                 () => {
                     deleteSelectedRows();
@@ -609,261 +392,41 @@
                 });
 
 
-            $filterCollapse.on('hidden.bs.collapse',
-                function() {
-                    console.log('Filters Hidden');
-                    $filtersToggle.text('Show Filters');
-
-
-                    $filtersVisible.val(false);
-                });
-
-            $filterCollapse.on('shown.bs.collapse',
-                function() {
-                    console.log('Filters Shown');
-                    $filtersToggle.text('Hide Filters');
-                    // var alist = $('a[href*="&filtersVisible"]');
-
-                    $filtersVisible.val(true);
-                });
-            $checkAllRows.on('change',
-                function() {
-                    var th = $(this).index();
-                    var isChecked = $(this).prop('checked');
-                    $('input[name=checkTableRow]').prop('checked', isChecked);
-                    var selectedRowsCount = countSelectedRows();
-                    if (selectedRowsCount > 0) {
-                        $selectedRowsActionsLink.removeClass('disabled');
-                    } else {
-                        $selectedRowsActionsLink.addClass('disabled');
-                    }
-                });
-
-
-            var rosSelectorsToggleHandler = () => {
-                var $selectSingleSelectors = $('td[name=selectRowColumn]');
-                var selectorsVisible = $rowSelectorsVisible.val();
-                var newSelectorsVisible =
-                    (selectorsVisible == 'True' || selectorsVisible == 'true' || selectorsVisible === true)
-                        ? 'False'
-                        : 'True';
-                if (newSelectorsVisible == 'True') {
-                    $selectAllSelector.removeAttr('hidden');
-                    $selectSingleSelectors.removeAttr('hidden');
-                    $selectAllSelector.show();
-                    $selectSingleSelectors.show();
-                    $rowSelectorsVisible.val(true);
-                    $rowSelectorsToggle.text('Hide Row Selectors');
-                    $selectedRowsActionsMenu.removeAttr('hidden');
-                    $selectedRowsActionsLink.addClass('disabled');
-                } else {
-                    $selectAllSelector.hide();
-                    $selectSingleSelectors.hide();
-                    $rowSelectorsVisible.val(false);
-                    $rowSelectorsToggle.text('Show Row Selectors');
-                    $selectedRowsActionsMenu.attr('hidden', 'true');
+            
+            //------------------------------
+             var currencyChanged = () => {
+                let curCurrencySelected = parseInt($('#CurrencySelector').val());
+                var currencyCode;
+                try {
+                    let currentCurrency = currencyListJs.find(x => x.id === curCurrencySelected);
+                    currencyCode = currentCurrency.code;
+                    let locale = currentCurrency.displayLocale;
+                    formatterCurrency = new Intl.NumberFormat(locale,
+                        {
+                            style: 'currency',
+                            currency: currencyCode,
+                            minimumFractionDigits: 2
+                        });
+                     indPgLib.setCurrencyFormatter(formatterCurrency);
+                } catch (e) {
+                    //not found keep old formater or maybe create a default one
+                    console.log('Not found currency code for this id');
                 }
             };
-            $rowSelectorsToggle.on('click',
-                function() {
-                    rosSelectorsToggleHandler();
-                });
-
-
-            $('#DatePeriodFilter').on('change',
-                function() {
-                    $('#pageIndex').val(1);
-                    refreshTableData();
-                });
-            $('#CompanyFilter').on('change',
-                function() {
-                    $('#pageIndex').val(1);
-                    refreshTableData();
-                });
-            $('#PageSize').on('change',
-                function() {
-                    $('#pageIndex').val(1);
-                    refreshTableData();
-                });
-            $('#GoToLast').on('click',
-                function() {
-                    gotoLastPage();
-                });
-            $('#GoToFirst').on('click',
-                function() {
-                    gotoFirstPage();
-                });
-            $('#GoToNext').on('click',
-                function() {
-                    gotoNextPage();
-                });
-            $('#GoToPrevious').on('click',
-                function() {
-                    gotoPreviousPage();
-                });
-            $('#TransDateHeader').on('click',
-                function() {
-                    var newSortVal = '';
-                    var curSort = $('#currentSort').val();
-                    if (curSort === undefined || curSort === null || curSort.length === 0) {
-                        curSort = 'transactiondate:desc';
-                    }
-                    var curSortAr = curSort.split(':');
-                    if (curSortAr[0] === 'transactiondate') {
-                        var newSort = curSortAr[1] === 'asc' ? 'desc' : 'asc';
-                        newSortVal = curSortAr[0] + ':' + newSort;
-                    } else {
-                        newSortVal = 'transactiondate:asc';
-                    }
-                    $('#currentSort').val(newSortVal);
-                    $('#pageIndex').val(1);
-                    refreshTableData();
-
-                });
-            $('#TransactorNameHeader').on('click',
-                function() {
-                    var newSortVal = '';
-                    var curSort = $('#currentSort').val();
-                    if (curSort === undefined || curSort === null || curSort.length === 0) {
-                        curSort = 'transactorname:desc';
-                    }
-                    var curSortAr = curSort.split(':');
-                    if (curSortAr[0] === 'transactorname') {
-                        var newSort = curSortAr[1] === 'asc' ? 'desc' : 'asc';
-                        newSortVal = curSortAr[0] + ':' + newSort;
-                    } else {
-                        newSortVal = 'transactorname:asc';
-                    }
-                    $('#currentSort').val(newSortVal);
-                    $('#pageIndex').val(1);
-                    refreshTableData();
-                });
-            $('#CreateNew').on('click',
-                function() {
-                    var uri = '@Url.Page("Create")';
-                    window.location.href = uri;
-                });
-
-            $('.search_icon').on('click',
-                function() {
-                    icon = $(this).find("svg");
-                    if (icon.hasClass('fa-search')) {
-                        icon.addClass("fa-times").removeClass("fa-search");
-                    } else {
-                        icon.addClass("fa-search").removeClass("fa-times");
-                        $('.search_input').val('');
-                    }
-
-                    refreshTableData();
-                });
-
-            $('#FiltersForm').on('submit',
-                function(e) {
-                    e.preventDefault();
-                    var $icon = $('.search_icon').find("svg");
-                    if ($icon.hasClass('fa-search')) {
-                        $icon.addClass("fa-times").removeClass("fa-search");
-
-                    } else {
-                        $icon.addClass("fa-search").removeClass("fa-times");
-
-                    }
-                    refreshTableData();
-                });
-            var storageItemJs = localStorage.getItem('ExpensesIndexView');
-            if (storageItemJs === undefined || storageItemJs === null) {
-                $('#pageIndex').val(1);
-                $('#filtersVisible').val(true);
-                $('#rowSelectorsVisible').val(true);
-                // $rowSelectorsToggle.text('Hide Row Selectors');
-                // $filtersToggle.text('Hide Filters');
-                $('#DatePeriodFilter').val('CURMONTH');
-                $('#CompanyFilter').val(0);
-                $('#currentSort').val('transactiondate:desc');
-            } else {
-                var storageItem = JSON.parse(storageItemJs);
-                var filtersValue = storageItem.find(x => x.filterKey === 'filtersVisible').filterValue;
-                if (filtersValue === true) {
-                    $filtersToggle.text('Hide Filters');
-                } else {
-                    $filtersToggle.text('Show Filters');
-                }
-                $('#filtersVisible').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'rowSelectorsVisible').filterValue;
-                $('#rowSelectorsVisible').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'dateRangeFilter').filterValue;
-                $('#DatePeriodFilter').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'currentSort').filterValue;
-                $('#currentSort').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'companyFilter').filterValue;
-                $('#CompanyFilter').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'pageSize').filterValue;
-                $('#PageSize').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'pageIndex').filterValue;
-                $('#pageIndex').val(filtersValue);
-            }
-            handleFiltersUi();
-            refreshTableData();
-
-            rowSelectorsUi();
-
+            
+            indPgLib.addPagerElementEventListeners();
+            indPgLib.registerPageHandlers();
+            indPgLib.loadSettings('ExpensesIndexView');
+            indPgLib.handleFiltersUi();
+            currencyChanged();
+            indPgLib.refreshData();
+            indPgLib.rowSelectorsUi();
+            //----------------
         });
 
         $(window).on('beforeunload',
             function(e) {
-                //#region CommentOut
-                //#region Variables
-                var filtersVisible = $('#filterCollapse').hasClass('show');
-                var $rowSelectorsColumn = $('th[name=selectAllRowsColumn]');
-
-                var rowSelectorsNotVisible = $rowSelectorsColumn.is(':hidden');
-                var rowSelectorsVisible = (rowSelectorsNotVisible) ? false : true;
-
-                var pageSize = $('#PageSize').val();
-                var dateRange = $('#DatePeriodFilter').val();
-                var currentSort = $('#currentSort').val();
-                var companyFilter = $('#CompanyFilter').val();
-                var pageIndex = $('#pageIndex').val();
-                var filtersArr = [];
-                //#endregion
-                filtersArr.push({
-                    filterKey: 'filtersVisible',
-                    filterValue: filtersVisible
-                });
-                filtersArr.push({
-                    filterKey: 'rowSelectorsVisible',
-                    filterValue: rowSelectorsVisible
-                });
-                filtersArr.push({
-                    filterKey: 'pageIndex',
-                    filterValue: pageIndex
-                });
-                filtersArr.push({
-                    filterKey: 'pageSize',
-                    filterValue: pageSize
-                });
-                filtersArr.push({
-                    filterKey: 'dateRangeFilter',
-                    filterValue: dateRange
-                });
-                filtersArr.push({
-                    filterKey: 'currentSort',
-                    filterValue: currentSort
-                });
-                filtersArr.push({
-                    filterKey: 'companyFilter',
-                    filterValue: companyFilter
-                });
-                //var storageItem = new {
-                //    itemName: 'dateRangeFilter',
-                //    filters:filtersArr
-                //};
-
-                var sessionVal = JSON.stringify(filtersArr);
-
-                localStorage.setItem('ExpensesIndexView', sessionVal);
-                //#endregion
-
+                indPgLib.saveSettings('ExpensesIndexView');
             });
     </script>
 }
