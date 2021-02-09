@@ -16,100 +16,76 @@
         <input type="hidden" asp-for="@Model.CopyFromTransactorId" id="CopyFromTransactorId" />
         <div class="row mb-3">
             <div class="col-md-3">
-
                 <div class="form-floating">
                     <input asp-for="ItemVm.TransDate" class="form-control form-control-sm" autofocus />
                     <label asp-for="ItemVm.TransDate" class="form-label small"></label>
                     <span asp-validation-for="ItemVm.TransDate" class="text-danger"></span>
                 </div>
-                
             </div>
             <div class="col-md-6">
-
                 <div class="form-floating">
                     <select asp-for="ItemVm.TransTransactorDocSeriesId" class="form-select form-select-sm" asp-items="ViewBag.TransTransactorDocSeriesId"></select>
                     <label asp-for="ItemVm.TransTransactorDocSeriesId" class="form-label small"></label>
                 </div>
             </div>
-
             <div class="col-md-3">
-
                 <div class="form-floating">
                     <input asp-for="ItemVm.TransRefCode" class="form-control form-control-sm" placeholder="Ref Code"/>
                     <label asp-for="ItemVm.TransRefCode" class="form-label small"></label>
                     <span asp-validation-for="ItemVm.TransRefCode" class="text-danger"></span>
                 </div>
-
-               
             </div>
-
         </div>
         <div class="row mb-3">
             <div class="col-md-6">
                 <div class="form-floating">
-
-                    <select asp-for="ItemVm.TransactorId" class="form-select form-select-sm"></select>
+                    <select asp-for="ItemVm.TransactorId" class="form-select form-select-sm" asp-items="ViewBag.TransactorId"></select>
                     <label asp-for="ItemVm.TransactorId" class="form-label small"></label>
                     <span asp-validation-for="ItemVm.TransactorId" class="text-danger"></span>
                 </div>
-
-               
             </div>
             <div class="col-md-3">
                 <div class="form-floating">
-
                     <select asp-for="ItemVm.FiscalPeriodId" class="form-select form-select-sm" asp-items="ViewBag.FiscalPeriodId" readonly></select>
                     <label asp-for="ItemVm.FiscalPeriodId" class="form-label small"></label>
                     <span asp-validation-for="ItemVm.FiscalPeriodId" class="text-danger"></span>
                     </div>
-                
             </div>
             <div class="col-md-3">
                 <div class="form-floating">
-
                     <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm" asp-items="ViewBag.CompanyId"></select>
                     <label asp-for="ItemVm.CompanyId" class="form-label small"></label>
                 </div>
             </div>
         </div>
-
         <div class="row mb-3">
             <div class="col-md-1">
                 <div class="form-floating">
-
                     <input asp-for="ItemVm.FpaRate" class="form-control form-control-sm" placeholder="VAT Percent" />
                     <label asp-for="ItemVm.FpaRate" class="form-label small"></label>
-                    
                         <span asp-validation-for="ItemVm.FpaRate" class="text-danger"></span>
-                    
                 </div>
-
             </div>
             <div class="col-md-3">
                 <div class="form-floating">
-
                     <input asp-for="ItemVm.AmountNet" class="form-control form-control-sm" placeholder="Net Value" />
                     <label asp-for="ItemVm.AmountNet" class="form-label small"></label>
                     <div class="invalid-feedback">
                         <span asp-validation-for="ItemVm.AmountNet" class="text-danger"></span>
                     </div>
                 </div>
-
             </div>
             <div class="col-md-2">
                 <div class="form-floating">
-
                     <input asp-for="ItemVm.AmountFpa" class="form-control form-control-sm" placeholder="VAT Amount" />
                     <label asp-for="ItemVm.AmountFpa" class="form-label small"></label>
                     <div class="invalid-feedback">
                         <span asp-validation-for="ItemVm.AmountFpa" class="text-danger"></span>
                     </div>
                 </div>
-
             </div>
             <div class="col-md-2">
                 <div class="form-floating">
-
                     <input asp-for="ItemVm.AmountDiscount" class="form-control form-control-sm" placeholder="Discount Amount" />
                     <label asp-for="ItemVm.AmountDiscount" class="form-label small"></label>
                     <div class="invalid-feedback">
@@ -118,20 +94,15 @@
                 </div>
             </div>
             <div class="col-md-2">
-
                 <div class="form-floating">
-
                     <input asp-for="ItemVm.AmountSum" class="form-control form-control-sm" disabled />
                     <label asp-for="ItemVm.AmountSum" class="form-label small">Sum</label>
                 </div>
-
             </div>
-
         </div>
         <div class="row mb-3">
             <div class="col-md-12">
                 <div class="form-floating">
-
                     <textarea asp-for="ItemVm.Etiology" class="form-control form-control-sm" placeholder="Αιτιολογία Κίνησης"> </textarea>
                     <label asp-for="ItemVm.Etiology" class="form-label small"></label>
                 </div>
