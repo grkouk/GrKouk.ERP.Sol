@@ -501,8 +501,8 @@
         let $tdCol = $("<td>");
         if (col.hasOwnProperty('colType')) {
             if (col.colType === 'imageViewer') {
-                let vrLink = '<a href = "#" role = "button" data-toggle="modal"';
-                vrLink += ` data-target="${col.imageViewer.target}"`;
+                let vrLink = '<a href = "#" role = "button" data-bs-toggle="modal"';
+                vrLink += ` data-bs-target="${col.imageViewer.target}"`;
                 col.imageViewer.dataAttributes.forEach(function (item) {
                     vrLink += ` data-${item.key}="${value[item.valueKey]}"`;
                 });
@@ -573,7 +573,7 @@
         if (actionSection !== undefined) {
             switch (actionSection) {
                 case "sectionActions":
-                    classText = `class="mr-1"`;
+                    classText = `class="me-1"`;
                     break;
                 case "sectionSubActions":
                     classText = `class="dropdown-item"`;
@@ -835,7 +835,7 @@
             });
             if (actionColSubDefs.length > 0) {
                 actionHtml += '<a class="dropdown-toggle" role="button" id="dropdownMenuButton"';
-                actionHtml += 'data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                actionHtml += 'data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
                 actionHtml += '<i class="fas fa-bars" style="color:slategray"></i></a>';
                 actionHtml += '<div class="dropdown-menu small" aria-labelledby="dropdownMenuButton">';
 
@@ -847,7 +847,7 @@
             let mobileHtml = "";
             if (actionMobileColDefs.length > 0) {
                 mobileHtml += '<a class="dropdown-toggle" role="button" id="dropdownMenuButton"';
-                mobileHtml += 'data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+                mobileHtml += 'data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
                 mobileHtml += '<i class="fas fa-bars" style="color:slategray"></i></a>';
                 mobileHtml += '<div class="dropdown-menu small" aria-labelledby="dropdownMenuButton">';
 
