@@ -626,12 +626,12 @@
                 actionHtml += ">";
                 break;
             case "modalSelectorEventAction":
-                actionHtml += `<a ${classText} href="#" data-toggle="modal"`;
+                actionHtml += `<a ${classText} href="#" data-bs-toggle="modal"`;
                 if (col.elementName) {
                     actionHtml += ` name=${col.elementName}`;
                 }
                 if (col.selectorTarget) {
-                    actionHtml += ` data-target=${col.selectorTarget}`;
+                    actionHtml += ` data-bs-target=${col.selectorTarget}`;
                 }
                 if (col.selectorType) {
                     actionHtml += ` data-selectorType=${col.selectorType}`;

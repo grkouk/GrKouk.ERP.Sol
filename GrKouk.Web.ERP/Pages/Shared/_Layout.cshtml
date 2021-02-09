@@ -27,7 +27,7 @@
 </head>
 <body>
 @*<nav class="navbar fixed-top navbar-expand-md navbar-dark bg-dark">*@
-<nav class="navbar fixed-top navbar-expand-md navbar-light bg-white border-bottom box-shadow mb-3">
+<nav class="navbar fixed-top navbar-expand-md navbar-light bg-white border-bottom mb-3">
     <div class="container-fluid">
          <a asp-page="/Index" class="navbar-brand">GrKouk Web ERP </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navBarMain"
@@ -35,9 +35,7 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navBarMain">
-            <ul class="navbar-nav mr-auto">
-
-
+            <ul class="navbar-nav me-auto">
                 @if (User.IsInRole("Admin"))
                 {
                     <li class="nav-link dropdown">
@@ -137,57 +135,9 @@
     </div>
 </nav>
 
-<nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container">
-
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                <li>
-                    <a asp-page="/Index">Home</a>
-                </li>
-                <li>
-                    <a asp-page="/About">About</a>
-                </li>
-                <li>
-                    <a asp-page="/Contact">Contact</a>
-                </li>
-                @if (User.IsInRole("Admin"))
-                {
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Management <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a asp-page="/Companies/index">Companies(Εταιρείες)</a>
-                            </li>
-                            <li>
-                                <a asp-page="/Expenses/index">Exprenses(Εξοδα)</a>
-                            </li>
-                            <li>
-                                <a asp-page="/configuration/warehousetransdef/index">Warehouse Trans Def</a>
-                            </li>
-                            <li role="separator" class="divider"></li>
-                            <li>
-                                <a asp-page="/FinancialMovements/index">Financial Movements</a>
-                            </li>
-                            <li>
-                                <a asp-page="/TransactorTypes/index">Transactor Types</a>
-                            </li>
-                            <li role="separator" class="divider"></li>
-                            <li>
-                                <a asp-page="/Transactors/index">Transactors</a>
-                            </li>
-                        </ul>
-                    </li>
-                }
-            </ul>
-           
-        </div>
-    </div>
-</nav>
-
-<partial name="_CookieConsentPartial"/>
 @RenderSection("OutOfBody",required:false)
-<div class="container body-content">
+<br/>
+<div class="container mt-2">
     @RenderBody()
     <hr/>
     <footer>
@@ -199,7 +149,9 @@
 
 
 <environment include="Development">
-    
+    <script src="~/lib/jquery/jquery.js"></script>
+    <script src="~/lib/popper2/umd/popper.js"></script>
+    <script src="~/lib/bootstrap5/js/bootstrap.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 </environment>
 <environment exclude="Development">

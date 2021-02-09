@@ -16,7 +16,7 @@
             <a href="#" role="button" class="nav-link" id="CreateNew">Create New</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#filterCollapse" role="button" id="filtersToggle"
+            <a class="nav-link" data-bs-toggle="collapse" data-bs-target="#filterCollapse" role="button" id="filtersToggle"
                aria-expanded="false" aria-controls="filterCollapse">
             </a>
         </li>
@@ -40,14 +40,14 @@
         </li>
     </ul>
 </div>
-<div class="collapse show" id="filterCollapse">
+
     @await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowDateFlt = true })
 
-    <div class="row mt-1">
-        <partial name="_PagerPartial" />
-    </div>
-</div>
+   
 
+<div class="row mt-1">
+    <partial name="_PagerPartial" />
+</div>
 <table class="table table-bordered table-sm m-0" id="myTable">
     <thead class="thead-light">
 

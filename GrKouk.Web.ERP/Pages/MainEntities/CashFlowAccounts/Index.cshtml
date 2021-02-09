@@ -22,7 +22,7 @@
         </li>
 
         <li class="nav-item dropdown ">
-            <a class="btn btn-sm btn-outline-secondary dropdown-toggle" role="button" id="ddDiarys" data-toggle="dropdown"
+            <a class="btn btn-sm btn-outline-secondary dropdown-toggle" role="button" id="ddDiarys" data-bs-toggle="dropdown"
                aria-haspopup="true" aria-expanded="false">Ημερολόγια</a>
 
             <div class="dropdown-menu small " name="diaryDropDownMenu">
@@ -32,7 +32,7 @@
             </div>
         </li>
         <li class="nav-item">
-            <a class="btn btn-sm btn-outline-secondary" data-toggle="collapse" href="#filterCollapse" role="button" id="filtersToggle"
+            <a class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#filterCollapse" href="#filterCollapse" role="button" id="filtersToggle"
                aria-expanded="false" aria-controls="filterCollapse">
             </a>
         </li>
@@ -42,7 +42,7 @@
             </a>
         </li>
         <li class="nav-item dropdown " id="SelectedRowsActionsMenu">
-            <a class="btn btn-sm btn-outline-secondary dropdown-toggle disabled" role="button" id="ddSelectedRowsActions" data-toggle="dropdown"
+            <a class="btn btn-sm btn-outline-secondary dropdown-toggle disabled" role="button" id="ddSelectedRowsActions" data-bs-toggle="dropdown"
                aria-haspopup="true" aria-expanded="false">Actions</a>
             <div class="dropdown-menu small">
 
@@ -55,13 +55,14 @@
         </li>
     </ul>
 </div>
-<div class="collapse show" id="filterCollapse">
+
     @await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowDateFlt = false, ShowCurrencyFlt = false })
 
-    <div class="row mt-1">
-        <partial name="_PagerPartial" />
-    </div>
+   
 
+
+<div class="row mt-1">
+    <partial name="_PagerPartial" />
 </div>
 <table class="table table-bordered table-sm" id="myTable">
     <thead class="thead-light">
