@@ -256,8 +256,8 @@
                  transactionDataChanged();
             } else {
                   $('#ItemVm_TransDate').val(new Date().toISOString().slice(0, 10));
-                 selectTransactor= parseInt( $('#CopyFromTransactorId').val())
-                 }
+                  selectTransactor = parseInt($('#CopyFromTransactorId').val());
+             }
              /*
             if ($initialLoad.val()=='True') {
                 console.log("Initial load is true setting initial values");
@@ -276,9 +276,9 @@
 
             $initialLoad.val(false);
             docSeriesChanged();
-            if (selectTransactor!==0){
-                $('#ItemVm_TransactorId').val(selectTransactor)
-                }
+            if (selectTransactor!==0) {
+                $('#ItemVm_TransactorId').val(selectTransactor);
+            }
         });
 
 
