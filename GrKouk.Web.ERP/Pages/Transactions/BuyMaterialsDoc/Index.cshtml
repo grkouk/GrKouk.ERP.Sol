@@ -53,13 +53,7 @@
 <div class="row mt-1">
     <partial name="_PagerPartial" />
 </div>
-<table class="table table-bordered table-sm m-0" id="myTable">
-    <thead class="thead-light">
-
-    </thead>
-    <tbody>
-    </tbody>
-</table>
+<partial name="_DataTable"/>
 <div class="row">
     <partial name="_PagerPartial" />
 </div>
@@ -67,35 +61,42 @@
 <partial name="_LoadMePartial" />
 <!-- Modal Item selector for payments -->
 <div class="modal fade" id="itemSelector" tabindex="-1" role="dialog" aria-labelledby="itemsModalLabel" aria-hidden="true" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg"  role="document">
 
         <div class="modal-content">
             <div class="modal-header">
-
-
                 <div class="container-fluid">
                     <div class="row mb-1">
-                        
+                        <div class="col-6">
+                            <p class="modal-title font-weight-bold" id="itemsModalLabel">Selector</p>
+                        </div>
+                        <div class="col-6 text-end">
+
+                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    
                     </div>
-                    <div class="row mb-1">
+                    <div class="row">
                         <div class="col-md-3 text-center">
                             <h3 id="docAmount">0</h3>
                             <span class="text-muted">Doc Amount</span>
                         </div>
-                        <div class="col-md-1 text-center">
+                        <div class="col-md-3 text-center">
                             <h3 id="tocover">0</h3>
                             <span class="text-muted">To Cover</span>
                         </div>
-                        <div class="col-md-1 text-center">
+                        <div class="col-md-3 text-center">
                             <h3 id="covered">0</h3>
                             <span class="text-muted">Covered</span>
                         </div>
-                        <div class="col-md-1 text-center">
+                        <div class="col-md-3 text-center">
                             <h3 id="remaining">0</h3>
                             <span class="text-muted">Remaining</span>
                         </div>
                     </div>
-                    <div class="row mb-1 align-items-center">
+                    <div class="row text-center">
                         <div class="col-11">
                             <input class="form-control form-control-sm" name="itemsSearchText" placeholder="Search text" type="text" />
 
@@ -171,7 +172,7 @@
                     sortType: 'numeric',
                     header: 'Date',
                     text: '',
-                    headerClass: 'small text-center ',
+                    headerClass: 'small text-center',
                     class: 'small',
                     classWhenCondition: '',
                     classCondition: {},
@@ -274,7 +275,7 @@
                     header: 'Net Amount',
                     text: '',
                     headerClass: 'small text-center',
-                    class: 'small text-right ',
+                    class: 'small text-end ',
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
@@ -294,7 +295,7 @@
                     header: 'Amount',
                     text: '',
                     headerClass: 'small text-center',
-                    class: 'small text-right ',
+                    class: 'small text-end ',
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
@@ -314,7 +315,7 @@
                     header: 'Payed Amount',
                     text: '',
                     headerClass: 'small text-center',
-                    class: 'small text-right ',
+                    class: 'small text-end ',
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
@@ -627,7 +628,7 @@
                                 actualVal: '',
                                 columnFormat: 'c',
                                 headerClass: 'small text-center',
-                                class: 'small text-right '
+                                class: 'small text-end '
                             },
                             {
                                 key: 'amountUsedInPayments',
@@ -639,7 +640,7 @@
                                 actualVal: '',
                                 columnFormat: 'c',
                                 headerClass: 'small text-center',
-                                class: 'small text-right '
+                                class: 'small text-end '
                             },
                             {
                                 key: 'companyCode',
@@ -663,7 +664,7 @@
                                 actualVal: '',
                                 columnFormat: 'c',
                                 headerClass: 'small text-center',
-                                class: 'small text-right text-primary'
+                                class: 'small text-end text-primary'
                             }
                         ];
                         let curSortUndefined = false;

@@ -23,7 +23,7 @@
             <a href="#" role="button" class="nav-link" id="CreateNew">Create New</a>
         </li>
         <li class="nav-item dropdown " id="IndexActionsMenu">
-            <a class="nav-link dropdown-toggle" role="button" id="ddIndexActionsActions" data-toggle="dropdown"
+            <a class="nav-link dropdown-toggle" role="button" id="ddIndexActionsActions" data-bs-toggle="dropdown"
                aria-haspopup="true" aria-expanded="false">
                 Actions
             </a>
@@ -41,13 +41,13 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#" id="rowSelectorsToggle" role="button">
+            <a class="nav-link" data-bs-toggle="collapse" href="#" id="rowSelectorsToggle" role="button">
 
             </a>
             @*<a class="nav-link disabled" href="#" tabindex="-1" >Selectors</a>*@
         </li>
         <li class="nav-item dropdown " id="SelectedRowsActionsMenu">
-            <a class="nav-link dropdown-toggle disabled" role="button" id="ddSelectedRowsActions" data-toggle="dropdown"
+            <a class="nav-link dropdown-toggle disabled" role="button" id="ddSelectedRowsActions" data-bs-toggle="dropdown"
                aria-haspopup="true" aria-expanded="false">
                 Actions
             </a>
@@ -70,13 +70,8 @@
 <div class="row mt-1">
     <partial name="_PagerPartial" />
 </div>
-<table class="table table-bordered table-sm" id="myTable">
-    <thead class="thead-light">
+<partial name="_DataTable"/>
 
-    </thead>
-    <tbody>
-    </tbody>
-</table>
 <div class="row">
     <partial name="_PagerPartial" />
 </div>
@@ -95,41 +90,41 @@
     </div>
 </div>
 <!-- Modal Item selector for payments -->
-<div class="modal fade" id="itemSelector" tabindex="-1" role="dialog" aria-labelledby="itemsModalLabel" aria-hidden="true" data-keyboard="false">
+<div class="modal fade" id="itemSelector" tabindex="-1" role="dialog" aria-labelledby="itemsModalLabel" aria-hidden="true" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered modal-lg" style="overflow-y: scroll; max-height:75%;  margin-top: 50px; margin-bottom:50px;" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="container-fluid">
-                    <div class="form-row mb-1">
+                    <div class="row mb-1">
                         <div class="col-6">
                             <p class="modal-title font-weight-bold" id="itemsModalLabel">Selector</p>
                         </div>
-                        <div class="col-6 text-right">
+                        <div class="col-6 text-end">
 
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-3 text-center">
+                    <div class="row">
+                        <div class="col-md-3 text-center">
                             <h3 id="docAmount">0</h3>
                             <span class="text-muted">Doc Amount</span>
                         </div>
-                        <div class="form-group col-md-3 text-center">
+                        <div class="col-md-3 text-center">
                             <h3 id="tocover">0</h3>
                             <span class="text-muted">To Cover</span>
                         </div>
-                        <div class="form-group col-md-3 text-center">
+                        <div class="col-md-3 text-center">
                             <h3 id="covered">0</h3>
                             <span class="text-muted">Covered</span>
                         </div>
-                        <div class="form-group col-md-3 text-center">
+                        <div class="col-md-3 text-center">
                             <h3 id="remaining">0</h3>
                             <span class="text-muted">Remaining</span>
                         </div>
                     </div>
-                    <div class="form-row text-center">
+                    <div class="row text-center">
                         <div class="col-11">
                             <input class="form-control form-control-sm" name="itemsSearchText" placeholder="Search text" type="text" />
 
@@ -156,7 +151,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" id="SaveItemSelector">Save changes</button>
             </div>
         </div>
