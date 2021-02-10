@@ -61,94 +61,123 @@
                         <span asp-validation-for="ItemVm.TransDate" class="text-danger"></span>
                     </div>
                 </div>
-                 <div class="col-md-6">
+                <div class="col-md-6">
                     <div class="form-floating">
                         <select asp-for="ItemVm.BuyDocSeriesId" class="form-select form-select-sm" asp-items="ViewBag.BuyDocSeriesId"></select>
                         <label asp-for="ItemVm.BuyDocSeriesId" class="form-label small"></label>
                     </div>
                 </div>
-               <div class="col-md-3">
+                <div class="col-md-3">
                     <div class="form-floating">
-                        <input asp-for="ItemVm.TransRefCode" class="form-control form-control-sm" placeholder="Ref Code"/>
+                        <input asp-for="ItemVm.TransRefCode" class="form-control form-control-sm" placeholder="Ref Code" />
                         <label asp-for="ItemVm.TransRefCode" class="form-label small"></label>
                         <span asp-validation-for="ItemVm.TransRefCode" class="text-danger"></span>
                     </div>
                 </div>
-                
+
             </div>
             <div class="row mb-3">
-                <div class="col-md-6 d-flex align-items-center">
-                  
+                <div class="col-md-6">
+
                     <div class="form-floating input-group input-group-sm">
-                            @* <div class="form-floating"> *@
-                                <select asp-for="ItemVm.TransactorId" class="form-select form-select-sm" asp-items="ViewBag.TransactorId"></select>
-                                <label asp-for="ItemVm.TransactorId" class="form-label small"></label>    
-                            @* </div>      *@
+                        <select asp-for="ItemVm.TransactorId" class="form-select form-select-sm" asp-items="ViewBag.TransactorId"></select>
+                        <label asp-for="ItemVm.TransactorId" class="form-label small"></label>
                         <div class="input-group-append" id="button-addon4">
                             <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="SuppliersSelector" type="button">...</button>
-                        
-                        </div>  
+
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating">
-                    
-                    <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm" asp-items="ViewBag.CompanyId"></select>
-                    <label asp-for="ItemVm.CompanyId" class="form_label" small></label>
+
+                        <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm" asp-items="ViewBag.CompanyId"></select>
+                        <label asp-for="ItemVm.CompanyId" class="form-label" small></label>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    
+
                     <div class="form-floating">
                         <select asp-for="ItemVm.PaymentMethodId" class="form-select form-select-sm" asp-items="ViewBag.PaymentMethodId"></select>
-                        <label asp-for="ItemVm.PaymentMethodId" class="form_label" small></label>
+                        <label asp-for="ItemVm.PaymentMethodId" class="form-label" small></label>
                     </div>
 
                 </div>
             </div>
 
             <div class="row mb-3">
-                <div class="col-sm-1">
-                    <label class="form_label small">Seek Type</label>
-                    <select asp-for="SeekType" class="form-select form-select-sm input-doc-line" asp-items="ViewBag.SeekType"></select>
+                <div class="col-sm-3 col-md-2">
+
+                    <div class="form-floating">
+                        <select asp-for="SeekType" class="form-select form-select-sm input-doc-line" asp-items="ViewBag.SeekType"></select>
+                        <label class="form-label small">Seek Type</label>
+                    </div>
                 </div>
-                <div class="col-sm-3">
-                    <label class="small">LookUp</label>
-                    <div class="input-group input-group-sm">
-                        <input class="form-control form-control-sm input-doc-line" id="Lookup" autocomplete="off" />
+                <div class="col-sm-4 col-md-2">
+
+                    <div class="form-floating input-group input-group-sm">
+                        <input class="form-control form-control-sm input-doc-line" id="Lookup" autocomplete="off" placeholder="Lookup" />
+                        <label class="form-label small">LookUp</label>
                         <div class="input-group-append" id="button-addon5">
                             <button class="btn btn-outline-secondary btn-sm input-doc-line" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="ProductsSelector" type="button"><i class="fab fa-asymmetrik"></i></button>
                         </div>
                     </div>
-                    <span class="text-danger small"></span>
+
                 </div>
-                <div class="col-sm-2">
-                    <label class="small">Unit</label>
-                    <select class="form-select form-select-sm input-doc-line" id="prodUnitSelector"></select>
+                <div class="col-sm-3 col-md-2">
+
+                    <div class="form-floating">
+                        <select class="form-select form-select-sm input-doc-line" id="prodUnitSelector"></select>
+                        <label class="form-label small">Unit</label>
+                    </div>
                 </div>
-                <div class="col-sm-1">
-                    <label class="small" id="transQLabel">Quantity</label>
-                    <input class="form-control form-control-sm small input-doc-line text-end" type="number" placeholder="Quantity" id="transQuantity" />
+                <div class="col-sm-3 col-md-2">
+
+                    <div class="form-floating">
+                        <input class="form-control form-control-sm small input-doc-line text-end" type="number" placeholder="Quantity" id="transQuantity" />
+                        <label class="form-label" id="transQLabel">Quantity</label>
+                        
+                    </div>
                     <div class="invalid-feedback">
                         Please enter a valid Quantity.
                     </div>
+
+
                 </div>
 
-                <div class="col-md-1">
-                    <label class="small">Price </label>
-                    <input class="form-control form-control-sm input-doc-line text-end" type="number" placeholder="Price" id="PriceOnTransUnit" />
-                    <span class="text-danger small"></span>
+                <div class="col-sm-3 col-md-2">
+
+                    <div class="form-floating">
+                        <div class="form-floating">
+                            <input class="form-control form-control-sm input-doc-line text-end" type="number" placeholder="Price" id="PriceOnTransUnit" />
+                            <label class="form-label small">Price </label>
+                        
+                        </div>
+                        <div class="invalid-feedback">
+                            Please enter a valid Price.
+                        </div>
+                    </div>
                 </div>
-               
-                <div class="col-sm-1">
-                    <label class="small">Dis% </label>
-                    <input class="form-control form-control-sm small input-doc-line text-end" type="number" placeholder="Dis %" id="Discount" />
-                    <span class="text-danger small"></span>
+
+                <div class="col-sm-3 col-md-2">
+
+                    <div class="form-floating">
+                        <input class="form-control form-control-sm small input-doc-line text-end" type="number" placeholder="Dis %" id="Discount" />
+                        <label class="form-label small">Dis% </label>
+                        <div class="invalid-feedback">
+                            Please enter a valid Price.
+                        </div>
+                    </div>
                 </div>
-                <div class="col-sm-1">
-                    <label class="small">VAT% </label>
-                    <input class="form-control form-control-sm small input-doc-line text-end" type="number" placeholder="Vat%" id="VatPercent" />
-                    <span class="text-danger small"></span>
+                <div class="col-sm-3 col-md-2">
+
+                    <div class="form-floating">
+                        <input class="form-control form-control-sm small input-doc-line text-end" type="number" placeholder="Vat%" id="VatPercent" />
+                        <label class="form-label small">VAT% </label>
+                        <div class="invalid-feedback">
+                            Please enter a valid Price.
+                        </div>
+                    </div>
                 </div>
                 <div class="col-sm-1 align-self-end">
                     <button id="addToList" class="btn btn-primary btn-sm">
@@ -427,7 +456,7 @@
             var $transQuantity = $('#transQuantity');
             var $transUnitSelector = $('#prodUnitSelector');
             var $transPrice = $('#PriceOnTransUnit');
-           
+
             var $lineNetValue = $('#LineNetValue');
             var $lineVatValue = $('#LineVatValue');
             var $lineDiscValue = $('#LineDiscValue');
@@ -615,9 +644,9 @@
                     let $el = $(this);
                     let elValue = $el.attr('data-actualValue');
                     if (!isNaN(elValue)) {
-                        $el.val(formatterCurrency.format(elValue));    
+                        $el.val(formatterCurrency.format(elValue));
                     }
-                    
+
                 });
             };
             const formatCurrencyTableElements = () => {
@@ -895,7 +924,7 @@
 
                         }
                     }
-                    
+
 
                 }
             };
@@ -938,10 +967,10 @@
                         })
                         .catch((error) => {
                             reject(error);
-                            
+
                         });
                 });
-               
+
             };
             var autoCompleteNameDef = {
                 source: '/api/materials/SearchWarehouseItemsForBuy',
@@ -1231,7 +1260,7 @@
                         var $colDiscAmount = $('td:eq(8)', $row);
                         var $colFpaAmount = $('td:eq(9)', $row);
                         var $colGrossAmount = $('td:eq(10)', $row);
-                        
+
                         var lineEdit = $colLine.text();
                         var materialId = $colMaterial.attr('data-materialId');
                         var materialName = $colMaterial.text();
@@ -1259,16 +1288,16 @@
                         let companyId = $companyId.val();
                         getProductInfo(materialId, transactorId, companyId, transUnitId)
                             .then((units) => {
-                                
+
                                 $lineNetValue.attr('data-actualValue', lineNetAmount);
-                                
+
                                 $lineDiscValue.attr('data-actualValue', lineDiscAmount);
-                                
+
                                 $lineVatValue.attr('data-actualValue', lineVatAmount);
-                                
+
                                 $lineBrutValue.attr('data-actualValue', lineGrosAmount);
                                 formatCurrencyLineValueElements();
-                               
+
                                 $lineEditing.val(lineEdit);
                                 $materialId.val(materialId);
                                 $lookUp.val(materialName);
@@ -1291,7 +1320,7 @@
                             .catch((error) => {
                                 console.log(error);
                             });
-                        
+
                         //lineUpdatePrice(price, fpaRate);
                     }
                 });
