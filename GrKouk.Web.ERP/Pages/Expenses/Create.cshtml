@@ -12,7 +12,7 @@
     <form method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
         <input type="hidden" asp-for="@Model.CopyFromId" id="CopyFromId" />
-        <div class="form-row">
+        <div class="row mb-3">
 
             <div class="form-group col-md-2">
                 <label asp-for="FinDiaryTransaction.TransactionDate" class="small"></label>
@@ -21,12 +21,12 @@
             </div>
             <div class="form-group col-md-4">
                 <label asp-for="FinDiaryTransaction.TransactorId" class="small"></label>
-                <select asp-for="FinDiaryTransaction.TransactorId" class="form-control form-control-sm"
+                <select asp-for="FinDiaryTransaction.TransactorId" class="form-select form-select-sm"
                         onchange=""
                         asp-items="ViewBag.TransactorId"></select>
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-md-2">
                 <label asp-for="FinDiaryTransaction.ReferenceCode" class="small"></label>
                 <input asp-for="FinDiaryTransaction.ReferenceCode" class="form-control form-control-sm" />
@@ -34,28 +34,28 @@
             </div>
             <div class="form-group col-md-4">
                 <label asp-for="FinDiaryTransaction.FinTransCategoryId" class="small"></label>
-                <select asp-for="FinDiaryTransaction.FinTransCategoryId" class="form-control form-control-sm" asp-items="ViewBag.FinTransCategoryId"></select>
+                <select asp-for="FinDiaryTransaction.FinTransCategoryId" class="form-select form-select-sm" asp-items="ViewBag.FinTransCategoryId"></select>
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-md-2">
                 <label class="small" id="test"></label>
                 <label asp-for="FinDiaryTransaction.CompanyId" class="small"></label>
-                <select asp-for="FinDiaryTransaction.CompanyId" class="form-control form-control-sm" asp-items="ViewBag.CompanyId"></select>
+                <select asp-for="FinDiaryTransaction.CompanyId" class="form-select form-select-sm" asp-items="ViewBag.CompanyId"></select>
             </div>
             <div class="form-group col-md-4">
                 <label asp-for="FinDiaryTransaction.CostCentreId" class="small"></label>
-                <select asp-for="FinDiaryTransaction.CostCentreId" class="form-control form-control-sm" asp-items="ViewBag.CostCentreId"></select>
+                <select asp-for="FinDiaryTransaction.CostCentreId" class="form-select form-select-sm" asp-items="ViewBag.CostCentreId"></select>
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-md-6">
                 <label asp-for="FinDiaryTransaction.Description" class="small"></label>
                 <textarea asp-for="FinDiaryTransaction.Description" class="form-control form-control-sm" placeholder="Description of Transaction"></textarea>
                 <span asp-validation-for="FinDiaryTransaction.Description" class="text-danger small"></span>
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-md-3">
                 <label asp-for="FinDiaryTransaction.AmountFpa" class="small"></label>
                 <input asp-for="FinDiaryTransaction.AmountFpa" class="form-control form-control-sm" />
@@ -67,7 +67,7 @@
                 <span asp-validation-for="FinDiaryTransaction.AmountNet" class="text-danger small"></span>
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary btn-sm" />
             </div>
@@ -113,7 +113,6 @@
                 console.log("Value of select");
                 console.log($('#FinDiaryTransaction_TransactorId').val());
                 var selectedTransactorId = $('#FinDiaryTransaction_TransactorId').val();
-               // var a = '@Url.Action("GetLastDiaryTransactionDataAsync", "GrkoukInfoApi")';
                 const Uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
                 const FinalUri = `${Uri}/GrkoukInfoApi/LastDiaryTransactionData?transactorId=${selectedTransactorId}`;
                 console.log(`Final Uri=${FinalUri}`);
