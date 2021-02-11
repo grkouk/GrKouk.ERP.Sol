@@ -6,7 +6,8 @@
 @inject IConfiguration Configuration
 
 @{
-    ViewData["Title"] = "Create";
+    Layout = "_LayoutEntryFormTransaction";
+    ViewData["Title"] = "Νέο Παραστατικό Αγοράς";
 }
 @section MyCss
 {
@@ -18,6 +19,17 @@
 }
 
 <style>
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        margin: 0;
+    }
+    /*body {
+        padding-top: 50px;
+        padding-bottom: 20px;
+    }*/
     .ui-autocomplete-loading {
         background: white url('@Url.Content("~/images/ui-anim_basic_16x16.gif")') right center no-repeat;
     }
@@ -29,10 +41,11 @@
         font-size: 0.7rem;
     }
 </style>
-<h4>Νέο παραστατικό αγοράς υλικών(<span class="h4 text-primary" name="docCurrency">Euro</span>)</h4>
+@*<h4>Νέο παραστατικό αγοράς υλικών(<span class="h4 text-primary" name="docCurrency">Euro</span>)</h4>*@
 
-<hr />
-<div class="container">
+
+<div class="container-xxl pt-5">
+    <hr />
     <form method="post" id="transForm">
         <fieldset id="thisForm">
             <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
@@ -105,16 +118,14 @@
                 </div>
             </div>
 
-            <div class="row mb-3">
-                <div class="col-sm-3 col-md-2">
-
+            <div class="row mb-3 gx-1 align-items-start">
+                <div class="col-sm-3 col-md-3 col-lg-2">
                     <div class="form-floating">
                         <select asp-for="SeekType" class="form-select form-select-sm input-doc-line" asp-items="ViewBag.SeekType"></select>
                         <label class="form-label small">Seek Type</label>
                     </div>
                 </div>
-                <div class="col-sm-4 col-md-2">
-
+                <div class="col-sm-4 col-md-6 col-lg-3">
                     <div class="form-floating input-group input-group-sm">
                         <input class="form-control form-control-sm input-doc-line" id="Lookup" autocomplete="off" placeholder="Lookup" />
                         <label class="form-label small">LookUp</label>
@@ -122,60 +133,48 @@
                             <button class="btn btn-outline-secondary btn-sm input-doc-line" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="ProductsSelector" type="button"><i class="fab fa-asymmetrik"></i></button>
                         </div>
                     </div>
-
                 </div>
-                <div class="col-sm-3 col-md-2">
-
+                <div class="col-sm-3 col-md-3 col-lg-2">
                     <div class="form-floating">
                         <select class="form-select form-select-sm input-doc-line" id="prodUnitSelector"></select>
                         <label class="form-label small">Unit</label>
                     </div>
                 </div>
-                <div class="col-sm-3 col-md-2">
-
+                <div class="col-sm-3 col-md-3 col-lg-1">
                     <div class="form-floating">
                         <input class="form-control form-control-sm small input-doc-line text-end" type="number" placeholder="Quantity" id="transQuantity" />
-                        <label class="form-label" id="transQLabel">Quantity</label>
-                        
+                        <label class="form-label small" id="transQLabel">Quantity</label>
                     </div>
                     <div class="invalid-feedback">
                         Please enter a valid Quantity.
                     </div>
-
-
                 </div>
-
-                <div class="col-sm-3 col-md-2">
-
+                <div class="col-sm-3 col-md-3 col-lg-1">
                     <div class="form-floating">
                         <div class="form-floating">
                             <input class="form-control form-control-sm input-doc-line text-end" type="number" placeholder="Price" id="PriceOnTransUnit" />
                             <label class="form-label small">Price </label>
-                        
                         </div>
                         <div class="invalid-feedback">
                             Please enter a valid Price.
                         </div>
                     </div>
                 </div>
-
-                <div class="col-sm-3 col-md-2">
-
+                <div class="col-sm-3 col-md-2 col-lg-1">
                     <div class="form-floating">
                         <input class="form-control form-control-sm small input-doc-line text-end" type="number" placeholder="Dis %" id="Discount" />
                         <label class="form-label small">Dis% </label>
                         <div class="invalid-feedback">
-                            Please enter a valid Price.
+                            Please enter a valid Discount.
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-3 col-md-2">
-
+                <div class="col-sm-3 col-md-2 col-lg-1">
                     <div class="form-floating">
                         <input class="form-control form-control-sm small input-doc-line text-end" type="number" placeholder="Vat%" id="VatPercent" />
                         <label class="form-label small">VAT% </label>
                         <div class="invalid-feedback">
-                            Please enter a valid Price.
+                            Please enter a valid VAT.
                         </div>
                     </div>
                 </div>
@@ -244,7 +243,7 @@
                     <span class="text-danger small"></span>
                 </div>
             </div>
-            <div class="row mb-3">
+            <div class="row mb-3 ps-2 pe-2">
                 <table id="detailsTable" class="table table-responsive-sm">
                     <thead class="small">
                         <tr>
@@ -307,25 +306,25 @@
                                     var transQuantityText = $@"{transQuantity:N2}";
                                     var q1Text = $@"{q1:N2}";
                                     var tLine = $"<tr><td class=\"small\"> {lineCount}" +
-                                            $"</td><td class=\"small\" data-materialId=\"{materialId}\" " +
-                                                    $"data-transUnitId=\"{transUnitId}\" data-transUnitFactor=\"{transUnitFactor}\" " +
-                                                    $"data-Q2=\"{q2Actual}\"  " +
-                                                    $"data-baseUnitPriceNet=\"{unitPriceActual}\"  " +
-                                                    $"data-factor=\"{factorActual}\" data-mainUnitId=\"{mainUnitId}\" data-secUnitId=\"{secUnitId}\" " +
-                                                    $">{materialName} </td><td class=\"small text-end\"  data-actualValue=\"{transQuantityActual}\" >" +
-                                                    $" {transQuantityText} </td><td class=\"small text-end\"  data-actualValue=\"{q1Actual}\" > " +
-                                                    $" {q1Text} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{transPriceActual}\" >" +
-                                                    $" {transPrice} </td><td class=\"small text-end\"  data-actualValue=\"{disRateActual}\" >" +
-                                                    $"{disRate} </td><td class=\"small text-end\"  data-actualValue=\"{vatRateActual}\" >" +
-                                                    $"{vatRate} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{netAmountActual}\" >" +
-                                                    $"{netAmount} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{disAmountActual}\" >" +
-                                                    $"{disAmount} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{vatAmountActual}\" >" +
-                                                    $"{vatAmount} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{grosAmountActual}\" >" +
-                                                    $"{grosAmount} </td>" +
-                                                    $"<td class=\"small\">" +
-                                                    $"<a data-itemId=\"0\" href=\"#\" class=\"modifyItem\"><i class=\"fas fa-edit\"></i></a></td>" +
-                                                    $"<td class=\"small\">" +
-                                                    $"<a data-itemId=\"0\" href=\"#\" class=\"deleteItem\"><i class=\"fas fa-trash\"></i></a></td></tr>";
+                                                $"</td><td class=\"small\" data-materialId=\"{materialId}\" " +
+                                                $"data-transUnitId=\"{transUnitId}\" data-transUnitFactor=\"{transUnitFactor}\" " +
+                                                $"data-Q2=\"{q2Actual}\"  " +
+                                                $"data-baseUnitPriceNet=\"{unitPriceActual}\"  " +
+                                                $"data-factor=\"{factorActual}\" data-mainUnitId=\"{mainUnitId}\" data-secUnitId=\"{secUnitId}\" " +
+                                                $">{materialName} </td><td class=\"small text-end\"  data-actualValue=\"{transQuantityActual}\" >" +
+                                                $" {transQuantityText} </td><td class=\"small text-end\"  data-actualValue=\"{q1Actual}\" > " +
+                                                $" {q1Text} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{transPriceActual}\" >" +
+                                                $" {transPrice} </td><td class=\"small text-end\"  data-actualValue=\"{disRateActual}\" >" +
+                                                $"{disRate} </td><td class=\"small text-end\"  data-actualValue=\"{vatRateActual}\" >" +
+                                                $"{vatRate} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{netAmountActual}\" >" +
+                                                $"{netAmount} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{disAmountActual}\" >" +
+                                                $"{disAmount} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{vatAmountActual}\" >" +
+                                                $"{vatAmount} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{grosAmountActual}\" >" +
+                                                $"{grosAmount} </td>" +
+                                                $"<td class=\"small\">" +
+                                                $"<a data-itemId=\"0\" href=\"#\" class=\"modifyItem\"><i class=\"fas fa-edit\"></i></a></td>" +
+                                                $"<td class=\"small\">" +
+                                                $"<a data-itemId=\"0\" href=\"#\" class=\"deleteItem\"><i class=\"fas fa-trash\"></i></a></td></tr>";
                                     @Html.Raw(tLine)
                                     ;
                                 }
@@ -375,9 +374,7 @@
 
 </div>
 
-<div>
-    <a class="small" asp-page="Index">Back to List</a>
-</div>
+
 
 
 

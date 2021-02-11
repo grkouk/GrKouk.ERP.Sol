@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@ViewData["Title"] - GrKouk Web ERP</title>
+    <partial name="_CssBootstrapBlockPartial"/>
+    @RenderSection("MyCss", required: false)
+</head>
+<body>
+    <nav class="navbar navbar-dark fixed-top bg-secondary flex-md-nowrap p-0 shadow">
+        <a class="navbar-brand me-2 pe-2 ps-2" href="/index">Grkouk Web ERP</a>
+       
+        <h4 class="navbar-brand">@ViewData["Title"]</h4>
+        <ul class="navbar-nav px-3">
+            <li class="nav-item text-nowrap">
+                <a class="nav-link" href="index">Back to List</a>
+            </li>
+        </ul>
+    </nav>    
+
+ @RenderBody()
+
+<partial name="_JsBlockPartial"/>
+@RenderSection("Scripts", required: false)
+@await Component.InvokeAsync("NToastNotify")
+</body>
+</html>
