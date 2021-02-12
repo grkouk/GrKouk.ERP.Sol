@@ -40,6 +40,9 @@
     .input-doc-line {
         font-size: 0.7rem;
     }
+    .fill-height {
+        line-height:2.8rem;
+    }
 </style>
 @*<h4>Νέο παραστατικό αγοράς υλικών(<span class="h4 text-primary" name="docCurrency">Euro</span>)</h4>*@
 
@@ -89,26 +92,30 @@
                 </div>
 
             </div>
-            <div class="row mb-3">
+            <div class="row mb-3 gx-1  align-items-center">
                 <div class="col-md-6">
 
-                    <div class="form-floating input-group input-group-sm">
+                    <div class="form-floating">
                         <select asp-for="ItemVm.TransactorId" class="form-select form-select-sm" asp-items="ViewBag.TransactorId"></select>
                         <label asp-for="ItemVm.TransactorId" class="form-label small"></label>
-                        <div class="input-group-append" id="button-addon4">
-                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="SuppliersSelector" type="button">...</button>
-
-                        </div>
+                        
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-auto">
+                    <button class="btn btn-outline-secondary fill-height" data-bs-toggle="modal"
+                            data-bs-target="#itemSelector" data-selectorType="SuppliersSelector" type="button">
+                        ...
+                    </button>
+
+                </div>
+                <div class="col-md-2">
                     <div class="form-floating">
 
                         <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm" asp-items="ViewBag.CompanyId"></select>
                         <label asp-for="ItemVm.CompanyId" class="form-label" small></label>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
 
                     <div class="form-floating">
                         <select asp-for="ItemVm.PaymentMethodId" class="form-select form-select-sm" asp-items="ViewBag.PaymentMethodId"></select>
@@ -118,7 +125,7 @@
                 </div>
             </div>
 
-            <div class="row mb-3 gx-1 align-items-start">
+            <div class="row mb-3 gx-1  align-items-center">
                 <div class="col-sm-3 col-md-3 col-lg-2">
                     <div class="form-floating">
                         <select asp-for="SeekType" class="form-select form-select-sm input-doc-line" asp-items="ViewBag.SeekType"></select>
@@ -126,13 +133,19 @@
                     </div>
                 </div>
                 <div class="col-sm-4 col-md-6 col-lg-3">
-                    <div class="form-floating input-group input-group-sm">
+                    <div class="form-floating ">
                         <input class="form-control form-control-sm input-doc-line" id="Lookup" autocomplete="off" placeholder="Lookup" />
                         <label class="form-label small">LookUp</label>
-                        <div class="input-group-append" id="button-addon5">
-                            <button class="btn btn-outline-secondary btn-sm input-doc-line" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="ProductsSelector" type="button"><i class="fab fa-asymmetrik"></i></button>
-                        </div>
+
                     </div>
+                </div>
+                <div class="col-auto fill-height">
+                    <button class="btn btn-outline-secondary btn-sm input-doc-line fill-height" data-bs-toggle="modal" 
+                            data-bs-target="#itemSelector" data-selectorType="ProductsSelector" 
+                            type="button"
+                            >
+                      ...  
+                    </button>
                 </div>
                 <div class="col-sm-3 col-md-3 col-lg-2">
                     <div class="form-floating">
@@ -361,7 +374,7 @@
             </div>
             <div class="row mb-3">
                 <div class="col-md-12">
-                    <label asp-for="ItemVm.Etiology" class="form_label small"></label>
+                    <label asp-for="ItemVm.Etiology" class="form-label small"></label>
                     <textarea asp-for="ItemVm.Etiology" class="form-control form-control-sm small"></textarea>
                     <span asp-validation-for="ItemVm.Etiology" class="text-danger small"></span>
                 </div>
@@ -490,6 +503,7 @@
                 });
             $('#itemSelector').on('show.bs.modal',
                 function(event) {
+                   
                     var button = $(event.relatedTarget);
                     var selectorType = button.data('selectortype');
                     //var modal = $(this);
@@ -1057,9 +1071,21 @@
 
                 seriesChanged();
             });
-
+            //$('#ItemVm_TransactorId').on('keyup', function(event) {
+            //    let keyPressed = event.key;
+            //    //console.log("Inside keyUp event");
+               
+            //    if (keyPressed === "?") {
+            //        console.log("key in transactor was ?");
+                    
+            //        selectorsLib.showSupplierSelector();
+            //        $('#itemSelector').show();
+            //        return;
+            //    }
+            //    console.log("key in transactor was " + keyPressed);
+            //});
             $('#ItemVm_TransactorId').change(() => {
-                //console.log("Transactor change event ->" + $('#ItemVm_TransactorId').val());
+                console.log("Transactor change event ->" + $('#ItemVm_TransactorId').val());
                 transactorChanged();
             });
             $('#addToList').click((e) => {

@@ -3,7 +3,8 @@
 @using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
 @{
-    ViewData["Title"] = "Edit";
+    Layout = "_LayoutEntryFormTransaction";
+    ViewData["Title"] = "Μεταβολή Παραστατικού Αγοράς";
 }
 @section MyCss
 {
@@ -23,6 +24,9 @@
     }
     .input-doc-line {
         font-size: 0.7rem;
+    }
+    .fill-height {
+        line-height:2.8rem;
     }
 </style>
 <h4>Update Buy Document(<span class="h4 text-primary" name="docCurrency">Euro</span>)</h4>
@@ -51,151 +55,190 @@
             <input type="hidden" id="SeriesUsedPrice" />
             <input type="hidden" id="LineEditing" />
             <input type="hidden" id="LookupValueValid" />
-            <div class="form-row">
-                <div class="form-group col-md-2">
-                    <label asp-for="ItemVm.TransDate" class="control-label small "></label>
-                    <input asp-for="ItemVm.TransDate" class="form-control form-control-sm small" autofocus />
-                    <span asp-validation-for="ItemVm.TransDate" class="text-danger small"></span>
+            <div class="row mb-3">
+                <div class="col-md-2">
+                    <div class="form-floating">
+                        <input asp-for="ItemVm.TransDate" class="form-control form-control-sm" autofocus />
+                        <label asp-for="ItemVm.TransDate" class="form-label small"></label>
+                        <span asp-validation-for="ItemVm.TransDate" class="text-danger"></span>
+                    </div>
                 </div>
-                <div class="form-group col-md-7">
-                    <label asp-for="ItemVm.BuyDocSeriesId" class="control-label small"></label>
-                    <select asp-for="ItemVm.BuyDocSeriesId" class="form-control form-control-sm small" asp-items="ViewBag.BuyDocSeriesId"></select>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <select asp-for="ItemVm.BuyDocSeriesId" class="form-select form-select-sm" asp-items="ViewBag.BuyDocSeriesId"></select>
+                        <label asp-for="ItemVm.BuyDocSeriesId" class="form-label small"></label>
+                    </div>
                 </div>
-                <div class="form-group col-md-3">
-                    <label asp-for="ItemVm.TransRefCode" class="control-label small"></label>
-                    <input asp-for="ItemVm.TransRefCode" class="form-control form-control-sm small" />
-                    <span asp-validation-for="ItemVm.TransRefCode" class="text-danger small"></span>
+                <div class="col-md-3">
+                    <div class="form-floating">
+                        <input asp-for="ItemVm.TransRefCode" class="form-control form-control-sm" placeholder="Ref Code" />
+                        <label asp-for="ItemVm.TransRefCode" class="form-label small"></label>
+                        <span asp-validation-for="ItemVm.TransRefCode" class="text-danger"></span>
+                    </div>
 
                 </div>
             </div>
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    <label asp-for="ItemVm.TransactorId" class="control-label small"></label>
-                    <div class="input-group input-group-sm">
-                        <select asp-for="ItemVm.TransactorId" class="form-control form-control-sm small" asp-items="ViewBag.TransactorId"></select>
-                        <div class="input-group-append" id="button-addon4">
-                            <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#itemSelector" data-selectorType="SuppliersSelector" type="button">...</button>
-                        </div>
+            <div class="row mb-3 gx-1  align-items-center">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <select asp-for="ItemVm.TransactorId" class="form-select form-select-sm" asp-items="ViewBag.TransactorId"></select>
+                        <label asp-for="ItemVm.TransactorId" class="form-label small"></label>
+
                     </div>
                 </div>
-                <div class="form-group col-md-3">
-                    <label asp-for="ItemVm.CompanyId" class="control-label" small></label>
-                    <select asp-for="ItemVm.CompanyId" class="form-control form-control-sm small" asp-items="ViewBag.CompanyId"></select>
+                <div class="col-auto">
+                    <button class="btn btn-outline-secondary fill-height" data-bs-toggle="modal"
+                            data-bs-target="#itemSelector" data-selectorType="SuppliersSelector" type="button">
+                        ...
+                    </button>
+
                 </div>
-                <div class="form-group col-md-3">
-                    <label asp-for="ItemVm.PaymentMethodId" class="control-label" small></label>
-                    <select asp-for="ItemVm.PaymentMethodId" class="form-control form-control-sm small" asp-items="ViewBag.PaymentMethodId"></select>
+                <div class="col-md-2">
+                    <div class="form-floating">
+
+                        <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm" asp-items="ViewBag.CompanyId"></select>
+                        <label asp-for="ItemVm.CompanyId" class="form-label" small></label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-floating">
+                        <select asp-for="ItemVm.PaymentMethodId" class="form-select form-select-sm" asp-items="ViewBag.PaymentMethodId"></select>
+                        <label asp-for="ItemVm.PaymentMethodId" class="form-label" small></label>
+                    </div>
                 </div>
             </div>
 
-            <div class="form-row">
-                <div class="form-group col-sm-1">
-                    <label class="control-label small">Seek Type</label>
-                    <select asp-for="SeekType" class="form-control form-control-sm input-doc-line" asp-items="ViewBag.SeekType"></select>
-                </div>
-                <div class="form-group col-sm-3">
-                    <label class="small">LookUp</label>
-                    <div class="input-group input-group-sm">
-                        <input class="form-control form-control-sm input-doc-line" id="Lookup" autocomplete="off" />
-                        <div class="input-group-append" id="button-addon5">
-                            <button class="btn btn-outline-secondary btn-sm input-doc-line" data-toggle="modal" data-target="#itemSelector" data-selectorType="ProductsSelector" type="button"><i class="fab fa-asymmetrik"></i></button>
-                        </div>
+            <div class="row mb-3 gx-1  align-items-center">
+                <div class="col-sm-3 col-md-3 col-lg-2">
+                    <div class="form-floating">
+                        <select asp-for="SeekType" class="form-select form-select-sm input-doc-line" asp-items="ViewBag.SeekType"></select>
+                        <label class="form-label small">Seek Type</label>
                     </div>
-                    <span class="text-danger small"></span>
                 </div>
-                <div class="form-group col-sm-2">
-                    <label class="small">Unit</label>
-                    <select class="form-control form-control-sm input-doc-line" id="prodUnitSelector"></select>
+                <div class="col-sm-4 col-md-6 col-lg-3">
+                    <div class="form-floating ">
+                        <input class="form-control form-control-sm input-doc-line" id="Lookup" autocomplete="off" placeholder="Lookup" />
+                        <label class="form-label small">LookUp</label>
+
+                    </div>
                 </div>
-                <div class="form-group col-sm-1">
-                    <label class="small" id="transQLabel">Quantity</label>
-                    <input class="form-control form-control-sm small input-doc-line text-right" type="number" placeholder="Quantity" id="transQuantity" />
+                <div class="col-auto fill-height">
+                    <button class="btn btn-outline-secondary btn-sm input-doc-line fill-height" data-bs-toggle="modal"
+                            data-bs-target="#itemSelector" data-selectorType="ProductsSelector"
+                            type="button">
+                        ...
+                    </button>
+                </div>
+                <div class="col-sm-3 col-md-3 col-lg-2">
+                    <div class="form-floating">
+                        <select class="form-select form-select-sm input-doc-line" id="prodUnitSelector"></select>
+                        <label class="form-label small">Unit</label>
+                    </div>
+                </div>
+                <div class="col-sm-3 col-md-3 col-lg-1">
+                    <div class="form-floating">
+                        <input class="form-control form-control-sm small input-doc-line text-end" type="number" placeholder="Quantity" id="transQuantity" />
+                        <label class="form-label small" id="transQLabel">Quantity</label>
+                    </div>
                     <div class="invalid-feedback">
                         Please enter a valid Quantity.
                     </div>
                 </div>
-
-                <div class="form-group col-md-1">
-                    <label class="small">Price </label>
-                    <input class="form-control form-control-sm input-doc-line text-right" type="number" placeholder="Price" id="PriceOnTransUnit" />
-                    <span class="text-danger small"></span>
+                <div class="col-sm-3 col-md-3 col-lg-1">
+                    <div class="form-floating">
+                        <div class="form-floating">
+                            <input class="form-control form-control-sm input-doc-line text-end" type="number" placeholder="Price" id="PriceOnTransUnit" />
+                            <label class="form-label small">Price </label>
+                        </div>
+                        <div class="invalid-feedback">
+                            Please enter a valid Price.
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group col-sm-1">
-                    <label class="small">Dis% </label>
-                    <input class="form-control form-control-sm small input-doc-line text-right" type="number" placeholder="Dis %" id="Discount" />
-                    <span class="text-danger small"></span>
+                <div class="col-sm-3 col-md-2 col-lg-1">
+                    <div class="form-floating">
+                        <input class="form-control form-control-sm small input-doc-line text-end" type="number" placeholder="Dis %" id="Discount" />
+                        <label class="form-label small">Dis% </label>
+                        <div class="invalid-feedback">
+                            Please enter a valid Discount.
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group col-sm-1">
-                    <label class="small">VAT% </label>
-                    <input class="form-control form-control-sm small input-doc-line text-right" type="number" placeholder="Vat%" id="VatPercent" />
-                    <span class="text-danger small"></span>
+                <div class="col-sm-3 col-md-2 col-lg-1">
+                    <div class="form-floating">
+                        <input class="form-control form-control-sm small input-doc-line text-end" type="number" placeholder="Vat%" id="VatPercent" />
+                        <label class="form-label small">VAT% </label>
+                        <div class="invalid-feedback">
+                            Please enter a valid VAT.
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group col-sm-1 align-self-end">
+                <div class="col-sm-1 align-self-end">
                     <button id="addToList" class="btn btn-primary btn-sm">
                         <i class="far fa-arrow-alt-circle-down"></i>
                     </button>
                 </div>
             </div>
-            <div class="form-row">
+            <div class="row mb-3">
                 <div class="form-group col-sm-1">
                     <label class="small" id="q1Label">Q1</label>
-                    <input class="form-control form-control-sm small input-doc-line text-right" type="text" placeholder="Q 1" id="Q1" tabindex="-1" readonly />
+                    <input class="form-control form-control-sm small input-doc-line text-end" type="text" placeholder="Q 1" id="Q1" tabindex="-1" readonly />
                     <div class="invalid-feedback">
                         Please enter a valid Q1.
                     </div>
                 </div>
                 <div class="form-group col-sm-1">
                     <label class="small" id="q2Label">Q2</label>
-                    <input class="form-control form-control-sm small input-doc-line text-right" type="text" placeholder="Q 2" id="Q2" tabindex="-1" readonly />
+                    <input class="form-control form-control-sm small input-doc-line text-end" type="text" placeholder="Q 2" id="Q2" tabindex="-1" readonly />
                     <span class="text-danger small"></span>
                 </div>
                 <div class="form-group col-md-1">
                     <label class="small">Unit Factor</label>
-                    <input class="form-control form-control-sm input-doc-line text-right" type="text" placeholder="Base Factor" id="MaterialFactor" tabindex="-1" readonly />
+                    <input class="form-control form-control-sm input-doc-line text-end" type="text" placeholder="Base Factor" id="MaterialFactor" tabindex="-1" readonly />
                     <span class="text-danger small"></span>
                 </div>
                 <div class="form-group col-md-1">
                     <label class="small">Trans Factor</label>
-                    <input class="form-control form-control-sm input-doc-line text-right" type="text" placeholder="Trans Factor" id="TransactionUnitFactor" tabindex="-1" readonly />
+                    <input class="form-control form-control-sm input-doc-line text-end" type="text" placeholder="Trans Factor" id="TransactionUnitFactor" tabindex="-1" readonly />
                     <span class="text-danger small"></span>
                 </div>
                 <div class="form-group col-md-1">
                     <label class="small">Price Base</label>
-                    <input class="form-control form-control-sm input-doc-line text-right" type="text" placeholder="Price" id="Price" tabindex="-1" readonly />
+                    <input class="form-control form-control-sm input-doc-line text-end" type="text" placeholder="Price" id="Price" tabindex="-1" readonly />
                     <span class="text-danger small"></span>
                 </div>
                 <div class="form-group col-md-1">
                     <label class="small">Price Net</label>
-                    <input class="form-control form-control-sm input-doc-line text-right" type="text" type="number" placeholder="Price Net" id="PriceNet" tabindex="-1" readonly />
+                    <input class="form-control form-control-sm input-doc-line text-end" type="text" type="number" placeholder="Price Net" id="PriceNet" tabindex="-1" readonly />
                     <span class="text-danger small"></span>
                 </div>
                 <div class="form-group col-md-1">
                     <label class="small">Vat Value</label>
-                    <input class="form-control form-control-sm input-doc-line text-right currency-input" type="text" placeholder="Vat Value" id="LineVatValue" tabindex="-1" readonly />
+                    <input class="form-control form-control-sm input-doc-line text-end currency-input" type="text" placeholder="Vat Value" id="LineVatValue" tabindex="-1" readonly />
                     <span class="text-danger small"></span>
                 </div>
                 <div class="form-group col-md-1">
                     <label class="small">Disc Value</label>
-                    <input class="form-control form-control-sm input-doc-line text-right currency-input" type="text" placeholder="Disc Value" id="LineDiscValue" tabindex="-1" readonly />
+                    <input class="form-control form-control-sm input-doc-line text-end currency-input" type="text" placeholder="Disc Value" id="LineDiscValue" tabindex="-1" readonly />
                     <span class="text-danger small"></span>
                 </div>
                 <div class="form-group col-md-1">
                     <label class="small">Net Value</label>
-                    <input class="form-control form-control-sm input-doc-line text-right currency-input" type="text" placeholder="Net Value" id="LineNetValue" tabindex="-1" readonly />
+                    <input class="form-control form-control-sm input-doc-line text-end currency-input" type="text" placeholder="Net Value" id="LineNetValue" tabindex="-1" readonly />
                     <span class="text-danger small"></span>
                 </div>
                 <div class="form-group col-md-1">
                     <label class="small">Brut Value</label>
-                    <input class="form-control form-control-sm input-doc-line text-right currency-input" type="text" placeholder="Brut Value" id="LineBrutValue" tabindex="-1" readonly />
+                    <input class="form-control form-control-sm input-doc-line text-end currency-input" type="text" placeholder="Brut Value" id="LineBrutValue" tabindex="-1" readonly />
                     <span class="text-danger small"></span>
                 </div>
                 <div class="form-group col-md-1">
                     <label class="small">Expense Value</label>
-                    <input class="form-control form-control-sm input-doc-line text-right currency-input" type="text" placeholder="Exp Value" id="LineExpValue" tabindex="-1" readonly />
+                    <input class="form-control form-control-sm input-doc-line text-end currency-input" type="text" placeholder="Exp Value" id="LineExpValue" tabindex="-1" readonly />
                     <span class="text-danger small"></span>
                 </div>
             </div>
-            <div class="form-row">
+            <div class="row mb-3 ps-2 pe-2">
                 <table id="detailsTable" class="table table-responsive-sm">
                     <thead class="small">
                         <tr>
@@ -262,15 +305,15 @@
                                                 $"data-Q2=\"{q2Actual}\"  " +
                                                 $"data-baseUnitPriceNet=\"{unitPriceActual}\"  " +
                                                 $"data-factor=\"{factorActual}\" data-mainUnitId=\"{mainUnitId}\" data-secUnitId=\"{secUnitId}\" " +
-                                                $">{materialName} </td><td class=\"small text-right\"  data-actualValue=\"{transQuantityActual}\" >" +
-                                                $" {transQuantityText} </td><td class=\"small text-right\"  data-actualValue=\"{q1Actual}\" > " +
-                                                $" {q1Text} </td><td class=\"small text-right currency-input-text\"  data-actualValue=\"{transPriceActual}\" >" +
-                                                $" {transPrice} </td><td class=\"small text-right\"  data-actualValue=\"{disRateActual}\" >" +
-                                                $"{disRate} </td><td class=\"small text-right\"  data-actualValue=\"{vatRateActual}\" >" +
-                                                $"{vatRate} </td><td class=\"small text-right currency-input-text\"  data-actualValue=\"{netAmountActual}\" >" +
-                                                $"{netAmount} </td><td class=\"small text-right currency-input-text\"  data-actualValue=\"{disAmountActual}\" >" +
-                                                $"{disAmount} </td><td class=\"small text-right currency-input-text\"  data-actualValue=\"{vatAmountActual}\" >" +
-                                                $"{vatAmount} </td><td class=\"small text-right currency-input-text\"  data-actualValue=\"{grosAmountActual}\" >" +
+                                                $">{materialName} </td><td class=\"small text-end\"  data-actualValue=\"{transQuantityActual}\" >" +
+                                                $" {transQuantityText} </td><td class=\"small text-end\"  data-actualValue=\"{q1Actual}\" > " +
+                                                $" {q1Text} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{transPriceActual}\" >" +
+                                                $" {transPrice} </td><td class=\"small text-end\"  data-actualValue=\"{disRateActual}\" >" +
+                                                $"{disRate} </td><td class=\"small text-end\"  data-actualValue=\"{vatRateActual}\" >" +
+                                                $"{vatRate} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{netAmountActual}\" >" +
+                                                $"{netAmount} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{disAmountActual}\" >" +
+                                                $"{disAmount} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{vatAmountActual}\" >" +
+                                                $"{vatAmount} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{grosAmountActual}\" >" +
                                                 $"{grosAmount} </td>" +
                                                 $"<td class=\"small\">" +
                                                 $"<a data-itemId=\"0\" href=\"#\" class=\"modifyItem\"><i class=\"fas fa-edit\"></i></a></td>" +
@@ -284,48 +327,44 @@
                     </tbody>
                 </table>
             </div>
-            <div class="form-row">
-                <div class="form-group col-3">
+            <div class="row mb-3">
+                <div class="col-3">
                     <label class=" small">Net Amount</label>
-                    <input asp-for="ItemVm.AmountNet" class="form-control form-control-sm small text-right" type="text" disabled />
+                    <input asp-for="ItemVm.AmountNet" class="form-control form-control-sm small text-end" type="text" disabled />
                     <span asp-validation-for="ItemVm.AmountNet" class="text-danger small"></span>
                 </div>
 
 
-                <div class="form-group col-3">
+                <div class="col-3">
                     <label class=" small">Discount</label>
-                    <input asp-for="ItemVm.AmountDiscount" class="form-control form-control-sm small text-right" type="text" disabled />
+                    <input asp-for="ItemVm.AmountDiscount" class="form-control form-control-sm small text-end" type="text" disabled />
                     <span asp-validation-for="ItemVm.AmountDiscount" class="text-danger small"></span>
                 </div>
-                <div class="form-group col-3">
+                <div class="col-3">
                     <label class="small">Amount VAT</label>
-                    <input asp-for="ItemVm.AmountFpa" class="form-control form-control-sm small text-right" type="text" disabled />
+                    <input asp-for="ItemVm.AmountFpa" class="form-control form-control-sm small text-end" type="text" disabled />
                     <span asp-validation-for="ItemVm.AmountFpa" class="text-danger small"></span>
                 </div>
-                <div class="form-group col-3">
+                <div class="col-3">
                     <label class=" small">Sum</label>
-                    <input id="DocumentSum" type="text" class="form-control form-control-sm small text-right" disabled />
+                    <input id="DocumentSum" type="text" class="form-control form-control-sm small text-end" disabled />
 
                 </div>
             </div>
-            <div class="form-row">
-                <div class="form-group col-md-12">
+            <div class="row mb-3">
+                <div class="col-md-12">
                     <label asp-for="ItemVm.Etiology" class="control-label small"></label>
                     <textarea asp-for="ItemVm.Etiology" class="form-control form-control-sm small"></textarea>
                     <span asp-validation-for="ItemVm.Etiology" class="text-danger small"></span>
                 </div>
             </div>
-            <div class="form-group">
+            <div>
                 <input type="submit" value="Update" class="btn btn-primary btn-sm" id="saveForm" />
             </div>
         </fieldset>
     </form>
 </div>
 
-
-<div>
-    <a class="small" asp-page="./Index">Back to List</a>
-</div>
 <!-- Modal Image Viewer -->
 <div class="modal fade" id="imageViewer" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
     <div class="modal-dialog " role="document">
@@ -1101,15 +1140,15 @@
                     prItem += '>';
                     prItem += `${productName}`;
                     prItem += '</td>';
-                    prItem += `<td class="small text-right" data-actualValue="${transQuantity}">${transUnitText}</td>`;
-                    prItem += `<td class="small text-right" data-actualValue="${quantity1}">${mainUnitText}</td>`;
-                    prItem += `<td class="small text-right currency-input-text" data-actualValue="${priceOnTransUnit}">${formatterCurrency.format(priceOnTransUnit)}</td>`;
-                    prItem += `<td class="small text-right" data-actualValue="${discount}">${formatterNumber.format(discount)}</td>`;
-                    prItem += `<td class="small text-right" data-actualValue="${vatPercent}">${formatterNumber.format(vatPercent)}</td>`;
-                    prItem += `<td class="small text-right currency-input-text" data-actualValue="${netAmount}">${formatterCurrency.format(netAmount)}</td>`;
-                    prItem += `<td class="small text-right currency-input-text" data-actualValue="${discountAmount}">${formatterCurrency.format(discountAmount)}</td>`;
-                    prItem += `<td class="small text-right currency-input-text" data-actualValue="${fpaAmount}">${formatterCurrency.format(fpaAmount)}</td>`;
-                    prItem += `<td class="small text-right currency-input-text" data-actualValue="${grosAmount}">${formatterCurrency.format(grosAmount)}</td>`;
+                    prItem += `<td class="small text-end" data-actualValue="${transQuantity}">${transUnitText}</td>`;
+                    prItem += `<td class="small text-end" data-actualValue="${quantity1}">${mainUnitText}</td>`;
+                    prItem += `<td class="small text-end currency-input-text" data-actualValue="${priceOnTransUnit}">${formatterCurrency.format(priceOnTransUnit)}</td>`;
+                    prItem += `<td class="small text-end" data-actualValue="${discount}">${formatterNumber.format(discount)}</td>`;
+                    prItem += `<td class="small text-end" data-actualValue="${vatPercent}">${formatterNumber.format(vatPercent)}</td>`;
+                    prItem += `<td class="small text-end currency-input-text" data-actualValue="${netAmount}">${formatterCurrency.format(netAmount)}</td>`;
+                    prItem += `<td class="small text-end currency-input-text" data-actualValue="${discountAmount}">${formatterCurrency.format(discountAmount)}</td>`;
+                    prItem += `<td class="small text-end currency-input-text" data-actualValue="${fpaAmount}">${formatterCurrency.format(fpaAmount)}</td>`;
+                    prItem += `<td class="small text-end currency-input-text" data-actualValue="${grosAmount}">${formatterCurrency.format(grosAmount)}</td>`;
                     prItem += '<td class="small">';
                     prItem += '<a data-itemId="0" href="#" class="modifyItem"><i class="fas fa-edit"></i></a>';
                     prItem += '</td><td class="small">';
