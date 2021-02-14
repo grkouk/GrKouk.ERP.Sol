@@ -8,16 +8,27 @@
     @RenderSection("MyCss", required: false)
 </head>
 <body>
-    <nav class="navbar navbar-dark fixed-top bg-secondary flex-md-nowrap p-0 shadow">
-        <a class="navbar-brand me-2 pe-2 ps-2" href="/index">Grkouk Web ERP</a>
-       
-        <h4 class="navbar-brand">@ViewData["Title"]</h4>
-        <ul class="navbar-nav px-3">
-            <li class="nav-item text-nowrap">
-                <a class="nav-link" asp-page="./Index">Back to List</a>
-            </li>
-        </ul>
-    </nav>    
+<nav class="navbar navbar-expand navbar-dark bg-secondary" aria-label="Second navbar example">
+    <div class="container-fluid">
+         <a class="navbar-brand" href="/index">Grkouk Web ERP</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample02" aria-controls="navbarsExample02" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarsExample02">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <h5 class="nav-link" aria-current="page" href="#">@ViewData["Title"]</h5>
+                </li>
+                <li class="nav-item">
+                    <h5 class="nav-link" name="docCurrency"></h5>
+                </li>
+            </ul>
+             <a class="nav-link" asp-page="./Index">Back to List</a>
+        </div>
+    </div>
+  </nav>
+ 
 
  @RenderBody()
 
