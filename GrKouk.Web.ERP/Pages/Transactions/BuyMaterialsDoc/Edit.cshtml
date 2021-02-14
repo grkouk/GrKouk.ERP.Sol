@@ -652,12 +652,7 @@
                     let elValue = $el.attr('data-actualValue');
                     if (!isNaN(elValue)) {
                         $el.val(formatterCurrency.format(elValue));
-                    } else {
-                        elValue = $el.val();
-                        if (!isNaN(elValue)) {
-                            $el.val(formatterCurrency.format(elValue));
-                        }
-                    }
+                    } 
 
                 });
             };

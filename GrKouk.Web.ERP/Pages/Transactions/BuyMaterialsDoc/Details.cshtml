@@ -187,11 +187,7 @@
                                             $"{netAmount} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{disAmountActual}\" >" +
                                             $"{disAmount} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{vatAmountActual}\" >" +
                                             $"{vatAmount} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{grosAmountActual}\" >" +
-                                            $"{grosAmount} </td>" +
-                                            $"<td class=\"small\">" +
-                                            $"<a data-itemId=\"0\" href=\"#\" class=\"modifyItem\"><i class=\"fas fa-edit\"></i></a></td>" +
-                                            $"<td class=\"small\">" +
-                                            $"<a data-itemId=\"0\" href=\"#\" class=\"deleteItem\"><i class=\"fas fa-trash\"></i></a></td></tr>";
+                                            $"{grosAmount} </td></tr>" ;
                                 @Html.Raw(tLine)
                                 ;
                             }
@@ -215,7 +211,7 @@
                 </div>
                 <div class="col-3">
                     <label class="small">Amount VAT</label>
-                    <input asp-for="ItemVm.AmountFpa" class="form-control form-control-sm text-end" type="text currency-input" disabled />
+                    <input asp-for="ItemVm.AmountFpa" class="form-control form-control-sm text-end currency-input" type="text" disabled />
                     <span asp-validation-for="ItemVm.AmountFpa" class="text-danger small"></span>
                 </div>
                 <div class="col-3">
@@ -272,6 +268,12 @@
                 let elValue = $el.attr('data-actualValue');
                 if (!isNaN(elValue)) {
                     $el.val(formatterCurrency.format(elValue));
+                }else {
+                    let parse = Globalize.numberParser(); 
+                    elValue = parse($el.val());
+                    if (!isNaN(elValue)) {
+                        $el.val(formatterCurrency.format(elValue));
+                    }
                 }
 
             });
