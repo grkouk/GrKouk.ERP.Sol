@@ -23,6 +23,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
             _context = context;
             _mapper = mapper;
         }
+        public decimal DocumentSum { get; set; }
         public BuyDocModifyDto ItemVm { get; set; }
         public async Task<IActionResult> OnGetAsync(int? id)
         {
