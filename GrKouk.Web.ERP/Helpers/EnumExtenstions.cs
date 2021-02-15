@@ -6,10 +6,10 @@ namespace GrKouk.Web.ERP.Helpers
 {
     public static class EnumExtensionMethods
     {
-        public static string GetDescription(this Enum GenericEnum)
+        public static string GetDescription(this Enum genericEnum)
         {
-            Type genericEnumType = GenericEnum.GetType();
-            MemberInfo[] memberInfo = genericEnumType.GetMember(GenericEnum.ToString());
+            Type genericEnumType = genericEnum.GetType();
+            MemberInfo[] memberInfo = genericEnumType.GetMember(genericEnum.ToString());
             if (memberInfo != null && memberInfo.Length > 0)
             {
                 var _Attribs = memberInfo[0].GetCustomAttributes(typeof(System.ComponentModel.DescriptionAttribute), false);
@@ -18,7 +18,7 @@ namespace GrKouk.Web.ERP.Helpers
                     return ((System.ComponentModel.DescriptionAttribute)_Attribs.ElementAt(0)).Description;
                 }
             }
-            return GenericEnum.ToString();
+            return genericEnum.ToString();
         }
 
        
