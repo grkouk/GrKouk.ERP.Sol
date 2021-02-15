@@ -25,7 +25,7 @@ namespace GrKouk.Erp.Dtos.WarehouseItems
         {
             get
             {
-                string ret = "";
+                string ret;
                 switch (MaterialType)
                 {
 
@@ -51,7 +51,7 @@ namespace GrKouk.Erp.Dtos.WarehouseItems
         public string WarehouseItemNatureName {
             get
             {
-                string ret = "";
+                string ret;
                 switch (WarehouseItemNature)
                 {
                     case WarehouseItemNatureEnum.WarehouseItemNatureUndefined:

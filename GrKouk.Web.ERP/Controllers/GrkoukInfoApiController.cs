@@ -117,15 +117,15 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpPost("DeleteBuyDocumentsList")]
         public async Task<IActionResult> DeleteBuyDocumentList([FromBody] IdList docIds)
         {
-            await using (var transaction = await _context.Database.BeginTransactionAsync())
-            {
-                foreach (var itemId in docIds.Ids)
-                {
-                    Debug.Write("test");
-                }
+            // await using (var transaction = await _context.Database.BeginTransactionAsync())
+            // {
+            //     foreach (var itemId in docIds.Ids)
+            //     {
+            //         Debug.Write("test");
+            //     }
 
-                await transaction.CommitAsync();
-            }
+            //     await transaction.CommitAsync();
+            // }
 
             return Ok();
         }
@@ -1497,12 +1497,12 @@ namespace GrKouk.Web.ERP.Controllers
                         .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
                     if (r != null)
                     {
-                        listItem.AmountFpa = listItem.AmountFpa / r.Rate;
-                        listItem.AmountNet = listItem.AmountNet / r.Rate;
-                        listItem.AmountDiscount = listItem.AmountDiscount / r.Rate;
-                        listItem.TransFpaAmount = listItem.TransFpaAmount / r.Rate;
-                        listItem.TransNetAmount = listItem.TransNetAmount / r.Rate;
-                        listItem.TransDiscountAmount = listItem.TransDiscountAmount / r.Rate;
+                        listItem.AmountFpa /= r.Rate;
+                        listItem.AmountNet /= r.Rate;
+                        listItem.AmountDiscount /= r.Rate;
+                        listItem.TransFpaAmount /= r.Rate;
+                        listItem.TransNetAmount /= r.Rate;
+                        listItem.TransDiscountAmount /= r.Rate;
                     }
                 }
 
@@ -1512,12 +1512,12 @@ namespace GrKouk.Web.ERP.Controllers
                         .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
                     if (r != null)
                     {
-                        listItem.AmountFpa = listItem.AmountFpa * r.Rate;
-                        listItem.AmountNet = listItem.AmountNet * r.Rate;
-                        listItem.AmountDiscount = listItem.AmountDiscount * r.Rate;
-                        listItem.TransFpaAmount = listItem.TransFpaAmount * r.Rate;
-                        listItem.TransNetAmount = listItem.TransNetAmount * r.Rate;
-                        listItem.TransDiscountAmount = listItem.TransDiscountAmount * r.Rate;
+                        listItem.AmountFpa *= r.Rate;
+                        listItem.AmountNet *= r.Rate;
+                        listItem.AmountDiscount *= r.Rate;
+                        listItem.TransFpaAmount *= r.Rate;
+                        listItem.TransNetAmount *= r.Rate;
+                        listItem.TransDiscountAmount *= r.Rate;
                     }
                 }
             }
