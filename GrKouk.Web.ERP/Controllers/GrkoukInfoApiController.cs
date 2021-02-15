@@ -1670,12 +1670,12 @@ namespace GrKouk.Web.ERP.Controllers
                         .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
                     if (r != null)
                     {
-                        listItem.AmountFpa = listItem.AmountFpa / r.Rate;
-                        listItem.AmountNet = listItem.AmountNet / r.Rate;
-                        listItem.AmountDiscount = listItem.AmountDiscount / r.Rate;
-                        listItem.TransFpaAmount = listItem.TransFpaAmount / r.Rate;
-                        listItem.TransNetAmount = listItem.TransNetAmount / r.Rate;
-                        listItem.TransDiscountAmount = listItem.TransDiscountAmount / r.Rate;
+                        listItem.AmountFpa /= r.Rate;
+                        listItem.AmountNet /= r.Rate;
+                        listItem.AmountDiscount /= r.Rate;
+                        listItem.TransFpaAmount /= r.Rate;
+                        listItem.TransNetAmount /= r.Rate;
+                        listItem.TransDiscountAmount /= r.Rate;
                     }
                 }
 
@@ -1685,12 +1685,12 @@ namespace GrKouk.Web.ERP.Controllers
                         .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
                     if (r != null)
                     {
-                        listItem.AmountFpa = listItem.AmountFpa * r.Rate;
-                        listItem.AmountNet = listItem.AmountNet * r.Rate;
-                        listItem.AmountDiscount = listItem.AmountDiscount * r.Rate;
-                        listItem.TransFpaAmount = listItem.TransFpaAmount * r.Rate;
-                        listItem.TransNetAmount = listItem.TransNetAmount * r.Rate;
-                        listItem.TransDiscountAmount = listItem.TransDiscountAmount * r.Rate;
+                        listItem.AmountFpa *= r.Rate;
+                        listItem.AmountNet *= r.Rate;
+                        listItem.AmountDiscount *= r.Rate;
+                        listItem.TransFpaAmount *= r.Rate;
+                        listItem.TransNetAmount *= r.Rate;
+                        listItem.TransDiscountAmount *= r.Rate;
                     }
                 }
             }
@@ -4380,12 +4380,12 @@ namespace GrKouk.Web.ERP.Controllers
                         .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
                     if (r != null)
                     {
-                        listItem.AmountFpa = listItem.AmountFpa / r.Rate;
-                        listItem.AmountNet = listItem.AmountNet / r.Rate;
-                        listItem.AmountDiscount = listItem.AmountDiscount / r.Rate;
-                        listItem.TransFpaAmount = listItem.TransFpaAmount / r.Rate;
-                        listItem.TransNetAmount = listItem.TransNetAmount / r.Rate;
-                        listItem.TransDiscountAmount = listItem.TransDiscountAmount / r.Rate;
+                        listItem.AmountFpa /= r.Rate;
+                        listItem.AmountNet /= r.Rate;
+                        listItem.AmountDiscount /= r.Rate;
+                        listItem.TransFpaAmount /= r.Rate;
+                        listItem.TransNetAmount /= r.Rate;
+                        listItem.TransDiscountAmount /= r.Rate;
                     }
                 }
 
@@ -4395,12 +4395,12 @@ namespace GrKouk.Web.ERP.Controllers
                         .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
                     if (r != null)
                     {
-                        listItem.AmountFpa = listItem.AmountFpa * r.Rate;
-                        listItem.AmountNet = listItem.AmountNet * r.Rate;
-                        listItem.AmountDiscount = listItem.AmountDiscount * r.Rate;
-                        listItem.TransFpaAmount = listItem.TransFpaAmount * r.Rate;
-                        listItem.TransNetAmount = listItem.TransNetAmount * r.Rate;
-                        listItem.TransDiscountAmount = listItem.TransDiscountAmount * r.Rate;
+                        listItem.AmountFpa *= r.Rate;
+                        listItem.AmountNet *= r.Rate;
+                        listItem.AmountDiscount *= r.Rate;
+                        listItem.TransFpaAmount *= r.Rate;
+                        listItem.TransNetAmount *= r.Rate;
+                        listItem.TransDiscountAmount *= r.Rate;
                     }
                 }
             }
@@ -4581,12 +4581,12 @@ namespace GrKouk.Web.ERP.Controllers
                         .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
                     if (r != null)
                     {
-                        listItem.AmountFpa = listItem.AmountFpa / r.Rate;
-                        listItem.AmountNet = listItem.AmountNet / r.Rate;
-                        listItem.AmountDiscount = listItem.AmountDiscount / r.Rate;
-                        listItem.TransFpaAmount = listItem.TransFpaAmount / r.Rate;
-                        listItem.TransNetAmount = listItem.TransNetAmount / r.Rate;
-                        listItem.TransDiscountAmount = listItem.TransDiscountAmount / r.Rate;
+                        listItem.AmountFpa /= r.Rate;
+                        listItem.AmountNet /= r.Rate;
+                        listItem.AmountDiscount /= r.Rate;
+                        listItem.TransFpaAmount /= r.Rate;
+                        listItem.TransNetAmount /= r.Rate;
+                        listItem.TransDiscountAmount /= r.Rate;
                     }
                 }
 
@@ -4596,12 +4596,12 @@ namespace GrKouk.Web.ERP.Controllers
                         .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
                     if (r != null)
                     {
-                        listItem.AmountFpa = listItem.AmountFpa * r.Rate;
-                        listItem.AmountNet = listItem.AmountNet * r.Rate;
-                        listItem.AmountDiscount = listItem.AmountDiscount * r.Rate;
-                        listItem.TransFpaAmount = listItem.TransFpaAmount * r.Rate;
-                        listItem.TransNetAmount = listItem.TransNetAmount * r.Rate;
-                        listItem.TransDiscountAmount = listItem.TransDiscountAmount * r.Rate;
+                        listItem.AmountFpa *= r.Rate;
+                        listItem.AmountNet *= r.Rate;
+                        listItem.AmountDiscount *= r.Rate;
+                        listItem.TransFpaAmount *= r.Rate;
+                        listItem.TransNetAmount *= r.Rate;
+                        listItem.TransDiscountAmount *= r.Rate;
                     }
                 }
 
@@ -4627,12 +4627,12 @@ namespace GrKouk.Web.ERP.Controllers
                         .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
                     if (r != null)
                     {
-                        item.AmountFpa = item.AmountFpa / r.Rate;
-                        item.AmountNet = item.AmountNet / r.Rate;
-                        item.AmountDiscount = item.AmountDiscount / r.Rate;
-                        item.TransFpaAmount = item.TransFpaAmount / r.Rate;
-                        item.TransNetAmount = item.TransNetAmount / r.Rate;
-                        item.TransDiscountAmount = item.TransDiscountAmount / r.Rate;
+                        item.AmountFpa /= r.Rate;
+                        item.AmountNet /= r.Rate;
+                        item.AmountDiscount /= r.Rate;
+                        item.TransFpaAmount /= r.Rate;
+                        item.TransNetAmount /= r.Rate;
+                        item.TransDiscountAmount /= r.Rate;
                     }
                 }
 
@@ -4642,12 +4642,12 @@ namespace GrKouk.Web.ERP.Controllers
                         .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
                     if (r != null)
                     {
-                        item.AmountFpa = item.AmountFpa * r.Rate;
-                        item.AmountNet = item.AmountNet * r.Rate;
-                        item.AmountDiscount = item.AmountDiscount * r.Rate;
-                        item.TransFpaAmount = item.TransFpaAmount * r.Rate;
-                        item.TransNetAmount = item.TransNetAmount * r.Rate;
-                        item.TransDiscountAmount = item.TransDiscountAmount * r.Rate;
+                        item.AmountFpa *= r.Rate;
+                        item.AmountNet *= r.Rate;
+                        item.AmountDiscount *= r.Rate;
+                        item.TransFpaAmount *= r.Rate;
+                        item.TransNetAmount *= r.Rate;
+                        item.TransDiscountAmount *= r.Rate;
                     }
                 }
             }
@@ -4694,8 +4694,10 @@ namespace GrKouk.Web.ERP.Controllers
             beforePeriod.CreatorId = -1;
             beforePeriod.TransactorName = "";
 
-            var listWithTotal = new List<KartelaLine>();
-            listWithTotal.Add(beforePeriod);
+            var listWithTotal = new List<KartelaLine>
+            {
+                beforePeriod
+            };
 
             //----------------------------------------------------
 
@@ -4926,12 +4928,12 @@ namespace GrKouk.Web.ERP.Controllers
                         .OrderByDescending(p => p.ClosingDate).FirstOrDefaultAsync();
                     if (r != null)
                     {
-                        listItem.AmountFpa = listItem.AmountFpa / r.Rate;
-                        listItem.AmountNet = listItem.AmountNet / r.Rate;
-                        listItem.AmountDiscount = listItem.AmountDiscount / r.Rate;
-                        listItem.TransFpaAmount = listItem.TransFpaAmount / r.Rate;
-                        listItem.TransNetAmount = listItem.TransNetAmount / r.Rate;
-                        listItem.TransDiscountAmount = listItem.TransDiscountAmount / r.Rate;
+                        listItem.AmountFpa /= r.Rate;
+                        listItem.AmountNet /= r.Rate;
+                        listItem.AmountDiscount /= r.Rate;
+                        listItem.TransFpaAmount /= r.Rate;
+                        listItem.TransNetAmount /= r.Rate;
+                        listItem.TransDiscountAmount /= r.Rate;
                     }
                 }
 
@@ -4941,12 +4943,12 @@ namespace GrKouk.Web.ERP.Controllers
                         .OrderByDescending(p => p.ClosingDate).FirstOrDefaultAsync();
                     if (r != null)
                     {
-                        listItem.AmountFpa = listItem.AmountFpa * r.Rate;
-                        listItem.AmountNet = listItem.AmountNet * r.Rate;
-                        listItem.AmountDiscount = listItem.AmountDiscount * r.Rate;
-                        listItem.TransFpaAmount = listItem.TransFpaAmount * r.Rate;
-                        listItem.TransNetAmount = listItem.TransNetAmount * r.Rate;
-                        listItem.TransDiscountAmount = listItem.TransDiscountAmount * r.Rate;
+                        listItem.AmountFpa *= r.Rate;
+                        listItem.AmountNet *= r.Rate;
+                        listItem.AmountDiscount *= r.Rate;
+                        listItem.TransFpaAmount *= r.Rate;
+                        listItem.TransNetAmount *= r.Rate;
+                        listItem.TransDiscountAmount *= r.Rate;
                     }
                 }
             }
@@ -4962,12 +4964,12 @@ namespace GrKouk.Web.ERP.Controllers
                         .OrderByDescending(p => p.ClosingDate).FirstOrDefaultAsync();
                     if (r != null)
                     {
-                        listItem.AmountFpa = listItem.AmountFpa / r.Rate;
-                        listItem.AmountNet = listItem.AmountNet / r.Rate;
-                        listItem.AmountDiscount = listItem.AmountDiscount / r.Rate;
-                        listItem.TransFpaAmount = listItem.TransFpaAmount / r.Rate;
-                        listItem.TransNetAmount = listItem.TransNetAmount / r.Rate;
-                        listItem.TransDiscountAmount = listItem.TransDiscountAmount / r.Rate;
+                        listItem.AmountFpa /= r.Rate;
+                        listItem.AmountNet /= r.Rate;
+                        listItem.AmountDiscount /= r.Rate;
+                        listItem.TransFpaAmount /= r.Rate;
+                        listItem.TransNetAmount /= r.Rate;
+                        listItem.TransDiscountAmount /= r.Rate;
                     }
                 }
 
@@ -4977,12 +4979,12 @@ namespace GrKouk.Web.ERP.Controllers
                         .OrderByDescending(p => p.ClosingDate).FirstOrDefaultAsync();
                     if (r != null)
                     {
-                        listItem.AmountFpa = listItem.AmountFpa * r.Rate;
-                        listItem.AmountNet = listItem.AmountNet * r.Rate;
-                        listItem.AmountDiscount = listItem.AmountDiscount * r.Rate;
-                        listItem.TransFpaAmount = listItem.TransFpaAmount * r.Rate;
-                        listItem.TransNetAmount = listItem.TransNetAmount * r.Rate;
-                        listItem.TransDiscountAmount = listItem.TransDiscountAmount * r.Rate;
+                        listItem.AmountFpa *= r.Rate;
+                        listItem.AmountNet *= r.Rate;
+                        listItem.AmountDiscount *= r.Rate;
+                        listItem.TransFpaAmount *= r.Rate;
+                        listItem.TransNetAmount *= r.Rate;
+                        listItem.TransDiscountAmount *= r.Rate;
                     }
                 }
             }
@@ -5027,8 +5029,10 @@ namespace GrKouk.Web.ERP.Controllers
             beforePeriod.CreatorId = -1;
             beforePeriod.MaterialName = "";
 
-            var listWithTotal = new List<WarehouseKartelaLine>();
-            listWithTotal.Add(beforePeriod);
+            var listWithTotal = new List<WarehouseKartelaLine>
+            {
+                beforePeriod
+            };
             // decimal runningTotal = 0;
             decimal runningTotalVolume = beforePeriod.RunningTotalVolume;
             decimal runningTotalValue = beforePeriod.RunningTotalValue;

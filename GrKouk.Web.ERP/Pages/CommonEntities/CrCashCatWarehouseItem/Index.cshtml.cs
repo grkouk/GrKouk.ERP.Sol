@@ -42,8 +42,10 @@ namespace GrKouk.Web.Erp.Pages.CommonEntities.CrCashCatWarehouseItem
             ViewData["PageFilterSize"] = new SelectList(pageFilterSize, "Value", "Text");
 
             var dbCompanies = _context.Companies.OrderBy(p => p.Code).AsNoTracking();
-            List<SelectListItem> companiesList = new List<SelectListItem>();
-            companiesList.Add(new SelectListItem() { Value = 0.ToString(), Text = "{All Companies}" });
+            List<SelectListItem> companiesList = new List<SelectListItem>
+            {
+                new SelectListItem() { Value = 0.ToString(), Text = "{All Companies}" }
+            };
             foreach (var company in dbCompanies)
             {
                 companiesList.Add(new SelectListItem() { Value = company.Id.ToString(), Text = company.Code });
@@ -51,8 +53,10 @@ namespace GrKouk.Web.Erp.Pages.CommonEntities.CrCashCatWarehouseItem
             ViewData["CompanyFilter"] = new SelectList(companiesList, "Value", "Text");
 
             var dbClientProfiles = _context.ClientProfiles.OrderBy(p => p.Name).AsNoTracking();
-            List<SelectListItem> clientProfilesList = new List<SelectListItem>();
-            clientProfilesList.Add(new SelectListItem() { Value = 0.ToString(), Text = "{All Profiles}" });
+            List<SelectListItem> clientProfilesList = new List<SelectListItem>
+            {
+                new SelectListItem() { Value = 0.ToString(), Text = "{All Profiles}" }
+            };
             foreach (var clientProfile in dbClientProfiles)
             {
                 clientProfilesList.Add(new SelectListItem() { Value = clientProfile.Id.ToString(), Text = clientProfile.Name });
@@ -60,8 +64,10 @@ namespace GrKouk.Web.Erp.Pages.CommonEntities.CrCashCatWarehouseItem
             ViewData["ClientProfileFilter"] = new SelectList(clientProfilesList, "Value", "Text");
 
             var dbCashRegCategories = _context.CashRegCategories.OrderBy(p => p.Name).AsNoTracking();
-            List<SelectListItem> cashRegRegCateroryList = new List<SelectListItem>();
-            cashRegRegCateroryList.Add(new SelectListItem() { Value = 0.ToString(), Text = "{All Categories}" });
+            List<SelectListItem> cashRegRegCateroryList = new List<SelectListItem>
+            {
+                new SelectListItem() { Value = 0.ToString(), Text = "{All Categories}" }
+            };
             foreach (var cashRegCategory in dbCashRegCategories)
             {
                 cashRegRegCateroryList.Add(new SelectListItem() { Value = cashRegCategory.Id.ToString(), Text = cashRegCategory.Name });

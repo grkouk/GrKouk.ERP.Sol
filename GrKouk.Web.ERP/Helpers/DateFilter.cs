@@ -96,8 +96,10 @@ namespace GrKouk.Web.ERP.Helpers
         public static DateFilterDates GetDateFilterDates(string dateFilterName)
         {
 
-            DateFilterDates dateFilter = new DateFilterDates();
-            dateFilter.FilterName = dateFilterName;
+            DateFilterDates dateFilter = new DateFilterDates
+            {
+                FilterName = dateFilterName
+            };
 
             switch (dateFilterName)
             {
@@ -110,13 +112,13 @@ namespace GrKouk.Web.ERP.Helpers
                     var y = DateTime.Now.Year;
                     if (m>1)
                     {
-                        m = m - 1;
+                        m--;
 
                     }
                     else
                     {
                         m = 12;
-                        y = y - 1;
+                        y--;
                     }
                     dateFilter.FromDate = new DateTime(y, m, 1);
                     dateFilter.ToDate = new DateTime(y, m, DateTime.DaysInMonth(y, m));
@@ -258,8 +260,10 @@ namespace GrKouk.Web.ERP.Helpers
          public static DateFilterDates GetRecTransDateFilterDates(string dateFilterName)
         {
 
-            DateFilterDates dateFilter = new DateFilterDates();
-            dateFilter.FilterName = dateFilterName;
+            DateFilterDates dateFilter = new DateFilterDates
+            {
+                FilterName = dateFilterName
+            };
 
             switch (dateFilterName)
             {
@@ -275,13 +279,13 @@ namespace GrKouk.Web.ERP.Helpers
                     var y = DateTime.Now.Year;
                     if (m>1)
                     {
-                        m = m - 1;
+                        m--;
 
                     }
                     else
                     {
                         m = 12;
-                        y = y - 1;
+                        y--;
                     }
                     dateFilter.FromDate = new DateTime(y, m, 1);
                     dateFilter.ToDate = new DateTime(y, m, DateTime.DaysInMonth(y, m));
@@ -308,7 +312,7 @@ namespace GrKouk.Web.ERP.Helpers
                     break;
                 case "LASTYEAR":
                     var ty = DateTime.Now.Year;
-                    ty = ty - 1;
+                    ty--;
                     dateFilter.FromDate = new DateTime(ty, 1, 1);
                     dateFilter.ToDate = new DateTime(ty, 12, DateTime.DaysInMonth(ty, 12));
                     break;
