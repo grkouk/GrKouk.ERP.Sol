@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.CashFlow;
-using GrKouk.Erp.Domain.DocDefinitions;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Mvc;

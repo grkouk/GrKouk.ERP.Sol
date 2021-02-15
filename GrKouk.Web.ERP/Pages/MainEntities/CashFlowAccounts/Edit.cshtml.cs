@@ -1,21 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
-using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.CashFlow;
-using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.CashFlowAccounts;
 using GrKouk.Erp.Dtos.Diaries;
-using GrKouk.Erp.Dtos.WarehouseItems;
 using GrKouk.Web.ERP.Data;
-using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NToastNotify;
 

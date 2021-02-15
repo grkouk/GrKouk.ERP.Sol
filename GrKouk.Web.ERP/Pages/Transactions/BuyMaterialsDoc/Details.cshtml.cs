@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.BuyDocuments;
 using GrKouk.Web.ERP.Data;
 using Microsoft.AspNetCore.Mvc;

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.DocDefinitions;
 using GrKouk.Erp.Domain.MediaEntities;

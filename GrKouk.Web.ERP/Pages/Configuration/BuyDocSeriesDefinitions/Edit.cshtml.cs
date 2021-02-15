@@ -16,12 +16,12 @@ namespace GrKouk.Web.Erp.Pages.Configuration.BuyDocSeriesDefinitions
     public class EditModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IToastNotification toastNotification;
+        private readonly IToastNotification _toastNotification;
 
         public EditModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            this.toastNotification = toastNotification;
+            _toastNotification = toastNotification;
         }
 
         [BindProperty]
@@ -73,7 +73,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.BuyDocSeriesDefinitions
             try
             {
                 await _context.SaveChangesAsync();
-                toastNotification.AddSuccessToastMessage("Saved");
+                _toastNotification.AddSuccessToastMessage("Saved");
             }
             catch (DbUpdateConcurrencyException)
             {

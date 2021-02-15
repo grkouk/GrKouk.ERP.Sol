@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -122,13 +119,13 @@ namespace GrKouk.Web.ERP.Controllers
                     }
                 }
 
-                DateTime beforePeriodDate = DateTime.Today;
+                //DateTime beforePeriodDate = DateTime.Today;
                 if (!string.IsNullOrEmpty(request.DateRange))
                 {
                     var datePeriodFilter = request.DateRange;
                     DateFilterDates dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
                     DateTime fromDate = dfDates.FromDate;
-                    beforePeriodDate = fromDate.AddDays(-1);
+                    //beforePeriodDate = fromDate.AddDays(-1);
                     DateTime toDate = dfDates.ToDate;
                     fullListIq = fullListIq.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
                     //transactionsList = transactionsList.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);

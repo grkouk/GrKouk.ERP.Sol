@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Web.ERP.Data;
 using Microsoft.AspNetCore.Mvc;

@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using GrKouk.Erp.Domain.CashFlow;
-using GrKouk.Erp.Domain.Shared;
 using GrKouk.Web.ERP.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

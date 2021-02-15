@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -640,7 +639,7 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpGet("FiscalPeriod")]
         public async Task<IActionResult> GetFiscalPeriod(DateTime forDate)
         {
-            Debug.Print("******Inside GetFiscal period " + forDate.ToString());
+            //Debug.Print("******Inside GetFiscal period " + forDate.ToString());
             var dateOfTrans = forDate;
             var fiscalPeriod = await _context.FiscalPeriods.FirstOrDefaultAsync(p =>
                 dateOfTrans >= p.StartDate && dateOfTrans <= p.EndDate);
