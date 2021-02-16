@@ -198,7 +198,7 @@
                    header: 'Amount',
                    text: '',
                    headerClass: 'small text-center',
-                   class: 'small text-right ',
+                   class: 'small text-end ',
                    classWhenCondition: '',
                    classCondition: {},
                    remoteReference: {}
@@ -354,7 +354,7 @@
                         success: function(result) {
                             console.log(result);
                             toastr.success("Delete", result.message);
-                            refreshTableData();
+                            indPgLib.refreshData();
 
                         },
                         complete: function() {
