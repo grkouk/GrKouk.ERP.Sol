@@ -124,16 +124,15 @@
                 console.log("Value of select");
                 console.log($('#ItemVm_TransactorId').val());
                 var selectedTransactorId = $('#ItemVm_TransactorId').val();
-                const Uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
-                const FinalUri = `${Uri}/GrkoukInfoApi/LastDiaryTransactionData?transactorId=${selectedTransactorId}`;
-                console.log(`Final Uri=${FinalUri}`);
+                const finalUri = `/api/GrkoukInfoApi/LastDiaryTransactionData?transactorId=${selectedTransactorId}`;
+                console.log(`Final Uri=${finalUri}`);
 
                 //const callParameters = {
                 //    headers: { "Content-Type": "application/json;charset=UTF-8" },
                 //    body: data,
                 //    method: "GET"
                 //};
-                fetch(FinalUri )
+                fetch(finalUri )
                     .then(function (response) {
                         if (response.ok) {
                             return response.json();
