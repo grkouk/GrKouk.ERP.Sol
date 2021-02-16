@@ -6,7 +6,6 @@
 }
 @section MyCss
     {
-    @*<link rel="stylesheet" href="~/css/bootstrap-multiselect.css" />*@
     <link rel="stylesheet" href="~/lib/bootstrap-select/css/bootstrap-select.min.css" />
 }
 <h4>Create Diary</h4>
@@ -17,39 +16,39 @@
         <input type="hidden" asp-for="ItemVm.SelectedDocTypes" />
         <input type="hidden" asp-for="ItemVm.SelectedMatNatures" />
         <input type="hidden" asp-for="ItemVm.SelectedTransTypes" />
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <label asp-for="ItemVm.Name" class="form-control-label small"></label>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label asp-for="ItemVm.Name" class="form-label small"></label>
                 <input asp-for="ItemVm.Name" class="form-control form-control-sm" />
                 <span asp-validation-for="ItemVm.Name" class="text-danger small"></span>
             </div>
-            <div class="form-group col-md-3">
-                <label asp-for="ItemVm.DiaryType" class="control-label small"></label>
-                <select asp-for="ItemVm.DiaryType" class="form-control form-control-sm" asp-items="ViewBag.diaryTypes"></select>
+            <div class="col-md-3">
+                <label asp-for="ItemVm.DiaryType" class="form-label small"></label>
+                <select asp-for="ItemVm.DiaryType" class="form-select form-select-sm" asp-items="ViewBag.diaryTypes"></select>
                 <span asp-validation-for="ItemVm.DiaryType" class="text-danger small"></span>
             </div>
         </div>
-        <div class="form-row">
-            <div class=" form-group col-md-3">
-                <label class="form-control-label small">Document Types to Include </label>
-                <select class="selectpicker form-control " id="DocTypes" multiple
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label class="form-label small">Document Types to Include </label>
+                <select class="selectpicker form-control form-control-sm" id="DocTypes" multiple
                         data-selected-text-format="count > 1"></select>
             </div>
-            <div class=" form-group col-md-3">
-                <label class="form-control-label small">Transactor Types </label>
-                <select class="selectpicker form-control " id="TransactorTypes" multiple
+            <div class="col-md-3">
+                <label class="form-label small">Transactor Types </label>
+                <select class="selectpicker form-control form-control-sm" id="TransactorTypes" multiple
                         data-selected-text-format="count > 1"
                         asp-items="ViewBag.transactorTypes"></select>
             </div>
-            <div class="form-group col-md-3">
-                <label class="form-control-label small">WarehouseItem Natures </label>
-                <select class="selectpicker form-control " id="MaterialNatureTypes" multiple
+            <div class="col-md-3">
+                <label class="form-label small">WarehouseItem Natures </label>
+                <select class="selectpicker form-control form-control-sm" id="MaterialNatureTypes" multiple
                         data-selected-text-format="count > 1"
                         asp-items="ViewBag.MaterialNatureTypes"></select>
             </div>
         </div>
-        <div class="form-row">
-            <div class="form-group">
+        <div class="row mb-3">
+            <div>
                 <input type="submit" value="Create" class="btn btn-primary btn-sm" />
             </div>
         </div>
@@ -63,7 +62,6 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
         <script src="~/lib/bootstrap-select/js/bootstrap-select.min.js"></script>
-    @*<script src="~/lib/multiselectListbox/multiselect.min.js"></script>*@
     <script>
         $(document).ready(function () {
 
@@ -85,41 +83,7 @@
             //var materialNatureList = @Html.Raw(Json.Serialize(ViewBag.MaterialNaturesList));
 
             console.log(buyDocTypeList);
-            var notUsed = () => {
-                $docTypes.multiselect({
-                    templates: {
-                        li: '<li ><a class="dropdown-item"><label class="m-0 pl-2 pr-0"></label></a></li>',
-                        ul: ' <ul style=" height:200px; overflow-y:scroll;" class="multiselect-container dropdown-menu p-1 m-0" overflow-y:scroll"></ul>',
-                        button: '<button type="button" style=" text-align:left;" class="multiselect dropdown-toggle" data-toggle="dropdown" data-flip="false"><span class="multiselect-selected-text"></span> <b class="caret"></b></button>',
-                        filter: '<li class="multiselect-item filter" ><div class="input-group m-0"><input class="form-control multiselect-search" type="text"></div></li>',
-                        filterClearBtn: '<span class="input-group-btn"><button class="btn multiselect-clear-filter" type="button"><i class="fas fa-minus-circle"></i></button></span>'
-                    },
-                    buttonContainer: '<div class="dropdown" />',
-                    buttonClass: 'btn btn-outline-secondary',
-                    includeSelectAllOption: true,
-                    onChange: function (element, checked) {
-                        console.log($('#DocTypes').val());
-                        var sel = $('#DocTypes option:selected');
-                        var selected = [];
-                        $(sel).each(function (index, item) {
-                            selected.push([$(this).val()]);
-                        });
-                        console.log('selected=' + selected);
-                        var sDocs = selected.toString();
-                        console.log('sDocs=' + sDocs);
-                        //#region CodeNot Used
-                        //var sDoc1 = selected.join(', ');
-                        //var sDoc1= $.each(selected, function(key, value) {
-                        //    var str = value.toString();
-                        //    return str;
-                        //}).get().join(', ');
-                        //console.log('sDoc1=' + sDoc1);
-                        //#endregion
-
-                        $('#ItemVm_SelectedDocTypes').val(sDocs);
-                    }
-                });
-            };
+           
 
             var diaryTypeChanged = () => {
                 var selectedDocType = $diaryType.val();
