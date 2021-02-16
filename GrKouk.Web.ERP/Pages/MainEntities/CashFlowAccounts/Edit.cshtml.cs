@@ -103,7 +103,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.CashFlowAccounts
                 ModelState.AddModelError("", "Concurrency error");
                 if (!ItemExists(ItemVm.Id))
                 {
-                    _toastNotification.AddErrorToastMessage("WarehouseItem was not found");
+                    _toastNotification.AddErrorToastMessage("Cash flow Account was not found");
                     return NotFound();
                 }
                 else
