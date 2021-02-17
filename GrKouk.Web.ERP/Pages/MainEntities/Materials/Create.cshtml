@@ -15,109 +15,109 @@
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="hidden" asp-for="@Model.CopyFromId" id="CopyFromId" />
         <input type="hidden" asp-for="WarehouseItemVm.SelectedCompanies" />
-        <div class="form-row">
-            <div class="form-group col-md-2">
-                <label asp-for="WarehouseItemVm.Code" class="control-label small"></label>
+        <div class="row mb-3">
+            <div class="col-md-2">
+                <label asp-for="WarehouseItemVm.Code" class="form-label small"></label>
                 <input asp-for="WarehouseItemVm.Code" class="form-control form-control-sm small" />
                 <span asp-validation-for="WarehouseItemVm.Code" class="text-danger small"></span>
             </div>
-            <div class="form-group col-md-6">
-                <label asp-for="WarehouseItemVm.Name" class="control-label small"></label>
+            <div class="col-md-6">
+                <label asp-for="WarehouseItemVm.Name" class="form-label small"></label>
                 <input asp-for="WarehouseItemVm.Name" class="form-control form-control-sm small" />
                 <span asp-validation-for="WarehouseItemVm.Name" class="text-danger small"></span>
             </div>
 
-            <div class="form-group col-md-3">
-                <label asp-for="WarehouseItemVm.WarehouseItemNature" class="control-label small"></label>
-                <select asp-for="WarehouseItemVm.WarehouseItemNature" class="form-control form-control-sm small" asp-items="ViewBag.MaterialNatures"></select>
+            <div class="col-md-3">
+                <label asp-for="WarehouseItemVm.WarehouseItemNature" class="form-label small"></label>
+                <select asp-for="WarehouseItemVm.WarehouseItemNature" class="form-select form-select-sm" asp-items="ViewBag.MaterialNatures"></select>
                 <span asp-validation-for="WarehouseItemVm.WarehouseItemNature" class="text-danger small"></span>
             </div>
-            <div class="form-group col-md-1 ">
+            <div class="col-md-1 ">
                 <label asp-for="WarehouseItemVm.Active" class="small"></label>
                 <input asp-for="WarehouseItemVm.Active" class="form-check form-control-sm" />
             </div>
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-12">
+        <div class="row mb-3">
+            <div class="col-md-12">
                 <label asp-for="WarehouseItemVm.ShortDescription" class="small"></label>
                 <textarea asp-for="WarehouseItemVm.ShortDescription" class="form-control form-control-sm small" placeholder="Σύντομη Περιγραφή"> </textarea>
                 <span asp-validation-for="WarehouseItemVm.ShortDescription" class="text-danger small"></span>
             </div>
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-12">
+        <div class="row mb-3">
+            <div class="col-md-12">
                 <label asp-for="WarehouseItemVm.Description" class="small"></label>
                 <textarea asp-for="WarehouseItemVm.Description" class="form-control form-control-sm small" placeholder="Περιγραφή"> </textarea>
                 <span asp-validation-for="WarehouseItemVm.Description" class="text-danger small"></span>
             </div>
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-4">
-                <label asp-for="WarehouseItemVm.MainMeasureUnitId" class="control-label small"></label>
-                <select asp-for="WarehouseItemVm.MainMeasureUnitId" class="form-control form-control-sm small" asp-items="ViewBag.MainMeasureUnitId"></select>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label asp-for="WarehouseItemVm.MainMeasureUnitId" class="form-label small"></label>
+                <select asp-for="WarehouseItemVm.MainMeasureUnitId" class="form-select form-select-sm small" asp-items="ViewBag.MainMeasureUnitId"></select>
             </div>
-            <div class="form-group col-md-3">
-                <label asp-for="WarehouseItemVm.SecondaryMeasureUnitId" class="control-label small"></label>
-                <select asp-for="WarehouseItemVm.SecondaryMeasureUnitId" class="form-control form-control-sm small" asp-items="ViewBag.SecondaryMeasureUnitId"></select>
+            <div class="col-md-3">
+                <label asp-for="WarehouseItemVm.SecondaryMeasureUnitId" class="form-label small"></label>
+                <select asp-for="WarehouseItemVm.SecondaryMeasureUnitId" class="form-select form-select-sm small" asp-items="ViewBag.SecondaryMeasureUnitId"></select>
             </div>
-            <div class="form-group col-md-1">
-                <label asp-for="WarehouseItemVm.SecondaryUnitToMainRate" class="control-label small"></label>
+            <div class="col-md-1">
+                <label asp-for="WarehouseItemVm.SecondaryUnitToMainRate" class="form-label small"></label>
                 <input asp-for="WarehouseItemVm.SecondaryUnitToMainRate" class="form-control form-control-sm small" />
                 <span asp-validation-for="WarehouseItemVm.SecondaryUnitToMainRate" class="text-danger small"></span>
             </div>
-            <div class="form-group col-md-3">
-                <label asp-for="WarehouseItemVm.BuyMeasureUnitId" class="control-label small"></label>
-                <select asp-for="WarehouseItemVm.BuyMeasureUnitId" class="form-control form-control-sm small" asp-items="ViewBag.BuyMeasureUnitId"></select>
+            <div class="col-md-3">
+                <label asp-for="WarehouseItemVm.BuyMeasureUnitId" class="form-label small"></label>
+                <select asp-for="WarehouseItemVm.BuyMeasureUnitId" class="form-select form-select-sm small" asp-items="ViewBag.BuyMeasureUnitId"></select>
             </div>
-            <div class="form-group col-md-1">
-                <label asp-for="WarehouseItemVm.BuyUnitToMainRate" class="control-label small"></label>
+            <div class="col-md-1">
+                <label asp-for="WarehouseItemVm.BuyUnitToMainRate" class="form-label small"></label>
                 <input asp-for="WarehouseItemVm.BuyUnitToMainRate" class="form-control form-control-sm small" />
                 <span asp-validation-for="WarehouseItemVm.BuyUnitToMainRate" class="text-danger small"></span>
             </div>
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-2">
-                <label asp-for="WarehouseItemVm.FpaDefId" class="control-label small"></label>
-                <select asp-for="WarehouseItemVm.FpaDefId" class="form-control form-control-sm small" asp-items="ViewBag.FpaDefId"></select>
+        <div class="row mb-3">
+            <div class="col-md-2">
+                <label asp-for="WarehouseItemVm.FpaDefId" class="form-label small"></label>
+                <select asp-for="WarehouseItemVm.FpaDefId" class="form-select form-select-sm small" asp-items="ViewBag.FpaDefId"></select>
             </div>
-            <div class="form-group col-md-3">
-                <label asp-for="WarehouseItemVm.BarCode" class="control-label small"></label>
+            <div class="col-md-3">
+                <label asp-for="WarehouseItemVm.BarCode" class="form-label small"></label>
                 <input asp-for="WarehouseItemVm.BarCode" class="form-control form-control-sm small" />
                 <span asp-validation-for="WarehouseItemVm.BarCode" class="text-danger small"></span>
             </div>
-            <div class="form-group col-md-3">
-                <label asp-for="WarehouseItemVm.ManufacturerCode" class="control-label small"></label>
+            <div class="col-md-3">
+                <label asp-for="WarehouseItemVm.ManufacturerCode" class="form-label small"></label>
                 <input asp-for="WarehouseItemVm.ManufacturerCode" class="form-control form-control-sm small" />
                 <span asp-validation-for="WarehouseItemVm.ManufacturerCode" class="text-danger small"></span>
             </div>
-            <div class="form-group col-md-2">
-                <label asp-for="WarehouseItemVm.PriceNetto" class="control-label small"></label>
+            <div class="col-md-2">
+                <label asp-for="WarehouseItemVm.PriceNetto" class="form-label small"></label>
                 <input asp-for="WarehouseItemVm.PriceNetto" class="form-control form-control-sm small" />
                 <span asp-validation-for="WarehouseItemVm.PriceNetto" class="text-danger small"></span>
             </div>
-            <div class="form-group col-md-2">
-                <label asp-for="WarehouseItemVm.PriceBrutto" class="control-label small"></label>
+            <div class="col-md-2">
+                <label asp-for="WarehouseItemVm.PriceBrutto" class="form-label small"></label>
                 <input asp-for="WarehouseItemVm.PriceBrutto" class="form-control form-control-sm small" />
                 <span asp-validation-for="WarehouseItemVm.PriceBrutto" class="text-danger small"></span>
             </div>
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-3">
-                <label asp-for="WarehouseItemVm.MaterialType" class="control-label small"></label>
-                <select asp-for="WarehouseItemVm.MaterialType" class="form-control form-control-sm small" asp-items="ViewBag.MaterialType"></select>
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label asp-for="WarehouseItemVm.MaterialType" class="form-label small"></label>
+                <select asp-for="WarehouseItemVm.MaterialType" class="form-select form-select-sm small" asp-items="ViewBag.MaterialType"></select>
                 <span asp-validation-for="WarehouseItemVm.MaterialType" class="text-danger small"></span>
             </div>
-            <div class="form-group col-md-3">
-                <label asp-for="WarehouseItemVm.MaterialCategoryId" class="control-label small"></label>
-                <select asp-for="WarehouseItemVm.MaterialCategoryId" class="form-control form-control-sm small" asp-items="ViewBag.MaterialCategoryId"></select>
+            <div class="col-md-3">
+                <label asp-for="WarehouseItemVm.MaterialCategoryId" class="form-label small"></label>
+                <select asp-for="WarehouseItemVm.MaterialCategoryId" class="form-select form-select-sm small" asp-items="ViewBag.MaterialCategoryId"></select>
             </div>
 
-            <div class="form-group col-md-3">
-                <label asp-for="WarehouseItemVm.CompanyId" class="control-label small"></label>
-                <select asp-for="WarehouseItemVm.CompanyId" class="form-control form-control-sm small" asp-items="ViewBag.CompanyId"></select>
+            <div class="col-md-3">
+                <label asp-for="WarehouseItemVm.CompanyId" class="form-label small"></label>
+                <select asp-for="WarehouseItemVm.CompanyId" class="form-select form-select-sm" asp-items="ViewBag.CompanyId"></select>
             </div>
-            <div class=" form-group col-md-3">
-                <label class="form-control-label small">Companies</label>
+            <div class="col-md-3">
+                <label class="form-label small">Companies</label>
                 <ejs-multiselect id="SelectedCompanies" dataSource="@ViewBag.CompaniesListJs" placeholder="Select Companies" mode="CheckBox"
                                  showDropDownIcon="true"
                                  showSelectAll="true" selectAllText="Select All" unSelectAllText="unSelect All">
@@ -125,8 +125,8 @@
                 </ejs-multiselect>
             </div>
         </div>
-        <div class="form-row">
-            <div class="form-group">
+        <div class="row mb-3">
+            <div>
                 <input type="submit" value="Create" class="btn btn-primary btn-sm" />
             </div>
         </div>
@@ -141,9 +141,10 @@
 </div>
 
 @section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
     <ejs-scripts></ejs-scripts>
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+   
     <script>
         $(document).ready(function () {
            
