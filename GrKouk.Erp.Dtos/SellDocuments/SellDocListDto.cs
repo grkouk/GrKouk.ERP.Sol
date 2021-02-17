@@ -32,17 +32,11 @@ namespace GrKouk.Erp.Dtos.SellDocuments
         public decimal AmountNet { get; set; }
         public decimal AmountDiscount { get; set; }
         [Display(Name = "Total Amount")]
-        public decimal TotalAmount
-        {
-            get => AmountNet + AmountFpa - AmountDiscount;
+        public decimal TotalAmount => AmountNet + AmountFpa - AmountDiscount;
 
-        }
         [Display(Name = "Total Net Amount")]
-        public decimal TotalNetAmount
-        {
-            get => AmountNet - AmountDiscount;
+        public decimal TotalNetAmount => AmountNet - AmountDiscount;
 
-        }
         public int CompanyId { get; set; }
 
         [Display(Name = "Company")]

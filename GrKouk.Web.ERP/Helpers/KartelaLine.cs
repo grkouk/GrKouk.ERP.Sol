@@ -16,6 +16,8 @@ namespace GrKouk.Web.ERP.Helpers
         public string RefCode { get; set; }
         public string SectionCode { get; set; }
         public int CreatorId { get; set; }
+        public int CreatorSectionId { get; set; }
+        public string CreatorSectionCode { get; set; }
         public decimal Debit { get; set; }
         public decimal Credit { get; set; }
         public decimal RunningTotal { get; set; }

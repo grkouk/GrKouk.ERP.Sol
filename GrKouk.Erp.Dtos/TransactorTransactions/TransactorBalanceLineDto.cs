@@ -67,4 +67,6 @@ namespace GrKouk.Erp.Dtos.TransactorTransactions
         [Display(Name = "Company")]
         public string CompanyCode { get; set; }
     }
+
+  
 }

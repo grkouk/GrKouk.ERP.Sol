@@ -1,7 +1,9 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using GrKouk.Erp.Domain.DocDefinitions;
+using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -19,7 +21,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.TransactorTransDocTypes
         }
 
         [BindProperty]
-        public TransTransactorDocTypeDef TransTransactorDocTypeDef { get; set; }
+        public TransTransactorDocTypeDef ItemVm { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -28,27 +30,41 @@ namespace GrKouk.Web.Erp.Pages.Configuration.TransactorTransDocTypes
                 return NotFound();
             }
 
-            TransTransactorDocTypeDef = await _context.TransTransactorDocTypeDefs
+            ItemVm = await _context.TransTransactorDocTypeDefs
                 .Include(t => t.Company)
                 .Include(t => t.TransTransactorDef).FirstOrDefaultAsync(m => m.Id == id);
 
-            if (TransTransactorDocTypeDef == null)
+            if (ItemVm == null)
             {
                 return NotFound();
             }
-           ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Code");
-           ViewData["TransTransactorDefId"] = new SelectList(_context.TransTransactorDefs, "Id", "Name");
+
+            LoadCombos();
             return Page();
         }
+        private void LoadCombos()
+        {
+            ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
+            ViewData["TransTransactorDefId"] = new SelectList(_context.TransTransactorDefs.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
+            ViewData["SectionList"] = SelectListHelpers.GetSectionsList(_context);
+            var transactorTypesListJs = _context.TransactorTypes.OrderBy(p => p.Name)
+                           .Select(p => new DiaryDocTypeItem()
+                           {
+                               Title = p.Name,
+                               Value = p.Id
+                           }).ToList();
+            ViewData["TransactorTypesListJs"] = transactorTypesListJs;
 
+        }
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
+                LoadCombos();
                 return Page();
             }
 
-            _context.Attach(TransTransactorDocTypeDef).State = EntityState.Modified;
+            _context.Attach(ItemVm).State = EntityState.Modified;
 
             try
             {
@@ -56,7 +72,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.TransactorTransDocTypes
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TransTransactorDocTypeDefExists(TransTransactorDocTypeDef.Id))
+                if (!TransTransactorDocTypeDefExists(ItemVm.Id))
                 {
                     return NotFound();
                 }

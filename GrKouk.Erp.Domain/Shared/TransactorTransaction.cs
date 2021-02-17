@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using GrKouk.Erp.Definitions;
@@ -8,6 +9,8 @@ namespace GrKouk.Erp.Domain.Shared
 {
     public class TransactorTransaction
     {
+        private ICollection<BuyDocTransPaymentMapping> _buyDocPaymentMappings;
+        private ICollection<SellDocTransPaymentMapping> _salesDocPaymentMappings;
         public int Id { get; set; }
 
         [DataType(DataType.Date)]
@@ -26,7 +29,7 @@ namespace GrKouk.Erp.Domain.Shared
         public int SectionId { get; set; }
         public virtual Section Section { get; set; }
         public int CreatorId { get; set; }
-
+        public int CreatorSectionId { get; set; }
         public int FiscalPeriodId { get; set; }
         public virtual FiscalPeriod FiscalPeriod { get; set; }
       
@@ -56,6 +59,15 @@ namespace GrKouk.Erp.Domain.Shared
 
         [Timestamp]
         public byte[] Timestamp { get; set; }
-
+        public virtual ICollection<BuyDocTransPaymentMapping> BuyDocPaymentMappings
+        {
+            get => _buyDocPaymentMappings ?? (_buyDocPaymentMappings = new List<BuyDocTransPaymentMapping>());
+            set => _buyDocPaymentMappings = value;
+        }
+        public virtual ICollection<SellDocTransPaymentMapping> SalesDocPaymentMappings
+        {
+            get => _salesDocPaymentMappings ?? (_salesDocPaymentMappings = new List<SellDocTransPaymentMapping>());
+            set => _salesDocPaymentMappings = value;
+        }
     }
 }

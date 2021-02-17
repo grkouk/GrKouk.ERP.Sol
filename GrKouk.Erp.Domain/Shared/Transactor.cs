@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace GrKouk.Erp.Domain.Shared
@@ -6,9 +7,9 @@ namespace GrKouk.Erp.Domain.Shared
     /// <summary>
     /// Transactor is a customer, a supplier etc
     /// </summary>
-  public  class Transactor
+    public class Transactor
     {
-        private ICollection<TransactorCompanyMapping> _transactorCompanyMappings;
+
         public int Id { get; set; }
 
         [MaxLength(15)]
@@ -36,15 +37,20 @@ namespace GrKouk.Erp.Domain.Shared
         public int TransactorTypeId { get; set; }
         public TransactorType TransactorType { get; set; }
         //public int CompanyId { get; set; }
-       // public virtual Company Company { get; set; }
-
+        // public virtual Company Company { get; set; }
+        private ICollection<TransactorCompanyMapping> _transactorCompanyMappings;
         public ICollection<TransactorCompanyMapping> TransactorCompanyMappings
         {
             get => _transactorCompanyMappings ?? (_transactorCompanyMappings = new List<TransactorCompanyMapping>());
             set => _transactorCompanyMappings = value;
         }
+        [DataType(DataType.Date)]
+        public DateTime DateCreated { get; set; }
 
-      
+        [DataType(DataType.Date)]
+        public DateTime DateLastModified { get; set; }
+
+
         [Timestamp]
         public byte[] Timestamp { get; set; }
     }

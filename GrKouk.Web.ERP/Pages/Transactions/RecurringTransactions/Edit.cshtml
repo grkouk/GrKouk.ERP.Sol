@@ -1292,8 +1292,8 @@
                 // if ($initialLoad.val()=='True'){
                 //     seriesId=docSeriesId;
                 // }
-                const uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
-                let finalUri = `${uri}/materials/RecSeriesData?seriesId=${seriesId}&docType=${recType}`;
+                //const uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
+                let finalUri = `/api/materials/RecSeriesData?seriesId=${seriesId}&docType=${recType}`;
                 fetch(finalUri)
                     .then(function(response) {
                         if (response.ok) {
@@ -1437,8 +1437,8 @@
                 $amountSum.attr('data-actualValue', sumGross);
             };
             var getWarehouseItemInfo = (itemId) => {
-                var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
-                var finalUri = `${uri}/materials/materialdata?warehouseItemId=${itemId}`;
+                //var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
+                var finalUri = `/api/materials/materialdata?warehouseItemId=${itemId}`;
                 $materialId.val(itemId);
                 console.log(finalUri);
 

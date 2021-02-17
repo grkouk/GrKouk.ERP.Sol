@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GrKouk.Erp.Definitions;
+using Newtonsoft.Json;
+using Syncfusion.EJ2.Base;
 
 namespace GrKouk.Web.ERP.Helpers
 {
@@ -22,6 +25,8 @@ namespace GrKouk.Web.ERP.Helpers
         public string ClientProfileFilter { get; set; }
         public string CashRegCategoryFilter { get; set; }
         public int DisplayCurrencyId { get; set; }
+        public string CodeToCompute { get; set; }
+        public int DocumentId { get; set; }
     }
 
     public class IndexDataTableResponse<T>
@@ -33,6 +38,7 @@ namespace GrKouk.Web.ERP.Helpers
         public decimal SumOfAmount { get; set; }
         public decimal SumOfNetAmount { get; set; }
         public decimal SumOfVatAmount { get; set; }
+        public decimal SumOfPayedAmount { get; set; }
         public decimal SumOfDebit { get; set; }
         public decimal SumOfCredit { get; set; }
         public decimal SumOfDifference { get; set; }
@@ -43,6 +49,7 @@ namespace GrKouk.Web.ERP.Helpers
         public decimal GrandSumOfAmount { get; set; }
         public decimal GrandSumOfNetAmount { get; set; }
         public decimal GrandSumOfVatAmount { get; set; }
+        public decimal GrandSumOfPayedAmount { get; set; }
         public decimal GrandSumOfDebit { get; set; }
         public decimal GrandSumOfCredit { get; set; }
         public decimal GrandSumOfDifference { get; set; }
@@ -54,4 +61,28 @@ namespace GrKouk.Web.ERP.Helpers
         public List<SearchListItem> Diaries { get; set; }
 
     }
+
+    public class CodeToComputeDefinition
+    {
+        public MainInfoSourceTypeEnum SrcType { get; set; }
+        public string[] MatNatures { get; set; }
+        public int[] TransTypes { get; set; }
+        public string[] CompSelected { get; set; }
+        public int[] DocTypesSelected { get; set; }
+
+    }
+
+    public class ExtendedDataManagerRequest : DataManagerRequest
+    {
+      
+        [JsonProperty(PropertyName = "transactorId", Required = Required.Default)]
+        public int? TransactorId { get; set; }
+        [JsonProperty(PropertyName = "displayCurrencyId", Required = Required.Default)]
+        public int DisplayCurrencyId { get; set; }
+        [JsonProperty(PropertyName = "companyFilter", Required = Required.Default)]
+        public string CompanyFilter { get; set; }
+        [JsonProperty(PropertyName = "dateRange", Required = Required.Default)]
+        public string DateRange { get; set; }
+    }
+
 }

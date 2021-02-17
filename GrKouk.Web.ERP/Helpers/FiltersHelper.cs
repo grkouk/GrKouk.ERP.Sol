@@ -42,6 +42,19 @@ namespace GrKouk.Web.ERP.Helpers
             };
             return filtersSelectList;
         }
+        public static List<SelectListItem> GetFinancialActionsList()
+        {
+            var listItems = Enum.GetValues(typeof(FinActionsEnum))
+                .Cast<FinActionsEnum>()
+                .Select(c => new SelectListItem()
+                {
+                    Value = ((int)c).ToString(),
+                    Text = c.GetDescription()
+                }).ToList();
+            //Αλλαγή του στοιχείου 0 από απροσδιόριστο σε {Ολές οι φύσεις είδους}
+           
+            return listItems;
+        }
         public static List<SelectListItem> GetWarehouseItemNaturesList()
         {
             var materialNatures = Enum.GetValues(typeof(WarehouseItemNatureEnum))
@@ -83,7 +96,21 @@ namespace GrKouk.Web.ERP.Helpers
 
             return companiesList;
         }
+        public static async Task<List<SelectListItem>> GetCompaniesFilterListAsync(ApiDbContext context)
+        {
 
+            var dbCompanies = await context.Companies.Where(t => t.Id != 1).OrderBy(p => p.Code)
+                .AsNoTracking()
+                .ToListAsync();
+            List<SelectListItem> companiesList = new List<SelectListItem>();
+            companiesList.Add(new SelectListItem() { Value = 0.ToString(), Text = "{All Companies}" });
+            foreach (var company in dbCompanies)
+            {
+                companiesList.Add(new SelectListItem() { Value = company.Id.ToString(), Text = company.Code });
+            }
+
+            return companiesList;
+        }
         public static async Task<List<SelectListItem>> GetTransactorsForTypeFilterListAsync(ApiDbContext context, string trType)
         {
             var trTypeObject = await context.TransactorTypes.FirstOrDefaultAsync(p => p.Code == trType);
@@ -109,6 +136,21 @@ namespace GrKouk.Web.ERP.Helpers
             }
 
             return transactorsList;
+        }
+        public static async Task<List<SelectListItem>> GetTransactorTypeFilterListAsync(ApiDbContext context)
+        {
+           
+            var dbTransactorTypes = await context.TransactorTypes.OrderBy(p => p.Code)
+                .AsNoTracking()
+                .ToListAsync();
+            List<SelectListItem> transactorTypes = new List<SelectListItem>();
+            transactorTypes.Add(new SelectListItem() { Value = 0.ToString(), Text = "{All Types}" });
+            foreach (var dbTransactorType in dbTransactorTypes)
+            {
+                transactorTypes.Add(new SelectListItem() { Value = dbTransactorType.Id.ToString(), Text = dbTransactorType.Code });
+            }
+           
+            return transactorTypes;
         }
         public static List<SelectListItem> GetTransactorsForTypeFilterList(ApiDbContext context, string trType)
         {
@@ -138,6 +180,18 @@ namespace GrKouk.Web.ERP.Helpers
         public static List<SelectListItem> GetCurrenciesFilterList(ApiDbContext context)
         {
             var dbItems = context.Currencies.OrderBy(p => p.Name).AsNoTracking();
+            List<SelectListItem> itemsList = new List<SelectListItem>();
+            //itemsList.Add(new SelectListItem() { Value = 0.ToString(), Text = "{All Companies}" });
+            foreach (var item in dbItems)
+            {
+                itemsList.Add(new SelectListItem() { Value = item.Id.ToString(), Text = item.Code });
+            }
+
+            return itemsList;
+        }
+        public static async Task<List<SelectListItem>> GetCurrenciesFilterListAsync(ApiDbContext context)
+        {
+            var dbItems = await context.Currencies.OrderBy(p => p.Name).AsNoTracking().ToListAsync();
             List<SelectListItem> itemsList = new List<SelectListItem>();
             //itemsList.Add(new SelectListItem() { Value = 0.ToString(), Text = "{All Companies}" });
             foreach (var item in dbItems)

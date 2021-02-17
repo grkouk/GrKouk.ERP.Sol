@@ -6,12 +6,14 @@ using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NToastNotify;
+
 
 namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
 {
@@ -25,6 +27,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
         public bool NotUpdatable;
         public bool InitialLoad = true;
         public int CopyFromId { get; set; }
+        public int CopyFromTransactorId { get; set; } = 0;
 
         public CreateModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
         {
@@ -36,11 +39,33 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
         public IActionResult OnGet(int? copyFromId)
         {
             LoadCombos();
+            CopyFromId = 0;
+            if (copyFromId != null)
+            {
+                CopyFromId = (int) copyFromId;
+
+                var transactionToModify = _context.TransactorTransactions
+                    .Include(t => t.Company)
+                    .Include(t => t.FiscalPeriod)
+                    .Include(t => t.Section)
+                    .Include(t => t.TransTransactorDocSeries)
+                    .Include(t => t.TransTransactorDocType)
+                    .Include(t => t.Transactor).FirstOrDefault(m => m.Id == CopyFromId);
+
+                if (transactionToModify == null)
+                {
+                    return NotFound();
+                }
+
+                ItemVm = _mapper.Map<TransactorTransCreateDto>(transactionToModify);
+                CopyFromTransactorId = ItemVm.TransactorId;
+            }
+
             return Page();
         }
 
-        [BindProperty]
-        public TransactorTransCreateDto ItemVm { get; set; }
+        [BindProperty] public TransactorTransCreateDto ItemVm { get; set; }
+
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
@@ -51,21 +76,16 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
             //_context.TransactorTransactions.Add(TransactorTransaction);
 
             #region Fiscal Period
-            //if (ItemVm.FiscalPeriodId <= 0)
-            //{
-            //    ModelState.AddModelError(string.Empty, "No Fiscal Period covers Transaction Date");
-            //    LoadCombos();
-            //    return Page();
-            //}
-            var fiscalPeriod = await _context.FiscalPeriods.FirstOrDefaultAsync(p =>
-                ItemVm.TransDate >= p.StartDate && ItemVm.TransDate <= p.EndDate);
+
+            var fiscalPeriod = await HelperFunctions.GetFiscalPeriod(_context, ItemVm.TransDate);
             if (fiscalPeriod == null)
             {
-               
                 ModelState.AddModelError(string.Empty, "No Fiscal Period covers Transaction Date");
                 return Page();
             }
+
             #endregion
+
             var spTransaction = _mapper.Map<TransactorTransaction>(ItemVm);
 
             var docSeries = await
@@ -78,6 +98,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
                 LoadCombos();
                 return Page();
             }
+
             await _context.Entry(docSeries).Reference(t => t.TransTransactorDocTypeDef).LoadAsync();
 
             var docTypeDef = docSeries.TransTransactorDocTypeDef;
@@ -87,17 +108,30 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
 
             var transTransactorDef = docTypeDef.TransTransactorDef;
 
+            #region Section Management
 
-            var section = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == _sectionCode);
-            if (section == null)
+            int sectionId = 0;
+            if (docTypeDef.SectionId == 0)
             {
+                var sectn = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == _sectionCode);
+                if (sectn == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Δεν υπάρχει το Section");
+                    LoadCombos();
+                    return Page();
+                }
 
-                ModelState.AddModelError(string.Empty, "Δεν υπάρχει το Section");
-                LoadCombos();
-                return Page();
+                sectionId = sectn.Id;
+            }
+            else
+            {
+                sectionId = docTypeDef.SectionId;
             }
 
-            spTransaction.SectionId = section.Id;
+            #endregion
+
+
+            spTransaction.SectionId = sectionId;
             spTransaction.TransTransactorDocTypeId = docSeries.TransTransactorDocTypeDefId;
             spTransaction.FiscalPeriodId = fiscalPeriod.Id;
             spTransaction.FinancialAction = transTransactorDef.FinancialTransAction;
@@ -138,27 +172,59 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
             _toastNotification.AddSuccessToastMessage("Saved");
 
 
-
             return RedirectToPage("./Index");
         }
+
         private void LoadCombos()
         {
             var transactorsListDb = _context.Transactors
-                .Include(p=>p.TransactorType)
-                .Where(p=>p.TransactorType.Code != "SYS.DTRANSACTOR")
+                .Include(p => p.TransactorType)
+                .Where(p => p.TransactorType.Code != "SYS.DTRANSACTOR")
                 .OrderBy(s => s.Name).AsNoTracking();
             List<SelectListItem> transactorsList = new List<SelectListItem>();
-            
+
             foreach (var dbTransactor in transactorsListDb)
             {
-
-                transactorsList.Add(new SelectListItem() { Value = dbTransactor.Id.ToString(), Text = dbTransactor.Name +"-"+ dbTransactor.TransactorType.Code });
+                transactorsList.Add(new SelectListItem()
+                {
+                    Value = dbTransactor.Id.ToString(),
+                    Text = dbTransactor.Name + "-" + dbTransactor.TransactorType.Code
+                });
             }
-            ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(c => c.Code).AsNoTracking(), "Id", "Code");
-            ViewData["FiscalPeriodId"] = new SelectList(_context.FiscalPeriods.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
+
+            ViewData["CompanyId"] =
+                new SelectList(_context.Companies.OrderBy(c => c.Code).AsNoTracking(), "Id", "Code");
+            ViewData["FiscalPeriodId"] =
+                new SelectList(_context.FiscalPeriods.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
             ViewData["TransactorId"] = new SelectList(transactorsList, "Value", "Text");
-            ViewData["TransTransactorDocSeriesId"] = new SelectList(_context.TransTransactorDocSeriesDefs.OrderBy(s => s.Name).AsNoTracking(), "Id", "Name");
-            //ViewData["SectionId"] = new SelectList(_context.Sections, "Id", "Code");
+            ViewData["TransTransactorDocSeriesId"] =
+                new SelectList(_context.TransTransactorDocSeriesDefs.OrderBy(s => s.Name).AsNoTracking(), "Id", "Name");
+            var transactorsListJs = _context.Transactors
+                .Include(p => p.TransactorType)
+                .Where(p => p.TransactorType.Code != "SYS.DTRANSACTOR")
+                .Select(p => new TransactorSelectListItem()
+                {
+                    Id = p.Id,
+                    TransactorName = p.Name,
+                    TransactorTypeId = p.TransactorType.Id,
+                    TransactorTypeCode = p.TransactorType.Code,
+                    Value = p.Id.ToString(),
+                    Text = $"{p.Name} {{{p.TransactorType.Code}}}"
+                })
+                .AsNoTracking()
+                .ToList();
+            ViewData["transactorsListJs"] = transactorsListJs;
+            var docTypeAllowedTransactorTypesListJs = _context.TransTransactorDocSeriesDefs
+                .Include(p => p.TransTransactorDocTypeDef)
+                .Select(p => new TransactorDocTypeAllowedTransactorTypes()
+                {
+                    DocSeriesId = p.Id,
+                    DocTypeId = p.TransTransactorDocTypeDefId,
+                    AllowedTypes = p.TransTransactorDocTypeDef.AllowedTransactorTypes
+                })
+                .AsNoTracking()
+                .ToList();
+            ViewData["docTypeAllowedTransactorTypesListJs"] = docTypeAllowedTransactorTypesListJs;
         }
     }
 }

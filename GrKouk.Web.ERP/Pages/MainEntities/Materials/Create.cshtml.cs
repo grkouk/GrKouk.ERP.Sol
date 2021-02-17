@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.Shared;
+using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Erp.Dtos.WarehouseItems;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
@@ -85,6 +87,13 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
             ViewData["SecondaryMeasureUnitId"] = new SelectList(_context.MeasureUnits.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
             ViewData["MaterialType"] = new SelectList(materialTypes, "Value", "Text");
            // ViewData["CashRegCategoryId"] = new SelectList(_context.CashRegCategories.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
+           var companiesListJs = _context.Companies.OrderBy(p => p.Name)
+               .Select(p => new DiaryDocTypeItem()
+               {
+                   Title = p.Name,
+                   Value = p.Id
+               }).ToList();
+           ViewData["CompaniesListJs"] = companiesListJs;
         }
 
         [BindProperty]
@@ -94,24 +103,41 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
         {
             if (!ModelState.IsValid)
             {
+                LoadCombos();
                 return Page();
             }
             var materialToAttach = _mapper.Map<WarehouseItem>(WarehouseItemVm);
-            _context.WarehouseItems.Add(materialToAttach);
+            await using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                materialToAttach.DateCreated=DateTime.Today;
+                materialToAttach.DateLastModified=DateTime.Today;
+                int[] companiesSelected = JsonSerializer.Deserialize<int[]>(WarehouseItemVm.SelectedCompanies);
+                foreach (var i in companiesSelected)
+                {
+
+                    materialToAttach.CompanyMappings.Add(new CompanyWarehouseItemMapping
+                    {
+                        CompanyId = i,
+                        WarehouseItemId = materialToAttach.Id
+                    });
+                }
+                await _context.WarehouseItems.AddAsync(materialToAttach);
                 await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
                 _toastNotification.AddSuccessToastMessage("WarehouseItem Created");
+                
                 return RedirectToPage("./Index");
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                await transaction.RollbackAsync();
+                ModelState.AddModelError("",e.Message);
                 _toastNotification.AddErrorToastMessage(e.Message);
+                LoadCombos();
                 return Page();
             }
-
-          
         }
     }
 }

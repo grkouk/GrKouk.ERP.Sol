@@ -61,6 +61,7 @@ namespace GrKouk.Erp.Dtos.WarehouseItems
         [Display(Name = "Μικτή Τιμή")]
         public decimal PriceBrutto { get; set; }
         public int CashRegCategoryId { get; set; }
+        public string SelectedCompanies { get; set; }
         [Timestamp]
         public byte[] Timestamp { get; set; }
 

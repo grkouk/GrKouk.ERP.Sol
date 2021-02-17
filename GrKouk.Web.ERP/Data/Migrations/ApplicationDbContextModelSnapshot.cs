@@ -15,9 +15,259 @@ namespace GrKouk.Web.ERP.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.4")
+                .HasAnnotation("ProductVersion", "3.1.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("GrKouk.Erp.Domain.CashFlow.CashFlowAccount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(20)")
+                        .HasMaxLength(20);
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(200)")
+                        .HasMaxLength(200);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasFilter("[Code] IS NOT NULL");
+
+                    b.ToTable("CashFlowAccounts");
+                });
+
+            modelBuilder.Entity("GrKouk.Erp.Domain.CashFlow.CashFlowAccountCompanyMapping", b =>
+                {
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CashFlowAccountId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CompanyId", "CashFlowAccountId");
+
+                    b.HasIndex("CashFlowAccountId");
+
+                    b.ToTable("CashFlowAccountCompanyMappings");
+                });
+
+            modelBuilder.Entity("GrKouk.Erp.Domain.CashFlow.CashFlowAccountTransaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<decimal>("AmountDiscount")
+                        .HasColumnType("decimal(18, 4)");
+
+                    b.Property<decimal>("AmountFpa")
+                        .HasColumnType("decimal(18, 4)");
+
+                    b.Property<decimal>("AmountNet")
+                        .HasColumnType("decimal(18, 4)");
+
+                    b.Property<int>("CashFlowAccountId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatorSectionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DocumentSeriesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DocumentTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Etiology")
+                        .HasColumnType("nvarchar(500)")
+                        .HasMaxLength(500);
+
+                    b.Property<int>("FinancialAction")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FiscalPeriodId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RefCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SectionId")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("Timestamp")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTime>("TransDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("TransDiscountAmount")
+                        .HasColumnType("decimal(18, 4)");
+
+                    b.Property<decimal>("TransFpaAmount")
+                        .HasColumnType("decimal(18, 4)");
+
+                    b.Property<decimal>("TransNetAmount")
+                        .HasColumnType("decimal(18, 4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CashFlowAccountId");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("CreatorId");
+
+                    b.HasIndex("CreatorSectionId");
+
+                    b.HasIndex("DocumentSeriesId");
+
+                    b.HasIndex("DocumentTypeId");
+
+                    b.HasIndex("FiscalPeriodId");
+
+                    b.HasIndex("SectionId");
+
+                    b.HasIndex("TransDate");
+
+                    b.ToTable("CashFlowAccountTransactions");
+                });
+
+            modelBuilder.Entity("GrKouk.Erp.Domain.CashFlow.CashFlowDocSeriesDef", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("CashFlowDocTypeDefId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(20)")
+                        .HasMaxLength(20);
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(200)")
+                        .HasMaxLength(200);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CashFlowDocTypeDefId");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasFilter("[Code] IS NOT NULL");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("CashFlowDocSeriesDefs");
+                });
+
+            modelBuilder.Entity("GrKouk.Erp.Domain.CashFlow.CashFlowDocTypeDef", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("CashFlowTransactionDefId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(20)")
+                        .HasMaxLength(20);
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(200)")
+                        .HasMaxLength(200);
+
+                    b.Property<int>("SectionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CashFlowTransactionDefId");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasFilter("[Code] IS NOT NULL");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("CashFlowDocTypeDefs");
+                });
+
+            modelBuilder.Entity("GrKouk.Erp.Domain.CashFlow.CashFlowTransactionDef", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(20)")
+                        .HasMaxLength(20);
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DefaultDocSeriesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FinancialTransAction")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(200)")
+                        .HasMaxLength(200);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasFilter("[Code] IS NOT NULL");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("CashFlowTransactionDefs");
+                });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.BuyDocSeriesDef", b =>
                 {
@@ -494,6 +744,10 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.Property<bool>("Active")
                         .HasColumnType("bit");
 
+                    b.Property<string>("AllowedTransactorTypes")
+                        .HasColumnType("nvarchar(200)")
+                        .HasMaxLength(200);
+
                     b.Property<string>("Code")
                         .HasColumnType("nvarchar(15)")
                         .HasMaxLength(15);
@@ -504,6 +758,9 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
+
+                    b.Property<int>("SectionId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("TransTransactorDefId")
                         .HasColumnType("int");
@@ -854,8 +1111,8 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasColumnType("nvarchar(500)")
+                        .HasMaxLength(500);
 
                     b.HasKey("Code");
 
@@ -870,6 +1127,9 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<decimal>("AmountDiscount")
+                        .HasColumnType("decimal(18, 4)");
+
+                    b.Property<decimal>("AmountExpenses")
                         .HasColumnType("decimal(18, 4)");
 
                     b.Property<decimal>("AmountFpa")
@@ -909,8 +1169,17 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.Property<int>("SecondaryUnitId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("UnitExpenses")
+                    b.Property<decimal>("TransUnitPrice")
                         .HasColumnType("decimal(18, 4)");
+
+                    b.Property<double>("TransactionQuantity")
+                        .HasColumnType("float");
+
+                    b.Property<float>("TransactionUnitFactor")
+                        .HasColumnType("real");
+
+                    b.Property<int>("TransactionUnitId")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal(18, 4)");
@@ -1111,6 +1380,21 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasIndex("CurrencyId");
 
                     b.ToTable("Companies");
+                });
+
+            modelBuilder.Entity("GrKouk.Erp.Domain.Shared.CompanyWarehouseItemMapping", b =>
+                {
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WarehouseItemId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CompanyId", "WarehouseItemId");
+
+                    b.HasIndex("WarehouseItemId");
+
+                    b.ToTable("CompanyWarehouseItemMappings");
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.CostCentre", b =>
@@ -1741,6 +2025,12 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .HasColumnType("nvarchar(15)")
                         .HasMaxLength(15);
 
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateLastModified")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("EMail")
                         .HasColumnType("nvarchar(200)")
                         .HasMaxLength(200);
@@ -1820,6 +2110,9 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.Property<int>("CreatorId")
                         .HasColumnType("int");
 
+                    b.Property<int>("CreatorSectionId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("DiscountRate")
                         .HasColumnType("decimal(18,2)");
 
@@ -1873,6 +2166,8 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasIndex("CompanyId");
 
                     b.HasIndex("CreatorId");
+
+                    b.HasIndex("CreatorSectionId");
 
                     b.HasIndex("FiscalPeriodId");
 
@@ -1940,6 +2235,12 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.Property<int>("CompanyId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateLastModified")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -2019,6 +2320,9 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.Property<decimal>("AmountDiscount")
                         .HasColumnType("decimal(18, 4)");
 
+                    b.Property<decimal>("AmountExpenses")
+                        .HasColumnType("decimal(18, 4)");
+
                     b.Property<decimal>("AmountFpa")
                         .HasColumnType("decimal(18, 4)");
 
@@ -2080,6 +2384,9 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("TransDiscountAmount")
+                        .HasColumnType("decimal(18, 4)");
+
+                    b.Property<decimal>("TransExpensesAmount")
                         .HasColumnType("decimal(18, 4)");
 
                     b.Property<decimal>("TransFpaAmount")
@@ -2389,6 +2696,99 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("GrKouk.Erp.Domain.CashFlow.CashFlowAccountCompanyMapping", b =>
+                {
+                    b.HasOne("GrKouk.Erp.Domain.CashFlow.CashFlowAccount", "CashFlowAccount")
+                        .WithMany("CompanyMappings")
+                        .HasForeignKey("CashFlowAccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GrKouk.Erp.Domain.Shared.Company", "Company")
+                        .WithMany("CashFlowAccountCompanyMappings")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GrKouk.Erp.Domain.CashFlow.CashFlowAccountTransaction", b =>
+                {
+                    b.HasOne("GrKouk.Erp.Domain.CashFlow.CashFlowAccount", "CashFlowAccount")
+                        .WithMany()
+                        .HasForeignKey("CashFlowAccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GrKouk.Erp.Domain.Shared.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GrKouk.Erp.Domain.CashFlow.CashFlowDocSeriesDef", "DocumentSeries")
+                        .WithMany()
+                        .HasForeignKey("DocumentSeriesId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GrKouk.Erp.Domain.CashFlow.CashFlowDocTypeDef", "DocumentType")
+                        .WithMany()
+                        .HasForeignKey("DocumentTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GrKouk.Erp.Domain.Shared.FiscalPeriod", "FiscalPeriod")
+                        .WithMany()
+                        .HasForeignKey("FiscalPeriodId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GrKouk.Erp.Domain.Shared.Section", "Section")
+                        .WithMany()
+                        .HasForeignKey("SectionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GrKouk.Erp.Domain.CashFlow.CashFlowDocSeriesDef", b =>
+                {
+                    b.HasOne("GrKouk.Erp.Domain.CashFlow.CashFlowDocTypeDef", "CashFlowDocTypeDefinition")
+                        .WithMany()
+                        .HasForeignKey("CashFlowDocTypeDefId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GrKouk.Erp.Domain.Shared.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GrKouk.Erp.Domain.CashFlow.CashFlowDocTypeDef", b =>
+                {
+                    b.HasOne("GrKouk.Erp.Domain.CashFlow.CashFlowTransactionDef", "CashFlowTransactionDefinition")
+                        .WithMany()
+                        .HasForeignKey("CashFlowTransactionDefId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GrKouk.Erp.Domain.Shared.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GrKouk.Erp.Domain.CashFlow.CashFlowTransactionDef", b =>
+                {
+                    b.HasOne("GrKouk.Erp.Domain.Shared.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.BuyDocSeriesDef", b =>
                 {
                     b.HasOne("GrKouk.Erp.Domain.DocDefinitions.BuyDocTypeDef", "BuyDocTypeDef")
@@ -2636,7 +3036,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("GrKouk.Erp.Domain.Shared.TransactorTransaction", "TransactorTransaction")
-                        .WithMany()
+                        .WithMany("BuyDocPaymentMappings")
                         .HasForeignKey("TransactorTransactionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -2701,6 +3101,21 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasOne("GrKouk.Erp.Domain.Shared.Currency", "Currency")
                         .WithMany()
                         .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GrKouk.Erp.Domain.Shared.CompanyWarehouseItemMapping", b =>
+                {
+                    b.HasOne("GrKouk.Erp.Domain.Shared.Company", "Company")
+                        .WithMany("WarehouseItemCompanyMappings")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GrKouk.Erp.Domain.Shared.WarehouseItem", "WarehouseItem")
+                        .WithMany("CompanyMappings")
+                        .HasForeignKey("WarehouseItemId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
@@ -2826,7 +3241,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("GrKouk.Erp.Domain.Shared.TransactorTransaction", "TransactorTransaction")
-                        .WithMany()
+                        .WithMany("SalesDocPaymentMappings")
                         .HasForeignKey("TransactorTransactionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();

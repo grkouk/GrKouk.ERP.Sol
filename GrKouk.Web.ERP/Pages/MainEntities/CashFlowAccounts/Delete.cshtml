@@ -1,0 +1,35 @@
+﻿@page
+@model DeleteModel
+
+@{
+    ViewData["Title"] = "Delete CashFlow Account";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>CashFlow Account</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.ItemVm.Code)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ItemVm.Code)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ItemVm.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ItemVm.Name)
+        </dd>
+        
+    </dl>
+    
+    <form method="post">
+        <input type="hidden" asp-for="ItemVm.Id" />
+        <input type="submit" value="Delete" class="btn btn-default" /> |
+        <a asp-page="./Index">Back to List</a>
+    </form>
+</div>

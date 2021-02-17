@@ -78,7 +78,9 @@
                         },
                         timeout: 10000,
                         onload: null,
-                        onerror: null,
+                        onerror: function(response) {
+                            console.log(response);
+                        },
                         ondata: null
                     },
                     load: 'create',

@@ -56,9 +56,10 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors
                 return Page();
             }
 
-            
+            //ToDo: enclose in transaction
             var transactorToAdd = _mapper.Map<Transactor>(ItemVm);
-            
+            transactorToAdd.DateCreated=DateTime.Today;
+            transactorToAdd.DateLastModified=DateTime.Today;
             _context.Transactors.Add(transactorToAdd);
 
             if (!String.IsNullOrEmpty(ItemVm.SelectedCompanies))

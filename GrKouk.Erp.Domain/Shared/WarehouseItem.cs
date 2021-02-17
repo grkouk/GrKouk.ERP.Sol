@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.DocDefinitions;
@@ -73,6 +74,19 @@ namespace GrKouk.Erp.Domain.Shared
             get => _warehouseItemCodes ?? (_warehouseItemCodes = new List<WrItemCode>());
             set => _warehouseItemCodes = value;
         }
+
+        private ICollection<CompanyWarehouseItemMapping> _companyWarehouseItemMappings;
+        public virtual ICollection<CompanyWarehouseItemMapping> CompanyMappings
+        {
+            get => _companyWarehouseItemMappings ?? (_companyWarehouseItemMappings = new List<CompanyWarehouseItemMapping>());
+            set => _companyWarehouseItemMappings = value;
+        }
+
+        [DataType(DataType.Date)]
+        public DateTime DateCreated { get; set; }
+
+        [DataType(DataType.Date)]
+        public DateTime DateLastModified { get; set; }
         [Timestamp]
         public byte[] Timestamp { get; set; }
     }

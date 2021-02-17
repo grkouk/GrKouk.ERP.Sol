@@ -46,30 +46,20 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
 
         public async Task<IActionResult> OnPostAsync(int? id)
         {
-            const string sectionCode = "SYS-SELL-COMBINED-SCN";
+            // const string sectionCode = "SYS-SELL-COMBINED-SCN";
             if (id == null)
             {
                 return NotFound();
             }
-            #region Section Management
-
-            var section = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == sectionCode);
-            if (section == null)
-            {
-                return NotFound(new
-                {
-                    error = "Could not locate section "
-                });
-            }
-            #endregion
+           
             SaleDocument = await _context.SellDocuments.FindAsync(id);
 
             if (SaleDocument != null)
             {
                 _context.SellDocLines.RemoveRange(_context.SellDocLines.Where(p => p.SellDocumentId == id));
-                _context.TransactorTransactions.RemoveRange(_context.TransactorTransactions.Where(p => p.SectionId == section.Id && p.CreatorId == id));
-                _context.WarehouseTransactions.RemoveRange(_context.WarehouseTransactions.Where(p => p.SectionId == section.Id && p.CreatorId == id));
-
+                _context.TransactorTransactions.RemoveRange(_context.TransactorTransactions.Where(p => p.CreatorSectionId == SaleDocument.SectionId && p.CreatorId == id));
+                _context.WarehouseTransactions.RemoveRange(_context.WarehouseTransactions.Where(p => p.SectionId == SaleDocument.SectionId && p.CreatorId == id));
+                _context.SellDocTransPaymentMappings.RemoveRange(_context.SellDocTransPaymentMappings.Where(p=>p.SellDocumentId==id));
                 _context.SellDocuments.Remove(SaleDocument);
 
                 await _context.SaveChangesAsync();

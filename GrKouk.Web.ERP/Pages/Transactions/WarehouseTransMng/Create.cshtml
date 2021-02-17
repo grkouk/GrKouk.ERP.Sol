@@ -190,8 +190,8 @@
                 var materialId = $material.val();
                 console.log("WarehouseItem change event ->" + materialId);
 
-                var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
-                var finalUri = `${uri}/materials/materialdata?warehouseItemId=${materialId}`;
+                //var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
+                var finalUri = `/api/materials/materialdata?warehouseItemId=${materialId}`;
                 fetch(finalUri)
                     .then(function(response) {
                         if (response.ok) {
@@ -232,8 +232,8 @@
                 var seriesId = $series.val();
                 console.log("Series change event ->" + seriesId);
 
-                var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
-                var finalUri = `${uri}/materials/WarehouseTransType?seriesId=${seriesId}`;
+                //var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
+                var finalUri = `/api/materials/WarehouseTransType?seriesId=${seriesId}`;
                 fetch(finalUri)
                     .then(function(response) {
                         if (response.ok) {
@@ -263,8 +263,8 @@
                 console.log("Inside transDate Changed");
 
                 var forDate = $transDate.val();
-                var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
-                var finalUri = `${uri}/materials/FiscalPeriod?forDate=${forDate}`;
+                //var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
+                var finalUri = `/api/materials/FiscalPeriod?forDate=${forDate}`;
                 fetch(finalUri)
                     .then(function(response) {
                         if (response.ok) {

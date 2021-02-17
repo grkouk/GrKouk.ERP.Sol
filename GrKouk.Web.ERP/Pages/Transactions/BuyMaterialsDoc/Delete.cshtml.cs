@@ -49,29 +49,16 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
             {
                 return NotFound();
             }
-            // #region Section Management
-            //
-            // var section = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == sectionCode);
-            // if (section == null)
-            // {
-            //    
-            //    
-            //     return NotFound(new
-            //     {
-            //         error = "Could not locate section "
-            //     });
-            // }
-            //
-            // #endregion
+           
             BuyDocument = await _context.BuyDocuments.FindAsync(id);
 
             if (BuyDocument != null)
             {
 
                 _context.BuyDocLines.RemoveRange(_context.BuyDocLines.Where(p => p.BuyDocumentId == id));
-                _context.TransactorTransactions.RemoveRange(_context.TransactorTransactions.Where(p => p.SectionId == BuyDocument.SectionId && p.CreatorId == id));
+                _context.TransactorTransactions.RemoveRange(_context.TransactorTransactions.Where(p => p.CreatorSectionId == BuyDocument.SectionId && p.CreatorId == id));
                 _context.WarehouseTransactions.RemoveRange(_context.WarehouseTransactions.Where(p => p.SectionId == BuyDocument.SectionId && p.CreatorId == id));
-
+                _context.BuyDocTransPaymentMappings.RemoveRange(_context.BuyDocTransPaymentMappings.Where(p=>p.BuyDocumentId==id));
                 _context.BuyDocuments.Remove(BuyDocument);
 
                 await _context.SaveChangesAsync();

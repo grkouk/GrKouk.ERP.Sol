@@ -1,4 +1,6 @@
-﻿namespace GrKouk.Erp.Dtos.Transactors
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace GrKouk.Erp.Dtos.Transactors
 {
     public class TransactorBigClass
     {

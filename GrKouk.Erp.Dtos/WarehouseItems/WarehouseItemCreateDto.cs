@@ -58,6 +58,6 @@ namespace GrKouk.Erp.Dtos.WarehouseItems
         public decimal PriceBrutto { get; set; }
         public int CompanyId { get; set; }
         public int CashRegCategoryId { get; set; }
-
+        public string SelectedCompanies { get; set; }
     }
 }

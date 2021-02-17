@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -61,8 +62,8 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
                 return BadRequest();
             }
             //If section is not our section the canot update disable input controls
-            NotUpdatable = transactionToModify.SectionId != section.Id;
-
+            //NotUpdatable = transactionToModify.SectionId != section.Id;
+            NotUpdatable=transactionToModify.CreatorId!=0;
             ItemVm = _mapper.Map<TransactorTransModifyDto>(transactionToModify);
             LoadCombos();
             return Page();
@@ -81,6 +82,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
                 LoadCombos();
                 return Page();
             }
+
             var spTransactionToAttach = _mapper.Map<TransactorTransaction>(ItemVm);
             #region Fiscal Period
             //var dateOfTrans = ItemVm.TransDate;
@@ -108,60 +110,94 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
                 .Reference(t => t.TransTransactorDef)
                 .Load();
             var transTransactorDef = docTypeDef.TransTransactorDef;
-
-
-            //spTransaction.SectionId = section.Id;
-            spTransactionToAttach.TransTransactorDocTypeId = docSeries.TransTransactorDocTypeDefId;
-            spTransactionToAttach.FinancialAction = transTransactorDef.FinancialTransAction;
-            switch (transTransactorDef.FinancialTransAction)
+            #region Section Management
+            int sectionId = 0;
+            if (docTypeDef.SectionId == 0)
             {
-                case FinActionsEnum.FinActionsEnumNoChange:
-                    spTransactionToAttach.TransDiscountAmount = 0;
-                    spTransactionToAttach.TransFpaAmount = 0;
-                    spTransactionToAttach.TransNetAmount = 0;
-                    break;
-                case FinActionsEnum.FinActionsEnumDebit:
-                    spTransactionToAttach.TransDiscountAmount = spTransactionToAttach.AmountDiscount;
-                    spTransactionToAttach.TransFpaAmount = spTransactionToAttach.AmountFpa;
-                    spTransactionToAttach.TransNetAmount = spTransactionToAttach.AmountNet;
-                    break;
-                case FinActionsEnum.FinActionsEnumCredit:
-                    spTransactionToAttach.TransDiscountAmount = spTransactionToAttach.AmountDiscount;
-                    spTransactionToAttach.TransFpaAmount = spTransactionToAttach.AmountFpa;
-                    spTransactionToAttach.TransNetAmount = spTransactionToAttach.AmountNet;
-                    break;
-                case FinActionsEnum.FinActionsEnumNegativeDebit:
-                    spTransactionToAttach.TransNetAmount = spTransactionToAttach.AmountNet * -1;
-                    spTransactionToAttach.TransFpaAmount = spTransactionToAttach.AmountFpa * -1;
-                    spTransactionToAttach.TransDiscountAmount = spTransactionToAttach.AmountDiscount * -1;
-                    break;
-                case FinActionsEnum.FinActionsEnumNegativeCredit:
-                    spTransactionToAttach.TransNetAmount = spTransactionToAttach.AmountNet * -1;
-                    spTransactionToAttach.TransFpaAmount = spTransactionToAttach.AmountFpa * -1;
-                    spTransactionToAttach.TransDiscountAmount = spTransactionToAttach.AmountDiscount * -1;
-                    break;
-                default:
-                    break;
-            }
-
-
-            _context.Attach(spTransactionToAttach).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TransactorTransactionExists(ItemVm.Id))
+                var sectn = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == _sectionCode);
+                if (sectn == null)
                 {
-                    return NotFound();
+                    ModelState.AddModelError(string.Empty, "Δεν υπάρχει το Section");
+                    LoadCombos();
+                    return Page();
                 }
-                else
+
+                sectionId = sectn.Id;
+            }
+            else
+            {
+                sectionId = docTypeDef.SectionId;
+            }
+            #endregion
+
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                spTransactionToAttach.SectionId = sectionId;
+                spTransactionToAttach.TransTransactorDocTypeId = docSeries.TransTransactorDocTypeDefId;
+                spTransactionToAttach.FinancialAction = transTransactorDef.FinancialTransAction;
+                switch (transTransactorDef.FinancialTransAction)
                 {
-                    throw;
+                    case FinActionsEnum.FinActionsEnumNoChange:
+                        spTransactionToAttach.TransDiscountAmount = 0;
+                        spTransactionToAttach.TransFpaAmount = 0;
+                        spTransactionToAttach.TransNetAmount = 0;
+                        break;
+                    case FinActionsEnum.FinActionsEnumDebit:
+                        spTransactionToAttach.TransDiscountAmount = spTransactionToAttach.AmountDiscount;
+                        spTransactionToAttach.TransFpaAmount = spTransactionToAttach.AmountFpa;
+                        spTransactionToAttach.TransNetAmount = spTransactionToAttach.AmountNet;
+                        break;
+                    case FinActionsEnum.FinActionsEnumCredit:
+                        spTransactionToAttach.TransDiscountAmount = spTransactionToAttach.AmountDiscount;
+                        spTransactionToAttach.TransFpaAmount = spTransactionToAttach.AmountFpa;
+                        spTransactionToAttach.TransNetAmount = spTransactionToAttach.AmountNet;
+                        break;
+                    case FinActionsEnum.FinActionsEnumNegativeDebit:
+                        spTransactionToAttach.TransNetAmount = spTransactionToAttach.AmountNet * -1;
+                        spTransactionToAttach.TransFpaAmount = spTransactionToAttach.AmountFpa * -1;
+                        spTransactionToAttach.TransDiscountAmount = spTransactionToAttach.AmountDiscount * -1;
+                        break;
+                    case FinActionsEnum.FinActionsEnumNegativeCredit:
+                        spTransactionToAttach.TransNetAmount = spTransactionToAttach.AmountNet * -1;
+                        spTransactionToAttach.TransFpaAmount = spTransactionToAttach.AmountFpa * -1;
+                        spTransactionToAttach.TransDiscountAmount = spTransactionToAttach.AmountDiscount * -1;
+                        break;
+                    default:
+                        break;
+                }
+
+               
+
+                try
+                {
+                    _context.Attach(spTransactionToAttach).State = EntityState.Modified;
+                    var docId = spTransactionToAttach.Id;
+                    _context.BuyDocTransPaymentMappings.RemoveRange(
+                        _context.BuyDocTransPaymentMappings
+                            .Where(p => p.TransactorTransactionId == docId));
+                    _context.SellDocTransPaymentMappings.RemoveRange(
+                        _context.SellDocTransPaymentMappings
+                            .Where(p => p.TransactorTransactionId == docId));
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    await transaction.RollbackAsync();
+                    ModelState.AddModelError(string.Empty, "Concurrency error");
+                    LoadCombos();
+                    return Page();
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    string msg = $"Error  {ex.Message} inner exception->{ex.InnerException?.Message}";
+                    ModelState.AddModelError(string.Empty,msg );
+                    LoadCombos();
+                    return Page();
                 }
             }
+           
 
             return RedirectToPage("./Index");
 

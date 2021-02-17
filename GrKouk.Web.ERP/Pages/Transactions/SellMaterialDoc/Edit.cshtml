@@ -216,22 +216,22 @@
                 </table>
             </div>
             <div class="form-row">
-                <div class="form-group">
+                <div class="form-group col-3">
                     <label class=" small">Net Amount</label>
                     <input asp-for="ItemVm.AmountNet" class="form-control form-control-sm small text-right" type="text" disabled />
                     <span asp-validation-for="ItemVm.AmountNet" class="text-danger small"></span>
                 </div>
-                <div class="form-group">
+                <div class="form-group col-3">
                     <label class=" small">Discount</label>
                     <input asp-for="ItemVm.AmountDiscount" class="form-control form-control-sm small text-right" type="text" disabled />
                     <span asp-validation-for="ItemVm.AmountDiscount" class="text-danger small"></span>
                 </div>
-                <div class="form-group">
+                <div class="form-group col-3">
                     <label class="small">Amount VAT</label>
                     <input asp-for="ItemVm.AmountFpa" class="form-control form-control-sm small text-right" type="text" disabled />
                     <span asp-validation-for="ItemVm.AmountFpa" class="text-danger small"></span>
                 </div>
-                <div class="form-group">
+                <div class="form-group col-3">
                     <label class=" small">Sum</label>
                     <input id="DocumentSum" type="text" class="form-control form-control-sm small text-right" disabled />
                 </div>
@@ -1250,8 +1250,8 @@
                 console.log("Inside Series Changed");
 
                 var seriesId = $transDocSeriesId.val();
-                var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
-                var finalUri = `${uri}/materials/SalesSeriesData?seriesId=${seriesId}`;
+                //var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
+                var finalUri = `/api/materials/SalesSeriesData?seriesId=${seriesId}`;
                 fetch(finalUri)
                     .then(function(response) {
                         if (response.ok) {
@@ -1397,8 +1397,8 @@
                 $amountSum.attr('data-actualValue', sumGross);
             };
              var getWarehouseItemInfo = (itemId) => {
-                var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
-                var finalUri = `${uri}/materials/materialdata?warehouseItemId=${itemId}`;
+                //var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
+                var finalUri = `/api/materials/materialdata?warehouseItemId=${itemId}`;
                 $materialId.val(itemId);
                 console.log(finalUri);
 

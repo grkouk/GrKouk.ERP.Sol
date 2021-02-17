@@ -101,7 +101,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
         [BindProperty]
         public SellDocCreateAjaxDto ItemVm { get; set; }
         public SellDocModifyDto CopyFromItemVm { get; set; }
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
             if (!ModelState.IsValid)
             {

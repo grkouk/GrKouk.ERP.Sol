@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GrKouk.Erp.Domain.MediaEntities;
 using GrKouk.Web.ERP.Data;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -13,9 +14,9 @@ namespace GrKouk.Web.ERP.Pages.MediaMng
     public class CreateModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
-        public CreateModel(ApiDbContext context, IHostingEnvironment hostingEnvironment)
+        public CreateModel(ApiDbContext context, IWebHostEnvironment hostingEnvironment)
         {
             _context = context;
             _hostingEnvironment = hostingEnvironment;
@@ -50,9 +51,26 @@ namespace GrKouk.Web.ERP.Pages.MediaMng
                 string newFileName = Guid.NewGuid() + extension;
                 string newFilenameOnServer = pathForUploadedFiles + "\\" + newFileName;
 
-                using (FileStream stream = new FileStream(newFilenameOnServer, FileMode.Create))
+                await using (FileStream stream = new FileStream(newFilenameOnServer, FileMode.Create))
                 {
-                    await uploadedFile.CopyToAsync(stream);
+                    try
+                    {
+                        await uploadedFile.CopyToAsync(stream);
+                    }
+                    catch (DirectoryNotFoundException e)
+                    {
+                        return StatusCode(StatusCodes.Status409Conflict, new {message=e.Message });
+                    }
+                    catch (UnauthorizedAccessException  e)
+                    {
+                        return StatusCode(StatusCodes.Status403Forbidden, new {message=e.Message });
+                    }
+                    catch (Exception e)
+                    {
+
+                        return StatusCode(StatusCodes.Status409Conflict, new {message=e.Message });
+                    }
+                    
                 }
 
                 MediaEntry.MediaFile = newFileName;
@@ -61,6 +79,7 @@ namespace GrKouk.Web.ERP.Pages.MediaMng
             }
             //return new JsonResult(listFiles);
             await _context.SaveChangesAsync();
+
             return RedirectToPage("./Index");
         }
     }

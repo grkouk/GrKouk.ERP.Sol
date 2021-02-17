@@ -25,7 +25,7 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors
             _context = context;
             _mapper = mapper;
         }
-
+        [BindProperty]
         public TransactorDetailDto Item { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)

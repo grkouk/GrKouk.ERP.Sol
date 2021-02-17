@@ -17,9 +17,9 @@ namespace GrKouk.Web.ERP.Controllers
     public class PictureController : ControllerBase
     {
         private readonly ApiDbContext _context;
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
-        public PictureController(ApiDbContext context, IHostingEnvironment hostingEnvironment)
+        public PictureController(ApiDbContext context, IWebHostEnvironment hostingEnvironment)
         {
             _context = context;
             _hostingEnvironment = hostingEnvironment;
@@ -54,17 +54,34 @@ namespace GrKouk.Web.ERP.Controllers
                 //</ Filename >
                 //< Copy File to Target >
 
-                using (FileStream stream = new FileStream(newFilenameOnServer, FileMode.Create))
+                await using (FileStream stream = new FileStream(newFilenameOnServer, FileMode.Create))
                 {
-                    await uploadedFile.CopyToAsync(stream);
+                    try
+                    {
+                        await uploadedFile.CopyToAsync(stream);
+                    }
+                    catch (DirectoryNotFoundException e)
+                    {
+                        return StatusCode(StatusCodes.Status409Conflict, new {message=e.Message });
+                    }
+                    catch (UnauthorizedAccessException  e)
+                    {
+                        return StatusCode(StatusCodes.Status403Forbidden, new {message=e.Message });
+                    }
+                    catch (Exception e)
+                    {
+
+                        return StatusCode(StatusCodes.Status409Conflict, new {message=e.Message });
+                    }
+                    
                 }
             }
 
             //------</ @Loop: Uploaded Files >------
 
 
-
-            return new JsonResult(listFiles);
+            return Ok(listFiles);
+            //return new JsonResult(listFiles);
         }
     }
 }

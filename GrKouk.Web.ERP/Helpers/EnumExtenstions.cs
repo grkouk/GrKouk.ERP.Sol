@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace GrKouk.Web.ERP.Helpers
 {
@@ -23,5 +24,6 @@ namespace GrKouk.Web.ERP.Helpers
             return GenericEnum.ToString();
         }
 
+       
     }
 }

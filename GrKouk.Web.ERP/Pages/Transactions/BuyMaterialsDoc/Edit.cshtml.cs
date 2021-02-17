@@ -55,7 +55,20 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
             {
                 return NotFound();
             }
+            //check for new values or old values
+            var vmLines = ItemVm.BuyDocLines;
+            foreach (var vmLine in vmLines)
+            {
+                if (vmLine.TransactionUnitId==0)
+                {
+                    vmLine.TransactionUnitId = vmLine.PrimaryUnitId;
+                    vmLine.TransactionUnitFactor = 1;
+                    vmLine.TransUnitPrice = vmLine.UnitPrice;
+                    vmLine.TransactionQuantity = vmLine.Quontity1;
+                }
 
+            }
+            
             LoadCombos();
             return Page();
         }
@@ -77,33 +90,33 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
             ViewData["PaymentMethodId"] = new SelectList(_context.PaymentMethods.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
         }
 
-        public async Task<IActionResult> OnPostAsync()
-        {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
+        //public async Task<IActionResult> OnPostAsync()
+        //{
+        //    //if (!ModelState.IsValid)
+        //    //{
+        //    //    return Page();
+        //    //}
 
-            _context.Attach(ItemVm).State = EntityState.Modified;
+        //    //_context.Attach(ItemVm).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!BuyMaterialsDocumentExists(ItemVm.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    //try
+        //    //{
+        //    //    await _context.SaveChangesAsync();
+        //    //}
+        //    //catch (DbUpdateConcurrencyException)
+        //    //{
+        //    //    if (!BuyMaterialsDocumentExists(ItemVm.Id))
+        //    //    {
+        //    //        return NotFound();
+        //    //    }
+        //    //    else
+        //    //    {
+        //    //        throw;
+        //    //    }
+        //    //}
 
-            return RedirectToPage("./Index2");
-        }
+        //    //return RedirectToPage("./Index2");
+        //}
 
         private bool BuyMaterialsDocumentExists(int id)
         {

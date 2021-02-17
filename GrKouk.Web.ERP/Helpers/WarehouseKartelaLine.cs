@@ -5,6 +5,8 @@ namespace GrKouk.Web.ERP.Helpers
 {
     public class WarehouseKartelaLine
     {
+        public int Id { get; set; }
+
         [DataType(DataType.Date)]
 
         public DateTime TransDate { get; set; }

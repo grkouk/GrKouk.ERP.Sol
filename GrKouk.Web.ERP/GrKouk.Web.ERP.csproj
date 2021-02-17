@@ -6,24 +6,60 @@
     <Authors>George Koukoudis</Authors>
     <Company>GrKouk</Company>
     <Copyright>George Koukoudis</Copyright>
+    <Version>0.8.1.0</Version>
+    <PackageVersion>0.8.1.0</PackageVersion>
+    <AssemblyVersion>0.8.1.0</AssemblyVersion>
+    <FileVersion>0.8.1.0</FileVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Data\Migrations\20200531135638_trans.cs" />
+    <Compile Remove="Data\Migrations\20200531135638_trans.Designer.cs" />
+    <Compile Remove="Data\Migrations\20201105105344_CashFlowSectionEntities.cs" />
+    <Compile Remove="Data\Migrations\20201105105344_CashFlowSectionEntities.Designer.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.4" />
-    <PackageReference Include="NToastNotify" Version="6.1.3" />
-    <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="18.1.0.52" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
+    <PackageReference Include="NToastNotify" Version="7.0.0" />
+    <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="18.4.0.35" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\GrKouk.Erp.Definitions\GrKouk.Erp.Definitions.csproj" />
     <ProjectReference Include="..\GrKouk.Erp.Domain\GrKouk.Erp.Domain.csproj" />
     <ProjectReference Include="..\GrKouk.Erp.Dtos\GrKouk.Erp.Dtos.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove=".eslintrc.json" />
+    <Content Remove="package.json" />
+    <Content Remove="Pages\_MainInfo.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include=".eslintrc.json" />
+    <None Include="package.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Pages\Components\" />
+    <Folder Include="Pages\Configuration\CashFlow\CFADocTypeDefs\" />
+    <Folder Include="Pages\Configuration\CashFlow\CFADocSeriesDefs\" />
+    <Folder Include="wwwroot\productimages\" />
   </ItemGroup>
 
 </Project>
