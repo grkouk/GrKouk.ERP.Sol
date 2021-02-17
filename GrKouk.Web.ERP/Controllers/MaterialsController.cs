@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -535,34 +534,36 @@ namespace GrKouk.Web.ERP.Controllers
                     error = "WarehouseItem not found "
                 });
             }
-            var unitList = new List<ProductUnit>();
-            unitList.Add(new ProductUnit()
+            var unitList = new List<ProductUnit>
             {
-                UnitId = materialData.MainMeasureUnitId,
-                UnitCode = materialData.MainMeasureUnit.Code,
-                UnitName = materialData.MainMeasureUnit.Name,
-                UnitType = UnitTypeEnum.BaseUnitType,
-                IsDefault = false,
-                UnitFactor = 1
-            });
-            unitList.Add(new ProductUnit()
-            {
-                UnitId = materialData.SecondaryMeasureUnitId,
-                UnitCode = materialData.SecondaryMeasureUnit.Code,
-                UnitName = materialData.SecondaryMeasureUnit.Name,
-                UnitType = UnitTypeEnum.SecondaryUnitType,
-                IsDefault = false,
-                UnitFactor = materialData.SecondaryUnitToMainRate
-            });
-            unitList.Add(new ProductUnit()
-            {
-                UnitId = materialData.BuyMeasureUnitId,
-                UnitCode = materialData.BuyMeasureUnit.Code,
-                UnitName = materialData.BuyMeasureUnit.Name,
-                UnitType = UnitTypeEnum.BuyUnitType,
-                IsDefault = true,
-                UnitFactor = materialData.BuyUnitToMainRate
-            });
+                new ProductUnit()
+                {
+                    UnitId = materialData.MainMeasureUnitId,
+                    UnitCode = materialData.MainMeasureUnit.Code,
+                    UnitName = materialData.MainMeasureUnit.Name,
+                    UnitType = UnitTypeEnum.BaseUnitType,
+                    IsDefault = false,
+                    UnitFactor = 1
+                },
+                new ProductUnit()
+                {
+                    UnitId = materialData.SecondaryMeasureUnitId,
+                    UnitCode = materialData.SecondaryMeasureUnit.Code,
+                    UnitName = materialData.SecondaryMeasureUnit.Name,
+                    UnitType = UnitTypeEnum.SecondaryUnitType,
+                    IsDefault = false,
+                    UnitFactor = materialData.SecondaryUnitToMainRate
+                },
+                new ProductUnit()
+                {
+                    UnitId = materialData.BuyMeasureUnitId,
+                    UnitCode = materialData.BuyMeasureUnit.Code,
+                    UnitName = materialData.BuyMeasureUnit.Name,
+                    UnitType = UnitTypeEnum.BuyUnitType,
+                    IsDefault = true,
+                    UnitFactor = materialData.BuyUnitToMainRate
+                }
+            };
             //get special codes
             //foreach (var spCode in materialData.WarehouseItemCodes)
             //{
@@ -640,7 +641,7 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpGet("FiscalPeriod")]
         public async Task<IActionResult> GetFiscalPeriod(DateTime forDate)
         {
-            Debug.Print("******Inside GetFiscal period " + forDate.ToString());
+            //Debug.Print("******Inside GetFiscal period " + forDate.ToString());
             var dateOfTrans = forDate;
             var fiscalPeriod = await _context.FiscalPeriods.FirstOrDefaultAsync(p =>
                 dateOfTrans >= p.StartDate && dateOfTrans <= p.EndDate);

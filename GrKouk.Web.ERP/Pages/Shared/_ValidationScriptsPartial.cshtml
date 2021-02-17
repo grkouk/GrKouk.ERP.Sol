@@ -87,9 +87,15 @@
         if (element.type === "date") {
             value = new Date(value).toLocaleDateString();
         }
-        val = Globalize.parseDate(value,
+        var val = Globalize.parseDate(value,
             $.validator.methods.dateGlobalizeOptions.dateParseFormat);
         return this.optional(element) || !/Invalid|NaN/.test(new Date(val).toString());
     };
+    var settings = {
+        validClass: "is-valid",
+        errorClass: "is-invalid"
 
+    }; 
+    $.validator.setDefaults(settings);
+    $.validator.unobtrusive.options = settings;
 </script>

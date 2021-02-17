@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
-using GrKouk.Erp.Domain.DocDefinitions;
-using GrKouk.Erp.Domain.Shared;
 
 namespace GrKouk.Erp.Domain.CashFlow
 {
@@ -16,6 +13,7 @@ namespace GrKouk.Erp.Domain.CashFlow
 
         [MaxLength(200)]
         public string Name { get; set; }
+
         [DataType(DataType.Date)]
         public DateTime DateCreated { get; set; }
 

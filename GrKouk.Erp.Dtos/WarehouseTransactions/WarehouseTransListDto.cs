@@ -88,7 +88,7 @@ namespace GrKouk.Erp.Dtos.WarehouseTransactions
         {
             get
             {
-                decimal ret = 0;
+                decimal ret;
                 if (InvoicedValueAction.Equals(InventoryValueActionEnum.InventoryValueActionEnumIncrease) || 
                     InvoicedValueAction.Equals(InventoryValueActionEnum.InventoryValueActionEnumDecrease))
                 {
@@ -128,7 +128,7 @@ namespace GrKouk.Erp.Dtos.WarehouseTransactions
         {
             get
             {
-                decimal ret = 0;
+                decimal ret;
                 if (InvoicedValueAction.Equals(InventoryValueActionEnum.InventoryValueActionEnumIncrease) ||
                     InvoicedValueAction.Equals(InventoryValueActionEnum.InventoryValueActionEnumDecrease))
                 {

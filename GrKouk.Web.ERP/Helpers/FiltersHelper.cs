@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -87,8 +86,10 @@ namespace GrKouk.Web.ERP.Helpers
 
             //TODO: Use All Companies code from settings page and chenge author?
             var dbCompanies = context.Companies.Where(t => t.Id != 1).OrderBy(p => p.Code).AsNoTracking();
-            List<SelectListItem> companiesList = new List<SelectListItem>();
-            companiesList.Add(new SelectListItem() { Value = 0.ToString(), Text = "{All Companies}" });
+            List<SelectListItem> companiesList = new List<SelectListItem>
+            {
+                new SelectListItem() { Value = 0.ToString(), Text = "{All Companies}" }
+            };
             foreach (var company in dbCompanies)
             {
                 companiesList.Add(new SelectListItem() { Value = company.Id.ToString(), Text = company.Code });
@@ -102,8 +103,10 @@ namespace GrKouk.Web.ERP.Helpers
             var dbCompanies = await context.Companies.Where(t => t.Id != 1).OrderBy(p => p.Code)
                 .AsNoTracking()
                 .ToListAsync();
-            List<SelectListItem> companiesList = new List<SelectListItem>();
-            companiesList.Add(new SelectListItem() { Value = 0.ToString(), Text = "{All Companies}" });
+            List<SelectListItem> companiesList = new List<SelectListItem>
+            {
+                new SelectListItem() { Value = 0.ToString(), Text = "{All Companies}" }
+            };
             foreach (var company in dbCompanies)
             {
                 companiesList.Add(new SelectListItem() { Value = company.Id.ToString(), Text = company.Code });
@@ -143,8 +146,10 @@ namespace GrKouk.Web.ERP.Helpers
             var dbTransactorTypes = await context.TransactorTypes.OrderBy(p => p.Code)
                 .AsNoTracking()
                 .ToListAsync();
-            List<SelectListItem> transactorTypes = new List<SelectListItem>();
-            transactorTypes.Add(new SelectListItem() { Value = 0.ToString(), Text = "{All Types}" });
+            List<SelectListItem> transactorTypes = new List<SelectListItem>
+            {
+                new SelectListItem() { Value = 0.ToString(), Text = "{All Types}" }
+            };
             foreach (var dbTransactorType in dbTransactorTypes)
             {
                 transactorTypes.Add(new SelectListItem() { Value = dbTransactorType.Id.ToString(), Text = dbTransactorType.Code });

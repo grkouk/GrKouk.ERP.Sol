@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -90,33 +89,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
             ViewData["PaymentMethodId"] = new SelectList(_context.PaymentMethods.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
         }
 
-        //public async Task<IActionResult> OnPostAsync()
-        //{
-        //    //if (!ModelState.IsValid)
-        //    //{
-        //    //    return Page();
-        //    //}
-
-        //    //_context.Attach(ItemVm).State = EntityState.Modified;
-
-        //    //try
-        //    //{
-        //    //    await _context.SaveChangesAsync();
-        //    //}
-        //    //catch (DbUpdateConcurrencyException)
-        //    //{
-        //    //    if (!BuyMaterialsDocumentExists(ItemVm.Id))
-        //    //    {
-        //    //        return NotFound();
-        //    //    }
-        //    //    else
-        //    //    {
-        //    //        throw;
-        //    //    }
-        //    //}
-
-        //    //return RedirectToPage("./Index2");
-        //}
+       
 
         private bool BuyMaterialsDocumentExists(int id)
         {

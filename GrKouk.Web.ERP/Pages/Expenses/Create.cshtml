@@ -3,7 +3,8 @@
 @using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
 @{
-    ViewData["Title"] = "Create";
+        Layout = "_LayoutEntryFormTransaction";
+        ViewData["Title"] = "Νέο Εξοδο";
 }
 
 <h4>Create Diary Transaction</h4>
@@ -12,63 +13,73 @@
     <form method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
         <input type="hidden" asp-for="@Model.CopyFromId" id="CopyFromId" />
-        <div class="form-row">
+        <div class="row mb-3">
 
-            <div class="form-group col-md-2">
-                <label asp-for="FinDiaryTransaction.TransactionDate" class="small"></label>
-                <input asp-for="FinDiaryTransaction.TransactionDate" class="form-control form-control-sm" />
-                <span asp-validation-for="FinDiaryTransaction.TransactionDate" class="text-danger small"></span>
+            <div class="col-md-2">
+
+                <div class="form-floating">
+                     <input asp-for="ItemVm.TransactionDate" class="form-control form-control-sm" placeholder="Trans date"/>
+                    <label asp-for="ItemVm.TransactionDate" class="small"></label>
+                    <span asp-validation-for="ItemVm.TransactionDate" class="text-danger small"></span>
+                </div>
             </div>
-            <div class="form-group col-md-4">
-                <label asp-for="FinDiaryTransaction.TransactorId" class="small"></label>
-                <select asp-for="FinDiaryTransaction.TransactorId" class="form-control form-control-sm"
-                        onchange=""
-                        asp-items="ViewBag.TransactorId"></select>
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group col-md-2">
-                <label asp-for="FinDiaryTransaction.ReferenceCode" class="small"></label>
-                <input asp-for="FinDiaryTransaction.ReferenceCode" class="form-control form-control-sm" />
-                <span asp-validation-for="FinDiaryTransaction.ReferenceCode" class="text-danger small"></span>
-            </div>
-            <div class="form-group col-md-4">
-                <label asp-for="FinDiaryTransaction.FinTransCategoryId" class="small"></label>
-                <select asp-for="FinDiaryTransaction.FinTransCategoryId" class="form-control form-control-sm" asp-items="ViewBag.FinTransCategoryId"></select>
+            <div class="col-md-4">
+
+                <div class="form-floating">
+                    <select asp-for="ItemVm.TransactorId" class="form-select form-select-sm" asp-items="ViewBag.TransactorId"></select>
+                    <label asp-for="ItemVm.TransactorId" class="small"></label>
+                </div>
             </div>
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-2">
+        <div class="row mb-3">
+            <div class="col-md-2">
+
+                <div class="form-floating">
+                    <input asp-for="ItemVm.ReferenceCode" class="form-control form-control-sm"/>
+                    <label asp-for="ItemVm.ReferenceCode" class="small"></label>
+                    <span asp-validation-for="ItemVm.ReferenceCode" class="text-danger small"></span>
+                </div>
+            </div>
+            <div class="col-md-4">
+
+                <div class="form-floating">
+                    <select asp-for="ItemVm.FinTransCategoryId" class="form-select form-select-sm" asp-items="ViewBag.FinTransCategoryId"></select>
+                    <label asp-for="ItemVm.FinTransCategoryId" class="small"></label>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-2">
                 <label class="small" id="test"></label>
-                <label asp-for="FinDiaryTransaction.CompanyId" class="small"></label>
-                <select asp-for="FinDiaryTransaction.CompanyId" class="form-control form-control-sm" asp-items="ViewBag.CompanyId"></select>
+                <label asp-for="ItemVm.CompanyId" class="small"></label>
+                <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm" asp-items="ViewBag.CompanyId"></select>
             </div>
-            <div class="form-group col-md-4">
-                <label asp-for="FinDiaryTransaction.CostCentreId" class="small"></label>
-                <select asp-for="FinDiaryTransaction.CostCentreId" class="form-control form-control-sm" asp-items="ViewBag.CostCentreId"></select>
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <label asp-for="FinDiaryTransaction.Description" class="small"></label>
-                <textarea asp-for="FinDiaryTransaction.Description" class="form-control form-control-sm" placeholder="Description of Transaction"></textarea>
-                <span asp-validation-for="FinDiaryTransaction.Description" class="text-danger small"></span>
+            <div class="col-md-4">
+                <label asp-for="ItemVm.CostCentreId" class="small"></label>
+                <select asp-for="ItemVm.CostCentreId" class="form-select form-select-sm" asp-items="ViewBag.CostCentreId"></select>
             </div>
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-3">
-                <label asp-for="FinDiaryTransaction.AmountFpa" class="small"></label>
-                <input asp-for="FinDiaryTransaction.AmountFpa" class="form-control form-control-sm" />
-                <span asp-validation-for="FinDiaryTransaction.AmountFpa" class="text-danger small"></span>
-            </div>
-            <div class="form-group col-md-3">
-                <label asp-for="FinDiaryTransaction.AmountNet" class="small"></label>
-                <input asp-for="FinDiaryTransaction.AmountNet" class="form-control form-control-sm" />
-                <span asp-validation-for="FinDiaryTransaction.AmountNet" class="text-danger small"></span>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label asp-for="ItemVm.Description" class="small"></label>
+                <textarea asp-for="ItemVm.Description" class="form-control form-control-sm" placeholder="Description of Transaction"></textarea>
+                <span asp-validation-for="ItemVm.Description" class="text-danger small"></span>
             </div>
         </div>
-        <div class="form-row">
-            <div class="form-group">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label asp-for="ItemVm.AmountFpa" class="small"></label>
+                <input asp-for="ItemVm.AmountFpa" class="form-control form-control-sm" />
+                <span asp-validation-for="ItemVm.AmountFpa" class="text-danger small"></span>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="ItemVm.AmountNet" class="small"></label>
+                <input asp-for="ItemVm.AmountNet" class="form-control form-control-sm" />
+                <span asp-validation-for="ItemVm.AmountNet" class="text-danger small"></span>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div>
                 <input type="submit" value="Create" class="btn btn-primary btn-sm" />
             </div>
         </div>
@@ -88,11 +99,11 @@
             console.log("Inside Document ready");
 
             var companyCurrencyListJs = @Html.Raw(Json.Serialize(ViewBag.CompanyCurrencyListJs));
-            $('#FinDiaryTransaction_CompanyId').change(() => {
+            $('#ItemVm_CompanyId').change(() => {
                 console.log("Value of select");
-                console.log($('#FinDiaryTransaction_CompanyId').val());
+                console.log($('#ItemVm_CompanyId').val());
                 console.log(companyCurrencyListJs);
-                let companyId=$('#FinDiaryTransaction_CompanyId').val();
+                let companyId=$('#ItemVm_CompanyId').val();
                 if (companyId) {
                     let obj = companyCurrencyListJs.find(o => o.companyId == companyId);
                     if (obj) {
@@ -109,21 +120,19 @@
                 
             });
 
-            $('#FinDiaryTransaction_TransactorId').change(() => {
+            $('#ItemVm_TransactorId').change(() => {
                 console.log("Value of select");
-                console.log($('#FinDiaryTransaction_TransactorId').val());
-                var selectedTransactorId = $('#FinDiaryTransaction_TransactorId').val();
-               // var a = '@Url.Action("GetLastDiaryTransactionDataAsync", "GrkoukInfoApi")';
-                const Uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
-                const FinalUri = `${Uri}/GrkoukInfoApi/LastDiaryTransactionData?transactorId=${selectedTransactorId}`;
-                console.log(`Final Uri=${FinalUri}`);
+                console.log($('#ItemVm_TransactorId').val());
+                var selectedTransactorId = $('#ItemVm_TransactorId').val();
+                const finalUri = `/api/GrkoukInfoApi/LastDiaryTransactionData?transactorId=${selectedTransactorId}`;
+                console.log(`Final Uri=${finalUri}`);
 
                 //const callParameters = {
                 //    headers: { "Content-Type": "application/json;charset=UTF-8" },
                 //    body: data,
                 //    method: "GET"
                 //};
-                fetch(FinalUri )
+                fetch(finalUri )
                     .then(function (response) {
                         if (response.ok) {
                             return response.json();
@@ -136,9 +145,9 @@
                     .then(function (myJson) {
                         if (myJson) {
                             console.log(JSON.stringify(myJson));
-                            $('#FinDiaryTransaction_CompanyId').val(myJson.companyId);
-                            $('#FinDiaryTransaction_FinTransCategoryId').val(myJson.categoryId);
-                            $('#FinDiaryTransaction_CostCentreId').val(myJson.costCentreId);
+                            $('#ItemVm_CompanyId').val(myJson.companyId);
+                            $('#ItemVm_FinTransCategoryId').val(myJson.categoryId);
+                            $('#ItemVm_CostCentreId').val(myJson.costCentreId);
                         }
 
                     })
@@ -148,10 +157,10 @@
 
             if (copyFromId===0) {
               
-                $('#FinDiaryTransaction_AmountNet').val(0);
-                $('#FinDiaryTransaction_AmountFpa').val(0);    
+                $('#ItemVm_AmountNet').val(0);
+                $('#ItemVm_AmountFpa').val(0);    
             }
-            $('#FinDiaryTransaction_TransactionDate').val(new Date().toISOString().slice(0, 10));
+            $('#ItemVm_TransactionDate').val(new Date().toISOString().slice(0, 10));
         });
     </script>
 

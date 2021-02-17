@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.CashFlow;
-using GrKouk.Erp.Domain.DocDefinitions;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -84,8 +82,10 @@ namespace GrKouk.Web.ERP.Pages.Configuration.CashFlow.CFATransactionDefs
             
 
             var dbSeriesList = _context.TransTransactorDocSeriesDefs.OrderBy(p => p.Name).AsNoTracking();
-            List<SelectListItem> seriesList = new List<SelectListItem>();
-            seriesList.Add(new SelectListItem() { Value = 0.ToString(), Text = "{No Default series}" });
+            List<SelectListItem> seriesList = new List<SelectListItem>
+            {
+                new SelectListItem() { Value = 0.ToString(), Text = "{No Default series}" }
+            };
             foreach (var dbSeriesItem in dbSeriesList)
             {
                 seriesList.Add(new SelectListItem() { Value = dbSeriesItem.Id.ToString(), Text = dbSeriesItem.Name });

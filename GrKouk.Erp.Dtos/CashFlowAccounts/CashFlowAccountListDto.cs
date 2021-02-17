@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace GrKouk.Erp.Dtos.CashFlowAccounts
+﻿namespace GrKouk.Erp.Dtos.CashFlowAccounts
 {
     public class CashFlowAccountListDto
     {

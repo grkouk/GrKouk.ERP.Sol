@@ -47,7 +47,7 @@ namespace GrKouk.Web.Erp.Pages.Expenses
 
                 if (diaryTransactionToModify != null)
                 {
-                    FinDiaryTransaction = _mapper.Map<FinDiaryExpenceTransModifyDto>(diaryTransactionToModify);
+                    ItemVm = _mapper.Map<FinDiaryExpenceTransModifyDto>(diaryTransactionToModify);
                 }
                 
             }
@@ -56,7 +56,7 @@ namespace GrKouk.Web.Erp.Pages.Expenses
         }
 
         [BindProperty]
-        public FinDiaryExpenceTransModifyDto FinDiaryTransaction { get; set; }
+        public FinDiaryExpenceTransModifyDto ItemVm { get; set; }
 
         public async Task<IActionResult> OnPostAsync()
         {
@@ -66,7 +66,7 @@ namespace GrKouk.Web.Erp.Pages.Expenses
                 return Page();
             }
 
-            var diaryTransactionToAttach = _mapper.Map<FinDiaryTransaction>(FinDiaryTransaction);
+            var diaryTransactionToAttach = _mapper.Map<FinDiaryTransaction>(ItemVm);
 
             diaryTransactionToAttach.Kind = (int)DiaryTransactionsKindEnum.Expence;
             diaryTransactionToAttach.RevenueCentreId = 1;

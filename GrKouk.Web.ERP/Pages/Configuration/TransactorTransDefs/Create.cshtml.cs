@@ -81,8 +81,10 @@ namespace GrKouk.Web.Erp.Pages.Configuration.TransactorTransDefs
             ViewData["TurnOverTransId"] = new SelectList(_context.FinancialMovements.AsNoTracking(), "Id", "Name");
 
             var dbSeriesList = _context.TransTransactorDocSeriesDefs.OrderBy(p => p.Name).AsNoTracking();
-            List<SelectListItem> seriesList = new List<SelectListItem>();
-            seriesList.Add(new SelectListItem() { Value = 0.ToString(), Text = "{No Default series}" });
+            List<SelectListItem> seriesList = new List<SelectListItem>
+            {
+                new SelectListItem() { Value = 0.ToString(), Text = "{No Default series}" }
+            };
             foreach (var dbSeriesItem in dbSeriesList)
             {
                 seriesList.Add(new SelectListItem() { Value = dbSeriesItem.Id.ToString(), Text = dbSeriesItem.Name });

@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using GrKouk.Web.ERP.Data;
-using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 

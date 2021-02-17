@@ -15,35 +15,35 @@
 <div class="container">
     <form method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-md-3">
-                <label asp-for="ItemVm.CompanyId" class="control-label" small></label>
-                <select asp-for="ItemVm.CompanyId" class="form-control form-control-sm small" asp-items="ViewBag.CompanyId"></select>
+                <label asp-for="ItemVm.CompanyId" class="form-label" small></label>
+                <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm" asp-items="ViewBag.CompanyId"></select>
             </div>
             <div class="form-group col-md-6">
-                <label asp-for="ItemVm.TransactorId" class="control-label small"></label>
+                <label asp-for="ItemVm.TransactorId" class="form-label small"></label>
                 <div class="input-group input-group-sm">
-                    <select asp-for="ItemVm.TransactorId" class="form-control form-control-sm small" asp-items="ViewBag.TransactorId"></select>
+                    <select asp-for="ItemVm.TransactorId" class="form-select form-select-sm" asp-items="ViewBag.TransactorId"></select>
                     <div class="input-group-append" id="button-addon4">
-                        <button class="btn btn-outline-secondary" data-toggle="modal" data-target="#itemSelector" data-selectorType="SuppliersSelector" type="button">...</button>
+                        <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="SuppliersSelector" type="button">...</button>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-sm-4">
                 <label asp-for="ItemVm.WarehouseItemId" class="control-label small"></label>
 
                 <div class="input-group input-group-sm">
-                    <select asp-for="ItemVm.WarehouseItemId" class="form-control form-control-sm" asp-items="ViewBag.WarehouseItemId"></select>
+                    <select asp-for="ItemVm.WarehouseItemId" class="form-select form-select-sm" asp-items="ViewBag.WarehouseItemId"></select>
                     <div class="input-group-append" id="button-addon5">
-                        <button class="btn btn-outline-secondary btn-sm " data-toggle="modal" data-target="#itemSelector" data-selectorType="ProductsSelector" type="button"><i class="fab fa-asymmetrik"></i></button>
+                        <button class="btn btn-outline-secondary btn-sm " data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="ProductsSelector" type="button"><i class="fab fa-asymmetrik"></i></button>
                     </div>
                 </div>
             </div>
             <div class="form-group col-sm-2">
                 <label asp-for="ItemVm.CodeType" class="control-label small"></label>
-                <select asp-for="ItemVm.CodeType" class="form-control form-control-sm" asp-items="ViewBag.CodeType"></select>
+                <select asp-for="ItemVm.CodeType" class="form-select form-select-sm" asp-items="ViewBag.CodeType"></select>
                 <span asp-validation-for="ItemVm.CodeType" class="text-danger small"></span>
             </div>
             <div class="form-group col-sm-2">
@@ -54,7 +54,7 @@
         </div>
 
 
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-sm-2">
                 <label asp-for="ItemVm.BuyCodeUsedUnit" class="control-label small"></label>
                 <select asp-for="ItemVm.BuyCodeUsedUnit" class="form-control form-control-sm" asp-items="ViewBag.CodeUsedUnit"></select>
@@ -67,7 +67,7 @@
             </div>
 
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-sm-2">
                 <label asp-for="ItemVm.SellCodeUsedUnit" class="control-label small"></label>
                 <select asp-for="ItemVm.SellCodeUsedUnit" class="form-control form-control-sm" asp-items="ViewBag.CodeUsedUnit"></select>
@@ -81,7 +81,7 @@
 
         </div>
 
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary btn-sm" />
             </div>
@@ -113,23 +113,23 @@
     </div>
 </div>
 <!-- Modal Item selector -->
-<div class="modal fade" id="itemSelector" tabindex="-1" role="dialog" aria-labelledby="itemsModalLabel" aria-hidden="true" data-keyboard="false">
+<div class="modal fade" id="itemSelector" tabindex="-1" role="dialog" aria-labelledby="itemsModalLabel" aria-hidden="true" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered modal-lg" style="overflow-y: scroll; max-height:75%;  margin-top: 50px; margin-bottom:50px;" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="container-fluid">
-                    <div class="form-row">
+                    <div class="row mb-3">
                         <div class="col-6">
                             <p class="modal-title font-weight-bold" id="itemsModalLabel">Selector</p>
                         </div>
                         <div class="col-6 text-right">
 
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                     </div>
-                    <div class="form-row">
+                    <div class="row mb-3">
                         <div class="form-group col-md-3">
                             <select class="selectpicker form-control form-control-sm small " id="CompaniesList" multiple
                                     title="Companies" data-actions-box="true" data-selected-text-format="count > 1"></select>
@@ -143,7 +143,7 @@
                                     title="Item Natures" data-actions-box="true" data-selected-text-format="count > 1"></select>
                         </div>
                     </div>
-                    <div class="form-row">
+                    <div class="row mb-3">
                         <div class="col-10">
                             <input class="form-control form-control-sm" name="itemsSearchText" placeholder="Search text" type="text" />
 

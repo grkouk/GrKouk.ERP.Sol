@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using GrKouk.Erp.Domain.CashFlow;
+﻿using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.DocDefinitions;
 using GrKouk.Erp.Domain.MediaEntities;
 using GrKouk.Erp.Domain.RecurringTransactions;

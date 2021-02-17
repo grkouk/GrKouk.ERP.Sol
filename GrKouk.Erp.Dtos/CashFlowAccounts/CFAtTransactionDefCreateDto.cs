@@ -1,7 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using GrKouk.Erp.Definitions;
-using GrKouk.Erp.Domain.CashFlow;
-using GrKouk.Erp.Domain.Shared;
 
 namespace GrKouk.Erp.Dtos.CashFlowAccounts
 {

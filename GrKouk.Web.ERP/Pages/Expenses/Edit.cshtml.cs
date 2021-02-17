@@ -28,7 +28,7 @@ namespace GrKouk.Web.Erp.Pages.Expenses
         }
 
         [BindProperty]
-        public FinDiaryExpenceTransModifyDto FinDiaryTransactionVM { get; set; }
+        public FinDiaryExpenceTransModifyDto ItemVm { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -50,7 +50,7 @@ namespace GrKouk.Web.Erp.Pages.Expenses
                 return NotFound();
             }
 
-            FinDiaryTransactionVM = _mapper.Map<FinDiaryExpenceTransModifyDto>(diaryTransactionToModify);
+            ItemVm = _mapper.Map<FinDiaryExpenceTransModifyDto>(diaryTransactionToModify);
 
             LoadCompbos();
 
@@ -65,7 +65,7 @@ namespace GrKouk.Web.Erp.Pages.Expenses
                 return Page();
             }
 
-            var diaryTransactionToAttach = _mapper.Map<FinDiaryTransaction>(FinDiaryTransactionVM);
+            var diaryTransactionToAttach = _mapper.Map<FinDiaryTransaction>(ItemVm);
 
             //diaryTransactionToAttach.Kind = (int)DiaryTransactionsKindEnum.Expence;
             //diaryTransactionToAttach.RevenueCentreId = 1;

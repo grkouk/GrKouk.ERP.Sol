@@ -4,16 +4,12 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
 using GrKouk.Erp.Domain.CashFlow;
-using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.CashFlowAccounts;
 using GrKouk.Erp.Dtos.Diaries;
-using GrKouk.Erp.Dtos.Transactors;
 using GrKouk.Web.ERP.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using NToastNotify;
 
 namespace GrKouk.Web.ERP.Pages.MainEntities.CashFlowAccounts

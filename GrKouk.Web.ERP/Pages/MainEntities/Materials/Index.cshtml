@@ -23,7 +23,7 @@
             <a asp-page="/MainEntities/MaterialCodes/index" class="nav-link">WarehouseItem Codes</a>
         </li>
         <li class="nav-item dropdown ">
-            <a class="nav-link dropdown-toggle " role="button" id="ddDiarys" data-toggle="dropdown"
+            <a class="nav-link dropdown-toggle " role="button" id="ddDiarys" data-bs-toggle="dropdown"
                aria-haspopup="true" aria-expanded="false">Ημερολόγια</a>
             <div class="dropdown-menu small">
                 <h6 class="dropdown-header">Σχετικά Ημερολόγια</h6>
@@ -33,7 +33,7 @@
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#filterCollapse" role="button" id="filtersToggle"
+            <a class="nav-link" data-bs-toggle="collapse" data-bs-target="#filterCollapse" href="#filterCollapse" role="button" id="filtersToggle"
                aria-expanded="false" aria-controls="filterCollapse">
             </a>
         </li>
@@ -43,7 +43,7 @@
             </a>
         </li>
         <li class="nav-item dropdown " id="SelectedRowsActionsMenu">
-            <a class="nav-link dropdown-toggle disabled" role="button" id="ddSelectedRowsActions" data-toggle="dropdown"
+            <a class="nav-link dropdown-toggle disabled" role="button" id="ddSelectedRowsActions" data-bs-toggle="dropdown"
                aria-haspopup="true" aria-expanded="false">Actions</a>
             <div class="dropdown-menu small">
 
@@ -56,12 +56,11 @@
         </li>
     </ul>
 </div>
-<div class="collapse show" id="filterCollapse">
+
     @await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowMaterialNatureFlt = true, ShowDateFlt = false, ShowCurrencyFlt = false })
 
-    <div class="row">
-        <partial name="_PagerPartial" />
-    </div>
+<div class="row">
+    <partial name="_PagerPartial" />
 </div>
 <table class="table table-bordered table-sm" id="myTable">
     <thead class="thead-light">
