@@ -7,32 +7,36 @@
 
 <h4>Edit Company</h4>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Company.Id" />
-            <div class="form-group">
-                <label asp-for="Company.Code" class="control-label"></label>
-                <input asp-for="Company.Code" class="form-control" />
+<div class="container">
+
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="Company.Id" />
+        <div class="row mb-3">
+            <div class="col">
+                <label asp-for="Company.Code" class="form-label small"></label>
+                <input asp-for="Company.Code" class="form-control form-control-sm" />
                 <span asp-validation-for="Company.Code" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Company.Name" class="control-label"></label>
-                <input asp-for="Company.Name" class="form-control" />
-                <span asp-validation-for="Company.Name" class="text-danger"></span>
+            <div class="col">
+                <label asp-for="Company.Name" class="form-label small"></label>
+                <input asp-for="Company.Name" class="form-control form-control-sm" />
+                <span asp-validation-for="Company.Name" class="text-danger small"></span>
             </div>
-            <div class="form-group ">
-                <label asp-for="Company.CurrencyId" class=""></label>
-                <select asp-for="Company.CurrencyId" class="form-control "
+        </div>
+        <div class="row mb-3">
+            <div class="col-6 ">
+                <label asp-for="Company.CurrencyId" class="form-label small"></label>
+                <select asp-for="Company.CurrencyId" class="form-select form-select-sm "
                         onchange=""
                         asp-items="ViewBag.CurrencyId"></select>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-default" />
-            </div>
-        </form>
-    </div>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Save" class="btn btn-primary" />
+        </div>
+    </form>
+
 </div>
 
 <div>

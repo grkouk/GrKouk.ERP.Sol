@@ -11,121 +11,103 @@
 <div class="container">
     <form method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
-        <div class="form-row">
-            <div class="form-group col-md-2">
+        <div class="row mb-3">
+            <div class="col-md-2">
                 <label asp-for="TransWarehouseDef.Code" class="small"></label>
                 <input asp-for="TransWarehouseDef.Code" class="form-control form-control-sm" />
                 <span asp-validation-for="TransWarehouseDef.Code" class="text-danger small"></span>
             </div>
-            <div class="form-group col-md-4">
+            <div class="col-md-4">
                 <label asp-for="TransWarehouseDef.Name" class="small"></label>
                 <input asp-for="TransWarehouseDef.Name" class="form-control form-control-sm" />
                 <span asp-validation-for="TransWarehouseDef.Name" class="text-danger small"></span>
 
             </div>
-            <div class="form-group col-md-3">
+            <div class="col-md-3">
                 <label asp-for="TransWarehouseDef.DefaultDocSeriesId" class="small"></label>
-                <select asp-for="TransWarehouseDef.DefaultDocSeriesId" class="form-control form-control-sm" asp-items="ViewBag.DefaultDocSeriesId"></select>
+                <select asp-for="TransWarehouseDef.DefaultDocSeriesId" class="form-select form-select-sm" asp-items="ViewBag.DefaultDocSeriesId"></select>
             </div>
-            <div class="form-group col-md-2">
+            <div class="col-md-2">
                 <label asp-for="TransWarehouseDef.CompanyId" class="small"></label>
-                <select asp-for="TransWarehouseDef.CompanyId" class="form-control form-control-sm" asp-items="ViewBag.CompanyId"></select>
+                <select asp-for="TransWarehouseDef.CompanyId" class="form-select form-select-sm" asp-items="ViewBag.CompanyId"></select>
             </div>
-            <div class="form-group col-md-1 ">
+            <div class="col-md-1 ">
 
                 <label asp-for="TransWarehouseDef.Active" class="small"></label>
                 <input asp-for="TransWarehouseDef.Active" class="form-check form-control-sm" />
 
             </div>
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-3">
+        <div class="row mb-3">
+            <div class="col-md-3">
                 <label asp-for="TransWarehouseDef.MaterialInventoryAction" class="small"></label>
-                <select asp-for="TransWarehouseDef.MaterialInventoryAction" class="form-control form-control-sm" asp-items="ViewBag.MaterialInventoryActions"></select>
+                <select asp-for="TransWarehouseDef.MaterialInventoryAction" class="form-select form-select-sm" asp-items="ViewBag.MaterialInventoryActions"></select>
             </div>
-            <div class="form-group col-md-3">
+            <div class="col-md-3">
                 <label asp-for="TransWarehouseDef.MaterialInventoryValueAction" class="small"></label>
-                <select asp-for="TransWarehouseDef.MaterialInventoryValueAction" class="form-control form-control-sm" asp-items="ViewBag.MaterialInventoryValueActions"></select>
+                <select asp-for="TransWarehouseDef.MaterialInventoryValueAction" class="form-select form-select-sm" asp-items="ViewBag.MaterialInventoryValueActions"></select>
             </div>
-            <div class="form-group col-md-3">
+            <div class="col-md-3">
                 <label asp-for="TransWarehouseDef.ServiceInventoryAction" class="small"></label>
-                <select asp-for="TransWarehouseDef.ServiceInventoryAction" class="form-control form-control-sm" asp-items="ViewBag.ServiceInventoryAction"></select>
+                <select asp-for="TransWarehouseDef.ServiceInventoryAction" class="form-select form-select-sm" asp-items="ViewBag.ServiceInventoryAction"></select>
             </div>
-            <div class="form-group col-md-3">
+            <div class="col-md-3">
                 <label asp-for="TransWarehouseDef.ServiceInventoryValueAction" class="small"></label>
-                <select asp-for="TransWarehouseDef.ServiceInventoryValueAction" class="form-control form-control-sm" asp-items="ViewBag.ServiceInventoryValueAction"></select>
+                <select asp-for="TransWarehouseDef.ServiceInventoryValueAction" class="form-select form-select-sm" asp-items="ViewBag.ServiceInventoryValueAction"></select>
             </div>
 
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-3">
+        <div class="row mb-3">
+            <div class="col-md-3">
                 <label asp-for="TransWarehouseDef.FixedAssetInventoryAction" class="small"></label>
-                <select asp-for="TransWarehouseDef.FixedAssetInventoryAction" class="form-control form-control-sm" asp-items="ViewBag.FixedAssetInventoryAction"></select>
+                <select asp-for="TransWarehouseDef.FixedAssetInventoryAction" class="form-select form-select-sm" asp-items="ViewBag.FixedAssetInventoryAction"></select>
             </div>
-            <div class="form-group col-md-3">
+            <div class="col-md-3">
                 <label asp-for="TransWarehouseDef.FixedAssetInventoryValueAction" class="small"></label>
-                <select asp-for="TransWarehouseDef.FixedAssetInventoryValueAction" class="form-control form-control-sm" asp-items="ViewBag.FixedAssetInventoryValueAction"></select>
+                <select asp-for="TransWarehouseDef.FixedAssetInventoryValueAction" class="form-select form-select-sm" asp-items="ViewBag.FixedAssetInventoryValueAction"></select>
             </div>
-            <div class="form-group col-md-3">
+            <div class="col-md-3">
                 <label asp-for="TransWarehouseDef.ExpenseInventoryAction" class="small"></label>
-                <select asp-for="TransWarehouseDef.ExpenseInventoryAction" class="form-control form-control-sm" asp-items="ViewBag.ExpenseInventoryAction"></select>
+                <select asp-for="TransWarehouseDef.ExpenseInventoryAction" class="form-select form-select-sm" asp-items="ViewBag.ExpenseInventoryAction"></select>
             </div>
-            <div class="form-group col-md-3">
+            <div class="col-md-3">
                 <label asp-for="TransWarehouseDef.ExpenseInventoryValueAction" class="small"></label>
-                <select asp-for="TransWarehouseDef.ExpenseInventoryValueAction" class="form-control form-control-sm" asp-items="ViewBag.ExpenseInventoryValueAction"></select>
+                <select asp-for="TransWarehouseDef.ExpenseInventoryValueAction" class="form-select form-select-sm" asp-items="ViewBag.ExpenseInventoryValueAction"></select>
             </div>
-            <div class="form-group col-md-3">
+            <div class="col-md-3">
                 <label asp-for="TransWarehouseDef.IncomeInventoryAction" class="small"></label>
-                <select asp-for="TransWarehouseDef.IncomeInventoryAction" class="form-control form-control-sm" asp-items="ViewBag.IncomeInventoryAction"></select>
+                <select asp-for="TransWarehouseDef.IncomeInventoryAction" class="form-select form-select-sm" asp-items="ViewBag.IncomeInventoryAction"></select>
             </div>
-            <div class="form-group col-md-3">
+            <div class="col-md-3">
                 <label asp-for="TransWarehouseDef.IncomeInventoryValueAction" class="small"></label>
-                <select asp-for="TransWarehouseDef.IncomeInventoryValueAction" class="form-control form-control-sm" asp-items="ViewBag.IncomeInventoryValueAction"></select>
+                <select asp-for="TransWarehouseDef.IncomeInventoryValueAction" class="form-select form-select-sm" asp-items="ViewBag.IncomeInventoryValueAction"></select>
             </div>
 
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-3">
+        <div class="row mb-3">
+            <div class="col-md-3">
                 <label asp-for="TransWarehouseDef.RawMaterialInventoryAction" class="small"></label>
-                <select asp-for="TransWarehouseDef.RawMaterialInventoryAction" class="form-control form-control-sm" asp-items="ViewBag.RawMaterialInventoryAction"></select>
+                <select asp-for="TransWarehouseDef.RawMaterialInventoryAction" class="form-select form-select-sm" asp-items="ViewBag.RawMaterialInventoryAction"></select>
             </div>
-            <div class="form-group col-md-3">
+            <div class="col-md-3">
                 <label asp-for="TransWarehouseDef.RawMaterialInventoryValueAction" class="small"></label>
-                <select asp-for="TransWarehouseDef.RawMaterialInventoryValueAction" class="form-control form-control-sm" asp-items="ViewBag.RawMaterialInventoryValueAction"></select>
+                <select asp-for="TransWarehouseDef.RawMaterialInventoryValueAction" class="form-select form-select-sm" asp-items="ViewBag.RawMaterialInventoryValueAction"></select>
             </div>
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-3">
+        <div class="row mb-3">
+            <div class="col-md-3">
                 <label asp-for="TransWarehouseDef.MaterialInvoicedVolumeAction" class="small"></label>
-                <select asp-for="TransWarehouseDef.MaterialInvoicedVolumeAction" class="form-control form-control-sm" asp-items="ViewBag.MaterialInvoicedVolumeAction"></select>
+                <select asp-for="TransWarehouseDef.MaterialInvoicedVolumeAction" class="form-select form-select-sm" asp-items="ViewBag.MaterialInvoicedVolumeAction"></select>
             </div>
-            <div class="form-group col-md-3">
+            <div class="col-md-3">
                 <label asp-for="TransWarehouseDef.MaterialInvoicedValueAction" class="small"></label>
-                <select asp-for="TransWarehouseDef.MaterialInvoicedValueAction" class="form-control form-control-sm" asp-items="ViewBag.MaterialInvoicedValueAction"></select>
+                <select asp-for="TransWarehouseDef.MaterialInvoicedValueAction" class="form-select form-select-sm" asp-items="ViewBag.MaterialInvoicedValueAction"></select>
             </div>
         </div>
 
-        @*<div class="form-row">
-            <div class="form-group col-md-3">
-                <label asp-for="TransWarehouseDef.VolBuyAction" class="control-label small"></label>
-                <select asp-for="TransWarehouseDef.VolBuyAction" class="form-control form-control-sm" asp-items="ViewBag.VolBuyAction"></select>
-            </div>
-            <div class="form-group col-md-3">
-                <label asp-for="TransWarehouseDef.AmtBuyAction" class="small"></label>
-                <select asp-for="TransWarehouseDef.AmtBuyAction" class="form-control form-control-sm" asp-items="ViewBag.AmtBuyAction"></select>
-            </div>
+       
 
-            <div class="form-group col-md-3">
-                <label asp-for="TransWarehouseDef.VolSellAction" class="small"></label>
-                <select asp-for="TransWarehouseDef.VolSellAction" class="form-control form-control-sm" asp-items="ViewBag.VolSellAction"></select>
-            </div>
-            <div class="form-group col-md-3">
-                <label asp-for="TransWarehouseDef.AmtSellAction" class="small"></label>
-                <select asp-for="TransWarehouseDef.AmtSellAction" class="form-control form-control-sm" asp-items="ViewBag.AmtSellAction"></select>
-            </div>
-        </div>*@
-
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary btn-sm" />
             </div>
