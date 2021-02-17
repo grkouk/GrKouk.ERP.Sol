@@ -17,7 +17,7 @@
         <input type="hidden" asp-for="BuyDocTypeDef.Id" />
         <input type="hidden" asp-for="BuyDocTypeDef.SelectedWarehouseItemNatures" />
         <input type="hidden" asp-for="BuyDocTypeDef.AllowedTransactorTypes" />
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-md-2">
                 <label asp-for="BuyDocTypeDef.Code" class="control-label small"></label>
                 <input asp-for="BuyDocTypeDef.Code" class="form-control form-control-sm" />
@@ -40,7 +40,7 @@
 
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
            
             <div class="form-group col-md-3">
                 <label asp-for="BuyDocTypeDef.TransTransactorDefId" class="control-label small"></label>
@@ -62,7 +62,7 @@
                 <span asp-validation-for="BuyDocTypeDef.CompanyId" class="text-danger small"></span>
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
              <div class="form-group col-md-3">
                 <label asp-for="BuyDocTypeDef.SectionId" class="control-label small"></label>
                 <select asp-for="BuyDocTypeDef.SectionId" class="form-control form-control-sm" asp-items="ViewBag.SectionList"></select>
@@ -81,7 +81,7 @@
                         asp-items="ViewBag.transactorTypesList"></select>
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group">
                 <input type="submit" value="Update" class="btn btn-primary btn-sm" />
             </div>

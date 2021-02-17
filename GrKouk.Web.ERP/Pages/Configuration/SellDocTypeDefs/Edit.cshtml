@@ -18,7 +18,7 @@
         <input type="hidden" asp-for="SellDocTypeDef.AllowedTransactorTypes" />
 
         <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-md-2">
                 <label asp-for="SellDocTypeDef.Code" class="control-label small"></label>
                 <input asp-for="SellDocTypeDef.Code" class="form-control form-control-sm small" />
@@ -42,7 +42,7 @@
 
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-md-3">
                 <label asp-for="SellDocTypeDef.TransTransactorDefId" class="control-label small"></label>
                 <select asp-for="SellDocTypeDef.TransTransactorDefId" class="form-control form-control-sm small" asp-items="ViewBag.TransTransactorDefId"></select>
@@ -62,7 +62,7 @@
                 <span asp-validation-for="SellDocTypeDef.CompanyId" class="text-danger small"></span>
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
              <div class="form-group col-md-3">
                 <label asp-for="SellDocTypeDef.SectionId" class="control-label small"></label>
                 <select asp-for="SellDocTypeDef.SectionId" class="form-control form-control-sm" asp-items="ViewBag.SectionList"></select>
@@ -81,7 +81,7 @@
                         asp-items="ViewBag.transactorTypesList"></select>
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group">
                 <input type="submit" value="Update" class="btn btn-primary btn-sm" />
             </div>

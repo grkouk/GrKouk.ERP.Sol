@@ -18,7 +18,7 @@
         <input type="hidden" asp-for="ItemVm.AllowedTransactorTypes"/>
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-md-3">
                 <label asp-for="ItemVm.Code" class="control-label"></label>
                 <input asp-for="ItemVm.Code" class="form-control form-control-sm" />
@@ -36,7 +36,7 @@
 
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-md-2">
                 <label asp-for="ItemVm.SectionId" class="control-label small"></label>
                 <select asp-for="ItemVm.SectionId" class="form-control form-control-sm" asp-items="ViewBag.SectionList"></select>
@@ -62,7 +62,7 @@
             </div>
         </div>
 
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary btn-sm" />
             </div>
