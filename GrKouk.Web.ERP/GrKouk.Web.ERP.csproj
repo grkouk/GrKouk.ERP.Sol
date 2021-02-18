@@ -58,7 +58,7 @@
   <ItemGroup>
     <Folder Include="Pages\Components\" />
     <Folder Include="Pages\Configuration\CashFlow\CFADocTypeDefs\" />
-    <Folder Include="Pages\Configuration\CashFlow\CFADocSeriesDefs\" />
+    <Folder Include="Pages\Transactions\CFATransactions\" />
     <Folder Include="wwwroot\lib\bootstrap5" />
     <Folder Include="wwwroot\productimages\" />
   </ItemGroup>

@@ -3172,6 +3172,210 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
+        [HttpGet("GetIndexTblDataCfaDocTypeDefs")]
+        public async Task<IActionResult> GetIndexTblDataCfaDocTypeDefs([FromQuery] IndexDataTableRequest request)
+        {
+            //Thread.Sleep(10000);
+            IQueryable<CashFlowDocTypeDef> fullListIq = _context.CashFlowDocTypeDefs;
+
+
+            if (!string.IsNullOrEmpty(request.SortData))
+            {
+                switch (request.SortData.ToLower())
+                {
+                    case "namesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.Name);
+                        break;
+                    case "namesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.Name);
+                        break;
+                    case "codesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.Code);
+                        break;
+                    case "codesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.Code);
+                        break;
+
+                    case "companycodesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.Company.Code);
+                        break;
+                    case "companycodesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.Company.Code);
+                        break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.CompanyFilter))
+            {
+                if (int.TryParse(request.CompanyFilter, out var companyId))
+                {
+                    if (companyId > 0)
+                    {
+                        var allCompCode =
+                            await _context.AppSettings.SingleOrDefaultAsync(
+                                p => p.Code == Constants.AllCompaniesCodeKey);
+                        if (allCompCode == null)
+                        {
+                            return NotFound("All Companies Code Setting not found");
+                        }
+
+                        var allCompaniesEntity =
+                            await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+                        if (allCompaniesEntity != null)
+                        {
+                            var allCompaniesId = allCompaniesEntity.Id;
+                            fullListIq =
+                                fullListIq.Where(p => p.CompanyId == companyId || p.CompanyId == allCompaniesId);
+                        }
+                        else
+                        {
+                            fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
+                        }
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.SearchFilter))
+            {
+                fullListIq = fullListIq.Where(p => p.Name.Contains(request.SearchFilter)
+                                                   || p.Code.Contains(request.SearchFilter)
+                                                  );
+            }
+
+            PagedList<CfaDocTypeDefListDto> listItems;
+            try
+            {
+                var projectedList = fullListIq.ProjectTo<CfaDocTypeDefListDto>(_mapper.ConfigurationProvider);
+                var pageIndex = request.PageIndex;
+
+                var pageSize = request.PageSize;
+
+                listItems = await PagedList<CfaDocTypeDefListDto>.CreateAsync(projectedList, pageIndex, pageSize);
+            }
+            catch (Exception e)
+            {
+                string msg = e.InnerException?.Message;
+                return BadRequest(new
+                {
+                    error = e.Message + " " + msg
+                });
+            }
+
+
+
+            var response = new IndexDataTableResponse<CfaDocTypeDefListDto>
+            {
+                TotalRecords = listItems.TotalCount,
+                TotalPages = listItems.TotalPages,
+                HasPrevious = listItems.HasPrevious,
+                HasNext = listItems.HasNext,
+                // Diaries = relevantDiarys,
+                Data = listItems
+            };
+            return Ok(response);
+        }
+        [HttpGet("GetIndexTblDataCfaDocSeriesDefs")]
+        public async Task<IActionResult> GetIndexTblDataCfaDocSeriesDefs([FromQuery] IndexDataTableRequest request)
+        {
+            //Thread.Sleep(10000);
+            IQueryable<CashFlowDocSeriesDef> fullListIq = _context.CashFlowDocSeriesDefs;
+
+
+            if (!string.IsNullOrEmpty(request.SortData))
+            {
+                switch (request.SortData.ToLower())
+                {
+                    case "namesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.Name);
+                        break;
+                    case "namesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.Name);
+                        break;
+                    case "codesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.Code);
+                        break;
+                    case "codesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.Code);
+                        break;
+
+                    case "companycodesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.Company.Code);
+                        break;
+                    case "companycodesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.Company.Code);
+                        break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.CompanyFilter))
+            {
+                if (int.TryParse(request.CompanyFilter, out var companyId))
+                {
+                    if (companyId > 0)
+                    {
+                        var allCompCode =
+                            await _context.AppSettings.SingleOrDefaultAsync(
+                                p => p.Code == Constants.AllCompaniesCodeKey);
+                        if (allCompCode == null)
+                        {
+                            return NotFound("All Companies Code Setting not found");
+                        }
+
+                        var allCompaniesEntity =
+                            await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+                        if (allCompaniesEntity != null)
+                        {
+                            var allCompaniesId = allCompaniesEntity.Id;
+                            fullListIq =
+                                fullListIq.Where(p => p.CompanyId == companyId || p.CompanyId == allCompaniesId);
+                        }
+                        else
+                        {
+                            fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
+                        }
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.SearchFilter))
+            {
+                fullListIq = fullListIq.Where(p => p.Name.Contains(request.SearchFilter)
+                                                   || p.Code.Contains(request.SearchFilter)
+                                                  );
+            }
+
+            PagedList<CfaDocSeriesDefListDto> listItems;
+            try
+            {
+                var projectedList = fullListIq.ProjectTo<CfaDocSeriesDefListDto>(_mapper.ConfigurationProvider);
+                var pageIndex = request.PageIndex;
+
+                var pageSize = request.PageSize;
+
+                listItems = await PagedList<CfaDocSeriesDefListDto>.CreateAsync(projectedList, pageIndex, pageSize);
+            }
+            catch (Exception e)
+            {
+                string msg = e.InnerException?.Message;
+                return BadRequest(new
+                {
+                    error = e.Message + " " + msg
+                });
+            }
+
+
+
+            var response = new IndexDataTableResponse<CfaDocSeriesDefListDto>
+            {
+                TotalRecords = listItems.TotalCount,
+                TotalPages = listItems.TotalPages,
+                HasPrevious = listItems.HasPrevious,
+                HasNext = listItems.HasNext,
+                // Diaries = relevantDiarys,
+                Data = listItems
+            };
+            return Ok(response);
+        }
         [HttpGet("GetSelectorTransactors")]
         public async Task<IActionResult> GetSelectorTransactors([FromQuery] IndexDataTableRequest request)
         {

@@ -221,7 +221,7 @@
                
             ];
             const indexPageDef = {
-                uri: '/api/GrKoukInfoApi/GetIndexTblDataCfaTransactionDefs',
+                uri: '/api/GrKoukInfoApi/GetIndexTblDataCfaDocTypeDefs',
                 currencyFormatter: formatterCurrency,
                 numberFormatter: formatterNumber,
                 colDefs: colDefs,
@@ -230,7 +230,7 @@
                 actionMobileColDefs: actionMobileColDefs,
                 tableHandlersToRegister: tableHandlersToRegister,
                 pageHandlersToRegister: pageHandlersToRegister,
-                 indexPageType:definitionsLib.IndexPageTypeEnum.IndexPage,
+                indexPageType:definitionsLib.IndexPageTypeEnum.IndexPage,
                 afterTableLoad: {
                    
                 }
@@ -321,7 +321,7 @@
                     deleteSelectedRows();
                 });
 
-            var storageItemJs = localStorage.getItem('TransactorsIndexView');
+            var storageItemJs = localStorage.getItem('CFTypeDefsIndexView');
             if (storageItemJs === undefined || storageItemJs === null) {
                 $('#pageIndex').val(1);
                 $('#filtersVisible').val(true);
@@ -415,7 +415,7 @@
 
                 var sessionVal = JSON.stringify(filtersArr);
 
-                localStorage.setItem('TransactorsIndexView', sessionVal);
+                localStorage.setItem('CFTypeDefsIndexView', sessionVal);
                 //#endregion
 
             });

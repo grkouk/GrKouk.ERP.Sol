@@ -3,7 +3,7 @@
 @model IndexModel
 
 @{
-    ViewData["Title"] = "CashFlow Transaction Type Definitions";
+    ViewData["Title"] = "CashFlow Doc Series Definitions";
 }
 @section MyCss
 {
@@ -170,16 +170,7 @@
                 }
             ];
             const actionColSubDefs = [
-                {
-                    actionType: 'newWindowAction',
-                    visibility: 'always',
-                    elementName: '',
-                    condition: {},
-                    text: 'Καρτέλλα',
-                    valueKey: 'id',
-                    icon: '<i class="fas fa-receipt fa-lg" style="color:slategray"></i>',
-                    url: '@Url.Page("./Kartela")?transactorId='
-                }
+                
             ];
             const actionMobileColDefs = [
                 {
@@ -230,7 +221,7 @@
                
             ];
             const indexPageDef = {
-                uri: '/api/GrKoukInfoApi/GetIndexTblDataCfaTransactionDefs',
+                uri: '/api/GrKoukInfoApi/GetIndexTblDataCfaDocSeriesDefs',
                 currencyFormatter: formatterCurrency,
                 numberFormatter: formatterNumber,
                 colDefs: colDefs,
@@ -239,7 +230,7 @@
                 actionMobileColDefs: actionMobileColDefs,
                 tableHandlersToRegister: tableHandlersToRegister,
                 pageHandlersToRegister: pageHandlersToRegister,
-                 indexPageType:definitionsLib.IndexPageTypeEnum.IndexPage,
+                indexPageType:definitionsLib.IndexPageTypeEnum.IndexPage,
                 afterTableLoad: {
                    
                 }
@@ -330,7 +321,7 @@
                     deleteSelectedRows();
                 });
 
-            var storageItemJs = localStorage.getItem('CFTransactionDefsIndexView');
+            var storageItemJs = localStorage.getItem('CFSeriesDefsIndexView');
             if (storageItemJs === undefined || storageItemJs === null) {
                 $('#pageIndex').val(1);
                 $('#filtersVisible').val(true);
@@ -424,7 +415,7 @@
 
                 var sessionVal = JSON.stringify(filtersArr);
 
-                localStorage.setItem('CFTransactionDefsIndexView', sessionVal);
+                localStorage.setItem('CFSeriesDefsIndexView', sessionVal);
                 //#endregion
 
             });
