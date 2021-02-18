@@ -33,56 +33,31 @@ namespace GrKouk.Erp.Dtos.CashFlowTransactions
         public int CreatorSectionId { get; set; }
         public string CreatorSectionCode { get; set; }
         public int FiscalPeriodId { get; set; }
+        public CashFlowAccountActionsEnum CfaAction { get; set; }
+        
 
-        public FinActionsEnum FinancialAction { get; set; }
+       
+        public decimal Amount { get; set; }
 
-        public decimal FpaRate { get; set; }
-        public decimal DiscountRate { get; set; }
-
-        public decimal AmountFpa { get; set; }
-        public decimal AmountNet { get; set; }
-        public decimal AmountDiscount { get; set; }
-
-        public decimal TransFpaAmount { get; set; }
-        public decimal TransNetAmount { get; set; }
-        public decimal TransDiscountAmount { get; set; }
-        /// <summary>
-        /// Transaction amount without taxes
-        /// </summary>
-        public decimal TotalNetAmount => TransNetAmount - TransDiscountAmount;
-
-        public decimal TotalAmount => TransNetAmount + TransFpaAmount - TransDiscountAmount;
-
+        public decimal TransAmount { get; set; }
+        
         [DisplayFormat(DataFormatString = "{0:C}")]
-        [Display(Name = "Debit")]
-        public decimal DebitAmount =>
-            (FinancialAction.Equals(FinActionsEnum.FinActionsEnumDebit) ||
-             FinancialAction.Equals(FinActionsEnum.FinActionsEnumNegativeDebit)
-                ? TotalAmount
+        [Display(Name = "Deposit")]
+        public decimal DepositAmount =>
+            (CfaAction.Equals(CashFlowAccountActionsEnum.CfaActionDeposit) ||
+             CfaAction.Equals(CashFlowAccountActionsEnum.CfaActionNegativeDeposit)
+                ? TransAmount
                 : 0);
 
         [DisplayFormat(DataFormatString = "{0:C}")]
-        [Display(Name = "Credit")]
-        public decimal CreditAmount => (FinancialAction.Equals(FinActionsEnum.FinActionsEnumCredit) ||
-                                        FinancialAction.Equals(FinActionsEnum.FinActionsEnumNegativeCredit)
-            ? TotalAmount
+        [Display(Name = "Withdraw")]
+        public decimal WithdrawAmount => (CfaAction.Equals(CashFlowAccountActionsEnum.CfaActionNegativeWithdraw) ||
+                                          CfaAction.Equals(CashFlowAccountActionsEnum.CfaActionNegativeWithdraw)
+            ? TransAmount
             : 0);
 
 
-        [DisplayFormat(DataFormatString = "{0:C}")]
-        [Display(Name = "Net Debit ")]
-        public decimal DebitNetAmount =>
-            (FinancialAction.Equals(FinActionsEnum.FinActionsEnumDebit) ||
-             FinancialAction.Equals(FinActionsEnum.FinActionsEnumNegativeDebit)
-                ? TotalNetAmount
-                : 0);
-
-        [DisplayFormat(DataFormatString = "{0:C}")]
-        [Display(Name = "Net Credit")]
-        public decimal CreditNetAmount => (FinancialAction.Equals(FinActionsEnum.FinActionsEnumCredit) ||
-                                        FinancialAction.Equals(FinActionsEnum.FinActionsEnumNegativeCredit)
-            ? TotalNetAmount
-            : 0);
+       
         public int CompanyId { get; set; }  
         [Display(Name = "Company")]
         public string CompanyCode { get; set; }

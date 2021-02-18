@@ -26,25 +26,13 @@ namespace GrKouk.Erp.Dtos.CashFlowTransactions
         public int CreatorId { get; set; }
         [Display(Name = "Fiscal Period")]
         public int FiscalPeriodId { get; set; }
+        public CashFlowAccountActionsEnum CfaAction { get; set; }
+        
+       [DisplayFormat(DataFormatString = "{0:C}")]
+        [Display(Name = "Amount")]
+        public decimal AmountSum { get; set; }
 
-        public FinActionsEnum FinancialAction { get; set; }
-        [Display(Name = "VAT Rate")]
-        public decimal FpaRate { get; set; }
-        [Display(Name = "Discount Rate")]
-        public decimal DiscountRate { get; set; }
-        [Display(Name = "VAT Amount")]
-        public decimal AmountFpa { get; set; }
-        [Display(Name = "Net Amount")]
-        public decimal AmountNet { get; set; }
-        [Display(Name = "Discount Amount")]
-        public decimal AmountDiscount { get; set; }
-        [DisplayFormat(DataFormatString = "{0:C}")]
-        [Display(Name = "Sum Amount")]
-        public decimal AmountSum => (AmountNet + AmountFpa - AmountDiscount);
-        //public decimal TransFpaAmount { get; set; }
-        //public decimal TransNetAmount { get; set; }
-        //public decimal TransDiscountAmount { get; set; }
-
+        
         [MaxLength(500)]
         public string Etiology { get; set; }
         [Required]
