@@ -13,9 +13,9 @@ namespace GrKouk.Erp.Dtos.CashFlowAccounts
         public string Name { get; set; }
         [Display(Name = "Ενεργό")]
         public bool Active { get; set; }
-        public FinActionsEnum FinancialTransAction { get; set; }
+        
        
-       
+        public CashFlowAccountActionsEnum CfaAction { get; set; }
         [Display(Name = "Default Series")]
         public int DefaultDocSeriesId { get; set; }
 

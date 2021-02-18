@@ -121,6 +121,20 @@ namespace GrKouk.Erp.Definitions
         [Description("Αρνητική Πίστωση")]
         FinActionsEnumNegativeCredit = 4
     }
+
+    public enum CashFlowAccountActionsEnum
+    {
+        [Description("Καμία Μεταβολή")]
+        CfaActionNoChange = 0,
+        [Description("Κατάθεση")]
+        CfaActionDeposit = 1,
+        [Description("Ανάληψη")]
+        CfaActionWithdraw = 2,
+        [Description("Αρνητική Κατάθεση")]
+        CfaActionNegativeDeposit = 3,
+        [Description("Αρνητική Ανάληψη")]
+        CfaActionNegativeWithdraw = 4
+    }
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1712:Do not prefix enum values with type name", Justification = "<Pending>")]
     public enum PriceTypeEnum
     {
