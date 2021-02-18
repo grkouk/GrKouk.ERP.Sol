@@ -76,8 +76,9 @@ namespace GrKouk.Web.ERP.Pages.Configuration.CashFlow.CFATransactionDefs
         }
         private void LoadCombos()
         {
-            var financialActions = FiltersHelper.GetFinancialActionsList();
-            ViewData["FinancialActions"] = new SelectList(financialActions, "Value", "Text");
+            var actions = FiltersHelper.GetCashFlowAccountActionsList();
+            ViewData["CfaActions"] = new SelectList(actions, "Value", "Text");
+
             ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
             
 

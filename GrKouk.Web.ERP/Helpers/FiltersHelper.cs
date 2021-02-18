@@ -54,6 +54,19 @@ namespace GrKouk.Web.ERP.Helpers
            
             return listItems;
         }
+        public static List<SelectListItem> GetCashFlowAccountActionsList()
+        {
+            var listItems = Enum.GetValues(typeof(CashFlowAccountActionsEnum))
+                .Cast<CashFlowAccountActionsEnum>()
+                .Select(c => new SelectListItem()
+                {
+                    Value = ((int)c).ToString(),
+                    Text = c.GetDescription()
+                }).ToList();
+           
+           
+            return listItems;
+        }
         public static List<SelectListItem> GetWarehouseItemNaturesList()
         {
             var materialNatures = Enum.GetValues(typeof(WarehouseItemNatureEnum))

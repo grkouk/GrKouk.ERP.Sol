@@ -1,0 +1,581 @@
+﻿@page
+@using GrKouk.Web.ERP.Helpers
+@model IndexModel
+
+@{
+    ViewData["Title"] = "Transactor Transactions";
+}
+@section MyCss
+    {
+    <link rel="stylesheet" href="~/css/custom-checkbox.css" />
+    <link rel="stylesheet" href="~/css/searchbar.css" />
+}
+<h4>Transactor Transactions Index</h4>
+
+<div class="container ">
+    <ul class="nav small justify-content-end ">
+        <li class="nav-item">
+            <a href="#" role="button" class="nav-link" id="CreateNew">Create New</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="collapse" data-bs-target="#filterCollapse" href="#filterCollapse" role="button" id="filtersToggle"
+               aria-expanded="false" aria-controls="filterCollapse">
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#" id="rowSelectorsToggle" role="button">
+
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="@Url.Page("./addcrossentry")">Αντιλογισμός</a>
+        </li>
+        <li class="nav-item dropdown " id="SelectedRowsActionsMenu">
+            <a class="nav-link dropdown-toggle disabled" role="button" id="ddSelectedRowsActions" data-toggle="dropdown"
+               aria-haspopup="true" aria-expanded="false">Actions</a>
+            <div class="dropdown-menu small">
+                <a class="dropdown-item" href="#" id="deleteSelectedRows">Delete Selected</a>
+                <a class="dropdown-item" href="./AddCrossEntry" id="lnkAntilogismos">Αντιλογισμός</a>
+                <a class="dropdown-item" href="#">Something else here</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">Separated link</a>
+
+            </div>
+        </li>
+    </ul>
+</div>
+@await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { })
+
+<div class="row mt-1">
+    <partial name="_PagerPartial" />
+</div>
+<table class="table table-bordered table-sm" id="myTable">
+    <thead class="thead-light">
+
+    </thead>
+    <tbody>
+    </tbody>
+
+</table>
+
+<div class="row">
+    <partial name="_PagerPartial" />
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="loader"></div>
+                <div>
+                    <p>Executing request. <br><br><small>Please wait...</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+    <script src="~/js/moment.min.js"></script>
+    <script src="~/js/definitions.js"></script>
+    <script src="~/js/indexPageIIFE.lib.js"></script>
+    <script>
+        $(document).ready(function() {
+            var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
+            let baseCulture = '@System.Globalization.CultureInfo.CurrentCulture.';
+            var formatterCurrency = new Intl.NumberFormat(currentCulture,
+                {
+                    style: 'currency',
+                    currency: 'EUR',
+                    minimumFractionDigits: 2
+                });
+            var formatterNumber = new Intl.NumberFormat(currentCulture,
+                {
+                    maximumFractionDigits: 3
+
+                });
+            //#region variables
+
+            var $deleteSelectedRowsLink = $('#deleteSelectedRows');
+            var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
+            //#endregion
+            //#region Index page definition objects
+            const colDefs = [
+                {
+                    key: 'transDate',
+                    responseKey: 'transDate',
+                    actualVal: '',
+                    columnFormat: 'd',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: 'DateSort',
+                    sortType: 'numeric',
+                    header: 'Date',
+                    text: '',
+                    headerClass: 'small text-center ',
+                    class: 'small',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {
+                    }
+                },
+                {
+                    key: 'transactorName',
+                    responseKey: 'transactorName',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: 'label',
+                    grandTotalKey: 'label',
+                    totalFormatter: '',
+                    sortKey: 'TransactorNameSort',
+                    sortType: 'alpha',
+                    header: 'Transactor',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {
+                        isRemoteReference: true,
+                        valueKey: 'transactorId',
+                        url: '@Url.Page("/mainentities/transactors/details")?id='
+                    }
+                },
+                {
+                    key: 'transTransactorDocSeriesCode',
+                    responseKey: 'transTransactorDocSeriesCode',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: 'SeriesCodeSort',
+                    sortType: 'alpha',
+                    header: 'Series',
+                    text: '',
+                    headerClass: 'small text-center d-none d-md-table-cell',
+                    class: 'small d-none d-md-table-cell ',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {
+                    }
+                },
+                {
+                    key: 'transRefCode',
+                    responseKey: 'transRefCode',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: '',
+                    sortType: '',
+                    header: 'Ref Number',
+                    text: '',
+                    headerClass: 'small text-center d-none d-md-table-cell',
+                    class: 'small d-none d-md-table-cell ',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {
+                    }
+                },
+                {
+                    key: 'sectionCode',
+                    responseKey: 'sectionCode',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: 'SectionCodeSort',
+                    sortType: 'alpha',
+                    header: 'Section',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small ',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {
+                    }
+                },
+                {
+                    key: 'companyCode',
+                    responseKey: 'companyCode',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: 'CompanyCodeSort',
+                    sortType: 'alpha',
+                    header: 'Company',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small ',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {
+                    }
+                },
+                {
+                    key: 'debitAmount',
+                    responseKey: 'debitAmount',
+                    actualVal: '',
+                    columnFormat: 'c',
+                    totalKey: 'sumOfDebit',
+                    grandTotalKey: 'grandSumOfDebit',
+                    totalFormatter: 'currency',
+                    sortKey: '',
+                    sortType: '',
+                    header: 'Debit',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small text-right ',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {
+                    }
+                },
+                {
+                    key: 'creditAmount',
+                    responseKey: 'creditAmount',
+                    actualVal: '',
+                    columnFormat: 'c',
+                    totalKey: 'sumOfCredit',
+                    grandTotalKey: 'grandSumOfCredit',
+                    totalFormatter: 'currency',
+                    sortKey: '',
+                    sortType: '',
+                    header: 'Credit',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small text-right ',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {
+                    }
+                }
+            ];
+            const actionColDefs = [
+                {
+                    actionType: 'defaultAction',
+                    valueKey: 'id',
+                    icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
+                    url: '@Url.Page("./Edit")?id='
+                },
+                {
+                    actionType: 'defaultAction',
+                    valueKey: 'id',
+                    icon: '<i class="fas fa-info-circle fa-lg" style="color:slategray"></i>',
+                    url: '@Url.Page("./Details")?id='
+                },
+                {
+                    actionType: 'defaultAction',
+                    valueKey: 'id',
+                    icon: '<i class="fas fa-trash fa-lg" style="color:slategray"></i>',
+                    url: '@Url.Page("./Delete")?id='
+                },
+                {
+                    actionType: 'defaultAction',
+                    valueKey: 'id',
+                    icon: '<i class="fas fa-clone fa-lg" style="color:slategray"></i>',
+                    url: '@Url.Page("./Create")?copyFromId='
+                }
+            ];
+            const actionColSubDefs = [
+                {
+                    actionType: 'newWindowAction',
+                    valueKey: 'transactorId',
+                    text: 'Καρτέλλα',
+                    icon: '<i class="fas fa-clone fa-lg" style="color:slategray"></i>',
+                    url: '@Url.Page("/mainentities/transactors/Kartela")?transactorId='
+                },
+                {
+                    actionType: 'defaultAction2',
+                    visibility: 'always',
+                    target: '_blank',
+                    condition: {},
+                    text: 'Edit Prototype',
+
+                    dataAttributes: [
+                        {
+                            key: 'docid',
+                            valueKey: 'docid'
+                        }
+                    ],
+                    icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
+                    uriType: 'funcHref', //funcUrl staticHref, staticUrl
+                    urlKeys: [
+                        { key: 'id', valueKey: 'id' }
+                    ],
+                    uriFunc: function(col, valueSource) {
+                        let retUri = '';
+                        if (valueSource.creatorSectionId > 0 ) {
+                            switch (valueSource.creatorSectionCode) {
+                                case "SCNSELLCOMBINED":
+                                    retUri = `/transactions/sellmaterialdoc/Edit?id=${valueSource["creatorId"]}`;
+                                    break;
+                                case "SCNBUYMATTRANS":
+                                    retUri = `/transactions/buymaterialsdoc/Edit?id=${valueSource["creatorId"]}`;
+                                    break;
+                            default:
+                            }
+
+                        } else {
+
+                            var itemId = valueSource["id"];
+                            retUri = `@Url.Page("./Edit")?id=${itemId}`;
+                        }
+                        return retUri;
+                    },
+                    uri: ''
+                }
+            ];
+            const actionMobileColDefs = [
+                {
+                    actionType: 'defaultAction',
+                    visibility: 'always',
+                    elementName: '',
+                    condition: {},
+                    text: 'Edit',
+                    valueKey: 'id',
+                    icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
+                    url: '@Url.Page("./Edit")?id='
+                },
+                {
+                    actionType: 'defaultAction',
+                    visibility: 'always',
+                    elementName: '',
+                    condition: {},
+                    text: 'Details',
+                    valueKey: 'id',
+                    icon: '<i class="fas fa-info-circle fa-lg" style="color:slategray"></i>',
+                    url: '@Url.Page("./Details")?id='
+                },
+                {
+                    actionType: 'defaultAction',
+                    visibility: 'always',
+                    elementName: '',
+                    condition: {},
+                    text: 'Delete',
+                    valueKey: 'id',
+                    icon: '<i class="fas fa-trash fa-lg" style="color:slategray"></i>',
+                    url: '@Url.Page("./Delete")?id='
+                },
+                {
+                    actionType: 'defaultAction',
+                    visibility: 'always',
+                    elementName: '',
+                    condition: {},
+                    text: 'Duplicate',
+                    valueKey: 'id',
+                    icon: '<i class="fas fa-clone fa-lg" style="color:slategray"></i>',
+                    url: '@Url.Page("./Create")?copyFromId='
+                },
+                {
+                    actionType: 'newWindowAction',
+                    visibility: 'always',
+                    condition: {},
+                    valueKey: 'transactorId',
+                    text: 'Καρτέλλα',
+                    icon: '<i class="fas fa-receipt fa-lg" style="color:slategray"></i>',
+                    url: '@Url.Page("/mainentities/transactors/Kartela")?transactorId='
+                },
+
+                {
+                    actionType: 'defaultAction2',
+                    visibility: 'always',
+                    target: '_blank',
+                    condition: {},
+                    text: 'Edit Prototype',
+
+                    dataAttributes: [
+                        {
+                            key: 'docid',
+                            valueKey: 'docid'
+                        }
+                    ],
+                    icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
+                    uriType: 'funcHref', //funcUrl staticHref, staticUrl
+                    urlKeys: [
+                        { key: 'id', valueKey: 'id' }
+                    ],
+                    uriFunc: function(col, valueSource) {
+                        let retUri = '';
+                        if (valueSource.creatorSectionId > 0 ) {
+                            switch (valueSource.creatorSectionCode) {
+                                case "SCNSELLCOMBINED":
+                                    retUri = `/transactions/sellmaterialdoc/Edit?id=${valueSource["creatorId"]}`;
+                                    break;
+                                case "SCNBUYMATTRANS":
+                                    retUri = `/transactions/buymaterialsdoc/Edit?id=${valueSource["creatorId"]}`;
+                                    break;
+                            default:
+                            }
+
+                        } else {
+                            /*
+                            var params = '';
+                            for (var i = 0; i < col.urlKeys.length - 1; i++) {
+                                if (i > 0) {
+                                    params += "&";
+                                }
+                                params += `${col.urlKeys[i].key}=${col.urlKeys[i].key}`;
+                            }
+                            */
+                            var itemId = valueSource["id"];
+                            retUri = `@Url.Page("./Edit")?id=${itemId}`;
+                        }
+                        return retUri;
+                    },
+                    uri: ''
+                },
+            ];
+            const tableHandlersToRegister = [
+            ];
+            const pageHandlersToRegister = [
+                {
+                    selector: '#CurrencySelector',
+                    event: 'change',
+                    handler: function(event) {
+                        currencyChanged();
+                        indPgLib.refreshData();
+                    }
+                }
+            ];
+            const indexPageDef = {
+                uri: '/api/GrKoukInfoApi/GetIndexTblDataTransactorTrans',
+                currencyFormatter: formatterCurrency,
+                numberFormatter: formatterNumber,
+                colDefs: colDefs,
+                actionColDefs: actionColDefs,
+                actionColSubDefs: actionColSubDefs,
+                actionMobileColDefs: actionMobileColDefs,
+                tableHandlersToRegister: tableHandlersToRegister,
+                pageHandlersToRegister: pageHandlersToRegister,
+                afterTableLoad: {}
+            };
+
+            indPgLib.setIndexPageDefinition(indexPageDef);
+            //#endregion
+
+            var deleteSelectedRows = () => {
+                var $rowSelectors = $('input[name=checkTableRow]');
+                var selectedRows = $rowSelectors.filter(':checked');
+                var idsToDelete = [];
+                $.each(selectedRows,
+                    function(key, value) {
+                        console.log(value);
+                        var id = parseInt(value.dataset.itemid);
+                        idsToDelete.push(id);
+                    });
+                if (idsToDelete.length > 0) {
+                    var idsJs = JSON.stringify({
+                        //ToDo: Change this
+                        section: 'SectionCode',
+                        ids: idsToDelete
+                    });
+                    var timeout;
+
+                    $.ajax({
+                        contentType: 'application/json; charset=utf-8',
+
+                        dataType: 'json',
+                        type: 'POST',
+                        data: idsJs,
+                        url: "/api/GrkoukInfoApi/DeletesellDoοοcumentsList",
+                        beforeSend: function() {
+                            if (timeout) {
+                                clearTimeout(timeout);
+                            }
+                            timeout = setTimeout(function() {
+
+                                    $("#loadMe").modal({
+                                        backdrop: "static", //remove ability to close modal with click
+                                        keyboard: false, //remove option to close with keyboard
+                                        show: true //Display loader!
+                                    });
+                                },
+                                1000);
+
+                        },
+                        success: function(result) {
+                            console.log(result);
+                            toastr.success("Delete", result.message);
+                            refreshTableData();
+
+                        },
+                        complete: function() {
+                            if (timeout) {
+                                clearTimeout(timeout);
+                            }
+                            $("#loadMe").modal("hide");
+                            setTimeout(function() {
+                                    console.log('Checking for open modals');
+                                    var isOpen = $('#loadMe').hasClass('show');
+                                    if (isOpen) {
+                                        console.log('There is an open Modal');
+                                        $("#loadMe").modal("hide");
+                                    } else {
+                                        console.log('No open modal');
+                                    }
+                                },
+                                2000);
+                        },
+                        error: function(e) {
+                            console.log(e);
+                            toastr.error("Error", e.responseJSON.error);
+
+                        }
+                    });
+
+                }
+
+            };
+
+
+            $deleteSelectedRowsLink.on('click',
+                () => {
+                    deleteSelectedRows();
+                });
+            var currencyChanged = () => {
+                let curCurrencySelected = parseInt($('#CurrencySelector').val());
+                var currencyCode;
+                try {
+                    let currentCurrency = currencyListJs.find(x => x.id === curCurrencySelected);
+                    currencyCode = currentCurrency.code;
+                    let locale = currentCurrency.displayLocale;
+                    formatterCurrency = new Intl.NumberFormat(locale,
+                        {
+                            style: 'currency',
+                            currency: currencyCode,
+                            minimumFractionDigits: 2
+                        });
+                    indPgLib.setCurrencyFormatter(formatterCurrency);
+                } catch (e) {
+                    //not found keep old formater or maybe create a default one
+                    console.log('Not found currency code for this id');
+                }
+            };
+            indPgLib.addPagerElementEventListeners();
+            indPgLib.registerPageHandlers();
+            indPgLib.loadSettings('TransactorTransIndexView');
+            //----------------
+
+            indPgLib.handleFiltersUi();
+            currencyChanged();
+            indPgLib.refreshData();
+            indPgLib.rowSelectorsUi();
+
+
+        });
+
+        $(window).on('beforeunload',
+            function(e) {
+                indPgLib.saveSettings('TransactorTransIndexView');
+
+            });
+    </script>
+}

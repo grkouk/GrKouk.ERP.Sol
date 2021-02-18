@@ -1,0 +1,287 @@
+﻿@page
+@model CreateModel
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    Layout = "_LayoutEntryFormTransaction";
+    ViewData["Title"] = "Νέα κίνηση συναλλασομένου";
+}
+
+<h2>Create Transactor Transaction</h2>
+<hr />
+<div class="container">
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="@Model.InitialLoad" id="IsInitialLoad" />
+        <input type="hidden" asp-for="@Model.CopyFromId" id="CopyFromId" />
+        <input type="hidden" asp-for="@Model.CopyFromTransactorId" id="CopyFromTransactorId" />
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <input asp-for="ItemVm.TransDate" class="form-control form-control-sm" autofocus />
+                    <label asp-for="ItemVm.TransDate" class="form-label small"></label>
+                    <span asp-validation-for="ItemVm.TransDate" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <select asp-for="ItemVm.TransTransactorDocSeriesId" class="form-select form-select-sm" asp-items="ViewBag.TransTransactorDocSeriesId"></select>
+                    <label asp-for="ItemVm.TransTransactorDocSeriesId" class="form-label small"></label>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <input asp-for="ItemVm.TransRefCode" class="form-control form-control-sm" placeholder="Ref Code"/>
+                    <label asp-for="ItemVm.TransRefCode" class="form-label small"></label>
+                    <span asp-validation-for="ItemVm.TransRefCode" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <select asp-for="ItemVm.TransactorId" class="form-select form-select-sm" asp-items="ViewBag.TransactorId"></select>
+                    <label asp-for="ItemVm.TransactorId" class="form-label small"></label>
+                    <span asp-validation-for="ItemVm.TransactorId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <select asp-for="ItemVm.FiscalPeriodId" class="form-select form-select-sm" asp-items="ViewBag.FiscalPeriodId" readonly></select>
+                    <label asp-for="ItemVm.FiscalPeriodId" class="form-label small"></label>
+                    <span asp-validation-for="ItemVm.FiscalPeriodId" class="text-danger"></span>
+                    </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm" asp-items="ViewBag.CompanyId"></select>
+                    <label asp-for="ItemVm.CompanyId" class="form-label small"></label>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-1">
+                <div class="form-floating">
+                    <input asp-for="ItemVm.FpaRate" class="form-control form-control-sm" placeholder="VAT Percent" />
+                    <label asp-for="ItemVm.FpaRate" class="form-label small"></label>
+                        <span asp-validation-for="ItemVm.FpaRate" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <input asp-for="ItemVm.AmountNet" class="form-control form-control-sm" placeholder="Net Value" />
+                    <label asp-for="ItemVm.AmountNet" class="form-label small"></label>
+                    <div class="invalid-feedback">
+                        <span asp-validation-for="ItemVm.AmountNet" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-floating">
+                    <input asp-for="ItemVm.AmountFpa" class="form-control form-control-sm" placeholder="VAT Amount" />
+                    <label asp-for="ItemVm.AmountFpa" class="form-label small"></label>
+                    <div class="invalid-feedback">
+                        <span asp-validation-for="ItemVm.AmountFpa" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-floating">
+                    <input asp-for="ItemVm.AmountDiscount" class="form-control form-control-sm" placeholder="Discount Amount" />
+                    <label asp-for="ItemVm.AmountDiscount" class="form-label small"></label>
+                    <div class="invalid-feedback">
+                        <span asp-validation-for="ItemVm.AmountDiscount" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-floating">
+                    <input asp-for="ItemVm.AmountSum" class="form-control form-control-sm" disabled />
+                    <label asp-for="ItemVm.AmountSum" class="form-label small">Sum</label>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <div class="form-floating">
+                    <textarea asp-for="ItemVm.Etiology" class="form-control form-control-sm" placeholder="Αιτιολογία Κίνησης"> </textarea>
+                    <label asp-for="ItemVm.Etiology" class="form-label small"></label>
+                </div>
+                <div class="invalid-feedback">
+                    <span asp-validation-for="ItemVm.Etiology" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col">
+                <input type="submit" value="Create" class="btn btn-primary btn-sm" />
+            </div>
+        </div>
+    </form>
+</div>
+
+<div>
+    <a class="small" asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function () {
+
+            var $initialLoad = $('#IsInitialLoad');
+
+            //if (!$initialLoad.val()) return;
+            var $transDate = $('#ItemVm_TransDate');
+            var $amountNet = $('#ItemVm_AmountNet');
+            var $amountFpa = $('#ItemVm_AmountFpa');
+            var $amountDic = $('#ItemVm_AmountDiscount');
+            var $fpaRate = $('#ItemVm_FpaRate');
+            var $amountSum = $('#ItemVm_AmountSum');
+            var $fiscalPeriod = $('#ItemVm_FiscalPeriodId');
+            var fiscalPeriodDom = document.getElementById("ItemVm_FiscalPeriodId");
+            const $docSeriesEl=$('#ItemVm_TransTransactorDocSeriesId');
+            const $transactorListEl = $('#ItemVm_TransactorId');
+            var transactorsListJs = @Html.Raw(Json.Serialize(ViewBag.transactorsListJs));
+            var allowedTypesListJs = @Html.Raw(Json.Serialize(ViewBag.docTypeAllowedTransactorTypesListJs));
+
+            var calculateAmounts = () => {
+                console.log("Calculate Values called");
+
+                var fpaRate = parseFloat($fpaRate.val());
+                var amountNet = parseFloat($amountNet.val());
+                var amountDic = parseFloat($amountDic.val());
+                var amountForFpa = amountNet - amountDic;
+                var amountFpa = amountForFpa * fpaRate;
+
+                $amountFpa.val( amountFpa);
+
+                $amountSum.val(amountNet + amountFpa - amountDic);
+            };
+
+            var transactionDataChanged = () => {
+                //console.log("Inside transDate Changed");
+
+                var forDate = $transDate.val();
+                //var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
+                var finalUri = `/api/materials/FiscalPeriod?forDate=${forDate}`;
+                fetch(finalUri)
+                    .then(function(response) {
+                        if (response.ok) {
+                            return response.json();
+                        } else {
+                            return "-1";
+                        }
+
+                    })
+                    .then(function(myJson) {
+                        //console.log("Inside fetch then with myJson" + JSON.stringify(myJson));
+                        if (myJson) {
+
+                            var fiscalPeriodId = myJson.periodId;
+                           // console.log("Returned PeriodId=" + fiscalPeriodId);
+                            //var fId = parseInt(fiscalPeriodId);
+                            //$fiscalPeriod.val(fiscalPeriodId).trigger("chosen:updated");
+                            fiscalPeriodDom.value = fiscalPeriodId;
+
+                        }
+                        // $spinner.attr('hidden', true);
+                    })
+                    .catch((error) => {
+                            // $spinner.attr('hidden', true);
+                            console.log(error);
+                        }
+                    );
+            };
+            const docSeriesChanged=()=>{
+               const docSeriesId=$('#ItemVm_TransTransactorDocSeriesId').val();
+               //locate inside list selected docseriesid
+               let a = allowedTypesListJs.find(o=>o.docSeriesId==docSeriesId);
+               if (a){
+                   console.log('Found');
+                   let allowed = JSON.parse(a.allowedTypes);
+                   if (allowed){
+                        let  lst = transactorsListJs.filter(function(item){
+                                return allowed.indexOf(item.transactorTypeId) !== -1;
+                              });
+                         $transactorListEl.empty();
+
+                        $.each(lst, function(index, item) {
+                            $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
+                        });
+                   } else {
+                     $transactorListEl.empty();
+
+                    $.each(transactorsListJs, function(index, item) {
+                        $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
+                    });
+                   }
+
+               } else {
+                   console.log('Not Found');
+                   $transactorListEl.empty();
+
+                  $.each(transactorsListJs, function(index, item) {
+                      $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
+                  });
+               }
+
+            };
+            $docSeriesEl.change((e)=>{
+                console.log(e)
+                docSeriesChanged();
+            });
+            $transDate.change(() => {
+                transactionDataChanged();
+            });
+            $fpaRate.change((event) => {
+                console.log("Inside Fpa Rate Change");
+                calculateAmounts();
+            });
+            $amountNet.change((event) => {
+                console.log("Inside Net Amount Change");
+                calculateAmounts();
+            });
+            $amountDic.change((event) => {
+                console.log("Inside Discount Amount Change");
+                calculateAmounts();
+            });
+            var copyFromId =parseInt( $('#CopyFromId').val());
+            let selectTransactor=0;
+             if (copyFromId===0) {
+                $fpaRate.val(0);
+                $amountDic.val(0);
+                $amountFpa.val(0);
+                $amountNet.val(0);
+                 $('#ItemVm_TransDate').val(new Date().toISOString().slice(0, 10));
+                 transactionDataChanged();
+            } else {
+                  $('#ItemVm_TransDate').val(new Date().toISOString().slice(0, 10));
+                  selectTransactor = parseInt($('#CopyFromTransactorId').val());
+             }
+             /*
+            if ($initialLoad.val()=='True') {
+                console.log("Initial load is true setting initial values");
+                $fpaRate.val(0);
+                $amountDic.val(0);
+                $amountFpa.val(0);
+                $amountNet.val(0);
+
+                $('#ItemVm_TransDate').val(new Date().toISOString().slice(0, 10));
+                transactionDataChanged();
+
+            }
+            */
+
+            console.log("After initial load check");
+
+            $initialLoad.val(false);
+            docSeriesChanged();
+            if (selectTransactor!==0) {
+                $('#ItemVm_TransactorId').val(selectTransactor);
+            }
+        });
+
+
+    </script>
+}
