@@ -138,36 +138,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
             ActionHandlers.CashFlowFinAction(cfaTransactionDef.CfaAction, cfaTransaction);
 
 
-            //switch (cfaTransactionDef.FinancialTransAction)
-            //{
-            //    case FinActionsEnum.FinActionsEnumNoChange:
-            //        cfaTransaction.TransDiscountAmount = 0;
-            //        cfaTransaction.TransFpaAmount = 0;
-            //        cfaTransaction.TransNetAmount = 0;
-            //        break;
-            //    case FinActionsEnum.FinActionsEnumDebit:
-            //        cfaTransaction.TransDiscountAmount = cfaTransaction.AmountDiscount;
-            //        cfaTransaction.TransFpaAmount = cfaTransaction.AmountFpa;
-            //        cfaTransaction.TransNetAmount = cfaTransaction.AmountNet;
-            //        break;
-            //    case FinActionsEnum.FinActionsEnumCredit:
-            //        cfaTransaction.TransDiscountAmount = cfaTransaction.AmountDiscount;
-            //        cfaTransaction.TransFpaAmount = cfaTransaction.AmountFpa;
-            //        cfaTransaction.TransNetAmount = cfaTransaction.AmountNet;
-            //        break;
-            //    case FinActionsEnum.FinActionsEnumNegativeDebit:
-            //        cfaTransaction.TransNetAmount = cfaTransaction.AmountNet * -1;
-            //        cfaTransaction.TransFpaAmount = cfaTransaction.AmountFpa * -1;
-            //        cfaTransaction.TransDiscountAmount = cfaTransaction.AmountDiscount * -1;
-            //        break;
-            //    case FinActionsEnum.FinActionsEnumNegativeCredit:
-            //        cfaTransaction.TransNetAmount = cfaTransaction.AmountNet * -1;
-            //        cfaTransaction.TransFpaAmount = cfaTransaction.AmountFpa * -1;
-            //        cfaTransaction.TransDiscountAmount = cfaTransaction.AmountDiscount * -1;
-            //        break;
-            //    default:
-            //        break;
-            //}
+           
 
 
             await _context.CashFlowAccountTransactions.AddAsync(cfaTransaction);
@@ -180,29 +151,15 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
 
         private void LoadCombos()
         {
-            var transactorsListDb = _context.Transactors
-                .Include(p => p.TransactorType)
-                .Where(p => p.TransactorType.Code != "SYS.DTRANSACTOR")
-                .OrderBy(s => s.Name).AsNoTracking();
-            List<SelectListItem> transactorsList = new List<SelectListItem>();
-
-            foreach (var dbTransactor in transactorsListDb)
-            {
-                transactorsList.Add(new SelectListItem()
-                {
-                    Value = dbTransactor.Id.ToString(),
-                    Text = dbTransactor.Name + "-" + dbTransactor.TransactorType.Code
-                });
-            }
-            ViewData["CashFlowAccountId"] = new SelectList(transactorsList, "Value", "Text");
-
+            
+           
+            ViewData["CashFlowAccountId"] =
+                new SelectList(_context.CashFlowAccounts.OrderBy(c => c.Name).AsNoTracking(), "Id", "Name");
             ViewData["CompanyId"] =
                 new SelectList(_context.Companies.OrderBy(c => c.Code).AsNoTracking(), "Id", "Code");
-            ViewData["FiscalPeriodId"] =
-                new SelectList(_context.FiscalPeriods.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
            
             ViewData["DocSeriesId"] =
-                new SelectList(_context.TransTransactorDocSeriesDefs.OrderBy(s => s.Name).AsNoTracking(), "Id", "Name");
+                new SelectList(_context.CashFlowDocSeriesDefs.OrderBy(s => s.Name).AsNoTracking(), "Id", "Name");
             
             var transactorsListJs = _context.Transactors
                 .Include(p => p.TransactorType)
