@@ -5,7 +5,7 @@
     ViewData["Title"] = "Create";
 }
 
-<h4>Create TransTransactorDef</h4>
+<h4>Create Cash Flow transaction Def</h4>
 <hr />
 <div class="container">
     <form method="post">
@@ -13,22 +13,22 @@
 
         <div class="row mb-3">
             <div class="form-group col-md-2">
-                <label asp-for="ItemVm.Code" class="control-label"></label>
+                <label asp-for="ItemVm.Code" class="form-label"></label>
                 <input asp-for="ItemVm.Code" class="form-control form-control-sm" />
                 <span asp-validation-for="ItemVm.Code" class="text-danger"></span>
             </div>
             <div class="form-group col-md-4">
-                <label asp-for="ItemVm.Name" class="control-label"></label>
+                <label asp-for="ItemVm.Name" class="form-label"></label>
                 <input asp-for="ItemVm.Name" class="form-control form-control-sm" />
                 <span asp-validation-for="ItemVm.Name" class="text-danger"></span>
             </div>
             <div class="form-group col-md-3">
                 <label asp-for="ItemVm.DefaultDocSeriesId"></label>
-                <select asp-for="ItemVm.DefaultDocSeriesId" class="form-control form-control-sm" asp-items="ViewBag.DefaultDocSeriesId"></select>
+                <select asp-for="ItemVm.DefaultDocSeriesId" class="form-select form-select-sm" asp-items="ViewBag.DefaultDocSeriesId"></select>
             </div>
             <div class="form-group col-md-2">
-                <label asp-for="ItemVm.CompanyId" class="control-label"></label>
-                <select asp-for="ItemVm.CompanyId" class="form-control form-control-sm" asp-items="ViewBag.CompanyId"></select>
+                <label asp-for="ItemVm.CompanyId" class="form-label"></label>
+                <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm" asp-items="ViewBag.CompanyId"></select>
                 <span asp-validation-for="ItemVm.CompanyId" class="text-danger"></span>
             </div>
             <div class="form-group col-md-1 ">
@@ -40,8 +40,8 @@
         </div>
         <div class="row mb-3">
             <div class="form-group col-md-4">
-                <label asp-for="ItemVm.FinancialTransAction" class="control-label"></label>
-                <select asp-for="ItemVm.FinancialTransAction" class="form-control form-control-sm" asp-items="ViewBag.FinancialActions"></select>
+                <label asp-for="ItemVm.FinancialTransAction" class="form-label"></label>
+                <select asp-for="ItemVm.FinancialTransAction" class="form-select form-select-sm" asp-items="ViewBag.FinancialActions"></select>
                 <span asp-validation-for="ItemVm.FinancialTransAction" class="text-danger"></span>
             </div>
            

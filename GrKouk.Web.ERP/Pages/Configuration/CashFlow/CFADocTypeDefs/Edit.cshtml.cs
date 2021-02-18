@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-namespace GrKouk.Web.ERP.Pages.Configuration.CashFlow.CFATransactionDefs
+namespace GrKouk.Web.ERP.Pages.Configuration.CashFlow.CFADocTypeDefs
 {
     public class EditModel : PageModel
     {
@@ -21,7 +21,7 @@ namespace GrKouk.Web.ERP.Pages.Configuration.CashFlow.CFATransactionDefs
         }
 
         [BindProperty]
-        public CashFlowTransactionDef ItemVm { get; set; }
+        public CashFlowDocTypeDef ItemVm { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -30,7 +30,7 @@ namespace GrKouk.Web.ERP.Pages.Configuration.CashFlow.CFATransactionDefs
                 return NotFound();
             }
 
-            ItemVm = await _context.CashFlowTransactionDefs
+            ItemVm = await _context.CashFlowDocTypeDefs
                 .Include(t => t.Company)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
@@ -72,25 +72,14 @@ namespace GrKouk.Web.ERP.Pages.Configuration.CashFlow.CFATransactionDefs
 
         private bool ItemExists(int id)
         {
-            return _context.CashFlowTransactionDefs.Any(e => e.Id == id);
+            return _context.CashFlowDocTypeDefs.Any(e => e.Id == id);
         }
         private void LoadCombos()
         {
-            var financialActions = FiltersHelper.GetFinancialActionsList();
-            ViewData["FinancialActions"] = new SelectList(financialActions, "Value", "Text");
             ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
-            
-
-            var dbSeriesList = _context.TransTransactorDocSeriesDefs.OrderBy(p => p.Name).AsNoTracking();
-            List<SelectListItem> seriesList = new List<SelectListItem>
-            {
-                new SelectListItem() { Value = 0.ToString(), Text = "{No Default series}" }
-            };
-            foreach (var dbSeriesItem in dbSeriesList)
-            {
-                seriesList.Add(new SelectListItem() { Value = dbSeriesItem.Id.ToString(), Text = dbSeriesItem.Name });
-            }
-            ViewData["DefaultDocSeriesId"] = new SelectList(seriesList, "Value", "Text");
+          
+            ViewData["CashFlowTransactionDefId"] =
+                new SelectList(_context.CashFlowTransactionDefs.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
         }
     }
 }
