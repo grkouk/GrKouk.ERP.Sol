@@ -3,14 +3,14 @@
 @model IndexModel
 
 @{
-    ViewData["Title"] = "Transactor Transactions";
+    ViewData["Title"] = "CFA Transactions";
 }
 @section MyCss
     {
     <link rel="stylesheet" href="~/css/custom-checkbox.css" />
     <link rel="stylesheet" href="~/css/searchbar.css" />
 }
-<h4>Transactor Transactions Index</h4>
+<h4>CFA Transactions Index</h4>
 
 <div class="container ">
     <ul class="nav small justify-content-end ">
@@ -49,32 +49,13 @@
 <div class="row mt-1">
     <partial name="_PagerPartial" />
 </div>
-<table class="table table-bordered table-sm" id="myTable">
-    <thead class="thead-light">
-
-    </thead>
-    <tbody>
-    </tbody>
-
-</table>
+<partial name="_DataTable" />
 
 <div class="row">
     <partial name="_PagerPartial" />
 </div>
+<partial name="_LoadMePartial" />
 
-<!-- Modal -->
-<div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <div class="loader"></div>
-                <div>
-                    <p>Executing request. <br><br><small>Please wait...</small></p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 @section Scripts
 {
     <script src="~/js/moment.min.js"></script>
@@ -446,7 +427,7 @@
                 }
             ];
             const indexPageDef = {
-                uri: '/api/GrKoukInfoApi/GetIndexTblDataTransactorTrans',
+                uri: '/api/GrKoukInfoApi/GetIndexTblDataCfaTrans',
                 currencyFormatter: formatterCurrency,
                 numberFormatter: formatterNumber,
                 colDefs: colDefs,
@@ -561,7 +542,7 @@
             };
             indPgLib.addPagerElementEventListeners();
             indPgLib.registerPageHandlers();
-            indPgLib.loadSettings('TransactorTransIndexView');
+            indPgLib.loadSettings('CfaTransIndexView');
             //----------------
 
             indPgLib.handleFiltersUi();
@@ -574,7 +555,7 @@
 
         $(window).on('beforeunload',
             function(e) {
-                indPgLib.saveSettings('TransactorTransIndexView');
+                indPgLib.saveSettings('CfaTransIndexView');
 
             });
     </script>

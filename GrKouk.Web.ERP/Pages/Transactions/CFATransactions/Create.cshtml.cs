@@ -3,7 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GrKouk.Erp.Definitions;
+using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.Shared;
+using GrKouk.Erp.Dtos.CashFlowTransactions;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
@@ -19,7 +21,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
     [Authorize(Roles = "Admin")]
     public class CreateModel : PageModel
     {
-        private const string _sectionCode = "SYS-TRANSACTOR-TRANS";
+        private const string _sectionCode = "SYS-CFA-TRANS";
         private readonly ApiDbContext _context;
         private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
@@ -43,27 +45,28 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
             {
                 CopyFromId = (int) copyFromId;
 
-                var transactionToModify = _context.TransactorTransactions
+                var transactionToModify = _context.CashFlowAccountTransactions
                     .Include(t => t.Company)
                     .Include(t => t.FiscalPeriod)
                     .Include(t => t.Section)
-                    .Include(t => t.TransTransactorDocSeries)
-                    .Include(t => t.TransTransactorDocType)
-                    .Include(t => t.Transactor).FirstOrDefault(m => m.Id == CopyFromId);
+                    .Include(t => t.DocumentSeries)
+                    .Include(t => t.DocumentType)
+                    .Include(t => t.CashFlowAccount)
+                    .FirstOrDefault(m => m.Id == CopyFromId);
 
                 if (transactionToModify == null)
                 {
                     return NotFound();
                 }
 
-                ItemVm = _mapper.Map<TransactorTransCreateDto>(transactionToModify);
-                CopyFromTransactorId = ItemVm.TransactorId;
+                ItemVm = _mapper.Map<CfaTransactionCreateDto>(transactionToModify);
+                CopyFromTransactorId = ItemVm.CashFlowAccountId;
             }
 
             return Page();
         }
 
-        [BindProperty] public TransactorTransCreateDto ItemVm { get; set; }
+        [BindProperty] public CfaTransactionCreateDto ItemVm { get; set; }
 
         public async Task<IActionResult> OnPostAsync()
         {
@@ -71,8 +74,6 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
             {
                 return Page();
             }
-
-            //_context.TransactorTransactions.Add(TransactorTransaction);
 
             #region Fiscal Period
 
@@ -85,11 +86,11 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
 
             #endregion
 
-            var spTransaction = _mapper.Map<TransactorTransaction>(ItemVm);
+            var cfaTransaction = _mapper.Map<CashFlowAccountTransaction>(ItemVm);
 
             var docSeries = await
-                _context.TransTransactorDocSeriesDefs.SingleOrDefaultAsync(m =>
-                    m.Id == ItemVm.TransTransactorDocSeriesId);
+                _context.CashFlowDocSeriesDefs.SingleOrDefaultAsync(m =>
+                    m.Id == ItemVm.DocSeriesId);
 
             if (docSeries is null)
             {
@@ -98,14 +99,14 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
                 return Page();
             }
 
-            await _context.Entry(docSeries).Reference(t => t.TransTransactorDocTypeDef).LoadAsync();
+            await _context.Entry(docSeries).Reference(t => t.CashFlowDocTypeDefinition).LoadAsync();
 
-            var docTypeDef = docSeries.TransTransactorDocTypeDef;
+            var docTypeDef = docSeries.CashFlowDocTypeDefinition;
             await _context.Entry(docTypeDef)
-                .Reference(t => t.TransTransactorDef)
+                .Reference(t => t.CashFlowTransactionDefinition)
                 .LoadAsync();
 
-            var transTransactorDef = docTypeDef.TransTransactorDef;
+            var cfaTransactionDef = docTypeDef.CashFlowTransactionDefinition;
 
             #region Section Management
 
@@ -130,43 +131,46 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
             #endregion
 
 
-            spTransaction.SectionId = sectionId;
-            spTransaction.TransTransactorDocTypeId = docSeries.TransTransactorDocTypeDefId;
-            spTransaction.FiscalPeriodId = fiscalPeriod.Id;
-            spTransaction.FinancialAction = transTransactorDef.FinancialTransAction;
-            switch (transTransactorDef.FinancialTransAction)
-            {
-                case FinActionsEnum.FinActionsEnumNoChange:
-                    spTransaction.TransDiscountAmount = 0;
-                    spTransaction.TransFpaAmount = 0;
-                    spTransaction.TransNetAmount = 0;
-                    break;
-                case FinActionsEnum.FinActionsEnumDebit:
-                    spTransaction.TransDiscountAmount = spTransaction.AmountDiscount;
-                    spTransaction.TransFpaAmount = spTransaction.AmountFpa;
-                    spTransaction.TransNetAmount = spTransaction.AmountNet;
-                    break;
-                case FinActionsEnum.FinActionsEnumCredit:
-                    spTransaction.TransDiscountAmount = spTransaction.AmountDiscount;
-                    spTransaction.TransFpaAmount = spTransaction.AmountFpa;
-                    spTransaction.TransNetAmount = spTransaction.AmountNet;
-                    break;
-                case FinActionsEnum.FinActionsEnumNegativeDebit:
-                    spTransaction.TransNetAmount = spTransaction.AmountNet * -1;
-                    spTransaction.TransFpaAmount = spTransaction.AmountFpa * -1;
-                    spTransaction.TransDiscountAmount = spTransaction.AmountDiscount * -1;
-                    break;
-                case FinActionsEnum.FinActionsEnumNegativeCredit:
-                    spTransaction.TransNetAmount = spTransaction.AmountNet * -1;
-                    spTransaction.TransFpaAmount = spTransaction.AmountFpa * -1;
-                    spTransaction.TransDiscountAmount = spTransaction.AmountDiscount * -1;
-                    break;
-                default:
-                    break;
-            }
+            cfaTransaction.SectionId = sectionId;
+            cfaTransaction.DocumentTypeId = docSeries.CashFlowDocTypeDefId;
+            cfaTransaction.FiscalPeriodId = fiscalPeriod.Id;
+            cfaTransaction.CfaAction = cfaTransactionDef.CfaAction;
+            ActionHandlers.CashFlowFinAction(cfaTransactionDef.CfaAction, cfaTransaction);
 
 
-            _context.TransactorTransactions.Add(spTransaction);
+            //switch (cfaTransactionDef.FinancialTransAction)
+            //{
+            //    case FinActionsEnum.FinActionsEnumNoChange:
+            //        cfaTransaction.TransDiscountAmount = 0;
+            //        cfaTransaction.TransFpaAmount = 0;
+            //        cfaTransaction.TransNetAmount = 0;
+            //        break;
+            //    case FinActionsEnum.FinActionsEnumDebit:
+            //        cfaTransaction.TransDiscountAmount = cfaTransaction.AmountDiscount;
+            //        cfaTransaction.TransFpaAmount = cfaTransaction.AmountFpa;
+            //        cfaTransaction.TransNetAmount = cfaTransaction.AmountNet;
+            //        break;
+            //    case FinActionsEnum.FinActionsEnumCredit:
+            //        cfaTransaction.TransDiscountAmount = cfaTransaction.AmountDiscount;
+            //        cfaTransaction.TransFpaAmount = cfaTransaction.AmountFpa;
+            //        cfaTransaction.TransNetAmount = cfaTransaction.AmountNet;
+            //        break;
+            //    case FinActionsEnum.FinActionsEnumNegativeDebit:
+            //        cfaTransaction.TransNetAmount = cfaTransaction.AmountNet * -1;
+            //        cfaTransaction.TransFpaAmount = cfaTransaction.AmountFpa * -1;
+            //        cfaTransaction.TransDiscountAmount = cfaTransaction.AmountDiscount * -1;
+            //        break;
+            //    case FinActionsEnum.FinActionsEnumNegativeCredit:
+            //        cfaTransaction.TransNetAmount = cfaTransaction.AmountNet * -1;
+            //        cfaTransaction.TransFpaAmount = cfaTransaction.AmountFpa * -1;
+            //        cfaTransaction.TransDiscountAmount = cfaTransaction.AmountDiscount * -1;
+            //        break;
+            //    default:
+            //        break;
+            //}
+
+
+            await _context.CashFlowAccountTransactions.AddAsync(cfaTransaction);
             await _context.SaveChangesAsync();
             _toastNotification.AddSuccessToastMessage("Saved");
 
@@ -190,14 +194,16 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
                     Text = dbTransactor.Name + "-" + dbTransactor.TransactorType.Code
                 });
             }
+            ViewData["CashFlowAccountId"] = new SelectList(transactorsList, "Value", "Text");
 
             ViewData["CompanyId"] =
                 new SelectList(_context.Companies.OrderBy(c => c.Code).AsNoTracking(), "Id", "Code");
             ViewData["FiscalPeriodId"] =
                 new SelectList(_context.FiscalPeriods.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
-            ViewData["TransactorId"] = new SelectList(transactorsList, "Value", "Text");
-            ViewData["TransTransactorDocSeriesId"] =
+           
+            ViewData["DocSeriesId"] =
                 new SelectList(_context.TransTransactorDocSeriesDefs.OrderBy(s => s.Name).AsNoTracking(), "Id", "Name");
+            
             var transactorsListJs = _context.Transactors
                 .Include(p => p.TransactorType)
                 .Where(p => p.TransactorType.Code != "SYS.DTRANSACTOR")

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using AutoMapper;
+using GrKouk.Erp.Dtos.CashFlowTransactions;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
@@ -21,11 +22,11 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
             _mapper = mapper;
         }
         #region Fields
-        public string SectionCode { get; set; } = "SYS-TRANSACTOR-TRANS";
+        public string SectionCode { get; set; } = "SYS-CFA-TRANS";
         #endregion
         public decimal sumCredit = 0;
         public decimal sumDebit = 0;
-        public PagedList<TransactorTransListDto> ListItems { get; set; }
+        public PagedList<CfaTransactionListDto> ListItems { get; set; }
         public void OnGet()
         {
             LoadFilters();

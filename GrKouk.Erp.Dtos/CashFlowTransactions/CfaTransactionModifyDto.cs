@@ -29,7 +29,7 @@ namespace GrKouk.Erp.Dtos.CashFlowTransactions
 
         [DisplayFormat(DataFormatString = "{0:C}")]
         [Display(Name = "Amount")]
-        public decimal AmountSum { get; set; }
+        public decimal Amount { get; set; }
 
         [MaxLength(500)]
         [Display(Name = "Etiology")]

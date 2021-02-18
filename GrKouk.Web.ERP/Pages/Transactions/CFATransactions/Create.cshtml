@@ -4,12 +4,10 @@
 @inject IConfiguration Configuration
 @{
     Layout = "_LayoutEntryFormTransaction";
-    ViewData["Title"] = "Νέα κίνηση συναλλασομένου";
+    ViewData["Title"] = "Νέα κίνηση Cash Flow Account";
 }
-
-<h2>Create Transactor Transaction</h2>
 <hr />
-<div class="container">
+<div class="container-xxl">
     <form method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="hidden" asp-for="@Model.InitialLoad" id="IsInitialLoad" />
@@ -23,83 +21,58 @@
                     <span asp-validation-for="ItemVm.TransDate" class="text-danger"></span>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="form-floating">
-                    <select asp-for="ItemVm.TransTransactorDocSeriesId" class="form-select form-select-sm" asp-items="ViewBag.TransTransactorDocSeriesId"></select>
-                    <label asp-for="ItemVm.TransTransactorDocSeriesId" class="form-label small"></label>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="form-floating">
-                    <input asp-for="ItemVm.TransRefCode" class="form-control form-control-sm" placeholder="Ref Code"/>
-                    <label asp-for="ItemVm.TransRefCode" class="form-label small"></label>
-                    <span asp-validation-for="ItemVm.TransRefCode" class="text-danger"></span>
-                </div>
-            </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <div class="form-floating">
-                    <select asp-for="ItemVm.TransactorId" class="form-select form-select-sm" asp-items="ViewBag.TransactorId"></select>
-                    <label asp-for="ItemVm.TransactorId" class="form-label small"></label>
-                    <span asp-validation-for="ItemVm.TransactorId" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="form-floating">
-                    <select asp-for="ItemVm.FiscalPeriodId" class="form-select form-select-sm" asp-items="ViewBag.FiscalPeriodId" readonly></select>
-                    <label asp-for="ItemVm.FiscalPeriodId" class="form-label small"></label>
-                    <span asp-validation-for="ItemVm.FiscalPeriodId" class="text-danger"></span>
-                    </div>
-            </div>
             <div class="col-md-3">
                 <div class="form-floating">
                     <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm" asp-items="ViewBag.CompanyId"></select>
                     <label asp-for="ItemVm.CompanyId" class="form-label small"></label>
                 </div>
             </div>
-        </div>
-        <div class="row mb-3">
-            <div class="col-md-1">
-                <div class="form-floating">
-                    <input asp-for="ItemVm.FpaRate" class="form-control form-control-sm" placeholder="VAT Percent" />
-                    <label asp-for="ItemVm.FpaRate" class="form-label small"></label>
-                        <span asp-validation-for="ItemVm.FpaRate" class="text-danger"></span>
-                </div>
-            </div>
             <div class="col-md-3">
                 <div class="form-floating">
-                    <input asp-for="ItemVm.AmountNet" class="form-control form-control-sm" placeholder="Net Value" />
-                    <label asp-for="ItemVm.AmountNet" class="form-label small"></label>
+                    <input asp-for="ItemVm.TransRefCode" class="form-control form-control-sm" placeholder="Ref Code" />
+                    <label asp-for="ItemVm.TransRefCode" class="form-label small"></label>
+                    <span asp-validation-for="ItemVm.TransRefCode" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+
+
+            <div class="col-md-4">
+                <div class="form-floating">
+                    <select asp-for="ItemVm.CashFlowAccountId" class="form-select form-select-sm" asp-items="ViewBag.CashFlowAccountId"></select>
+                    <label asp-for="ItemVm.CashFlowAccountId" class="form-label small"></label>
+                    <span asp-validation-for="ItemVm.CashFlowAccountId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-floating">
+                    <select asp-for="ItemVm.DocSeriesId" class="form-select form-select-sm" asp-items="ViewBag.DocSeriesId"></select>
+                    <label asp-for="ItemVm.DocSeriesId" class="form-label small"></label>
+                </div>
+            </div>
+            @*<div class="col-md-3">
+            <div class="form-floating">
+                <select asp-for="ItemVm.FiscalPeriodId" class="form-select form-select-sm" asp-items="ViewBag.FiscalPeriodId" readonly></select>
+                <label asp-for="ItemVm.FiscalPeriodId" class="form-label small"></label>
+                <span asp-validation-for="ItemVm.FiscalPeriodId" class="text-danger"></span>
+                </div>
+        </div>*@
+
+        </div>
+        <div class="row mb-3">
+           
+            <div class="col-md-3">
+                <div class="form-floating">
+                    <input asp-for="ItemVm.Amount" class="form-control form-control-sm currency-input" placeholder="Amount" />
+                    <label asp-for="ItemVm.Amount" class="form-label small"></label>
                     <div class="invalid-feedback">
-                        <span asp-validation-for="ItemVm.AmountNet" class="text-danger"></span>
+                        <span asp-validation-for="ItemVm.Amount" class="text-danger"></span>
                     </div>
                 </div>
             </div>
-            <div class="col-md-2">
-                <div class="form-floating">
-                    <input asp-for="ItemVm.AmountFpa" class="form-control form-control-sm" placeholder="VAT Amount" />
-                    <label asp-for="ItemVm.AmountFpa" class="form-label small"></label>
-                    <div class="invalid-feedback">
-                        <span asp-validation-for="ItemVm.AmountFpa" class="text-danger"></span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="form-floating">
-                    <input asp-for="ItemVm.AmountDiscount" class="form-control form-control-sm" placeholder="Discount Amount" />
-                    <label asp-for="ItemVm.AmountDiscount" class="form-label small"></label>
-                    <div class="invalid-feedback">
-                        <span asp-validation-for="ItemVm.AmountDiscount" class="text-danger"></span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="form-floating">
-                    <input asp-for="ItemVm.AmountSum" class="form-control form-control-sm" disabled />
-                    <label asp-for="ItemVm.AmountSum" class="form-label small">Sum</label>
-                </div>
-            </div>
+           
+           
         </div>
         <div class="row mb-3">
             <div class="col-md-12">
@@ -126,44 +99,59 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/product.lib.js"></script>
     <script>
         $(document).ready(function () {
+            var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
+            //console.log('Current Culture ' + currentCulture);
 
+            var formatterCurrency = new Intl.NumberFormat(currentCulture,
+                {
+                    style: 'currency',
+                    currency: 'EUR',
+                    minimumFractionDigits: 2
+                });
+            var formatterNumber = new Intl.NumberFormat(currentCulture,
+                {
+                    maximumFractionDigits: 3
+
+                });
             var $initialLoad = $('#IsInitialLoad');
 
             //if (!$initialLoad.val()) return;
-            var $transDate = $('#ItemVm_TransDate');
-            var $amountNet = $('#ItemVm_AmountNet');
-            var $amountFpa = $('#ItemVm_AmountFpa');
-            var $amountDic = $('#ItemVm_AmountDiscount');
-            var $fpaRate = $('#ItemVm_FpaRate');
-            var $amountSum = $('#ItemVm_AmountSum');
+            const $transDate = $('#ItemVm_TransDate');
+            const $amount = $('#ItemVm_Amount');
+            const $companyId = $('#ItemVm_CompanyId');
+            const $docCurrency = $('[name=docCurrency]');
+
             var $fiscalPeriod = $('#ItemVm_FiscalPeriodId');
             var fiscalPeriodDom = document.getElementById("ItemVm_FiscalPeriodId");
             const $docSeriesEl=$('#ItemVm_TransTransactorDocSeriesId');
             const $transactorListEl = $('#ItemVm_TransactorId');
             var transactorsListJs = @Html.Raw(Json.Serialize(ViewBag.transactorsListJs));
             var allowedTypesListJs = @Html.Raw(Json.Serialize(ViewBag.docTypeAllowedTransactorTypesListJs));
+           
+            const formatCurrencyLineValueElements = () => {
+                let $elementsToUpdateVal = $('.currency-input');
+                $elementsToUpdateVal.each(function() {
+                    let $el = $(this);
+                    let parse = Globalize.numberParser(); 
+                    let elValue = parse($el.val());
+                    if (!isNaN(elValue)) {
+                        $el.val(formatterCurrency.format(elValue));
+                    }
 
-            var calculateAmounts = () => {
-                console.log("Calculate Values called");
-
-                var fpaRate = parseFloat($fpaRate.val());
-                var amountNet = parseFloat($amountNet.val());
-                var amountDic = parseFloat($amountDic.val());
-                var amountForFpa = amountNet - amountDic;
-                var amountFpa = amountForFpa * fpaRate;
-
-                $amountFpa.val( amountFpa);
-
-                $amountSum.val(amountNet + amountFpa - amountDic);
+                });
+            };
+            const updateCurrencyFormat = () => {
+                formatCurrencyLineValueElements();
             };
 
             var transactionDataChanged = () => {
                 //console.log("Inside transDate Changed");
 
                 var forDate = $transDate.val();
-                //var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
+                
                 var finalUri = `/api/materials/FiscalPeriod?forDate=${forDate}`;
                 fetch(finalUri)
                     .then(function(response) {
@@ -175,13 +163,11 @@
 
                     })
                     .then(function(myJson) {
-                        //console.log("Inside fetch then with myJson" + JSON.stringify(myJson));
+                        
                         if (myJson) {
 
                             var fiscalPeriodId = myJson.periodId;
-                           // console.log("Returned PeriodId=" + fiscalPeriodId);
-                            //var fId = parseInt(fiscalPeriodId);
-                            //$fiscalPeriod.val(fiscalPeriodId).trigger("chosen:updated");
+                           
                             fiscalPeriodDom.value = fiscalPeriodId;
 
                         }
@@ -194,7 +180,7 @@
                     );
             };
             const docSeriesChanged=()=>{
-               const docSeriesId=$('#ItemVm_TransTransactorDocSeriesId').val();
+               const docSeriesId=$('#ItemVm_DocSeriesId').val();
                //locate inside list selected docseriesid
                let a = allowedTypesListJs.find(o=>o.docSeriesId==docSeriesId);
                if (a){
@@ -227,55 +213,59 @@
                }
 
             };
-            $docSeriesEl.change((e)=>{
-                console.log(e)
+            const companyChanged = () => {
+                let companyId = parseInt($companyId.val());
+                if (isNaN(companyId)) {
+                    companyId = 0;
+                }
+                if (companyId>0) {
+                   
+                    productLib.getCompanyBaseCurrencyInfo(companyId)
+                        .then((data) => {
+                            let currencyCode = data.currencyCode;
+                            //var currencyLocale = data.currencyLocale;
+                            let locale = data.currencyLocale;
+                            formatterCurrency = new Intl.NumberFormat(locale,
+                                {
+                                    style: 'currency',
+                                    currency: currencyCode,
+                                    minimumFractionDigits: 2
+                                });
+                            $docCurrency.text(currencyCode);
+                            updateCurrencyFormat();
+                        })
+                        .catch((error) => {
+                            console.log("Error getting company base currency");
+                            console.log(error);
+                        });
+                }
+            };
+            $docSeriesEl.change((e)=> {
+                console.log(e);
                 docSeriesChanged();
             });
             $transDate.change(() => {
                 transactionDataChanged();
             });
-            $fpaRate.change((event) => {
-                console.log("Inside Fpa Rate Change");
-                calculateAmounts();
+            $companyId.change(() => {
+                companyChanged();
             });
-            $amountNet.change((event) => {
-                console.log("Inside Net Amount Change");
-                calculateAmounts();
-            });
-            $amountDic.change((event) => {
-                console.log("Inside Discount Amount Change");
-                calculateAmounts();
-            });
+           
             var copyFromId =parseInt( $('#CopyFromId').val());
             let selectTransactor=0;
              if (copyFromId===0) {
-                $fpaRate.val(0);
-                $amountDic.val(0);
-                $amountFpa.val(0);
-                $amountNet.val(0);
+               
+                $amount.val(0);
                  $('#ItemVm_TransDate').val(new Date().toISOString().slice(0, 10));
                  transactionDataChanged();
             } else {
                   $('#ItemVm_TransDate').val(new Date().toISOString().slice(0, 10));
                   selectTransactor = parseInt($('#CopyFromTransactorId').val());
              }
-             /*
-            if ($initialLoad.val()=='True') {
-                console.log("Initial load is true setting initial values");
-                $fpaRate.val(0);
-                $amountDic.val(0);
-                $amountFpa.val(0);
-                $amountNet.val(0);
-
-                $('#ItemVm_TransDate').val(new Date().toISOString().slice(0, 10));
-                transactionDataChanged();
-
-            }
-            */
-
-            console.log("After initial load check");
-
+          
+          
             $initialLoad.val(false);
+            companyChanged();
             docSeriesChanged();
             if (selectTransactor!==0) {
                 $('#ItemVm_TransactorId').val(selectTransactor);
