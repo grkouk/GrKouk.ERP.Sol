@@ -38,12 +38,15 @@
         <div class="row mb-3">
 
 
-            <div class="col-md-6">
+            <div class="col-md-5">
                 <div class="form-floating">
-                    <select asp-for="ItemVm.CashFlowAccountId" class="form-select form-select-sm" asp-items="ViewBag.CashFlowAccountId"></select>
+                    <select asp-for="ItemVm.CashFlowAccountId" class="form-select form-select-sm"></select>
                     <label asp-for="ItemVm.CashFlowAccountId" class="form-label small"></label>
                     <span asp-validation-for="ItemVm.CashFlowAccountId" class="text-danger"></span>
                 </div>
+            </div>
+            <div class="col-1" id="SpinnerLoaderCompanies" style="display: none">
+                <span class="spinner-border spinner-border-sm text-primary" ></span>
             </div>
             <div class="col-md-6">
                 <div class="form-floating">
@@ -51,13 +54,7 @@
                     <label asp-for="ItemVm.DocSeriesId" class="form-label small"></label>
                 </div>
             </div>
-            @*<div class="col-md-3">
-            <div class="form-floating">
-                <select asp-for="ItemVm.FiscalPeriodId" class="form-select form-select-sm" asp-items="ViewBag.FiscalPeriodId" readonly></select>
-                <label asp-for="ItemVm.FiscalPeriodId" class="form-label small"></label>
-                <span asp-validation-for="ItemVm.FiscalPeriodId" class="text-danger"></span>
-                </div>
-        </div>*@
+           
 
         </div>
         <div class="row mb-3 justify-content-end">
@@ -117,19 +114,18 @@
 
                 });
             var $initialLoad = $('#IsInitialLoad');
-
+            const $spinnerElement = $('#SpinnerLoaderCompanies');
             //if (!$initialLoad.val()) return;
             const $transDate = $('#ItemVm_TransDate');
             const $amount = $('#ItemVm_Amount');
             const $companyId = $('#ItemVm_CompanyId');
             const $docCurrency = $('[name=docCurrency]');
-
+            const $cashFlowAccountId = $('#ItemVm_CashFlowAccountId');
             var $fiscalPeriod = $('#ItemVm_FiscalPeriodId');
             var fiscalPeriodDom = document.getElementById("ItemVm_FiscalPeriodId");
             const $docSeriesEl=$('#ItemVm_TransTransactorDocSeriesId');
             const $transactorListEl = $('#ItemVm_TransactorId');
-            var transactorsListJs = @Html.Raw(Json.Serialize(ViewBag.transactorsListJs));
-            var allowedTypesListJs = @Html.Raw(Json.Serialize(ViewBag.docTypeAllowedTransactorTypesListJs));
+           
            
             const formatCurrencyLineValueElements = () => {
                 let $elementsToUpdateVal = $('.currency-input');
@@ -179,49 +175,25 @@
                         }
                     );
             };
-            const docSeriesChanged=()=>{
-               const docSeriesId=$('#ItemVm_DocSeriesId').val();
-               //locate inside list selected docseriesid
-               let a = allowedTypesListJs.find(o=>o.docSeriesId==docSeriesId);
-               if (a){
-                   console.log('Found');
-                   let allowed = JSON.parse(a.allowedTypes);
-                   if (allowed){
-                        let  lst = transactorsListJs.filter(function(item){
-                                return allowed.indexOf(item.transactorTypeId) !== -1;
-                              });
-                         $transactorListEl.empty();
-
-                        $.each(lst, function(index, item) {
-                            $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
-                        });
-                   } else {
-                     $transactorListEl.empty();
-
-                    $.each(transactorsListJs, function(index, item) {
-                        $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
-                    });
-                   }
-
-               } else {
-                   console.log('Not Found');
-                   $transactorListEl.empty();
-
-                  $.each(transactorsListJs, function(index, item) {
-                      $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
-                  });
-               }
-
+            const loadCompanyCfAccounts = (lst) => {
+                $cashFlowAccountId.empty();
+                $.each(lst, function(index, item) {
+                    $cashFlowAccountId.append($('<option></option>').attr('value', item.value).text(item.text));
+                });
             };
+            
             const companyChanged = () => {
                 let companyId = parseInt($companyId.val());
+               
                 if (isNaN(companyId)) {
                     companyId = 0;
                 }
-                if (companyId>0) {
-                   
-                    productLib.getCompanyBaseCurrencyInfo(companyId)
+                if (companyId > 0) {
+
+                    productLib.getCompanyCashFlowAccounts(companyId, $spinnerElement)
                         .then((data) => {
+                            loadCompanyCfAccounts(data.accounts);
+
                             let currencyCode = data.currencyCode;
                             //var currencyLocale = data.currencyLocale;
                             let locale = data.currencyLocale;
@@ -238,11 +210,13 @@
                             console.log("Error getting company base currency");
                             console.log(error);
                         });
+                } else {
+                    $cashFlowAccountId.empty();
                 }
             };
             $docSeriesEl.change((e)=> {
                 console.log(e);
-                docSeriesChanged();
+               
             });
             $transDate.change(() => {
                 transactionDataChanged();
@@ -252,7 +226,7 @@
             });
            
             var copyFromId =parseInt( $('#CopyFromId').val());
-            let selectTransactor=0;
+            let selectedItemId=0;
              if (copyFromId===0) {
                
                 $amount.val(0);
@@ -260,15 +234,15 @@
                  transactionDataChanged();
             } else {
                   $('#ItemVm_TransDate').val(new Date().toISOString().slice(0, 10));
-                  selectTransactor = parseInt($('#CopyFromTransactorId').val());
+                  selectedItemId = parseInt($('#CopyFromTransactorId').val());
              }
           
           
             $initialLoad.val(false);
             companyChanged();
-            docSeriesChanged();
-            if (selectTransactor!==0) {
-                $('#ItemVm_TransactorId').val(selectTransactor);
+            
+            if (selectedItemId!==0) {
+                $cashFlowAccountId.val(selectedItemId);
             }
         });
 

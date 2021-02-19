@@ -127,6 +127,46 @@ namespace GrKouk.Web.ERP.Helpers
 
             return companiesList;
         }
+        /// <summary>
+        /// Returns list of all companies without company AllComp async 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public static async Task<List<SelectListItem>> GetSolidCompaniesFilterListAsync(ApiDbContext context)
+        {
+           
+            var dbCompanies = await context.Companies.Where(t => t.Id != 1).OrderBy(p => p.Code)
+                .AsNoTracking()
+                .ToListAsync();
+            List<SelectListItem> companiesList = new List<SelectListItem>();
+           
+            foreach (var company in dbCompanies)
+            {
+                companiesList.Add(new SelectListItem() { Value = company.Id.ToString(), Text = company.Code });
+            }
+
+            return companiesList;
+        }
+        /// <summary>
+        /// Returns list of all companies without company AllComp 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public static List<SelectListItem> GetSolidCompaniesFilterList(ApiDbContext context)
+        {
+           
+            var dbCompanies = context.Companies.Where(t => t.Id != 1).OrderBy(p => p.Code)
+                .AsNoTracking()
+                .ToList();
+            List<SelectListItem> companiesList = new List<SelectListItem>();
+           
+            foreach (var company in dbCompanies)
+            {
+                companiesList.Add(new SelectListItem() { Value = company.Id.ToString(), Text = company.Code });
+            }
+
+            return companiesList;
+        }
         public static async Task<List<SelectListItem>> GetTransactorsForTypeFilterListAsync(ApiDbContext context, string trType)
         {
             var trTypeObject = await context.TransactorTypes.FirstOrDefaultAsync(p => p.Code == trType);

@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GrKouk.Web.ERP.Controllers
 {
@@ -458,7 +459,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             return Ok(materials);
         }
-         [HttpGet("companyBaseCurrencyInfo")]
+        [HttpGet("companyBaseCurrencyInfo")]
         public async Task<IActionResult> CompanyBaseCurrencyInfoAsync(int companyId)
         {
             if (companyId == 0)
@@ -486,6 +487,47 @@ namespace GrKouk.Web.ERP.Controllers
                 CurrencyCode = theCompany.Currency.Code,
                 CurrencyLocale = theCompany.Currency.DisplayLocale
                
+                
+            };
+            return Ok(response);
+        }
+        [HttpGet("CashFlowAccountsForCompany")]
+        public async Task<IActionResult> CashFlowAccountsForCompanyAsync(int companyId)
+        {
+            if (companyId == 0)
+            {
+                return BadRequest(new
+                {
+                    error = "No company Id provided"
+                });
+            }
+            var theCompany = await _context.Companies
+                .Include(p=>p.Currency)
+                .Where(p => p.Id == companyId)
+                .SingleOrDefaultAsync();
+            
+            if (theCompany == null)
+            {
+                return NotFound(new
+                {
+                    error = "Company not found "
+                });
+            }
+
+            var accountsForCompany = await _context.CashFlowAccountCompanyMappings
+                .Include(p => p.CashFlowAccount)
+                .Where(p => p.CompanyId == companyId)
+                .Select(x => new
+                    {
+                        value = x.CashFlowAccountId,
+                        text = x.CashFlowAccount.Name
+                    }
+                ).ToListAsync();
+            var response = new 
+            {
+                CurrencyCode = theCompany.Currency.Code,
+                CurrencyLocale = theCompany.Currency.DisplayLocale,
+                Accounts = accountsForCompany
                 
             };
             return Ok(response);

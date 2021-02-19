@@ -155,38 +155,14 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
            
             ViewData["CashFlowAccountId"] =
                 new SelectList(_context.CashFlowAccounts.OrderBy(c => c.Name).AsNoTracking(), "Id", "Name");
-            ViewData["CompanyId"] =
-                new SelectList(_context.Companies.OrderBy(c => c.Code).AsNoTracking(), "Id", "Code");
+           
+            var companiesList = FiltersHelper.GetSolidCompaniesFilterList(_context);
+            ViewData["CompanyId"] = new SelectList(companiesList, "Value", "Text");
            
             ViewData["DocSeriesId"] =
                 new SelectList(_context.CashFlowDocSeriesDefs.OrderBy(s => s.Name).AsNoTracking(), "Id", "Name");
             
-            var transactorsListJs = _context.Transactors
-                .Include(p => p.TransactorType)
-                .Where(p => p.TransactorType.Code != "SYS.DTRANSACTOR")
-                .Select(p => new TransactorSelectListItem()
-                {
-                    Id = p.Id,
-                    TransactorName = p.Name,
-                    TransactorTypeId = p.TransactorType.Id,
-                    TransactorTypeCode = p.TransactorType.Code,
-                    Value = p.Id.ToString(),
-                    Text = $"{p.Name} {{{p.TransactorType.Code}}}"
-                })
-                .AsNoTracking()
-                .ToList();
-            ViewData["transactorsListJs"] = transactorsListJs;
-            var docTypeAllowedTransactorTypesListJs = _context.TransTransactorDocSeriesDefs
-                .Include(p => p.TransTransactorDocTypeDef)
-                .Select(p => new TransactorDocTypeAllowedTransactorTypes()
-                {
-                    DocSeriesId = p.Id,
-                    DocTypeId = p.TransTransactorDocTypeDefId,
-                    AllowedTypes = p.TransTransactorDocTypeDef.AllowedTransactorTypes
-                })
-                .AsNoTracking()
-                .ToList();
-            ViewData["docTypeAllowedTransactorTypesListJs"] = docTypeAllowedTransactorTypesListJs;
+           
         }
     }
 }
