@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -494,6 +495,7 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpGet("CashFlowAccountsForCompany")]
         public async Task<IActionResult> CashFlowAccountsForCompanyAsync(int companyId)
         {
+            Thread.Sleep(10000);
             if (companyId == 0)
             {
                 return BadRequest(new

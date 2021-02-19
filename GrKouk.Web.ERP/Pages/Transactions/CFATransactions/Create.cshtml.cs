@@ -81,6 +81,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
             if (fiscalPeriod == null)
             {
                 ModelState.AddModelError(string.Empty, "No Fiscal Period covers Transaction Date");
+                LoadCombos();
                 return Page();
             }
 
@@ -151,11 +152,6 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
 
         private void LoadCombos()
         {
-            
-           
-            ViewData["CashFlowAccountId"] =
-                new SelectList(_context.CashFlowAccounts.OrderBy(c => c.Name).AsNoTracking(), "Id", "Name");
-           
             var companiesList = FiltersHelper.GetSolidCompaniesFilterList(_context);
             ViewData["CompanyId"] = new SelectList(companiesList, "Value", "Text");
            
