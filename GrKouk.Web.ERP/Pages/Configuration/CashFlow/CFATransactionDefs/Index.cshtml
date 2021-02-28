@@ -60,6 +60,7 @@
 
 
 @section Scripts {
+     <script src="~/js/definitions.js"></script>
     <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
         $(document).ready(function() {
@@ -238,6 +239,7 @@
                 actionMobileColDefs: actionMobileColDefs,
                 tableHandlersToRegister: tableHandlersToRegister,
                 pageHandlersToRegister: pageHandlersToRegister,
+                 indexPageType:definitionsLib.IndexPageTypeEnum.IndexPage,
                 afterTableLoad: {
                    
                 }
@@ -328,7 +330,7 @@
                     deleteSelectedRows();
                 });
 
-            var storageItemJs = localStorage.getItem('TransactorsIndexView');
+            var storageItemJs = localStorage.getItem('CFTransactionDefsIndexView');
             if (storageItemJs === undefined || storageItemJs === null) {
                 $('#pageIndex').val(1);
                 $('#filtersVisible').val(true);
@@ -422,7 +424,7 @@
 
                 var sessionVal = JSON.stringify(filtersArr);
 
-                localStorage.setItem('TransactorsIndexView', sessionVal);
+                localStorage.setItem('CFTransactionDefsIndexView', sessionVal);
                 //#endregion
 
             });

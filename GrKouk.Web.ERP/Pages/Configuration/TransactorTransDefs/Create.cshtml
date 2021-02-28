@@ -11,7 +11,7 @@
     <form method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-md-2">
                 <label asp-for="TransTransactorDef.Code" class="control-label"></label>
                 <input asp-for="TransTransactorDef.Code" class="form-control form-control-sm" />
@@ -38,7 +38,7 @@
 
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-md-4">
                 <label asp-for="TransTransactorDef.FinancialTransAction" class="control-label"></label>
                 <select asp-for="TransTransactorDef.FinancialTransAction" class="form-control form-control-sm" asp-items="ViewBag.FinancialActions"></select>
@@ -51,7 +51,7 @@
             </div>
         </div>
 
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary btn-sm" />
             </div>

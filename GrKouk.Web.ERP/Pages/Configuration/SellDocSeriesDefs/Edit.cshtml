@@ -12,7 +12,7 @@
     <form method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="hidden" asp-for="SellDocSeriesDef.Id" />
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-md-2">
                 <label asp-for="SellDocSeriesDef.Code" class="control-label small"></label>
                 <input asp-for="SellDocSeriesDef.Code" class="form-control form-control-sm" />
@@ -33,7 +33,7 @@
                 <input asp-for="SellDocSeriesDef.Active" class="form-check form-control-sm" />
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-md-3">
                 <label asp-for="SellDocSeriesDef.AutoPayoffWay" class="control-label small"></label>
                 <select asp-for="SellDocSeriesDef.AutoPayoffWay" class="form-control form-control-sm" asp-items="ViewBag.AutoPayoffWay"></select>
@@ -43,7 +43,7 @@
                 <select asp-for="SellDocSeriesDef.PayoffSeriesId" class="form-control form-control-sm" asp-items="ViewBag.PayoffSeriesId"></select>
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-md-3">
                 <label asp-for="SellDocSeriesDef.SellDocTypeDefId" class="control-label small"></label>
                 <select asp-for="SellDocSeriesDef.SellDocTypeDefId" class="form-control form-control-sm" asp-items="ViewBag.SellDocTypeDefId"></select>
@@ -54,7 +54,7 @@
             </div>
         </div>
 
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group">
                 <input type="submit" value="Update" class="btn btn-secondary btn-sm" />
             </div>

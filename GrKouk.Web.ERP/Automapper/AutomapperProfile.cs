@@ -6,6 +6,7 @@ using GrKouk.Erp.Domain.RecurringTransactions;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.BuyDocuments;
 using GrKouk.Erp.Dtos.CashFlowAccounts;
+using GrKouk.Erp.Dtos.CashFlowTransactions;
 using GrKouk.Erp.Dtos.CashRegister;
 using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Erp.Dtos.FinDiary;
@@ -18,13 +19,11 @@ using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Erp.Dtos.WarehouseItems;
 using GrKouk.Erp.Dtos.WarehouseTransactions;
 using GrKouk.Web.ERP.Helpers;
+using Microsoft.AspNetCore.Routing.Constraints;
 
-namespace GrKouk.Web.ERP.Automapper
-{
-    public class AutoMapperProfile : Profile
-    {
-        public AutoMapperProfile()
-        {
+namespace GrKouk.Web.ERP.Automapper {
+    public class AutoMapperProfile : Profile {
+        public AutoMapperProfile() {
             #region 
             CreateMap<FinDiaryTransaction, FinDiaryExpenseTransactionDto>()
                 .ForMember(dest => dest.TransactorName, opt => opt.MapFrom(src => src.Transactor.Name))
@@ -201,39 +200,57 @@ namespace GrKouk.Web.ERP.Automapper
             CreateMap<CashFlowDocSeriesDef, CfaDocSeriesDefModifyDto>().ReverseMap();
             CreateMap<CashFlowTransactionDef, CFATransactionDefListDto>()
                 .ForMember(dest => dest.CompanyName,
-                    opt => 
+                    opt =>
                         opt.MapFrom(src => src.Company.Name))
                 .ForMember(dest => dest.CompanyCode,
-                    opt => 
+                    opt =>
                         opt.MapFrom(src => src.Company.Code));
-            
+
             CreateMap<CashFlowDocTypeDef, CfaDocTypeDefListDto>()
                 .ForMember(dest => dest.CfaTransactionDefName,
-                    opt => 
+                    opt =>
                         opt.MapFrom(src => src.CashFlowTransactionDefinition.Name))
                 .ForMember(dest => dest.CfaTransactionDefCode,
-                    opt => 
+                    opt =>
                         opt.MapFrom(src => src.CashFlowTransactionDefinition.Code))
                 .ForMember(dest => dest.CompanyName,
-                    opt => 
+                    opt =>
                         opt.MapFrom(src => src.Company.Name))
                 .ForMember(dest => dest.CompanyCode,
-                    opt => 
+                    opt =>
                         opt.MapFrom(src => src.Company.Code));
 
             CreateMap<CashFlowDocSeriesDef, CfaDocSeriesDefListDto>()
                 .ForMember(dest => dest.CfaDocTypeDefName,
-                    opt => 
+                    opt =>
                         opt.MapFrom(src => src.CashFlowDocTypeDefinition.Name))
                 .ForMember(dest => dest.CfaDocTypeDefCode,
-                    opt => 
+                    opt =>
                         opt.MapFrom(src => src.CashFlowDocTypeDefinition.Code))
                 .ForMember(dest => dest.CompanyName,
-                    opt => 
+                    opt =>
                         opt.MapFrom(src => src.Company.Name))
                 .ForMember(dest => dest.CompanyCode,
-                    opt => 
+                    opt =>
                         opt.MapFrom(src => src.Company.Code));
+            CreateMap<CashFlowAccountTransaction, CfaTransactionCreateDto>()
+                .ForMember(dest => dest.DocSeriesId,
+                    opt =>
+                        opt.MapFrom(src => src.DocumentSeriesId))
+                .ForMember(dest => dest.DocTypeId,
+                    opt => 
+                        opt.MapFrom(src => src.DocumentTypeId))
+                .ReverseMap();
+            CreateMap<CashFlowAccountTransaction, CfaTransactionModifyDto>()
+                .ForMember(dest => dest.DocSeriesId,
+                    opt =>
+                        opt.MapFrom(src => src.DocumentSeriesId))
+                .ForMember(dest => dest.DocTypeId,
+                    opt => 
+                    opt.MapFrom(src => src.DocumentTypeId))
+                .ReverseMap();
+
+            ;
         }
     }
 }

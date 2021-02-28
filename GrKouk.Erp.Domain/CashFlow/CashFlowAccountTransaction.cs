@@ -30,21 +30,16 @@ namespace GrKouk.Erp.Domain.CashFlow
         public int FiscalPeriodId { get; set; }
         public virtual FiscalPeriod FiscalPeriod { get; set; }
       
-        public FinActionsEnum FinancialAction { get; set; }
-
+        public CashFlowAccountActionsEnum CfaAction { get; set; }
+        
+       
         [Column(TypeName = "decimal(18, 4)")]
-        public decimal AmountFpa { get; set; }
+        public decimal Amount { get; set; }
+        
         [Column(TypeName = "decimal(18, 4)")]
-        public decimal AmountNet { get; set; }
-        [Column(TypeName = "decimal(18, 4)")]
-        public decimal AmountDiscount { get; set; }
-        [Column(TypeName = "decimal(18, 4)")]
-        public decimal TransFpaAmount { get; set; }
-        [Column(TypeName = "decimal(18, 4)")]
-        public decimal TransNetAmount { get; set; }
-        [Column(TypeName = "decimal(18, 4)")]
-        public decimal TransDiscountAmount { get; set; }
-
+        public decimal TransAmount { get; set; }
+        
+        
         [MaxLength(500)]
         public string Etiology { get; set; }
 

@@ -72,12 +72,13 @@ namespace GrKouk.Web.ERP.Pages.Configuration.CashFlow.CFATransactionDefs
 
         private bool ItemExists(int id)
         {
-            return _context.CashFlowDocSeriesDefs.Any(e => e.Id == id);
+            return _context.CashFlowTransactionDefs.Any(e => e.Id == id);
         }
         private void LoadCombos()
         {
-            var financialActions = FiltersHelper.GetFinancialActionsList();
-            ViewData["FinancialActions"] = new SelectList(financialActions, "Value", "Text");
+            var actions = FiltersHelper.GetCashFlowAccountActionsList();
+            ViewData["CfaActions"] = new SelectList(actions, "Value", "Text");
+
             ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
             
 

@@ -14,22 +14,22 @@
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="FinancialMovement.Code" class="control-label"></label>
-                <input asp-for="FinancialMovement.Code" class="form-control" />
+                <label asp-for="FinancialMovement.Code" class="form-label small"></label>
+                <input asp-for="FinancialMovement.Code" class="form-control form-control-sm" />
                 <span asp-validation-for="FinancialMovement.Code" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="FinancialMovement.Name" class="control-label"></label>
-                <input asp-for="FinancialMovement.Name" class="form-control" />
+                <label asp-for="FinancialMovement.Name" class="form-label small"></label>
+                <input asp-for="FinancialMovement.Name" class="form-control form-control-sm" />
                 <span asp-validation-for="FinancialMovement.Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="FinancialMovement.Action" class="control-label"></label>
-                <input asp-for="FinancialMovement.Action" class="form-control" />
+                <label asp-for="FinancialMovement.Action" class="form-label small"></label>
+                <input asp-for="FinancialMovement.Action" class="form-control form-control-sm" />
                 <span asp-validation-for="FinancialMovement.Action" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
     </div>

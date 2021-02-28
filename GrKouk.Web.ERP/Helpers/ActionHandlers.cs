@@ -165,7 +165,7 @@ namespace GrKouk.Web.ERP.Helpers
             }
         }
         /// <summary>
-        /// Manipulates Transactor transaction object based on finAction 
+        /// Manipulates Transactor transaction object based on cfaAction 
         /// </summary>
         /// <param name="finAction"></param>
         /// <param name="transaction"></param>
@@ -208,39 +208,30 @@ namespace GrKouk.Web.ERP.Helpers
             }
         }
 
-         public static void CashFlowFinAction(FinActionsEnum finAction, CashFlowAccountTransaction transaction)
+         public static void CashFlowFinAction(CashFlowAccountActionsEnum cfaAction, CashFlowAccountTransaction transaction)
         {
-            switch (finAction)
+            switch (cfaAction)
             {
-                case FinActionsEnum.FinActionsEnumNoChange:
-                    transaction.FinancialAction = FinActionsEnum.FinActionsEnumNoChange;
-                    transaction.TransDiscountAmount = 0;
-                    transaction.TransFpaAmount = 0;
-                    transaction.TransNetAmount = 0;
+                case CashFlowAccountActionsEnum.CfaActionNoChange:
+                    transaction.CfaAction = CashFlowAccountActionsEnum.CfaActionNoChange;
+                   
+                    transaction.TransAmount = 0;
                     break;
-                case FinActionsEnum.FinActionsEnumDebit:
-                    transaction.FinancialAction = FinActionsEnum.FinActionsEnumDebit;
-                    transaction.TransDiscountAmount = transaction.AmountDiscount;
-                    transaction.TransFpaAmount = transaction.AmountFpa;
-                    transaction.TransNetAmount = transaction.AmountNet;
+                case CashFlowAccountActionsEnum.CfaActionDeposit:
+                    transaction.CfaAction = CashFlowAccountActionsEnum.CfaActionDeposit;
+                    transaction.TransAmount = transaction.Amount;
                     break;
-                case FinActionsEnum.FinActionsEnumCredit:
-                    transaction.FinancialAction = FinActionsEnum.FinActionsEnumCredit;
-                    transaction.TransDiscountAmount = transaction.AmountDiscount;
-                    transaction.TransFpaAmount = transaction.AmountFpa;
-                    transaction.TransNetAmount = transaction.AmountNet;
+                case CashFlowAccountActionsEnum.CfaActionWithdraw:
+                    transaction.CfaAction = CashFlowAccountActionsEnum.CfaActionWithdraw;
+                    transaction.TransAmount = transaction.Amount;
                     break;
-                case FinActionsEnum.FinActionsEnumNegativeDebit:
-                    transaction.FinancialAction = FinActionsEnum.FinActionsEnumNegativeDebit;
-                    transaction.TransDiscountAmount = transaction.AmountDiscount * -1;
-                    transaction.TransFpaAmount = transaction.AmountFpa * -1;
-                    transaction.TransNetAmount = transaction.AmountNet * -1;
+                case CashFlowAccountActionsEnum.CfaActionNegativeDeposit:
+                    transaction.CfaAction = CashFlowAccountActionsEnum.CfaActionNegativeDeposit;
+                    transaction.TransAmount = transaction.Amount * -1;
                     break;
-                case FinActionsEnum.FinActionsEnumNegativeCredit:
-                    transaction.FinancialAction = FinActionsEnum.FinActionsEnumNegativeCredit;
-                    transaction.TransDiscountAmount = transaction.AmountDiscount * -1;
-                    transaction.TransFpaAmount = transaction.AmountFpa * -1;
-                    transaction.TransNetAmount = transaction.AmountNet * -1;
+                case CashFlowAccountActionsEnum.CfaActionNegativeWithdraw:
+                    transaction.CfaAction = CashFlowAccountActionsEnum.CfaActionNegativeWithdraw;
+                    transaction.TransAmount = transaction.Amount * -1;
                     break;
                 default:
                     break;

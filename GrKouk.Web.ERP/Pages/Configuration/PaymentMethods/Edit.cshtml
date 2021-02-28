@@ -11,7 +11,7 @@
     <form method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="hidden" asp-for="PaymentMethod.Id" />
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-md-6">
                 <label asp-for="PaymentMethod.Name" class="control-label small"></label>
                 <input asp-for="PaymentMethod.Name" class="form-control form-control-sm"/>
@@ -23,7 +23,7 @@
                 <span asp-validation-for="PaymentMethod.DaysOverdue" class="text-danger"></span>
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-md-3">
                 <label asp-for="PaymentMethod.AutoPayoffWay" class="control-label small"></label>
                 <select asp-for="PaymentMethod.AutoPayoffWay" class="form-control form-control-sm" asp-items="ViewBag.AutoPayoffWay"></select>
@@ -36,7 +36,7 @@
             </div>
         </div>
 
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-secondary btn-sm"/>
             </div>

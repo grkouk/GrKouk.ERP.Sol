@@ -17,109 +17,109 @@
         <input type="hidden" asp-for="ItemVm.Id" />
         <input type="hidden" asp-for="ItemVm.Timestamp" />
         <input type="hidden" asp-for="ItemVm.SelectedCompanies" />
-        <div class="form-row">
-            <div class="form-group col-md-2">
-                <label asp-for="ItemVm.Code" class="control-label small"></label>
+        <div class="row mb-3">
+            <div class="col-md-2">
+                <label asp-for="ItemVm.Code" class="form-label small"></label>
                 <input asp-for="ItemVm.Code" class="form-control form-control-sm small" />
                 <span asp-validation-for="ItemVm.Code" class="text-danger small"></span>
             </div>
-            <div class="form-group col-md-6">
-                <label asp-for="ItemVm.Name" class="control-label small"></label>
+            <div class="col-md-6">
+                <label asp-for="ItemVm.Name" class="form-label small"></label>
                 <input asp-for="ItemVm.Name" class="form-control form-control-sm small" />
                 <span asp-validation-for="ItemVm.Name" class="text-danger small"></span>
             </div>
 
-            <div class="form-group col-md-3">
-                <label asp-for="ItemVm.WarehouseItemNature" class="control-label small"></label>
-                <select asp-for="ItemVm.WarehouseItemNature" class="form-control form-control-sm small" asp-items="ViewBag.MaterialNatures"></select>
+            <div class="col-md-3">
+                <label asp-for="ItemVm.WarehouseItemNature" class="form-label small"></label>
+                <select asp-for="ItemVm.WarehouseItemNature" class="form-select form-select-sm small" asp-items="ViewBag.MaterialNatures"></select>
                 <span asp-validation-for="ItemVm.WarehouseItemNature" class="text-danger small"></span>
             </div>
-            <div class="form-group col-md-1 ">
+            <div class="col-md-1 ">
                 <label asp-for="ItemVm.Active" class="small"></label>
                 <input asp-for="ItemVm.Active" class="form-check form-control-sm" />
             </div>
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-12">
+        <div class="row mb-3">
+            <div class="col-md-12">
                 <label asp-for="ItemVm.ShortDescription" class="small"></label>
                 <textarea asp-for="ItemVm.ShortDescription" class="form-control form-control-sm small" placeholder="Σύντομη Περιγραφή"> </textarea>
                 <span asp-validation-for="ItemVm.ShortDescription" class="text-danger small"></span>
             </div>
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-12">
+        <div class="row mb-3">
+            <div class="col-md-12">
                 <label asp-for="ItemVm.Description" class="small"></label>
                 <textarea asp-for="ItemVm.Description" class="form-control form-control-sm small" placeholder="Περιγραφή"> </textarea>
                 <span asp-validation-for="ItemVm.Description" class="text-danger small"></span>
             </div>
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-4">
-                <label asp-for="ItemVm.MainMeasureUnitId" class="control-label small"></label>
-                <select asp-for="ItemVm.MainMeasureUnitId" class="form-control form-control-sm small" asp-items="ViewBag.MainMeasureUnitId"></select>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label asp-for="ItemVm.MainMeasureUnitId" class="form-label small"></label>
+                <select asp-for="ItemVm.MainMeasureUnitId" class="form-select form-select-sm small" asp-items="ViewBag.MainMeasureUnitId"></select>
             </div>
-            <div class="form-group col-md-3">
-                <label asp-for="ItemVm.SecondaryMeasureUnitId" class="control-label small"></label>
-                <select asp-for="ItemVm.SecondaryMeasureUnitId" class="form-control form-control-sm small" asp-items="ViewBag.SecondaryMeasureUnitId"></select>
+            <div class="col-md-3">
+                <label asp-for="ItemVm.SecondaryMeasureUnitId" class="form-label small"></label>
+                <select asp-for="ItemVm.SecondaryMeasureUnitId" class="form-select form-select-sm small" asp-items="ViewBag.SecondaryMeasureUnitId"></select>
             </div>
-            <div class="form-group col-md-1">
-                <label asp-for="ItemVm.SecondaryUnitToMainRate" class="control-label small"></label>
+            <div class="col-md-1">
+                <label asp-for="ItemVm.SecondaryUnitToMainRate" class="form-label small"></label>
                 <input asp-for="ItemVm.SecondaryUnitToMainRate" class="form-control form-control-sm small" />
                 <span asp-validation-for="ItemVm.SecondaryUnitToMainRate" class="text-danger small"></span>
             </div>
-            <div class="form-group col-md-3">
-                <label asp-for="ItemVm.BuyMeasureUnitId" class="control-label small"></label>
-                <select asp-for="ItemVm.BuyMeasureUnitId" class="form-control form-control-sm small" asp-items="ViewBag.BuyMeasureUnitId"></select>
+            <div class="col-md-3">
+                <label asp-for="ItemVm.BuyMeasureUnitId" class="form-label small"></label>
+                <select asp-for="ItemVm.BuyMeasureUnitId" class="form-select form-select-sm small" asp-items="ViewBag.BuyMeasureUnitId"></select>
             </div>
-            <div class="form-group col-md-1">
-                <label asp-for="ItemVm.BuyUnitToMainRate" class="control-label small"></label>
+            <div class="col-md-1">
+                <label asp-for="ItemVm.BuyUnitToMainRate" class="form-label small"></label>
                 <input asp-for="ItemVm.BuyUnitToMainRate" class="form-control form-control-sm small" />
                 <span asp-validation-for="ItemVm.BuyUnitToMainRate" class="text-danger small"></span>
             </div>
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-2">
-                <label asp-for="ItemVm.FpaDefId" class="control-label small"></label>
-                <select asp-for="ItemVm.FpaDefId" class="form-control form-control-sm small" asp-items="ViewBag.FpaDefId"></select>
+        <div class="row mb-3">
+            <div class="col-md-2">
+                <label asp-for="ItemVm.FpaDefId" class="form-label small"></label>
+                <select asp-for="ItemVm.FpaDefId" class="form-select form-select-sm small" asp-items="ViewBag.FpaDefId"></select>
             </div>
-            <div class="form-group col-md-3">
-                <label asp-for="ItemVm.BarCode" class="control-label small"></label>
+            <div class="col-md-3">
+                <label asp-for="ItemVm.BarCode" class="form-label small"></label>
                 <input asp-for="ItemVm.BarCode" class="form-control form-control-sm small" />
                 <span asp-validation-for="ItemVm.BarCode" class="text-danger small"></span>
             </div>
-            <div class="form-group col-md-3">
-                <label asp-for="ItemVm.ManufacturerCode" class="control-label small"></label>
+            <div class="col-md-3">
+                <label asp-for="ItemVm.ManufacturerCode" class="form-label small"></label>
                 <input asp-for="ItemVm.ManufacturerCode" class="form-control form-control-sm small" />
                 <span asp-validation-for="ItemVm.ManufacturerCode" class="text-danger small"></span>
             </div>
-            <div class="form-group col-md-2">
-                <label asp-for="ItemVm.PriceNetto" class="control-label small"></label>
+            <div class="col-md-2">
+                <label asp-for="ItemVm.PriceNetto" class="form-label small"></label>
                 <input asp-for="ItemVm.PriceNetto" class="form-control form-control-sm small" />
                 <span asp-validation-for="ItemVm.PriceNetto" class="text-danger small"></span>
             </div>
-            <div class="form-group col-md-2">
-                <label asp-for="ItemVm.PriceBrutto" class="control-label small"></label>
+            <div class="col-md-2">
+                <label asp-for="ItemVm.PriceBrutto" class="form-label small"></label>
                 <input asp-for="ItemVm.PriceBrutto" class="form-control form-control-sm small" />
                 <span asp-validation-for="ItemVm.PriceBrutto" class="text-danger small"></span>
             </div>
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-3">
-                <label asp-for="ItemVm.MaterialType" class="control-label small"></label>
-                <select asp-for="ItemVm.MaterialType" class="form-control form-control-sm small" asp-items="ViewBag.MaterialType"></select>
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label asp-for="ItemVm.MaterialType" class="form-label small"></label>
+                <select asp-for="ItemVm.MaterialType" class="form-select form-select-sm small" asp-items="ViewBag.MaterialType"></select>
                 <span asp-validation-for="ItemVm.MaterialType" class="text-danger small"></span>
             </div>
-            <div class="form-group col-md-3">
-                <label asp-for="ItemVm.MaterialCategoryId" class="control-label small"></label>
-                <select asp-for="ItemVm.MaterialCategoryId" class="form-control form-control-sm small" asp-items="ViewBag.MaterialCategoryId"></select>
+            <div class="col-md-3">
+                <label asp-for="ItemVm.MaterialCategoryId" class="form-label small"></label>
+                <select asp-for="ItemVm.MaterialCategoryId" class="form-select form-select-sm small" asp-items="ViewBag.MaterialCategoryId"></select>
             </div>
 
-            <div class="form-group col-md-3">
-                <label asp-for="ItemVm.CompanyId" class="control-label small"></label>
-                <select asp-for="ItemVm.CompanyId" class="form-control form-control-sm small" asp-items="ViewBag.CompanyId"></select>
+            <div class="col-md-3">
+                <label asp-for="ItemVm.CompanyId" class="form-label small"></label>
+                <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm small" asp-items="ViewBag.CompanyId"></select>
             </div>
-            <div class=" form-group col-md-3">
-                <label class="form-control-label small">Companies</label>
+            <div class=" col-md-3">
+                <label class="form-label small">Companies</label>
                 <ejs-multiselect id="SelectedCompanies" dataSource="@ViewBag.CompaniesListJs" placeholder="Select Companies" mode="CheckBox"
                                  showDropDownIcon="true"
                                  showSelectAll="false" selectAllText="Select All" unSelectAllText="unSelect All">
@@ -127,8 +127,8 @@
                 </ejs-multiselect>
             </div>
         </div>
-        <div class="form-row">
-            <div class="form-group">
+        <div class="row mb-3">
+            <div>
                 <input type="submit" value="Update" class="btn btn-primary btn-sm" />
             </div>
         </div>
@@ -140,9 +140,10 @@
 </div>
 
 @section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
     <ejs-scripts></ejs-scripts>
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+  
     <script>
         $(document).ready(function() {
             const selectedCompanies = document.getElementById("SelectedCompanies").ej2_instances[0];

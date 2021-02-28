@@ -1,0 +1,257 @@
+﻿@page
+@model EditModel
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    Layout = "_LayoutEntryFormTransaction";
+    ViewData["Title"] = "Μεταβολή Κίνησης Cash Flow Account";
+    var formDisabled = Model.NotUpdatable ? "disabled" : "";
+}
+
+
+@{
+    if (Model.NotUpdatable) {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>Not updateable!</strong> This transaction is created from other section and cannot be updated.
+            <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+}
+
+
+<hr />
+<div class="container">
+
+    <form method="post">
+        <fieldset @formDisabled>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ItemVm.Id" />
+            <input type="hidden" asp-for="@Model.CfaId" id="cfaId"/>
+            <input type="hidden" asp-for="ItemVm.Timestamp" />
+            <input type="hidden" asp-for="ItemVm.SectionId" />
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <div class="form-floating">
+                        <input asp-for="ItemVm.TransDate" class="form-control form-control-sm" autofocus />
+                        <label asp-for="ItemVm.TransDate" class="form-label small"></label>
+                        <span asp-validation-for="ItemVm.TransDate" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="form-floating">
+                        <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm" asp-items="ViewBag.CompanyId"></select>
+                        <label asp-for="ItemVm.CompanyId" class="form-label small"></label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-floating">
+                        <input asp-for="ItemVm.TransRefCode" class="form-control form-control-sm" placeholder="Ref Code" />
+                        <label asp-for="ItemVm.TransRefCode" class="form-label small"></label>
+                        <span asp-validation-for="ItemVm.TransRefCode" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3 align-items-center">
+
+
+                <div class="col-md-5">
+                    <div class="form-floating">
+                        <select asp-for="ItemVm.CashFlowAccountId" class="form-select form-select-sm"></select>
+                        <label asp-for="ItemVm.CashFlowAccountId" class="form-label small"></label>
+                        <span asp-validation-for="ItemVm.CashFlowAccountId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-auto ms-0 ps-0" id="SpinnerLoaderCompanies" style="display: none">
+                    <span class="spinner-border spinner-border-sm text-primary"></span>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <select asp-for="ItemVm.DocSeriesId" class="form-select form-select-sm" asp-items="ViewBag.DocSeriesId"></select>
+                        <label asp-for="ItemVm.DocSeriesId" class="form-label small"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3 justify-content-end">
+                <div class="col-md-3">
+                    <div class="form-floating">
+                        <input asp-for="ItemVm.Amount" class="form-control form-control-sm text-end currency-input" placeholder="Amount" />
+                        <label asp-for="ItemVm.Amount" class="form-label small"></label>
+                        <div class="invalid-feedback">
+                            <span asp-validation-for="ItemVm.Amount" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <div class="form-floating">
+                        <textarea asp-for="ItemVm.Etiology" class="form-control form-control-sm" placeholder="Αιτιολογία Κίνησης"> </textarea>
+                        <label asp-for="ItemVm.Etiology" class="form-label small"></label>
+                    </div>
+                    <div class="invalid-feedback">
+                        <span asp-validation-for="ItemVm.Etiology" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <input type="submit" value="Create" class="btn btn-primary btn-sm" />
+                </div>
+            </div>
+        </fieldset>
+    </form>
+</div>
+
+<div>
+    <a class="small" asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/product.lib.js"></script>
+    <script>
+        $(document).ready(function () {
+            var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
+            //console.log('Current Culture ' + currentCulture);
+
+            var formatterCurrency = new Intl.NumberFormat(currentCulture,
+                {
+                    style: 'currency',
+                    currency: 'EUR',
+                    minimumFractionDigits: 2
+                });
+            var formatterNumber = new Intl.NumberFormat(currentCulture,
+                {
+                    maximumFractionDigits: 3
+
+                });
+            var $initialLoad = $('#IsInitialLoad');
+            const $spinnerElement = $('#SpinnerLoaderCompanies');
+            //if (!$initialLoad.val()) return;
+            const $transDate = $('#ItemVm_TransDate');
+            const $cfaId = $('#cfaId');
+            const $amount = $('#ItemVm_Amount');
+            const $companyId = $('#ItemVm_CompanyId');
+            const $docCurrency = $('[name=docCurrency]');
+            const $cashFlowAccountId = $('#ItemVm_CashFlowAccountId');
+
+            const formatCurrencyLineValueElements = () => {
+                let $elementsToUpdateVal = $('.currency-input');
+                $elementsToUpdateVal.each(function() {
+                    let $el = $(this);
+                    let parse = Globalize.numberParser();
+                    let elValue = parse($el.val());
+                    if (!isNaN(elValue)) {
+                        $el.val(formatterCurrency.format(elValue));
+                    }
+
+                });
+            };
+            const updateCurrencyFormat = () => {
+                formatCurrencyLineValueElements();
+            };
+            const setGlobalizeLocale = (culture) => {
+                return new Promise((resolve, reject) => {
+                    $.when(
+                            $.get("/lib/cldr-data/supplemental/likelySubtags.json"),
+                            $.get("/lib/cldr-data/main/" + culture + "/numbers.json"),
+                            $.get("/lib/cldr-data/main/" + culture + "/currencies.json"),
+                            $.get("/lib/cldr-data/supplemental/numberingSystems.json"),
+                            $.get("/lib/cldr-data/main/" + culture + "/ca-gregorian.json"),
+                            $.get("/lib/cldr-data/main/" + culture +"/timeZoneNames.json"),
+                            $.get("/lib/cldr-data/supplemental/timeData.json"),
+                            $.get("/lib/cldr-data/supplemental/weekData.json")
+                        ).then(function () {
+                            // Normalize $.get results, we only need the JSON, not the request statuses.
+                            return [].slice.apply(arguments, [0]).map(function (result) {
+                                return result[0];
+                            });
+                        }).then(Globalize.load)
+                        .then(function () {
+                            console.log("Globalize culture loaded " + culture);
+                            Globalize.locale(culture);
+                            resolve();
+
+                        });
+                });
+               
+            };
+
+            const loadCompanyCfAccounts = (lst) => {
+                $cashFlowAccountId.empty();
+                $.each(lst, function(index, item) {
+                    $cashFlowAccountId.append($('<option></option>').attr('value', item.value).text(item.text));
+                });
+            };
+
+            const companyChanged = () => {
+                let companyId = parseInt($companyId.val());
+
+                if (isNaN(companyId)) {
+                    companyId = 0;
+                }
+                if (companyId > 0) {
+
+                    productLib.getCompanyCashFlowAccounts(companyId, $spinnerElement)
+                        .then((data) => {
+                            loadCompanyCfAccounts(data.accounts);
+                            let cfaId = $cfaId.val();
+                            $cashFlowAccountId.val(cfaId);
+                            let currencyCode = data.currencyCode;
+                            
+                            //var currencyLocale = data.currencyLocale;
+                            let locale = data.currencyLocale.substring(0,2);
+                            setGlobalizeLocale(locale)
+                                .then(() => {
+                                    formatterCurrency = new Intl.NumberFormat(locale,
+                                        {
+                                            style: 'currency',
+                                            currency: currencyCode,
+                                            minimumFractionDigits: 2
+                                        });
+                                    $docCurrency.text(currencyCode);
+                                    updateCurrencyFormat();
+                                });
+                            
+                           
+                        })
+                        .catch((error) => {
+                            console.log("Error getting company base currency");
+                            console.log(error);
+                        });
+                } else {
+                    $cashFlowAccountId.empty();
+                }
+            };
+
+
+            $companyId.change(() => {
+                companyChanged();
+            });
+
+            var copyFromId =parseInt( $('#CopyFromId').val());
+            let selectedItemId=0;
+             if (copyFromId===0) {
+
+                $amount.val(0);
+                 $('#ItemVm_TransDate').val(new Date().toISOString().slice(0, 10));
+
+            } else {
+                  $('#ItemVm_TransDate').val(new Date().toISOString().slice(0, 10));
+                  selectedItemId = parseInt($('#CopyFromTransactorId').val());
+             }
+
+
+
+            companyChanged();
+
+            if (selectedItemId!==0) {
+                $cashFlowAccountId.val(selectedItemId);
+            }
+        });
+
+
+    </script>
+}

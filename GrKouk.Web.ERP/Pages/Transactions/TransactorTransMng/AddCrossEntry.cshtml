@@ -10,66 +10,66 @@
     <form method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         @* <input type="hidden" asp-for="@Model.InitialLoad" id="IsInitialLoad"/> *@
-        <div class="form-row">
-            <div class="form-group col-md-3">
+        <div class="row mb-3">
+            <div class="col-md-3">
                 <label asp-for="ItemVm.TransDate" class="small"></label>
                 <input asp-for="ItemVm.TransDate" class="form-control form-control-sm small" autofocus/>
                 <span asp-validation-for="ItemVm.TransDate" class="text-danger"></span>
             </div>
-            <div class="form-group col-md-3">
+            <div class="col-md-3">
                 <label asp-for="ItemVm.RefCode" class="small"></label>
                 <input asp-for="ItemVm.RefCode" class="form-control form-control-sm small"/>
                 <span asp-validation-for="ItemVm.RefCode" class="text-danger"></span>
             </div>
-            <div class="form-group col-md-3">
+            <div class="col-md-3">
                 <label asp-for="ItemVm.CompanyId" class="small"></label>
-                <select asp-for="ItemVm.CompanyId" class="form-control form-control-sm small" asp-items="ViewBag.CompanyId"></select>
+                <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm small" asp-items="ViewBag.CompanyId"></select>
             </div>
 
 
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-6">
+        <div class="row mb-3">
+            <div class="col-md-6">
                 <label asp-for="ItemVm.DocSeries1Id" class="small"></label>
-                <select asp-for="ItemVm.DocSeries1Id" class="form-control form-control-sm small" asp-items="ViewBag.DocSeriesId"></select>
+                <select asp-for="ItemVm.DocSeries1Id" class="form-select form-select-sm small" asp-items="ViewBag.DocSeriesId"></select>
             </div>
-            <div class="form-group col-md-6">
+            <div class="col-md-6">
                 <label asp-for="ItemVm.Transactor1Id" class="small"></label>
-                <select asp-for="ItemVm.Transactor1Id" class="form-control form-control-sm small" asp-items="ViewBag.TransactorId"></select>
+                <select asp-for="ItemVm.Transactor1Id" class="form-select form-select-sm small" asp-items="ViewBag.TransactorId"></select>
             </div>
 
 
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-6">
+        <div class="row mb-3">
+            <div class="col-md-6">
                 <label asp-for="ItemVm.DocSeries2Id" class="small"></label>
-                <select asp-for="ItemVm.DocSeries2Id" class="form-control form-control-sm small" asp-items="ViewBag.DocSeriesId"></select>
+                <select asp-for="ItemVm.DocSeries2Id" class="form-select form-select-sm small" asp-items="ViewBag.DocSeriesId"></select>
             </div>
-            <div class="form-group col-md-6">
+            <div class="col-md-6">
                 <label asp-for="ItemVm.Transactor2Id" class="small"></label>
-                <select asp-for="ItemVm.Transactor2Id" class="form-control form-control-sm small" asp-items="ViewBag.TransactorId"></select>
+                <select asp-for="ItemVm.Transactor2Id" class="form-select form-select-sm small" asp-items="ViewBag.TransactorId"></select>
             </div>
 
 
         </div>
 
-        <div class="form-row">
-            <div class="form-group col-md-12">
+        <div class="row mb-3">
+            <div class="col-md-12">
                 <label asp-for="ItemVm.Etiology" class="small"></label>
                 <textarea asp-for="ItemVm.Etiology" class="form-control form-control-sm small" placeholder="Αιτιολογία Κίνησης"> </textarea>
                 <span asp-validation-for="ItemVm.Etiology" class="text-danger"></span>
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
 
-            <div class="form-group col-md-3">
+            <div class="col-md-3">
                 <label asp-for="ItemVm.Amount" class="small"></label>
                 <input asp-for="ItemVm.Amount" class="form-control form-control-sm small"/>
                 <span asp-validation-for="ItemVm.Amount" class="text-danger"></span>
             </div>
 
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary btn-sm"/>
             </div>

@@ -1,0 +1,59 @@
+﻿@page
+@model EditModel
+
+@{
+    ViewData["Title"] = "Edit CashFlow Doc Type Definition";
+}
+
+<h4>Edit CashFlow Transaction Definition</h4>
+<hr />
+
+<div class="container">
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="ItemVm.Id" />
+        <div class="row mb-3">
+            <div class="form-group col-md-2">
+                <label asp-for="ItemVm.Code" class="form-label"></label>
+                <input asp-for="ItemVm.Code" class="form-control form-control-sm" />
+                <span asp-validation-for="ItemVm.Code" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-4">
+                <label asp-for="ItemVm.Name" class="form-label"></label>
+                <input asp-for="ItemVm.Name" class="form-control form-control-sm" />
+                <span asp-validation-for="ItemVm.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-3">
+                <label asp-for="ItemVm.CashFlowTransactionDefId"></label>
+                <select asp-for="ItemVm.CashFlowTransactionDefId" class="form-select form-select-sm" asp-items="ViewBag.CashFlowTransactionDefId"></select>
+            </div>
+            <div class="form-group col-md-2">
+                <label asp-for="ItemVm.CompanyId" class="form-label"></label>
+                <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm" asp-items="ViewBag.CompanyId"></select>
+                <span asp-validation-for="ItemVm.CompanyId" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-1 ">
+
+                <label asp-for="ItemVm.Active"></label>
+                <input asp-for="ItemVm.Active" class="form-check form-control-sm" />
+
+            </div>
+        </div>
+        
+
+        <div class="row mb-3">
+            <div class="form-group">
+                <input type="submit" value="Update" class="btn btn-primary btn-sm" />
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
