@@ -167,7 +167,7 @@
                     <div class="form-floating">
                         <input class="form-control form-control-sm small input-doc-line text-end" type="number" placeholder="Dis %" id="Discount" />
                         <label class="form-label small">Dis% </label>
-                        <div class="invalid-feedback">
+                        <div class="invalid-tooltip">
                             Please enter a valid Discount.
                         </div>
                     </div>
@@ -176,7 +176,7 @@
                     <div class="form-floating">
                         <input class="form-control form-control-sm small input-doc-line text-end" type="number" placeholder="Vat%" id="VatPercent" />
                         <label class="form-label small">VAT% </label>
-                        <div class="invalid-feedback">
+                        <div class="invalid-tooltip">
                             Please enter a valid VAT.
                         </div>
                     </div>
@@ -297,13 +297,16 @@
                                 var q2Actual = FormattableString.Invariant($"{q2}");
                                 var unitPriceActual = FormattableString.Invariant($"{unitPrice}");
                                 var vatRateActual = FormattableString.Invariant($"{vatRate}");
+                                //var vatRateActual = vatRate;
                                 var factorActual = FormattableString.Invariant($"{factor}");
                                 var disRateActual = FormattableString.Invariant($"{disRate}");
+                                //var disRateActual = disRate;
                                 var disAmountActual = FormattableString.Invariant($"{disAmount}");
                                 var vatAmountActual = FormattableString.Invariant($"{vatAmount}");
                                 var netAmountActual = FormattableString.Invariant($"{netAmount}");
                                 var grosAmountActual = FormattableString.Invariant($"{grosAmount}");
                                 var transPriceActual = FormattableString.Invariant($"{transPrice}");
+                                //var transPriceActual = transPrice;
                                 var transUnitFactorActual = FormattableString.Invariant($"{transUnitFactor}");
                                 var transQuantityText = $@"{transQuantity:N2}";
                                 var q1Text = $@"{q1:N2}";
@@ -419,7 +422,7 @@
             $('#LineEditing').val(0);
             var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
             console.log('Current Culture ' + currentCulture);
-
+            var parseNumber ;
             var formatterCurrency = new Intl.NumberFormat(currentCulture,
                 {
                     style: 'currency',
@@ -671,6 +674,32 @@
                 formatCurrencyLineValueElements();
                 formatCurrencyTableElements();
             };
+            const setGlobalizeLocale = (culture) => {
+                return new Promise((resolve, reject) => {
+                    $.when(
+                        $.get("/lib/cldr-data/supplemental/likelySubtags.json"),
+                        $.get("/lib/cldr-data/main/" + culture + "/numbers.json"),
+                        $.get("/lib/cldr-data/main/" + culture + "/currencies.json"),
+                        $.get("/lib/cldr-data/supplemental/numberingSystems.json"),
+                        $.get("/lib/cldr-data/main/" + culture + "/ca-gregorian.json"),
+                        $.get("/lib/cldr-data/main/" + culture + "/timeZoneNames.json"),
+                        $.get("/lib/cldr-data/supplemental/timeData.json"),
+                        $.get("/lib/cldr-data/supplemental/weekData.json")
+                    ).then(function () {
+                        // Normalize $.get results, we only need the JSON, not the request statuses.
+                        return [].slice.apply(arguments, [0]).map(function (result) {
+                            return result[0];
+                        });
+                    }).then(Globalize.load)
+                        .then(function () {
+                            console.log("Globalize culture loaded " + culture);
+                            Globalize.locale(culture);
+                            resolve();
+
+                        });
+                });
+
+            };
             const companyChanged = () => {
                 let companyId = parseInt($companyId.val());
                 if (isNaN(companyId)) {
@@ -686,16 +715,38 @@
                     productLib.getCompanyBaseCurrencyInfo(companyId)
                         .then((data) => {
                             let currencyCode = data.currencyCode;
+                            
                             //var currencyLocale = data.currencyLocale;
-                            let locale = data.currencyLocale;
-                            formatterCurrency = new Intl.NumberFormat(locale,
-                                {
-                                    style: 'currency',
-                                    currency: currencyCode,
-                                    minimumFractionDigits: 2
+                            let locale = data.currencyLocale.substring(0,2);
+                            setGlobalizeLocale(locale)
+                                .then(() => {
+                                    formatterCurrency = new Intl.NumberFormat(locale,
+                                        {
+                                            style: 'currency',
+                                            currency: currencyCode,
+                                            minimumFractionDigits: 2
+                                        });
+                                    formatterNumber = new Intl.NumberFormat(locale,
+                                        {
+                                            maximumFractionDigits: 3
+
+                                        });
+                                    parseNumber = Globalize.numberParser();
+                                    $docCurrency.text(currencyCode);
+                                    updateCurrencyFormat();
                                 });
-                            $docCurrency.text(currencyCode);
-                            updateCurrencyFormat();
+                            //------------
+                            //let currencyCode = data.currencyCode;
+                            //var currencyLocale = data.currencyLocale;
+                            //let locale = data.currencyLocale;
+                            //formatterCurrency = new Intl.NumberFormat(locale,
+                            //    {
+                            //        style: 'currency',
+                            //        currency: currencyCode,
+                            //        minimumFractionDigits: 2
+                            //    });
+                            //$docCurrency.text(currencyCode);
+                            //updateCurrencyFormat();
                         })
                         .catch((error) => {
                             console.log("Error getting company base currency");
@@ -1044,6 +1095,7 @@
                 default:
                 }
             };
+          
             $transUnitSelector.change((event) => {
                 //console.log("Inside unitSelector change event");
                 // console.log(event);
@@ -1287,9 +1339,17 @@
                     var q2 = $colMaterial.attr('data-Q2');
                     var transQ = $colTransQ.attr('data-actualValue');
                     var q1 = $colQ1.attr('data-actualValue');
-                    var transPrice = $colTransPrice.attr('data-actualValue');
-                    var discountRate = $colDiscRate.attr('data-actualValue');
-                    var fpaRate = $colFpaRate.attr('data-actualValue');
+                   
+                    var t = $colTransPrice.attr('data-actualValue');
+                    var t2 = parseFloat(t);
+                   // var t1 = parseNumber(t);
+                    var transPrice = t2;
+                    
+                    t = $colFpaRate.attr('data-actualValue');
+                    t2 = parseFloat(t);
+                    var fpaRate = t2;
+
+                    var discountRate = parseFloat($colDiscRate.attr('data-actualValue'));
                     var lineNetAmount = $colNetAmount.attr('data-actualValue');
                     var lineDiscAmount = $colDiscAmount.attr('data-actualValue');
                     var lineVatAmount = $colFpaAmount.attr('data-actualValue');
@@ -1315,14 +1375,23 @@
                             $lookUp.val(materialName);
                             $transQuantity.val(transQ);
                             $transUnitId.val(transUnitId);
+                            //let fm = Globalize.numberFormatter();
                             $transUnitType.val(transUnitType);
-                            $transPrice.val(transPrice);
+
+                            //var tPrice = formatterNumber.format(transPrice);
+                            //var tVatPerc = formatterNumber.format(fpaRate);
+                            //var tDiscPerc = formatterNumber.format(discountRate);
+                            
+                            var tPrice = transPrice;
+                            var tVatPerc = fpaRate;
+                            var tDiscPerc = discountRate;
+                            $transPrice.val(tPrice);
                             $transUnitFactor.val(transUnitFactor);
                             $priceNet.val(baseUnitPriceNet);
                             $q1.val(q1);
                             $q2.val(q2);
-                            $vatPercent.val(fpaRate);
-                            $discount.val(discountRate);
+                            $vatPercent.val(tVatPerc);
+                            $discount.val(tDiscPerc);
                             $mainUnitId.val(mainUnitId);
                             $secUnitId.val(secUnitId);
                             $factor.val(factor);
