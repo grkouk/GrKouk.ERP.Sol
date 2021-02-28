@@ -84,9 +84,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
                 LoadCombos();
                 return Page();
             }
-
             #endregion
-
             var cfaTransaction = _mapper.Map<CashFlowAccountTransaction>(ItemVm);
 
             var docSeries = await
@@ -128,9 +126,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
             {
                 sectionId = docTypeDef.SectionId;
             }
-
             #endregion
-
 
             cfaTransaction.SectionId = sectionId;
             cfaTransaction.DocumentTypeId = docSeries.CashFlowDocTypeDefId;
@@ -138,14 +134,9 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
             cfaTransaction.CfaAction = cfaTransactionDef.CfaAction;
             ActionHandlers.CashFlowFinAction(cfaTransactionDef.CfaAction, cfaTransaction);
 
-
-           
-
-
             await _context.CashFlowAccountTransactions.AddAsync(cfaTransaction);
             await _context.SaveChangesAsync();
             _toastNotification.AddSuccessToastMessage("Saved");
-
 
             return RedirectToPage("./Index");
         }
