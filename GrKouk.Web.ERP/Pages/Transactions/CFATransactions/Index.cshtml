@@ -103,16 +103,16 @@
                     }
                 },
                 {
-                    key: 'transactorName',
-                    responseKey: 'transactorName',
+                    key: 'cashFlowAccountName',
+                    responseKey: 'cashFlowAccountName',
                     actualVal: '',
                     columnFormat: 't',
                     totalKey: 'label',
                     grandTotalKey: 'label',
                     totalFormatter: '',
-                    sortKey: 'TransactorNameSort',
+                    sortKey: 'NameSort',
                     sortType: 'alpha',
-                    header: 'Transactor',
+                    header: 'Cash Flow Account',
                     text: '',
                     headerClass: 'small text-center',
                     class: 'small',
@@ -120,19 +120,19 @@
                     classCondition: {},
                     remoteReference: {
                         isRemoteReference: true,
-                        valueKey: 'transactorId',
-                        url: '@Url.Page("/mainentities/transactors/details")?id='
+                        valueKey: 'cashFlowAccountId',
+                        url: '@Url.Page("/mainentities/cashflowaccounts/details")?id='
                     }
                 },
                 {
-                    key: 'transTransactorDocSeriesCode',
-                    responseKey: 'transTransactorDocSeriesCode',
+                    key: 'docSeriesName',
+                    responseKey: 'docSeriesName',
                     actualVal: '',
                     columnFormat: 't',
                     totalKey: '',
                     grandTotalKey: '',
                     totalFormatter: '',
-                    sortKey: 'SeriesCodeSort',
+                    sortKey: 'SeriesNameSort',
                     sortType: 'alpha',
                     header: 'Series',
                     text: '',
@@ -201,8 +201,8 @@
                     }
                 },
                 {
-                    key: 'debitAmount',
-                    responseKey: 'debitAmount',
+                    key: 'depositAmount',
+                    responseKey: 'depositAmount',
                     actualVal: '',
                     columnFormat: 'c',
                     totalKey: 'sumOfDebit',
@@ -210,18 +210,18 @@
                     totalFormatter: 'currency',
                     sortKey: '',
                     sortType: '',
-                    header: 'Debit',
+                    header: 'Deposit',
                     text: '',
                     headerClass: 'small text-center',
-                    class: 'small text-right ',
+                    class: 'small text-end ',
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
                     }
                 },
                 {
-                    key: 'creditAmount',
-                    responseKey: 'creditAmount',
+                    key: 'withdrawAmount',
+                    responseKey: 'withdrawAmount',
                     actualVal: '',
                     columnFormat: 'c',
                     totalKey: 'sumOfCredit',
@@ -229,10 +229,10 @@
                     totalFormatter: 'currency',
                     sortKey: '',
                     sortType: '',
-                    header: 'Credit',
+                    header: 'Withdraw',
                     text: '',
                     headerClass: 'small text-center',
-                    class: 'small text-right ',
+                    class: 'small text-end ',
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {

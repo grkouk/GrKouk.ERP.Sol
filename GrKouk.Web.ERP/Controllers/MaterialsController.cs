@@ -495,7 +495,7 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpGet("CashFlowAccountsForCompany")]
         public async Task<IActionResult> CashFlowAccountsForCompanyAsync(int companyId)
         {
-            Thread.Sleep(10000);
+            //Thread.Sleep(10000);
             if (companyId == 0)
             {
                 return BadRequest(new
