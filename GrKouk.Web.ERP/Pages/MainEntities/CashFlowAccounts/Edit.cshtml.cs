@@ -50,7 +50,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.CashFlowAccounts
             }
 
             ItemVm = _mapper.Map<CashFlowAccountModifyDto>(itemToModify);
-            int[] selectedCompanies = itemToModify.CompanyMappings.Select(x => x.CompanyId).ToArray();
+            string[] selectedCompanies = itemToModify.CompanyMappings.Select(x => x.CompanyId.ToString()).ToArray();
             ItemVm.SelectedCompanies = JsonSerializer.Serialize(selectedCompanies);
             LoadCombos();
             // _toastNotification.AddInfoToastMessage("Welcome to edit page");
