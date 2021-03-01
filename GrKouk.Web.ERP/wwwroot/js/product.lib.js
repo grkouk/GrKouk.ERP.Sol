@@ -6,10 +6,10 @@
         $spinnerElement.hide();
     };
     const spinnerLoaderIsVisible = ($spinnerElement) => {
-        return($spinnerElement.is(':visible'));
+        return ($spinnerElement.is(':visible'));
     };
-    
-    const makeAjaxCall = (uri,$SpElement) => {
+
+    const makeAjaxCall = (uri, $SpElement) => {
         var timeout;
         return new Promise((resolve, reject) => {
             $.ajax({
@@ -147,10 +147,10 @@
             });
         });
     };
-    const getCompanyCashFlowAccounts = (companyId,spinnerElement) => {
+    const getCompanyCashFlowAccounts = (companyId, spinnerElement) => {
         let uri = "/api/materials/CashFlowAccountsForCompany";
         uri += `?companyId=${companyId}`;
-      
+
         return new Promise((resolve, reject) => {
             makeAjaxCall(uri, spinnerElement)
                 .then((data) => {
@@ -210,10 +210,37 @@
             });
         });
     };
+    const setGlobalizeLocale = (culture) => {
+        return new Promise((resolve, reject) => {
+            $.when(
+                $.get("/lib/cldr-data/supplemental/likelySubtags.json"),
+                $.get("/lib/cldr-data/main/" + culture + "/numbers.json"),
+                $.get("/lib/cldr-data/main/" + culture + "/currencies.json"),
+                $.get("/lib/cldr-data/supplemental/numberingSystems.json"),
+                $.get("/lib/cldr-data/main/" + culture + "/ca-gregorian.json"),
+                $.get("/lib/cldr-data/main/" + culture + "/timeZoneNames.json"),
+                $.get("/lib/cldr-data/supplemental/timeData.json"),
+                $.get("/lib/cldr-data/supplemental/weekData.json")
+            ).then(function () {
+                // Normalize $.get results, we only need the JSON, not the request statuses.
+                return [].slice.apply(arguments, [0]).map(function (result) {
+                    return result[0];
+                });
+            }).then(Globalize.load)
+                .then(function () {
+                    console.log("Globalize culture loaded " + culture);
+                    Globalize.locale(culture);
+                    resolve();
+
+                });
+        });
+
+    };
     return {
         getProductItemInfo: getProductItemInfo,
         setCompanyIdInSession: setCompanyIdInSession,
         getCompanyBaseCurrencyInfo: getCompanyBaseCurrencyInfo,
-        getCompanyCashFlowAccounts:getCompanyCashFlowAccounts
+        getCompanyCashFlowAccounts: getCompanyCashFlowAccounts,
+        setGlobalizeLocale: setGlobalizeLocale
     };
 })();
