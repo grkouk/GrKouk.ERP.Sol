@@ -36,13 +36,14 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.CashFlowAccounts
         private void LoadCombos()
         {
             var companiesListJs = _context.Companies.OrderBy(p => p.Name)
-                .Select(p => new DiaryDocTypeItem()
+                .Select(p => new UISelectTypeItem()
                 {
                     Title = p.Name,
-                    Value = p.Id
+                    ValueInt = p.Id,
+                    Value = p.Id.ToString()
                 }).ToList();
-           
-           
+
+
             ViewData["CompaniesListJs"] = companiesListJs;
         }
         [BindProperty]
@@ -58,15 +59,18 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.CashFlowAccounts
             await using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                itemToAttach.DateCreated=DateTime.Today;
-                itemToAttach.DateLastModified=DateTime.Today;
-                int[] companiesSelected = JsonSerializer.Deserialize<int[]>(ItemVm.SelectedCompanies);
+                itemToAttach.DateCreated = DateTime.Today;
+                itemToAttach.DateLastModified = DateTime.Today;
+                string[] companiesSelected = JsonSerializer.Deserialize<string[]>(ItemVm.SelectedCompanies);
                 foreach (var i in companiesSelected)
                 {
-
+                    if (!Int32.TryParse(i, out int compId))
+                    {
+                        throw new Exception("Selected company Id error");
+                    }
                     itemToAttach.CompanyMappings.Add(new CashFlowAccountCompanyMapping()
                     {
-                        CompanyId = i,
+                        CompanyId = compId,
                         CashFlowAccountId = itemToAttach.Id
                     });
                 }
@@ -74,21 +78,21 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.CashFlowAccounts
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
                 _toastNotification.AddSuccessToastMessage("CashFlow Account Created");
-                
+
                 return RedirectToPage("./Index");
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
                 await transaction.RollbackAsync();
-                ModelState.AddModelError("",e.Message);
+                ModelState.AddModelError("", e.Message);
                 _toastNotification.AddErrorToastMessage(e.Message);
                 LoadCombos();
                 return Page();
             }
-           
 
-           
+
+
         }
     }
 }

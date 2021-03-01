@@ -55,10 +55,12 @@
                 </div>
             </div>
         </div>
+      
         <div class="row mb-3 justify-content-end">
             <div class="col-md-3">
                 <div class="form-floating">
-                    <input asp-for="ItemVm.Amount" class="form-control form-control-sm text-end currency-input" placeholder="Amount" />
+                    <input asp-for="ItemVm.Amount" class="form-control form-control-sm text-end currency-input" placeholder="Amount"
+                    data-actualValue="0" />
                     <label asp-for="ItemVm.Amount" class="form-label small"></label>
                     <div class="invalid-feedback">
                         <span asp-validation-for="ItemVm.Amount" class="text-danger"></span>
@@ -87,10 +89,11 @@
 
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{await Html.RenderPartialAsync("_ValidationScriptsStrippedPartial");}
     <script src="~/js/product.lib.js"></script>
     <script>
         $(document).ready(function () {
+           /*
             var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
             //console.log('Current Culture ' + currentCulture);
 
@@ -105,6 +108,10 @@
                     maximumFractionDigits: 3
 
                 });
+             */
+            let formatterCurrency; 
+            let formatterNumber;
+            let parseNumber;
             var $initialLoad = $('#IsInitialLoad');
             const $spinnerElement = $('#SpinnerLoaderCompanies');
             //if (!$initialLoad.val()) return;
@@ -149,18 +156,27 @@
                     productLib.getCompanyCashFlowAccounts(companyId, $spinnerElement)
                         .then((data) => {
                             loadCompanyCfAccounts(data.accounts);
-
                             let currencyCode = data.currencyCode;
-                            //var currencyLocale = data.currencyLocale;
-                            let locale = data.currencyLocale;
-                            formatterCurrency = new Intl.NumberFormat(locale,
-                                {
-                                    style: 'currency',
-                                    currency: currencyCode,
-                                    minimumFractionDigits: 2
+                            let locale = data.currencyLocale.substring(0,2);
+                            productLib.setGlobalizeLocale(locale)
+                                .then(() => {
+                                    formatterCurrency = new Intl.NumberFormat(locale,
+                                        {
+                                            style: 'currency',
+                                            currency: currencyCode,
+                                            minimumFractionDigits: 2
+                                        });
+                                    formatterNumber = new Intl.NumberFormat(locale,
+                                        {
+                                            maximumFractionDigits: 3
+
+                                        });
+                                    parseNumber = Globalize.numberParser();
+                                    $docCurrency.text(currencyCode);
+                                    updateCurrencyFormat();
                                 });
-                            $docCurrency.text(currencyCode);
-                            updateCurrencyFormat();
+                            //---------------------------
+                           
                         })
                         .catch((error) => {
                             console.log("Error getting company base currency");
@@ -175,7 +191,24 @@
             $companyId.change(() => {
                 companyChanged();
             });
-           
+           $amount.blur((e)=>{
+               let el = $( e.target );
+               let elInputValue = el.val();
+               el.attr('data-actualValue',elInputValue);
+               console.log("Inside blur event");
+               console.log(e);
+           });
+           $amount.focus((e)=>{
+               let el = $( e.target );
+               //let $el = $(this);
+               let elAttrValue = el.attr('data-actualValue');
+               let elValue = parseFloat(elAttrValue);
+               el.val(elValue);
+               console.log("Inside focus event");
+               console.log(e);
+           });
+          
+
             var copyFromId =parseInt( $('#CopyFromId').val());
             let selectedItemId=0;
              if (copyFromId===0) {

@@ -41,8 +41,8 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.CashFlowAccounts
             var itemToModify = await _context.CashFlowAccounts
 
                 .Include(p => p.CompanyMappings)
-                .FirstOrDefaultAsync(m => m.Id == id);;
-                
+                .FirstOrDefaultAsync(m => m.Id == id); ;
+
 
             if (itemToModify == null)
             {
@@ -59,11 +59,12 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.CashFlowAccounts
         private void LoadCombos()
         {
 
-             var companiesListJs = _context.Companies.OrderBy(p => p.Name)
-                .Select(p => new DiaryDocTypeItem()
+            var companiesListJs = _context.Companies.OrderBy(p => p.Name)
+                .Select(p => new UISelectTypeItem()
                 {
                     Title = p.Name,
-                    Value = p.Id
+                    ValueInt = p.Id,
+                    Value = p.Id.ToString()
                 }).ToList();
             ViewData["CompaniesListJs"] = companiesListJs;
         }
@@ -78,17 +79,20 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.CashFlowAccounts
             try
             {
                 var itemToAttach = _mapper.Map<CashFlowAccount>(ItemVm);
-                itemToAttach.DateLastModified=DateTime.Today;
+                itemToAttach.DateLastModified = DateTime.Today;
                 _context.Attach(itemToAttach).State = EntityState.Modified;
                 _context.CashFlowAccountCompanyMappings.RemoveRange(_context.CashFlowAccountCompanyMappings.Where(p => p.CashFlowAccountId == itemToAttach.Id));
-                
-                int[] companiesSelected = JsonSerializer.Deserialize<int[]>(ItemVm.SelectedCompanies);
+                string[] companiesSelected = JsonSerializer.Deserialize<string[]>(ItemVm.SelectedCompanies);
+
                 foreach (var i in companiesSelected)
                 {
-
+                    if (!Int32.TryParse(i, out int compId))
+                    {
+                        throw new Exception("Selected company Id error");
+                    }
                     itemToAttach.CompanyMappings.Add(new CashFlowAccountCompanyMapping()
                     {
-                        CompanyId = i,
+                        CompanyId = compId,
                         CashFlowAccountId = itemToAttach.Id
                     });
                 }
