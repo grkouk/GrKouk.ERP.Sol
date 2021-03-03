@@ -1,0 +1,111 @@
+﻿@page
+@model DeleteModel
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+
+@{
+    Layout = "_LayoutEntryFormTransaction";
+    ViewData["Title"] = "Delete Cash Flow Transaction";
+    var formDisabled = Model.NotUpdatable ? "disabled" : "";
+}
+
+@{
+    if (Model.NotUpdatable) {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>Not updateable!</strong> This transaction is created from other section and cannot be updated.
+            <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+}
+<hr />
+<div class="container">
+
+    <form method="post">
+        <fieldset @formDisabled>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ItemVm.Id" />
+            <input type="hidden" asp-for="@Model.CfaId" id="cfaId" />
+            <input type="hidden" asp-for="ItemVm.Timestamp" />
+            <input type="hidden" asp-for="ItemVm.SectionId" />
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <div class="form-floating">
+                        <input disabled asp-for="ItemVm.TransDate" class="form-control form-control-sm" autofocus />
+                        <label asp-for="ItemVm.TransDate" class="form-label small"></label>
+                        <span asp-validation-for="ItemVm.TransDate" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="form-floating">
+                        <select disabled asp-for="ItemVm.CompanyId" class="form-select form-select-sm" asp-items="ViewBag.CompanyId"></select>
+                        <label asp-for="ItemVm.CompanyId" class="form-label small"></label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-floating">
+                        <input disabled asp-for="ItemVm.TransRefCode" class="form-control form-control-sm" placeholder="Ref Code" />
+                        <label asp-for="ItemVm.TransRefCode" class="form-label small"></label>
+                        <span asp-validation-for="ItemVm.TransRefCode" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3 align-items-center">
+
+
+                <div class="col-md-5">
+                    <div class="form-floating">
+                        <select disabled asp-for="ItemVm.CashFlowAccountId" class="form-select form-select-sm" asp-items="ViewBag.CashFlowAccountId"></select>
+                        <label asp-for="ItemVm.CashFlowAccountId" class="form-label small"></label>
+                        <span asp-validation-for="ItemVm.CashFlowAccountId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-auto ms-0 ps-0" id="SpinnerLoaderCompanies" style="display: none">
+                    <span class="spinner-border spinner-border-sm text-primary"></span>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <select disabled asp-for="ItemVm.DocSeriesId" class="form-select form-select-sm" asp-items="ViewBag.DocSeriesId"></select>
+                        <label asp-for="ItemVm.DocSeriesId" class="form-label small"></label>
+                    </div>
+                </div>
+            </div>
+            @{
+                var vl = Model.ItemVm?.Amount;
+                var vl1 = FormattableString.Invariant($"{vl}");
+
+            }
+            <div class="row mb-3 justify-content-end">
+                <div class="col-md-3">
+                    <div class="form-floating">
+                        <input disabled asp-for="ItemVm.Amount" class="form-control form-control-sm text-end currency-input" placeholder="Amount"
+                               data-actualValue="@vl1" />
+                        <label asp-for="ItemVm.Amount" class="form-label small"></label>
+                        <div class="invalid-feedback">
+                            <span asp-validation-for="ItemVm.Amount" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <div class="form-floating">
+                        <textarea disabled asp-for="ItemVm.Etiology" class="form-control form-control-sm" placeholder="Αιτιολογία Κίνησης"> </textarea>
+                        <label asp-for="ItemVm.Etiology" class="form-label small"></label>
+                    </div>
+                    <div class="invalid-feedback">
+                        <span asp-validation-for="ItemVm.Etiology" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <input type="submit" value="Delete" class="btn btn-primary btn-sm" />
+                </div>
+            </div>
+        </fieldset>
+    </form>
+</div>
+
+
