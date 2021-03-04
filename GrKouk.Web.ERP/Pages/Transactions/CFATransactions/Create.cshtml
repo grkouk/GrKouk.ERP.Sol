@@ -46,7 +46,7 @@
                 </div>
             </div>
             <div class="col-auto ms-0 ps-0" id="SpinnerLoaderCompanies" style="display: none">
-                <span class="spinner-border spinner-border-sm text-primary" ></span>
+                <span class="spinner-border spinner-border-sm text-primary"></span>
             </div>
             <div class="col-md-6">
                 <div class="form-floating">
@@ -55,12 +55,12 @@
                 </div>
             </div>
         </div>
-      
+
         <div class="row mb-3 justify-content-end">
             <div class="col-md-3">
                 <div class="form-floating">
                     <input asp-for="ItemVm.Amount" class="form-control form-control-sm text-end currency-input" placeholder="Amount"
-                    data-actualValue="0" />
+                           data-actualValue="0" />
                     <label asp-for="ItemVm.Amount" class="form-label small"></label>
                     <div class="invalid-feedback">
                         <span asp-validation-for="ItemVm.Amount" class="text-danger"></span>
@@ -81,7 +81,7 @@
         </div>
         <div class="row mb-3">
             <div class="col">
-                <input type="submit" value="Create" class="btn btn-primary btn-sm" />
+                <input type="submit" value="Create" class="btn btn-primary btn-sm" id="saveForm" />
             </div>
         </div>
     </form>
@@ -93,25 +93,12 @@
     <script src="~/js/product.lib.js"></script>
     <script>
         $(document).ready(function () {
-           /*
-            var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
-            //console.log('Current Culture ' + currentCulture);
 
-            var formatterCurrency = new Intl.NumberFormat(currentCulture,
-                {
-                    style: 'currency',
-                    currency: 'EUR',
-                    minimumFractionDigits: 2
-                });
-            var formatterNumber = new Intl.NumberFormat(currentCulture,
-                {
-                    maximumFractionDigits: 3
-
-                });
-             */
-            let formatterCurrency; 
+            let formatterCurrency;
             let formatterNumber;
             let parseNumber;
+            let formatCurrency;
+            let formatNumber;
             var $initialLoad = $('#IsInitialLoad');
             const $spinnerElement = $('#SpinnerLoaderCompanies');
             //if (!$initialLoad.val()) return;
@@ -120,12 +107,13 @@
             const $companyId = $('#ItemVm_CompanyId');
             const $docCurrency = $('[name=docCurrency]');
             const $cashFlowAccountId = $('#ItemVm_CashFlowAccountId');
-           
+
             const formatCurrencyLineValueElements = () => {
                 let $elementsToUpdateVal = $('.currency-input');
-                $elementsToUpdateVal.each(function() {
+                let parse = Globalize.numberParser();
+                $elementsToUpdateVal.each(function () {
                     let $el = $(this);
-                    let parse = Globalize.numberParser(); 
+                   
                     let elValue = parse($el.val());
                     if (!isNaN(elValue)) {
                         $el.val(formatterCurrency.format(elValue));
@@ -136,18 +124,61 @@
             const updateCurrencyFormat = () => {
                 formatCurrencyLineValueElements();
             };
+            const prepCurrencyInputs = () => {
+                productLib.prepCurrencyInputs();
+                /*
+                let $elementsToUpdateVal = $('.currency-input');
+                $elementsToUpdateVal.each(function () {
+                    let $el = $(this);
+                    $el.blur((e) => {
+                        console.log("Inside blur event");
+                        let jEl = e.target;
+                        let jElInputValue = jEl.value;
+                        let typeOfInput = typeof jElInputValue;
+                        console.log(`typeof e.target=${typeOfInput}`);
+                        let jElValGlParser = parseNumber(jElInputValue);
+                        jEl.dataset.actualvalue = jElValGlParser;
+                        jEl.value = formatCurrency(jElValGlParser);
+                    });
+                    $el.focus((e) => {
+                        console.log("Inside focus event");
+                        let jEl = e.target;
+                        let jElAttrValue = jEl.dataset.actualvalue;
+                        let jElAttrValueParsed = parseFloat(jElAttrValue);
+                        let jElValFormatted = formatNumber(jElAttrValueParsed);
+                        jEl.value = jElValFormatted;
+                        jEl.select();
+                    });
 
-           
+                });
+                */
+            };
+            const prepCurrencyInputsForPost = () => {
+                productLib.prepCurrencyInputsForPost();
+                /*
+                let $elementsToUpdateVal = $('.currency-input');
+                $elementsToUpdateVal.each(function () {
+                    
+                    var jEl = this;
+                    let jElAttrValue = jEl.dataset.actualvalue;
+                    let jElAttrValueParsed = parseFloat(jElAttrValue);
+                    let jElValFormatted = formatNumber(jElAttrValueParsed);
+                    jEl.value = jElValFormatted;
+
+                });
+                */
+            };
             const loadCompanyCfAccounts = (lst) => {
                 $cashFlowAccountId.empty();
-                $.each(lst, function(index, item) {
-                    $cashFlowAccountId.append($('<option></option>').attr('value', item.value).text(item.text));
-                });
+                $.each(lst,
+                    function (index, item) {
+                        $cashFlowAccountId.append($('<option></option>').attr('value', item.value).text(item.text));
+                    });
             };
-            
+
             const companyChanged = () => {
                 let companyId = parseInt($companyId.val());
-               
+
                 if (isNaN(companyId)) {
                     companyId = 0;
                 }
@@ -157,7 +188,7 @@
                         .then((data) => {
                             loadCompanyCfAccounts(data.accounts);
                             let currencyCode = data.currencyCode;
-                            let locale = data.currencyLocale.substring(0,2);
+                            let locale = data.currencyLocale.substring(0, 2);
                             productLib.setGlobalizeLocale(locale)
                                 .then(() => {
                                     formatterCurrency = new Intl.NumberFormat(locale,
@@ -172,11 +203,15 @@
 
                                         });
                                     parseNumber = Globalize.numberParser();
+                                    formatNumber = Globalize.numberFormatter();
+                                    formatCurrency = Globalize.currencyFormatter(currencyCode);
+                                    productLib.setParsers(parseNumber);
+                                    productLib.setFormatters(formatNumber, formatCurrency);
                                     $docCurrency.text(currencyCode);
                                     updateCurrencyFormat();
                                 });
                             //---------------------------
-                           
+
                         })
                         .catch((error) => {
                             console.log("Error getting company base currency");
@@ -186,46 +221,31 @@
                     $cashFlowAccountId.empty();
                 }
             };
-           
-           
+
+
             $companyId.change(() => {
                 companyChanged();
             });
-           $amount.blur((e)=>{
-               let el = $( e.target );
-               let elInputValue = el.val();
-               el.attr('data-actualValue',elInputValue);
-               console.log("Inside blur event");
-               console.log(e);
-           });
-           $amount.focus((e)=>{
-               let el = $( e.target );
-               //let $el = $(this);
-               let elAttrValue = el.attr('data-actualValue');
-               let elValue = parseFloat(elAttrValue);
-               el.val(elValue);
-               console.log("Inside focus event");
-               console.log(e);
-           });
-          
+           
+            $('#saveForm').click(function (e) {
+                prepCurrencyInputsForPost();
+            });
+            var copyFromId = parseInt($('#CopyFromId').val());
+            let selectedItemId = 0;
+            if (copyFromId === 0) {
 
-            var copyFromId =parseInt( $('#CopyFromId').val());
-            let selectedItemId=0;
-             if (copyFromId===0) {
-               
                 $amount.val(0);
-                 $('#ItemVm_TransDate').val(new Date().toISOString().slice(0, 10));
-                
+                $('#ItemVm_TransDate').val(new Date().toISOString().slice(0, 10));
+
             } else {
-                  $('#ItemVm_TransDate').val(new Date().toISOString().slice(0, 10));
-                  selectedItemId = parseInt($('#CopyFromTransactorId').val());
-             }
-          
-          
-            
+                $('#ItemVm_TransDate').val(new Date().toISOString().slice(0, 10));
+                selectedItemId = parseInt($('#CopyFromTransactorId').val());
+            }
             companyChanged();
-            
-            if (selectedItemId!==0) {
+            prepCurrencyInputs();
+           
+
+            if (selectedItemId !== 0) {
                 $cashFlowAccountId.val(selectedItemId);
             }
         });
