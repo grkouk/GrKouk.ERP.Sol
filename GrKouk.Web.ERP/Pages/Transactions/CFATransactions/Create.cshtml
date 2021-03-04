@@ -126,47 +126,11 @@
             };
             const prepCurrencyInputs = () => {
                 productLib.prepCurrencyInputs();
-                /*
-                let $elementsToUpdateVal = $('.currency-input');
-                $elementsToUpdateVal.each(function () {
-                    let $el = $(this);
-                    $el.blur((e) => {
-                        console.log("Inside blur event");
-                        let jEl = e.target;
-                        let jElInputValue = jEl.value;
-                        let typeOfInput = typeof jElInputValue;
-                        console.log(`typeof e.target=${typeOfInput}`);
-                        let jElValGlParser = parseNumber(jElInputValue);
-                        jEl.dataset.actualvalue = jElValGlParser;
-                        jEl.value = formatCurrency(jElValGlParser);
-                    });
-                    $el.focus((e) => {
-                        console.log("Inside focus event");
-                        let jEl = e.target;
-                        let jElAttrValue = jEl.dataset.actualvalue;
-                        let jElAttrValueParsed = parseFloat(jElAttrValue);
-                        let jElValFormatted = formatNumber(jElAttrValueParsed);
-                        jEl.value = jElValFormatted;
-                        jEl.select();
-                    });
-
-                });
-                */
+                
             };
             const prepCurrencyInputsForPost = () => {
                 productLib.prepCurrencyInputsForPost();
-                /*
-                let $elementsToUpdateVal = $('.currency-input');
-                $elementsToUpdateVal.each(function () {
-                    
-                    var jEl = this;
-                    let jElAttrValue = jEl.dataset.actualvalue;
-                    let jElAttrValueParsed = parseFloat(jElAttrValue);
-                    let jElValFormatted = formatNumber(jElAttrValueParsed);
-                    jEl.value = jElValFormatted;
-
-                });
-                */
+                
             };
             const loadCompanyCfAccounts = (lst) => {
                 $cashFlowAccountId.empty();
