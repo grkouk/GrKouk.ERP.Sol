@@ -1,4 +1,15 @@
 ﻿var productLib = (function () {
+    let numberFormatter;
+    let currencyFormatter;
+    let numberParser;
+    
+    const setParsers = (parserNumber) => {
+        numberParser = parserNumber;
+    };
+    const setFormatters = (formatterNumber, formatterCurrency) => {
+        numberFormatter = formatterNumber;
+        currencyFormatter = formatterCurrency;
+    };
     const spinnerLoaderShow = ($spinnerElement) => {
         $spinnerElement.show();
     };
@@ -220,6 +231,7 @@
                 $.get("/lib/cldr-data/main/" + culture + "/ca-gregorian.json"),
                 $.get("/lib/cldr-data/main/" + culture + "/timeZoneNames.json"),
                 $.get("/lib/cldr-data/supplemental/timeData.json"),
+                $.get("/lib/cldr-data/supplemental/currencyData.json"),
                 $.get("/lib/cldr-data/supplemental/weekData.json")
             ).then(function () {
                 // Normalize $.get results, we only need the JSON, not the request statuses.
@@ -236,11 +248,54 @@
         });
 
     };
+    const prepCurrencyInputs = () => {
+        let $elementsToUpdateVal = $('.currency-input');
+        $elementsToUpdateVal.each(function () {
+            let $el = $(this);
+            $el.blur((e) => {
+                console.log("Inside blur event");
+                let jEl = e.target;
+                let jElInputValue = jEl.value;
+                let typeOfInput = typeof jElInputValue;
+                console.log(`typeof e.target=${typeOfInput}`);
+                let jElValGlParser = numberParser(jElInputValue);
+                jEl.dataset.actualvalue = jElValGlParser;
+                jEl.value = currencyFormatter(jElValGlParser);
+            });
+            $el.focus((e) => {
+                console.log("Inside focus event");
+                let jEl = e.target;
+                let jElAttrValue = jEl.dataset.actualvalue;
+                let jElAttrValueParsed = parseFloat(jElAttrValue);
+                let jElValFormatted = numberFormatter(jElAttrValueParsed);
+                jEl.value = jElValFormatted;
+                jEl.select();
+            });
+
+        });
+    };
+    const prepCurrencyInputsForPost = () => {
+        let $elementsToUpdateVal = $('.currency-input');
+        $elementsToUpdateVal.each(function () {
+                    
+            var jEl = this;
+            let jElAttrValue = jEl.dataset.actualvalue;
+            let jElAttrValueParsed = parseFloat(jElAttrValue);
+            let jElValFormatted = numberFormatter(jElAttrValueParsed);
+            jEl.value = jElValFormatted;
+
+        });
+    };
+    
     return {
         getProductItemInfo: getProductItemInfo,
         setCompanyIdInSession: setCompanyIdInSession,
         getCompanyBaseCurrencyInfo: getCompanyBaseCurrencyInfo,
         getCompanyCashFlowAccounts: getCompanyCashFlowAccounts,
-        setGlobalizeLocale: setGlobalizeLocale
+        prepCurrencyInputsForPost: prepCurrencyInputsForPost,
+        prepCurrencyInputs: prepCurrencyInputs,
+        setGlobalizeLocale: setGlobalizeLocale,
+        setParsers : setParsers,
+        setFormatters: setFormatters
     };
 })();
