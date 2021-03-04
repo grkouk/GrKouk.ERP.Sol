@@ -1,4 +1,15 @@
 ﻿var productLib = (function () {
+    let numberFormatter;
+    let currencyFormatter;
+    let numberParser;
+    
+    const setParsers = (parserNumber) => {
+        numberParser = parserNumber;
+    };
+    const setFormatters = (formatterNumber, formatterCurrency) => {
+        numberFormatter = formatterNumber;
+        currencyFormatter = formatterCurrency;
+    };
     const spinnerLoaderShow = ($spinnerElement) => {
         $spinnerElement.show();
     };
@@ -6,10 +17,10 @@
         $spinnerElement.hide();
     };
     const spinnerLoaderIsVisible = ($spinnerElement) => {
-        return($spinnerElement.is(':visible'));
+        return ($spinnerElement.is(':visible'));
     };
-    
-    const makeAjaxCall = (uri,$SpElement) => {
+
+    const makeAjaxCall = (uri, $SpElement) => {
         var timeout;
         return new Promise((resolve, reject) => {
             $.ajax({
@@ -147,10 +158,10 @@
             });
         });
     };
-    const getCompanyCashFlowAccounts = (companyId,spinnerElement) => {
+    const getCompanyCashFlowAccounts = (companyId, spinnerElement) => {
         let uri = "/api/materials/CashFlowAccountsForCompany";
         uri += `?companyId=${companyId}`;
-      
+
         return new Promise((resolve, reject) => {
             makeAjaxCall(uri, spinnerElement)
                 .then((data) => {
@@ -210,10 +221,81 @@
             });
         });
     };
+    const setGlobalizeLocale = (culture) => {
+        return new Promise((resolve, reject) => {
+            $.when(
+                $.get("/lib/cldr-data/supplemental/likelySubtags.json"),
+                $.get("/lib/cldr-data/main/" + culture + "/numbers.json"),
+                $.get("/lib/cldr-data/main/" + culture + "/currencies.json"),
+                $.get("/lib/cldr-data/supplemental/numberingSystems.json"),
+                $.get("/lib/cldr-data/main/" + culture + "/ca-gregorian.json"),
+                $.get("/lib/cldr-data/main/" + culture + "/timeZoneNames.json"),
+                $.get("/lib/cldr-data/supplemental/timeData.json"),
+                $.get("/lib/cldr-data/supplemental/currencyData.json"),
+                $.get("/lib/cldr-data/supplemental/weekData.json")
+            ).then(function () {
+                // Normalize $.get results, we only need the JSON, not the request statuses.
+                return [].slice.apply(arguments, [0]).map(function (result) {
+                    return result[0];
+                });
+            }).then(Globalize.load)
+                .then(function () {
+                    console.log("Globalize culture loaded " + culture);
+                    Globalize.locale(culture);
+                    resolve();
+
+                });
+        });
+
+    };
+    const prepCurrencyInputs = () => {
+        let $elementsToUpdateVal = $('.currency-input');
+        $elementsToUpdateVal.each(function () {
+            let $el = $(this);
+            $el.blur((e) => {
+                console.log("Inside blur event");
+                let jEl = e.target;
+                let jElInputValue = jEl.value;
+                let typeOfInput = typeof jElInputValue;
+                console.log(`typeof e.target=${typeOfInput}`);
+                let jElValGlParser = numberParser(jElInputValue);
+                jEl.dataset.actualvalue = jElValGlParser;
+                jEl.value = currencyFormatter(jElValGlParser);
+            });
+            $el.focus((e) => {
+                console.log("Inside focus event");
+                let jEl = e.target;
+                let jElAttrValue = jEl.dataset.actualvalue;
+                let jElAttrValueParsed = parseFloat(jElAttrValue);
+                let jElValFormatted = numberFormatter(jElAttrValueParsed);
+                jEl.value = jElValFormatted;
+                jEl.select();
+            });
+
+        });
+    };
+    const prepCurrencyInputsForPost = () => {
+        let $elementsToUpdateVal = $('.currency-input');
+        $elementsToUpdateVal.each(function () {
+                    
+            var jEl = this;
+            let jElAttrValue = jEl.dataset.actualvalue;
+            let jElAttrValueParsed = parseFloat(jElAttrValue);
+            let jElValFormatted = numberFormatter(jElAttrValueParsed);
+            jEl.value = jElValFormatted;
+
+        });
+    };
+    
     return {
         getProductItemInfo: getProductItemInfo,
         setCompanyIdInSession: setCompanyIdInSession,
         getCompanyBaseCurrencyInfo: getCompanyBaseCurrencyInfo,
-        getCompanyCashFlowAccounts:getCompanyCashFlowAccounts
+        getCompanyCashFlowAccounts: getCompanyCashFlowAccounts,
+        prepCurrencyInputsForPost: prepCurrencyInputsForPost,
+        prepCurrencyInputs: prepCurrencyInputs,
+        setGlobalizeLocale: setGlobalizeLocale,
+        setParsers : setParsers,
+        setFormatters: setFormatters
     };
 })();

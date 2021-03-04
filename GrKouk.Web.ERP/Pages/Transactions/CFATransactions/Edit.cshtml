@@ -73,10 +73,16 @@
                     </div>
                 </div>
             </div>
+            @{
+                var vl = Model.ItemVm?.Amount;
+                var vl1 = FormattableString.Invariant($"{vl}");
+
+            }
             <div class="row mb-3 justify-content-end">
                 <div class="col-md-3">
                     <div class="form-floating">
-                        <input asp-for="ItemVm.Amount" class="form-control form-control-sm text-end currency-input" placeholder="Amount" />
+                        <input asp-for="ItemVm.Amount" class="form-control form-control-sm text-end currency-input" placeholder="Amount" 
+                               data-actualValue="@vl1"/>
                         <label asp-for="ItemVm.Amount" class="form-label small"></label>
                         <div class="invalid-feedback">
                             <span asp-validation-for="ItemVm.Amount" class="text-danger"></span>
@@ -97,36 +103,25 @@
             </div>
             <div class="row mb-3">
                 <div class="col">
-                    <input type="submit" value="Create" class="btn btn-primary btn-sm" />
+                    <input type="submit" value="Update" class="btn btn-primary btn-sm" id="saveForm"/>
                 </div>
             </div>
         </fieldset>
     </form>
 </div>
 
-<div>
-    <a class="small" asp-page="./Index">Back to List</a>
-</div>
+
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{await Html.RenderPartialAsync("_ValidationScriptsStrippedPartial");}
     <script src="~/js/product.lib.js"></script>
     <script>
         $(document).ready(function () {
-            var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
-            //console.log('Current Culture ' + currentCulture);
-
-            var formatterCurrency = new Intl.NumberFormat(currentCulture,
-                {
-                    style: 'currency',
-                    currency: 'EUR',
-                    minimumFractionDigits: 2
-                });
-            var formatterNumber = new Intl.NumberFormat(currentCulture,
-                {
-                    maximumFractionDigits: 3
-
-                });
+            let formatterCurrency;
+            let formatterNumber;
+            let parseNumber;
+            let formatCurrency;
+            let formatNumber;
             var $initialLoad = $('#IsInitialLoad');
             const $spinnerElement = $('#SpinnerLoaderCompanies');
             //if (!$initialLoad.val()) return;
@@ -152,31 +147,13 @@
             const updateCurrencyFormat = () => {
                 formatCurrencyLineValueElements();
             };
-            const setGlobalizeLocale = (culture) => {
-                return new Promise((resolve, reject) => {
-                    $.when(
-                            $.get("/lib/cldr-data/supplemental/likelySubtags.json"),
-                            $.get("/lib/cldr-data/main/" + culture + "/numbers.json"),
-                            $.get("/lib/cldr-data/main/" + culture + "/currencies.json"),
-                            $.get("/lib/cldr-data/supplemental/numberingSystems.json"),
-                            $.get("/lib/cldr-data/main/" + culture + "/ca-gregorian.json"),
-                            $.get("/lib/cldr-data/main/" + culture +"/timeZoneNames.json"),
-                            $.get("/lib/cldr-data/supplemental/timeData.json"),
-                            $.get("/lib/cldr-data/supplemental/weekData.json")
-                        ).then(function () {
-                            // Normalize $.get results, we only need the JSON, not the request statuses.
-                            return [].slice.apply(arguments, [0]).map(function (result) {
-                                return result[0];
-                            });
-                        }).then(Globalize.load)
-                        .then(function () {
-                            console.log("Globalize culture loaded " + culture);
-                            Globalize.locale(culture);
-                            resolve();
-
-                        });
-                });
-               
+            const prepCurrencyInputs = () => {
+                productLib.prepCurrencyInputs();
+                
+            };
+            const prepCurrencyInputsForPost = () => {
+                productLib.prepCurrencyInputsForPost();
+                
             };
 
             const loadCompanyCfAccounts = (lst) => {
@@ -200,10 +177,8 @@
                             let cfaId = $cfaId.val();
                             $cashFlowAccountId.val(cfaId);
                             let currencyCode = data.currencyCode;
-                            
-                            //var currencyLocale = data.currencyLocale;
                             let locale = data.currencyLocale.substring(0,2);
-                            setGlobalizeLocale(locale)
+                            productLib.setGlobalizeLocale(locale)
                                 .then(() => {
                                     formatterCurrency = new Intl.NumberFormat(locale,
                                         {
@@ -211,6 +186,16 @@
                                             currency: currencyCode,
                                             minimumFractionDigits: 2
                                         });
+                                    formatterNumber = new Intl.NumberFormat(locale,
+                                        {
+                                            maximumFractionDigits: 3
+
+                                        });
+                                    parseNumber = Globalize.numberParser();
+                                    formatNumber = Globalize.numberFormatter();
+                                    formatCurrency = Globalize.currencyFormatter(currencyCode);
+                                    productLib.setParsers(parseNumber);
+                                    productLib.setFormatters(formatNumber, formatCurrency);
                                     $docCurrency.text(currencyCode);
                                     updateCurrencyFormat();
                                 });
@@ -230,7 +215,9 @@
             $companyId.change(() => {
                 companyChanged();
             });
-
+            $('#saveForm').click(function (e) {
+                prepCurrencyInputsForPost();
+            });
             var copyFromId =parseInt( $('#CopyFromId').val());
             let selectedItemId=0;
              if (copyFromId===0) {
@@ -246,7 +233,7 @@
 
 
             companyChanged();
-
+            prepCurrencyInputs();
             if (selectedItemId!==0) {
                 $cashFlowAccountId.val(selectedItemId);
             }

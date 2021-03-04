@@ -1,0 +1,40 @@
+﻿
+    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+
+    <!-- cldr scripts (needed for globalize) -->
+    <script src="~/lib/cldrjs/dist/cldr.js"></script>
+    <script src="~/lib/cldrjs/dist/cldr/event.js"></script>
+    <script src="~/lib/cldrjs/dist/cldr/supplemental.js"></script>
+
+    <!-- globalize scripts -->
+   
+    <script src="~/lib/globalize16/globalize.js"></script>
+    <script src="~/lib/globalize16/globalize/message.js"></script>
+    <script src="~/lib/globalize16/globalize/number.js"></script>
+    <script src="~/lib/globalize16/globalize/plural.js"></script>
+    <script src="~/lib/globalize16/globalize/date.js"></script>
+    <script src="~/lib/globalize16/globalize/currency.js"></script>
+
+    <script src="~/lib/jquery-validation-globalize/jquery.validate.globalize.js"></script>
+
+
+<script type="text/javascript">
+
+
+    $.validator.methods.date = function (value, element) {
+        if (element.type === "date") {
+            value = new Date(value).toLocaleDateString();
+        }
+        var val = Globalize.parseDate(value,
+            $.validator.methods.dateGlobalizeOptions.dateParseFormat);
+        return this.optional(element) || !/Invalid|NaN/.test(new Date(val).toString());
+    };
+    var settings = {
+        validClass: "is-valid",
+        errorClass: "is-invalid"
+
+    };
+    $.validator.setDefaults(settings);
+    $.validator.unobtrusive.options = settings;
+</script>
