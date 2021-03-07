@@ -88,10 +88,11 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
             ViewData["MaterialType"] = new SelectList(materialTypes, "Value", "Text");
            // ViewData["CashRegCategoryId"] = new SelectList(_context.CashRegCategories.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
            var companiesListJs = _context.Companies.OrderBy(p => p.Name)
-               .Select(p => new DiaryDocTypeItem()
+               .Select(p => new UISelectTypeItem()
                {
                    Title = p.Name,
-                   Value = p.Id
+                   ValueInt = p.Id,
+                   Value = p.Id.ToString()
                }).ToList();
            ViewData["CompaniesListJs"] = companiesListJs;
         }
@@ -112,13 +113,16 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
             {
                 materialToAttach.DateCreated=DateTime.Today;
                 materialToAttach.DateLastModified=DateTime.Today;
-                int[] companiesSelected = JsonSerializer.Deserialize<int[]>(WarehouseItemVm.SelectedCompanies);
+                string[] companiesSelected = JsonSerializer.Deserialize<string[]>(WarehouseItemVm.SelectedCompanies);
                 foreach (var i in companiesSelected)
                 {
-
+                    if (!Int32.TryParse(i, out int compId))
+                    {
+                        throw new Exception("Selected company Id error");
+                    }
                     materialToAttach.CompanyMappings.Add(new CompanyWarehouseItemMapping
                     {
-                        CompanyId = i,
+                        CompanyId = compId,
                         WarehouseItemId = materialToAttach.Id
                     });
                 }

@@ -35,7 +35,7 @@
                 <ejs-multiselect id="SelectedCompanies" dataSource="@ViewBag.CompaniesListJs" placeholder="Select Companies" mode="CheckBox"
                                  showDropDownIcon="true"
                                  showSelectAll="false" selectAllText="Select All" unSelectAllText="unSelect All">
-                    <e-multiselect-fields text="Title" value="ValueInt"></e-multiselect-fields>
+                    <e-multiselect-fields text="Title" value="Value"></e-multiselect-fields>
                 </ejs-multiselect>
             </div>
         </div>
@@ -66,7 +66,8 @@
             
             selectedCompanies.changeOnBlur=false;
             selectedCompanies.addEventListener("change",(event)=>{
-                
+                console.log("Inside selected companies change event handler");
+                console.log(event);
                 var selected = JSON.stringify(event.value);
                 $('#ItemVm_SelectedCompanies').val(selected);
             });

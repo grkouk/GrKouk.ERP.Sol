@@ -35,7 +35,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
     <PackageReference Include="NToastNotify" Version="7.0.0" />
-    <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="18.4.0.35" />
+    <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="18.4.0.46" />
   </ItemGroup>
 
   <ItemGroup>
