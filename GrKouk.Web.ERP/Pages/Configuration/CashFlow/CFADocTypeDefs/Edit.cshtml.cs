@@ -76,6 +76,7 @@ namespace GrKouk.Web.ERP.Pages.Configuration.CashFlow.CFADocTypeDefs
         }
         private void LoadCombos()
         {
+            ViewData["SectionList"] = SelectListHelpers.GetSectionsList(_context);
             ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
           
             ViewData["CashFlowTransactionDefId"] =
