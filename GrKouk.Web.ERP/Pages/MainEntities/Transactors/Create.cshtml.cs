@@ -37,10 +37,11 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors
         private void LoadCombos()
         {
             var companiesListJs = _context.Companies.OrderBy(p => p.Name)
-                .Select(p => new DiaryDocTypeItem()
+                .Select(p => new UISelectTypeItem()
                 {
                     Title = p.Name,
-                    Value = p.Id
+                    ValueInt = p.Id,
+                    Value = p.Id.ToString()
                 }).ToList();
             ViewData["TransactorTypeId"] = new SelectList(_context.TransactorTypes.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
             //ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
