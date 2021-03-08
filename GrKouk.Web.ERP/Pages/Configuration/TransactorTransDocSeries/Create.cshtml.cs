@@ -25,7 +25,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.TransactorTransDocSeries
         }
 
         [BindProperty]
-        public TransTransactorDocSeriesDef TransTransactorDocSeriesDef { get; set; }
+        public TransTransactorDocSeriesDef ItemVm { get; set; }
 
         public async Task<IActionResult> OnPostAsync()
         {
@@ -34,7 +34,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.TransactorTransDocSeries
                 return Page();
             }
 
-            _context.TransTransactorDocSeriesDefs.Add(TransTransactorDocSeriesDef);
+            _context.TransTransactorDocSeriesDefs.Add(ItemVm);
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");
