@@ -87,6 +87,8 @@ namespace GrKouk.Erp.Dtos.TransactorTransactions
         [Display(Name = "Company")]
         public string CompanyCode { get; set; }
         public int CompanyCurrencyId { get; set; }
+
+        public int CfAccountId { get; set; }
     }
 
     public class PaymentTransactionDto
@@ -126,7 +128,7 @@ namespace GrKouk.Erp.Dtos.TransactorTransactions
 
         public decimal TotalAmount => TransNetAmount + TransFpaAmount - TransDiscountAmount;
         public decimal AmountUsedInPayments { get; set; }
-        
+        public int CfAccountId { get; set; }
         public int CompanyId { get; set; }  
         
         public string CompanyCode { get; set; }

@@ -3870,6 +3870,7 @@ namespace GrKouk.Web.ERP.Controllers
                         p.BuyDocPaymentMappings.Sum(k => k.AmountUsed)),
                     CompanyId = p.CompanyId,
                     CompanyCode = p.Company.Code,
+                    CfAccountId = p.CfAccountId,
                     CompanyCurrencyId = p.Company.CurrencyId
                 });
             if (!string.IsNullOrEmpty(request.SortData))
@@ -4062,6 +4063,7 @@ namespace GrKouk.Web.ERP.Controllers
                         p.SalesDocPaymentMappings.Sum(k => k.AmountUsed)),
                     CompanyId = p.CompanyId,
                     CompanyCode = p.Company.Code,
+                    CfAccountId = p.CfAccountId,
                     CompanyCurrencyId = p.Company.CurrencyId
                 });
             if (!string.IsNullOrEmpty(request.SortData))
