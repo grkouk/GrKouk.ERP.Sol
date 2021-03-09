@@ -55,5 +55,24 @@ namespace GrKouk.Web.ERP.Helpers
             }
             return valuesList;
         }
+
+        /// <summary>
+        /// Return a select list of Cash Flow Accounts with addition of 0 -> No selection
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        public static List<SelectListItem> GetCfaNoSelectionList(ApiDbContext context)
+        {
+            var dbList = context.CashFlowAccounts.OrderBy(p => p.Name).AsNoTracking();
+            List<SelectListItem> valuesList = new List<SelectListItem>
+            {
+                new SelectListItem() { Value = 0.ToString(), Text = "{No Selection}" }
+            };
+            foreach (var item in dbList)
+            {
+                valuesList.Add(new SelectListItem() { Value = item.Id.ToString(), Text = item.Name });
+            }
+            return valuesList;
+        }
     }
 }
