@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GrKouk.Erp.Definitions;
+using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Web.ERP.Data;
@@ -110,7 +112,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
 
             #region Section Management
 
-            int sectionId = 0;
+            int sectionId ;
             if (docTypeDef.SectionId == 0)
             {
                 var sectn = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == _sectionCode);
@@ -130,46 +132,72 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
 
             #endregion
 
+            await using var transaction = await _context.Database.BeginTransactionAsync();
 
-            spTransaction.SectionId = sectionId;
-            spTransaction.TransTransactorDocTypeId = docSeries.TransTransactorDocTypeDefId;
-            spTransaction.FiscalPeriodId = fiscalPeriod.Id;
-            spTransaction.FinancialAction = transTransactorDef.FinancialTransAction;
-            switch (transTransactorDef.FinancialTransAction)
+            try
             {
-                case FinActionsEnum.FinActionsEnumNoChange:
-                    spTransaction.TransDiscountAmount = 0;
-                    spTransaction.TransFpaAmount = 0;
-                    spTransaction.TransNetAmount = 0;
-                    break;
-                case FinActionsEnum.FinActionsEnumDebit:
-                    spTransaction.TransDiscountAmount = spTransaction.AmountDiscount;
-                    spTransaction.TransFpaAmount = spTransaction.AmountFpa;
-                    spTransaction.TransNetAmount = spTransaction.AmountNet;
-                    break;
-                case FinActionsEnum.FinActionsEnumCredit:
-                    spTransaction.TransDiscountAmount = spTransaction.AmountDiscount;
-                    spTransaction.TransFpaAmount = spTransaction.AmountFpa;
-                    spTransaction.TransNetAmount = spTransaction.AmountNet;
-                    break;
-                case FinActionsEnum.FinActionsEnumNegativeDebit:
-                    spTransaction.TransNetAmount = spTransaction.AmountNet * -1;
-                    spTransaction.TransFpaAmount = spTransaction.AmountFpa * -1;
-                    spTransaction.TransDiscountAmount = spTransaction.AmountDiscount * -1;
-                    break;
-                case FinActionsEnum.FinActionsEnumNegativeCredit:
-                    spTransaction.TransNetAmount = spTransaction.AmountNet * -1;
-                    spTransaction.TransFpaAmount = spTransaction.AmountFpa * -1;
-                    spTransaction.TransDiscountAmount = spTransaction.AmountDiscount * -1;
-                    break;
-                default:
-                    break;
+                spTransaction.SectionId = sectionId;
+                spTransaction.TransTransactorDocTypeId = docSeries.TransTransactorDocTypeDefId;
+                spTransaction.FiscalPeriodId = fiscalPeriod.Id;
+                spTransaction.FinancialAction = transTransactorDef.FinancialTransAction;
+                ActionHandlers.TransactorFinAction(transTransactorDef.FinancialTransAction, spTransaction);
+          
+                await _context.TransactorTransactions.AddAsync(spTransaction);
+                await _context.SaveChangesAsync();
+                if (ItemVm.CfAccountId>0)
+                {
+                    var cfaSeriesId = docSeries.DefaultCfaTransSeriesId;
+                    if (cfaSeriesId>0)
+                    {
+                        var cfaSeries = await _context.CashFlowDocSeriesDefs.FindAsync(cfaSeriesId);
+                        if (cfaSeries!=null)
+                        {
+                            await _context.Entry(cfaSeries)
+                                .Reference(t => t.CashFlowDocTypeDefinition)
+                                .LoadAsync();
+
+                            var cfaType = cfaSeries.CashFlowDocTypeDefinition;
+                            if (cfaType!=null)
+                            {
+                                await _context.Entry(cfaType)
+                                    .Reference(t => t.CashFlowTransactionDefinition)
+                                    .LoadAsync();
+
+                                var cfaTransDef = cfaType.CashFlowTransactionDefinition;
+                                var cfaTrans = new CashFlowAccountTransaction {
+                                    TransDate = ItemVm.TransDate,
+                                    CashFlowAccountId = ItemVm.CfAccountId,
+                                    CompanyId = ItemVm.CompanyId,
+                                    DocumentSeriesId = cfaSeries.Id,
+                                    DocumentTypeId = cfaType.Id,
+                                    Etiology = ItemVm.Etiology,
+                                    FiscalPeriodId = spTransaction.FiscalPeriodId,
+                                    CreatorSectionId = sectionId,
+                                    CreatorId = spTransaction.Id,
+                                    RefCode = spTransaction.TransRefCode,
+                                    Amount = ItemVm.AmountSum,
+                                    SectionId = cfaType.SectionId > 0 ? cfaType.SectionId : sectionId
+                                };
+                                ActionHandlers.CashFlowFinAction(cfaTransDef.CfaAction, cfaTrans);
+                                await _context.CashFlowAccountTransactions.AddAsync(cfaTrans);
+                                await _context.SaveChangesAsync();
+                            }
+                        }
+                    }
+                }
+                
+                await transaction.CommitAsync();
+                _toastNotification.AddSuccessToastMessage("Saved");
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                string msg = e.Message;
+                msg += e.InnerException?.Message;
 
-
-            _context.TransactorTransactions.Add(spTransaction);
-            await _context.SaveChangesAsync();
-            _toastNotification.AddSuccessToastMessage("Saved");
+                await transaction.RollbackAsync();
+                _toastNotification.AddErrorToastMessage(msg);
+            }
 
 
             return RedirectToPage("./Index");
