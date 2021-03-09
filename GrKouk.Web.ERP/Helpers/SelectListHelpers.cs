@@ -61,7 +61,7 @@ namespace GrKouk.Web.ERP.Helpers
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public static List<SelectListItem> GetCfaNoSelectionList(ApiDbContext context)
+        public static List<SelectListItem> GetCfAccountsNoSelectionList(ApiDbContext context)
         {
             var dbList = context.CashFlowAccounts.OrderBy(p => p.Name).AsNoTracking();
             List<SelectListItem> valuesList = new List<SelectListItem>
