@@ -15,7 +15,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             
            
-            <div class="form-row">
+            <div class="row mb-3">
                 <div class="form-group col-md-3">
                     <label asp-for="ItemVm.TransDate" class="small"></label>
                     <input asp-for="ItemVm.TransDate" class="form-control form-control-sm small" autofocus />
@@ -23,7 +23,7 @@
                 </div>
                 <div class="form-group col-md-6">
                     <label asp-for="ItemVm.TransTransactorDocSeriesId" class="small"></label>
-                    <select asp-for="ItemVm.TransTransactorDocSeriesId" class="form-control form-control-sm small" asp-items="ViewBag.TransTransactorDocSeriesId"></select>
+                    <select asp-for="ItemVm.TransTransactorDocSeriesId" class="form-select form-select-sm small" asp-items="ViewBag.TransTransactorDocSeriesId"></select>
                 </div>
 
                 <div class="form-group col-md-3">
@@ -33,22 +33,22 @@
                 </div>
 
             </div>
-            <div class="form-row">
+            <div class="row mb-3">
                 <div class="form-group col-md-6">
                     <label asp-for="ItemVm.TransactorId" class="small"></label>
-                    <select asp-for="ItemVm.TransactorId" class="form-control form-control-sm small" asp-items="ViewBag.TransactorId"></select>
+                    <select asp-for="ItemVm.TransactorId" class="form-select form-select-sm small" asp-items="ViewBag.TransactorId"></select>
                 </div>
                 <div class="form-group col-md-3">
-                    <label asp-for="ItemVm.FiscalPeriodId" class="small"></label>
-                    <select asp-for="ItemVm.FiscalPeriodId" class="form-control form-control-sm small" asp-items="ViewBag.FiscalPeriodId" readonly></select>
+                    <label asp-for="ItemVm.CfAccountId" class="small"></label>
+                    <select asp-for="ItemVm.CfAccountId" class="form-select form-select-sm small" asp-items="ViewBag.CfAccountId" readonly></select>
                 </div>
                 <div class="form-group col-md-3">
                     <label asp-for="ItemVm.CompanyId" class="small"></label>
-                    <select asp-for="ItemVm.CompanyId" class="form-control form-control-sm small" asp-items="ViewBag.CompanyId"></select>
+                    <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm small" asp-items="ViewBag.CompanyId"></select>
                 </div>
             </div>
 
-            <div class="form-row">
+            <div class="row mb-3">
                 <div class="form-group col-md-1">
                     <label asp-for="ItemVm.FpaRate" class="small"></label>
                     <input asp-for="ItemVm.FpaRate" class="form-control form-control-sm small" />
@@ -78,7 +78,7 @@
 
 
             </div>
-            <div class="form-row">
+            <div class="row mb-3">
                 <div class="form-group col-md-12">
                     <label asp-for="ItemVm.Etiology" class="small"></label>
                     <textarea asp-for="ItemVm.Etiology" class="form-control form-control-sm small" placeholder="Αιτιολογία Κίνησης"> </textarea>

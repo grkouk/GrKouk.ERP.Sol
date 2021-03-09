@@ -225,6 +225,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
                 .AsNoTracking()
                 .ToList();
             ViewData["docTypeAllowedTransactorTypesListJs"] = docTypeAllowedTransactorTypesListJs;
+            ViewData["CfAccountId"] = SelectListHelpers.GetCfAccountsNoSelectionList(_context);
         }
     }
 }
