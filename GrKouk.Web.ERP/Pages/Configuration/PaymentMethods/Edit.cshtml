@@ -13,24 +13,24 @@
         <input type="hidden" asp-for="PaymentMethod.Id" />
         <div class="row mb-3">
             <div class="form-group col-md-6">
-                <label asp-for="PaymentMethod.Name" class="control-label small"></label>
+                <label asp-for="PaymentMethod.Name" class="form-label small"></label>
                 <input asp-for="PaymentMethod.Name" class="form-control form-control-sm"/>
                 <span asp-validation-for="PaymentMethod.Name" class="text-danger"></span>
             </div>
             <div class="form-group col-md-2">
-                <label asp-for="PaymentMethod.DaysOverdue" class="control-label small"></label>
+                <label asp-for="PaymentMethod.DaysOverdue" class="form-label small"></label>
                 <input asp-for="PaymentMethod.DaysOverdue" class="form-control form-control-sm"/>
                 <span asp-validation-for="PaymentMethod.DaysOverdue" class="text-danger"></span>
             </div>
         </div>
         <div class="row mb-3">
             <div class="form-group col-md-3">
-                <label asp-for="PaymentMethod.AutoPayoffWay" class="control-label small"></label>
-                <select asp-for="PaymentMethod.AutoPayoffWay" class="form-control form-control-sm" asp-items="ViewBag.AutoPayoffWay"></select>
+                <label asp-for="PaymentMethod.AutoPayoffWay" class="form-label small"></label>
+                <select asp-for="PaymentMethod.AutoPayoffWay" class="form-select form-select-sm" asp-items="ViewBag.AutoPayoffWay"></select>
                 <span asp-validation-for="PaymentMethod.AutoPayoffWay" class="text-danger"></span>
             </div>
             <div class="form-group col-md-3">
-                <label asp-for="PaymentMethod.PayoffSeriesId" class="control-label small"></label>
+                <label asp-for="PaymentMethod.PayoffSeriesId" class="form-label small"></label>
                 <input asp-for="PaymentMethod.PayoffSeriesId" class="form-control form-control-sm"/>
                 <span asp-validation-for="PaymentMethod.PayoffSeriesId" class="text-danger"></span>
             </div>

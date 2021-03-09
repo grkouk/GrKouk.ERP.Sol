@@ -7,7 +7,7 @@
     ViewData["Title"] = "Νέα κίνηση συναλλασομένου";
 }
 
-<h2>Create Transactor Transaction</h2>
+
 <hr />
 <div class="container">
     <form method="post">
@@ -120,9 +120,7 @@
     </form>
 </div>
 
-<div>
-    <a class="small" asp-page="Index">Back to List</a>
-</div>
+
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
@@ -138,7 +136,7 @@
             var $amountDic = $('#ItemVm_AmountDiscount');
             var $fpaRate = $('#ItemVm_FpaRate');
             var $amountSum = $('#ItemVm_AmountSum');
-            var $fiscalPeriod = $('#ItemVm_FiscalPeriodId');
+            var $cfAccountId = $('#ItemVm_CfAccountId');
             var fiscalPeriodDom = document.getElementById("ItemVm_FiscalPeriodId");
             const $docSeriesEl=$('#ItemVm_TransTransactorDocSeriesId');
             const $transactorListEl = $('#ItemVm_TransactorId');
@@ -178,11 +176,11 @@
                         //console.log("Inside fetch then with myJson" + JSON.stringify(myJson));
                         if (myJson) {
 
-                            var fiscalPeriodId = myJson.periodId;
+                           // var fiscalPeriodId = myJson.periodId;
                            // console.log("Returned PeriodId=" + fiscalPeriodId);
                             //var fId = parseInt(fiscalPeriodId);
                             //$fiscalPeriod.val(fiscalPeriodId).trigger("chosen:updated");
-                            fiscalPeriodDom.value = fiscalPeriodId;
+                            //fiscalPeriodDom.value = fiscalPeriodId;
 
                         }
                         // $spinner.attr('hidden', true);
@@ -211,10 +209,13 @@
                         });
                    } else {
                      $transactorListEl.empty();
-
-                    $.each(transactorsListJs, function(index, item) {
+                     $.each(transactorsListJs, function(index, item) {
                         $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
-                    });
+                     });
+                   }
+                   let cfaId = parseInt( a.defaultCfaId);
+                   if (cfaId!==NaN) {
+                       $cfAccountId.val(cfaId);
                    }
 
                } else {
@@ -232,7 +233,7 @@
                 docSeriesChanged();
             });
             $transDate.change(() => {
-                transactionDataChanged();
+                //transactionDataChanged();
             });
             $fpaRate.change((event) => {
                 console.log("Inside Fpa Rate Change");
@@ -254,7 +255,7 @@
                 $amountFpa.val(0);
                 $amountNet.val(0);
                  $('#ItemVm_TransDate').val(new Date().toISOString().slice(0, 10));
-                 transactionDataChanged();
+                 //transactionDataChanged();
             } else {
                   $('#ItemVm_TransDate').val(new Date().toISOString().slice(0, 10));
                   selectTransactor = parseInt($('#CopyFromTransactorId').val());

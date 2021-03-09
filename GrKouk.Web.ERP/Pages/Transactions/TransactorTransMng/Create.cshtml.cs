@@ -220,6 +220,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
                 {
                     DocSeriesId = p.Id,
                     DocTypeId = p.TransTransactorDocTypeDefId,
+                    DefaultCfaId = p.TransTransactorDocTypeDef.DefaultCfaId,
                     AllowedTypes = p.TransTransactorDocTypeDef.AllowedTransactorTypes
                 })
                 .AsNoTracking()
