@@ -25,7 +25,12 @@ namespace GrKouk.Erp.Domain.DocDefinitions
         public virtual Company Company { get; set; }
         [Display(Name = "Default Section")]
         public int SectionId { get; set; }
-         [MaxLength(200)]
+
+        //This Type uses the following Cash Flow Account
+        [Display(Name = "Default CF Account")]
+        public int DefaultCfaId { get; set; }
+         
+        [MaxLength(200)]
         public string AllowedTransactorTypes { get; set; }
     }
 }

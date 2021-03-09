@@ -6,8 +6,6 @@ namespace GrKouk.Erp.Dtos.TransactorTransactions
 {
    public  class TransactorTransCreateDto
     {
-        //public int Id { get; set; }
-
         [DataType(DataType.Date)]
         [Display(Name = "Trans Date")]
         public DateTime TransDate { get; set; }
@@ -41,16 +39,15 @@ namespace GrKouk.Erp.Dtos.TransactorTransactions
         [DisplayFormat(DataFormatString = "{0:C}")]
         [Display(Name = "Sum Amount")]
         public decimal AmountSum => (AmountNet + AmountFpa - AmountDiscount);
-        //public decimal TransFpaAmount { get; set; }
-        //public decimal TransNetAmount { get; set; }
-        //public decimal TransDiscountAmount { get; set; }
+       
 
         [MaxLength(500)]
         public string Etiology { get; set; }
         [Required]
         public int CompanyId { get; set; }
 
-        //[Timestamp]
-        //public byte[] Timestamp { get; set; }
+        [Display(Name = "Cash Flow Account")]
+        public int CfAccountId { get; set; }
+       
     }
 }

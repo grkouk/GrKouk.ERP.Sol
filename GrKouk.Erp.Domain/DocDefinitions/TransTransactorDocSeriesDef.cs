@@ -19,6 +19,10 @@ namespace GrKouk.Erp.Domain.DocDefinitions
         public int TransTransactorDocTypeDefId { get; set; }
         public TransTransactorDocTypeDef TransTransactorDocTypeDef { get; set; }
 
+        //Cash Flow Trans Def series Id 
+        [Display(Name = "Default Cfa Doc Series")]
+        public int  DefaultCfaTransSeriesId { get; set; }
+
         public int CompanyId { get; set; }
         public virtual Company Company { get; set; }
     }
