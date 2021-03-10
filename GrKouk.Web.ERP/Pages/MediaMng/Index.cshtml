@@ -18,17 +18,17 @@
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#filterCollapse" role="button" id="filtersToggle"
+            <a class="nav-link" data-bs-toggle="collapse" href="#filterCollapse" role="button" id="filtersToggle"
                aria-expanded="false" aria-controls="filterCollapse">
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#" id="rowSelectorsToggle" role="button">
+            <a class="nav-link" data-bs-toggle="collapse" href="#" id="rowSelectorsToggle" role="button">
 
             </a>
         </li>
         <li class="nav-item dropdown " id="SelectedRowsActionsMenu">
-            <a class="nav-link dropdown-toggle disabled" role="button" id="ddSelectedRowsActions" data-toggle="dropdown"
+            <a class="nav-link dropdown-toggle disabled" role="button" id="ddSelectedRowsActions" data-bs-toggle="dropdown"
                aria-haspopup="true" aria-expanded="false">Actions</a>
             <div class="dropdown-menu small">
 
@@ -151,7 +151,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="imageModalLabel">Image</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -159,7 +159,7 @@
                 <img id="imageControl" src="" style="height:400px;width:400px;" />
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 
             </div>
         </div>
@@ -400,7 +400,7 @@
                                         var urlKartela = `@Url.Page("./Kartela")?warehouseItemId=${itemId}`;
                                         var actionsCol = '<td class="small text-center d-none d-md-table-cell">';
 
-                                        actionsCol += `<a href="#" data-mediaid="${itemId}" role="button" data-toggle="modal" data-target="#productSelector"><i class="fas fa-info-circle fa-lg" style="color:slategray"></i></a> | `;
+                                        actionsCol += `<a href="#" data-mediaid="${itemId}" role="button" data-bs-toggle="modal" data-bs-target="#productSelector"><i class="fas fa-info-circle fa-lg" style="color:slategray"></i></a> | `;
                                         // actionsCol += `<a href="${urlInfo}"><i class="fas fa-info-circle fa-lg" style="color:slategray"></i></a> | `;
                                         actionsCol += `<a href="${urlDel}"><i class="fas fa-trash fa-lg" style="color:slategray"></i></a>  `;
 
@@ -409,12 +409,12 @@
                                         var actionColMobile =
                                             '<td class="small text-center d-table-cell d-sm-table-cell d-md-none">';
                                         actionColMobile +=
-                                            '<a class=" dropdown-toggle" role="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" ';
+                                            '<a class=" dropdown-toggle" role="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" ';
                                         actionColMobile +=
                                             'aria-expanded="false"><i class="fas fa-bars fa-lg" style="color:slategray"></i></a>';
                                         actionColMobile +=
                                             '<div class="dropdown-menu small" aria-labelledby="dropdownMenuButton">';
-                                        actionColMobile += `<a class="dropdown-item" href="#" data-mediaid="${itemId}" role="button" data-toggle="modal" data-target="#productSelector">`;
+                                        actionColMobile += `<a class="dropdown-item" href="#" data-mediaid="${itemId}" role="button" data-bs-toggle="modal" data-bs-target="#productSelector">`;
                                         actionColMobile += '<i class="fas fa-info-circle fa-lg" style="color:slategray"></i>Details</a>';
                                         actionColMobile += `<a class="dropdown-item" href="${urlDel}">`;
                                         actionColMobile +='<i class="fas fa-trash fa-lg" style = "color:slategray" ></i> Delete</a>';
@@ -439,7 +439,7 @@
                                         });
                                         var imageCol = '<td>';
                                         imageCol +=
-                                            '<a href="#" role="button" data-toggle="modal" data-target="#imageViewer" ';
+                                            '<a href="#" role="button" data-bs-toggle="modal" data-bs-target="#imageViewer" ';
                                         imageCol += `data-imageurl="${value.url}">`;
                                         imageCol += `<img src="${value.url}" style="height:50px;width:50px;" />`;
                                         imageCol += '</a>';
