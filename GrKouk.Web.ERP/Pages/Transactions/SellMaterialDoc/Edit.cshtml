@@ -46,28 +46,28 @@
             <input type="hidden" id="LookupValueValid" />
             <div class="row mb-3">
                 <div class="form-group col-md-2">
-                    <label asp-for="ItemVm.TransDate" class="control-label small "></label>
+                    <label asp-for="ItemVm.TransDate" class="form-label small "></label>
                     <input asp-for="ItemVm.TransDate" class="form-control form-control-sm small" autofocus />
                     <span asp-validation-for="ItemVm.TransDate" class="text-danger small"></span>
                 </div>
                 <div class="form-group col-md-6">
-                    <label asp-for="ItemVm.SellDocSeriesId" class="control-label small"></label>
+                    <label asp-for="ItemVm.SellDocSeriesId" class="form-label small"></label>
                     <select asp-for="ItemVm.SellDocSeriesId" class="form-select form-select-sm small" asp-items="ViewBag.SellDocSeriesId"></select>
                 </div>
                 <div class="form-group col-md-2">
-                    <label asp-for="ItemVm.TransRefCode" class="control-label small"></label>
+                    <label asp-for="ItemVm.TransRefCode" class="form-label small"></label>
                     <input asp-for="ItemVm.TransRefCode" class="form-control form-control-sm small" />
                     <span asp-validation-for="ItemVm.TransRefCode" class="text-danger small"></span>
 
                 </div>
                 <div class="form-group col-md-2">
-                    <label asp-for="ItemVm.SalesChannelId" class="control-label small"></label>
+                    <label asp-for="ItemVm.SalesChannelId" class="form-label small"></label>
                     <select asp-for="ItemVm.SalesChannelId" class="form-select form-select-sm " asp-items="ViewBag.SalesChannelId"></select>
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="form-group col-md-6">
-                    <label asp-for="ItemVm.TransactorId" class="control-label small"></label>
+                    <label asp-for="ItemVm.TransactorId" class="form-label small"></label>
                     <div class="input-group input-group-sm">
                         <select asp-for="ItemVm.TransactorId" class="form-control form-control-sm small" asp-items="ViewBag.TransactorId"></select>
                         <div class="input-group-append" id="button-addon4">
@@ -76,11 +76,11 @@
                     </div>
                 </div>
                 <div class="form-group col-md-3 ">
-                    <label asp-for="ItemVm.CompanyId" class="control-label small"></label>
+                    <label asp-for="ItemVm.CompanyId" class="form-label small"></label>
                     <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm small" asp-items="ViewBag.CompanyId"></select>
                 </div>
                 <div class="form-group col-md-3">
-                    <label asp-for="ItemVm.PaymentMethodId" class="control-label small" small></label>
+                    <label asp-for="ItemVm.PaymentMethodId" class="form-label small" small></label>
                     <select asp-for="ItemVm.PaymentMethodId" class="form-select form-select-sm small" asp-items="ViewBag.PaymentMethodId"></select>
                 </div>
             </div>
@@ -238,7 +238,7 @@
             </div>
             <div class="row mb-3">
                 <div class="form-group col-md-12">
-                    <label asp-for="ItemVm.Etiology" class="control-label small"></label>
+                    <label asp-for="ItemVm.Etiology" class="form-label small"></label>
                     <textarea asp-for="ItemVm.Etiology" class="form-control form-control-sm small"></textarea>
                     <span asp-validation-for="ItemVm.Etiology" class="text-danger small"></span>
                 </div>
