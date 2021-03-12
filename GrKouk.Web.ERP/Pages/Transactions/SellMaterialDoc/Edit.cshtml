@@ -44,7 +44,7 @@
             <input type="hidden" id="MaterialBruttoPrice" />
             <input type="hidden" id="SeriesUsedPrice" />
             <input type="hidden" id="LookupValueValid" />
-            <div class="form-row">
+            <div class="row mb-3">
                 <div class="form-group col-md-2">
                     <label asp-for="ItemVm.TransDate" class="control-label small "></label>
                     <input asp-for="ItemVm.TransDate" class="form-control form-control-sm small" autofocus />
@@ -52,7 +52,7 @@
                 </div>
                 <div class="form-group col-md-6">
                     <label asp-for="ItemVm.SellDocSeriesId" class="control-label small"></label>
-                    <select asp-for="ItemVm.SellDocSeriesId" class="form-control form-control-sm small" asp-items="ViewBag.SellDocSeriesId"></select>
+                    <select asp-for="ItemVm.SellDocSeriesId" class="form-select form-select-sm small" asp-items="ViewBag.SellDocSeriesId"></select>
                 </div>
                 <div class="form-group col-md-2">
                     <label asp-for="ItemVm.TransRefCode" class="control-label small"></label>
@@ -62,10 +62,10 @@
                 </div>
                 <div class="form-group col-md-2">
                     <label asp-for="ItemVm.SalesChannelId" class="control-label small"></label>
-                    <select asp-for="ItemVm.SalesChannelId" class="form-control form-control-sm " asp-items="ViewBag.SalesChannelId"></select>
+                    <select asp-for="ItemVm.SalesChannelId" class="form-select form-select-sm " asp-items="ViewBag.SalesChannelId"></select>
                 </div>
             </div>
-            <div class="form-row">
+            <div class="row mb-3">
                 <div class="form-group col-md-6">
                     <label asp-for="ItemVm.TransactorId" class="control-label small"></label>
                     <div class="input-group input-group-sm">
@@ -77,17 +77,17 @@
                 </div>
                 <div class="form-group col-md-3 ">
                     <label asp-for="ItemVm.CompanyId" class="control-label small"></label>
-                    <select asp-for="ItemVm.CompanyId" class="form-control form-control-sm small" asp-items="ViewBag.CompanyId"></select>
+                    <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm small" asp-items="ViewBag.CompanyId"></select>
                 </div>
                 <div class="form-group col-md-3">
                     <label asp-for="ItemVm.PaymentMethodId" class="control-label small" small></label>
-                    <select asp-for="ItemVm.PaymentMethodId" class="form-control form-control-sm small" asp-items="ViewBag.PaymentMethodId"></select>
+                    <select asp-for="ItemVm.PaymentMethodId" class="form-select form-select-sm small" asp-items="ViewBag.PaymentMethodId"></select>
                 </div>
             </div>
-            <div class="form-row">
+            <div class="row mb-3">
                 <div class="form-group col-sm-1">
                     <label class="control-label small">Seek Type</label>
-                    <select asp-for="SeekType" class="form-control form-control-sm " style="font-size: 0.7rem" asp-items="ViewBag.SeekType"></select>
+                    <select asp-for="SeekType" class="form-select form-select-sm " style="font-size: 0.7rem" asp-items="ViewBag.SeekType"></select>
                 </div>
                 <div class="form-group col-md-3">
                     <label class="small">LookUp</label>
@@ -137,7 +137,7 @@
                     </button>
                 </div>
             </div>
-            <div class="form-row">
+            <div class="row mb-3">
                 <table id="detailsTable" class="table table-responsive-sm">
                     <thead class="small">
                         <tr>
@@ -193,15 +193,15 @@
                                 var tLine = $"<tr><td class=\"small\"> {lineCount}" +
                                             $"</td><td class=\"small\" data-materialId=\"{materialId}\" " +
                                             $"data-factor=\"{factorActual}\" data-mainUnitId=\"{mainUnitId}\" data-secUnitId=\"{secUnitId}\">" +
-                                            $"{materialName} </td><td class=\"small text-right\"  data-actualValue=\"{q1Actual}\" >" +
-                                            $" {q1Str} </td><td class=\"small text-right\"  data-actualValue=\"{q2Actual}\" > " +
-                                            $" {q2Str} </td><td class=\"small text-right\"  data-actualValue=\"{unitPriceActual}\" >" +
-                                            $" {unitPrice} </td><td class=\"small text-right\"  data-actualValue=\"{disRateActual}\" >" +
-                                            $"{disRate} </td><td class=\"small text-right\"  data-actualValue=\"{vatRateActual}\" >" +
-                                            $"{vatRate} </td><td class=\"small text-right\"  data-actualValue=\"{netAmountActual}\" >" +
-                                            $"{netAmount} </td><td class=\"small text-right\"  data-actualValue=\"{disAmountActual}\" >" +
-                                            $"{disAmount} </td><td class=\"small text-right\"  data-actualValue=\"{vatAmountActual}\" >" +
-                                            $"{vatAmount} </td><td class=\"small text-right\"  data-actualValue=\"{grosAmountActual}\" >" +
+                                            $"{materialName} </td><td class=\"small text-end\"  data-actualValue=\"{q1Actual}\" >" +
+                                            $" {q1Str} </td><td class=\"small text-end\"  data-actualValue=\"{q2Actual}\" > " +
+                                            $" {q2Str} </td><td class=\"small text-end\"  data-actualValue=\"{unitPriceActual}\" >" +
+                                            $" {unitPrice} </td><td class=\"small text-end\"  data-actualValue=\"{disRateActual}\" >" +
+                                            $"{disRate} </td><td class=\"small text-end\"  data-actualValue=\"{vatRateActual}\" >" +
+                                            $"{vatRate} </td><td class=\"small text-end\"  data-actualValue=\"{netAmountActual}\" >" +
+                                            $"{netAmount} </td><td class=\"small text-end\"  data-actualValue=\"{disAmountActual}\" >" +
+                                            $"{disAmount} </td><td class=\"small text-end\"  data-actualValue=\"{vatAmountActual}\" >" +
+                                            $"{vatAmount} </td><td class=\"small text-end\"  data-actualValue=\"{grosAmountActual}\" >" +
                                             $"{grosAmount} </td>" +
                                             $"<td class=\"small\">" +
                                             $"<a data-itemId=\"0\" href=\"#\" class=\"modifyItem\"><i class=\"fas fa-edit\"></i></a></td>" +
@@ -215,28 +215,28 @@
                     </tbody>
                 </table>
             </div>
-            <div class="form-row">
+            <div class="row mb-3">
                 <div class="form-group col-3">
                     <label class=" small">Net Amount</label>
-                    <input asp-for="ItemVm.AmountNet" class="form-control form-control-sm small text-right" type="text" disabled />
+                    <input asp-for="ItemVm.AmountNet" class="form-control form-control-sm small text-end" type="text" disabled />
                     <span asp-validation-for="ItemVm.AmountNet" class="text-danger small"></span>
                 </div>
                 <div class="form-group col-3">
                     <label class=" small">Discount</label>
-                    <input asp-for="ItemVm.AmountDiscount" class="form-control form-control-sm small text-right" type="text" disabled />
+                    <input asp-for="ItemVm.AmountDiscount" class="form-control form-control-sm small text-end" type="text" disabled />
                     <span asp-validation-for="ItemVm.AmountDiscount" class="text-danger small"></span>
                 </div>
                 <div class="form-group col-3">
                     <label class="small">Amount VAT</label>
-                    <input asp-for="ItemVm.AmountFpa" class="form-control form-control-sm small text-right" type="text" disabled />
+                    <input asp-for="ItemVm.AmountFpa" class="form-control form-control-sm small text-end" type="text" disabled />
                     <span asp-validation-for="ItemVm.AmountFpa" class="text-danger small"></span>
                 </div>
                 <div class="form-group col-3">
                     <label class=" small">Sum</label>
-                    <input id="DocumentSum" type="text" class="form-control form-control-sm small text-right" disabled />
+                    <input id="DocumentSum" type="text" class="form-control form-control-sm small text-end" disabled />
                 </div>
             </div>
-            <div class="form-row">
+            <div class="row mb-3">
                 <div class="form-group col-md-12">
                     <label asp-for="ItemVm.Etiology" class="control-label small"></label>
                     <textarea asp-for="ItemVm.Etiology" class="form-control form-control-sm small"></textarea>
@@ -280,18 +280,18 @@
         <div class="modal-content">
             <div class="modal-header">
                 <div class="container-fluid">
-                    <div class="form-row">
+                    <div class="row mb-3">
                         <div class="col-6">
                             <p class="modal-title font-weight-bold" id="itemsModalLabel">Selector</p>
                         </div>
-                        <div class="col-6 text-right">
+                        <div class="col-6 text-end">
 
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                     </div>
-                    <div class="form-row">
+                    <div class="row mb-3">
                         <div class="form-group col-md-3">
                             <select class="selectpicker form-control form-control-sm small " id="CompaniesList" multiple
                                     title="Companies" data-actions-box="true" data-selected-text-format="count > 1"></select>
@@ -305,7 +305,7 @@
                                     title="Item Natures" data-actions-box="true" data-selected-text-format="count > 1"></select>
                         </div>
                     </div>
-                    <div class="form-row">
+                    <div class="row mb-3">
                         <div class="col-10">
                             <input class="form-control form-control-sm" name="itemsSearchText" placeholder="Search text" type="text" />
 
@@ -1575,47 +1575,47 @@
                         '"' +
                         '>' +
                         productName +
-                        '</td><td class="small text-right" ' +
+                        '</td><td class="small text-end" ' +
                         'data-actualValue="' +
                         quantity1 +
                         '" >' +
                         formatterNumber.format(quantity1) +
-                        '</td><td class="small text-right" ' +
+                        '</td><td class="small text-end" ' +
                         'data-actualValue="' +
                         quantity2 +
                         '" >' +
                         formatterNumber.format(quantity2) +
-                        '</td><td class="small text-right" ' +
+                        '</td><td class="small text-end" ' +
                         'data-actualValue="' +
                         price +
                         '" >' +
                         formatterCurrency.format(price) +
-                        '</td><td class="small text-right" ' +
+                        '</td><td class="small text-end" ' +
                         'data-actualValue="' +
                         discount +
                         '" >' +
                         formatterNumber.format(discount) +
-                        '</td><td class="small text-right" ' +
+                        '</td><td class="small text-end" ' +
                         'data-actualValue="' +
                         vatPercent +
                         '" >' +
                         formatterNumber.format(vatPercent) +
-                        '</td><td class="small text-right" ' +
+                        '</td><td class="small text-end" ' +
                         'data-actualValue="' +
                         netAmount +
                         '" >' +
                         formatterCurrency.format(netAmount) +
-                        '</td><td class="small text-right" ' +
+                        '</td><td class="small text-end" ' +
                         'data-actualValue="' +
                         discountAmount +
                         '" >' +
                         formatterCurrency.format(discountAmount) +
-                        '</td><td class="small text-right" ' +
+                        '</td><td class="small text-end" ' +
                         'data-actualValue="' +
                         fpaAmount +
                         '" >' +
                         formatterCurrency.format(fpaAmount) +
-                        '</td><td class="small text-right" ' +
+                        '</td><td class="small text-end" ' +
                         'data-actualValue="' +
                         grosAmount +
                         '" >' +
