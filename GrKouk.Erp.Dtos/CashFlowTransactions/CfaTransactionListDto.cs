@@ -51,7 +51,7 @@ namespace GrKouk.Erp.Dtos.CashFlowTransactions
 
         [DisplayFormat(DataFormatString = "{0:C}")]
         [Display(Name = "Withdraw")]
-        public decimal WithdrawAmount => (CfaAction.Equals(CashFlowAccountActionsEnum.CfaActionNegativeWithdraw) ||
+        public decimal WithdrawAmount => (CfaAction.Equals(CashFlowAccountActionsEnum.CfaActionWithdraw) ||
                                           CfaAction.Equals(CashFlowAccountActionsEnum.CfaActionNegativeWithdraw)
             ? TransAmount
             : 0);
