@@ -162,6 +162,12 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
                                 await _context.Entry(cfaType)
                                     .Reference(t => t.CashFlowTransactionDefinition)
                                     .LoadAsync();
+                                var transactor = await _context.Transactors
+                                    .Where(p => p.Id == ItemVm.TransactorId)
+                                    .AsNoTracking()
+                                    .SingleOrDefaultAsync();
+                                var etiology =
+                                    $"{cfaSeries.Name} created from {docSeries.Name} for {transactor.Name} with {ItemVm.Etiology} ";
 
                                 var cfaTransDef = cfaType.CashFlowTransactionDefinition;
                                 var cfaTrans = new CashFlowAccountTransaction {
@@ -170,7 +176,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
                                     CompanyId = ItemVm.CompanyId,
                                     DocumentSeriesId = cfaSeries.Id,
                                     DocumentTypeId = cfaType.Id,
-                                    Etiology = ItemVm.Etiology,
+                                    Etiology = etiology,
                                     FiscalPeriodId = spTransaction.FiscalPeriodId,
                                     CreatorSectionId = sectionId,
                                     CreatorId = spTransaction.Id,

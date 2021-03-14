@@ -145,7 +145,12 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                                     await _context.Entry(cfaType)
                                         .Reference(t => t.CashFlowTransactionDefinition)
                                         .LoadAsync();
-
+                                    var transactor = await _context.Transactors
+                                        .Where(p => p.Id == ItemVm.TransactorId)
+                                        .AsNoTracking()
+                                        .SingleOrDefaultAsync();
+                                    var etiology =
+                                        $"{cfaSeries.Name} created from {docSeries.Name} for {transactor.Name} with {ItemVm.Etiology} ";
                                     var cfaTransDef = cfaType.CashFlowTransactionDefinition;
                                     var cfaTrans = new CashFlowAccountTransaction {
                                         TransDate = ItemVm.TransDate,
