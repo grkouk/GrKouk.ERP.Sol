@@ -1767,39 +1767,39 @@ namespace GrKouk.Web.ERP.Controllers {
 
                                         var etiology =
                                             $"{cfaSeries.Name} created from {docSeries.Name} for {transactor.Name} with {data.Etiology} ";
-                                       
-                                        
-                                       
-                                            var cfaTransDef = cfaType.CashFlowTransactionDefinition;
-                                            var cfaTrans = new CashFlowAccountTransaction {
-                                                TransDate = data.TransDate,
-                                                CashFlowAccountId = paymentCfAccountId,
-                                                CompanyId = data.CompanyId,
-                                                DocumentSeriesId = cfaSeries.Id,
-                                                DocumentTypeId = cfaType.Id,
-                                                Etiology = etiology,
-                                                FiscalPeriodId = sTransactorTransaction.FiscalPeriodId,
-                                                CreatorSectionId = sectionId,
-                                                CreatorId = docId,
-                                                RefCode = data.TransRefCode,
-                                                Amount = sTransactorTransaction.AmountNet - sTransactorTransaction.AmountDiscount + sTransactorTransaction.AmountFpa,
-                                                SectionId = cfaType.SectionId > 0 ? cfaType.SectionId : sectionId
-                                            };
-                                            ActionHandlers.CashFlowFinAction(cfaTransDef.CfaAction, cfaTrans);
-                                            await _context.CashFlowAccountTransactions.AddAsync(cfaTrans);
-                                            sTransactorTransaction.CfAccountId = paymentCfAccountId;
-                                            _context.Attach(sTransactorTransaction).State = EntityState.Modified;
-                                            try {
-                                                await _context.SaveChangesAsync();
-                                            }
-                                            catch (Exception e) {
-                                                transaction.Rollback();
-                                                string msg = e.InnerException?.Message;
-                                                return BadRequest(new {
-                                                    error = e.Message + " " + msg
-                                                });
-                                            }
-                                        
+
+
+
+                                        var cfaTransDef = cfaType.CashFlowTransactionDefinition;
+                                        var cfaTrans = new CashFlowAccountTransaction {
+                                            TransDate = data.TransDate,
+                                            CashFlowAccountId = paymentCfAccountId,
+                                            CompanyId = data.CompanyId,
+                                            DocumentSeriesId = cfaSeries.Id,
+                                            DocumentTypeId = cfaType.Id,
+                                            Etiology = etiology,
+                                            FiscalPeriodId = sTransactorTransaction.FiscalPeriodId,
+                                            CreatorSectionId = sectionId,
+                                            CreatorId = docId,
+                                            RefCode = data.TransRefCode,
+                                            Amount = sTransactorTransaction.AmountNet - sTransactorTransaction.AmountDiscount + sTransactorTransaction.AmountFpa,
+                                            SectionId = cfaType.SectionId > 0 ? cfaType.SectionId : sectionId
+                                        };
+                                        ActionHandlers.CashFlowFinAction(cfaTransDef.CfaAction, cfaTrans);
+                                        await _context.CashFlowAccountTransactions.AddAsync(cfaTrans);
+                                        sTransactorTransaction.CfAccountId = paymentCfAccountId;
+                                        _context.Attach(sTransactorTransaction).State = EntityState.Modified;
+                                        try {
+                                            await _context.SaveChangesAsync();
+                                        }
+                                        catch (Exception e) {
+                                            transaction.Rollback();
+                                            string msg = e.InnerException?.Message;
+                                            return BadRequest(new {
+                                                error = e.Message + " " + msg
+                                            });
+                                        }
+
 
                                     }
                                 }
@@ -1990,7 +1990,8 @@ namespace GrKouk.Web.ERP.Controllers {
                     _context.WarehouseTransactions.Where(p => p.SectionId == data.SectionId && p.CreatorId == data.Id));
                 _context.BuyDocTransPaymentMappings.RemoveRange(
                     _context.BuyDocTransPaymentMappings.Where(p => p.BuyDocumentId == data.Id));
-
+                _context.CashFlowAccountTransactions.RemoveRange(
+                    _context.CashFlowAccountTransactions.Where(p => p.CreatorSectionId == data.SectionId && p.CreatorId == data.Id));
                 #region Fiscal Period
 
                 var fiscalPeriod = await _context.FiscalPeriods.FirstOrDefaultAsync(p =>
@@ -2108,6 +2109,7 @@ namespace GrKouk.Web.ERP.Controllers {
 
                 if (paymentMethod.AutoPayoffWay == SeriesAutoPayoffEnum.SeriesAutoPayoffEnumAuto) {
                     var autoPaySeriesId = transToAttach.BuyDocSeries.PayoffSeriesId;
+                    var paymentCfAccountId = paymentMethod.CfAccountId;
                     if (autoPaySeriesId > 0) {
                         var transTransactorPayOffSeries = await
                             _context.TransTransactorDocSeriesDefs.FirstOrDefaultAsync(p =>
@@ -2119,18 +2121,22 @@ namespace GrKouk.Web.ERP.Controllers {
                                 error = "AutoPayOff series not found"
                             });
                         }
-
+                        var transactor = await _context.Transactors
+                            .Where(p => p.Id == data.TransactorId)
+                            .AsNoTracking()
+                            .SingleOrDefaultAsync();
                         var spTransactorCreateDto = _mapper.Map<TransactorTransCreateDto>(data);
                         //Ετσι δεν μεταφέρει το Id απο το data
                         var sTransactorTransaction = _mapper.Map<TransactorTransaction>(spTransactorCreateDto);
-
+                        var transTransactorEtiology =
+                            $"{transTransactorPayOffSeries.Name} created from {docSeries.Name} for {transactor.Name} with {data.Etiology} ";
                         sTransactorTransaction.TransactorId = data.TransactorId;
                         sTransactorTransaction.TransTransactorDocTypeId =
                             transTransactorPayOffSeries.TransTransactorDocTypeDefId;
 
                         sTransactorTransaction.TransTransactorDocSeriesId = transTransactorPayOffSeries.Id;
                         sTransactorTransaction.FiscalPeriodId = fiscalPeriod.Id;
-                        sTransactorTransaction.Etiology = "AutoPayOff";
+                        sTransactorTransaction.Etiology = transTransactorEtiology;
                         sTransactorTransaction.CreatorId = docId;
                         sTransactorTransaction.CreatorSectionId = sectionId;
                         await _context.Entry(transTransactorPayOffSeries)
@@ -2163,7 +2169,64 @@ namespace GrKouk.Web.ERP.Controllers {
                                 error = e.Message + " " + msg
                             });
                         }
+                        //Cash Flow Account Transaction 
+                        if (paymentCfAccountId > 0) {
+                            var defaultCfaSeriesId = transTransactorPayOffSeries.DefaultCfaTransSeriesId;
+                            if (defaultCfaSeriesId > 0) {
+                                var cfaSeries = await _context.CashFlowDocSeriesDefs.FindAsync(defaultCfaSeriesId);
+                                if (cfaSeries != null) {
+                                    await _context.Entry(cfaSeries)
+                                        .Reference(t => t.CashFlowDocTypeDefinition)
+                                        .LoadAsync();
 
+                                    var cfaType = cfaSeries.CashFlowDocTypeDefinition;
+                                    if (cfaType != null) {
+                                        await _context.Entry(cfaType)
+                                            .Reference(t => t.CashFlowTransactionDefinition)
+                                            .LoadAsync();
+
+                                        var etiology =
+                                            $"{cfaSeries.Name} created from {docSeries.Name} for {transactor.Name} with {data.Etiology} ";
+
+
+
+                                        var cfaTransDef = cfaType.CashFlowTransactionDefinition;
+                                        var cfaTrans = new CashFlowAccountTransaction {
+                                            TransDate = data.TransDate,
+                                            CashFlowAccountId = paymentCfAccountId,
+                                            CompanyId = data.CompanyId,
+                                            DocumentSeriesId = cfaSeries.Id,
+                                            DocumentTypeId = cfaType.Id,
+                                            Etiology = etiology,
+                                            FiscalPeriodId = sTransactorTransaction.FiscalPeriodId,
+                                            CreatorSectionId = sectionId,
+                                            CreatorId = docId,
+                                            RefCode = data.TransRefCode,
+                                            Amount = sTransactorTransaction.AmountNet - sTransactorTransaction.AmountDiscount + sTransactorTransaction.AmountFpa,
+                                            SectionId = cfaType.SectionId > 0 ? cfaType.SectionId : sectionId
+                                        };
+                                        ActionHandlers.CashFlowFinAction(cfaTransDef.CfaAction, cfaTrans);
+                                        await _context.CashFlowAccountTransactions.AddAsync(cfaTrans);
+                                        sTransactorTransaction.CfAccountId = paymentCfAccountId;
+                                        _context.Attach(sTransactorTransaction).State = EntityState.Modified;
+                                        try {
+                                            await _context.SaveChangesAsync();
+                                        }
+                                        catch (Exception e) {
+                                            transaction.Rollback();
+                                            string msg = e.InnerException?.Message;
+                                            return BadRequest(new {
+                                                error = e.Message + " " + msg
+                                            });
+                                        }
+
+
+                                    }
+                                }
+                            }
+                        }
+
+                        //End Cash Flow Account Transaction 
                         try {
                             var payOfTransactionId = _context.Entry(sTransactorTransaction).Entity.Id;
                             var payOffMapping = new BuyDocTransPaymentMapping() {
