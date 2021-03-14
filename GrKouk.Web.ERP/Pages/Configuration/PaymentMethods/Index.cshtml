@@ -22,9 +22,7 @@
             <th class="small">
                 @Html.DisplayNameFor(model => model.PaymentMethod[0].AutoPayoffWay)
             </th>
-            <th class="small">
-                @Html.DisplayNameFor(model => model.PaymentMethod[0].PayoffSeriesId)
-            </th>
+          
             <th></th>
         </tr>
     </thead>
@@ -40,9 +38,7 @@
             <td class="small">
                 @Html.DisplayFor(modelItem => item.AutoPayoffWay)
             </td>
-            <td class="small">
-                @Html.DisplayFor(modelItem => item.PayoffSeriesId)
-            </td>
+           
             <td class="small">
                 <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |

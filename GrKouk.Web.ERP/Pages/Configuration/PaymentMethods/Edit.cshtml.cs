@@ -22,7 +22,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.PaymentMethods
         }
 
         [BindProperty]
-        public PaymentMethod PaymentMethod { get; set; }
+        public PaymentMethod ItemVm { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -31,9 +31,9 @@ namespace GrKouk.Web.Erp.Pages.Configuration.PaymentMethods
                 return NotFound();
             }
            
-            PaymentMethod = await _context.PaymentMethods.FirstOrDefaultAsync(m => m.Id == id);
+            ItemVm = await _context.PaymentMethods.FirstOrDefaultAsync(m => m.Id == id);
 
-            if (PaymentMethod == null)
+            if (ItemVm == null)
             {
                 return NotFound();
             }
@@ -50,6 +50,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.PaymentMethods
                     Text = c.GetDescription()
                 }).ToList();
             ViewData["AutoPayoffWay"] = new SelectList(seriesAutoPayOffList, "Value", "Text");
+            ViewData["CfAccountId"] = SelectListHelpers.GetCfAccountsNoSelectionList(_context);
         }
         public async Task<IActionResult> OnPostAsync()
         {
@@ -58,7 +59,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.PaymentMethods
                 return Page();
             }
 
-            _context.Attach(PaymentMethod).State = EntityState.Modified;
+            _context.Attach(ItemVm).State = EntityState.Modified;
 
             try
             {
@@ -66,7 +67,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.PaymentMethods
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PaymentMethodExists(PaymentMethod.Id))
+                if (!PaymentMethodExists(ItemVm.Id))
                 {
                     return NotFound();
                 }
