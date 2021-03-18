@@ -2,7 +2,7 @@
     let numberFormatter;
     let currencyFormatter;
     let numberParser;
-    
+
     const setParsers = (parserNumber) => {
         numberParser = parserNumber;
     };
@@ -109,7 +109,7 @@
             });
         });
     };
-    const getCompanyBaseCurrencyInfo = (companyId) => {
+    const getCompanyBaseCurrencyInfoV0 = (companyId) => {
         let uri = "/api/materials/companyBaseCurrencyInfo";
         uri += `?companyId=${companyId}`;
         var timeout;
@@ -156,6 +156,20 @@
                     }, 2000);
                 },
             });
+        });
+    };
+    const getCompanyBaseCurrencyInfo = (companyId, spinnerElement) => {
+        let uri = "/api/materials/companyBaseCurrencyInfo";
+        uri += `?companyId=${companyId}`;
+
+        return new Promise((resolve, reject) => {
+            makeAjaxCall(uri, spinnerElement)
+                .then((data) => {
+                    resolve(data);
+                })
+                .catch((error) => {
+                    reject(error);
+                });
         });
     };
     const getCompanyCashFlowAccounts = (companyId, spinnerElement) => {
@@ -250,7 +264,7 @@
     };
     const prepCurrencyInputs = () => {
         let $elementsToUpdateVal = $('.currency-input');
-        $elementsToUpdateVal.each(function () {
+        $elementsToUpdateVal.each(function() {
             let $el = $(this);
             $el.blur((e) => {
                 console.log("Inside blur event");
@@ -274,10 +288,36 @@
 
         });
     };
+    const prepNumericInputs = () => {
+        let $elementsToUpdateVal = $('.numeric-input');
+        $elementsToUpdateVal.each(function () {
+            let $el = $(this);
+            $el.blur((e) => {
+                console.log("Inside blur event");
+                let jEl = e.target;
+                let jElInputValue = jEl.value;
+                let typeOfInput = typeof jElInputValue;
+                console.log(`typeof e.target=${typeOfInput}`);
+                let jElValGlParser = numberParser(jElInputValue);
+                jEl.dataset.actualvalue = jElValGlParser;
+                jEl.value = numberFormatter(jElValGlParser);
+            });
+            $el.focus((e) => {
+                console.log("Inside focus event");
+                let jEl = e.target;
+                let jElAttrValue = jEl.dataset.actualvalue;
+                let jElAttrValueParsed = parseFloat(jElAttrValue);
+                let jElValFormatted = numberFormatter(jElAttrValueParsed);
+                jEl.value = jElValFormatted;
+                jEl.select();
+            });
+
+        });
+    };
     const prepCurrencyInputsForPost = () => {
         let $elementsToUpdateVal = $('.currency-input');
         $elementsToUpdateVal.each(function () {
-                    
+
             var jEl = this;
             let jElAttrValue = jEl.dataset.actualvalue;
             let jElAttrValueParsed = parseFloat(jElAttrValue);
@@ -286,7 +326,7 @@
 
         });
     };
-    
+
     return {
         getProductItemInfo: getProductItemInfo,
         setCompanyIdInSession: setCompanyIdInSession,
@@ -294,8 +334,9 @@
         getCompanyCashFlowAccounts: getCompanyCashFlowAccounts,
         prepCurrencyInputsForPost: prepCurrencyInputsForPost,
         prepCurrencyInputs: prepCurrencyInputs,
+        prepNumericInputs: prepNumericInputs,
         setGlobalizeLocale: setGlobalizeLocale,
-        setParsers : setParsers,
+        setParsers: setParsers,
         setFormatters: setFormatters
     };
 })();
