@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
+using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Erp.Dtos.Transactors;
@@ -50,23 +52,10 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors
             }
 
             ItemVm = _mapper.Map<TransactorModifyDto>(dbTransactor);
-            string cmps="";
-            bool isFirst = true;
-            foreach (var companyMapping in dbTransactor.TransactorCompanyMappings)
-            {
-                if (!isFirst)
-                {
-                    cmps += ",";
-                }
-                else
-                {
-                    isFirst = false;
-                }
+            string[] selectedCompanies = dbTransactor.TransactorCompanyMappings.Select(x => x.CompanyId.ToString()).ToArray();
+            ItemVm.SelectedCompanies = JsonSerializer.Serialize(selectedCompanies);
 
-                cmps += companyMapping.CompanyId.ToString();
-            }
-
-            ItemVm.SelectedCompanies = cmps;    
+           
             LoadCombos();
 
             return Page();
@@ -75,10 +64,11 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors
         private void LoadCombos()
         {
             var companiesListJs = _context.Companies.OrderBy(p => p.Name)
-                .Select(p => new DiaryDocTypeItem()
+                .Select(p => new UISelectTypeItem()
                 {
                     Title = p.Name,
-                    Value = p.Id
+                    ValueInt = p.Id,
+                    Value = p.Id.ToString()
                 }).ToList();
             ViewData["TransactorTypeId"] = new SelectList(_context.TransactorTypes.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
             //ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
@@ -93,33 +83,22 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors
             var transactorToAdd = _mapper.Map<Transactor>(ItemVm);
             transactorToAdd.DateLastModified=DateTime.Today;
             _context.Attach(transactorToAdd).State = EntityState.Modified;
-            //transactorToAdd.TransactorCompanyMappings.Clear();
+            
             _context.TransactorCompanyMappings.RemoveRange(_context.TransactorCompanyMappings.Where(p => p.TransactorId == transactorToAdd.Id));
             
-            if (!String.IsNullOrEmpty(ItemVm.SelectedCompanies))
+            string[] companiesSelected = JsonSerializer.Deserialize<string[]>(ItemVm.SelectedCompanies);
+            foreach (var i in companiesSelected)
             {
-                var listOfCompanies = ItemVm.SelectedCompanies.Split(",");
-                //bool fl = true;
-                foreach (var listOfCompany in listOfCompanies)
+                if (!Int32.TryParse(i, out int compId))
                 {
-                    int.TryParse(listOfCompany, out var companyId);
-                    if (companyId > 0)
-                    {
-                        transactorToAdd.TransactorCompanyMappings.Add(new TransactorCompanyMapping
-                        {
-                            CompanyId = companyId,
-                            TransactorId = transactorToAdd.Id
-                        });
-                        //TODO: remove when companyid column removed for transactor entity
-                        //if (fl)
-                        //{
-                        //    transactorToAdd.CompanyId = companyId;
-                        //    fl = false;
-                        //}
-
-                    }
+                    throw new Exception("Selected company Id error");
                 }
-
+                
+                transactorToAdd.TransactorCompanyMappings.Add(new TransactorCompanyMapping()
+                {
+                    CompanyId = compId,
+                    TransactorId = transactorToAdd.Id
+                });
             }
             try
             {
