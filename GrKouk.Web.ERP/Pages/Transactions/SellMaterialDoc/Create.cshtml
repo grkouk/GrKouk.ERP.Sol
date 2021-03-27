@@ -86,7 +86,15 @@
                     <select asp-for="ItemVm.PaymentMethodId" class="form-select form-select-sm small" asp-items="ViewBag.PaymentMethodId"></select>
                 </div>
             </div>
-
+            <div class="row mb-3">
+                <div class="col-6">
+                    <label class="form-label small">Test Autocomplete</label>
+                    <ejs-autocomplete id="AutoCompleteTest" placeholder="Selection text" popupHeight="200px"  autofill="true">
+                        <e-autocomplete-fields text="text" value="value"></e-autocomplete-fields>
+                        <e-data-manager url="@Url.Action("GetSellDocAutoComplete", "AutoComplete")" adaptor="UrlAdaptor"></e-data-manager>
+                    </ejs-autocomplete>
+                </div>
+            </div>
             <div class="row mb-3">
                 <div class="form-group col-sm-1">
                     <label class="form-label small">Seek Type</label>
@@ -95,7 +103,7 @@
                 <div class="form-group col-md-3">
                     <label class="small">LookUp</label>
                     <div class="input-group input-group-sm">
-                        <input class="form-control form-control-sm " style="font-size: 0.7rem" id="Lookup" autocomplete="off"/>
+                        <input class="form-control form-control-sm " style="font-size: 0.7rem" id="Lookup" autocomplete="off" />
                         <div class="input-group-append" id="button-addon5">
                             <button class="btn btn-outline-secondary btn-sm " data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="ProductsSelector" style="font-size: 0.7rem" type="button"><i class="fab fa-asymmetrik"></i></button>
                         </div>
@@ -164,10 +172,8 @@
                     <tbody>
                         @{
                             var lineCount = 0;
-                            if (Model.CopyFromItemVm != null)
-                            {
-                                foreach (var docLine in Model.CopyFromItemVm.SellDocLines)
-                                {
+                            if (Model.CopyFromItemVm != null) {
+                                foreach (var docLine in Model.CopyFromItemVm.SellDocLines) {
                                     lineCount++;
                                     var materialId = docLine.WarehouseItemId;
                                     var q1 = docLine.Quontity1;
@@ -317,6 +323,7 @@
     <script>
         $(document).ready(function() {
             console.log("Inside Document ready");
+
             $('#LineEditing').val(0);
             var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
             console.log('Current Culture ' + currentCulture);
@@ -394,7 +401,7 @@
                     switch (selectorType) {
                     case "ProductsSelector":
                         selectorsLib.showProductSelector(handleProductSelection);
-                        
+
                         break;
                     case "CustomerSelector":
                         selectorsLib.showCustomerSelector();
@@ -403,7 +410,7 @@
                     default:
                     }
                 });
-           
+
             //#endregion
 
             var priceChanged = () => {
@@ -452,7 +459,20 @@
                     break;
                 }
             };
+            const refreshAutoCompleteQuery = () => {
+               
+                let selCompanyId = $companyId.val();
+               
+               
+                
+                let selSeriesId = $translDocSeriesId.val();
+                let grd = document.getElementById("AutoCompleteTest").ej2_instances[0];
+                grd.query = new ej.data.Query()
+                   
+                    .addParams('seriesId', selSeriesId)
+                    .addParams('companyId', selCompanyId);
 
+            };
             var companyChanged = () => {
                 return $.ajax({
                     contentType: 'application/json; charset=utf-8',
@@ -628,7 +648,7 @@
                         $vatPercent.val(rate);
                         $('#MaterialFpaId').val(fpaId);
                         $price.val(lastPrice);
-                       
+
                         $priceNetto.val(priceNetto);
                         $priceBrutto.val(priceBrutto);
                         $discount.val('0');
@@ -888,7 +908,7 @@
                     e.preventDefault();
                     var $self = $(this);
                     if ($(this).attr('data-itemId') == "0") {
-                       
+
                         $(this).parents('tr').css("background-color", "#ff6347").fadeOut(800,
                             function() {
                                 $(this).remove();
@@ -959,7 +979,7 @@
 
                 var $form = $('#transForm');
                 var f = document.getElementById("transForm");
-               
+
                 e.preventDefault();
 
                 $('#thisForm').prop("disabled", true);
@@ -1037,7 +1057,7 @@
                 setSeekType();
             }
             console.log("After initial load check");
-
+            refreshAutoCompleteQuery();
             $initialLoad.val(false);
         });
 
