@@ -1,25 +1,24 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
-namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
-{
+namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
     [Authorize(Roles = "Admin")]
-    public class DeleteModel : PageModel
-    {
+    public class DeleteModel : PageModel {
         private readonly ApiDbContext _context;
         private readonly IMapper _mapper;
         public bool NotUpdatable;
-        public DeleteModel(ApiDbContext context, IMapper mapper)
-        {
+        public DeleteModel(ApiDbContext context, IMapper mapper) {
             _context = context;
             _mapper = mapper;
         }
@@ -27,10 +26,8 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
         [BindProperty]
         public TransactorTransModifyDto ItemVm { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(int? id)
-        {
-            if (id == null)
-            {
+        public async Task<IActionResult> OnGetAsync(int? id) {
+            if (id == null) {
                 return BadRequest();
             }
 
@@ -43,8 +40,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
                 .Include(t => t.Transactor)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (transactionToModify == null)
-            {
+            if (transactionToModify == null) {
                 return NotFound();
             }
             ItemVm = _mapper.Map<TransactorTransModifyDto>(transactionToModify);
@@ -53,10 +49,8 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(int? id)
-        {
-            if (id == null)
-            {
+        public async Task<IActionResult> OnPostAsync(int? id) {
+            if (id == null) {
                 return NotFound();
             }
 
@@ -64,29 +58,42 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
 
             if (itemToDelete != null)
             {
-                _context.BuyDocTransPaymentMappings.RemoveRange(
-                    _context.BuyDocTransPaymentMappings
-                        .Where(p => p.TransactorTransactionId == itemToDelete.Id));
-                _context.SellDocTransPaymentMappings.RemoveRange(
-                    _context.SellDocTransPaymentMappings
-                        .Where(p => p.TransactorTransactionId == itemToDelete.Id));
-
-                _context.TransactorTransactions.Remove(itemToDelete);
-                await _context.SaveChangesAsync();
+                await using var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    _context.BuyDocTransPaymentMappings.RemoveRange(
+                        _context.BuyDocTransPaymentMappings
+                            .Where(p => p.TransactorTransactionId == itemToDelete.Id));
+                    _context.SellDocTransPaymentMappings.RemoveRange(
+                        _context.SellDocTransPaymentMappings
+                            .Where(p => p.TransactorTransactionId == itemToDelete.Id));
+                    _context.CashFlowAccountTransactions.RemoveRange(
+                        _context.CashFlowAccountTransactions.Where(p =>
+                            p.CreatorSectionId == itemToDelete.SectionId && p.CreatorId == itemToDelete.Id));
+                    _context.TransactorTransactions.Remove(itemToDelete);
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    string msg = $"Error  {ex.Message} inner exception->{ex.InnerException?.Message}";
+                    ModelState.AddModelError(string.Empty, msg);
+                    LoadCombos();
+                    return Page();
+                }
             }
 
             return RedirectToPage("./Index");
         }
-        private void LoadCombos()
-        {
+        private void LoadCombos() {
             var transactorsListDb = _context.Transactors
                 .Include(p => p.TransactorType)
                 .Where(p => p.TransactorType.Code != "SYS.DTRANSACTOR")
                 .OrderBy(s => s.Name).AsNoTracking();
             List<SelectListItem> transactorsList = new List<SelectListItem>();
 
-            foreach (var dbTransactor in transactorsListDb)
-            {
+            foreach (var dbTransactor in transactorsListDb) {
 
                 transactorsList.Add(new SelectListItem() { Value = dbTransactor.Id.ToString(), Text = dbTransactor.Name + "-" + dbTransactor.TransactorType.Code });
             }
@@ -94,7 +101,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
             ViewData["FiscalPeriodId"] = new SelectList(_context.FiscalPeriods.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
             ViewData["TransactorId"] = new SelectList(transactorsList, "Value", "Text");
             ViewData["TransTransactorDocSeriesId"] = new SelectList(_context.TransTransactorDocSeriesDefs.OrderBy(s => s.Name).AsNoTracking(), "Id", "Name");
-            //ViewData["SectionId"] = new SelectList(_context.Sections, "Id", "Code");
+            ViewData["CfAccountId"] = SelectListHelpers.GetCfAccountsNoSelectionList(_context);
         }
     }
 }

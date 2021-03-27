@@ -54,7 +54,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.TransactorTransDocTypes
                                Value = p.Id
                            }).ToList();
             ViewData["TransactorTypesListJs"] = transactorTypesListJs;
-
+            ViewData["DefaultCfaId"] = SelectListHelpers.GetCfAccountsNoSelectionList(_context);
         }
         public async Task<IActionResult> OnPostAsync()
         {

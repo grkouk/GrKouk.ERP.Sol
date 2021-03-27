@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using GrKouk.Erp.Domain.DocDefinitions;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -25,7 +26,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.TransactorTransDocSeries
         }
 
         [BindProperty]
-        public TransTransactorDocSeriesDef TransTransactorDocSeriesDef { get; set; }
+        public TransTransactorDocSeriesDef ItemVm { get; set; }
 
         public async Task<IActionResult> OnPostAsync()
         {
@@ -34,7 +35,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.TransactorTransDocSeries
                 return Page();
             }
 
-            _context.TransTransactorDocSeriesDefs.Add(TransTransactorDocSeriesDef);
+            _context.TransTransactorDocSeriesDefs.Add(ItemVm);
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");
@@ -43,6 +44,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.TransactorTransDocSeries
         {
             ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
             ViewData["TransTransactorDocTypeDefId"] = new SelectList(_context.TransTransactorDocTypeDefs.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
+            ViewData["DefaultCfaTransSeriesId"] = SelectListHelpers.GetCfaDocSeriesDefNoSelectionList(_context);
         }
     }
 }

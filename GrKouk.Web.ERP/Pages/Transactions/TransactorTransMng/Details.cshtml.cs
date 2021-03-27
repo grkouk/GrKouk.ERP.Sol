@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -69,7 +70,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
             ViewData["FiscalPeriodId"] = new SelectList(_context.FiscalPeriods.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
             ViewData["TransactorId"] = new SelectList(transactorsList, "Value", "Text");
             ViewData["TransTransactorDocSeriesId"] = new SelectList(_context.TransTransactorDocSeriesDefs.OrderBy(s => s.Name).AsNoTracking(), "Id", "Name");
-            //ViewData["SectionId"] = new SelectList(_context.Sections, "Id", "Code");
+            ViewData["CfAccountId"] = SelectListHelpers.GetCfAccountsNoSelectionList(_context);
         }
     }
 }

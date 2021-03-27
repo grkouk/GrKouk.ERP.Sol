@@ -14,24 +14,24 @@
 <div class="container">
     <form id="ItemForm">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-md-3">
-                <label asp-for="ItemVm.ClientProfileId" class="control-label small"></label>
+                <label asp-for="ItemVm.ClientProfileId" class="form-label small"></label>
                 <select asp-for="ItemVm.ClientProfileId" class="form-control form-control-sm small" asp-items="ViewBag.ClientProfileId"></select>
                 <span asp-validation-for="ItemVm.ClientProfileId" class="text-danger small"></span>
             </div>
 
             <div class="form-group col-md-3">
-                <label asp-for="ItemVm.CashRegCategoryId" class="control-label small"></label>
+                <label asp-for="ItemVm.CashRegCategoryId" class="form-label small"></label>
                 <select asp-for="ItemVm.CashRegCategoryId" class="form-control form-control-sm" asp-items="ViewBag.CashRegCategoryId"></select>
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="col-9">
                 <label class="h4">Select Products</label>
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="col-4">
                 <select name="from[]" id="multiselect" style="width: 100%" class="form-control form-control-sm" size="8" multiple="multiple"
                         asp-items="ViewBag.WarehouseItemId"></select>
@@ -46,8 +46,8 @@
                 <select name="to[]" id="multiselect_to" class="form-control form-control-sm" size="8" multiple="multiple"></select>
             </div>
         </div>
-        @*<div class="form-row"> </div>*@
-        <div class="form-row">
+        @*<div class="row mb-3"> </div>*@
+        <div class="row mb-3">
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary btn-sm" />
             </div>
@@ -84,7 +84,7 @@
                
                 var warehouseItems = [];
                 $('#multiselect_to option').each(function () {
-                    $this = $(this);
+                    var $this = $(this);
                     console.log($this);
                     var id = parseInt($this.val());
                     warehouseItems.push(id);

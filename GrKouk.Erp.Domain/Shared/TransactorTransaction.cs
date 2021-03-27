@@ -57,8 +57,8 @@ namespace GrKouk.Erp.Domain.Shared
         public int CompanyId { get; set; }
         public virtual Company Company { get; set; }
 
-        [Timestamp]
-        public byte[] Timestamp { get; set; }
+        public int CfAccountId { get; set; }
+       
         public virtual ICollection<BuyDocTransPaymentMapping> BuyDocPaymentMappings
         {
             get => _buyDocPaymentMappings ?? (_buyDocPaymentMappings = new List<BuyDocTransPaymentMapping>());
@@ -69,5 +69,8 @@ namespace GrKouk.Erp.Domain.Shared
             get => _salesDocPaymentMappings ?? (_salesDocPaymentMappings = new List<SellDocTransPaymentMapping>());
             set => _salesDocPaymentMappings = value;
         }
+
+        [Timestamp]
+        public byte[] Timestamp { get; set; }
     }
 }

@@ -218,25 +218,25 @@
             $('#saveForm').click(function (e) {
                 prepCurrencyInputsForPost();
             });
-            var copyFromId =parseInt( $('#CopyFromId').val());
-            let selectedItemId=0;
-             if (copyFromId===0) {
+            //var copyFromId =parseInt( $('#CopyFromId').val());
+            //let selectedItemId=0;
+            // if (copyFromId===0) {
 
-                $amount.val(0);
-                 $('#ItemVm_TransDate').val(new Date().toISOString().slice(0, 10));
+            //    $amount.val(0);
+            //     $('#ItemVm_TransDate').val(new Date().toISOString().slice(0, 10));
 
-            } else {
-                  $('#ItemVm_TransDate').val(new Date().toISOString().slice(0, 10));
-                  selectedItemId = parseInt($('#CopyFromTransactorId').val());
-             }
+            //} else {
+            //      $('#ItemVm_TransDate').val(new Date().toISOString().slice(0, 10));
+            //      selectedItemId = parseInt($('#CopyFromTransactorId').val());
+            // }
 
 
 
             companyChanged();
             prepCurrencyInputs();
-            if (selectedItemId!==0) {
-                $cashFlowAccountId.val(selectedItemId);
-            }
+            //if (selectedItemId!==0) {
+            //    $cashFlowAccountId.val(selectedItemId);
+            //}
         });
 
 

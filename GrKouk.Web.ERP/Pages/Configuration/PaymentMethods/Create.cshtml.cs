@@ -36,9 +36,10 @@ namespace GrKouk.Web.Erp.Pages.Configuration.PaymentMethods
                     Text = c.GetDescription()
                 }).ToList();
             ViewData["AutoPayoffWay"] = new SelectList(seriesAutoPayOffList, "Value", "Text");
+            ViewData["CfAccountId"] = SelectListHelpers.GetCfAccountsNoSelectionList(_context);
         }
         [BindProperty]
-        public PaymentMethod PaymentMethod { get; set; }
+        public PaymentMethod ItemVm { get; set; }
 
         public async Task<IActionResult> OnPostAsync()
         {
@@ -47,7 +48,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.PaymentMethods
                 return Page();
             }
 
-            _context.PaymentMethods.Add(PaymentMethod);
+            _context.PaymentMethods.Add(ItemVm);
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");

@@ -58,7 +58,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
             }
 
             ItemVm = _mapper.Map<WarehouseItemModifyDto>(materialToModify);
-            int[] selectedCompanies = materialToModify.CompanyMappings.Select(x => x.CompanyId).ToArray();
+            string[] selectedCompanies = materialToModify.CompanyMappings.Select(x => x.CompanyId.ToString()).ToArray();
             ItemVm.SelectedCompanies = JsonSerializer.Serialize(selectedCompanies);
             LoadCombos();
             // _toastNotification.AddInfoToastMessage("Welcome to edit page");
@@ -91,10 +91,11 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
             ViewData["MaterialType"] = new SelectList(materialTypes, "Value", "Text");
             // ViewData["CashRegCategoryId"] = new SelectList(_context.CashRegCategories.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
             var companiesListJs = _context.Companies.OrderBy(p => p.Name)
-                .Select(p => new DiaryDocTypeItem()
+                .Select(p => new UISelectTypeItem()
                 {
                     Title = p.Name,
-                    Value = p.Id
+                    ValueInt = p.Id,
+                    Value = p.Id.ToString()
                 }).ToList();
             ViewData["CompaniesListJs"] = companiesListJs;
         }
@@ -113,13 +114,16 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
                 _context.Attach(materialToAttach).State = EntityState.Modified;
                 _context.CompanyWarehouseItemMappings.RemoveRange(_context.CompanyWarehouseItemMappings.Where(p => p.WarehouseItemId == materialToAttach.Id));
                 
-                int[] companiesSelected = JsonSerializer.Deserialize<int[]>(ItemVm.SelectedCompanies);
+                string[] companiesSelected = JsonSerializer.Deserialize<string[]>(ItemVm.SelectedCompanies);
                 foreach (var i in companiesSelected)
                 {
-
+                    if (!Int32.TryParse(i, out int compId))
+                    {
+                        throw new Exception("Selected company Id error");
+                    }
                     materialToAttach.CompanyMappings.Add(new CompanyWarehouseItemMapping
                     {
-                        CompanyId = i,
+                        CompanyId = compId,
                         WarehouseItemId = materialToAttach.Id
                     });
                 }

@@ -82,18 +82,11 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
                 LoadCombos();
                 return Page();
             }
-            if (ItemVm.FiscalPeriodId <= 0)
-            {
-                ModelState.AddModelError(string.Empty, "No Fiscal Period covers Transaction Date");
-                LoadCombos();
-                return Page();
-            }
+           
 
             var spTransactionToAttach = _mapper.Map<CashFlowAccountTransaction>(ItemVm);
             #region Fiscal Period
-            var dateOfTrans = ItemVm.TransDate;
-            var fiscalPeriod = await _context.FiscalPeriods.FirstOrDefaultAsync(p =>
-                p.StartDate.CompareTo(dateOfTrans) > 0 & p.EndDate.CompareTo(dateOfTrans) < 0);
+            var fiscalPeriod = await HelperFunctions.GetFiscalPeriod(_context, ItemVm.TransDate);
             if (fiscalPeriod == null) {
                 ModelState.AddModelError(string.Empty, "No Fiscal Period covers Transaction Date");
                 LoadCombos();

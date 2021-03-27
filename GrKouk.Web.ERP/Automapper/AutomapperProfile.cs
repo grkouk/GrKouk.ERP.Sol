@@ -240,6 +240,10 @@ namespace GrKouk.Web.ERP.Automapper {
                 .ForMember(dest => dest.DocTypeId,
                     opt => 
                         opt.MapFrom(src => src.DocumentTypeId))
+                .ForMember(dest => dest.TransRefCode,
+                    opt => 
+                        opt.MapFrom(src => src.RefCode))
+
                 .ReverseMap();
             CreateMap<CashFlowAccountTransaction, CfaTransactionModifyDto>()
                 .ForMember(dest => dest.DocSeriesId,
@@ -248,6 +252,9 @@ namespace GrKouk.Web.ERP.Automapper {
                 .ForMember(dest => dest.DocTypeId,
                     opt => 
                     opt.MapFrom(src => src.DocumentTypeId))
+                .ForMember(dest => dest.TransRefCode,
+                    opt => 
+                        opt.MapFrom(src => src.RefCode))
                 .ReverseMap();
 
             ;

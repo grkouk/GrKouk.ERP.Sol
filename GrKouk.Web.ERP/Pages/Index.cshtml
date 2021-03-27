@@ -6,20 +6,29 @@
 
 @section MyCss
 {
-    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/material.css" />
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/bootstrap4.css" />
 }
 
 @section OutOfBody
 {
-    @if (User.IsInRole("Admin"))
-    {
+    @if (User.IsInRole("Admin")) {
+        <h3></h3>
+        @*<div class="container-fluid">
+                <div class="row mt-5">
+
+
+                </div>
+
+            </div>*@
         <input type="hidden" id="logged" value="true" />
+
         <div class="container-fluid">
+            <div class="row"></div>
             <div class="row">
                 <main role="main" class="col-md-12 ms-sm-auto col-lg-12 px-4">
                     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                         @* <h3 class="h3">@Model.Item.TransactorTypeName @Model.Item.Name Details</h3> *@
-                        <h3></h3>
+
                         <div class="btn-toolbar mb-2 mb-md-0">
                             <div class="btn-group mr-2">
                                 <button type="button" class="btn  btn-sm btn-outline-secondary selected-company-text">Reference</button>
@@ -318,8 +327,7 @@
     }
 }
 
-@if (!User.IsInRole("Admin"))
-{
+@if (!User.IsInRole("Admin")) {
     <div class="text-center">
         <input type="hidden" id="logged" value="false" />
         <h1 class="display-4">Welcome</h1>

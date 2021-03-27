@@ -38,10 +38,7 @@ namespace GrKouk.Erp.Dtos.TransactorTransactions
         public decimal AmountDiscount { get; set; }
         [Display(Name = "Sum Amount")]
         public decimal AmountSum => (AmountNet + AmountFpa - AmountDiscount);
-        //public decimal TransFpaAmount { get; set; }
-        //public decimal TransNetAmount { get; set; }
-        //public decimal TransDiscountAmount { get; set; }
-
+       
         [MaxLength(500)]
         [Display(Name = "Etiology")]
         public string Etiology { get; set; }
@@ -50,5 +47,8 @@ namespace GrKouk.Erp.Dtos.TransactorTransactions
 
         [Timestamp]
         public byte[] Timestamp { get; set; }
+
+        [Display(Name = "Cash Flow Account")]
+        public int CfAccountId { get; set; }
     }
 }

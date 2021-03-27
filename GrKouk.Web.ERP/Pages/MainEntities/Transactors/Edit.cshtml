@@ -7,7 +7,7 @@
 @section MyCss
 {
 
-    <link rel="stylesheet" href="~/lib/bootstrap-select/css/bootstrap-select.min.css" />
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/bootstrap4.css" />
 }
 <h4>Edit Transactor</h4>
 <hr />
@@ -19,63 +19,101 @@
         <input type="hidden" asp-for="ItemVm.SelectedCompanies" />
         <div class="row mb-3">
             <div class="col-md-2">
-                <label asp-for="ItemVm.Code" class="form-label small"></label>
-                <input asp-for="ItemVm.Code" class="form-control form-control-sm" />
-                <span asp-validation-for="ItemVm.Code" class="text-danger small"></span>
+                <div class="form-floating">
+                    <input asp-for="ItemVm.Code" class="form-control form-control-sm" />
+                    <label asp-for="ItemVm.Code" class="form-label small"></label>
+                    <span asp-validation-for="ItemVm.Code" class="text-danger small"></span>
+                </div>
             </div>
-            <div class="col-md-6">
-                <label asp-for="ItemVm.Name" class="form-label small"></label>
-                <input asp-for="ItemVm.Name" class="form-control form-control-sm" />
-                <span asp-validation-for="ItemVm.Name" class="text-danger small"></span>
+            <div class="col-md-5">
+                <div class="form-floating">
+
+                    <input asp-for="ItemVm.Name" class="form-control form-control-sm" />
+                    <label asp-for="ItemVm.Name" class="form-label small"></label>
+                    <span asp-validation-for="ItemVm.Name" class="text-danger small"></span>
+                </div>
+
             </div>
 
             <div class="col-md-2">
-                <label asp-for="ItemVm.TransactorTypeId" class="form-label small"></label>
-                <select asp-for="ItemVm.TransactorTypeId" class="form-select form-select-sm" asp-items="ViewBag.TransactorTypeId"></select>
+                <div class="form-floating">
+
+                    <select asp-for="ItemVm.TransactorTypeId" class="form-select form-select-sm" asp-items="ViewBag.TransactorTypeId"></select>
+                    <label asp-for="ItemVm.TransactorTypeId" class="form-label small"></label>
+                </div>
+
+
             </div>
-            <div class="col-md-2">
-                <label class="form-label small">Selected Companies</label>
-                <select class="selectpicker form-control " id="SelectedCompanies" multiple
-                        data-selected-text-format="count > 2"></select>
+            <div class="col-md-3">
+                <label class="form-label small">New Selected Comp</label>
+                <ejs-multiselect id="SelectedCompanies" dataSource="@ViewBag.CompaniesListJs" placeholder="Select Companies" mode="CheckBox"
+                                 showDropDownIcon="true"
+                                 showSelectAll="false" selectAllText="Select All" unSelectAllText="unSelect All">
+                    <e-multiselect-fields text="Title" value="Value"></e-multiselect-fields>
+                </ejs-multiselect>
+
             </div>
+
         </div>
         <div class="row mb-3">
             <div class="col-md-6">
-                <label asp-for="ItemVm.Address" class="form-label small"></label>
-                <input asp-for="ItemVm.Address" class="form-control form-control-sm" />
-                <span asp-validation-for="ItemVm.Address" class="text-danger small"></span>
+                <div class="form-floating">
+                    <input asp-for="ItemVm.Address" class="form-control form-control-sm" />
+                    <label asp-for="ItemVm.Address" class="form-label small"></label>
+                    <span asp-validation-for="ItemVm.Address" class="text-danger small"></span>
+                </div>
+
             </div>
             <div class="col-md-4">
-                <label asp-for="ItemVm.City" class="form-label small"></label>
-                <input asp-for="ItemVm.City" class="form-control form-control-sm" />
-                <span asp-validation-for="ItemVm.City" class="text-danger small"></span>
+                <div class="form-floating">
+                    <input asp-for="ItemVm.City" class="form-control form-control-sm" />
+                    <label asp-for="ItemVm.City" class="form-label small"></label>
+                    <span asp-validation-for="ItemVm.City" class="text-danger small"></span>
+                </div>
+
             </div>
             <div class="col-md-2">
-                <label asp-for="ItemVm.Zip" class="form-label small"></label>
-                <input asp-for="ItemVm.Zip" class="form-control form-control-sm" />
-                <span asp-validation-for="ItemVm.Zip" class="text-danger small"></span>
+                <div class="form-floating">
+                    <input asp-for="ItemVm.Zip" class="form-control form-control-sm" />
+                    <label asp-for="ItemVm.Zip" class="form-label small"></label>
+                    <span asp-validation-for="ItemVm.Zip" class="text-danger small"></span>
+                </div>
+
             </div>
         </div>
         <div class="row mb-3">
             <div class="col-md-3">
-                <label asp-for="ItemVm.PhoneWork" class="form-label small"></label>
-                <input asp-for="ItemVm.PhoneWork" class="form-control form-control-sm" />
-                <span asp-validation-for="ItemVm.PhoneWork" class="text-danger small"></span>
+                <div class="form-floating">
+                    <input asp-for="ItemVm.PhoneWork" class="form-control form-control-sm" />
+                    <label asp-for="ItemVm.PhoneWork" class="form-label small"></label>
+                    <span asp-validation-for="ItemVm.PhoneWork" class="text-danger small"></span>
+                </div>
+
             </div>
             <div class="col-md-3">
-                <label asp-for="ItemVm.PhoneMobile" class="form-label small"></label>
-                <input asp-for="ItemVm.PhoneMobile" class="form-control form-control-sm" />
-                <span asp-validation-for="ItemVm.PhoneMobile" class="text-danger small"></span>
+                <div class="form-floating">
+                    <input asp-for="ItemVm.PhoneMobile" class="form-control form-control-sm" />
+                    <label asp-for="ItemVm.PhoneMobile" class="form-label small"></label>
+                    <span asp-validation-for="ItemVm.PhoneMobile" class="text-danger small"></span>
+                </div>
+
             </div>
             <div class="col-md-3">
-                <label asp-for="ItemVm.PhoneFax" class="form-label small"></label>
-                <input asp-for="ItemVm.PhoneFax" class="form-control form-control-sm" />
-                <span asp-validation-for="ItemVm.PhoneFax" class="text-danger small"></span>
+                <div class="form-floating">
+                    <input asp-for="ItemVm.PhoneFax" class="form-control form-control-sm" />
+                    <label asp-for="ItemVm.PhoneFax" class="form-label small"></label>
+                    <span asp-validation-for="ItemVm.PhoneFax" class="text-danger small"></span>
+                </div>
+
             </div>
             <div class="col-md-3">
-                <label asp-for="ItemVm.EMail" class="form-label small"></label>
-                <input asp-for="ItemVm.EMail" class="form-control form-control-sm" />
-                <span asp-validation-for="ItemVm.EMail" class="text-danger small"></span>
+                <div class="form-floating">
+                    <input asp-for="ItemVm.EMail" class="form-control form-control-sm" />
+                    <label asp-for="ItemVm.EMail" class="form-label small"></label>
+                    <span asp-validation-for="ItemVm.EMail" class="text-danger small"></span>
+                </div>
+
+
             </div>
         </div>
         <div>
@@ -90,44 +128,22 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script src="~/lib/bootstrap-select/js/bootstrap-select.min.js"></script>
+    <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
+    <ejs-scripts></ejs-scripts>
     <script>
         $(document).ready(function() {
-            var companiesListJs = @Html.Raw(Json.Serialize(ViewBag.CompaniesListJs));
+           
+            const selectedCompanies = document.getElementById("SelectedCompanies").ej2_instances[0];
+            var oldSel = $('#ItemVm_SelectedCompanies').val();
+            if (oldSel.length>0) {
+                selectedCompanies.value=JSON.parse(oldSel);    
+            }
+            selectedCompanies.changeOnBlur=false;
+            selectedCompanies.addEventListener("change",(event)=>{
 
-            var loadCompanies = () => {
-                $('#SelectedCompanies').empty();
-                $.each(companiesListJs, function(index, item) {
-                    $('#SelectedCompanies').append($('<option></option>').attr('value', item.value).text(item.title));
-                });
-
-                $('#SelectedCompanies').selectpicker('refresh');
-            };
-
-            var updateSelectedCompanies = () => {
-                var $selectedCompanies = $('#ItemVm_SelectedCompanies');
-                var companyList = $selectedCompanies.val();
-                var companyListArr = companyList.split(',');
-                
-                $('#SelectedCompanies').selectpicker('val', companyListArr);
-            };
-
-
-            $('#SelectedCompanies').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-                var sel = $('#SelectedCompanies option:selected');
-                var selected = [];
-                $(sel).each(function(index, item) {
-                    selected.push([$(this).val()]);
-                });
-                console.log('selected=' + selected);
-                var sDocs = selected.toString();
-                console.log('sDocs=' + sDocs);
-
-                $('#ItemVm_SelectedCompanies').val(sDocs);
+                var selected = JSON.stringify(event.value);
+                $('#ItemVm_SelectedCompanies').val(selected);
             });
-
-            loadCompanies();
-            updateSelectedCompanies();
             //$('.selectpicker').selectpicker( );
         });
     </script>

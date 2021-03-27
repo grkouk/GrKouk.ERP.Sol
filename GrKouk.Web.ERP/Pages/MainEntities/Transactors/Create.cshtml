@@ -6,9 +6,7 @@
 }
 @section MyCss
 {
-    @*<link rel="stylesheet" href="~/css/bootstrap-multiselect.css" />*@
     <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/bootstrap4.css" />
-    <link rel="stylesheet" href="~/lib/bootstrap-select/css/bootstrap-select.min.css" />
 }
 <h4>Create Transactor</h4>
 <hr />
@@ -31,24 +29,18 @@
                 <label asp-for="ItemVm.TransactorTypeId" class="form-label small"></label>
                 <select asp-for="ItemVm.TransactorTypeId" class="form-select form-select-sm" asp-items="ViewBag.TransactorTypeId"></select>
             </div>
-            <div class=" col-md-2">
-                <label class="form-label small">Selected Companies</label>
-                <select class="selectpicker form-control " id="SelectedCompanies" multiple
-                        data-selected-text-format="count > 2"></select>
-            </div>
-            <div class=" col-md-2">
+           
+            <div class="col-md-3">
                 <label class="form-label small">New Selected Comp</label>
-                <ejs-multiselect id="test" dataSource="@ViewBag.CompaniesListJs" placeholder="Select Companies" mode="CheckBox"
-                                 showDropDownIcon="true" 
-                                 showSelectAll="true" selectAllText="Select All" unSelectAllText="unSelect All"
-                                 >
+                <ejs-multiselect id="SelectedCompanies" dataSource="@ViewBag.CompaniesListJs" placeholder="Select Companies" mode="CheckBox"
+                                 showDropDownIcon="true"
+                                 showSelectAll="false" selectAllText="Select All" unSelectAllText="unSelect All">
                     <e-multiselect-fields text="Title" value="Value"></e-multiselect-fields>
                 </ejs-multiselect>
+
+
             </div>
-            @*<div class="col-md-2">
-            <label asp-for="ItemVm.CompanyId" class="control-label small"></label>
-            <select asp-for="ItemVm.CompanyId" class="form-control form-control-sm " asp-items="ViewBag.CompanyId"></select>
-        </div>*@
+          
         </div>
         <div class="row mb-3">
             <div class="col-md-6">
@@ -106,37 +98,17 @@
     <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
     <ejs-scripts></ejs-scripts>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script src="~/lib/bootstrap-select/js/bootstrap-select.min.js"></script>
+   
     <script>
         $(document).ready(function() {
-            var companiesListJs = @Html.Raw(Json.Serialize(ViewBag.CompaniesListJs));
-
-            var loadCompanies = () => {
-                $('#SelectedCompanies').empty();
-                $.each(companiesListJs, function(index, item) {
-                    $('#SelectedCompanies').append($('<option></option>').attr('value', item.value).text(item.title));
-                });
-               
-                $('#SelectedCompanies').selectpicker('refresh');
-            };
-
-           
-
-            $('#SelectedCompanies').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
-                var sel = $('#SelectedCompanies option:selected');
-                var selected = [];
-                $(sel).each(function(index, item) {
-                    selected.push([$(this).val()]);
-                });
-                console.log('selected=' + selected);
-                var sDocs = selected.toString();
-                console.log('sDocs=' + sDocs);
-               
-                $('#ItemVm_SelectedCompanies').val(sDocs);
+            const selectedCompanies = document.getElementById("SelectedCompanies").ej2_instances[0];
+            selectedCompanies.changeOnBlur=false;
+            selectedCompanies.addEventListener("change",(event)=>{
+              
+                var selected = JSON.stringify(event.value);
+                $('#ItemVm_SelectedCompanies').val(selected);
             });
 
-            loadCompanies();
-            //$('.selectpicker').selectpicker( );
         });
     </script>
 }

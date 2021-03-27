@@ -17,7 +17,8 @@ namespace GrKouk.Erp.Dtos.CashFlowTransactions
         public int DocTypeId { get; set; }
         [Display(Name = "Reference Code")]
         public string TransRefCode { get; set; }
-        [Display(Name = "Transactor")]
+
+        [Display(Name = "Cash Flow Account")]
         public int CashFlowAccountId { get; set; }
         [Display(Name = "Section")]
         public int SectionId { get; set; }
