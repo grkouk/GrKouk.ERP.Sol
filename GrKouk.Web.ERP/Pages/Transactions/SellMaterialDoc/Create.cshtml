@@ -24,6 +24,18 @@
         font-family: Verdana,Arial,sans-serif;
         font-size: 12px;
     }
+    .empImage {
+        margin: 6px 16px;
+        float: left;
+        width: 50px;
+        height: 50px;
+    }
+    .ename {
+        display: block !important;
+        opacity: .87;
+        font-size: 16px;
+        margin-top: 8px;
+    }
 </style>
 <h4>Νέο παραστατικό Πώλησης</h4>
 <hr />
@@ -89,9 +101,10 @@
             <div class="row mb-3">
                 <div class="col-6">
                     <label class="form-label small">Test Autocomplete</label>
-                    <ejs-autocomplete id="AutoCompleteTest" placeholder="Selection text" popupHeight="200px"  autofill="true">
-                        <e-autocomplete-fields text="text" value="value"></e-autocomplete-fields>
-                        <e-data-manager url="@Url.Action("GetSellDocAutoComplete", "AutoComplete")" adaptor="UrlAdaptor"></e-data-manager>
+                    <ejs-autocomplete id="AutoCompleteTest" placeholder="Selection text" popupHeight="450px"  autofill="true" 
+                       itemTemplate="@Html.Raw("<div><img class=\"empImage\" src=${imgUrl} /><div class=\"ename\"> ${text} </div></div>")">
+                    <e-autocomplete-fields text="text" value="value"></e-autocomplete-fields>
+                        @* <e-data-manager url="@Url.Action("GetSellDocAutoComplete", "AutoComplete")" adaptor="UrlAdaptor"></e-data-manager> *@
                     </ejs-autocomplete>
                 </div>
             </div>
@@ -321,7 +334,8 @@
     <script src="~/js/selectors.lib.js"></script>
     <script src="~/js/product.lib.js"></script>
     <script>
-        $(document).ready(function() {
+      
+$(document).ready(function() {
             console.log("Inside Document ready");
 
             $('#LineEditing').val(0);
@@ -459,6 +473,33 @@
                     break;
                 }
             };
+            const refreshAutoCompleteData=(e)=>{
+                let term = e.text;
+                let selCompanyId = $companyId.val();
+                let selSeriesId = $translDocSeriesId.val();
+                 let uri = "/api/autocomplete/GetAutoCompleteSellProducts";
+                 uri += `?companyId=${selCompanyId}`;
+                 uri += `&seriesId=${selSeriesId}`;
+                 uri += `&term=${term}`;
+                 productLib.makeAjaxCallGet(uri)
+                       .then((data) => {
+                             e.updateData(data.result, null);
+                       })
+                       .catch((error) => {
+                            console.log("Error in ajax call");
+                       });
+                        
+               
+                
+            };
+           const setUpAutoComplete=()=>{
+                let grd = document.getElementById("AutoCompleteTest").ej2_instances[0];
+                grd.addEventListener("filtering",(e)=>{
+                    console.log("******Inside filtering event listener");
+                    refreshAutoCompleteData(e);
+                });
+           };
+           
             const refreshAutoCompleteQuery = () => {
                
                 let selCompanyId = $companyId.val();
@@ -1057,7 +1098,8 @@
                 setSeekType();
             }
             console.log("After initial load check");
-            refreshAutoCompleteQuery();
+            setUpAutoComplete();
+            //refreshAutoCompleteQuery();
             $initialLoad.val(false);
         });
 

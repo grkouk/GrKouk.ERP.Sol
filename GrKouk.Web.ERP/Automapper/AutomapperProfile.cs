@@ -19,7 +19,6 @@ using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Erp.Dtos.WarehouseItems;
 using GrKouk.Erp.Dtos.WarehouseTransactions;
 using GrKouk.Web.ERP.Helpers;
-using Microsoft.AspNetCore.Routing.Constraints;
 
 namespace GrKouk.Web.ERP.Automapper {
     public class AutoMapperProfile : Profile {
@@ -257,7 +256,7 @@ namespace GrKouk.Web.ERP.Automapper {
                         opt.MapFrom(src => src.RefCode))
                 .ReverseMap();
 
-            ;
+            
         }
     }
 }
