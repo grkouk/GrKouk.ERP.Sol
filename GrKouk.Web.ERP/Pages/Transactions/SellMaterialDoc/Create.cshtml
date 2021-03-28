@@ -474,9 +474,12 @@ $(document).ready(function() {
                 }
             };
             const refreshAutoCompleteData=(e)=>{
+                
                 let term = e.text;
                 let selCompanyId = $companyId.val();
                 let selSeriesId = $translDocSeriesId.val();
+                console.log(`**Inside refresh autocomplete data with term=${term}`);
+                console.log(`**cancel=${e.cancel}`);
                  let uri = "/api/autocomplete/GetAutoCompleteSellProducts";
                  uri += `?companyId=${selCompanyId}`;
                  uri += `&seriesId=${selSeriesId}`;
@@ -493,11 +496,13 @@ $(document).ready(function() {
                 
             };
            const setUpAutoComplete=()=>{
-                let grd = document.getElementById("AutoCompleteTest").ej2_instances[0];
-                grd.addEventListener("filtering",(e)=>{
+                let autoCompleteEL = document.getElementById("AutoCompleteTest").ej2_instances[0];
+                autoCompleteEL.addEventListener("filtering",(e)=>{
                     console.log("******Inside filtering event listener");
                     refreshAutoCompleteData(e);
                 });
+                //autocompleteel . text ---> text of selected element
+                //autocompleteel . value ---> id of  selected element
            };
            
             const refreshAutoCompleteQuery = () => {
