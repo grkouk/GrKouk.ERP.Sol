@@ -14,7 +14,6 @@ namespace GrKouk.Erp.Domain.Shared
         public int WarehouseItemId { get; set; }
         public virtual WarehouseItem WarehouseItem { get; set; }
         public int PrimaryUnitId { get; set; }
-        //public virtual MeasureUnit PrimaryUnit { get; set; }
         public int SecondaryUnitId { get; set; }
         //public virtual MeasureUnit SecondaryUnit { get; set; }
         //Αλλαγή της εισαγωγής σε νουμερα στην μοναδα κίνησης.

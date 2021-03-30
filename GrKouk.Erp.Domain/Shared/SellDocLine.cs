@@ -13,12 +13,15 @@ namespace GrKouk.Erp.Domain.Shared
         public int WarehouseItemId { get; set; }
         public virtual WarehouseItem WarehouseItem { get; set; }
 
-
-
         public int PrimaryUnitId { get; set; }
-        //public virtual MeasureUnit PrimaryUnit { get; set; }
         public int SecondaryUnitId { get; set; }
-        //public virtual MeasureUnit SecondaryUnit { get; set; }
+        //---------------------------------------------------
+        public int TransactionUnitId { get; set; }
+        public double TransactionQuantity { get; set; }
+        public Single TransactionUnitFactor { get; set; }
+        [Column(TypeName = "decimal(18, 4)")]
+        public decimal TransUnitPrice { get; set; }
+        //---------------------------------------------------
         public Single Factor { get; set; }
         /// <summary>
         /// Ποσότητα σε μονάδα μέτρησης 1
