@@ -25,6 +25,7 @@ namespace GrKouk.Erp.Dtos.SellDocuments
         public decimal AmountFpa { get; set; }
         public decimal AmountNet { get; set; }
         public decimal AmountDiscount { get; set; }
+        public decimal AmountExpenses { get; set; }
         public string Etiology { get; set; }
     }
 }
