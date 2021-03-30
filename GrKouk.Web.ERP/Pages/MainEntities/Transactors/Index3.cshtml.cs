@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using GrKouk.Erp.Definitions;
+using GrKouk.Erp.Domain.MainEntities.Transactors;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.Transactors;
 using GrKouk.Web.ERP.Data;

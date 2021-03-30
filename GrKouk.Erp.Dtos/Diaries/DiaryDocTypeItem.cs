@@ -6,7 +6,7 @@
         // public string Label { get; set; }
         public int Value { get; set; }
     }
-    public class UISelectTypeItem
+    public class UiSelectTypeItem
     {
         public string Title { get; set; }
         public string Text { get; set; }

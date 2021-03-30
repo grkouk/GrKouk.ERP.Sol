@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using GrKouk.Erp.Definitions;
+using GrKouk.Erp.Domain.MainEntities.Warehouse;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.WarehouseItems;
 using GrKouk.Web.ERP.Data;

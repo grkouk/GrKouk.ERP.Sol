@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.Shared;
 
-namespace GrKouk.Erp.Domain.DocDefinitions
+namespace GrKouk.Erp.Domain.BuyDocDefinitions
 {
     public class BuyDocSeriesDef
     {

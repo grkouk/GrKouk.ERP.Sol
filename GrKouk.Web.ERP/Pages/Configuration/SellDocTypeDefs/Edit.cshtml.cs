@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.DocDefinitions;
+using GrKouk.Erp.Domain.SellDocDefinitions;
 using GrKouk.Erp.Dtos.Diaries;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -89,7 +90,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.SellDocTypeDefs
             };
             var warehouseItemNaturesList = Enum.GetValues(typeof(WarehouseItemNatureEnum))
                 .Cast<WarehouseItemNatureEnum>()
-                .Select(c => new UISelectTypeItem()
+                .Select(c => new UiSelectTypeItem()
                 {
                     ValueInt =(int) c,
                     Title = c.GetDescription()

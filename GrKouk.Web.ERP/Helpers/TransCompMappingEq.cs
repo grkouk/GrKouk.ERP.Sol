@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using GrKouk.Erp.Domain.Shared;
+using GrKouk.Erp.Domain.MainEntities.Transactors;
 
 namespace GrKouk.Web.ERP.Helpers
 {

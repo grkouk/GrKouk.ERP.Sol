@@ -1,4 +1,5 @@
-﻿using GrKouk.Erp.Domain.Shared;
+﻿using GrKouk.Erp.Domain.MainEntities.Warehouse;
+using GrKouk.Erp.Domain.Shared;
 using GrKouk.Web.ERP.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

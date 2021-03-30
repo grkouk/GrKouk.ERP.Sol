@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using GrKouk.Erp.Domain.CashFlow;
+using GrKouk.Erp.Domain.MainEntities.Transactors;
+using GrKouk.Erp.Domain.MainEntities.Warehouse;
 
 namespace GrKouk.Erp.Domain.Shared
 {

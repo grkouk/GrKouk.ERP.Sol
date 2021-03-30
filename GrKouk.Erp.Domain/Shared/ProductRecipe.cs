@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GrKouk.Erp.Domain.MainEntities.Warehouse;
 
 namespace GrKouk.Erp.Domain.Shared
 {

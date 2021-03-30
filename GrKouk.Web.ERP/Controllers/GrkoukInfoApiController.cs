@@ -7,7 +7,6 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.CashFlow;
-using GrKouk.Erp.Domain.DocDefinitions;
 using GrKouk.Erp.Domain.MediaEntities;
 using GrKouk.Erp.Domain.RecurringTransactions;
 using GrKouk.Erp.Domain.Shared;
@@ -31,6 +30,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using GrKouk.Erp.Domain.BuyDocDefinitions;
+using GrKouk.Erp.Domain.MainEntities.Warehouse;
+using GrKouk.Erp.Domain.SellDocDefinitions;
 using GrKouk.Erp.Dtos.CashFlowTransactions;
 
 //using Remotion.Linq.Parsing.Structure.IntermediateModel;
@@ -295,11 +297,11 @@ namespace GrKouk.Web.ERP.Controllers
         }
 
         [HttpGet("GetSelectorTransactorTypes")]
-        public async Task<ActionResult<IList<UISelectTypeItem>>> GetSelectorTransactorTypes()
+        public async Task<ActionResult<IList<UiSelectTypeItem>>> GetSelectorTransactorTypes()
         {
            // Thread.Sleep(40000);
             var transactorTypeList = await _context.TransactorTypes.OrderBy(p => p.Name)
-                .Select(p => new UISelectTypeItem()
+                .Select(p => new UiSelectTypeItem()
                 {
                     Title = p.Name,
                     ValueInt = p.Id,
@@ -309,12 +311,12 @@ namespace GrKouk.Web.ERP.Controllers
         }
 
         [HttpGet("GetSelectorMaterialNatures")]
-        public ActionResult<IList<UISelectTypeItem>> GetSelectorMaterialNatures()
+        public ActionResult<IList<UiSelectTypeItem>> GetSelectorMaterialNatures()
         {
             //Thread.Sleep(40000);
             var materialNatureList = Enum.GetValues(typeof(WarehouseItemNatureEnum))
                 .Cast<WarehouseItemNatureEnum>()
-                .Select(c => new UISelectTypeItem()
+                .Select(c => new UiSelectTypeItem()
                 {
                     ValueInt = (int)c,
                     Title = c.GetDescription()
@@ -324,30 +326,30 @@ namespace GrKouk.Web.ERP.Controllers
         }
 
         [HttpGet("GetSelectorCompanies")]
-        public ActionResult<IList<UISelectTypeItem>> GetSelectorCompanies()
+        public ActionResult<IList<UiSelectTypeItem>> GetSelectorCompanies()
         {
             //Thread.Sleep(40000);
             var dbCompanies = _context.Companies.Where(t => t.Id != 1).OrderBy(p => p.Code).AsNoTracking();
-            List<UISelectTypeItem> companiesList = new List<UISelectTypeItem>();
+            List<UiSelectTypeItem> companiesList = new List<UiSelectTypeItem>();
             //companiesList.Add(new UISelectTypeItem() { Value = 0.ToString(), Text = "{All Companies}" });
             foreach (var company in dbCompanies)
             {
-                companiesList.Add(new UISelectTypeItem() { ValueInt = company.Id, Value = company.Id.ToString(), Title = company.Code });
+                companiesList.Add(new UiSelectTypeItem() { ValueInt = company.Id, Value = company.Id.ToString(), Title = company.Code });
             }
 
             return Ok(companiesList);
         }
 
         [HttpGet("GetSelectorDocumentTypes")]
-        public ActionResult<IList<UISelectTypeItem>> GetSelectorDocumentTypes(MainInfoSourceTypeEnum docType)
+        public ActionResult<IList<UiSelectTypeItem>> GetSelectorDocumentTypes(MainInfoSourceTypeEnum docType)
         {
-            List<UISelectTypeItem> result;
+            List<UiSelectTypeItem> result;
 
             switch (docType)
             {
                 case MainInfoSourceTypeEnum.SourceTypeSales:
                     result = _context.SellDocTypeDefs.OrderBy(p => p.Name)
-                        .Select(p => new UISelectTypeItem()
+                        .Select(p => new UiSelectTypeItem()
                         {
                             Title = p.Name,
                             ValueInt = p.Id,
@@ -356,7 +358,7 @@ namespace GrKouk.Web.ERP.Controllers
                     break;
                 case MainInfoSourceTypeEnum.SourceTypeBuys:
                     result = _context.BuyDocTypeDefs.OrderBy(p => p.Name)
-                        .Select(p => new UISelectTypeItem()
+                        .Select(p => new UiSelectTypeItem()
                         {
                             Title = p.Name,
                             ValueInt = p.Id,
@@ -365,7 +367,7 @@ namespace GrKouk.Web.ERP.Controllers
                     break;
                 case MainInfoSourceTypeEnum.SourceTypeWarehouseTransactions:
                     result = _context.TransWarehouseDocTypeDefs.OrderBy(p => p.Name)
-                        .Select(p => new UISelectTypeItem()
+                        .Select(p => new UiSelectTypeItem()
                         {
                             Title = p.Name,
                             ValueInt = p.Id,
@@ -374,7 +376,7 @@ namespace GrKouk.Web.ERP.Controllers
                     break;
                 case MainInfoSourceTypeEnum.SourceTypeTransactorTransactions:
                     result = _context.TransTransactorDocTypeDefs.OrderBy(p => p.Name)
-                        .Select(p => new UISelectTypeItem()
+                        .Select(p => new UiSelectTypeItem()
                         {
                             Title = p.Name,
                             ValueInt = p.Id,
@@ -382,7 +384,7 @@ namespace GrKouk.Web.ERP.Controllers
                         }).ToList();
                     break;
                 default:
-                    result = new List<UISelectTypeItem>();
+                    result = new List<UiSelectTypeItem>();
                     break;
             }
 
@@ -3282,15 +3284,15 @@ namespace GrKouk.Web.ERP.Controllers
                                                   );
             }
 
-            PagedList<CFATransactionDefListDto> listItems;
+            PagedList<CfaTransactionDefListDto> listItems;
             try
             {
-                var projectedList = fullListIq.ProjectTo<CFATransactionDefListDto>(_mapper.ConfigurationProvider);
+                var projectedList = fullListIq.ProjectTo<CfaTransactionDefListDto>(_mapper.ConfigurationProvider);
                 var pageIndex = request.PageIndex;
 
                 var pageSize = request.PageSize;
 
-                listItems = await PagedList<CFATransactionDefListDto>.CreateAsync(projectedList, pageIndex, pageSize);
+                listItems = await PagedList<CfaTransactionDefListDto>.CreateAsync(projectedList, pageIndex, pageSize);
             }
             catch (Exception e)
             {
@@ -3303,7 +3305,7 @@ namespace GrKouk.Web.ERP.Controllers
 
 
 
-            var response = new IndexDataTableResponse<CFATransactionDefListDto>
+            var response = new IndexDataTableResponse<CfaTransactionDefListDto>
             {
                 TotalRecords = listItems.TotalCount,
                 TotalPages = listItems.TotalPages,

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using GrKouk.Erp.Domain.DocDefinitions;
+using GrKouk.Erp.Domain.SellDocDefinitions;
 using GrKouk.Web.ERP.Data;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;

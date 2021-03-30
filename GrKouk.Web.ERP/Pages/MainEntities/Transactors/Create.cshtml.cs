@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
+using GrKouk.Erp.Domain.MainEntities.Transactors;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Erp.Dtos.Transactors;
@@ -33,7 +34,7 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors {
         }
         private void LoadCombos() {
             var companiesListJs = _context.Companies.OrderBy(p => p.Name)
-                .Select(p => new UISelectTypeItem() {
+                .Select(p => new UiSelectTypeItem() {
                     Title = p.Name,
                     ValueInt = p.Id,
                     Value = p.Id.ToString()

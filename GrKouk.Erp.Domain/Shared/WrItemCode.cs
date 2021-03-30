@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using GrKouk.Erp.Definitions;
+using GrKouk.Erp.Domain.MainEntities.Warehouse;
 
 namespace GrKouk.Erp.Domain.Shared
 {

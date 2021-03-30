@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
 using GrKouk.Erp.Definitions;
+using GrKouk.Erp.Domain.MainEntities.Warehouse;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Erp.Dtos.WarehouseItems;
@@ -91,7 +92,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
             ViewData["MaterialType"] = new SelectList(materialTypes, "Value", "Text");
             // ViewData["CashRegCategoryId"] = new SelectList(_context.CashRegCategories.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
             var companiesListJs = _context.Companies.OrderBy(p => p.Name)
-                .Select(p => new UISelectTypeItem()
+                .Select(p => new UiSelectTypeItem()
                 {
                     Title = p.Name,
                     ValueInt = p.Id,

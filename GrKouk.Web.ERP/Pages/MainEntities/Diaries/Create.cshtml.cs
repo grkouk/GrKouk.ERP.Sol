@@ -96,14 +96,14 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Diaries
 
             var materialNatureList = Enum.GetValues(typeof(WarehouseItemNatureEnum))
                 .Cast<WarehouseItemNatureEnum>()
-                .Select(c => new UISelectTypeItem()
+                .Select(c => new UiSelectTypeItem()
                 {
                     ValueInt =(int) c,
                     Title = c.GetDescription()
                 }).ToList();
 
             var transactorTypeList = _context.TransactorTypes.OrderBy(p => p.Name)
-                .Select(p => new UISelectTypeItem()
+                .Select(p => new UiSelectTypeItem()
                 {
                     Title = p.Name,
                     Value = p.Id.ToString()

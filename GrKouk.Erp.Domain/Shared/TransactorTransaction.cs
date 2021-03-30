@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.DocDefinitions;
+using GrKouk.Erp.Domain.MainEntities.Transactors;
 
 namespace GrKouk.Erp.Domain.Shared
 {

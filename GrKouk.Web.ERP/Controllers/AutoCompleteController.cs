@@ -4,18 +4,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using GrKouk.Erp.Domain.MainEntities.Warehouse;
 using GrKouk.Erp.Domain.MediaEntities;
-using GrKouk.Erp.Domain.Shared;
-using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Erp.Dtos.WarehouseItems;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
 using Newtonsoft.Json;
-using NToastNotify.Helpers;
 using Syncfusion.EJ2.Base;
 
 namespace GrKouk.Web.ERP.Controllers

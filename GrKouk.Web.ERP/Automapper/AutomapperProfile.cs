@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.DocDefinitions;
+using GrKouk.Erp.Domain.MainEntities.Transactors;
+using GrKouk.Erp.Domain.MainEntities.Warehouse;
 using GrKouk.Erp.Domain.MediaEntities;
 using GrKouk.Erp.Domain.RecurringTransactions;
 using GrKouk.Erp.Domain.Shared;
@@ -197,7 +199,7 @@ namespace GrKouk.Web.ERP.Automapper {
             CreateMap<CashFlowDocTypeDef, CfaDocTypeDefModifyDto>().ReverseMap();
             CreateMap<CashFlowDocSeriesDef, CfaDocSeriesDefCreateDto>().ReverseMap();
             CreateMap<CashFlowDocSeriesDef, CfaDocSeriesDefModifyDto>().ReverseMap();
-            CreateMap<CashFlowTransactionDef, CFATransactionDefListDto>()
+            CreateMap<CashFlowTransactionDef, CfaTransactionDefListDto>()
                 .ForMember(dest => dest.CompanyName,
                     opt =>
                         opt.MapFrom(src => src.Company.Name))

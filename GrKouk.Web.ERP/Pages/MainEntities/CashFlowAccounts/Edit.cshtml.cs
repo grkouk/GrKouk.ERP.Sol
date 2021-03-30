@@ -60,7 +60,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.CashFlowAccounts
         {
 
             var companiesListJs = _context.Companies.OrderBy(p => p.Name)
-                .Select(p => new UISelectTypeItem()
+                .Select(p => new UiSelectTypeItem()
                 {
                     Title = p.Name,
                     ValueInt = p.Id,

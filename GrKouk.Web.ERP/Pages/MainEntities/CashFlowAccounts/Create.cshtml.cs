@@ -36,7 +36,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.CashFlowAccounts
         private void LoadCombos()
         {
             var companiesListJs = _context.Companies.OrderBy(p => p.Name)
-                .Select(p => new UISelectTypeItem()
+                .Select(p => new UiSelectTypeItem()
                 {
                     Title = p.Name,
                     ValueInt = p.Id,

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using GrKouk.Erp.Domain.Shared;
+using GrKouk.Erp.Domain.MainEntities.Warehouse;
 
 namespace GrKouk.Erp.Domain.RecurringTransactions
 {

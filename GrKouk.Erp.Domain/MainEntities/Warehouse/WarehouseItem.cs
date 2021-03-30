@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.DocDefinitions;
+using GrKouk.Erp.Domain.Shared;
 
-namespace GrKouk.Erp.Domain.Shared
+namespace GrKouk.Erp.Domain.MainEntities.Warehouse
 {
     public class WarehouseItem
     {

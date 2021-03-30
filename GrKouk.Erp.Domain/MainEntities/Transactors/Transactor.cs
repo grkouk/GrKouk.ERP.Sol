@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using GrKouk.Erp.Domain.Shared;
 
-namespace GrKouk.Erp.Domain.Shared
+namespace GrKouk.Erp.Domain.MainEntities.Transactors
 {
     /// <summary>
     /// Transactor is a customer, a supplier etc

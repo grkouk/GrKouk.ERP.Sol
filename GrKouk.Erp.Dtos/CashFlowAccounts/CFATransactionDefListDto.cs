@@ -1,6 +1,6 @@
 ﻿namespace GrKouk.Erp.Dtos.CashFlowAccounts
 {
-    public class CFATransactionDefListDto
+    public class CfaTransactionDefListDto
     {
         public int Id { get; set; }
         public string Code { get; set; }

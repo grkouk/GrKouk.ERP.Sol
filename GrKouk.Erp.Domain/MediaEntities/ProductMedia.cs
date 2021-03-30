@@ -1,4 +1,4 @@
-﻿using GrKouk.Erp.Domain.Shared;
+﻿using GrKouk.Erp.Domain.MainEntities.Warehouse;
 
 namespace GrKouk.Erp.Domain.MediaEntities
 {

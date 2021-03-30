@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using GrKouk.Erp.Definitions;
-using GrKouk.Erp.Domain.DocDefinitions;
+using GrKouk.Erp.Domain.BuyDocDefinitions;
 using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
@@ -36,7 +36,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.BuyDocTypeDefinition
           
             var usedPriceTypeList = Enum.GetValues(typeof(PriceTypeEnum))
                 .Cast<PriceTypeEnum>()
-                .Select(c => new UISelectTypeItem()
+                .Select(c => new UiSelectTypeItem()
                 {
                     Value = ((int)c).ToString(),
                     ValueInt = (int)c,
@@ -47,7 +47,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.BuyDocTypeDefinition
 
             var warehouseItemNaturesList = Enum.GetValues(typeof(WarehouseItemNatureEnum))
                 .Cast<WarehouseItemNatureEnum>()
-                .Select(c => new UISelectTypeItem()
+                .Select(c => new UiSelectTypeItem()
                 {
                     ValueInt = (int)c,
                     Title = c.GetDescription()

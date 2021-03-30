@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.DocDefinitions;
+using GrKouk.Erp.Domain.MainEntities.Transactors;
 using GrKouk.Erp.Domain.Shared;
 
 namespace GrKouk.Erp.Domain.RecurringTransactions

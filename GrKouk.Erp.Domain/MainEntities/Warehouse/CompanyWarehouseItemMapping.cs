@@ -1,4 +1,6 @@
-﻿namespace GrKouk.Erp.Domain.Shared
+﻿using GrKouk.Erp.Domain.Shared;
+
+namespace GrKouk.Erp.Domain.MainEntities.Warehouse
 {
     public class CompanyWarehouseItemMapping
     {

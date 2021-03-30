@@ -1,13 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using GrKouk.Erp.Definitions;
+using GrKouk.Erp.Domain.DocDefinitions;
 using GrKouk.Erp.Domain.Shared;
 
-namespace GrKouk.Erp.Domain.DocDefinitions
+namespace GrKouk.Erp.Domain.SellDocDefinitions
 {
-    /// <summary>
-    /// Τύπος παραστατικού αγορών
-    /// </summary>
-    public class BuyDocTypeDef
+    public class SellDocTypeDef
     {
         public int Id { get; set; }
 
@@ -26,9 +24,7 @@ namespace GrKouk.Erp.Domain.DocDefinitions
         [Display(Name = "Ενεργό")]
         public bool Active { get; set; }
 
-        //[Display(Name = "Κίνηση Προμηθευτή")]
-        //public int? TransSupplierDefId { get; set; }
-        //public TransSupplierDef TransSupplierDef { get; set; }
+       
         [Display(Name = "Κίνηση Συναλ/νου")]
         public int? TransTransactorDefId { get; set; }
         public TransTransactorDef TransTransactorDef { get; set; }
