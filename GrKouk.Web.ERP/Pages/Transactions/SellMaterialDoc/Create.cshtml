@@ -75,7 +75,7 @@
             <input type="hidden" id="LineEditing" />
             <input type="hidden" id="LookupValueValid" />
             <div class="row mb-3">
-                <div class="col-md-3 col-lg-3">
+                <div class="col-md-2 col-lg-3">
                     <div class="form-floating">
                         <input asp-for="ItemVm.TransDate" class="form-control form-control-sm" autofocus />
                         <label asp-for="ItemVm.TransDate" class="form-label small"></label>
@@ -95,7 +95,7 @@
                         <span asp-validation-for="ItemVm.TransRefCode" class="text-danger"></span>
                     </div>
                 </div>
-                <div class="col-md-2 col-lg-2">
+                <div class="col-md-3 col-lg-2">
                     <div class="form-floating">
                         <select asp-for="ItemVm.SalesChannelId" class="form-select form-select-sm" asp-items="ViewBag.SalesChannelId"></select>
                         <label asp-for="ItemVm.SalesChannelId" class="form-label small"></label>
@@ -420,9 +420,7 @@
 
 </div>
 
-<div>
-    <a asp-page="Index">Back to List</a>
-</div>
+
 <!-- Modal Image Viewer -->
 <div class="modal fade" id="imageViewer" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
     <div class="modal-dialog " role="document">
@@ -828,6 +826,7 @@
                         .catch((error) => {
                             console.log("Error getting company base currency");
                             console.log(error);
+                            toastr.error(error.statusText, "Error");
                         });
                 }
             };
@@ -851,84 +850,85 @@
                     }
                 });
             };
-                    var seriesChanged = () => {
-                        console.log("Inside Series Changed");
-                        //test
-                        var seriesId = $transDocSeriesId.val();
-                        //var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
-                        var finalUri = `/api/materials/SalesSeriesData?seriesId=${seriesId}`;
-                        fetch(finalUri)
-                            .then(function(response) {
-                                if (response.ok) {
-                                    return response.json();
-                                } else {
-                                    return "-1";
-                                }
-
-                            })
-                            .then(function(myJson) {
-                                console.log("Inside fetch then with myJson" + JSON.stringify(myJson));
-                                if (myJson) {
-
-                                    var usedPrice = myJson.usedPrice;
-                                    console.log("Returned usedPrice=" + usedPrice);
-                                    $seriesUsedPrice.val(usedPrice);
-
-                                }
-                                // $spinner.attr('hidden', true);
-                            })
-                            .catch((error) => {
-                                    // $spinner.attr('hidden', true);
-                                    console.log(error);
-                                }
-                            );
-                    };
-
-                    var setupUnitToUse = (e) => {
-                        switch (e) {
-                        case 'MAIN':
-                            $q1.prop('disabled', false);
-                            $q2.prop('disabled' , true);
-                            break;
-                        case 'SEC':
-                            $q1.prop('disabled', true);
-                            $q2.prop('disabled' , false);
-                            break;
-                        case 'BUY':
-                            $q1.prop('disabled', true);
-                            $q2.prop('disabled' , false);
-                            break;
-
-                        default:
-                            $q1.prop('disabled', false);
-                            $q2.prop('disabled', false);
-                            break;
+            var seriesChanged = () => {
+                console.log("Inside Series Changed");
+                //test
+                var seriesId = $transDocSeriesId.val();
+                //var uri = '@Configuration.GetSection("WebApiSettings")["WebApiLocal"]';
+                var finalUri = `/api/materials/SalesSeriesData?seriesId=${seriesId}`;
+                fetch(finalUri)
+                    .then(function(response) {
+                        if (response.ok) {
+                            return response.json();
+                        } else {
+                            return "-1";
                         }
-                    };
-                    var initValUnitToUse = (e) => {
-                        switch (e) {
-                        case 'MAIN':
-                            $q1.val(1);
-                            q1Changed();
-                            $q1.focus();
-                            break;
-                        case 'SEC':
-                            $q2.val(1);
-                            q2Changed();
-                            $q2.focus();
-                            break;
-                        case 'BUY':
-                            $q2.val(1);
-                            q2Changed();
-                            $q2.focus();
-                            break;
 
-                        default:
-                            $q1.val(1);
-                            q1Changed();
-                            break;
+                    })
+                    .then(function(myJson) {
+                        console.log("Inside fetch then with myJson" + JSON.stringify(myJson));
+                        if (myJson) {
+
+                            var usedPrice = myJson.usedPrice;
+                            console.log("Returned usedPrice=" + usedPrice);
+                            $seriesUsedPrice.val(usedPrice);
+
                         }
-                    };
+                        // $spinner.attr('hidden', true);
+                    })
+                    .catch((error) => {
+                            // $spinner.attr('hidden', true);
+                        console.log(error);
+                         toastr.error(error.statusText, "Error");
+                        }
+                    );
+            };
+
+            var setupUnitToUse = (e) => {
+                switch (e) {
+                case 'MAIN':
+                    $q1.prop('disabled', false);
+                    $q2.prop('disabled' , true);
+                    break;
+                case 'SEC':
+                    $q1.prop('disabled', true);
+                    $q2.prop('disabled' , false);
+                    break;
+                case 'BUY':
+                    $q1.prop('disabled', true);
+                    $q2.prop('disabled' , false);
+                    break;
+
+                default:
+                    $q1.prop('disabled', false);
+                    $q2.prop('disabled', false);
+                    break;
+                }
+            };
+            var initValUnitToUse = (e) => {
+                switch (e) {
+                case 'MAIN':
+                    $q1.val(1);
+                    q1Changed();
+                    $q1.focus();
+                    break;
+                case 'SEC':
+                    $q2.val(1);
+                    q2Changed();
+                    $q2.focus();
+                    break;
+                case 'BUY':
+                    $q2.val(1);
+                    q2Changed();
+                    $q2.focus();
+                    break;
+
+                default:
+                    $q1.val(1);
+                    q1Changed();
+                    break;
+                }
+            };
             const getUnitTypeName = (unitType) => {
                 let unitTypeName = "";
 
@@ -1356,6 +1356,7 @@
                 $transUnitFactor.val('');
                 $factor.val('');
                 $transUnitSelector.empty();
+                $transQuantity.val("");
             }
 
             $(document).on('click','a.deleteItem',function(e) {
