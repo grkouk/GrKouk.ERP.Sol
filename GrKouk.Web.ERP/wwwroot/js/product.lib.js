@@ -58,6 +58,47 @@
             });
         });
     };
+    const makeAjaxCallGet = (uri) => {
+        var timeout;
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                type: "GET",
+                url: uri,
+
+                success: function (data) {
+                    resolve(data);
+                },
+                error: function (error) {
+                    reject(error);
+                },
+                beforeSend: function () {
+                    if (timeout) {
+                        clearTimeout(timeout);
+                    }
+                    timeout = setTimeout(function () {
+                        //spinnerLoaderShow($SpElement);
+                    }, 1000);
+                },
+                complete: function () {
+                    if (timeout) {
+                        clearTimeout(timeout);
+                    }
+                    //spinnerLoaderHide($SpElement);
+                    setTimeout(function () {
+                        /*
+                        var isOpen = spinnerLoaderIsVisible($SpElement);
+                        if (isOpen) {
+                            spinnerLoaderHide($SpElement);
+                        }
+                        */
+                         
+                    }, 2000);
+                },
+            });
+        });
+    };
     const getProductItemInfo = (itemId, transactorId, companyId) => {
         let uri = "/api/materials/productdata";
         uri += `?warehouseItemId=${itemId}`;
@@ -337,6 +378,8 @@
         prepNumericInputs: prepNumericInputs,
         setGlobalizeLocale: setGlobalizeLocale,
         setParsers: setParsers,
-        setFormatters: setFormatters
+        setFormatters: setFormatters,
+        //For testing purposes
+        makeAjaxCallGet:makeAjaxCallGet
     };
 })();

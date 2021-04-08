@@ -81,4 +81,23 @@ namespace GrKouk.Web.ERP.Helpers
         public string DateRange { get; set; }
     }
 
+    public class AutoCompleteDataManagerRequest : DataManagerRequest
+    {
+      
+        [JsonProperty(PropertyName = "searchMode", Required = Required.Default)]
+        public int SearchMode { get; set; }
+        [JsonProperty(PropertyName = "searchTerm", Required = Required.Default)]
+        public string SearchTerm { get; set; }
+        [JsonProperty(PropertyName = "companyId", Required = Required.Default)]
+        public int CompanyId { get; set; }
+        [JsonProperty(PropertyName = "seriesId", Required = Required.Default)]
+        public int SeriesId { get; set; }
+    }
+
+    public class Ej2AutoCompleteItem
+    {
+        public int Value { get; set; }
+        public string Text { get; set; }
+        public string ImgUrl { get; set; }
+    }
 }
