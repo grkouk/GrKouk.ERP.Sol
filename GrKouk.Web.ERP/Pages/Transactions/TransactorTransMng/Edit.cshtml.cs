@@ -25,6 +25,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
         private readonly IToastNotification _toastNotification;
         public bool NotUpdatable;
         public bool InitialLoad = true;
+        public int EntityInTransactionId { get; set; }
         public EditModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification) {
             _context = context;
             _mapper = mapper;
@@ -51,6 +52,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                 return NotFound();
             }
 
+            EntityInTransactionId = transactionToModify.TransactorId;
             var section = _context.Sections.SingleOrDefault(s => s.SystemName == _sectionCode);
             if (section is null) {
                 _toastNotification.AddAlertToastMessage("Supplier Transactions section not found in DB");

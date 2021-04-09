@@ -35,6 +35,7 @@
             <input type="hidden" asp-for="ItemVm.Id" />
             <input type="hidden" asp-for="ItemVm.Timestamp" />
             <input type="hidden" asp-for="ItemVm.SectionId" />
+            <input type="hidden" asp-for="@Model.EntityInTransactionId" id="cfaId"/>
             <input type="hidden" asp-for="ItemVm.TransTransactorDocTypeId" />
             <input type="hidden" asp-for="@Model.InitialLoad" id="IsInitialLoad" />
             <div class="row mb-3">
@@ -183,6 +184,7 @@
             const $transactorListEl = $('#ItemVm_TransactorId');
             var transactorsListJs = @Html.Raw(Json.Serialize(ViewBag.transactorsListJs));
             var allowedTypesListJs = @Html.Raw(Json.Serialize(ViewBag.docTypeAllowedTransactorTypesListJs));
+            const $cfaId = $('#cfaId');
 
             const calculateAmounts = () => {
                console.log("Calculate Values called");
@@ -198,6 +200,7 @@
 
 
             const docSeriesChanged=()=>{
+                let cfaId = $cfaId.val();
                const docSeriesId=$('#ItemVm_TransTransactorDocSeriesId').val();
                //locate inside list selected docseriesid
                let a = allowedTypesListJs.find(o=>o.docSeriesId==docSeriesId);
@@ -229,7 +232,7 @@
                       $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
                   });
                }
-
+               $transactorListEl.val(cfaId);
             };
             const companyChanged = () => {
                 let companyId = parseInt($companyId.val());
@@ -278,9 +281,15 @@
             };
             $docSeriesEl.change((e)=> {
                 console.log(e);
+                let cfaId = $cfaId.val();
+               
                 docSeriesChanged();
+                $transactorListEl.val(cfaId);
             });
-
+            $transactorListEl.change((e) => {
+                let newId = $transactorListEl.val();
+                $cfaId.val(newId);
+            });
             let selectTransactor=0;
             setupEventManagers();
             docSeriesChanged();
