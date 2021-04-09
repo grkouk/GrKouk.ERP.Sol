@@ -191,22 +191,13 @@
     <script>
        
         $(document).ready(function () {
-
-            var $initialLoad = $('#IsInitialLoad');
-
-            //if (!$initialLoad.val()) return;
-            //var $amountDic = $('#ItemVm_AmountDiscount');
-            //var $fpaRate = $('#ItemVm_FpaRate');
-            //var $amountSum = $('#ItemVm_AmountSum');
-            //var $amountFpa = $('#ItemVm_AmountFpa');
-            //var $amountNet = $('#ItemVm_AmountNet');
-            //var fiscalPeriodDom = document.getElementById("ItemVm_FiscalPeriodId");
+            
             var $transDate = $('#ItemVm_TransDate');
-            var _amountNet = document.getElementById("AmountNet").ej2_instances[0];
-            var _amountFpa = document.getElementById("AmountFpa").ej2_instances[0];
-            var _amountDic = document.getElementById("AmountDiscount").ej2_instances[0];
-            var _fpaRate = document.getElementById("fpaRate").ej2_instances[0];
-            var _amountSum = document.getElementById("ItemVm_AmountSum").ej2_instances[0];
+            var amountNetEl = document.getElementById("AmountNet").ej2_instances[0];
+            var amountFpaEl = document.getElementById("AmountFpa").ej2_instances[0];
+            var amountDicEl = document.getElementById("AmountDiscount").ej2_instances[0];
+            var fpaRateEl = document.getElementById("fpaRate").ej2_instances[0];
+            var amountSumEl = document.getElementById("ItemVm_AmountSum").ej2_instances[0];
             var $cfAccountId = $('#ItemVm_CfAccountId');
             
             const $docSeriesEl=$('#ItemVm_TransTransactorDocSeriesId');
@@ -219,13 +210,13 @@
             const $copyFromTransactorId = $('#CopyFromTransactorId');
             var calculateAmounts = () => {
                 console.log("Calculate Values called");
-                var fpaRate = _fpaRate.value;
-                var amountNet = _amountNet.value;
-                var amountDic = _amountDic.value;
+                var fpaRate = fpaRateEl.value;
+                var amountNet = amountNetEl.value;
+                var amountDic = amountDicEl.value;
                 var amountForFpa = amountNet - amountDic;
                 var amountFpa = amountForFpa * fpaRate;
-                _amountFpa.value=amountFpa;
-                _amountSum.value=amountNet + amountFpa - amountDic;
+                amountFpaEl.value=amountFpa;
+                amountSumEl.value=amountNet + amountFpa - amountDic;
                
             };
 
@@ -310,13 +301,13 @@
             const setupEventManagers = () => {
 
                
-                _fpaRate.addEventListener("change",(event) => {
+                fpaRateEl.addEventListener("change",(event) => {
                     calculateAmounts();
                 });
-                _amountNet.addEventListener("change", (event) => {
+                amountNetEl.addEventListener("change", (event) => {
                     calculateAmounts();
                 });
-                _amountDic.addEventListener("change", (event) => {
+                amountDicEl.addEventListener("change", (event) => {
                     calculateAmounts();
                 });
                 //_amountFpa.addEventListener("change", (event) => {
@@ -334,10 +325,10 @@
             var copyFromId =parseInt( $('#CopyFromId').val());
             let selectTransactor=0;
             if (copyFromId===0) {
-                _fpaRate.value=0;
-                _amountDic.value=0;
-                _amountFpa.value=0;
-                _amountNet.value=0;
+                fpaRateEl.value=0;
+                amountDicEl.value=0;
+                amountFpaEl.value=0;
+                amountNetEl.value=0;
                 $transDate.val(new Date().toISOString().slice(0, 10));
 
             } else {
