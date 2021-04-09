@@ -1,5 +1,6 @@
 ﻿var productLib = (function () {
     let numberFormatter;
+    let percentFormatter;
     let currencyFormatter;
     let numberParser;
 
@@ -367,7 +368,46 @@
 
         });
     };
+    const setLanguageLocale = (culture, currencyCode, ejLoader) => {
+        return new Promise((resolve, reject) => {
+            $.when(
+                    $.get("/lib/cldr-data/supplemental/likelySubtags.json"),
+                    $.get("/lib/cldr-data/main/" + culture + "/numbers.json"),
+                    $.get("/lib/cldr-data/main/" + culture + "/currencies.json"),
+                    $.get("/lib/cldr-data/supplemental/numberingSystems.json"),
+                    $.get("/lib/cldr-data/main/" + culture + "/ca-gregorian.json"),
+                    $.get("/lib/cldr-data/main/" + culture + "/timeZoneNames.json"),
+                    $.get("/lib/cldr-data/supplemental/timeData.json"),
+                    $.get("/lib/cldr-data/supplemental/currencyData.json"),
+                    $.get("/lib/cldr-data/supplemental/weekData.json")
+                ).then(function () {
+                    // Normalize $.get results, we only need the JSON, not the request statuses.
+                    return [].slice.apply(arguments, [0]).map(function (result) {
+                        return result[0];
+                    });
+                }).then(function (data) {
+                    console.log(data);
+                    console.log(arguments);
 
+                    Globalize.load(data);
+                    for (let i = 0; i < data.length; i++) {
+                        const element = data[i];
+                        ejLoader(element);
+                    }
+                })
+
+                .then(function () {
+                    console.log("Globalize culture loaded " + culture);
+                    Globalize.locale(culture);
+                    numberParser = Globalize.numberParser();
+                    numberFormatter = Globalize.numberFormatter();
+                    //percentFormatter = Globalize.numberFormatter({ style: "percent" });
+                    //currencyFormatter = Globalize.currencyFormatter(currencyCode);
+                    resolve();
+
+                });
+        });
+    };
     return {
         getProductItemInfo: getProductItemInfo,
         setCompanyIdInSession: setCompanyIdInSession,
@@ -377,6 +417,7 @@
         prepCurrencyInputs: prepCurrencyInputs,
         prepNumericInputs: prepNumericInputs,
         setGlobalizeLocale: setGlobalizeLocale,
+        setLanguageLocale: setLanguageLocale,
         setParsers: setParsers,
         setFormatters: setFormatters,
         //For testing purposes

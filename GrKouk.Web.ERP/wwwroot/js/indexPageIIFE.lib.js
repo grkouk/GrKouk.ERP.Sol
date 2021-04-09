@@ -295,7 +295,13 @@
     const setupCreateNewElement = () => {
         let el = document.getElementById("CreateNew");
         if (el) {
-            el.href = `${window.location.href}/Create`;
+            let curLocation = window.location.href;
+            let srcTerm = "/Create";
+            let hRefToAssign = window.location.href;
+            if (!curLocation.endsWith(srcTerm)) {
+                hRefToAssign=`${window.location.href}/Create`;
+            }
+            el.href = hRefToAssign;
         }
 
     };
