@@ -3,7 +3,8 @@
 @using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
 @{
-    ViewData["Title"] = "Edit";
+    Layout = "_LayoutEntryFormTransaction";
+    ViewData["Title"] = "Edit Transactor Transaction";
     var formDisabled = Model.NotUpdatable ? "disabled" : "";
 }
 @section MyCss
@@ -80,94 +81,52 @@
                     </div>
                 </div>
             </div>
- <div class="row mb-3">
-            <div class="col-md-1">
+            <div class="row mb-3">
+                <div class="col-md-1">
 
-                <ejs-numerictextbox id="fpaRate" placeholder="VAT Rate" format="p2" showSpinButton="false"
-                                    ejs-for="@Model.ItemVm.FpaRate" floatLabelType="Auto"></ejs-numerictextbox>
-                <span asp-validation-for="ItemVm.FpaRate" class="text-danger"></span>
-            </div>
-            <div class="col-md-3">
-                <ejs-numerictextbox id="AmountNet" placeholder="Net Amount" format="c2" showSpinButton="false"
-                                    ejs-for="@Model.ItemVm.AmountNet" floatLabelType="Auto"></ejs-numerictextbox>
-                <div class="invalid-feedback">
-                    <span asp-validation-for="ItemVm.AmountNet" class="text-danger"></span>
+                    <ejs-numerictextbox id="fpaRate" placeholder="VAT Rate" format="p2" showSpinButton="false"
+                                        ejs-for="@Model.ItemVm.FpaRate" floatLabelType="Auto"></ejs-numerictextbox>
+                    <span asp-validation-for="ItemVm.FpaRate" class="text-danger"></span>
                 </div>
+                <div class="col-md-3">
+                    <ejs-numerictextbox id="AmountNet" placeholder="Net Amount" format="c2" showSpinButton="false"
+                                        ejs-for="@Model.ItemVm.AmountNet" floatLabelType="Auto"></ejs-numerictextbox>
+                    <div class="invalid-feedback">
+                        <span asp-validation-for="ItemVm.AmountNet" class="text-danger"></span>
+                    </div>
 
-            </div>
-            <div class="col-md-2">
-
-                <ejs-numerictextbox id="AmountFpa" placeholder="VAT Amount" format="c2" showSpinButton="false" 
-                                    readonly="true" created="onCreate"
-                                    
-                                    ejs-for="@Model.ItemVm.AmountFpa" floatLabelType="Auto"></ejs-numerictextbox>
-
-                <div class="invalid-feedback">
-                    <span asp-validation-for="ItemVm.AmountFpa" class="text-danger"></span>
                 </div>
+                <div class="col-md-2">
 
-            </div>
-            <div class="col-md-2">
+                    <ejs-numerictextbox id="AmountFpa" placeholder="VAT Amount" format="c2" showSpinButton="false"
+                                        readonly="true" created="onCreate"
+                                        ejs-for="@Model.ItemVm.AmountFpa" floatLabelType="Auto"></ejs-numerictextbox>
 
-                <ejs-numerictextbox id="AmountDiscount" placeholder="Discount Amount" format="c2" showSpinButton="false"
-                                    ejs-for="@Model.ItemVm.AmountDiscount" floatLabelType="Auto"></ejs-numerictextbox>
+                    <div class="invalid-feedback">
+                        <span asp-validation-for="ItemVm.AmountFpa" class="text-danger"></span>
+                    </div>
 
-                <div class="invalid-feedback">
-                    <span asp-validation-for="ItemVm.AmountDiscount" class="text-danger"></span>
                 </div>
+                <div class="col-md-2">
 
+                    <ejs-numerictextbox id="AmountDiscount" placeholder="Discount Amount" format="c2" showSpinButton="false"
+                                        ejs-for="@Model.ItemVm.AmountDiscount" floatLabelType="Auto"></ejs-numerictextbox>
+
+                    <div class="invalid-feedback">
+                        <span asp-validation-for="ItemVm.AmountDiscount" class="text-danger"></span>
+                    </div>
+
+                </div>
+                <div class="col-md-2">
+
+                    <ejs-numerictextbox id="ItemVm_AmountSum" readonly="true" placeholder="Net Amount" format="c2"
+                                        showSpinButton="false" created="onCreate"
+                                        ejs-for="@Model.ItemVm.AmountSum" floatLabelType="Auto"></ejs-numerictextbox>
+
+
+                </div>
             </div>
-            <div class="col-md-2">
 
-                <ejs-numerictextbox id="ItemVm_AmountSum" readonly="true" placeholder="Net Amount" format="c2" 
-                                    showSpinButton="false" created="onCreate"
-                                    ejs-for="@Model.ItemVm.AmountSum" floatLabelType="Auto"></ejs-numerictextbox>
-
-
-            </div>
-        </div>
-            @* <div class="row mb-3"> *@
-            @*     <div class="col-md-1"> *@
-            @*         <div class="form-floating"> *@
-            @*             <input asp-for="ItemVm.FpaRate" class="form-control form-control-sm" placeholder="VAT Percent" /> *@
-            @*             <label asp-for="ItemVm.FpaRate" class="form-label small"></label> *@
-            @*             <span asp-validation-for="ItemVm.FpaRate" class="text-danger"></span> *@
-            @*         </div> *@
-            @*     </div> *@
-            @*     <div class="col-md-3"> *@
-            @*         <div class="form-floating"> *@
-            @*             <input asp-for="ItemVm.AmountNet" class="form-control form-control-sm" placeholder="Net Value" /> *@
-            @*             <label asp-for="ItemVm.AmountNet" class="form-label small"></label> *@
-            @*             <div class="invalid-feedback"> *@
-            @*                 <span asp-validation-for="ItemVm.AmountNet" class="text-danger"></span> *@
-            @*             </div> *@
-            @*         </div> *@
-            @*     </div> *@
-            @*     <div class="col-md-2"> *@
-            @*         <div class="form-floating"> *@
-            @*             <input asp-for="ItemVm.AmountFpa" class="form-control form-control-sm" placeholder="VAT Amount" /> *@
-            @*             <label asp-for="ItemVm.AmountFpa" class="form-label small"></label> *@
-            @*             <div class="invalid-feedback"> *@
-            @*                 <span asp-validation-for="ItemVm.AmountFpa" class="text-danger"></span> *@
-            @*             </div> *@
-            @*         </div> *@
-            @*     </div> *@
-            @*     <div class="col-md-2"> *@
-            @*         <div class="form-floating"> *@
-            @*             <input asp-for="ItemVm.AmountDiscount" class="form-control form-control-sm" placeholder="Discount Amount" /> *@
-            @*             <label asp-for="ItemVm.AmountDiscount" class="form-label small"></label> *@
-            @*             <div class="invalid-feedback"> *@
-            @*                 <span asp-validation-for="ItemVm.AmountDiscount" class="text-danger"></span> *@
-            @*             </div> *@
-            @*         </div> *@
-            @*     </div> *@
-            @*     <div class="col-md-2"> *@
-            @*         <div class="form-floating"> *@
-            @*             <input asp-for="ItemVm.AmountSum" class="form-control form-control-sm" disabled /> *@
-            @*             <label asp-for="ItemVm.AmountSum" class="form-label small">Sum</label> *@
-            @*         </div> *@
-            @*     </div> *@
-            @* </div> *@
             <div class="row mb-3">
                 <div class="col-md-12">
                     <div class="form-floating">
@@ -194,16 +153,17 @@
 <partial name="_LoadMePartial" />
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsStrippedPartial");}
-     <!--Begin syncfusion integration-->
-        <script>
-            //I have to define this function here otherwise there is an error 
-            function onCreate() {
-                this.element.setAttribute("tabindex", "-1");
-            }
-        </script>
-        <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
-        <ejs-scripts></ejs-scripts>
-        <!--End syncfusion integration-->
+    <!--Begin syncfusion integration-->
+    <script>
+        //I have to define this function here otherwise there is an error
+        function onCreate() {
+            this.element.setAttribute("tabindex", "-1");
+        }
+    </script>
+    <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+    <!--End syncfusion integration-->
+    <script src="~/js/product.lib.js"></script>
     <script>
         $(document).ready(function () {
 
@@ -225,16 +185,16 @@
             var allowedTypesListJs = @Html.Raw(Json.Serialize(ViewBag.docTypeAllowedTransactorTypesListJs));
 
             const calculateAmounts = () => {
-                           console.log("Calculate Values called");
-                           var fpaRate = fpaRateEl.value;
-                           var amountNet = amountNetEl.value;
-                           var amountDic = amountDicEl.value;
-                           var amountForFpa = amountNet - amountDic;
-                           var amountFpa = amountForFpa * fpaRate;
-                           amountFpaEl.value=amountFpa;
-                           amountSumEl.value=amountNet + amountFpa - amountDic;
-                          
-                       };
+               console.log("Calculate Values called");
+               var fpaRate = fpaRateEl.value;
+               var amountNet = amountNetEl.value;
+               var amountDic = amountDicEl.value;
+               var amountForFpa = amountNet - amountDic;
+               var amountFpa = amountForFpa * fpaRate;
+               amountFpaEl.value=amountFpa;
+               amountSumEl.value=amountNet + amountFpa - amountDic;
+
+            };
 
 
             const docSeriesChanged=()=>{
@@ -259,7 +219,7 @@
                         $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
                      });
                    }
-                  
+
 
                } else {
                    console.log('Not Found');
@@ -272,66 +232,60 @@
 
             };
             const companyChanged = () => {
-                            let companyId = parseInt($companyId.val());
-                            if (isNaN(companyId)) {
-                                companyId = 0;
-                            }
-                            if (companyId > 0) {
-                               
-                                let loader = ej.base.loadCldr;
-                                productLib.getCompanyBaseCurrencyInfo(companyId, $spinnerElement)
-                                    .then((data) => {
-                                        let currencyCode = data.currencyCode;
-                                        let locale = data.currencyLocale.substring(0, 2);
-                                        productLib.setLanguageLocale(locale,currencyCode,loader)
-                                            .then(() => {
-                                                ej.base.setCulture(locale);
-                                                ej.base.setCurrencyCode(currencyCode);
-                                                $docCurrency.text(currencyCode);
-                                            })
-                                            .catch((error) => {
-                                                console.log("Error setting Globalize locale");
-                                                console.log(error);
-                                            });
-            
-            
-                                    })
-                                    .catch((error) => {
-                                        console.log("Error getting company base currency");
-                                        console.log(error);
-                                    });
-                            }
-                        };
-                        const setupEventManagers = () => {
-            
-                           
-                            fpaRateEl.addEventListener("change",(event) => {
-                                calculateAmounts();
-                            });
-                            amountNetEl.addEventListener("change", (event) => {
-                                calculateAmounts();
-                            });
-                            amountDicEl.addEventListener("change", (event) => {
-                                calculateAmounts();
-                            });
-                            
-                        };
+                let companyId = parseInt($companyId.val());
+                if (isNaN(companyId)) {
+                    companyId = 0;
+                }
+                if (companyId > 0) {
+
+                    let loader = ej.base.loadCldr;
+                    productLib.getCompanyBaseCurrencyInfo(companyId, $spinnerElement)
+                        .then((data) => {
+                            let currencyCode = data.currencyCode;
+                            let locale = data.currencyLocale.substring(0, 2);
+                            productLib.setLanguageLocale(locale,currencyCode,loader)
+                                .then(() => {
+                                    ej.base.setCulture(locale);
+                                    ej.base.setCurrencyCode(currencyCode);
+                                    $docCurrency.text(currencyCode);
+                                })
+                                .catch((error) => {
+                                    console.log("Error setting Globalize locale");
+                                    console.log(error);
+                                });
+
+
+                        })
+                        .catch((error) => {
+                            console.log("Error getting company base currency");
+                            console.log(error);
+                        });
+                }
+            };
+            const setupEventManagers = () => {
+
+
+                fpaRateEl.addEventListener("change",(event) => {
+                    calculateAmounts();
+                });
+                amountNetEl.addEventListener("change", (event) => {
+                    calculateAmounts();
+                });
+                amountDicEl.addEventListener("change", (event) => {
+                    calculateAmounts();
+                });
+
+            };
             $docSeriesEl.change((e)=> {
                 console.log(e);
                 docSeriesChanged();
             });
-            $transDate.change(() => {
-                //transactionDataChanged();
-            });
-           
 
             let selectTransactor=0;
-
-            $initialLoad.val(false);
+            setupEventManagers();
             docSeriesChanged();
-            //if (selectTransactor!==0) {
-            //    $('#ItemVm_TransactorId').val(selectTransactor);
-            //}
+            companyChanged();
+
         });
 
 
