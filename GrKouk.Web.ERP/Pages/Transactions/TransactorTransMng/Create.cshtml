@@ -1,6 +1,7 @@
 ﻿@page
 @model CreateModel
 @using Microsoft.Extensions.Configuration
+@using Microsoft.EntityFrameworkCore.Metadata.Internal
 @inject IConfiguration Configuration
 @{
     Layout = "_LayoutEntryFormTransaction";
@@ -81,7 +82,9 @@
             </div>
             <div class="col-md-2">
 
-                <ejs-numerictextbox id="AmountFpa" placeholder="VAT Amount" format="c2" showSpinButton="false" readonly="true"
+                <ejs-numerictextbox id="AmountFpa" placeholder="VAT Amount" format="c2" showSpinButton="false" 
+                                    readonly="true" created="onCreate"
+                                    
                                     ejs-for="@Model.ItemVm.AmountFpa" floatLabelType="Auto"></ejs-numerictextbox>
 
                 <div class="invalid-feedback">
@@ -101,7 +104,9 @@
             </div>
             <div class="col-md-2">
 
-                <ejs-numerictextbox id="ItemVm_AmountSum" readonly="true" placeholder="Net Amount" format="c2" showSpinButton="false" ejs-for="@Model.ItemVm.AmountSum" floatLabelType="Auto"></ejs-numerictextbox>
+                <ejs-numerictextbox id="ItemVm_AmountSum" readonly="true" placeholder="Net Amount" format="c2" 
+                                    showSpinButton="false" created="onCreate"
+                                    ejs-for="@Model.ItemVm.AmountSum" floatLabelType="Auto"></ejs-numerictextbox>
 
 
             </div>
@@ -173,11 +178,18 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsStrippedPartial");}
     <!--Begin syncfusion integration-->
+    <script>
+        //I have to define this function here otherwise there is an error 
+        function onCreate() {
+            this.element.setAttribute("tabindex", "-1");
+        }
+    </script>
     <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
     <ejs-scripts></ejs-scripts>
     <!--End syncfusion integration-->
     <script src="~/js/product.lib.js"></script>
     <script>
+       
         $(document).ready(function () {
 
             var $initialLoad = $('#IsInitialLoad');
@@ -219,40 +231,40 @@
 
            
             const docSeriesChanged=()=>{
-               const docSeriesId=$('#ItemVm_TransTransactorDocSeriesId').val();
-               //locate inside list selected docseriesid
-               let a = allowedTypesListJs.find(o=>o.docSeriesId==docSeriesId);
-               if (a){
-                   console.log('Found');
-                   let allowed = JSON.parse(a.allowedTypes);
-                   if (allowed){
+                const docSeriesId=$('#ItemVm_TransTransactorDocSeriesId').val();
+                //locate inside list selected docseriesid
+                let a = allowedTypesListJs.find(o=>o.docSeriesId==docSeriesId);
+                if (a){
+                    console.log('Found');
+                    let allowed = JSON.parse(a.allowedTypes);
+                    if (allowed){
                         let  lst = transactorsListJs.filter(function(item){
-                                return allowed.indexOf(item.transactorTypeId) !== -1;
-                              });
-                         $transactorListEl.empty();
+                            return allowed.indexOf(item.transactorTypeId) !== -1;
+                        });
+                        $transactorListEl.empty();
 
                         $.each(lst, function(index, item) {
                             $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
                         });
-                   } else {
-                     $transactorListEl.empty();
-                     $.each(transactorsListJs, function(index, item) {
+                    } else {
+                        $transactorListEl.empty();
+                        $.each(transactorsListJs, function(index, item) {
+                            $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
+                        });
+                    }
+                    let cfaId = parseInt( a.defaultCfaId);
+                    if (cfaId!==NaN) {
+                        $cfAccountId.val(cfaId);
+                    }
+
+                } else {
+                    console.log('Not Found');
+                    $transactorListEl.empty();
+
+                    $.each(transactorsListJs, function(index, item) {
                         $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
-                     });
-                   }
-                   let cfaId = parseInt( a.defaultCfaId);
-                   if (cfaId!==NaN) {
-                       $cfAccountId.val(cfaId);
-                   }
-
-               } else {
-                   console.log('Not Found');
-                   $transactorListEl.empty();
-
-                  $.each(transactorsListJs, function(index, item) {
-                      $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
-                  });
-               }
+                    });
+                }
 
             };
             const companyChanged = () => {
@@ -275,10 +287,10 @@
                             productLib.setLanguageLocale(locale,currencyCode,loader)
                                 .then(() => {
                                    
-                                   // productLib.setParsers(parseNumber);
+                                    // productLib.setParsers(parseNumber);
                                     //productLib.setFormatters(formatNumber, formatCurrency);
-                                   ej.base.setCulture(locale);
-                                   ej.base.setCurrencyCode(currencyCode);
+                                    ej.base.setCulture(locale);
+                                    ej.base.setCurrencyCode(currencyCode);
                                     $docCurrency.text(currencyCode);
                                     //updateCurrencyFormat();
                                 })
@@ -296,6 +308,8 @@
                 }
             };
             const setupEventManagers = () => {
+
+               
                 _fpaRate.addEventListener("change",(event) => {
                     calculateAmounts();
                 });
@@ -319,21 +333,21 @@
             });
             var copyFromId =parseInt( $('#CopyFromId').val());
             let selectTransactor=0;
-             if (copyFromId===0) {
-                 _fpaRate.value=0;
-                 _amountDic.value=0;
-                 _amountFpa.value=0;
-                 _amountNet.value=0;
-                 $transDate.val(new Date().toISOString().slice(0, 10));
+            if (copyFromId===0) {
+                _fpaRate.value=0;
+                _amountDic.value=0;
+                _amountFpa.value=0;
+                _amountNet.value=0;
+                $transDate.val(new Date().toISOString().slice(0, 10));
 
             } else {
-                 $transDate.val(new Date().toISOString().slice(0, 10));
-                  selectTransactor = parseInt($copyFromTransactorId.val());
-             }
+                $transDate.val(new Date().toISOString().slice(0, 10));
+                selectTransactor = parseInt($copyFromTransactorId.val());
+            }
             setupEventManagers();
             console.log("After initial load check");
 
-            $initialLoad.val(false);
+            //$initialLoad.val(false);
             docSeriesChanged();
             companyChanged();
             if (selectTransactor!==0) {
