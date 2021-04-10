@@ -175,51 +175,28 @@
                 </div>
                 <div class="col-sm-3 col-md-1 col-lg-1 col-xl-1">
                     <ejs-numerictextbox id="transQuantity" placeholder="Quantity" format="n3" showSpinButton="false" floatLabelType="Auto"></ejs-numerictextbox>
-                    @*<div class="form-floating">
-                    <input class="form-control form-control-sm small input-doc-line text-end numeric-input" placeholder="Quantity" id="transQuantity" data-actualValue="0"/>
-                    <label class="form-label small" id="transQLabel">Quantity</label>
-                </div>*@
+                  
                     <div class="invalid-feedback">
                         Please enter a valid Quantity.
                     </div>
                 </div>
                 <div class="col-sm-3 col-md-1 col-lg-1 col-xl-1">
                     <ejs-numerictextbox id="PriceOnTransUnit" placeholder="Price" format="c2" showSpinButton="false" floatLabelType="Auto"></ejs-numerictextbox>
-                    @*<div class="form-floating">
-                    <div class="form-floating">
-                        <input class="form-control form-control-sm input-doc-line text-end currency-input" placeholder="Price" id="PriceOnTransUnit" data-actualValue="0"/>
-                        <label class="form-label small">Price </label>
-                    </div>
-                    <div class="invalid-feedback">
-                        Please enter a valid Price.
-                    </div>
-                </div>*@
+                  
                     <div class="invalid-feedback">
                         Please enter a valid Price.
                     </div>
                 </div>
                 <div class="col-sm-3 col-md-1 col-lg-1 col-xl-1">
                     <ejs-numerictextbox id="DiscountPercent" placeholder="Dis %" format="p2" showSpinButton="false" floatLabelType="Auto"></ejs-numerictextbox>
-                    @*<div class="form-floating">
-                    <input class="form-control form-control-sm small input-doc-line text-end numeric-input" placeholder="Dis %" id="Discount"/>
-                    <label class="form-label small">Dis% </label>
-                    <div class="invalid-feedback">
-                        Please enter a valid Discount.
-                    </div>
-                </div>*@
+                   
                     <div class="invalid-feedback">
                         Please enter a valid Discount.
                     </div>
                 </div>
                 <div class="col-sm-3 col-md-1 col-lg-1 col-xl-1">
                     <ejs-numerictextbox id="VatPercent" placeholder="Vat %" format="p2" showSpinButton="false" floatLabelType="Auto"></ejs-numerictextbox>
-                    @*<div class="form-floating">
-                    <input class="form-control form-control-sm small input-doc-line text-end numeric-input" placeholder="Vat%" id="VatPercent"/>
-                    <label class="form-label small">VAT% </label>
-                    <div class="invalid-feedback">
-                        Please enter a valid VAT.
-                    </div>
-                </div>*@
+                   
                     <div class="invalid-feedback">
                         Please enter a valid VAT.
                     </div>
@@ -372,8 +349,7 @@
                                                 $"<a data-itemId=\"0\" href=\"#\" class=\"modifyItem\"><i class=\"fas fa-edit\"></i></a></td>" +
                                                 $"<td class=\"small\">" +
                                                 $"<a data-itemId=\"0\" href=\"#\" class=\"deleteItem\"><i class=\"fas fa-trash\"></i></a></td></tr>";
-                                    @Html.Raw(tLine)
-                                    ;
+                                    @Html.Raw(tLine);
                                 }
                             }
 
@@ -452,18 +428,7 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade modal-topmost" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <div class="loader"></div>
-                <div>
-                    <p>Executing request. <br><small>Please wait...</small></p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<partial name="_LoadMePartial" />
 <partial name="_ItemSelector" />
 
 @section Scripts {
@@ -517,20 +482,13 @@
             var $amountFpa = $('#ItemVm_AmountFpa');
             var $amountDiscount = $('#ItemVm_AmountDiscount');
             var $amountSum = $('#DocumentSum');
-            var $q1Label = $('#q1Label');
-            var $q2Label = $('#q2Label');
-            //var $discount = $("#Discount");
             var $materialId = $('#MaterialId');
-            //var $vatPercent = $('#VatPercent');
             var $factor = $('#MaterialFactor');
             var $mainUnitId = $('#MaterialMainUnitId');
             var $secUnitId = $('#MaterialSecondaryUnitId');
             var $seekType = $('#SeekType');
             var $initialLoad = $('#IsInitialLoad');
-            //var $priceNetto = $('#MaterialNettoPrice');
-            //var $priceBrutto = $('#MaterialBruttoPrice');
             var $seriesUsedPrice = $('#SeriesUsedPrice');
-            //var $priceLabel = $('#priceLabel');
             var $transDocSeriesId = $('#ItemVm_SellDocSeriesId');
             var $companyId = $('#ItemVm_CompanyId');
             var $price = $("#Price");
@@ -540,10 +498,7 @@
             var $transUnitId = $('#TransactionUnitId');
             var $transUnitType = $('#TransactionUnitType');
             var $transUnitFactor = $('#TransactionUnitFactor');
-            //var $transQuantity = $('#transQuantity');
             var $transUnitSelector = $('#prodUnitSelector');
-            //var $transPrice = $('#PriceOnTransUnit');
-
             var $lineNetValue = $('#LineNetValue');
             var $lineVatValue = $('#LineVatValue');
             var $lineDiscValue = $('#LineDiscValue');
@@ -605,9 +560,6 @@
 
 
             var priceChanged = () => {
-
-                //var transPrice = parseFloat($transPrice.val());
-                //let transPriceAttr = $transPrice.attr('data-actualValue');
                 let transPrice = priceOnTransUnitEl.value;
 
                 if (isNaN(transPrice)) {
@@ -620,7 +572,7 @@
                 }
                 var priceNetValue = 0;
 
-                //let vatPercetAttr = $vatPercent.attr('data-actualValue');
+                
                 var vatPerc = vatPercentEl.value;
                 if (isNaN(vatPerc)) {
                     vatPerc = 0;
@@ -654,8 +606,6 @@
                     baseQuantity = 0;
                 }
                 var netVal = priceNetValue * baseQuantity;
-
-                //let discountAttr = $discount.attr('data-actualValue');
 
                 var discPercent =discountPercentEl.value;
                 if (isNaN(discPercent)) {
@@ -747,7 +697,7 @@
             };
             const setupEventManagers = () => {
 
-               
+
                 vatPercentEl.addEventListener("change",(event) => {
                     priceChanged();
                 });
@@ -870,9 +820,6 @@
             };
             const transactorChanged = () => {
                 const $transactorId = $('#ItemVm_TransactorId');
-
-                //sessionStorage.setItem('CompanyId', $companyId.val());
-                // console.log('transactorChanged transactorId=' + $transactorId.val());
                 return $.ajax({
                     contentType: 'application/json; charset=utf-8',
 
@@ -1214,7 +1161,7 @@
                 transQuantityChanged();
 
             });
-          
+
             $seekType.change(() => {
                 setSeekType();
             });
