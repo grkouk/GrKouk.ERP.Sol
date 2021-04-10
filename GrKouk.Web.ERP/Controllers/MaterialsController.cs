@@ -2444,7 +2444,7 @@ namespace GrKouk.Web.ERP.Controllers {
                 #endregion
 
                 var docSeries = await
-                    _context.SellDocSeriesDefs.AsNoTracking().SingleOrDefaultAsync(m => m.Id == data.SellDocSeriesId);
+                    _context.SellDocSeriesDefs.SingleOrDefaultAsync(m => m.Id == data.SellDocSeriesId);
 
                 if (docSeries is null) {
                     await transaction.RollbackAsync();
@@ -2510,7 +2510,7 @@ namespace GrKouk.Web.ERP.Controllers {
 
                 if (transTransactorDef.DefaultDocSeriesId > 0) {
                     var transTransactorDefaultSeries = await
-                        _context.TransTransactorDocSeriesDefs.AsNoTracking().FirstOrDefaultAsync(p =>
+                        _context.TransTransactorDocSeriesDefs.FirstOrDefaultAsync(p =>
                             p.Id == transTransactorDef.DefaultDocSeriesId);
                     if (transTransactorDefaultSeries == null) {
                         await transaction.RollbackAsync();
@@ -2549,7 +2549,7 @@ namespace GrKouk.Web.ERP.Controllers {
 
                 //Αυτόματη εξόφληση
                 var paymentMethod =
-                    await _context.PaymentMethods.AsNoTracking().FirstOrDefaultAsync(p => p.Id == transToAttach.PaymentMethodId);
+                    await _context.PaymentMethods.FirstOrDefaultAsync(p => p.Id == transToAttach.PaymentMethodId);
                 if (paymentMethod is null) {
                     await transaction.RollbackAsync();
                     ModelState.AddModelError(string.Empty, "Δεν βρέθηκε ο τρόπος πληρωμής");
@@ -2563,7 +2563,7 @@ namespace GrKouk.Web.ERP.Controllers {
                     var paymentCfAccountId = paymentMethod.CfAccountId;
                     if (autoPaySeriesId > 0) {
                         var transTransactorPayOffSeries = await
-                            _context.TransTransactorDocSeriesDefs.AsNoTracking().FirstOrDefaultAsync(p =>
+                            _context.TransTransactorDocSeriesDefs.FirstOrDefaultAsync(p =>
                                 p.Id == autoPaySeriesId);
                         if (transTransactorPayOffSeries == null) {
                             await transaction.RollbackAsync();
@@ -2574,7 +2574,6 @@ namespace GrKouk.Web.ERP.Controllers {
                         }
                         var transactor = await _context.Transactors
                             .Where(p => p.Id == data.TransactorId)
-                            .AsNoTracking()
                             .SingleOrDefaultAsync();
                         var sTransactorTransaction = _mapper.Map<TransactorTransaction>(data);
                         var transTransactorEtiology =
@@ -2705,7 +2704,6 @@ namespace GrKouk.Web.ERP.Controllers {
                 if (transWarehouseDef.DefaultDocSeriesId > 0) {
                     var transWarehouseDefaultSeries =
                         await _context.TransWarehouseDocSeriesDefs
-                            .AsNoTracking()
                             .FirstOrDefaultAsync(p =>
                             p.Id == transWarehouseDef.DefaultDocSeriesId);
                     if (transWarehouseDefaultSeries == null) {
@@ -2874,7 +2872,7 @@ namespace GrKouk.Web.ERP.Controllers {
                 #endregion
 
                 var docSeries = await
-                    _context.SellDocSeriesDefs.AsNoTracking().SingleOrDefaultAsync(m => m.Id == data.SellDocSeriesId);
+                    _context.SellDocSeriesDefs.SingleOrDefaultAsync(m => m.Id == data.SellDocSeriesId);
 
                 if (docSeries is null) {
                     await transaction.RollbackAsync();
@@ -2928,7 +2926,7 @@ namespace GrKouk.Web.ERP.Controllers {
                 //--------------------------------------
                 if (transTransactorDef.DefaultDocSeriesId > 0) {
                     var transTransactorDefaultSeries = await
-                        _context.TransTransactorDocSeriesDefs.AsNoTracking().FirstOrDefaultAsync(p =>
+                        _context.TransTransactorDocSeriesDefs.FirstOrDefaultAsync(p =>
                             p.Id == transTransactorDef.DefaultDocSeriesId);
                     if (transTransactorDefaultSeries == null) {
                         await transaction.RollbackAsync();
@@ -2959,7 +2957,6 @@ namespace GrKouk.Web.ERP.Controllers {
                 //Αυτόματη εξόφληση
                 var paymentMethod =
                     await _context.PaymentMethods
-                        .AsNoTracking()
                         .FirstOrDefaultAsync(p => p.Id == transToAttach.PaymentMethodId);
                 if (paymentMethod is null) {
                     await transaction.RollbackAsync();
@@ -2975,7 +2972,6 @@ namespace GrKouk.Web.ERP.Controllers {
                     if (autoPaySeriesId > 0) {
                         var transTransactorPayOffSeries = await
                             _context.TransTransactorDocSeriesDefs
-                                .AsNoTracking()
                                 .FirstOrDefaultAsync(p =>
                                 p.Id == autoPaySeriesId);
                         if (transTransactorPayOffSeries == null) {
@@ -2987,7 +2983,6 @@ namespace GrKouk.Web.ERP.Controllers {
                         }
                         var transactor = await _context.Transactors
                             .Where(p => p.Id == data.TransactorId)
-                            .AsNoTracking()
                             .SingleOrDefaultAsync();
                         var spTransactorCreateDto = _mapper.Map<TransactorTransCreateDto>(data);
                         var transTransactorEtiology =
@@ -3118,7 +3113,6 @@ namespace GrKouk.Web.ERP.Controllers {
                 if (transWarehouseDef.DefaultDocSeriesId > 0) {
                     var transWarehouseDefaultSeries =
                         await _context.TransWarehouseDocSeriesDefs
-                            .AsNoTracking()
                             .FirstOrDefaultAsync(p =>
                             p.Id == transWarehouseDef.DefaultDocSeriesId);
                     if (transWarehouseDefaultSeries == null) {

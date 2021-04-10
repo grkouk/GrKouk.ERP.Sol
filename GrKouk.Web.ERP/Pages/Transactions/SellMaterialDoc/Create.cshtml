@@ -66,6 +66,7 @@
             <input type="hidden" id="MaterialBruttoPrice" />
             <input type="hidden" id="MaterialFpaId" />
             <input type="hidden" id="MaterialMainUnitId" />
+            <input type="hidden" id="MaterialMainUnitCode" />
             <input type="hidden" id="MaterialSecondaryUnitId" />
             <input type="hidden" id="TransactionUnitId" />
             <input type="hidden" id="TransactionUnitCode" />
@@ -175,9 +176,9 @@
                 <div class="col-sm-3 col-md-1 col-lg-1 col-xl-1">
                     <ejs-numerictextbox id="transQuantity" placeholder="Quantity" format="n3" showSpinButton="false" floatLabelType="Auto"></ejs-numerictextbox>
                     @*<div class="form-floating">
-                        <input class="form-control form-control-sm small input-doc-line text-end numeric-input" placeholder="Quantity" id="transQuantity" data-actualValue="0"/>
-                        <label class="form-label small" id="transQLabel">Quantity</label>
-                    </div>*@
+                    <input class="form-control form-control-sm small input-doc-line text-end numeric-input" placeholder="Quantity" id="transQuantity" data-actualValue="0"/>
+                    <label class="form-label small" id="transQLabel">Quantity</label>
+                </div>*@
                     <div class="invalid-feedback">
                         Please enter a valid Quantity.
                     </div>
@@ -185,14 +186,14 @@
                 <div class="col-sm-3 col-md-1 col-lg-1 col-xl-1">
                     <ejs-numerictextbox id="PriceOnTransUnit" placeholder="Price" format="c2" showSpinButton="false" floatLabelType="Auto"></ejs-numerictextbox>
                     @*<div class="form-floating">
-                        <div class="form-floating">
-                            <input class="form-control form-control-sm input-doc-line text-end currency-input" placeholder="Price" id="PriceOnTransUnit" data-actualValue="0"/>
-                            <label class="form-label small">Price </label>
-                        </div>
-                        <div class="invalid-feedback">
-                            Please enter a valid Price.
-                        </div>
-                    </div>*@
+                    <div class="form-floating">
+                        <input class="form-control form-control-sm input-doc-line text-end currency-input" placeholder="Price" id="PriceOnTransUnit" data-actualValue="0"/>
+                        <label class="form-label small">Price </label>
+                    </div>
+                    <div class="invalid-feedback">
+                        Please enter a valid Price.
+                    </div>
+                </div>*@
                     <div class="invalid-feedback">
                         Please enter a valid Price.
                     </div>
@@ -200,12 +201,12 @@
                 <div class="col-sm-3 col-md-1 col-lg-1 col-xl-1">
                     <ejs-numerictextbox id="DiscountPercent" placeholder="Dis %" format="p2" showSpinButton="false" floatLabelType="Auto"></ejs-numerictextbox>
                     @*<div class="form-floating">
-                        <input class="form-control form-control-sm small input-doc-line text-end numeric-input" placeholder="Dis %" id="Discount"/>
-                        <label class="form-label small">Dis% </label>
-                        <div class="invalid-feedback">
-                            Please enter a valid Discount.
-                        </div>
-                    </div>*@
+                    <input class="form-control form-control-sm small input-doc-line text-end numeric-input" placeholder="Dis %" id="Discount"/>
+                    <label class="form-label small">Dis% </label>
+                    <div class="invalid-feedback">
+                        Please enter a valid Discount.
+                    </div>
+                </div>*@
                     <div class="invalid-feedback">
                         Please enter a valid Discount.
                     </div>
@@ -213,12 +214,12 @@
                 <div class="col-sm-3 col-md-1 col-lg-1 col-xl-1">
                     <ejs-numerictextbox id="VatPercent" placeholder="Vat %" format="p2" showSpinButton="false" floatLabelType="Auto"></ejs-numerictextbox>
                     @*<div class="form-floating">
-                        <input class="form-control form-control-sm small input-doc-line text-end numeric-input" placeholder="Vat%" id="VatPercent"/>
-                        <label class="form-label small">VAT% </label>
-                        <div class="invalid-feedback">
-                            Please enter a valid VAT.
-                        </div>
-                    </div>*@
+                    <input class="form-control form-control-sm small input-doc-line text-end numeric-input" placeholder="Vat%" id="VatPercent"/>
+                    <label class="form-label small">VAT% </label>
+                    <div class="invalid-feedback">
+                        Please enter a valid VAT.
+                    </div>
+                </div>*@
                     <div class="invalid-feedback">
                         Please enter a valid VAT.
                     </div>
@@ -526,10 +527,10 @@
             var $secUnitId = $('#MaterialSecondaryUnitId');
             var $seekType = $('#SeekType');
             var $initialLoad = $('#IsInitialLoad');
-            var $priceNetto = $('#MaterialNettoPrice');
-            var $priceBrutto = $('#MaterialBruttoPrice');
+            //var $priceNetto = $('#MaterialNettoPrice');
+            //var $priceBrutto = $('#MaterialBruttoPrice');
             var $seriesUsedPrice = $('#SeriesUsedPrice');
-            var $priceLabel = $('#priceLabel');
+            //var $priceLabel = $('#priceLabel');
             var $transDocSeriesId = $('#ItemVm_SellDocSeriesId');
             var $companyId = $('#ItemVm_CompanyId');
             var $price = $("#Price");
@@ -1213,21 +1214,10 @@
                 transQuantityChanged();
 
             });
-            //$('#PriceOnTransUnit').change((event) => {
-            //    priceChanged();
-            //});
-            //$('#transQuantity').change((event) => {
-            //    transQuantityChanged();
-            //});
+          
             $seekType.change(() => {
                 setSeekType();
             });
-            //$vatPercent.change(() => {
-            //    priceChanged();
-            //});
-            //$price.change(() => {
-            //    priceChanged();
-            //});
             $companyId.change(() => {
                 companyChanged();
             });
