@@ -57,7 +57,18 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
             {
                 return NotFound();
             }
+            var vmLines = ItemVm.SellDocLines;
+            foreach (var vmLine in vmLines)
+            {
+                if (vmLine.TransactionUnitId==0)
+                {
+                    vmLine.TransactionUnitId = vmLine.PrimaryUnitId;
+                    vmLine.TransactionUnitFactor = 1;
+                    vmLine.TransUnitPrice = vmLine.UnitPrice;
+                    vmLine.TransactionQuantity = vmLine.Quontity1;
+                }
 
+            }
           
 
             LoadCombos();
@@ -83,38 +94,6 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
             ViewData["CompanyId"] = new SelectList(companiesList, "Value", "Text");
         }
 
-        public async Task<IActionResult> OnPostAsync()
-        {
-            if (!ModelState.IsValid)
-            {
-                LoadCombos();
-                return Page();
-            }
-
-            _context.Attach(ItemVm).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!BuyMaterialsDocumentExists(ItemVm.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return RedirectToPage("./Index2");
-        }
-
-        private bool BuyMaterialsDocumentExists(int id)
-        {
-            return _context.BuyDocuments.Any(e => e.Id == id);
-        }
+       
     }
 }

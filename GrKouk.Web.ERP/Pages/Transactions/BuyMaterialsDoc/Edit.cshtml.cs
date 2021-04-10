@@ -91,12 +91,6 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
             var companiesList = FiltersHelper.GetSolidCompaniesFilterList(_context);
             ViewData["CompanyId"] = new SelectList(companiesList, "Value", "Text");
         }
-
-       
-
-        private bool BuyMaterialsDocumentExists(int id)
-        {
-            return _context.BuyDocuments.Any(e => e.Id == id);
-        }
+        
     }
 }
