@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GrKouk.Erp.Dtos.BuyDocuments;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -83,10 +84,12 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
             ViewData["SeekType"] = new SelectList(seekTypes, "Value", "Text");
 
             var supplierList = _context.Transactors.Where(s => s.TransactorType.Code == "SYS.SUPPLIER").OrderBy(s => s.Name).AsNoTracking();
-            ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
+            //ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
             ViewData["BuyDocSeriesId"] = new SelectList(_context.BuyDocSeriesDefs.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
             ViewData["TransactorId"] = new SelectList(supplierList, "Id", "Name");
             ViewData["PaymentMethodId"] = new SelectList(_context.PaymentMethods.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
+            var companiesList = FiltersHelper.GetSolidCompaniesFilterList(_context);
+            ViewData["CompanyId"] = new SelectList(companiesList, "Value", "Text");
         }
 
        

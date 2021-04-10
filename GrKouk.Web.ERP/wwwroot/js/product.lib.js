@@ -401,8 +401,8 @@
                     Globalize.locale(culture);
                     numberParser = Globalize.numberParser();
                     numberFormatter = Globalize.numberFormatter();
-                    //percentFormatter = Globalize.numberFormatter({ style: "percent" });
-                    //currencyFormatter = Globalize.currencyFormatter(currencyCode);
+                    percentFormatter = Globalize.numberFormatter({ style: "percent" });
+                    currencyFormatter = Globalize.currencyFormatter(currencyCode);
                     resolve();
 
                 });

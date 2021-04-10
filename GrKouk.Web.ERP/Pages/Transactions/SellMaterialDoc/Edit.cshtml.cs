@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GrKouk.Erp.Dtos.SellDocuments;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -73,11 +74,13 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
             };
             ViewData["SeekType"] = new SelectList(seekTypes, "Value", "Text");
             var transactorList = _context.Transactors.Where(s => s.TransactorType.Code == "SYS.CUSTOMER" || s.TransactorType.Code == "SYS.DEPARTMENT").OrderBy(s => s.Name).AsNoTracking();
-            ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
+            //ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
             ViewData["SellDocSeriesId"] = new SelectList(_context.SellDocSeriesDefs.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
             ViewData["TransactorId"] = new SelectList(transactorList, "Id", "Name");
             ViewData["PaymentMethodId"] = new SelectList(_context.PaymentMethods.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
             ViewData["SalesChannelId"] = new SelectList(_context.SalesChannels.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
+            var companiesList = FiltersHelper.GetSolidCompaniesFilterList(_context);
+            ViewData["CompanyId"] = new SelectList(companiesList, "Value", "Text");
         }
 
         public async Task<IActionResult> OnPostAsync()
