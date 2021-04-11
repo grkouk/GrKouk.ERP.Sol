@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Web.ERP.Data;
@@ -56,13 +57,28 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
 
             if (SaleDocument != null)
             {
-                _context.SellDocLines.RemoveRange(_context.SellDocLines.Where(p => p.SellDocumentId == id));
-                _context.TransactorTransactions.RemoveRange(_context.TransactorTransactions.Where(p => p.CreatorSectionId == SaleDocument.SectionId && p.CreatorId == id));
-                _context.WarehouseTransactions.RemoveRange(_context.WarehouseTransactions.Where(p => p.SectionId == SaleDocument.SectionId && p.CreatorId == id));
-                _context.SellDocTransPaymentMappings.RemoveRange(_context.SellDocTransPaymentMappings.Where(p=>p.SellDocumentId==id));
-                _context.SellDocuments.Remove(SaleDocument);
+                await using var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    _context.SellDocLines.RemoveRange(_context.SellDocLines.Where(p => p.SellDocumentId == id));
+                    _context.TransactorTransactions.RemoveRange(_context.TransactorTransactions.Where(p => p.CreatorSectionId == SaleDocument.SectionId && p.CreatorId == id));
+                    _context.CashFlowAccountTransactions.RemoveRange(_context.CashFlowAccountTransactions.Where(p => p.CreatorSectionId == SaleDocument.SectionId && p.CreatorId == id));
+                    _context.WarehouseTransactions.RemoveRange(_context.WarehouseTransactions.Where(p => p.SectionId == SaleDocument.SectionId && p.CreatorId == id));
+                    _context.SellDocTransPaymentMappings.RemoveRange(_context.SellDocTransPaymentMappings.Where(p=>p.SellDocumentId==id));
+                    _context.SellDocuments.Remove(SaleDocument);
 
-                await _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    string msg = $"Error  {ex.Message} inner exception->{ex.InnerException?.Message}";
+                    ModelState.AddModelError(string.Empty, msg);
+                    //LoadCombos();
+                    return Page();
+                }
+               
             }
 
             return RedirectToPage("./Index");

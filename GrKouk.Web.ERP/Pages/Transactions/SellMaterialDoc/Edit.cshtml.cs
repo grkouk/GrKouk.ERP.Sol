@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GrKouk.Erp.Dtos.SellDocuments;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -56,7 +57,18 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
             {
                 return NotFound();
             }
+            var vmLines = ItemVm.SellDocLines;
+            foreach (var vmLine in vmLines)
+            {
+                if (vmLine.TransactionUnitId==0)
+                {
+                    vmLine.TransactionUnitId = vmLine.PrimaryUnitId;
+                    vmLine.TransactionUnitFactor = 1;
+                    vmLine.TransUnitPrice = vmLine.UnitPrice;
+                    vmLine.TransactionQuantity = vmLine.Quontity1;
+                }
 
+            }
           
 
             LoadCombos();
@@ -73,45 +85,15 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
             };
             ViewData["SeekType"] = new SelectList(seekTypes, "Value", "Text");
             var transactorList = _context.Transactors.Where(s => s.TransactorType.Code == "SYS.CUSTOMER" || s.TransactorType.Code == "SYS.DEPARTMENT").OrderBy(s => s.Name).AsNoTracking();
-            ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
+            //ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
             ViewData["SellDocSeriesId"] = new SelectList(_context.SellDocSeriesDefs.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
             ViewData["TransactorId"] = new SelectList(transactorList, "Id", "Name");
             ViewData["PaymentMethodId"] = new SelectList(_context.PaymentMethods.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
             ViewData["SalesChannelId"] = new SelectList(_context.SalesChannels.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
+            var companiesList = FiltersHelper.GetSolidCompaniesFilterList(_context);
+            ViewData["CompanyId"] = new SelectList(companiesList, "Value", "Text");
         }
 
-        public async Task<IActionResult> OnPostAsync()
-        {
-            if (!ModelState.IsValid)
-            {
-                LoadCombos();
-                return Page();
-            }
-
-            _context.Attach(ItemVm).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!BuyMaterialsDocumentExists(ItemVm.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return RedirectToPage("./Index2");
-        }
-
-        private bool BuyMaterialsDocumentExists(int id)
-        {
-            return _context.BuyDocuments.Any(e => e.Id == id);
-        }
+       
     }
 }

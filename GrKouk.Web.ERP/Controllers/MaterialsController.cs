@@ -1574,7 +1574,7 @@ namespace GrKouk.Web.ERP.Controllers {
                 #endregion
 
                 var docSeries = await
-                    _context.BuyDocSeriesDefs.AsNoTracking().SingleOrDefaultAsync(m => m.Id == data.BuyDocSeriesId);
+                    _context.BuyDocSeriesDefs.SingleOrDefaultAsync(m => m.Id == data.BuyDocSeriesId);
 
                 if (docSeries is null) {
                     await transaction.RollbackAsync();
@@ -1641,7 +1641,7 @@ namespace GrKouk.Web.ERP.Controllers {
 
                 if (transTransactorDef.DefaultDocSeriesId > 0) {
                     var transTransactorDefaultSeries = await
-                        _context.TransTransactorDocSeriesDefs.AsNoTracking().FirstOrDefaultAsync(p =>
+                        _context.TransTransactorDocSeriesDefs.FirstOrDefaultAsync(p =>
                             p.Id == transTransactorDef.DefaultDocSeriesId);
                     if (transTransactorDefaultSeries == null) {
                         await transaction.RollbackAsync();
@@ -1679,7 +1679,7 @@ namespace GrKouk.Web.ERP.Controllers {
 
                 //Αυτόματη εξόφληση
                 var paymentMethod =
-                    await _context.PaymentMethods.AsNoTracking().FirstOrDefaultAsync(p => p.Id == transToAttach.PaymentMethodId);
+                    await _context.PaymentMethods.FirstOrDefaultAsync(p => p.Id == transToAttach.PaymentMethodId);
                 if (paymentMethod is null) {
                     await transaction.RollbackAsync();
                     ModelState.AddModelError(string.Empty, "Δεν βρέθηκε ο τρόπος πληρωμής");
@@ -1704,8 +1704,7 @@ namespace GrKouk.Web.ERP.Controllers {
                         }
                         var transactor = await _context.Transactors
                             .Where(p => p.Id == data.TransactorId)
-                            .AsNoTracking()
-                            .SingleOrDefaultAsync();
+                           .SingleOrDefaultAsync();
                         var sTransactorTransaction = _mapper.Map<TransactorTransaction>(data);
                         var transTransactorEtiology =
                             $"{transTransactorPayOffSeries.Name} created from {docSeries.Name} for {transactor.Name} with {data.Etiology} ";
@@ -1832,7 +1831,7 @@ namespace GrKouk.Web.ERP.Controllers {
 
                 if (transWarehouseDef.DefaultDocSeriesId > 0) {
                     var transWarehouseDefaultSeries =
-                        await _context.TransWarehouseDocSeriesDefs.AsNoTracking().FirstOrDefaultAsync(p =>
+                        await _context.TransWarehouseDocSeriesDefs.FirstOrDefaultAsync(p =>
                             p.Id == transWarehouseDef.DefaultDocSeriesId);
                     if (transWarehouseDefaultSeries == null) {
                         await transaction.RollbackAsync();
@@ -1852,7 +1851,7 @@ namespace GrKouk.Web.ERP.Controllers {
 
                 foreach (var dataBuyDocLine in data.BuyDocLines) {
                     var warehouseItemId = dataBuyDocLine.WarehouseItemId;
-                    var material = await _context.WarehouseItems.AsNoTracking()
+                    var material = await _context.WarehouseItems
                         .SingleOrDefaultAsync(p => p.Id == warehouseItemId);
                     if (material is null) {
                         //Handle error
@@ -1865,7 +1864,7 @@ namespace GrKouk.Web.ERP.Controllers {
 
                     #region MaterialLine
 
-                    var buyMaterialLine = new BuyDocLine();
+                    
                     var transUnitId = dataBuyDocLine.TransactionUnitId;
                     var transUnitFactor = dataBuyDocLine.TransactionUnitFactor;
                     // var factor = dataBuyDocLine.Factor;
@@ -1878,24 +1877,26 @@ namespace GrKouk.Web.ERP.Controllers {
                     decimal lineNetAmount = unitPrice * units;
                     decimal lineDiscountAmount = lineNetAmount * discountRate;
                     decimal lineFpaAmount = (lineNetAmount - lineDiscountAmount) * fpaRate;
-                    buyMaterialLine.UnitPrice = unitPrice;
-                    buyMaterialLine.AmountFpa = lineFpaAmount;
-                    buyMaterialLine.AmountNet = lineNetAmount;
-                    buyMaterialLine.AmountDiscount = lineDiscountAmount;
-                    buyMaterialLine.DiscountRate = discountRate;
-                    buyMaterialLine.FpaRate = fpaRate;
-                    buyMaterialLine.WarehouseItemId = dataBuyDocLine.WarehouseItemId;
-                    buyMaterialLine.Quontity1 = dataBuyDocLine.Q1;
-                    buyMaterialLine.Quontity2 = dataBuyDocLine.Q2;
-                    buyMaterialLine.PrimaryUnitId = dataBuyDocLine.MainUnitId;
-                    buyMaterialLine.SecondaryUnitId = dataBuyDocLine.SecUnitId;
-                    buyMaterialLine.Factor = dataBuyDocLine.Factor;
-                    buyMaterialLine.BuyDocumentId = docId;
-                    buyMaterialLine.Etiology = transToAttach.Etiology;
-                    buyMaterialLine.TransactionUnitId = transUnitId;
-                    buyMaterialLine.TransactionQuantity = transUnits;
-                    buyMaterialLine.TransUnitPrice = transPrice;
-                    buyMaterialLine.TransactionUnitFactor = transUnitFactor;
+                    var buyMaterialLine = new BuyDocLine {
+                        UnitPrice = unitPrice,
+                        AmountFpa = lineFpaAmount,
+                        AmountNet = lineNetAmount,
+                        AmountDiscount = lineDiscountAmount,
+                        DiscountRate = discountRate,
+                        FpaRate = fpaRate,
+                        WarehouseItemId = dataBuyDocLine.WarehouseItemId,
+                        Quontity1 = dataBuyDocLine.Q1,
+                        Quontity2 = dataBuyDocLine.Q2,
+                        PrimaryUnitId = dataBuyDocLine.MainUnitId,
+                        SecondaryUnitId = dataBuyDocLine.SecUnitId,
+                        Factor = dataBuyDocLine.Factor,
+                        BuyDocumentId = docId,
+                        Etiology = transToAttach.Etiology,
+                        TransactionUnitId = transUnitId,
+                        TransactionQuantity = transUnits,
+                        TransUnitPrice = transPrice,
+                        TransactionUnitFactor = transUnitFactor
+                    };
                     //_context.Entry(transToAttach).Entity
                     transToAttach.BuyDocLines.Add(buyMaterialLine);
 
@@ -2008,7 +2009,7 @@ namespace GrKouk.Web.ERP.Controllers {
                 #endregion
 
                 var docSeries = await
-                    _context.BuyDocSeriesDefs.AsNoTracking().SingleOrDefaultAsync(m => m.Id == data.BuyDocSeriesId);
+                    _context.BuyDocSeriesDefs.SingleOrDefaultAsync(m => m.Id == data.BuyDocSeriesId);
 
                 if (docSeries is null) {
                     await transaction.RollbackAsync();
@@ -2060,7 +2061,7 @@ namespace GrKouk.Web.ERP.Controllers {
                 //--------------------------------------
                 if (transTransactorDef.DefaultDocSeriesId > 0) {
                     var transTransactorDefaultSeries = await
-                        _context.TransTransactorDocSeriesDefs.AsNoTracking().FirstOrDefaultAsync(p =>
+                        _context.TransTransactorDocSeriesDefs.FirstOrDefaultAsync(p =>
                             p.Id == transTransactorDef.DefaultDocSeriesId);
                     if (transTransactorDefaultSeries == null) {
                         await transaction.RollbackAsync();
@@ -2099,7 +2100,7 @@ namespace GrKouk.Web.ERP.Controllers {
 
                 //Αυτόματη εξόφληση
                 var paymentMethod =
-                    await _context.PaymentMethods.AsNoTracking().FirstOrDefaultAsync(p => p.Id == transToAttach.PaymentMethodId);
+                    await _context.PaymentMethods.FirstOrDefaultAsync(p => p.Id == transToAttach.PaymentMethodId);
                 if (paymentMethod is null) {
                     await transaction.RollbackAsync();
                     ModelState.AddModelError(string.Empty, "Δεν βρέθηκε ο τρόπος πληρωμής");
@@ -2113,7 +2114,7 @@ namespace GrKouk.Web.ERP.Controllers {
                     var paymentCfAccountId = paymentMethod.CfAccountId;
                     if (autoPaySeriesId > 0) {
                         var transTransactorPayOffSeries = await
-                            _context.TransTransactorDocSeriesDefs.AsNoTracking().FirstOrDefaultAsync(p =>
+                            _context.TransTransactorDocSeriesDefs.FirstOrDefaultAsync(p =>
                                 p.Id == autoPaySeriesId);
                         if (transTransactorPayOffSeries == null) {
                             await transaction.RollbackAsync();
@@ -2124,7 +2125,6 @@ namespace GrKouk.Web.ERP.Controllers {
                         }
                         var transactor = await _context.Transactors
                             .Where(p => p.Id == data.TransactorId)
-                            .AsNoTracking()
                             .SingleOrDefaultAsync();
                         var spTransactorCreateDto = _mapper.Map<TransactorTransCreateDto>(data);
                         //Ετσι δεν μεταφέρει το Id απο το data
@@ -2254,7 +2254,7 @@ namespace GrKouk.Web.ERP.Controllers {
 
                 if (transWarehouseDef.DefaultDocSeriesId > 0) {
                     var transWarehouseDefaultSeries =
-                        await _context.TransWarehouseDocSeriesDefs.AsNoTracking().FirstOrDefaultAsync(p =>
+                        await _context.TransWarehouseDocSeriesDefs.FirstOrDefaultAsync(p =>
                             p.Id == transWarehouseDef.DefaultDocSeriesId);
                     if (transWarehouseDefaultSeries == null) {
                         await transaction.RollbackAsync();
@@ -2286,7 +2286,7 @@ namespace GrKouk.Web.ERP.Controllers {
 
                     #region MaterialLine
 
-                    var warehouseItemLine = new BuyDocLine();
+                   
                     var transUnitId = dataBuyDocLine.TransactionUnitId;
                     var transUnitFactor = dataBuyDocLine.TransactionUnitFactor;
                     decimal transPrice = dataBuyDocLine.TransUnitPrice;
@@ -2298,24 +2298,26 @@ namespace GrKouk.Web.ERP.Controllers {
                     decimal lineNetAmount = unitPrice * units;
                     decimal lineDiscountAmount = lineNetAmount * discountRate;
                     decimal lineFpaAmount = (lineNetAmount - lineDiscountAmount) * fpaRate;
-                    warehouseItemLine.UnitPrice = unitPrice;
-                    warehouseItemLine.AmountFpa = lineFpaAmount;
-                    warehouseItemLine.AmountNet = lineNetAmount;
-                    warehouseItemLine.AmountDiscount = lineDiscountAmount;
-                    warehouseItemLine.DiscountRate = discountRate;
-                    warehouseItemLine.FpaRate = fpaRate;
-                    warehouseItemLine.WarehouseItemId = dataBuyDocLine.WarehouseItemId;
-                    warehouseItemLine.Quontity1 = dataBuyDocLine.Q1;
-                    warehouseItemLine.Quontity2 = dataBuyDocLine.Q2;
-                    warehouseItemLine.PrimaryUnitId = dataBuyDocLine.MainUnitId;
-                    warehouseItemLine.SecondaryUnitId = dataBuyDocLine.SecUnitId;
-                    warehouseItemLine.Factor = dataBuyDocLine.Factor;
-                    warehouseItemLine.BuyDocumentId = docId;
-                    warehouseItemLine.Etiology = transToAttach.Etiology;
-                    warehouseItemLine.TransactionUnitId = transUnitId;
-                    warehouseItemLine.TransactionQuantity = transUnits;
-                    warehouseItemLine.TransUnitPrice = transPrice;
-                    warehouseItemLine.TransactionUnitFactor = transUnitFactor;
+                    var warehouseItemLine = new BuyDocLine {
+                        UnitPrice = unitPrice,
+                        AmountFpa = lineFpaAmount,
+                        AmountNet = lineNetAmount,
+                        AmountDiscount = lineDiscountAmount,
+                        DiscountRate = discountRate,
+                        FpaRate = fpaRate,
+                        WarehouseItemId = dataBuyDocLine.WarehouseItemId,
+                        Quontity1 = dataBuyDocLine.Q1,
+                        Quontity2 = dataBuyDocLine.Q2,
+                        PrimaryUnitId = dataBuyDocLine.MainUnitId,
+                        SecondaryUnitId = dataBuyDocLine.SecUnitId,
+                        Factor = dataBuyDocLine.Factor,
+                        BuyDocumentId = docId,
+                        Etiology = transToAttach.Etiology,
+                        TransactionUnitId = transUnitId,
+                        TransactionQuantity = transUnits,
+                        TransUnitPrice = transPrice,
+                        TransactionUnitFactor = transUnitFactor
+                    };
 
                     //_context.Entry(transToAttach).Entity
 
@@ -2444,7 +2446,7 @@ namespace GrKouk.Web.ERP.Controllers {
                 #endregion
 
                 var docSeries = await
-                    _context.SellDocSeriesDefs.AsNoTracking().SingleOrDefaultAsync(m => m.Id == data.SellDocSeriesId);
+                    _context.SellDocSeriesDefs.SingleOrDefaultAsync(m => m.Id == data.SellDocSeriesId);
 
                 if (docSeries is null) {
                     await transaction.RollbackAsync();
@@ -2510,7 +2512,7 @@ namespace GrKouk.Web.ERP.Controllers {
 
                 if (transTransactorDef.DefaultDocSeriesId > 0) {
                     var transTransactorDefaultSeries = await
-                        _context.TransTransactorDocSeriesDefs.AsNoTracking().FirstOrDefaultAsync(p =>
+                        _context.TransTransactorDocSeriesDefs.FirstOrDefaultAsync(p =>
                             p.Id == transTransactorDef.DefaultDocSeriesId);
                     if (transTransactorDefaultSeries == null) {
                         await transaction.RollbackAsync();
@@ -2549,7 +2551,7 @@ namespace GrKouk.Web.ERP.Controllers {
 
                 //Αυτόματη εξόφληση
                 var paymentMethod =
-                    await _context.PaymentMethods.AsNoTracking().FirstOrDefaultAsync(p => p.Id == transToAttach.PaymentMethodId);
+                    await _context.PaymentMethods.FirstOrDefaultAsync(p => p.Id == transToAttach.PaymentMethodId);
                 if (paymentMethod is null) {
                     await transaction.RollbackAsync();
                     ModelState.AddModelError(string.Empty, "Δεν βρέθηκε ο τρόπος πληρωμής");
@@ -2563,7 +2565,7 @@ namespace GrKouk.Web.ERP.Controllers {
                     var paymentCfAccountId = paymentMethod.CfAccountId;
                     if (autoPaySeriesId > 0) {
                         var transTransactorPayOffSeries = await
-                            _context.TransTransactorDocSeriesDefs.AsNoTracking().FirstOrDefaultAsync(p =>
+                            _context.TransTransactorDocSeriesDefs.FirstOrDefaultAsync(p =>
                                 p.Id == autoPaySeriesId);
                         if (transTransactorPayOffSeries == null) {
                             await transaction.RollbackAsync();
@@ -2574,7 +2576,6 @@ namespace GrKouk.Web.ERP.Controllers {
                         }
                         var transactor = await _context.Transactors
                             .Where(p => p.Id == data.TransactorId)
-                            .AsNoTracking()
                             .SingleOrDefaultAsync();
                         var sTransactorTransaction = _mapper.Map<TransactorTransaction>(data);
                         var transTransactorEtiology =
@@ -2705,7 +2706,6 @@ namespace GrKouk.Web.ERP.Controllers {
                 if (transWarehouseDef.DefaultDocSeriesId > 0) {
                     var transWarehouseDefaultSeries =
                         await _context.TransWarehouseDocSeriesDefs
-                            .AsNoTracking()
                             .FirstOrDefaultAsync(p =>
                             p.Id == transWarehouseDef.DefaultDocSeriesId);
                     if (transWarehouseDefaultSeries == null) {
@@ -2738,7 +2738,12 @@ namespace GrKouk.Web.ERP.Controllers {
 
                     #region MaterialLine
 
-                    var sellDocLine = new SellDocLine();
+                   
+                    var transUnitId = docLine.TransactionUnitId;
+                    var transUnitFactor = docLine.TransactionUnitFactor;
+                    // var factor = dataBuyDocLine.Factor;
+                    decimal transPrice = docLine.TransUnitPrice;
+                    double transUnits = docLine.TransactionQuantity;
                     decimal unitPrice = docLine.Price;
                     decimal units = (decimal)docLine.Q1;
                     decimal fpaRate = (decimal)docLine.FpaRate;
@@ -2746,20 +2751,26 @@ namespace GrKouk.Web.ERP.Controllers {
                     decimal lineNetAmount = unitPrice * units;
                     decimal lineDiscountAmount = lineNetAmount * discountRate;
                     decimal lineFpaAmount = (lineNetAmount - lineDiscountAmount) * fpaRate;
-                    sellDocLine.UnitPrice = unitPrice;
-                    sellDocLine.AmountFpa = lineFpaAmount;
-                    sellDocLine.AmountNet = lineNetAmount;
-                    sellDocLine.AmountDiscount = lineDiscountAmount;
-                    sellDocLine.DiscountRate = discountRate;
-                    sellDocLine.FpaRate = fpaRate;
-                    sellDocLine.WarehouseItemId = docLine.WarehouseItemId;
-                    sellDocLine.Quontity1 = docLine.Q1;
-                    sellDocLine.Quontity2 = docLine.Q2;
-                    sellDocLine.PrimaryUnitId = docLine.MainUnitId;
-                    sellDocLine.SecondaryUnitId = docLine.SecUnitId;
-                    sellDocLine.Factor = docLine.Factor;
-                    sellDocLine.SellDocumentId = docId;
-                    sellDocLine.Etiology = transToAttach.Etiology;
+                    var sellDocLine = new SellDocLine {
+                        UnitPrice = unitPrice,
+                        AmountFpa = lineFpaAmount,
+                        AmountNet = lineNetAmount,
+                        AmountDiscount = lineDiscountAmount,
+                        DiscountRate = discountRate,
+                        FpaRate = fpaRate,
+                        WarehouseItemId = docLine.WarehouseItemId,
+                        Quontity1 = docLine.Q1,
+                        Quontity2 = docLine.Q2,
+                        PrimaryUnitId = docLine.MainUnitId,
+                        SecondaryUnitId = docLine.SecUnitId,
+                        Factor = docLine.Factor,
+                        SellDocumentId = docId,
+                        Etiology = transToAttach.Etiology,
+                        TransactionUnitId = transUnitId,
+                        TransactionQuantity = transUnits,
+                        TransUnitPrice = transPrice,
+                        TransactionUnitFactor = transUnitFactor
+                    };
                     //_context.Entry(transToAttach).Entity
                     transToAttach.SellDocLines.Add(sellDocLine);
 
@@ -2874,7 +2885,7 @@ namespace GrKouk.Web.ERP.Controllers {
                 #endregion
 
                 var docSeries = await
-                    _context.SellDocSeriesDefs.AsNoTracking().SingleOrDefaultAsync(m => m.Id == data.SellDocSeriesId);
+                    _context.SellDocSeriesDefs.SingleOrDefaultAsync(m => m.Id == data.SellDocSeriesId);
 
                 if (docSeries is null) {
                     await transaction.RollbackAsync();
@@ -2928,7 +2939,7 @@ namespace GrKouk.Web.ERP.Controllers {
                 //--------------------------------------
                 if (transTransactorDef.DefaultDocSeriesId > 0) {
                     var transTransactorDefaultSeries = await
-                        _context.TransTransactorDocSeriesDefs.AsNoTracking().FirstOrDefaultAsync(p =>
+                        _context.TransTransactorDocSeriesDefs.FirstOrDefaultAsync(p =>
                             p.Id == transTransactorDef.DefaultDocSeriesId);
                     if (transTransactorDefaultSeries == null) {
                         await transaction.RollbackAsync();
@@ -2959,7 +2970,6 @@ namespace GrKouk.Web.ERP.Controllers {
                 //Αυτόματη εξόφληση
                 var paymentMethod =
                     await _context.PaymentMethods
-                        .AsNoTracking()
                         .FirstOrDefaultAsync(p => p.Id == transToAttach.PaymentMethodId);
                 if (paymentMethod is null) {
                     await transaction.RollbackAsync();
@@ -2975,7 +2985,6 @@ namespace GrKouk.Web.ERP.Controllers {
                     if (autoPaySeriesId > 0) {
                         var transTransactorPayOffSeries = await
                             _context.TransTransactorDocSeriesDefs
-                                .AsNoTracking()
                                 .FirstOrDefaultAsync(p =>
                                 p.Id == autoPaySeriesId);
                         if (transTransactorPayOffSeries == null) {
@@ -2987,7 +2996,6 @@ namespace GrKouk.Web.ERP.Controllers {
                         }
                         var transactor = await _context.Transactors
                             .Where(p => p.Id == data.TransactorId)
-                            .AsNoTracking()
                             .SingleOrDefaultAsync();
                         var spTransactorCreateDto = _mapper.Map<TransactorTransCreateDto>(data);
                         var transTransactorEtiology =
@@ -3118,7 +3126,6 @@ namespace GrKouk.Web.ERP.Controllers {
                 if (transWarehouseDef.DefaultDocSeriesId > 0) {
                     var transWarehouseDefaultSeries =
                         await _context.TransWarehouseDocSeriesDefs
-                            .AsNoTracking()
                             .FirstOrDefaultAsync(p =>
                             p.Id == transWarehouseDef.DefaultDocSeriesId);
                     if (transWarehouseDefaultSeries == null) {
@@ -3151,7 +3158,11 @@ namespace GrKouk.Web.ERP.Controllers {
 
                     #region MaterialLine
 
-                    var sellDocLine = new SellDocLine();
+                   
+                    var transUnitId = docLine.TransactionUnitId;
+                    var transUnitFactor = docLine.TransactionUnitFactor;
+                    decimal transPrice = docLine.TransUnitPrice;
+                    double transUnits = docLine.TransactionQuantity;
                     decimal unitPrice = docLine.Price;
                     decimal units = (decimal)docLine.Q1;
                     decimal fpaRate = (decimal)docLine.FpaRate;
@@ -3159,20 +3170,26 @@ namespace GrKouk.Web.ERP.Controllers {
                     decimal lineNetAmount = unitPrice * units;
                     decimal lineDiscountAmount = lineNetAmount * discountRate;
                     decimal lineFpaAmount = (lineNetAmount - lineDiscountAmount) * fpaRate;
-                    sellDocLine.UnitPrice = unitPrice;
-                    sellDocLine.AmountFpa = lineFpaAmount;
-                    sellDocLine.AmountNet = lineNetAmount;
-                    sellDocLine.AmountDiscount = lineDiscountAmount;
-                    sellDocLine.DiscountRate = discountRate;
-                    sellDocLine.FpaRate = fpaRate;
-                    sellDocLine.WarehouseItemId = docLine.WarehouseItemId;
-                    sellDocLine.Quontity1 = docLine.Q1;
-                    sellDocLine.Quontity2 = docLine.Q2;
-                    sellDocLine.PrimaryUnitId = docLine.MainUnitId;
-                    sellDocLine.SecondaryUnitId = docLine.SecUnitId;
-                    sellDocLine.Factor = docLine.Factor;
-                    sellDocLine.SellDocumentId = docId;
-                    sellDocLine.Etiology = transToAttach.Etiology;
+                    var sellDocLine = new SellDocLine {
+                        UnitPrice = unitPrice,
+                        AmountFpa = lineFpaAmount,
+                        AmountNet = lineNetAmount,
+                        AmountDiscount = lineDiscountAmount,
+                        DiscountRate = discountRate,
+                        FpaRate = fpaRate,
+                        WarehouseItemId = docLine.WarehouseItemId,
+                        Quontity1 = docLine.Q1,
+                        Quontity2 = docLine.Q2,
+                        PrimaryUnitId = docLine.MainUnitId,
+                        SecondaryUnitId = docLine.SecUnitId,
+                        Factor = docLine.Factor,
+                        SellDocumentId = docId,
+                        Etiology = transToAttach.Etiology,
+                        TransactionUnitId = transUnitId,
+                        TransactionQuantity = transUnits,
+                        TransUnitPrice = transPrice,
+                        TransactionUnitFactor = transUnitFactor
+                    };
                     //_context.Entry(transToAttach).Entity
                     transToAttach.SellDocLines.Add(sellDocLine);
 

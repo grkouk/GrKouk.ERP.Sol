@@ -66,6 +66,7 @@
             <input type="hidden" id="MaterialBruttoPrice" />
             <input type="hidden" id="MaterialFpaId" />
             <input type="hidden" id="MaterialMainUnitId" />
+            <input type="hidden" id="MaterialMainUnitCode" />
             <input type="hidden" id="MaterialSecondaryUnitId" />
             <input type="hidden" id="TransactionUnitId" />
             <input type="hidden" id="TransactionUnitCode" />
@@ -173,41 +174,31 @@
                     </div>
                 </div>
                 <div class="col-sm-3 col-md-1 col-lg-1 col-xl-1">
-                    <div class="form-floating">
-                        <input class="form-control form-control-sm small input-doc-line text-end numeric-input" placeholder="Quantity" id="transQuantity" data-actualValue="0" />
-                        <label class="form-label small" id="transQLabel">Quantity</label>
-                    </div>
+                    <ejs-numerictextbox id="transQuantity" placeholder="Quantity" format="n3" showSpinButton="false" floatLabelType="Auto"></ejs-numerictextbox>
+                  
                     <div class="invalid-feedback">
                         Please enter a valid Quantity.
                     </div>
                 </div>
                 <div class="col-sm-3 col-md-1 col-lg-1 col-xl-1">
-                    <div class="form-floating">
-                        <div class="form-floating">
-                            <input class="form-control form-control-sm input-doc-line text-end currency-input" placeholder="Price" id="PriceOnTransUnit" data-actualValue="0" />
-                            <label class="form-label small">Price </label>
-                        </div>
-                        <div class="invalid-feedback">
-                            Please enter a valid Price.
-                        </div>
+                    <ejs-numerictextbox id="PriceOnTransUnit" placeholder="Price" format="c2" showSpinButton="false" floatLabelType="Auto"></ejs-numerictextbox>
+                  
+                    <div class="invalid-feedback">
+                        Please enter a valid Price.
                     </div>
                 </div>
                 <div class="col-sm-3 col-md-1 col-lg-1 col-xl-1">
-                    <div class="form-floating">
-                        <input class="form-control form-control-sm small input-doc-line text-end numeric-input" placeholder="Dis %" id="Discount" />
-                        <label class="form-label small">Dis% </label>
-                        <div class="invalid-feedback">
-                            Please enter a valid Discount.
-                        </div>
+                    <ejs-numerictextbox id="DiscountPercent" placeholder="Dis %" format="p2" showSpinButton="false" floatLabelType="Auto"></ejs-numerictextbox>
+                   
+                    <div class="invalid-feedback">
+                        Please enter a valid Discount.
                     </div>
                 </div>
                 <div class="col-sm-3 col-md-1 col-lg-1 col-xl-1">
-                    <div class="form-floating">
-                        <input class="form-control form-control-sm small input-doc-line text-end numeric-input" placeholder="Vat%" id="VatPercent" />
-                        <label class="form-label small">VAT% </label>
-                        <div class="invalid-feedback">
-                            Please enter a valid VAT.
-                        </div>
+                    <ejs-numerictextbox id="VatPercent" placeholder="Vat %" format="p2" showSpinButton="false" floatLabelType="Auto"></ejs-numerictextbox>
+                   
+                    <div class="invalid-feedback">
+                        Please enter a valid VAT.
                     </div>
                 </div>
                 <div class="col-sm-1">
@@ -256,7 +247,7 @@
                     <span class="text-danger small"></span>
                 </div>
                 <div class="col-md-1">
-                    <label class="small">Discolunt</label>
+                    <label class="small">Discount</label>
                     <input class="form-control form-control-sm input-doc-line text-end currency-input" type="text" placeholder="Disc Value" id="LineDiscValue" tabindex="-1" readonly />
                     <span class="text-danger small"></span>
                 </div>
@@ -324,11 +315,6 @@
                                     var netAmount = docLine.AmountNet;
                                     var grosAmount = netAmount - disAmount + vatAmount;
 
-                                    // var q1 = docLine.Quontity1;
-                                    var q1Str = $@"{q1:N2}";
-                                    // var q2 = docLine.Quontity2;
-                                    var q2Str = $@"{q2:N2}";
-
                                     var q1Actual = FormattableString.Invariant($"{q1}");
                                     var q2Actual = FormattableString.Invariant($"{q2}");
                                     var unitPriceActual = FormattableString.Invariant($"{unitPrice}");
@@ -363,8 +349,7 @@
                                                 $"<a data-itemId=\"0\" href=\"#\" class=\"modifyItem\"><i class=\"fas fa-edit\"></i></a></td>" +
                                                 $"<td class=\"small\">" +
                                                 $"<a data-itemId=\"0\" href=\"#\" class=\"deleteItem\"><i class=\"fas fa-trash\"></i></a></td></tr>";
-                                    @Html.Raw(tLine)
-                                    ;
+                                    @Html.Raw(tLine);
                                 }
                             }
 
@@ -443,18 +428,7 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade modal-topmost" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <div class="loader"></div>
-                <div>
-                    <p>Executing request. <br><small>Please wait...</small></p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<partial name="_LoadMePartial" />
 <partial name="_ItemSelector" />
 
 @section Scripts {
@@ -508,20 +482,13 @@
             var $amountFpa = $('#ItemVm_AmountFpa');
             var $amountDiscount = $('#ItemVm_AmountDiscount');
             var $amountSum = $('#DocumentSum');
-            var $q1Label = $('#q1Label');
-            var $q2Label = $('#q2Label');
-            var $discount = $("#Discount");
             var $materialId = $('#MaterialId');
-            var $vatPercent = $('#VatPercent');
             var $factor = $('#MaterialFactor');
             var $mainUnitId = $('#MaterialMainUnitId');
             var $secUnitId = $('#MaterialSecondaryUnitId');
             var $seekType = $('#SeekType');
             var $initialLoad = $('#IsInitialLoad');
-            var $priceNetto = $('#MaterialNettoPrice');
-            var $priceBrutto = $('#MaterialBruttoPrice');
             var $seriesUsedPrice = $('#SeriesUsedPrice');
-            var $priceLabel = $('#priceLabel');
             var $transDocSeriesId = $('#ItemVm_SellDocSeriesId');
             var $companyId = $('#ItemVm_CompanyId');
             var $price = $("#Price");
@@ -531,10 +498,7 @@
             var $transUnitId = $('#TransactionUnitId');
             var $transUnitType = $('#TransactionUnitType');
             var $transUnitFactor = $('#TransactionUnitFactor');
-            var $transQuantity = $('#transQuantity');
             var $transUnitSelector = $('#prodUnitSelector');
-            var $transPrice = $('#PriceOnTransUnit');
-
             var $lineNetValue = $('#LineNetValue');
             var $lineVatValue = $('#LineVatValue');
             var $lineDiscValue = $('#LineDiscValue');
@@ -543,6 +507,10 @@
             var $mainUnitCode = $('#MaterialMainUnitCode');
             var $transUnitCode = $('#TransactionUnitCode');
             var $docCurrency = $('[name=docCurrency]');
+            var discountPercentEl = document.getElementById("DiscountPercent").ej2_instances[0];
+            var vatPercentEl = document.getElementById("VatPercent").ej2_instances[0];
+            var transQuantityEl = document.getElementById("transQuantity").ej2_instances[0];
+            var priceOnTransUnitEl = document.getElementById("PriceOnTransUnit").ej2_instances[0];
             //#endregion
 
 
@@ -592,10 +560,8 @@
 
 
             var priceChanged = () => {
+                let transPrice = priceOnTransUnitEl.value;
 
-                //var transPrice = parseFloat($transPrice.val());
-                let transPriceAttr = $transPrice.attr('data-actualValue');
-                let transPrice = parseFloat(transPriceAttr);
                 if (isNaN(transPrice)) {
                     transPrice = 0;
                 }
@@ -606,8 +572,8 @@
                 }
                 var priceNetValue = 0;
 
-                let vatPercetAttr = $vatPercent.attr('data-actualValue');
-                var vatPerc = parseFloat(vatPercetAttr);
+                
+                var vatPerc = vatPercentEl.value;
                 if (isNaN(vatPerc)) {
                     vatPerc = 0;
                 }
@@ -641,8 +607,7 @@
                 }
                 var netVal = priceNetValue * baseQuantity;
 
-                let discountAttr = $discount.attr('data-actualValue');
-                var discPercent = parseFloat(discountAttr);
+                var discPercent =discountPercentEl.value;
                 if (isNaN(discPercent)) {
                     discPercent = 0;
                 }
@@ -664,7 +629,8 @@
                 $lineBrutValue.attr('data-actualValue', brutVal);
             };
             const transQuantityChanged = () => {
-                let trQ = parseFloat($transQuantity.val());
+                //let trQ = parseFloat($transQuantity.val());
+                let trQ = transQuantityEl.value;
                 if (isNaN(trQ)) {
                     return;
                 }
@@ -729,6 +695,22 @@
 
 
             };
+            const setupEventManagers = () => {
+
+
+                vatPercentEl.addEventListener("change",(event) => {
+                    priceChanged();
+                });
+                discountPercentEl.addEventListener("change", (event) => {
+                    priceChanged();
+                });
+                priceOnTransUnitEl.addEventListener("change", (event) => {
+                    priceChanged();
+                });
+                transQuantityEl.addEventListener("change", (event) => {
+                    transQuantityChanged();
+                });
+            };
             const setUpAutoComplete=()=>{
                 let autoCompleteEL = document.getElementById("AutoCompleteTest").ej2_instances[0];
                 autoCompleteEL.addEventListener("filtering",(e)=>{
@@ -790,13 +772,18 @@
                         .catch((error) => {
                             console.log("Error setting companyId in session ");
                             console.log(error);
+                            toastr.error(error.statusText, "Error");
                         });
                     productLib.getCompanyBaseCurrencyInfo(companyId, $spinnerElement)
                         .then((data) => {
                             let currencyCode = data.currencyCode;
                             let locale = data.currencyLocale.substring(0, 2);
-                            productLib.setGlobalizeLocale(locale)
+                            //productLib.setGlobalizeLocale(locale)
+                            let loader = ej.base.loadCldr;
+                            productLib.setLanguageLocale(locale, currencyCode, loader)
                                 .then(() => {
+                                    ej.base.setCulture(locale);
+                                    ej.base.setCurrencyCode(currencyCode);
                                     formatterCurrency = new Intl.NumberFormat(locale,
                                         {
                                             style: 'currency',
@@ -819,6 +806,7 @@
                                 .catch((error) => {
                                     console.log("Error setting Globalize locale");
                                     console.log(error);
+                                    toastr.error(error.statusText, "Error");
                                 });
 
 
@@ -832,9 +820,6 @@
             };
             const transactorChanged = () => {
                 const $transactorId = $('#ItemVm_TransactorId');
-
-                //sessionStorage.setItem('CompanyId', $companyId.val());
-                // console.log('transactorChanged transactorId=' + $transactorId.val());
                 return $.ajax({
                     contentType: 'application/json; charset=utf-8',
 
@@ -1031,8 +1016,10 @@
                         $secUnitId.val(r.buyUnitId);
                         $materialId.val(mId);
                         $factor.val(mFactor);
-                        $vatPercent.val(rate);
-                        $discount.val(0);
+                        //$vatPercent.val(rate);
+                        vatPercentEl.value = rate;
+                        //$discount.val(0);
+                        discountPercentEl.value = 0;
                         $materialFpaId.val(fpaId);
                         $price.val(lastPrice);
                         $priceNet.val(lastPrice);
@@ -1083,11 +1070,13 @@
                         var rate = data.fpaRate;
                         var lastPrice = data.lastPrice;
                         var fpaId = data.fpaId;
-                        $vatPercent.val(rate);
+                        //$vatPercent.val(rate);
+                        vatPercentEl.value = rate;
                         $('#MaterialFpaId').val(fpaId);
                         $price.val(lastPrice);
                         $priceNet.val(lastPrice);
-                        $discount.val('0');
+                        //$discount.val('0');
+                        discountPercentEl.value = 0;
                         $lookUp.val(data.warehouseItemName);
                         $mainUnitId.val(data.mainUnitId);
                         $mainUnitCode.val(data.mainUnitCode);
@@ -1172,20 +1161,9 @@
                 transQuantityChanged();
 
             });
-            $('#PriceOnTransUnit').change((event) => {
-                priceChanged();
-            });
-            $('#transQuantity').change((event) => {
-                transQuantityChanged();
-            });
+
             $seekType.change(() => {
                 setSeekType();
-            });
-            $vatPercent.change(() => {
-                priceChanged();
-            });
-            $price.change(() => {
-                priceChanged();
             });
             $companyId.change(() => {
                 companyChanged();
@@ -1214,9 +1192,9 @@
                 var baseUnitPriceNet = parseFloat($priceNet.val());
                 var quantity1 = $q1.val();
                 var quantity2 = $q2.val();
-                var discount = $discount.val();
+                var discount = discountPercentEl.value;
                 var materialId = $materialId.val();
-                var vatPercent = $vatPercent.val();
+                var vatPercent = vatPercentEl.value;
                 var factor = $factor.val();
                 var mainUnitId = $mainUnitId.val();
                 var secUnitId = $secUnitId.val();
@@ -1229,10 +1207,12 @@
                 var transUnitId = $transUnitId.val();
                 var transUnitType = $transUnitType.val();
                 var transUnitFactor = $transUnitFactor.val();
-                var transQuantity = $transQuantity.val();
+                //var transQuantity = $transQuantity.val();
+                var transQuantity = transQuantityEl.value;
                 var transUnitCode = $transUnitCode.val();
                 var mainUnitCode = $mainUnitCode.val();
-                var priceOnTransUnit = parseFloat( $transPrice.val());
+                //var priceOnTransUnit = parseFloat( $transPrice.val());
+                var priceOnTransUnit = priceOnTransUnitEl.value;
                 var transUnitText = `${formatterNumber.format(transQuantity)} ${transUnitCode}`;
                 var mainUnitText = `${formatterNumber.format(quantity1)} ${mainUnitCode}`;
 
@@ -1344,19 +1324,23 @@
                 $price.val('');
                 $q1.val('');
                 $q2.val('');
-                $discount.val('');
-                $vatPercent.val('');
+                //$discount.val('');
+                discountPercentEl.value = 0;
+                //$vatPercent.val('');
+                vatPercentEl.value = 0;
                 $priceNet.val('');
                 $lineNetValue.val('');
                 $lineVatValue.val('');
                 $lineDiscValue.val('');
                 $lineBrutValue.val('');
                 $lineExpValue.val('');
-                $transPrice.val('');
+                //$transPrice.val('');
+                priceOnTransUnitEl.value = 0;
                 $transUnitFactor.val('');
                 $factor.val('');
                 $transUnitSelector.empty();
-                $transQuantity.val("");
+                //$transQuantity.val("");
+                transQuantityEl.value = 0;
             }
 
             $(document).on('click','a.deleteItem',function(e) {
@@ -1431,16 +1415,20 @@
                             $lineEditing.val(lineEdit);
                             $materialId.val(materialId);
                             $lookUp.val(materialName);
-                            $transQuantity.val(transQ);
+                            //$transQuantity.val(transQ);
+                            transQuantityEl.value = transQ;
                             $transUnitId.val(transUnitId);
                             $transUnitType.val(transUnitType);
-                            $transPrice.val(transPrice);
+                            //$transPrice.val(transPrice);
+                            priceOnTransUnitEl.value = transPrice;
                             $transUnitFactor.val(transUnitFactor);
                             $priceNet.val(baseUnitPriceNet);
                             $q1.val(q1);
                             $q2.val(q2);
-                            $vatPercent.val(fpaRate);
-                            $discount.val(discountRate);
+                            //$vatPercent.val(fpaRate);
+                            vatPercentEl.value = fpaRate;
+                            //$discount.val(discountRate);
+                            discountPercentEl.value = discountRate;
                             $mainUnitId.val(mainUnitId);
                             $secUnitId.val(secUnitId);
                             $factor.val(factor);
@@ -1568,7 +1556,8 @@
                 setSeekType();
             }
             console.log("After initial load check");
-                setupAllNumericInputs();
+            setupAllNumericInputs();
+            setupEventManagers();
 
             setUpAutoComplete();
             //refreshAutoCompleteQuery();

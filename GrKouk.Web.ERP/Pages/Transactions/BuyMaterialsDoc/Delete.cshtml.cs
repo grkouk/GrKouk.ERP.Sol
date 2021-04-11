@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Web.ERP.Data;
@@ -54,15 +55,28 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
 
             if (BuyDocument != null)
             {
+                await using var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    _context.BuyDocLines.RemoveRange(_context.BuyDocLines.Where(p => p.BuyDocumentId == id));
+                    _context.TransactorTransactions.RemoveRange(_context.TransactorTransactions.Where(p => p.CreatorSectionId == BuyDocument.SectionId && p.CreatorId == id));
+                    _context.CashFlowAccountTransactions.RemoveRange(_context.CashFlowAccountTransactions.Where(p => p.CreatorSectionId == BuyDocument.SectionId && p.CreatorId == id));
+                    _context.WarehouseTransactions.RemoveRange(_context.WarehouseTransactions.Where(p => p.SectionId == BuyDocument.SectionId && p.CreatorId == id));
+                    _context.BuyDocTransPaymentMappings.RemoveRange(_context.BuyDocTransPaymentMappings.Where(p=>p.BuyDocumentId==id));
+                    _context.BuyDocuments.Remove(BuyDocument);
 
-                _context.BuyDocLines.RemoveRange(_context.BuyDocLines.Where(p => p.BuyDocumentId == id));
-                _context.TransactorTransactions.RemoveRange(_context.TransactorTransactions.Where(p => p.CreatorSectionId == BuyDocument.SectionId && p.CreatorId == id));
-                _context.CashFlowAccountTransactions.RemoveRange(_context.CashFlowAccountTransactions.Where(p => p.CreatorSectionId == BuyDocument.SectionId && p.CreatorId == id));
-                _context.WarehouseTransactions.RemoveRange(_context.WarehouseTransactions.Where(p => p.SectionId == BuyDocument.SectionId && p.CreatorId == id));
-                _context.BuyDocTransPaymentMappings.RemoveRange(_context.BuyDocTransPaymentMappings.Where(p=>p.BuyDocumentId==id));
-                _context.BuyDocuments.Remove(BuyDocument);
-
-                await _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    string msg = $"Error  {ex.Message} inner exception->{ex.InnerException?.Message}";
+                    ModelState.AddModelError(string.Empty, msg);
+                    //LoadCombos();
+                    return Page();
+                }
+               
             }
 
             return RedirectToPage("./Index");

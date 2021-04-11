@@ -135,15 +135,20 @@ namespace GrKouk.Web.ERP.Helpers
         public static async Task<List<SelectListItem>> GetSolidCompaniesFilterListAsync(ApiDbContext context)
         {
            
-            var dbCompanies = await context.Companies.Where(t => t.Id != 1).OrderBy(p => p.Code)
+            var companiesList = await context.Companies.Where(t => t.Id != 1).OrderBy(p => p.Code)
                 .AsNoTracking()
+                .Select(c=>new SelectListItem()
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Code
+                })
                 .ToListAsync();
-            List<SelectListItem> companiesList = new List<SelectListItem>();
+            //List<SelectListItem> companiesList = new List<SelectListItem>();
            
-            foreach (var company in dbCompanies)
-            {
-                companiesList.Add(new SelectListItem() { Value = company.Id.ToString(), Text = company.Code });
-            }
+            //foreach (var company in dbCompanies)
+            //{
+            //    companiesList.Add(new SelectListItem() { Value = company.Id.ToString(), Text = company.Code });
+            //}
 
             return companiesList;
         }
@@ -155,18 +160,25 @@ namespace GrKouk.Web.ERP.Helpers
         public static List<SelectListItem> GetSolidCompaniesFilterList(ApiDbContext context)
         {
            
-            var dbCompanies = context.Companies.Where(t => t.Id != 1).OrderBy(p => p.Code)
+            var dbCompanies = context.Companies.Where(t => t.Id != 1)
+                .OrderBy(p => p.Code)
                 .AsNoTracking()
+                .Select(c=>new SelectListItem()
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Code
+                })
                 .ToList();
-            List<SelectListItem> companiesList = new List<SelectListItem>();
+            //List<SelectListItem> companiesList = new List<SelectListItem>();
            
-            foreach (var company in dbCompanies)
-            {
-                companiesList.Add(new SelectListItem() { Value = company.Id.ToString(), Text = company.Code });
-            }
+            //foreach (var company in dbCompanies)
+            //{
+            //    companiesList.Add(new SelectListItem() { Value = company.Id.ToString(), Text = company.Code });
+            //}
 
-            return companiesList;
+            return dbCompanies;
         }
+
         public static async Task<List<SelectListItem>> GetTransactorsForTypeFilterListAsync(ApiDbContext context, string trType)
         {
             var trTypeObject = await context.TransactorTypes.FirstOrDefaultAsync(p => p.Code == trType);

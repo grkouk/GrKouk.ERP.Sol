@@ -181,11 +181,11 @@
 
            
             const docSeriesChanged=()=>{
-                const docSeriesId=$('#ItemVm_TransTransactorDocSeriesId').val();
+                const docSeriesId=$docSeriesEl.val();
                 //locate inside list selected docseriesid
                 let a = allowedTypesListJs.find(o=>o.docSeriesId==docSeriesId);
                 if (a){
-                    console.log('Found');
+                    //console.log('Found');
                     let allowed = JSON.parse(a.allowedTypes);
                     if (allowed){
                         let  lst = transactorsListJs.filter(function(item){
@@ -236,6 +236,7 @@
                                     $docCurrency.text(currencyCode);
                                 })
                                 .catch((error) => {
+                                    
                                     console.log("Error setting Globalize locale");
                                     console.log(error);
                                 });
@@ -263,7 +264,7 @@
                 
             };
             $docSeriesEl.change((e)=> {
-                console.log(e);
+                //console.log(e);
                 docSeriesChanged();
             });
            
@@ -287,7 +288,7 @@
             docSeriesChanged();
             companyChanged();
             if (selectTransactor!==0) {
-                $('#ItemVm_TransactorId').val(selectTransactor);
+                $transactorListEl.val(selectTransactor);
             }
         });
 
