@@ -1535,7 +1535,7 @@
                     amountFpa: $("#ItemVm_AmountFpa").attr('data-actualValue'),
                     amountNet: $("#ItemVm_AmountNet").attr('data-actualValue'),
                     amountDiscount: $("#ItemVm_AmountDiscount").attr('data-actualValue'),
-
+                    sectionId: $("#ItemVm_SectionId").val(),
                   
                     timestamp: $("#ItemVm_Timestamp").val(),
                     sellDocLines: linesArr
@@ -1563,7 +1563,7 @@
             setupAllNumericInputs();
             setupEventManagers();
 
-            setUpAutoComplete();
+            //setUpAutoComplete();
 
             $initialLoad.val(false);
         });
