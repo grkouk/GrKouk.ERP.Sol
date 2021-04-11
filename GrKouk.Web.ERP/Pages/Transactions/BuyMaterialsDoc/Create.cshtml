@@ -26,10 +26,6 @@
         appearance: none;
         margin: 0;
     }
-    /*body {
-        padding-top: 50px;
-        padding-bottom: 20px;
-    }*/
     .ui-autocomplete-loading {
         background: white url('@Url.Content("~/images/ui-anim_basic_16x16.gif")') right center no-repeat;
     }
@@ -150,41 +146,28 @@
                 </div>
             </div>
             <div class="col-sm-3 col-md-1 col-lg-1 col-xl-1">
-                <div class="form-floating">
-                    <input class="form-control form-control-sm small input-doc-line text-end numeric-input" placeholder="Quantity" id="transQuantity" data-actualValue="0"/>
-                    <label class="form-label small" id="transQLabel">Quantity</label>
-                </div>
+                <ejs-numerictextbox id="transQuantity" placeholder="Quantity" format="n3" showSpinButton="false" floatLabelType="Auto"></ejs-numerictextbox>
+
                 <div class="invalid-feedback">
                     Please enter a valid Quantity.
                 </div>
             </div>
             <div class="col-sm-3 col-md-1 col-lg-1 col-xl-1">
-                <div class="form-floating">
-                    <div class="form-floating">
-                        <input class="form-control form-control-sm input-doc-line text-end currency-input" placeholder="Price" id="PriceOnTransUnit" data-actualValue="0"/>
-                        <label class="form-label small">Price </label>
-                    </div>
-                    <div class="invalid-feedback">
-                        Please enter a valid Price.
-                    </div>
+                <ejs-numerictextbox id="PriceOnTransUnit" placeholder="Price" format="c2" showSpinButton="false" floatLabelType="Auto"></ejs-numerictextbox>
+                <div class="invalid-feedback">
+                    Please enter a valid Price.
                 </div>
             </div>
             <div class="col-sm-3 col-md-1 col-lg-1 col-xl-1">
-                <div class="form-floating">
-                    <input class="form-control form-control-sm small input-doc-line text-end numeric-input"  placeholder="Dis %" id="Discount"/>
-                    <label class="form-label small">Dis% </label>
-                    <div class="invalid-feedback">
-                        Please enter a valid Discount.
-                    </div>
+                <ejs-numerictextbox id="DiscountPercent" placeholder="Dis %" format="p2" showSpinButton="false" floatLabelType="Auto"></ejs-numerictextbox>
+                <div class="invalid-feedback">
+                    Please enter a valid Discount.
                 </div>
             </div>
             <div class="col-sm-3 col-md-1 col-lg-1 col-xl-1">
-                <div class="form-floating">
-                    <input class="form-control form-control-sm small input-doc-line text-end numeric-input"  placeholder="Vat%" id="VatPercent"/>
-                    <label class="form-label small">VAT% </label>
-                    <div class="invalid-feedback">
-                        Please enter a valid VAT.
-                    </div>
+                <ejs-numerictextbox id="VatPercent" placeholder="Vat %" format="p2" showSpinButton="false" floatLabelType="Auto"></ejs-numerictextbox>
+                <div class="invalid-feedback">
+                    Please enter a valid VAT.
                 </div>
             </div>
             <div class="col-sm-1">
@@ -413,20 +396,20 @@
         $(document).ready(function() {
             //console.log("Inside Document ready");
             $('#LineEditing').val(0);
-            var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
-            //console.log('Current Culture ' + currentCulture);
-
-            var formatterCurrency = new Intl.NumberFormat(currentCulture,
-                {
-                    style: 'currency',
-                    currency: 'EUR',
-                    minimumFractionDigits: 2
-                });
-            var formatterNumber = new Intl.NumberFormat(currentCulture,
-                {
-                    maximumFractionDigits: 3
-
-                });
+            // var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
+            // //console.log('Current Culture ' + currentCulture);
+            //
+            // var formatterCurrency = new Intl.NumberFormat(currentCulture,
+            //     {
+            //         style: 'currency',
+            //         currency: 'EUR',
+            //         minimumFractionDigits: 2
+            //     });
+            // var formatterNumber = new Intl.NumberFormat(currentCulture,
+            //     {
+            //         maximumFractionDigits: 3
+            //
+            //     });
             let parseNumber;
             let formatCurrency;
             let formatNumber;
@@ -478,7 +461,10 @@
             var $mainUnitCode = $('#MaterialMainUnitCode');
             var $transUnitCode = $('#TransactionUnitCode');
             var $docCurrency = $('[name=docCurrency]');
-
+            var discountPercentEl = document.getElementById("DiscountPercent").ej2_instances[0];
+            var vatPercentEl = document.getElementById("VatPercent").ej2_instances[0];
+            var transQuantityEl = document.getElementById("transQuantity").ej2_instances[0];
+            var priceOnTransUnitEl = document.getElementById("PriceOnTransUnit").ej2_instances[0];
 
             //#endregion
 
@@ -534,10 +520,7 @@
 
             //#endregion
             const priceChanged = () => {
-
-                //var transPrice = parseFloat($transPrice.val());
-                let transPriceAttr = $transPrice.attr('data-actualValue');
-                let transPrice = parseFloat(transPriceAttr);
+                let transPrice = priceOnTransUnitEl.value;
                 if (isNaN(transPrice)) {
                     transPrice = 0;
                 }
@@ -547,9 +530,8 @@
                     transFactor = 1;
                 }
                 var priceNetValue = 0;
-
-                let vatPercetAttr = $vatPercent.attr('data-actualValue');
-                var vatPerc = parseFloat(vatPercetAttr);
+                var vatPerc = vatPercentEl.value;
+              
                 if (isNaN(vatPerc)) {
                     vatPerc = 0;
                 }
@@ -582,9 +564,8 @@
                     baseQuantity = 0;
                 }
                 var netVal = priceNetValue * baseQuantity;
-
-                let discountAttr = $discount.attr('data-actualValue');
-                var discPercent = parseFloat(discountAttr);
+                var discPercent =discountPercentEl.value;
+               
                 if (isNaN(discPercent)) {
                     discPercent = 0;
                 }
@@ -607,7 +588,7 @@
 
             };
             const transQuantityChanged = () => {
-                let trQ = parseFloat($transQuantity.val());
+                let trQ = transQuantityEl.value;
                 if (isNaN(trQ)) {
                     return;
                 }
@@ -649,6 +630,20 @@
                 default:
                     break;
                 }
+            };
+             const setupEventManagers = () => {
+                vatPercentEl.addEventListener("change",(event) => {
+                    priceChanged();
+                });
+                discountPercentEl.addEventListener("change", (event) => {
+                    priceChanged();
+                });
+                priceOnTransUnitEl.addEventListener("change", (event) => {
+                    priceChanged();
+                });
+                transQuantityEl.addEventListener("change", (event) => {
+                    transQuantityChanged();
+                });
             };
             var setSeriesInSession = () => {
                 return $.ajax({
@@ -710,19 +705,12 @@
                         .then((data) => {
                             let currencyCode = data.currencyCode;
                             let locale = data.currencyLocale.substring(0, 2);
-                            productLib.setGlobalizeLocale(locale)
+                            let loader = ej.base.loadCldr;
+                           productLib.setLanguageLocale(locale, currencyCode, loader)
                                 .then(() => {
-                                    formatterCurrency = new Intl.NumberFormat(locale,
-                                        {
-                                            style: 'currency',
-                                            currency: currencyCode,
-                                            minimumFractionDigits: 2
-                                        });
-                                    formatterNumber = new Intl.NumberFormat(locale,
-                                        {
-                                            maximumFractionDigits: 3
-
-                                        });
+                                    ej.base.setCulture(locale);
+                                    ej.base.setCurrencyCode(currencyCode);
+                                   
                                     parseNumber = Globalize.numberParser();
                                     formatNumber = Globalize.numberFormatter();
                                     formatCurrency = Globalize.currencyFormatter(currencyCode);
@@ -734,6 +722,7 @@
                                 .catch((error) => {
                                     console.log("Error setting Globalize locale");
                                     console.log(error);
+                                    toastr.error(error.statusText, "Error");
                                 });
 
 
@@ -741,6 +730,7 @@
                         .catch((error) => {
                             console.log("Error getting company base currency");
                             console.log(error);
+                            toastr.error(error.statusText, "Error");
                         });
                 }
             };
@@ -794,6 +784,7 @@
                     .catch((error) => {
                             // $spinner.attr('hidden', true);
                             console.log(error);
+                            toastr.error(error.statusText, "Error");
                         }
                     );
             };
@@ -851,8 +842,9 @@
                         $secUnitId.val(r.buyUnitId);
                         $materialId.val(mId);
                         $factor.val(mFactor);
-                        $vatPercent.val(rate);
-                        $discount.val(0);
+                        vatPercentEl.value = rate;
+                        discountPercentEl.value = 0;
+                        
                         $materialFpaId.val(fpaId);
                         $price.val(lastPrice);
                         $priceNet.val(lastPrice);
@@ -985,11 +977,13 @@
                         var rate = data.fpaRate;
                         var lastPrice = data.lastPrice;
                         var fpaId = data.fpaId;
-                        $vatPercent.val(rate);
+                        
+                        vatPercentEl.value = rate;
                         $('#MaterialFpaId').val(fpaId);
                         $price.val(lastPrice);
                         $priceNet.val(lastPrice);
-                        $discount.val('0');
+                        discountPercentEl.value = 0;
+                        
                         $lookUp.val(data.warehouseItemName);
                         $mainUnitId.val(data.mainUnitId);
                         $mainUnitCode.val(data.mainUnitCode);
@@ -1025,6 +1019,7 @@
                 minLength: 2,
                 maxShowItems: 10,
                 select: function(event, ui) {
+                    $materialId.val(ui.item.value);
                     this.value = ui.item.label;
                     handleProductSelection(ui.item.value, ui.item.label);
                     return false;
@@ -1085,21 +1080,11 @@
                 transQuantityChanged();
 
             });
-            $('#PriceOnTransUnit').change((event) => {
-                priceChanged();
-            });
-            $('#transQuantity').change((event) => {
-                transQuantityChanged();
-            });
+           
             $seekType.change(() => {
                 setSeekType();
             });
-            $vatPercent.change(() => {
-                priceChanged();
-            });
-            $discount.change((event) => {
-                priceChanged();
-            });
+           
             $companyId.change(() => {
                 companyChanged();
             });
@@ -1129,9 +1114,13 @@
                 var baseUnitPriceNet = parseFloat($priceNet.val());
                 var quantity1 = $q1.val();
                 var quantity2 = $q2.val();
-                var discount = $discount.val();
+                var discount = discountPercentEl.value;
+                var vatPercent = vatPercentEl.value;
+                var transQuantity = transQuantityEl.value;
+                var priceOnTransUnit = priceOnTransUnitEl.value;
+               
                 var materialId = $materialId.val();
-                var vatPercent = $vatPercent.val();
+               
                 var factor = $factor.val();
                 var mainUnitId = $mainUnitId.val();
                 var secUnitId = $secUnitId.val();
@@ -1144,10 +1133,10 @@
                 var transUnitId = $transUnitId.val();
                 var transUnitType = $transUnitType.val();
                 var transUnitFactor = $transUnitFactor.val();
-                var transQuantity = $transQuantity.val();
+               
                 var transUnitCode = $transUnitCode.val();
                 var mainUnitCode = $mainUnitCode.val();
-                var priceOnTransUnit = parseFloat( $transPrice.val());
+               
                 var transUnitText = `${formatterNumber.format(transQuantity)} ${transUnitCode}`;
                 var mainUnitText = `${formatterNumber.format(quantity1)} ${mainUnitCode}`;
                 //console.log("Inside AddToList with lineEdit is " + lineEdit);
@@ -1257,21 +1246,22 @@
                 $price.val('');
                 $q1.val('');
                 $q2.val('');
-                $discount.val('');
-                $vatPercent.val('');
+                                
                 $priceNet.val('');
                 $lineNetValue.val('');
                 $lineVatValue.val('');
                 $lineDiscValue.val('');
                 $lineBrutValue.val('');
                 $lineExpValue.val('');
-                $transPrice.val('');
+                                
                 $transUnitFactor.val('');
                 $factor.val('');
                 $transUnitSelector.empty();
-                $transQuantity.val("");
-                //$q1.prop('disabled', false);
-                //$q2.prop('disabled', false);
+                
+                discountPercentEl.value = 0;
+                vatPercentEl.value = 0;
+                priceOnTransUnitEl.value = 0;
+                transQuantityEl.value = 0;
             }
 
             $(document).on('click',
@@ -1350,20 +1340,24 @@
                                 $lineEditing.val(lineEdit);
                                 $materialId.val(materialId);
                                 $lookUp.val(materialName);
-                                $transQuantity.val(transQ);
+                               transQuantityEl.value = transQ;
+                               priceOnTransUnitEl.value = transPrice;
+                               vatPercentEl.value = fpaRate;
+                               discountPercentEl.value = discountRate;
                                 $transUnitId.val(transUnitId);
                                 $transUnitType.val(transUnitType);
-                                $transPrice.val(transPrice);
+                                
                                 $transUnitFactor.val(transUnitFactor);
                                 $priceNet.val(baseUnitPriceNet);
                                 $q1.val(q1);
                                 $q2.val(q2);
-                                $vatPercent.val(fpaRate);
-                                $discount.val(discountRate);
+                               
+                               
                                 $mainUnitId.val(mainUnitId);
                                 $secUnitId.val(secUnitId);
                                 $factor.val(factor);
                                 $price.val(priceOnBaseUnit);
+                                
                                 $lookupValueValid.val('OK');
                             })
                             .catch((error) => {
@@ -1491,6 +1485,8 @@
             }
             //console.log("After initial load check");
             setupAllNumericInputs();
+            setupEventManagers();
+
             $initialLoad.val(false);
         });
 
