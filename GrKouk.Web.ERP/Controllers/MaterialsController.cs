@@ -1693,7 +1693,7 @@ namespace GrKouk.Web.ERP.Controllers {
                     var paymentCfAccountId = paymentMethod.CfAccountId;
                     if (autoPaySeriesId > 0) {
                         var transTransactorPayOffSeries = await
-                            _context.TransTransactorDocSeriesDefs.AsNoTracking().FirstOrDefaultAsync(p =>
+                            _context.TransTransactorDocSeriesDefs.FirstOrDefaultAsync(p =>
                                 p.Id == autoPaySeriesId);
                         if (transTransactorPayOffSeries == null) {
                             await transaction.RollbackAsync();
