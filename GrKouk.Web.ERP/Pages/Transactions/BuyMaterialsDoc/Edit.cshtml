@@ -144,10 +144,8 @@
                     </div>
                 </div>
                 <div class="col-sm-3 col-md-1 col-lg-1 col-xl-1">
-                    <div class="form-floating">
-                        <input class="form-control form-control-sm small input-doc-line text-end" type="number" placeholder="Quantity" id="transQuantity" />
-                        <label class="form-label small" id="transQLabel">Quantity</label>
-                    </div>
+                    <ejs-numerictextbox id="transQuantity" placeholder="Quantity" format="n3" showSpinButton="false" floatLabelType="Auto"></ejs-numerictextbox>
+    
                     <div class="invalid-feedback">
                         Please enter a valid Quantity.
                     </div>
@@ -204,12 +202,12 @@
                 </div>
                 <div class="form-group col-md-1">
                     <label class="small">Price Base</label>
-                    <input class="form-control form-control-sm input-doc-line text-end" type="text" placeholder="Price" id="Price" tabindex="-1" readonly />
+                    <input class="form-control form-control-sm input-doc-line currency-input text-end" type="text" placeholder="Price" id="Price" tabindex="-1" readonly />
                     <span class="text-danger small"></span>
                 </div>
                 <div class="form-group col-md-1">
                     <label class="small">Price Net</label>
-                    <input class="form-control form-control-sm input-doc-line text-end" type="text" type="number" placeholder="Price Net" id="PriceNet" tabindex="-1" readonly />
+                    <input class="form-control form-control-sm input-doc-line currency-input text-end" type="text" type="number" placeholder="Price Net" id="PriceNet" tabindex="-1" readonly />
                     <span class="text-danger small"></span>
                 </div>
                 <div class="form-group col-md-1">
@@ -412,6 +410,9 @@
         $(document).ready(function() {
             console.log("Inside Document ready");
             $('#LineEditing').val(0);
+            let parseNumber;
+            let formatCurrency;
+            let formatNumber;
             // var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
             // console.log('Current Culture ' + currentCulture);
             // var parseNumber ;
@@ -430,7 +431,7 @@
             var $initialLoad = $('#IsInitialLoad');
             var $transDate = $('#ItemVm_TransDate');
             var securityToken = $('[name=__RequestVerificationToken]').val();
-
+            const $spinnerElement = $('#loadMe');
             var $lookUp = $('#Lookup');
             var $q1 = $('#Q1');
             var $q2 = $('#Q2');
@@ -481,8 +482,13 @@
             var priceOnTransUnitEl = document.getElementById("PriceOnTransUnit").ej2_instances[0];
             //#endregion
          //#region items selectors modals
-            $.fn.selectpicker.Constructor.BootstrapVersion = '4';
+           // $.fn.selectpicker.Constructor.BootstrapVersion = '4';
             selectorsLib.initializeSelector();
+             const setupAllNumericInputs = () => {
+                //productLib.prepCurrencyInputs();
+                //productLib.prepNumericInputs();
+
+            };
             $('#imageViewer').on('show.bs.modal',
                 function(event) {
                     var button = $(event.relatedTarget);
@@ -572,19 +578,20 @@
                 var netDiscountedVal = netVal - discVal;
                 var vatVal = netDiscountedVal * vatPerc;
                 var brutVal = netDiscountedVal + vatVal;
-                var netValText = formatterCurrency.format(netVal);
-                var discValText = formatterCurrency.format(discVal);
-                var vatValText = formatterCurrency.format(vatVal);
-                var brutValText = formatterCurrency.format(brutVal);
-                $lineNetValue.val(netValText);
-                $lineNetValue.attr('data-actualValue',netVal);
-                $lineDiscValue.val(discValText);
                 $lineDiscValue.attr('data-actualValue', discVal);
-                $lineVatValue.val(vatValText);
-                $lineVatValue.attr('data-actualValue', vatVal);
-                $lineBrutValue.val(brutValText);
                 $lineBrutValue.attr('data-actualValue', brutVal);
-
+                $lineNetValue.attr('data-actualValue',netVal);
+                $lineVatValue.attr('data-actualValue', vatVal);
+                if (formatCurrency){
+                    var netValText = formatCurrency(netVal);
+                    var discValText = formatCurrency(discVal);
+                    var vatValText = formatCurrency(vatVal);
+                    var brutValText = formatCurrency(brutVal);
+                    $lineNetValue.val(netValText);
+                    $lineDiscValue.val(discValText);
+                    $lineVatValue.val(vatValText);
+                    $lineBrutValue.val(brutValText);
+                }
             };
             const transQuantityChanged = () => {
                 let trQ = transQuantityEl.value;
@@ -664,9 +671,10 @@
                 let $elementsToUpdateVal = $('.currency-input');
                 $elementsToUpdateVal.each(function() {
                     let $el = $(this);
-                    let elValue = $el.attr('data-actualValue');
+                    let elValueStr = $el.attr('data-actualValue');
+                    let elValue = parseFloat(elValueStr);
                     if (!isNaN(elValue)) {
-                        $el.val(formatterCurrency.format(elValue));
+                        $el.val(formatCurrency(elValue));
                     } 
 
                 });
@@ -675,9 +683,11 @@
                 let $elementsToUpdateText = $('.currency-input-text');
                 $elementsToUpdateText.each(function () {
                     let $el = $(this);
-                    let elValue = $el.attr('data-actualValue');
+                    //let elValue = $el.attr('data-actualValue');
+                    let elValueStr = $el.attr('data-actualValue');
+                    let elValue = parseFloat(elValueStr);
                     if (!isNaN(elValue)) {
-                        $el.text(formatterCurrency.format(elValue));
+                        $el.text(formatCurrency(elValue));
                     }
 
                 });
@@ -699,7 +709,7 @@
                             console.log("Error setting companyId in session ");
                             console.log(error);
                         });
-                    productLib.getCompanyBaseCurrencyInfo(companyId)
+                    productLib.getCompanyBaseCurrencyInfo(companyId, $spinnerElement)
                         .then((data) => {
                             let currencyCode = data.currencyCode;
                            let locale = data.currencyLocale.substring(0, 2);
@@ -709,7 +719,7 @@
                                    ej.base.setCulture(locale);
                                    ej.base.setCurrencyCode(currencyCode);
                                    
-                                    parseNumber = Globalize.numberParser();
+                                   parseNumber = Globalize.numberParser();
                                    formatNumber = Globalize.numberFormatter();
                                    formatCurrency = Globalize.currencyFormatter(currencyCode);
                                    productLib.setParsers(parseNumber);
@@ -784,8 +794,6 @@
                     }
                     );
             };
-
-
 
             var setupUnitToUse = (e) => {
                 switch (e) {
@@ -891,14 +899,16 @@
                         sumVat += parseFloat(lineVat);
                         sumGross += parseFloat(lineGross);
                     });
-                $amountNet.val(formatterCurrency.format(sumNet));
                 $amountNet.attr('data-actualValue', sumNet);
-                $amountFpa.val(formatterCurrency.format(sumVat));
                 $amountFpa.attr('data-actualValue', sumVat);
-                $amountDiscount.val(formatterCurrency.format(sumDisc));
                 $amountDiscount.attr('data-actualValue', sumDisc);
-                $amountSum.val(formatterCurrency.format(sumGross));
                 $amountSum.attr('data-actualValue', sumGross);
+                if (formatCurrency){
+                    $amountNet.val(formatCurrency(sumNet));
+                    $amountFpa.val(formatCurrency(sumVat));
+                    $amountDiscount.val(formatCurrency(sumDisc));
+                    $amountSum.val(formatCurrency(sumGross));    
+                }
             };
             const getUnitTypeName = (unitType) => {
                 let unitTypeName = "";
@@ -1124,8 +1134,10 @@
                 var productName = $lookUp.val();
                 var baseUnitPriceNet = parseFloat($priceNet.val());
                 var baseUnitPrice =  parseFloat($price.val());
-                var quantity1 = $q1.val();
-                var quantity2 = $q2.val();
+                var quantity1Str = $q1.val();
+                var quantity1 = parseFloat(quantity1Str);
+                var quantity2Str = $q2.val();
+                var quantity2 = parseFloat(quantity2Str);
                 var discount = discountPercentEl.value;
                 var vatPercent = vatPercentEl.value;
                 var transQuantity = transQuantityEl.value;
@@ -1149,8 +1161,8 @@
                 var transUnitCode = $transUnitCode.val();
                 var mainUnitCode = $mainUnitCode.val();
                 
-                var transUnitText = `${formatterNumber.format(transQuantity)} ${transUnitCode}`;
-                var mainUnitText = `${formatterNumber.format(quantity1)} ${mainUnitCode}`;
+                var transUnitText = `${formatNumber(transQuantity)} ${transUnitCode}`;
+                var mainUnitText = `${formatNumber(quantity1)} ${mainUnitCode}`;
                // console.log("Inside AddToList with lineEdit is " + lineEdit);
                 if (lineEdit == 0) {
                    // console.log("Inside lineEdit Adding Line");
@@ -1174,13 +1186,13 @@
                     prItem += '</td>';
                     prItem += `<td class="small text-end" data-actualValue="${transQuantity}">${transUnitText}</td>`;
                     prItem += `<td class="small text-end" data-actualValue="${quantity1}">${mainUnitText}</td>`;
-                    prItem += `<td class="small text-end currency-input-text" data-actualValue="${priceOnTransUnit}">${formatterCurrency.format(priceOnTransUnit)}</td>`;
-                    prItem += `<td class="small text-end" data-actualValue="${discount}">${formatterNumber.format(discount)}</td>`;
-                    prItem += `<td class="small text-end" data-actualValue="${vatPercent}">${formatterNumber.format(vatPercent)}</td>`;
-                    prItem += `<td class="small text-end currency-input-text" data-actualValue="${netAmount}">${formatterCurrency.format(netAmount)}</td>`;
-                    prItem += `<td class="small text-end currency-input-text" data-actualValue="${discountAmount}">${formatterCurrency.format(discountAmount)}</td>`;
-                    prItem += `<td class="small text-end currency-input-text" data-actualValue="${fpaAmount}">${formatterCurrency.format(fpaAmount)}</td>`;
-                    prItem += `<td class="small text-end currency-input-text" data-actualValue="${grosAmount}">${formatterCurrency.format(grosAmount)}</td>`;
+                    prItem += `<td class="small text-end currency-input-text" data-actualValue="${priceOnTransUnit}">${formatCurrency(priceOnTransUnit)}</td>`;
+                    prItem += `<td class="small text-end" data-actualValue="${discount}">${formatNumber(discount)}</td>`;
+                    prItem += `<td class="small text-end" data-actualValue="${vatPercent}">${formatNumber(vatPercent)}</td>`;
+                    prItem += `<td class="small text-end currency-input-text" data-actualValue="${netAmount}">${formatCurrency(netAmount)}</td>`;
+                    prItem += `<td class="small text-end currency-input-text" data-actualValue="${discountAmount}">${formatCurrency(discountAmount)}</td>`;
+                    prItem += `<td class="small text-end currency-input-text" data-actualValue="${fpaAmount}">${formatCurrency(fpaAmount)}</td>`;
+                    prItem += `<td class="small text-end currency-input-text" data-actualValue="${grosAmount}">${formatCurrency(grosAmount)}</td>`;
                     prItem += '<td class="small">';
                     prItem += '<a data-itemId="0" href="#" class="modifyItem"><i class="fas fa-edit"></i></a>';
                     prItem += '</td><td class="small">';
@@ -1233,14 +1245,14 @@
                     $colFpaAmount.attr('data-actualValue', fpaAmount);
                     $colGrossAmount.attr('data-actualValue', grosAmount);
 
-                    $colDiscRate.text(formatterNumber.format(discount));
-                    $colFpaRate.text(formatterNumber.format(vatPercent));
+                    $colDiscRate.text(formatNumber(discount));
+                    $colFpaRate.text(formatNumber(vatPercent));
 
-                    $colGrossAmount.text(formatterCurrency.format(grosAmount));
-                    $colTransPrice.text(formatterCurrency.format(priceOnTransUnit));
-                    $colNetAmount.text(formatterCurrency.format(netAmount));
-                    $colDiscAmount.text(formatterCurrency.format(discountAmount));
-                    $colFpaAmount.text(formatterCurrency.format(fpaAmount));
+                    $colGrossAmount.text(formatCurrency(grosAmount));
+                    $colTransPrice.text(formatCurrency(priceOnTransUnit));
+                    $colNetAmount.text(formatCurrency(netAmount));
+                    $colDiscAmount.text(formatCurrency(discountAmount));
+                    $colFpaAmount.text(formatCurrency(fpaAmount));
                  }
 
                 $lineEditing.val(0);
@@ -1340,13 +1352,9 @@
                     let companyId = $companyId.val();
                     getProductInfo(materialId, transactorId, companyId, transUnitId)
                         .then((units) => {
-
                             $lineNetValue.attr('data-actualValue', lineNetAmount);
-
                             $lineDiscValue.attr('data-actualValue', lineDiscAmount);
-
                             $lineVatValue.attr('data-actualValue', lineVatAmount);
-
                             $lineBrutValue.attr('data-actualValue', lineGrosAmount);
                             formatCurrencyLineValueElements();
 
@@ -1354,9 +1362,9 @@
                             $materialId.val(materialId);
                             $lookUp.val(materialName);
                             transQuantityEl.value = transQ;
-                           priceOnTransUnitEl.value = transPrice;
-                           vatPercentEl.value = fpaRate;
-                           discountPercentEl.value = discountRate;
+                            priceOnTransUnitEl.value = transPrice;
+                            vatPercentEl.value = fpaRate;
+                            discountPercentEl.value = discountRate;
                             
                             $transUnitId.val(transUnitId);
                             //let fm = Globalize.numberFormatter();
@@ -1366,8 +1374,6 @@
                             $priceNet.val(baseUnitPriceNet);
                             $q1.val(q1);
                             $q2.val(q2);
-                            
-                            
                             $mainUnitId.val(mainUnitId);
                             $secUnitId.val(secUnitId);
                             $factor.val(factor);
@@ -1473,9 +1479,10 @@
             //-------------
             if ($initialLoad.val()=='True') {
                // console.log("Initial load is true setting initial values");
+               companyChanged();
                 updateCounter();
                 seriesChanged();
-                companyChanged();
+                
                 setSeekType();
             }
             //#endregion
