@@ -16,11 +16,15 @@ namespace GrKouk.Web.ERP.Helpers
                 lookupDate >= p.StartDate && lookupDate <= p.EndDate);
             return fiscalPeriod;
         }
-        public static async Task<MeasureUnit> GetMeasureUnitDetailsAsync(ApiDbContext context,int unitId)
+        public static async Task<(string code,string name)> GetMeasureUnitDetailsAsync(ApiDbContext context,int unitId)
         {
             var itemDetails = await context.MeasureUnits.FirstOrDefaultAsync(p =>
                 p.Id==unitId);
-            return itemDetails;
+            if (itemDetails==null)
+            {
+                return (string.Empty, string.Empty);
+            }
+            return (itemDetails.Code,itemDetails.Name);
         }
         public static string EnumToJson<T>()
         {
