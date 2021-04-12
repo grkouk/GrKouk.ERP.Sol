@@ -62,8 +62,10 @@
                 var grosAmountActual = FormattableString.Invariant($"{grosAmount}");
                 var transPriceActual = FormattableString.Invariant($"{transPrice}");
                 var transUnitFactorActual = FormattableString.Invariant($"{transUnitFactor}");
-                var transQuantityText = $@"{transQuantity:N2}";
-                var q1Text = $@"{q1:N2}";
+                var transUnitCode = docLine.TransactionUnitCode;
+                var transQuantityText = $@"{transQuantity:N2} {transUnitCode}";
+                var primaryUnitCode = docLine.PrimaryUnitCode;
+                var q1Text = $@"{q1:N2} {primaryUnitCode}";
                 var tLine = $"<tr><td class=\"small\"> {lineCount}" +
                             $"</td><td class=\"small\" data-materialId=\"{materialId}\" " +
                             $"data-transUnitId=\"{transUnitId}\" data-transUnitFactor=\"{transUnitFactor}\" " +
