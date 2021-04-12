@@ -12,8 +12,14 @@ namespace GrKouk.Erp.Dtos.BuyDocuments
         public string WarehouseItemName { get; set; }
 
         public int PrimaryUnitId { get; set; }
+        public string PrimaryUnitName { get; set; }
+        public string PrimaryUnitCode { get; set; }
         public int SecondaryUnitId { get; set; }
+        public string SecondaryUnitName { get; set; }
+        public string SecondaryUnitCode { get; set; }
         public int TransactionUnitId { get; set; }
+        public string TransactionUnitName { get; set; }
+        public string TransactionUnitCode { get; set; }
         public double TransactionQuantity { get; set; }
         public Single TransactionUnitFactor { get; set; }
         public Single Factor { get; set; }
