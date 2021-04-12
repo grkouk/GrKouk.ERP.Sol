@@ -1,0 +1,95 @@
+﻿@model List<GrKouk.Erp.Dtos.SellDocuments.SellDocLineModifyDto>
+
+@{
+    Layout = null;
+}
+
+ <table id="detailsTable" class="table table-responsive-sm">
+    <thead class="small">
+        <tr>
+            <th class="small" style="width: 0%"> #</th>
+            <th class="small" style="width: 20%">Product</th>
+            <th class="small text-center" style="width: 10%">Q(Trans)</th>
+            <th class="small text-center" style="width: 10%">Q(Base)</th>
+            <th class="small text-center" style="width: 10%">Trans Price</th>
+            <th class="small text-center" style="width: 5%">Disc%</th>
+            <th class="small text-center" style="width: 5%">Vat%</th>
+            <th class="small text-center" style="width: 10%">Net</th>
+            <th class="small text-center" style="width: 10%">Disc</th>
+            <th class="small text-center" style="width: 10%">Vat</th>
+            <th class="small text-center" style="width: 10%">Gross</th>
+            <th class="small" style="width: 1%"></th>
+            <th class="small" style="width: 1%"></th>
+
+        </tr>
+    </thead>
+    <tbody>
+    @{
+        if (Model != null)
+        {
+            var lineCount = 0;
+            foreach (var docLine in Model)
+            {
+                lineCount++;
+                var materialId = docLine.WarehouseItemId;
+                var transUnitId = docLine.TransactionUnitId;
+                var transQuantity = docLine.TransactionQuantity;
+                var transQuantityActual = FormattableString.Invariant($"{transQuantity}");
+                var transUnitFactor = docLine.TransactionUnitFactor;
+                var q1 = docLine.Quontity1;
+                var q2 = docLine.Quontity2;
+                var transPrice = docLine.TransUnitPrice;
+                var unitPrice = docLine.UnitPrice;
+                var vatRate = docLine.FpaRate;
+                var mainUnitId = docLine.PrimaryUnitId;
+                var secUnitId = docLine.SecondaryUnitId;
+                var factor = docLine.Factor;
+                var materialName = docLine.WarehouseItemName;
+                var disRate = docLine.DiscountRate;
+                var disAmount = docLine.AmountDiscount;
+                var vatAmount = docLine.AmountFpa;
+                var netAmount = docLine.AmountNet;
+                var grosAmount = netAmount - disAmount + vatAmount;
+                var q1Actual = FormattableString.Invariant($"{q1}");
+                var q2Actual = FormattableString.Invariant($"{q2}");
+                var unitPriceActual = FormattableString.Invariant($"{unitPrice}");
+                var vatRateActual = FormattableString.Invariant($"{vatRate}");
+                var factorActual = FormattableString.Invariant($"{factor}");
+                var disRateActual = FormattableString.Invariant($"{disRate}");
+                var disAmountActual = FormattableString.Invariant($"{disAmount}");
+                var vatAmountActual = FormattableString.Invariant($"{vatAmount}");
+                var netAmountActual = FormattableString.Invariant($"{netAmount}");
+                var grosAmountActual = FormattableString.Invariant($"{grosAmount}");
+                var transPriceActual = FormattableString.Invariant($"{transPrice}");
+                var transUnitFactorActual = FormattableString.Invariant($"{transUnitFactor}");
+                var transUnitCode = docLine.TransactionUnitCode;
+                var transQuantityText = $@"{transQuantity:N2} {transUnitCode}";
+                var primaryUnitCode = docLine.PrimaryUnitCode;
+                var q1Text = $@"{q1:N2} {primaryUnitCode}";
+                var tLine = $"<tr><td class=\"small\"> {lineCount}" +
+                            $"</td><td class=\"small\" data-materialId=\"{materialId}\" " +
+                            $"data-transUnitId=\"{transUnitId}\" data-transUnitFactor=\"{transUnitFactor}\" " +
+                            $"data-Q2=\"{q2Actual}\"  " +
+                            $"data-baseUnitPriceNet=\"{unitPriceActual}\"  " +
+                            $"data-factor=\"{factorActual}\" data-mainUnitId=\"{mainUnitId}\" data-secUnitId=\"{secUnitId}\" " +
+                            $">{materialName} </td><td class=\"small text-end\"  data-actualValue=\"{transQuantityActual}\" >" +
+                            $" {transQuantityText} </td><td class=\"small text-end\"  data-actualValue=\"{q1Actual}\" > " +
+                            $" {q1Text} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{transPriceActual}\" >" +
+                            $" {transPrice} </td><td class=\"small text-end\"  data-actualValue=\"{disRateActual}\" >" +
+                            $"{disRate} </td><td class=\"small text-end\"  data-actualValue=\"{vatRateActual}\" >" +
+                            $"{vatRate} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{netAmountActual}\" >" +
+                            $"{netAmount} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{disAmountActual}\" >" +
+                            $"{disAmount} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{vatAmountActual}\" >" +
+                            $"{vatAmount} </td><td class=\"small text-end currency-input-text\"  data-actualValue=\"{grosAmountActual}\" >" +
+                            $"{grosAmount} </td>" +
+                            $"<td class=\"small\">" +
+                            $"<a data-itemId=\"0\" href=\"#\" class=\"modifyItem\"><i class=\"fas fa-edit\"></i></a></td>" +
+                            $"<td class=\"small\">" +
+                            $"<a data-itemId=\"0\" href=\"#\" class=\"deleteItem\"><i class=\"fas fa-trash\"></i></a></td></tr>";
+                @Html.Raw(tLine)
+                ;
+            }
+        }
+    }
+    </tbody>
+</table>

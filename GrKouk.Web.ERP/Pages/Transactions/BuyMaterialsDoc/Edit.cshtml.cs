@@ -49,6 +49,10 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
                 .ThenInclude(m => m.WarehouseItem)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
+            if (buyMatDoc == null)
+            {
+                return NotFound();
+            }
             ItemVm = _mapper.Map<BuyDocModifyDto>(buyMatDoc);
 
             if (ItemVm == null)

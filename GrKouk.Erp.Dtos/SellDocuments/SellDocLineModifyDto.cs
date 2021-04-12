@@ -11,11 +11,17 @@ namespace GrKouk.Erp.Dtos.SellDocuments
         public int WarehouseItemId { get; set; }
         public string WarehouseItemName { get; set; }
         public int TransactionUnitId { get; set; }
+        public string TransactionUnitName { get; set; }
+        public string TransactionUnitCode { get; set; }
         public double TransactionQuantity { get; set; }
         public Single TransactionUnitFactor { get; set; }
         public decimal TransUnitPrice { get; set; }
         public int PrimaryUnitId { get; set; }
+        public string PrimaryUnitName { get; set; }
+        public string PrimaryUnitCode { get; set; }
         public int SecondaryUnitId { get; set; }
+        public string SecondaryUnitName { get; set; }
+        public string SecondaryUnitCode { get; set; }
         public Single Factor { get; set; }
         public double Quontity1 { get; set; }
         public double Quontity2 { get; set; }

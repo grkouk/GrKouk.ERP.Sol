@@ -16,7 +16,12 @@ namespace GrKouk.Web.ERP.Helpers
                 lookupDate >= p.StartDate && lookupDate <= p.EndDate);
             return fiscalPeriod;
         }
-
+        public static async Task<MeasureUnit> GetMeasureUnitDetailsAsync(ApiDbContext context,int unitId)
+        {
+            var itemDetails = await context.MeasureUnits.FirstOrDefaultAsync(p =>
+                p.Id==unitId);
+            return itemDetails;
+        }
         public static string EnumToJson<T>()
         {
             var values = Enum.GetValues(typeof(T)).Cast<int>();
