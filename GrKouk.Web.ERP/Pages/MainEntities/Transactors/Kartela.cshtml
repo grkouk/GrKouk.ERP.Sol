@@ -240,7 +240,7 @@
                                  retUri = `/transactions/sellmaterialdoc/Edit?id=${valueSource["creatorId"]}`;
                                  break;
                              case "SCNBUYMATTRANS":
-                                 retUri = `/transactions/buymaterialsdoc/Edit?id=${valueSource["creatorId"]}`;
+                                 retUri = `/transactions/buymaterialsdoc/Details?id=${valueSource["creatorId"]}`;
                                  break;
                          default:
                          }
@@ -248,7 +248,7 @@
                      } else {
 
                          var itemId = valueSource["id"];
-                         retUri = `/transactions/transactortransmng/Edit?id=${itemId}`;
+                         retUri = `/transactions/transactortransmng/Details?id=${itemId}`;
                      }
                      return retUri;
                    },
