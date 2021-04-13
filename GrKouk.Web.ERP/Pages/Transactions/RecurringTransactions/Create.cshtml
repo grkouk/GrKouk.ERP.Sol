@@ -5,11 +5,15 @@
 @inject IConfiguration Configuration
 
 @{
-    ViewData["Title"] = "Create";
+    Layout = "_LayoutEntryFormTransaction";
+    ViewData["Title"] = "Δημιουργία Συνδρομής";
 }
 
 @section MyCss
 {
+     <!--Begin syncfusion integration-->
+        <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/bootstrap4.css"/>
+        <!--End syncfusion integration-->
     <link rel="stylesheet" href="~/css/search-modal.css"/>
     <link rel="stylesheet" href="~/lib/bootstrap-select/css/bootstrap-select.min.css"/>
 }
@@ -23,11 +27,11 @@
         font-size: 12px;
     }
 </style>
-<h4>Νέα Συνδρομή</h4>
+
 <hr/>
-<div class="container">
-<form method="post" id="transForm">
-    <fieldset id="thisForm">
+<div class="container-xxl">
+    <form method="post" id="transForm">
+     <fieldset id="thisForm">
         <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
         <input type="hidden" asp-for="@Model.CopyFromId" id="CopyFromId"/>
         <input type="hidden" asp-for="@Model.CreateFromId" id="CreateFromId"/>
@@ -46,14 +50,14 @@
         <input type="hidden" id="SeriesUsedPrice"/>
         <input type="hidden" id="LineEditing"/>
         <input type="hidden" id="LookupValueValid"/>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-md-2">
                 <label asp-for="ItemVm.RecurringDocType" class="control-label small"></label>
-                <select asp-for="ItemVm.RecurringDocType" class="form-control form-control-sm small" asp-items="ViewBag.DocType"></select>
+                <select asp-for="ItemVm.RecurringDocType" class="form-select form-select-sm small" asp-items="ViewBag.DocType"></select>
             </div>
             <div class="form-group col-md-2">
                 <label asp-for="ItemVm.RecurringFrequency" class="control-label small"></label>
-                <select asp-for="ItemVm.RecurringFrequency" class="form-control form-control-sm small" asp-items="ViewBag.RecurringFrequency"></select>
+                <select asp-for="ItemVm.RecurringFrequency" class="form-select form-select-sm small" asp-items="ViewBag.RecurringFrequency"></select>
             </div>
             <div class="form-group col-md-2">
                 <label asp-for="ItemVm.NextTransDate" class="control-label small "></label>
@@ -62,7 +66,7 @@
             </div>
             <div class="form-group col-md-4">
                 <label asp-for="ItemVm.DocSeriesId" class="control-label small"></label>
-                <select asp-for="ItemVm.DocSeriesId" class="form-control form-control-sm small" asp-items="ViewBag.DocSeriesId"></select>
+                <select asp-for="ItemVm.DocSeriesId" class="form-select form-select-sm small" asp-items="ViewBag.DocSeriesId"></select>
             </div>
             <div class="form-group col-md-2">
                 <label asp-for="ItemVm.TransRefCode" class="control-label small"></label>
@@ -71,7 +75,7 @@
 
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-md-6">
                 <label asp-for="ItemVm.TransactorId" class="control-label small"></label>
                 <div class="input-group input-group-sm">
@@ -83,25 +87,25 @@
             </div>
             <div class="form-group col-md-3">
                 <label asp-for="ItemVm.CompanyId" class="control-label" small></label>
-                <select asp-for="ItemVm.CompanyId" class="form-control form-control-sm small" asp-items="ViewBag.CompanyId"></select>
+                <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm small" asp-items="ViewBag.CompanyId"></select>
             </div>
             <div class="form-group col-md-3">
                 <label asp-for="ItemVm.PaymentMethodId" class="control-label" small></label>
-                <select asp-for="ItemVm.PaymentMethodId" class="form-control form-control-sm small" asp-items="ViewBag.PaymentMethodId"></select>
+                <select asp-for="ItemVm.PaymentMethodId" class="form-select form-select-sm small" asp-items="ViewBag.PaymentMethodId"></select>
             </div>
         </div>
 
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-sm-1">
                 <label class="control-label small">Seek Type</label>
-                <select asp-for="SeekType" class="form-control form-control-sm " style="font-size: 0.7rem" asp-items="ViewBag.SeekType"></select>
+                <select asp-for="SeekType" class="form-select form-select-sm " style="font-size: 0.7rem" asp-items="ViewBag.SeekType"></select>
             </div>
             <div class="form-group col-sm-3">
                 <label class="small">LookUp</label>
                 <div class="input-group input-group-sm">
                     <input class="form-control form-control-sm " style="font-size: 0.7rem" id="Lookup" autocomplete="off"/>
                     <div class="input-group-append" id="button-addon5">
-                        <button class="btn btn-outline-secondary btn-sm " data-toggle="modal" data-target="#itemSelector" data-selectorType="ProductsSelector" style="font-size: 0.7rem" type="button">
+                        <button class="btn btn-outline-secondary btn-sm " data-bs-toggle="modal" data-target="#itemSelector" data-selectorType="ProductsSelector" style="font-size: 0.7rem" type="button">
                             <i class="fab fa-asymmetrik"></i>
                         </button>
                     </div>
@@ -147,7 +151,7 @@
                 </button>
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
             <table id="detailsTable" class="table table-responsive-sm">
                 <thead class="small">
                 <tr>
@@ -229,7 +233,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-sm-3">
                 <label class=" small">Net Amount</label>
                 <input id="ItemVm_AmountNet" class="form-control form-control-sm small text-right" type="text" disabled/>
@@ -253,7 +257,7 @@
 
             </div>
         </div>
-        <div class="form-row">
+        <div class="row mb-3">
             <div class="form-group col-md-12">
                 <label asp-for="ItemVm.Etiology" class="control-label small"></label>
                 <textarea asp-for="ItemVm.Etiology" class="form-control form-control-sm small"></textarea>
@@ -268,9 +272,7 @@
 
 </div>
 
-<div>
-    <a class="small" asp-page="Index">Back to List</a>
-</div>
+
 <!-- Modal Image Viewer -->
 <div class="modal fade" id="imageViewer" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
     <div class="modal-dialog " role="document">
@@ -285,102 +287,16 @@
                 <img id="imageControl" src="" style="height:400px;width:400px;"/>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 
             </div>
         </div>
     </div>
 </div>
 <!-- Modal Item selector -->
-<div class="modal fade" id="itemSelector" tabindex="-1" role="dialog" aria-labelledby="itemsModalLabel" aria-hidden="true" data-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered modal-lg" style="overflow-y: scroll; max-height:75%;  margin-top: 50px; margin-bottom:50px;" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="container-fluid">
-                    <div class="form-row">
-                        <div class="col-6">
-                            <p class="modal-title font-weight-bold" id="itemsModalLabel">Selector</p>
-                        </div>
-                        <div class="col-6 text-right">
-
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-3">
-                            <select class="selectpicker form-control form-control-sm small " id="CompaniesList" multiple
-                                    title="Companies" data-actions-box="true" data-selected-text-format="count > 1">
-                            </select>
-                        </div>
-                        <div class="form-group col-md-3" id="MaterialNatureTypesDiv">
-                            <select class="selectpicker form-control form-control-sm small " id="MaterialNatureTypes" multiple
-                                    title="Item Natures" data-actions-box="true" data-selected-text-format="count > 1">
-                            </select>
-                        </div>
-                        <div class="form-group col-md-3" id="TransactorSelectorTypesDiv">
-                            <select class="selectpicker form-control form-control-sm small " id="TransactorTypes" multiple
-                                    title="Item Natures" data-actions-box="true" data-selected-text-format="count > 1">
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="col-10">
-                            <input class="form-control form-control-sm" name="itemsSearchText" placeholder="Search text" type="text"/>
-
-                        </div>
-                        <div class="col-2">
-                            <span class="spinner-border spinner-border-sm text-primary" id="SpinnerLoader" style="display: none"></span>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-            <div class="modal-body ">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-12">
-                            <table class="table table-bordered table-sm" id="selectorItemsList">
-                                <thead class="thead-light">
-                                <tr>
-                                    <th class="small">
-                                        Product
-                                    </th>
-                                    <th class="small">
-                                        col 2
-                                    </th>
-                                    <th></th>
-                                    <th></th>
-                                </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-        </div>
-    </div>
-</div>
-
+<partial name="_ItemSelector"/>
 <!-- Modal -->
-<div class="modal fade modal-topmost" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <div class="loader"></div>
-                <div>
-                    <p>Executing request. <br><small>Please wait...</small></p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<partial name="_LoadMePartial"/>
 <!-- Modal Another Recurring Doc exists -->
 <div class="modal fade" id="anotherDocExists" tabindex="-1" role="dialog" aria-labelledby="anotherDocExistsLabel" aria-hidden="true">
     <div class="modal-dialog " role="document">
@@ -426,11 +342,19 @@
 </div>
 
 @section Scripts {
-    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    @{ await Html.RenderPartialAsync("_ValidationScriptsStrippedPartial"); }
     <script src="~/lib/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script src="~/lib/jqueryui/jquery-ui.min.js"></script>
     <script src="~/js/jquery.ui.autocomplete.scroll.min.js"></script>
-  
+   <!--Begin syncfusion integration-->
+  <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
+  <ejs-scripts></ejs-scripts>
+  <!--End syncfusion integration-->
+  <!-- Begin For Modal selector -->
+  <script src="~/js/definitions.js"></script>
+  <script src="~/js/indexPageIIFE.lib.js"></script>
+  <script src="~/js/selectors.lib.js"></script>
+  <script src="~/js/product.lib.js"></script>
     <script>
         $(document).ready(function() {
             console.log("Inside Document ready");
