@@ -999,6 +999,7 @@
                 return new Promise((resolve, reject) => {
                     productLib.getProductItemInfo(itemId, transactorId, companyId)
                         .then((data) => {
+                             $mainUnitCode.val(data.mainUnitCode);
                             let units = data.productUnits;
                             loadUnitList(units,unitToSelectId);
                             resolve(units);

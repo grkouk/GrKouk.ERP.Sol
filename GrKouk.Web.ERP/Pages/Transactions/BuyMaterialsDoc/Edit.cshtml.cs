@@ -70,7 +70,12 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
                     vmLine.TransUnitPrice = vmLine.UnitPrice;
                     vmLine.TransactionQuantity = vmLine.Quontity1;
                 }
-
+                (vmLine.PrimaryUnitCode, vmLine.PrimaryUnitName) =
+                    await HelperFunctions.GetMeasureUnitDetailsAsync(_context,vmLine.PrimaryUnitId);
+                (vmLine.SecondaryUnitCode, vmLine.SecondaryUnitName) =
+                    await HelperFunctions.GetMeasureUnitDetailsAsync(_context,vmLine.SecondaryUnitId);
+                (vmLine.TransactionUnitCode, vmLine.TransactionUnitName) =
+                    await HelperFunctions.GetMeasureUnitDetailsAsync(_context,vmLine.TransactionUnitId);
             }
             
             LoadCombos();

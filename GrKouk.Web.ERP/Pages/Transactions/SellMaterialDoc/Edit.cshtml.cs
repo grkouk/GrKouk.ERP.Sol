@@ -50,7 +50,10 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
                 .Include(b => b.SellDocLines)
                 .ThenInclude(m => m.WarehouseItem)
                 .FirstOrDefaultAsync(m => m.Id == id);
-
+            if (sellMatDoc == null)
+            {
+                return NotFound();
+            }
             ItemVm = _mapper.Map<SellDocModifyDto>(sellMatDoc);
 
             if (ItemVm == null)
@@ -68,6 +71,12 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
                     vmLine.TransactionQuantity = vmLine.Quontity1;
                 }
 
+                (vmLine.PrimaryUnitCode, vmLine.PrimaryUnitName) =
+                    await HelperFunctions.GetMeasureUnitDetailsAsync(_context,vmLine.PrimaryUnitId);
+                (vmLine.SecondaryUnitCode, vmLine.SecondaryUnitName) =
+                    await HelperFunctions.GetMeasureUnitDetailsAsync(_context,vmLine.SecondaryUnitId);
+                (vmLine.TransactionUnitCode, vmLine.TransactionUnitName) =
+                    await HelperFunctions.GetMeasureUnitDetailsAsync(_context,vmLine.TransactionUnitId);
             }
           
 
