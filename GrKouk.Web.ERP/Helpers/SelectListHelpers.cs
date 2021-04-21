@@ -70,7 +70,7 @@ namespace GrKouk.Web.ERP.Helpers {
                 .AsNoTracking()
                 .Select(c => new SelectListItem() {
                     Value = c.Id.ToString(),
-                    Text = c.Code
+                    Text = c.Name
                 })
                 .ToListAsync();
             var itemToInsert = new SelectListItem() {

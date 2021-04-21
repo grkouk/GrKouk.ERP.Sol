@@ -216,10 +216,22 @@
                         });
                 }
             };
-
+            $docSeries1El.change((e)=> {
+                //console.log(e);
+                docSeries1Changed();
+            });
+            $docSeries2El.change((e) => {
+                //console.log(e);
+                docSeries2Changed();
+            });
+            $companyId.change(() => {
+                companyChanged();
+            });
 
             $transDate.val(new Date().toISOString().slice(0, 10));
-
+            docSeries1Changed();
+            docSeries2Changed();
+            companyChanged();
         });
     </script>
 }

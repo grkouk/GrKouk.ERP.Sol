@@ -36,7 +36,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
 
         public async Task<IActionResult> OnPostAsync() {
             if (!ModelState.IsValid) {
-                LoadCombos();
+                await LoadCombosAsync();
                 return Page();
             }
 
@@ -58,7 +58,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                         m.Id == ItemVm.DocSeries1Id);
                 if (docSeries1 is null) {
                     ModelState.AddModelError(string.Empty, "Δεν βρέθηκε η σειρά παραστατικού");
-                    LoadCombos();
+                    await LoadCombosAsync();
                     return Page();
                 }
 
@@ -77,7 +77,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                     var sectn = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == _sectionCode);
                     if (sectn == null) {
                         ModelState.AddModelError(string.Empty, "Δεν υπάρχει το Section");
-                        LoadCombos();
+                        await LoadCombosAsync();
                         return Page();
                     }
 
@@ -92,6 +92,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                 TransactorTransaction spTransaction1 = new TransactorTransaction {
                     TransDate = ItemVm.TransDate,
                     TransactorId = ItemVm.Transactor1Id,
+                    CfAccountId = ItemVm.Cfa1Id,
                     SectionId = sectionId1,
                     TransTransactorDocSeriesId = docSeries1.Id,
                     TransTransactorDocTypeId = docSeries1.TransTransactorDocTypeDefId,
@@ -158,7 +159,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                         m.Id == ItemVm.DocSeries2Id);
                 if (docSeries2 is null) {
                     ModelState.AddModelError(string.Empty, "Δεν βρέθηκε η σειρά παραστατικού");
-                    LoadCombos();
+                    await LoadCombosAsync();
                     return Page();
                 }
 
@@ -177,7 +178,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                     var sectn = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == _sectionCode);
                     if (sectn == null) {
                         ModelState.AddModelError(string.Empty, "Δεν υπάρχει το Section");
-                        LoadCombos();
+                        await LoadCombosAsync();
                         return Page();
                     }
 
@@ -192,6 +193,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                 TransactorTransaction spTransaction2 = new TransactorTransaction {
                     TransDate = ItemVm.TransDate,
                     TransactorId = ItemVm.Transactor2Id,
+                    CfAccountId = ItemVm.Cfa2Id,
                     SectionId = sectionId2,
                     TransTransactorDocSeriesId = docSeries2.Id,
                     TransTransactorDocTypeId = docSeries2.TransTransactorDocTypeDefId,
@@ -261,7 +263,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                     await transaction.RollbackAsync();
                     string msg = e.InnerException?.Message;
                     ModelState.AddModelError(string.Empty, msg);
-                    LoadCombos();
+                    await LoadCombosAsync();
                     return Page();
                 }
             }
@@ -321,7 +323,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
 
         private async Task LoadCombosAsync() {
             Func<Task<List<SelectListItem>>> transactorListFunc = async () => {
-                var transactorsList = await _context.Transactors
+                var itemList = await _context.Transactors
                     .Include(p => p.TransactorType)
                     .Where(p => p.TransactorType.Code != "SYS.DTRANSACTOR")
                     .OrderBy(s => s.Name)
@@ -331,7 +333,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                         Text = $"{c.Name}-{c.TransactorType.Code}"
                     })
                     .ToListAsync();
-                return transactorsList;
+                return itemList;
             };
             Func<Task<List<SelectListItem>>> companiesListFunc = async () => await FiltersHelper.GetSolidCompaniesFilterListAsync(_context);
             Func<Task<List<SelectListItem>>> fiscalPeriodListFunc = async () => await FiltersHelper.GetFiscalPeriodsFilterListAsync(_context);
@@ -350,6 +352,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                 var itemsList = await _context.Transactors
                         .Include(p => p.TransactorType)
                         .Where(p => p.TransactorType.Code != "SYS.DTRANSACTOR")
+                        .OrderBy(p=>p.Name)
                         .Select(p => new TransactorSelectListItem() {
                             Id = p.Id,
                             TransactorName = p.Name,
@@ -376,7 +379,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                 return itemsList;
             };
             Func<Task<List<SelectListItem>>> cfAccountsSelectListFunc = async () => await SelectListHelpers.GetCfAccountsNoSelectionListAsync(_context);
-            
+           
             ViewData["CompanyId"] = await companiesListFunc();
             ViewData["FiscalPeriodId"] = await fiscalPeriodListFunc();
             ViewData["TransactorId"] = await transactorListFunc();
