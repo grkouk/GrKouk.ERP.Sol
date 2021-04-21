@@ -1126,7 +1126,7 @@ namespace GrKouk.Web.ERP.Controllers {
                 }
                 catch (Exception e) {
                     transaction.Rollback();
-                    string msg = e.InnerException.Message;
+                    string msg = e.InnerException?.Message;
                     return BadRequest(new {
                         error = e.Message + " " + msg
                     });

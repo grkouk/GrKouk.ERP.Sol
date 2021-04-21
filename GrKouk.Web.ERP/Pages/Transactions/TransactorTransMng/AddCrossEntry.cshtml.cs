@@ -217,27 +217,69 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
                 });
             }
 
-            ViewData["CompanyId"] =
-                new SelectList(_context.Companies.OrderBy(c => c.Code).AsNoTracking(), "Id", "Code");
+            ViewData["CompanyId"] = FiltersHelper.GetSolidCompaniesFilterList(_context);
+                //new SelectList(_context.Companies.OrderBy(c => c.Code).AsNoTracking(), "Id", "Code");
             ViewData["FiscalPeriodId"] =
                 new SelectList(_context.FiscalPeriods.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
             ViewData["TransactorId"] = new SelectList(transactorsList, "Value", "Text");
             ViewData["DocSeriesId"] =
                 new SelectList(_context.TransTransactorDocSeriesDefs.OrderBy(s => s.Name).AsNoTracking(), "Id", "Name");
             //ViewData["SectionId"] = new SelectList(_context.Sections, "Id", "Code");
+            var transactorsListJs = _context.Transactors
+                .Include(p => p.TransactorType)
+                .Where(p => p.TransactorType.Code != "SYS.DTRANSACTOR")
+                .Select(p => new TransactorSelectListItem()
+                {
+                    Id = p.Id,
+                    TransactorName = p.Name,
+                    TransactorTypeId = p.TransactorType.Id,
+                    TransactorTypeCode = p.TransactorType.Code,
+                    Value = p.Id.ToString(),
+                    Text = $"{p.Name} {{{p.TransactorType.Code}}}"
+                })
+                .AsNoTracking()
+                .ToList();
+            ViewData["transactorsListJs"] = transactorsListJs;
+            var docTypeAllowedTransactorTypesListJs = _context.TransTransactorDocSeriesDefs
+                .Include(p => p.TransTransactorDocTypeDef)
+                .Select(p => new TransactorDocTypeAllowedTransactorTypes()
+                {
+                    DocSeriesId = p.Id,
+                    DocTypeId = p.TransTransactorDocTypeDefId,
+                    DefaultCfaId = p.TransTransactorDocTypeDef.DefaultCfaId,
+                    AllowedTypes = p.TransTransactorDocTypeDef.AllowedTransactorTypes
+                })
+                .AsNoTracking()
+                .ToList();
+            ViewData["docTypeAllowedTransactorTypesListJs"] = docTypeAllowedTransactorTypesListJs;
+            ViewData["CfAccountId"] = SelectListHelpers.GetCfAccountsNoSelectionList(_context);
         }
     }
 
     public class CrossEntryDto
     {
-        [DataType(DataType.Date)] public DateTime TransDate { get; set; }
+        [DataType(DataType.Date)] 
+        [Display(Name = "Ημερομηνία")]
+        public DateTime TransDate { get; set; }
+        [Display(Name = "Παραστατικο΄1")]
         public int DocSeries1Id { get; set; }
+        [Display(Name = "Παραστατικό 2")]
         public int DocSeries2Id { get; set; }
+        [Display(Name = "Συναλλασσόμενος 1")]
         public int Transactor1Id { get; set; }
+        [Display(Name = "Συναλλασσόμενος 2")]
         public int Transactor2Id { get; set; }
+        [Display(Name = "Χρημ.Λογ.1")]
+        public int Cfa1Id { get; set; }
+        [Display(Name = "Χρημ.Λογ 2")]
+        public int Cfa2Id { get; set; }
+        [Display(Name = "Αρ.Παραστατικού")]
         public string RefCode { get; set; }
+        [Display(Name = "Αιτιολογία")]
         public string Etiology { get; set; }
+        
         public decimal Amount { get; set; }
+        [Display(Name = "Εταιρεία")]
         public int CompanyId { get; set; }
     }
 }

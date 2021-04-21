@@ -2,57 +2,65 @@
 @model GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng.AddCrossEntry
 
 @{
-    ViewData["Title"] = "Create";
+    Layout = "_LayoutEntryFormTransaction";
+    ViewData["Title"] = "Δημιουργία αντιλογισμού";
 }
-<h2>Δημιουργία αντιλογισμού</h2>
-<hr/>
+@section MyCss
+{
+    <!--Begin syncfusion integration-->
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/bootstrap4.css" />
+    <!--End syncfusion integration-->
+}
+
+<hr />
 <div class="container">
     <form method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        @* <input type="hidden" asp-for="@Model.InitialLoad" id="IsInitialLoad"/> *@
+         @*<input type="hidden" asp-for="@Model.InitialLoad" id="IsInitialLoad"/>*@ 
         <div class="row mb-3">
             <div class="col-md-3">
                 <label asp-for="ItemVm.TransDate" class="small"></label>
-                <input asp-for="ItemVm.TransDate" class="form-control form-control-sm small" autofocus/>
+                <input asp-for="ItemVm.TransDate" class="form-control form-control-sm small" autofocus />
                 <span asp-validation-for="ItemVm.TransDate" class="text-danger"></span>
             </div>
             <div class="col-md-3">
                 <label asp-for="ItemVm.RefCode" class="small"></label>
-                <input asp-for="ItemVm.RefCode" class="form-control form-control-sm small"/>
+                <input asp-for="ItemVm.RefCode" class="form-control form-control-sm small" />
                 <span asp-validation-for="ItemVm.RefCode" class="text-danger"></span>
             </div>
             <div class="col-md-3">
                 <label asp-for="ItemVm.CompanyId" class="small"></label>
                 <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm small" asp-items="ViewBag.CompanyId"></select>
             </div>
-
-
         </div>
         <div class="row mb-3">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <label asp-for="ItemVm.DocSeries1Id" class="small"></label>
                 <select asp-for="ItemVm.DocSeries1Id" class="form-select form-select-sm small" asp-items="ViewBag.DocSeriesId"></select>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <label asp-for="ItemVm.Transactor1Id" class="small"></label>
                 <select asp-for="ItemVm.Transactor1Id" class="form-select form-select-sm small" asp-items="ViewBag.TransactorId"></select>
             </div>
-
-
+            <div class="col-md-4">
+                <label asp-for="ItemVm.Cfa1Id" class="small"></label>
+                <select asp-for="ItemVm.Cfa1Id" class="form-select form-select-sm small" asp-items="ViewBag.CfAccountId"></select>
+            </div>
         </div>
         <div class="row mb-3">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <label asp-for="ItemVm.DocSeries2Id" class="small"></label>
                 <select asp-for="ItemVm.DocSeries2Id" class="form-select form-select-sm small" asp-items="ViewBag.DocSeriesId"></select>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <label asp-for="ItemVm.Transactor2Id" class="small"></label>
                 <select asp-for="ItemVm.Transactor2Id" class="form-select form-select-sm small" asp-items="ViewBag.TransactorId"></select>
             </div>
-
-
+            <div class="col-md-4">
+                <label asp-for="ItemVm.Cfa2Id" class="small"></label>
+                <select asp-for="ItemVm.Cfa2Id" class="form-select form-select-sm small" asp-items="ViewBag.CfAccountId"></select>
+            </div>
         </div>
-
         <div class="row mb-3">
             <div class="col-md-12">
                 <label asp-for="ItemVm.Etiology" class="small"></label>
@@ -61,18 +69,157 @@
             </div>
         </div>
         <div class="row mb-3">
-
             <div class="col-md-3">
-                <label asp-for="ItemVm.Amount" class="small"></label>
-                <input asp-for="ItemVm.Amount" class="form-control form-control-sm small"/>
-                <span asp-validation-for="ItemVm.Amount" class="text-danger"></span>
+                <ejs-numerictextbox id="Amount" placeholder="Amount" format="c2" showSpinButton="false"
+                                    ejs-for="@Model.ItemVm.Amount" floatLabelType="Auto"></ejs-numerictextbox>
+                <div class="invalid-feedback">
+                    <span asp-validation-for="ItemVm.Amount" class="text-danger"></span>
+                </div>
+               
             </div>
 
         </div>
         <div class="row mb-3">
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary btn-sm"/>
+                <input type="submit" value="Create" class="btn btn-primary btn-sm" />
             </div>
         </div>
     </form>
 </div>
+<partial name="_LoadMePartial" />
+@section Scripts
+{
+    @{await Html.RenderPartialAsync("_ValidationScriptsStrippedPartial");}
+    <!--Begin syncfusion integration-->
+
+    <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+    <!--End syncfusion integration-->
+    <script src="~/js/product.lib.js"></script>
+    <script>
+        $(document).ready(function() {
+            var $transDate = $('#ItemVm_TransDate');
+            var amountNetEl = document.getElementById("Amount").ej2_instances[0];
+            var transactorsListJs = @Html.Raw(Json.Serialize(ViewBag.transactorsListJs));
+            var allowedTypesListJs = @Html.Raw(Json.Serialize(ViewBag.docTypeAllowedTransactorTypesListJs));
+            var $companyId = $('#ItemVm_CompanyId');
+            var $docCurrency = $('[name=docCurrency]');
+            const $spinnerElement = $('#loadMe');
+            const $docSeries1El = $('#ItemVm_DocSeries1Id');
+            const $docSeries2El = $('#ItemVm_DocSeries2Id');
+            const $transactorList1El = $('#ItemVm_Transactor1Id');
+            const $transactorList2El = $('#ItemVm_Transactor2Id');
+            const $cfaId1El = $('#ItemVm_Cfa1Id');
+            const $cfaId2El = $('#ItemVm_Cfa2Id');
+
+            const docSeries1Changed=()=>{
+                const docSeriesId=$docSeries1El.val();
+                //locate inside list selected docseriesid
+                let a = allowedTypesListJs.find(o=>o.docSeriesId==docSeriesId);
+                if (a){
+                    //console.log('Found');
+                    let allowed = JSON.parse(a.allowedTypes);
+                    if (allowed){
+                        let  lst = transactorsListJs.filter(function(item){
+                            return allowed.indexOf(item.transactorTypeId) !== -1;
+                        });
+                        $transactorList1El.empty();
+
+                        $.each(lst, function(index, item) {
+                            $transactorList1El.append($('<option></option>').attr('value', item.value).text(item.text));
+                        });
+                    } else {
+                        $transactorList1El.empty();
+                        $.each(transactorsListJs, function(index, item) {
+                            $transactorList1El.append($('<option></option>').attr('value', item.value).text(item.text));
+                        });
+                    }
+                    let cfaId = parseInt( a.defaultCfaId);
+                    if (cfaId!==NaN) {
+                        $cfaId1El.val(cfaId);
+                    }
+
+                } else {
+                    console.log('Not Found');
+                    $transactorList1El.empty();
+
+                    $.each(transactorsListJs, function(index, item) {
+                        $transactorList1El.append($('<option></option>').attr('value', item.value).text(item.text));
+                    });
+                }
+
+            };
+            const docSeries2Changed=()=>{
+                const docSeriesId=$docSeries2El.val();
+                //locate inside list selected docseriesid
+                let a = allowedTypesListJs.find(o=>o.docSeriesId==docSeriesId);
+                if (a){
+                    //console.log('Found');
+                    let allowed = JSON.parse(a.allowedTypes);
+                    if (allowed){
+                        let  lst = transactorsListJs.filter(function(item){
+                            return allowed.indexOf(item.transactorTypeId) !== -1;
+                        });
+                        $transactorList2El.empty();
+
+                        $.each(lst, function(index, item) {
+                            $transactorList2El.append($('<option></option>').attr('value', item.value).text(item.text));
+                        });
+                    } else {
+                        $transactorList2El.empty();
+                        $.each(transactorsListJs, function(index, item) {
+                            $transactorList2El.append($('<option></option>').attr('value', item.value).text(item.text));
+                        });
+                    }
+                    let cfaId = parseInt( a.defaultCfaId);
+                    if (cfaId!==NaN) {
+                        $cfaId2El.val(cfaId);
+                    }
+
+                } else {
+                    console.log('Not Found');
+                    $transactorList2El.empty();
+
+                    $.each(transactorsListJs, function(index, item) {
+                        $transactorList2El.append($('<option></option>').attr('value', item.value).text(item.text));
+                    });
+                }
+
+            };
+            const companyChanged = () => {
+                let companyId = parseInt($companyId.val());
+                if (isNaN(companyId)) {
+                    companyId = 0;
+                }
+                if (companyId > 0) {
+
+                    let loader = ej.base.loadCldr;
+                    productLib.getCompanyBaseCurrencyInfo(companyId, $spinnerElement)
+                        .then((data) => {
+                            let currencyCode = data.currencyCode;
+                            let locale = data.currencyLocale.substring(0, 2);
+                            productLib.setLanguageLocale(locale, currencyCode, loader)
+                                .then(() => {
+                                    ej.base.setCulture(locale);
+                                    ej.base.setCurrencyCode(currencyCode);
+                                    $docCurrency.text(currencyCode);
+                                })
+                                .catch((error) => {
+
+                                    console.log("Error setting Globalize locale");
+                                    console.log(error);
+                                });
+                        })
+                        .catch((error) => {
+                            console.log("Error getting company base currency");
+                            console.log(error);
+                        });
+                }
+            };
+
+
+            $transDate.val(new Date().toISOString().slice(0, 10));
+
+        });
+    </script>
+}
