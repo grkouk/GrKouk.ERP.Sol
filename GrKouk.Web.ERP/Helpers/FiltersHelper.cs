@@ -169,12 +169,7 @@ namespace GrKouk.Web.ERP.Helpers
                     Text = c.Code
                 })
                 .ToList();
-            //List<SelectListItem> companiesList = new List<SelectListItem>();
            
-            //foreach (var company in dbCompanies)
-            //{
-            //    companiesList.Add(new SelectListItem() { Value = company.Id.ToString(), Text = company.Code });
-            //}
 
             return dbCompanies;
         }
@@ -270,6 +265,21 @@ namespace GrKouk.Web.ERP.Helpers
             }
 
             return itemsList;
+        }
+        public static async Task<List<SelectListItem>> GetFiscalPeriodsFilterListAsync(ApiDbContext context)
+        {
+           
+            var itemList = await context.FiscalPeriods.OrderBy(p => p.Code)
+                .AsNoTracking()
+                .Select(c=>new SelectListItem()
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Code
+                })
+                .ToListAsync();
+           
+
+            return itemList;
         }
     }
 }
