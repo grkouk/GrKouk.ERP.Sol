@@ -255,7 +255,8 @@ namespace GrKouk.Web.ERP.Automapper {
                     opt => 
                         opt.MapFrom(src => src.RefCode))
                 .ReverseMap();
-
+            CreateMap<WarehouseItem, WrItemDetailDto>()
+                .ForMember(x => x.Companies, opt => opt.Ignore());
             
         }
     }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Web.ERP.Data;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -32,6 +34,24 @@ namespace GrKouk.Web.ERP.Helpers
             var enumDictionary = values.ToDictionary(value => Enum.GetName(typeof(T), value));
  
             return JsonConvert.SerializeObject(enumDictionary);
+        }
+
+        public static (int natureCode,string natureName) GetWarehouseNatureDetails(WarehouseItemNatureEnum nature)
+        {
+             var materialNatures = Enum.GetValues(typeof(WarehouseItemNatureEnum))
+                .Cast<WarehouseItemNatureEnum>()
+                .Select(c => new SelectListItem()
+                {
+                    Value = ((int)c).ToString(),
+                    Text = c.GetDescription()
+                }).ToList();
+             var natureItem = materialNatures
+                 .SingleOrDefault(p => p.Value == ((int)nature).ToString());
+             if (natureItem == null)
+             {
+                 return (natureCode: -1, natureName: "");
+             }   
+             return (natureCode: int.Parse(natureItem.Value), natureName: natureItem.Text);
         }
     }
 }
