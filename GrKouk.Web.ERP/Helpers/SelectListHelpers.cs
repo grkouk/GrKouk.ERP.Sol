@@ -73,12 +73,11 @@ namespace GrKouk.Web.ERP.Helpers {
                     Text = c.Name
                 })
                 .ToListAsync();
-            var itemToInsert = new SelectListItem() {
+
+            valuesList.Insert(0, new SelectListItem() {
                 Value = 0.ToString(),
                 Text = "{No Selection}"
-            };
-
-            valuesList.Insert(0, itemToInsert);
+            });
 
             return valuesList;
         }
