@@ -85,4 +85,9 @@ namespace GrKouk.Erp.Dtos.WarehouseItems
         public int CompanyId { get; set; }
         public string CompanyCode { get; set; }
     }
+
+    public class WrItemDetailDto
+    {
+
+    }
 }
