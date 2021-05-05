@@ -5,6 +5,7 @@ using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using AutoMapper;
 using GrKouk.Erp.Domain.Shared;
+using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Erp.Dtos.WarehouseItems;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
@@ -67,6 +68,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
             var itemTitle = $"{ItemVm.NatureName} {ItemVm.Name}";
             ViewData["ItemTitle"] = itemTitle;
             ViewData["Title"] = $"{itemTitle}-Details";
+            await LoadCombosAsync();
             return Page();
         }
          private async Task LoadCombosAsync() {
@@ -113,16 +115,37 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
                     .ToListAsync();
                 return itemsList;
             };
+            Func<Task<List<UISelectTypeItem>>> companiesListJsFunc = async () =>
+            {
+                var itemsList = await _context.Companies
+                   .OrderBy(p=>p.Name)
+                   .Select(p => new UISelectTypeItem() {
+                       Title = p.Name,
+                       ValueInt = p.Id,
+                       Value = p.Id.ToString()
+                    })
+                    .AsNoTracking()
+                    .ToListAsync();
+                return itemsList;
+            };
+            Func<Task<List<Currency>>> currenciesListJsFunc = async () =>
+            {
+                var itemsList = await _context.Currencies
+                    .OrderBy(p=>p.Name)
+                    .AsNoTracking()
+                    .ToListAsync();
+                return itemsList;
+            };
            
            
-           
-            ViewData["CompanyId"] = await companiesListFunc();
+            //ViewData["CompanyId"] = await companiesListFunc();
             
             ViewData["TransactorId"] = await transactorListFunc();
             
             ViewData["transactorsListJs"] = await transactorsJsListFunc();
-            ViewData["CurrencyListJs"] = await currenciesListFunc();
+            ViewData["CurrencyListJs"] = await currenciesListJsFunc();
             ViewData["DatePeriodListJs"] = DateFilter.GetDateFiltersSelectList();
+            ViewData["CompaniesListJs"] = await companiesListJsFunc();
            
         }
     }

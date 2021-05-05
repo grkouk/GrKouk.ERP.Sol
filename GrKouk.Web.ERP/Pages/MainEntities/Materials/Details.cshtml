@@ -15,16 +15,12 @@
                         <h3></h3>
                         <div class="btn-toolbar mb-2 mb-md-0">
                             <div class="btn-group mr-2">
-                                <button type="button" class="btn  btn-sm btn-outline-secondary selected-company-text">Reference</button>
-                                <button type="button" class="btn  btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split" id="companyMenuReference" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-reference="parent">
-                                    <span class="sr-only">Toggle Dropdown</span>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="companyMenuReference" name="CompanySelector">
-                                    <button class="dropdown-item company-item" type="button">Action</button>
-                                    <button class="dropdown-item company-item" type="button">Another Action</button>
-        
-                                    <button class="dropdown-item company-item" type="button">Another Action</button>
-                                </div>
+                                 <ejs-multiselect id="SelectedCompanies" dataSource="@ViewBag.CompaniesListJs" placeholder="Select Companies" mode="CheckBox"
+                                                                     showDropDownIcon="true"
+                                                                     showSelectAll="false" selectAllText="Select All" unSelectAllText="unSelect All">
+                                                        <e-multiselect-fields text="Title" value="Value"></e-multiselect-fields>
+                                                    </ejs-multiselect>
+                               
                             </div>
                             <div class="btn-group">
                                 <button type="button" class="btn  btn-sm btn-outline-secondary selected-currency-text">Reference</button>
@@ -158,13 +154,233 @@
 </div>
 @section Scripts
 {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.20.0/feather.min.js"></script>
+
     <script>
-        (function () {
+     $(document).ready(function () {
+         const sessionKey = 'MaterialDetailsPage';
+         let currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
+         let sessionObj = {
+             'currencyCode': '',
+             'periodCode': '',
+             'companyCode': ''
+         };
+         const currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
+         
+         const refreshView = () => {
+              const $selectedCurrency = $('.selected-currency-text');
+              let selCurrencyId = $selectedCurrency.data('currencyid');
+              const $selectedCurrencyInputField = $('#CurrencyId');
+              $selectedCurrencyInputField.val(selCurrencyId);
+          };
+           //-------------------Currency--------------------------------------------------
+          const loadCultureFiles = (name) => {
+               let files = ['ca-gregorian.json', 'numbers.json', 'timeZoneNames.json', 'currencies.json'];
+               if (name === 'ar') {
+                   files.push('numberingSystems.json');
+               }
+               let loader = ej.base.loadCldr;
+               let loadCulture = function(prop) {
+                   let val
+                   let ajax;
+                   if (name === 'ar' && prop === files.length - 1) {
+                       ajax = new ej.base.Ajax(location.origin + location.pathname + '/../../../lib/cldr-data/supplemental/' + files[prop], 'GET', false);
+                   } else {
+                       ajax = new ej.base.Ajax(location.origin + location.pathname + '/../../../lib/cldr-data/main/' + name + '/' + files[prop], 'GET', false);
+                   }
+                   ajax.onSuccess = function(value) {
+                       val = value;
+                   };
+                   ajax.send();
+                   loader(JSON.parse(val));
+               };
+               for (var prop = 0; prop < files.length; prop++) {
+                   loadCulture(prop);
+               }
+           };
+          const loadEj2Translation = (name) => {
+              let path = `/lib/ej2translations/${name}.json`;
+              let ajax = new ej.base.Ajax(path, 'GET', false); //load the name json culture file 
+              ajax.send().then((e) => {
+                  var culture = JSON.parse(e);
+                  ej.base.L10n.load(
+                      culture
+                  );
 
-           
+              });
+          };
+          const setCurrency = (currencyId, currencyCode, currencyLocale) => {
+              const $selectedCurrency = $('.selected-currency-text');
+              $selectedCurrency.data('currencyid', currencyId);
+              $selectedCurrency.data('currencycode', currencyCode);
+              $selectedCurrency.data('currencylocale', currencyLocale);
+              $selectedCurrency.text(currencyCode);
+              try {
+                  console.log(currencyCode);
+                  console.log(currentCulture);
+                  let cCulture = currencyLocale;
+                  let cBaseCulture = cCulture;
+                  if (cCulture.length > 2) {
+                      cBaseCulture = cCulture.substr(0, 2);
+                  }
+                  loadCultureFiles(cBaseCulture);
+                  ej.base.setCulture(cBaseCulture);
+                  ej.base.setCurrencyCode(currencyCode);
+                  //loadEj2Translation(cBaseCulture);
 
-        }())
+                  var grid = document.getElementById("Grid").ej2_instances[0];
+                  grid.locale = cBaseCulture;
+
+                  formatterCurrency = new Intl.NumberFormat(cCulture,
+                      {
+                          style: 'currency',
+                          currency: currencyCode,
+                          minimumFractionDigits: 2
+                      });
+
+              } catch (e) {
+                  console.log(e);
+                  console.log('Problem setting currency formatter');
+              }
+
+          };
+          const loadCurrencySelector = (availableCurrencies) => {
+              let $currenciesMenu = $('[name=CurrencySelector]');
+
+              $('.currency-item').remove();
+              if (availableCurrencies === undefined || availableCurrencies === null) {
+                  return;
+              }
+              var d = availableCurrencies;
+              d.forEach(function(item) {
+                  var $aLink = $('<button>').addClass('dropdown-item small currency-item');
+                  $aLink.text(item.name);
+                  // var diaryHRef = '/MainEntities/Transactors/RunDiary';
+                  // diaryHRef += `?diaryId=${item.value}`;
+                  $aLink.attr('type', 'button');
+                  $aLink.data('currencyid', item.id);
+                  $aLink.data('currencycode', item.code);
+                  $aLink.data('currencylocale', item.displayLocale);
+                  $currenciesMenu.append($aLink);
+              });
+              $('.currency-item').on('click',
+                  function(event) {
+                      let button = $(event.delegateTarget);
+                      let currencyId = button.data('currencyid');
+                      let currencyCode = button.data('currencycode');
+                      let currencyLocale = button.data('currencylocale');
+                      console.log(`Currency Id=${currencyId} currency Code=${currencyCode}`);
+
+                      setCurrency(currencyId, currencyCode, currencyLocale);
+                      refreshView();
+
+                      //let $btParent = button.parent()
+                  });
+          };
+          const getCurrencyId = (currencyCode, currencyList) => {
+              if (!(typeof currencyList != "undefined" && currencyList != null && currencyList.length != null && currencyList.length > 0)) {
+                  return 0;
+              }
+
+              let ret = currencyList.find(x => x.code === currencyCode).id;
+              const parsed = parseInt(ret);
+              if (isNaN(parsed)) {
+                  return currencyList[0].id;
+              } else {
+                  return parsed;
+              }
+          };
+          const getCurrency = (currencyCode, currencyList) => {
+              if (!(typeof currencyList != "undefined" && currencyList != null && currencyList.length != null && currencyList.length > 0)) {
+                  return null;
+              }
+
+              let ret = currencyList.find(x => x.code === currencyCode);
+
+              if (ret) {
+                  return ret;
+              } else {
+                  return currencyList[0];
+              }
+          };
+          //------------------Company------------------------------------------------
+          //--------------------------------------------------------------------------
+          const loadPreviousSession = (sessionKey, sessionObject) => {
+              let storageItemJs = localStorage.getItem(sessionKey);
+              if (storageItemJs === undefined || storageItemJs === null) {
+                  sessionObject.currencyCode = 'EUR';
+                  sessionObject.companyCode = '0';
+                  sessionObject.periodCode = "CURMONTH";
+
+              } else {
+                  var storageItem = JSON.parse(storageItemJs);
+                  try {
+                      let filtersValue = storageItem.find(x => x.filterKey === 'currentCurrency').filterValue;
+                      if (filtersValue === undefined || filtersValue === null) {
+                          sessionObject.currencyCode = 'EUR';
+                      } else {
+                          sessionObject.currencyCode = filtersValue;
+                      }
+                  } catch (e) {
+                      sessionObject.currencyCode = 'EUR';
+                  }
+                  try {
+                      let filtersValue = storageItem.find(x => x.filterKey === 'currentCompany').filterValue;
+                      if (filtersValue === undefined || filtersValue === null) {
+                          sessionObject.companyCode = '0';
+                      } else {
+                          sessionObject.companyCode = filtersValue;
+                      }
+                  } catch (e) {
+                      sessionObject.companyCode = '0';
+                  }
+                  try {
+                      let filtersValue = storageItem.find(x => x.filterKey === 'currentPeriod').filterValue;
+                      if (filtersValue === undefined || filtersValue === null) {
+                          sessionObject.periodCode = 'CURMONTH';
+                      } else {
+                          sessionObject.periodCode = filtersValue;
+                      }
+                  } catch (e) {
+                      sessionObject.periodCode = 'CURMONTH';
+                  }
+              }
+          };
+          //------------------------------------------------------------------------
+         loadCurrencySelector(currencyListJs);
+         let selCurrency = getCurrency(sessionObj.currencyCode, currencyListJs);
+         setCurrency(selCurrency.id, selCurrency.code, selCurrency.displayLocale);
+     });
+    $(window).on('beforeunload',
+        function(e) {
+            //#region CommentOut
+            //#region Variables
+            const sessionKey = 'MaterialDetailsPage';
+            const $selectedCurrency = $('.selected-currency-text');
+            const $selectedCompany = $('.selected-company-text');
+            const $selectedPeriod = $('.selected-period-text');
+            let currentCurrency = $selectedCurrency.data('currencycode');
+            let currentCompany = $selectedCompany.data('companyid');
+            let currentPeriod = $selectedPeriod.data('periodid');
+            var filtersArr = [];
+            //#endregion
+            filtersArr.push({
+                filterKey: 'currentCurrency',
+                filterValue: currentCurrency
+            });
+            filtersArr.push({
+                filterKey: 'currentCompany',
+                filterValue: currentCompany
+            });
+            filtersArr.push({
+                filterKey: 'currentPeriod',
+                filterValue: currentPeriod
+            });
+            let sessionVal = JSON.stringify(filtersArr);
+
+            localStorage.setItem(sessionKey, sessionVal);
+            //#endregion
+
+        });
     </script>
 }
 
