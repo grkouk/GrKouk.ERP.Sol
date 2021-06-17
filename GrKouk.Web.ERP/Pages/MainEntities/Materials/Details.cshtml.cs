@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using AutoMapper;
 using GrKouk.Erp.Domain.Shared;
@@ -144,6 +143,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
             
             ViewData["transactorsListJs"] = await transactorsJsListFunc();
             ViewData["CurrencyListJs"] = await currenciesListJsFunc();
+            ViewData["CurrencyList"]= await FiltersHelper.GetCurrenciesFilterListAsync(_context);
             ViewData["DatePeriodListJs"] = DateFilter.GetDateFiltersSelectList();
             ViewData["CompaniesListJs"] = await companiesListJsFunc();
            
