@@ -249,6 +249,20 @@ namespace GrKouk.Web.ERP.Helpers
 
             return itemsList;
         }
+        public static async Task<List<SearchListItem>> GetCurrenciesSearchListAsync(ApiDbContext context)
+        {
+            var valuesList = await context.Currencies
+                .OrderBy(p => p.Code)
+                .AsNoTracking()
+                .Select(c => new SearchListItem()
+                {
+                    Value = c.Id,
+                    Text = c.Code
+                })
+                .ToListAsync();
+
+            return valuesList;
+        }
         public static async Task<List<SelectListItem>> GetCurrenciesFilterListAsync(ApiDbContext context)
         {
             var valuesList = await context.Currencies

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -739,11 +740,25 @@ namespace GrKouk.Web.ERP.Controllers
             IQueryable<WarehouseTransaction> fullListIq =
                 _context.WarehouseTransactions.Where(p => p.WarehouseItemId == request.WarehouseItemId);
             if (!string.IsNullOrEmpty(request.CompanyFilter)) {
-                if (int.TryParse(request.CompanyFilter, out var companyId)) {
-                    if (companyId > 0) {
-                        fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
-                    }
+                List<int> firmIds = System.Text.Json.JsonSerializer.Deserialize<List<int>>(request.CompanyFilter);
+                var allCompCode =
+                    await _context.AppSettings.SingleOrDefaultAsync(
+                        p => p.Code == Constants.AllCompaniesCodeKey);
+                if (allCompCode == null)
+                {
+                    return NotFound("All Companies Code Setting not found");
                 }
+
+                var allCompaniesEntity =
+                    await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+
+                //if (allCompaniesEntity != null)
+                //{
+                //    var allCompaniesId = allCompaniesEntity.Id;
+                //    firmIds.Add(allCompaniesId);
+                //}
+
+                fullListIq = fullListIq.Where(p => firmIds.Contains( p.CompanyId));
             }
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
                 .Take(10)

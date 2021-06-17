@@ -2,183 +2,187 @@
 @model GrKouk.Web.ERP.Pages.MainEntities.Materials.DetailsModel
 
 @{
-	Layout = "_LayoutDashboard";
-	//ViewData["Title"] = "Product Details";
+    Layout = "_LayoutDashboard";
+    //ViewData["Title"] = "Product Details";
 }
 
 
 <div class="container-fluid">
- <div class="row">
-  <main role="main" class="col-md-12 ml-sm-auto col-lg-12 px-4">
-   <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-				@* <h3 class="h3">@Model.Item.TransactorTypeName @Model.Item.Name Details</h3> *@
-	<h3></h3>
-	<div class="btn-toolbar mb-2 mb-md-0">
-	 <div class="btn-group mr-2">
-	  <ejs-multiselect id="SelectedCompanies" dataSource="@ViewBag.CompaniesListJs" placeholder="Select Companies" mode="CheckBox"
-										 showDropDownIcon="true" showSelectAll="false" selectAllText="Select All" unSelectAllText="unSelect All">
-	   <e-multiselect-fields text="Title" value="Value"></e-multiselect-fields>
-	  </ejs-multiselect>
+    <div class="row">
+        <main role="main" class="col-md-12 ml-sm-auto col-lg-12 px-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                @* <h3 class="h3">@Model.Item.TransactorTypeName @Model.Item.Name Details</h3> *@
+                <h3></h3>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group mr-2">
+                        <ejs-multiselect id="SelectedCompanies" dataSource="@ViewBag.CompaniesListJs" placeholder="Select Companies" mode="CheckBox"
+                                         showDropDownIcon="true" showSelectAll="false" selectAllText="Select All" unSelectAllText="unSelect All">
+                            <e-multiselect-fields text="Title" value="ValueInt"></e-multiselect-fields>
+                        </ejs-multiselect>
 
-	 </div>
-	 <div class="btn-group mr-2">
-	  <select id="CurrencySelector" class="form-select form-select-sm"
-								asp-items="ViewBag.CurrencyList">
-	  </select>
-	 </div>
+                    </div>
+                    <div class="btn-group mr-2">
+                        <select id="CurrencySelector" class="form-select form-select-sm"
+                                asp-items="ViewBag.CurrencyList">
+                        </select>
+                    </div>
 
-	</div>
-   </div>
-   <div class="container">
-	<div class="card bg-light">
-	 <div class="card-body">
-	  <h5 class="card-title">@Model.ItemVm.Code</h5>
-	  <h6 class="card-subtitle mb-2 text-muted">@Model.ItemVm.Companies</h6>
-	  <p class="card-text"></p>
-	  <a href="./kartela?warehouseItemId=@Model.ItemVm.Id" class="card-link">Καρτέλα</a>
-	  <a href="#" class="card-link">Another link</a>
-	 </div>
-	</div>
-   </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5 class="card-title">@Model.ItemVm.Code</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">@Model.ItemVm.Companies</h6>
+                        <p class="card-text"></p>
+                        <a href="./kartela?warehouseItemId=@Model.ItemVm.Id" class="card-link">Καρτέλα</a>
+                        <a href="#" class="card-link">Another link</a>
+                    </div>
+                </div>
+            </div>
 
-   <hr />
-   <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-2 pb-2 mb-3 border-bottom">
-	<div class="d-flex align-items-center">
-	 <h5 class="mr-2">Financial Summary</h5>
-	 <div class="spinner-border ml-auto text-primary" role="status" aria-hidden="true" id="FinancialLoader" style="display: none"></div>
-	</div>
+            <hr />
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-2 pb-2 mb-3 border-bottom">
+                <div class="d-flex align-items-center">
+                    <h5 class="mr-2">Financial Summary</h5>
+                    <div class="spinner-border ml-auto text-primary" role="status" aria-hidden="true" id="FinancialLoader" style="display: none"></div>
+                </div>
 
-   </div>
-   <div class="container">
-	<div class="row align-items-center justify-content-between">
-	 <div class="col-lg-4 col-sm-12">
-	  <div class="card">
-	   <div class="card-header text-dark text-center">
-		<h5>Εισαγωγές</h5>
-	   </div>
-	   <div class="card-body text-center">
-		<table class="table-sm w-100">
+            </div>
+            <div class="container">
+                <div class="row align-items-center justify-content-between">
+                    <div class="col-lg-4 col-sm-12">
+                        <div class="card">
+                            <div class="card-header text-dark text-center">
+                                <h5>Εισαγωγές</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <table class="table-sm w-100">
 
-		 <tr>
-		  <td>Ποσότητες</td>
-		  <td>
-		   <span class="numeric-data" name="ImportVolume"></span>
+                                    <tr>
+                                        <td>Ποσότητες</td>
+                                        <td>
+                                            <span class="numeric-data" name="ImportVolume"></span>
 
-		  </td>
-		 </tr>
-		 <tr>
-		  <td>Αξία</td>
-		  <td>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Αξία</td>
+                                        <td>
 
-		   <span class="currency-data" name="ImportValue"></span>
-		  </td>
-		 </tr>
-		</table>
-	   </div>
-	  </div>
-	 </div>
-	 <div class="col-lg-4 col-sm-12">
-	  <div class="card">
-	   <div class="card-header text-dark text-center">
-		<h5>Εξαγωγές</h5>
-	   </div>
-	   <div class="card-body text-center">
-		<table class="table-sm w-100">
+                                            <span class="currency-data" name="ImportValue"></span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-12">
+                        <div class="card">
+                            <div class="card-header text-dark text-center">
+                                <h5>Εξαγωγές</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <table class="table-sm w-100">
 
-		 <tr>
-		  <td>Ποσότητες</td>
-		  <td><span class="numeric-data" name="ExportVolume"> </span></td>
-		 </tr>
-		 <tr>
-		  <td>Αξία</td>
-		  <td><span class="currency-data" name="ExportValue"></span></td>
-		 </tr>
-		</table>
-	   </div>
-	  </div>
-	 </div>
-	 <div class="col-lg-4 col-sm-12">
-	  <div class="card">
-	   <div class="card-header text-center">
-		<h5>Balance</h5>
-	   </div>
-	   <div class="card-body text-center">
-		<h6 id="Balance"></h6>
-	   </div>
-	  </div>
-	 </div>
-	</div>
-   </div>
-   <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-	<h5>Transactions</h5>
-	<div class="btn-toolbar mb-2 mb-md-0">
-	 <div class="btn-group mr-2">
-	  <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-	  <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
-	 </div>
-	 <div class="btn-group">
-	  <button type="button" class="btn  btn-sm btn-outline-secondary selected-period-text">Reference</button>
-	  <button type="button" class="btn  btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split" id="datePeriodMenuReference" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-reference="parent">
-	   <span class="sr-only">Toggle Dropdown</span>
-	  </button>
-	  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="datePeriodMenuReference" name="PeriodSelector">
-	   <button class="dropdown-item period-item" type="button">Action</button>
-	   <button class="dropdown-item period-item" type="button">Another Action</button>
+                                    <tr>
+                                        <td>Ποσότητες</td>
+                                        <td><span class="numeric-data" name="ExportVolume"> </span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Αξία</td>
+                                        <td><span class="currency-data" name="ExportValue"></span></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-12">
+                        <div class="card">
+                            <div class="card-header text-center">
+                                <h5>Balance</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <h6 id="Balance"></h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h5>Transactions</h5>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group mr-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn  btn-sm btn-outline-secondary selected-period-text">Reference</button>
+                        <button type="button" class="btn  btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split" id="datePeriodMenuReference" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-reference="parent">
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="datePeriodMenuReference" name="PeriodSelector">
+                            <button class="dropdown-item period-item" type="button">Action</button>
+                            <button class="dropdown-item period-item" type="button">Another Action</button>
 
-	   <button class="dropdown-item period-item" type="button">Another Action</button>
-	  </div>
-	 </div>
+                            <button class="dropdown-item period-item" type="button">Another Action</button>
+                        </div>
+                    </div>
 
-	</div>
-   </div>
-
-
-   <div id="transGrid"></div>
-   <input type="hidden" asp-for="ItemVm.Id" id="WarehouseItemId" />
-   <input type="hidden" id="CompanyId" />
-   <input type="hidden" id="CurrencyId" />
-   <input type="hidden" id="PeriodId" />
-   <ejs-grid id="Grid"
-					  allowPaging="true" allowResizing="true" allowSorting="true" enablePersistence="true">
-				@*<e-data-manager url="@Url.Action("", "FinancialData")" adaptor="UrlAdaptor"></e-data-manager> *@
-	<e-grid-aggregates>
-	 <e-grid-aggregate>
-	  <e-aggregate-columns>
-	   <e-aggregate-column field="debit" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
-	   <e-aggregate-column field="credit" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
-
-	  </e-aggregate-columns>
-
-	 </e-grid-aggregate>
-	</e-grid-aggregates>
-	<e-grid-pagesettings pageSizes="true"></e-grid-pagesettings>
-	<e-grid-columns>
-	 <e-grid-column field="transDate" headerText="Trans Date" textAlign="Right" width="50" type="date" format="dd/MM/yyyy"></e-grid-column>
-	 <e-grid-column field="docSeriesCode" headerText="Series Code" width="60"></e-grid-column>
-	 <e-grid-column field="refCode" headerText="Ref Code" width="60" textAlign="Right"></e-grid-column>
-	 <e-grid-column field="companyCode" headerText="Company Code" width="60"></e-grid-column>
-	 <e-grid-column field="debit" headerText="Debit" width="50" type="number" textAlign="Right" format="C2"></e-grid-column>
-	 <e-grid-column field="credit" headerText="Credit" width="50" type="number" textAlign="Right" format="C2"></e-grid-column>
-	 <e-grid-column field="runningTotal" headerText="Running Total" type="number" width="50" textAlign="Right" format="C2"></e-grid-column>
-	</e-grid-columns>
-   </ejs-grid>
+                </div>
+            </div>
 
 
+            <div id="transGrid"></div>
+            <input type="hidden" asp-for="ItemVm.Id" id="WarehouseItemId" />
+            <input type="hidden" id="SelectoedCompanies" />
+            <input type="hidden" id="CurrencyId" />
+            <input type="hidden" id="PeriodId" />
+			<input type="hidden" id="companiesSelectionChanged"/>
+            <ejs-grid id="Grid"
+                      allowPaging="true" allowResizing="true" allowSorting="true" enablePersistence="true">
+                @*<e-data-manager url="@Url.Action("", "FinancialData")" adaptor="UrlAdaptor"></e-data-manager> *@
+                <e-grid-aggregates>
+                    <e-grid-aggregate>
+                        <e-aggregate-columns>
+                            <e-aggregate-column field="debit" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
+                            <e-aggregate-column field="credit" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
 
-   <hr />
-   <footer>
-	<p>&copy; 2018-2021 - George Koukoudis</p>
-   </footer>
+                        </e-aggregate-columns>
 
-  </main>
- </div>
+                    </e-grid-aggregate>
+                </e-grid-aggregates>
+                <e-grid-pagesettings pageSizes="true"></e-grid-pagesettings>
+                <e-grid-columns>
+                    <e-grid-column field="transDate" headerText="Trans Date" textAlign="Right" width="50" type="date" format="dd/MM/yyyy"></e-grid-column>
+                    <e-grid-column field="docSeriesCode" headerText="Series Code" width="60"></e-grid-column>
+                    <e-grid-column field="refCode" headerText="Ref Code" width="60" textAlign="Right"></e-grid-column>
+                    <e-grid-column field="companyCode" headerText="Company Code" width="60"></e-grid-column>
+                    <e-grid-column field="debit" headerText="Debit" width="50" type="number" textAlign="Right" format="C2"></e-grid-column>
+                    <e-grid-column field="credit" headerText="Credit" width="50" type="number" textAlign="Right" format="C2"></e-grid-column>
+                    <e-grid-column field="runningTotal" headerText="Running Total" type="number" width="50" textAlign="Right" format="C2"></e-grid-column>
+                </e-grid-columns>
+            </ejs-grid>
+
+
+
+            <hr />
+            <footer>
+                <p>&copy; 2018-2021 - George Koukoudis</p>
+            </footer>
+
+        </main>
+    </div>
 </div>
 @section Scripts
 {
-<script src="~/js/product.lib.js"></script>
-<script>
-	 $(document).ready(function () {
+    <script src="~/js/product.lib.js"></script>
+    <script>
+		$(document).ready(function () {
+
 		 const $spinnerEl = $('#FinancialLoader');
+			const $currencySelector = $('#CurrencySelector');
+			const $companiesSelectionChanged = $('#companiesSelectionChanged');
 		 const sessionKey = 'MaterialDetailsPage';
 		 let currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
 		 let formatterCurrency = new Intl.NumberFormat(currentCulture,
@@ -187,7 +191,7 @@
 					currency: 'EUR',
 					minimumFractionDigits: 2
 				});
-			let formatterNumber = new Intl.NumberFormat(currentCulture,
+		 let formatterNumber = new Intl.NumberFormat(currentCulture,
 				{
 					maximumFractionDigits: 3
 
@@ -197,17 +201,34 @@
 			 'periodCode': '',
 			 'companyCode': ''
 		 };
-
+         const selectedCompanies = document.getElementById("SelectedCompanies").ej2_instances[0];
+         selectedCompanies.changeOnBlur = false;
+         selectedCompanies.addEventListener("change", (event) => {
+			 $companiesSelectionChanged.val(1);
+		 });
+            selectedCompanies.addEventListener("close", (event) => {
+				let selectionChanged = $companiesSelectionChanged.val();
+				if (selectionChanged) {
+					$companiesSelectionChanged.val(0);
+					let sComp = selectedCompanies.value;
+                    var selected = JSON.stringify(selectedCompanies.value);
+					$('#SelectedCompanies').val(selected);
+					refreshView();
+				}
+				
+                
+                
+            });
 		 const currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
 		 const warehouseItemId = @Model.ItemVm.Id;
 		 const refreshView = () => {
-			  const $selectedCurrency = $('.selected-currency-text');
-			  let selCurrencyId = $selectedCurrency.data('currencyid');
-			  const $selectedCurrencyInputField = $('#CurrencyId');
-			  $selectedCurrencyInputField.val(selCurrencyId);
-			   const $selectedPeriod = $('.selected-period-text');
-				let selPeriodId = $selectedPeriod.data('periodid');
-				getFinancialData(warehouseItemId,"","","1",$spinnerEl)
+
+             let selCurrencyId = $currencySelector.val();
+			 let selCompanies = $('#SelectedCompanies').val();
+			  // const $selectedPeriod = $('.selected-period-text');
+			 //	let selPeriodId = $selectedPeriod.data('periodid');
+			 getFinancialData(warehouseItemId, "", selCompanies,selCurrencyId, $spinnerEl)
+
 		  };
 		  const formatNumericElements = () => {
                 let $currencyElements = $('.currency-data');
@@ -218,8 +239,8 @@
 					let elValueStr = $el.text();
                     let elValue = parseFloat(elValueStr);
                     if (!isNaN(elValue)) {
-                        $el.text(formatCurrency(elValue));
-                    } 
+                        $el.text(formatterCurrency.format(elValue));
+                    }
 
                 });
 				$numElements.each(function() {
@@ -228,8 +249,8 @@
 					let elValueStr = $el.text();
                     let elValue = parseFloat(elValueStr);
                     if (!isNaN(elValue)) {
-                        $el.text(formatNumber(elValue));
-                    } 
+                        $el.text(formatterNumber.format(elValue));
+                    }
 
                 });
             };
@@ -247,11 +268,12 @@
 							minimumFractionDigits: 2
 						});
 						formatterNumber = new Intl.NumberFormat(locale,
-				{
-					maximumFractionDigits: 3
+						{
+							maximumFractionDigits: 3
 
-				});
-				formatNumericElements();
+							});
+					refreshView();
+				//formatNumericElements();
 					//indPgLib.setCurrencyFormatter(formatterCurrency);
 				} catch (e) {
 					//not found keep old formater or maybe create a default one
@@ -294,100 +316,7 @@
 
 			  });
 		  };
-		 @* const setCurrency = (currencyId, currencyCode, currencyLocale) => {
-	 	const $selectedCurrency = $('.selected-currency-text');
-	 	$selectedCurrency.data('currencyid', currencyId);
-	 	$selectedCurrency.data('currencycode', currencyCode);
-	 	$selectedCurrency.data('currencylocale', currencyLocale);
-	 	$selectedCurrency.text(currencyCode);
-	 	try {
-	  	console.log(currencyCode);
-	  	console.log(currentCulture);
-	  	let cCulture = currencyLocale;
-	  	let cBaseCulture = cCulture;
-	  	if (cCulture.length > 2) {
-	   	cBaseCulture = cCulture.substr(0, 2);
-	  	}
-	  	loadCultureFiles(cBaseCulture);
-	  	ej.base.setCulture(cBaseCulture);
-	  	ej.base.setCurrencyCode(currencyCode);
-	  	//loadEj2Translation(cBaseCulture);
 
-	  	var grid = document.getElementById("Grid").ej2_instances[0];
-	  	grid.locale = cBaseCulture;
-
-	  	formatterCurrency = new Intl.NumberFormat(cCulture,
-	   	{
-			style: 'currency',
-			currency: currencyCode,
-			minimumFractionDigits: 2
-	   	});
-
-	 	} catch (e) {
-	  	console.log(e);
-	  	console.log('Problem setting currency formatter');
-	 	}
-
-		};*@
-		  @*const loadCurrencySelector = (availableCurrencies) => {
-	 	let $currenciesMenu = $('[name=CurrencySelector]');
-
-	 	$('.currency-item').remove();
-	 	if (availableCurrencies === undefined || availableCurrencies === null) {
-	  	return;
-	 	}
-	 	var d = availableCurrencies;
-	 	d.forEach(function(item) {
-	  	var $aLink = $('<button>').addClass('dropdown-item small currency-item');
-	  	$aLink.text(item.name);
-	  	// var diaryHRef = '/MainEntities/Transactors/RunDiary';
-	  	// diaryHRef += `?diaryId=${item.value}`;
-	  	$aLink.attr('type', 'button');
-	  	$aLink.data('currencyid', item.id);
-	  	$aLink.data('currencycode', item.code);
-	  	$aLink.data('currencylocale', item.displayLocale);
-	  	$currenciesMenu.append($aLink);
-	 	});
-	 	$('.currency-item').on('click',
-	  	function(event) {
-	   	let button = $(event.delegateTarget);
-	   	let currencyId = button.data('currencyid');
-	   	let currencyCode = button.data('currencycode');
-	   	let currencyLocale = button.data('currencylocale');
-	   	console.log(`Currency Id=${currencyId} currency Code=${currencyCode}`);
-
-	   	setCurrency(currencyId, currencyCode, currencyLocale);
-	   	refreshView();
-
-	   	//let $btParent = button.parent()
-	  	});
-		};*@
-		  @*const getCurrencyId = (currencyCode, currencyList) => {
-	 	if (!(typeof currencyList != "undefined" && currencyList != null && currencyList.length != null && currencyList.length > 0)) {
-	  	return 0;
-	 	}
-
-	 	let ret = currencyList.find(x => x.code === currencyCode).id;
-	 	const parsed = parseInt(ret);
-	 	if (isNaN(parsed)) {
-	  	return currencyList[0].id;
-	 	} else {
-	  	return parsed;
-	 	}
-		};*@
-		 @* const getCurrency = (currencyCode, currencyList) => {
-	 	if (!(typeof currencyList != "undefined" && currencyList != null && currencyList.length != null && currencyList.length > 0)) {
-	  	return null;
-	 	}
-
-	 	let ret = currencyList.find(x => x.code === currencyCode);
-
-	 	if (ret) {
-	  	return ret;
-	 	} else {
-	  	return currencyList[0];
-	 	}
-		};*@
 		  //------------------Company------------------------------------------------
 		  //--------------------------------------------------------------------------
 		  const loadPreviousSession = (sessionKey, sessionObject) => {
@@ -433,7 +362,7 @@
 		  };
 		  //------------------------------------------------------------------------
 		  //------------------------------------------------------------------------
-			const getFinancialData = (itemId, dateRange, selCompany, selCurrency, spinnerEl) => {
+		 const getFinancialData = (itemId, dateRange, selCompany, selCurrency, spinnerEl) => {
 				productLib.getProductFinancialSummaryData(itemId,dateRange,selCompany,selCurrency,spinnerEl)
 				.then((data)=>{
 					console.log(data);
@@ -445,15 +374,15 @@
 					$importValue.text(data.sumImportValue);
 					$exportVolume.text(data.sumExportVolume);
 					$exportValue.text(data.sumExportValue);
+                    formatNumericElements();
 				})
 				.catch((error) => {
 							console.log("Error getting summary data");
 							console.log(error);
 						});
 			};
-		 loadCurrencySelector(currencyListJs);
-		 let selCurrency = getCurrency(sessionObj.currencyCode, currencyListJs);
-		 setCurrency(selCurrency.id, selCurrency.code, selCurrency.displayLocale);
+		
+            $companiesSelectionChanged.val(0);
 		  refreshView();
 	 });
 	$(window).on('beforeunload',
@@ -461,10 +390,10 @@
 			//#region CommentOut
 			//#region Variables
 			const sessionKey = 'MaterialDetailsPage';
-			const $selectedCurrency = $('.selected-currency-text');
+			const $selectedCurrency = $('#CurrencySelector');
 			const $selectedCompany = $('.selected-company-text');
 			const $selectedPeriod = $('.selected-period-text');
-			let currentCurrency = $selectedCurrency.data('currencycode');
+			let currentCurrency = $selectedCurrency.val();
 			let currentCompany = $selectedCompany.data('companyid');
 			let currentPeriod = $selectedPeriod.data('periodid');
 			var filtersArr = [];
@@ -487,7 +416,7 @@
 			//#endregion
 
 		});
-</script>
+    </script>
 }
 
 
