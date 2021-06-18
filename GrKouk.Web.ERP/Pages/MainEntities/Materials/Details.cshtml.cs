@@ -117,9 +117,9 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
             Func<Task<List<UISelectTypeItem>>> companiesListJsFunc = async () =>
             {
                 var itemsList = await _context.Companies
-                   .OrderBy(p=>p.Name)
+                   .OrderBy(p=>p.Code)
                    .Select(p => new UISelectTypeItem() {
-                       Title = p.Name,
+                       Title = p.Code,
                        ValueInt = p.Id,
                        Value = p.Id.ToString()
                     })

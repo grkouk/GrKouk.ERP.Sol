@@ -10,14 +10,16 @@
 <div class="container-fluid">
     <div class="row">
         <main role="main" class="col-md-12 ms-sm-auto col-lg-12 px-4">
-			<div class="row justify-content-end pt-2 pb-3 px-1">
-                <div class="col-2 gx-1">
-                    
-                        <ejs-multiselect id="SelectedCompanies" dataSource="@ViewBag.CompaniesListJs" placeholder="Select Companies" mode="CheckBox"
-                                         showDropDownIcon="true" showSelectAll="false" selectAllText="Select All" unSelectAllText="unSelect All">
-                            <e-multiselect-fields text="Title" value="ValueInt"></e-multiselect-fields>
-                        </ejs-multiselect>
-                    
+            <div class="row justify-content-end pt-2 pb-3 px-1">
+                <div class="col-5 gx-1">
+
+                    <ejs-multiselect id="SelectedCompanies" dataSource="@ViewBag.CompaniesListJs"
+                                     placeholder="Select Companies" mode="Default"
+                                     showDropDownIcon="true" showSelectAll="false"
+                                     selectAllText="Select All" unSelectAllText="unSelect All">
+                        <e-multiselect-fields text="Title" value="ValueInt"></e-multiselect-fields>
+                    </ejs-multiselect>
+
                 </div>
                 <div class="col-1 gx-1">
                     <select id="CurrencySelector" class="form-select form-select-sm"
@@ -134,7 +136,7 @@
             <input type="hidden" id="SelectoedCompanies" />
             <input type="hidden" id="CurrencyId" />
             <input type="hidden" id="PeriodId" />
-			<input type="hidden" id="companiesSelectionChanged"/>
+            <input type="hidden" id="companiesSelectionChanged" />
             <ejs-grid id="Grid"
                       allowPaging="true" allowResizing="true" allowSorting="true" enablePersistence="true">
                 @*<e-data-manager url="@Url.Action("", "FinancialData")" adaptor="UrlAdaptor"></e-data-manager> *@
@@ -206,25 +208,27 @@
 				let currentSelection = event.value;
                 if (currentSelection.includes(allCompaniesId)) {
 					//remove all others and keep only allcompanies selection
-					event.value = a;
-					//selectedCompanies.value = a;
-                }
-
-			 $companiesSelectionChanged.val(1);
-		 });
-            selectedCompanies.addEventListener("close", (event) => {
-				let selectionChanged = $companiesSelectionChanged.val();
-				if (selectionChanged) {
-					$companiesSelectionChanged.val(0);
-					let sComp = selectedCompanies.value;
-                    var selected = JSON.stringify(selectedCompanies.value);
-					$('#SelectedCompanies').val(selected);
-					refreshView();
+					//event.value = a;
+					selectedCompanies.value = a;
+					selectedCompanies.refreshView();
 				}
-				
-                
-                
-            });
+				let sComp = selectedCompanies.value;
+                var selected = JSON.stringify(selectedCompanies.value);
+				$('#SelectedCompanies').val(selected);
+				refreshView();
+
+			 //$companiesSelectionChanged.val(1);
+		 });
+            //selectedCompanies.addEventListener("close", (event) => {
+				//let selectionChanged = $companiesSelectionChanged.val();
+				//if (selectionChanged) {
+				//	$companiesSelectionChanged.val(0);
+				//	let sComp = selectedCompanies.value;
+                 //   var selected = JSON.stringify(selectedCompanies.value);
+				//	$('#SelectedCompanies').val(selected);
+				//	refreshView();
+				//}
+            //});
 		 const currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
 		 const warehouseItemId = @Model.ItemVm.Id;
 		 const refreshView = () => {
@@ -329,7 +333,7 @@
 			  let storageItemJs = localStorage.getItem(sessionKey);
 			  if (storageItemJs === undefined || storageItemJs === null) {
 				  sessionObject.currencyCode = 'EUR';
-				  sessionObject.companyCode = '0';
+				  sessionObject.companyCode = JSON.parse("[1]");
 				  sessionObject.periodCode = "CURMONTH";
 
 			  } else {
@@ -347,12 +351,16 @@
 				  try {
 					  let filtersValue = storageItem.find(x => x.filterKey === 'currentCompany').filterValue;
 					  if (filtersValue === undefined || filtersValue === null) {
-						  sessionObject.companyCode = '0';
+						  sessionObject.companyCode = JSON.parse("[1]");
 					  } else {
-						  sessionObject.companyCode = filtersValue;
+                          var fltVal = JSON.parse(filtersValue)
+                          if (fltVal.length=0) {
+
+                          }
+						  sessionObject.companyCode = JSON.parse( filtersValue);
 					  }
 				  } catch (e) {
-					  sessionObject.companyCode = '0';
+                      sessionObject.companyCode = JSON.parse("[1]");
 				  }
 				  try {
 					  let filtersValue = storageItem.find(x => x.filterKey === 'currentPeriod').filterValue;
@@ -368,7 +376,7 @@
 		  };
 		  //------------------------------------------------------------------------
 		  //------------------------------------------------------------------------
-		 const getFinancialData = (itemId, dateRange, selCompany, selCurrency, spinnerEl) => {
+		const getFinancialData = (itemId, dateRange, selCompany, selCurrency, spinnerEl) => {
 				productLib.getProductFinancialSummaryData(itemId,dateRange,selCompany,selCurrency,spinnerEl)
 				.then((data)=>{
 					console.log(data);
@@ -387,8 +395,10 @@
 							console.log(error);
 						});
 			};
-		
-            $companiesSelectionChanged.val(0);
+		loadPreviousSession(sessionKey, sessionObj);
+			selectedCompanies.value = sessionObj.companyCode;
+			$currencySelector.val(sessionObj.currencyCode);
+        $companiesSelectionChanged.val(0);
 		  refreshView();
 	 });
 	$(window).on('beforeunload',
@@ -396,11 +406,12 @@
 			//#region CommentOut
 			//#region Variables
 			const sessionKey = 'MaterialDetailsPage';
+            const selectedCompanies = document.getElementById("SelectedCompanies").ej2_instances[0];
 			const $selectedCurrency = $('#CurrencySelector');
-			const $selectedCompany = $('.selected-company-text');
+            //const $selectedCompany = $('#SelectedCompanies');
 			const $selectedPeriod = $('.selected-period-text');
 			let currentCurrency = $selectedCurrency.val();
-			let currentCompany = $selectedCompany.data('companyid');
+			let currentCompany = JSON.stringify( selectedCompanies.value);
 			let currentPeriod = $selectedPeriod.data('periodid');
 			var filtersArr = [];
 			//#endregion
