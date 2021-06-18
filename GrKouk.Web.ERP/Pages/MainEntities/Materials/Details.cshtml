@@ -353,10 +353,7 @@
 					  if (filtersValue === undefined || filtersValue === null) {
 						  sessionObject.companyCode = JSON.parse("[1]");
 					  } else {
-                          var fltVal = JSON.parse(filtersValue)
-                          if (fltVal.length=0) {
-
-                          }
+                          
 						  sessionObject.companyCode = JSON.parse( filtersValue);
 					  }
 				  } catch (e) {
