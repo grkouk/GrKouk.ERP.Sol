@@ -11,7 +11,7 @@
     <div class="row">
         <main role="main" class="col-md-12 ms-sm-auto col-lg-12 px-4">
 			<div class="row justify-content-end pt-2 pb-3 px-1">
-                <div class="col-2 gx-0">
+                <div class="col-2 gx-1">
                     
                         <ejs-multiselect id="SelectedCompanies" dataSource="@ViewBag.CompaniesListJs" placeholder="Select Companies" mode="CheckBox"
                                          showDropDownIcon="true" showSelectAll="false" selectAllText="Select All" unSelectAllText="unSelect All">
@@ -19,7 +19,7 @@
                         </ejs-multiselect>
                     
                 </div>
-                <div class="col-1 gx-0">
+                <div class="col-1 gx-1">
                     <select id="CurrencySelector" class="form-select form-select-sm"
                             asp-items="ViewBag.CurrencyList">
                     </select>
@@ -179,6 +179,7 @@
 		 const $spinnerEl = $('#FinancialLoader');
 			const $currencySelector = $('#CurrencySelector');
 			const $companiesSelectionChanged = $('#companiesSelectionChanged');
+			const allCompaniesId = @ViewBag.AllCompaniesId;
 		 const sessionKey = 'MaterialDetailsPage';
 		 let currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
 		 let formatterCurrency = new Intl.NumberFormat(currentCulture,
@@ -199,7 +200,16 @@
 		 };
          const selectedCompanies = document.getElementById("SelectedCompanies").ej2_instances[0];
          selectedCompanies.changeOnBlur = false;
-         selectedCompanies.addEventListener("change", (event) => {
+			selectedCompanies.addEventListener("change", (event) => {
+				let a = [allCompaniesId];
+				console.log("Change event " + event.value);
+				let currentSelection = event.value;
+                if (currentSelection.includes(allCompaniesId)) {
+					//remove all others and keep only allcompanies selection
+					event.value = a;
+					//selectedCompanies.value = a;
+                }
+
 			 $companiesSelectionChanged.val(1);
 		 });
             selectedCompanies.addEventListener("close", (event) => {

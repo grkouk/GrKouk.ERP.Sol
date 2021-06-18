@@ -146,6 +146,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
             ViewData["CurrencyList"]= await FiltersHelper.GetCurrenciesFilterListAsync(_context);
             ViewData["DatePeriodListJs"] = DateFilter.GetDateFiltersSelectList();
             ViewData["CompaniesListJs"] = await companiesListJsFunc();
+            ViewData["AllCompaniesId"]=await FiltersHelper.GetAllCompaniesIdAsync(_context);
            
         }
     }

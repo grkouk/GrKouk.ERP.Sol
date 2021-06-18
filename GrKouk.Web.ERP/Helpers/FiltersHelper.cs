@@ -262,6 +262,24 @@ namespace GrKouk.Web.ERP.Helpers
             
             return valuesList;
         }
+        public static async Task<int> GetAllCompaniesIdAsync(ApiDbContext context)
+        {
+            var allCompCode = await context.AppSettings.SingleOrDefaultAsync(
+                        p => p.Code == Constants.AllCompaniesCodeKey);
+            if (allCompCode == null)
+            {
+                return -1;
+            }
+            var allCompaniesEntity =
+                    await context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+
+            if (allCompaniesEntity != null)
+            {
+                return allCompaniesEntity.Id;
+                
+            }
+            return -1;
+        }
         public static async Task<List<SelectListItem>> GetFiscalPeriodsFilterListAsync(ApiDbContext context)
         {
            
