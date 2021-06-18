@@ -800,9 +800,18 @@ namespace GrKouk.Web.ERP.Controllers
             decimal grandSumImportValue = t1.Sum(p => p.ImportAmount);
             decimal grandSumExportVolume = t1.Sum(p => p.ExportUnits);
             decimal grandSumExportValue = t1.Sum(p => p.ExportAmount);
+            decimal grandSumInvoicedImportAmount = t1.Sum(p=>p.InvoicedImportAmount);
+            decimal grandSumInvoicedImportVolume = t1.Sum(p => p.InvoicedImportUnits);
+            decimal grandSumInvoicedExportAmount = t1.Sum(p => p.InvoicedExportAmount);
+            decimal grandSumInvoicedExportVolume = t1.Sum(p => p.InvoicedExportUnits);
+
             var response = new WarehouseItemFinancialDataResponse() {
                 SumImportVolume = grandSumImportVolume,
                 SumImportValue = grandSumImportValue,
+                SumInvoicedImportVolume = grandSumInvoicedImportVolume,
+                SumInvoicedImportValue = grandSumInvoicedImportAmount,
+                SumInvoicedExportVolume = grandSumInvoicedExportVolume,
+                SumInvoicedExportValue = grandSumInvoicedExportAmount,
                 SumExportVolume = grandSumExportVolume,
                 SumExportValue=grandSumExportValue
             };

@@ -58,17 +58,38 @@
                                 <table class="table-sm w-100">
 
                                     <tr>
-                                        <td>Ποσότητες</td>
+                                        <td>Ποσότητες(Εισ)</td>
                                         <td>
                                             <span class="numeric-data" name="ImportVolume"></span>
 
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Αξία</td>
+                                        <td>Αξία(Εισ)</td>
                                         <td>
 
                                             <span class="currency-data" name="ImportValue"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ποσότητες(Τιμ)</td>
+                                        <td>
+                                            <span class="numeric-data" name="InvoicedImportVolume"></span>
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Αξία(Τιμ)</td>
+                                        <td>
+
+                                            <span class="currency-data" name="InvoicedImportValue"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Μέση Τιμή(Τιμ)</td>
+                                        <td>
+
+                                            <span class="currency-data" name="MediumInvoicedImportPrice"></span>
                                         </td>
                                     </tr>
                                 </table>
@@ -84,12 +105,33 @@
                                 <table class="table-sm w-100">
 
                                     <tr>
-                                        <td>Ποσότητες</td>
+                                        <td>Ποσότητες(Εισ)</td>
                                         <td><span class="numeric-data" name="ExportVolume"> </span></td>
                                     </tr>
                                     <tr>
-                                        <td>Αξία</td>
+                                        <td>Αξία(Εισ)</td>
                                         <td><span class="currency-data" name="ExportValue"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ποσότητες(Τιμ)</td>
+                                        <td>
+                                            <span class="numeric-data" name="InvoicedExportVolume"></span>
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Αξία(Τιμ)</td>
+                                        <td>
+
+                                            <span class="currency-data" name="InvoicedExportValue"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Μέση Τιμή(Τιμ)</td>
+                                        <td>
+
+                                            <span class="currency-data" name="MediumInvoicedExportPrice"></span>
+                                        </td>
                                     </tr>
                                 </table>
                             </div>
@@ -101,7 +143,37 @@
                                 <h5>Balance</h5>
                             </div>
                             <div class="card-body text-center">
-                                <h6 id="Balance"></h6>
+                                <table class="table-sm w-100">
+                                    <tr>
+                                        <td>Ποσότητες(Εισ)</td>
+                                        <td><span class="numeric-data" name="VolumeBalance"> </span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Αξία(Εισ)</td>
+                                        <td><span class="currency-data" name="ValueBalance"></span></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+                                            
+
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+
+                                            
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td>
+
+                                            
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -178,30 +250,30 @@
     <script>
 		$(document).ready(function () {
 
-		 const $spinnerEl = $('#FinancialLoader');
+			const $spinnerEl = $('#FinancialLoader');
 			const $currencySelector = $('#CurrencySelector');
 			const $companiesSelectionChanged = $('#companiesSelectionChanged');
 			const allCompaniesId = @ViewBag.AllCompaniesId;
-		 const sessionKey = 'MaterialDetailsPage';
-		 let currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
-		 let formatterCurrency = new Intl.NumberFormat(currentCulture,
-				{
-					style: 'currency',
-					currency: 'EUR',
-					minimumFractionDigits: 2
-				});
-		 let formatterNumber = new Intl.NumberFormat(currentCulture,
-				{
-					maximumFractionDigits: 3
+			 const sessionKey = 'MaterialDetailsPage';
+			 let currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
+			 let formatterCurrency = new Intl.NumberFormat(currentCulture,
+					{
+						style: 'currency',
+						currency: 'EUR',
+						minimumFractionDigits: 2
+					});
+			 let formatterNumber = new Intl.NumberFormat(currentCulture,
+					{
+						maximumFractionDigits: 3
 
-				});
-		 let sessionObj = {
-			 'currencyCode': '',
-			 'periodCode': '',
-			 'companyCode': ''
-		 };
-         const selectedCompanies = document.getElementById("SelectedCompanies").ej2_instances[0];
-         selectedCompanies.changeOnBlur = false;
+					});
+			 let sessionObj = {
+				 'currencyCode': '',
+				 'periodCode': '',
+				 'companyCode': ''
+			 };
+			 const selectedCompanies = document.getElementById("SelectedCompanies").ej2_instances[0];
+			selectedCompanies.changeOnBlur = false;
 			selectedCompanies.addEventListener("change", (event) => {
 				let a = [allCompaniesId];
 				console.log("Change event " + event.value);
@@ -218,7 +290,7 @@
 				refreshView();
 
 			 //$companiesSelectionChanged.val(1);
-		 });
+			});
             //selectedCompanies.addEventListener("close", (event) => {
 				//let selectionChanged = $companiesSelectionChanged.val();
 				//if (selectionChanged) {
@@ -229,174 +301,193 @@
 				//	refreshView();
 				//}
             //});
-		 const currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
-		 const warehouseItemId = @Model.ItemVm.Id;
-		 const refreshView = () => {
+			 const currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
+			 const warehouseItemId = @Model.ItemVm.Id;
+			 const refreshView = () => {
 
-             let selCurrencyId = $currencySelector.val();
-			 let selCompanies = $('#SelectedCompanies').val();
-			  // const $selectedPeriod = $('.selected-period-text');
-			 //	let selPeriodId = $selectedPeriod.data('periodid');
-			 getFinancialData(warehouseItemId, "", selCompanies,selCurrencyId, $spinnerEl)
+				 let selCurrencyId = $currencySelector.val();
+				 let selCompanies = $('#SelectedCompanies').val();
+				  // const $selectedPeriod = $('.selected-period-text');
+				 //	let selPeriodId = $selectedPeriod.data('periodid');
+				 getFinancialData(warehouseItemId, "", selCompanies,selCurrencyId, $spinnerEl)
 
-		  };
-		  const formatNumericElements = () => {
-                let $currencyElements = $('.currency-data');
-				let $numElements = $('.numeric-data');
-                $currencyElements.each(function() {
-                    let $el = $(this);
-                    //let elValueStr = $el.attr('data-actualValue');
-					let elValueStr = $el.text();
-                    let elValue = parseFloat(elValueStr);
-                    if (!isNaN(elValue)) {
-                        $el.text(formatterCurrency.format(elValue));
-                    }
+			  };
+			  const formatNumericElements = () => {
+					let $currencyElements = $('.currency-data');
+					let $numElements = $('.numeric-data');
+					$currencyElements.each(function() {
+						let $el = $(this);
+						//let elValueStr = $el.attr('data-actualValue');
+						let elValueStr = $el.text();
+						let elValue = parseFloat(elValueStr);
+						if (!isNaN(elValue)) {
+							$el.text(formatterCurrency.format(elValue));
+						}
 
-                });
-				$numElements.each(function() {
-                    let $el = $(this);
-                    //let elValueStr = $el.attr('data-actualValue');
-					let elValueStr = $el.text();
-                    let elValue = parseFloat(elValueStr);
-                    if (!isNaN(elValue)) {
-                        $el.text(formatterNumber.format(elValue));
-                    }
+					});
+					$numElements.each(function() {
+						let $el = $(this);
+						//let elValueStr = $el.attr('data-actualValue');
+						let elValueStr = $el.text();
+						let elValue = parseFloat(elValueStr);
+						if (!isNaN(elValue)) {
+							$el.text(formatterNumber.format(elValue));
+						}
 
-                });
-            };
-		  var currencyChanged = () => {
-				let curCurrencySelected = parseInt($('#CurrencySelector').val());
-				var currencyCode;
-				try {
-					let currentCurrency = currencyListJs.find(x => x.id === curCurrencySelected);
-					currencyCode = currentCurrency.code;
-					let locale = currentCurrency.displayLocale;
-					formatterCurrency = new Intl.NumberFormat(locale,
-						{
-							style: 'currency',
-							currency: currencyCode,
-							minimumFractionDigits: 2
-						});
-						formatterNumber = new Intl.NumberFormat(locale,
-						{
-							maximumFractionDigits: 3
-
+					});
+				};
+			  var currencyChanged = () => {
+					let curCurrencySelected = parseInt($('#CurrencySelector').val());
+					var currencyCode;
+					try {
+						let currentCurrency = currencyListJs.find(x => x.id === curCurrencySelected);
+						currencyCode = currentCurrency.code;
+						let locale = currentCurrency.displayLocale;
+						formatterCurrency = new Intl.NumberFormat(locale,
+							{
+								style: 'currency',
+								currency: currencyCode,
+								minimumFractionDigits: 2
 							});
-					refreshView();
-				//formatNumericElements();
-					//indPgLib.setCurrencyFormatter(formatterCurrency);
-				} catch (e) {
-					//not found keep old formater or maybe create a default one
-					console.log('Not found currency code for this id');
-				}
-			};
-		   //-------------------Currency--------------------------------------------------
-		  const loadCultureFiles = (name) => {
-			   let files = ['ca-gregorian.json', 'numbers.json', 'timeZoneNames.json', 'currencies.json'];
-			   if (name === 'ar') {
-				   files.push('numberingSystems.json');
-			   }
-			   let loader = ej.base.loadCldr;
-			   let loadCulture = function(prop) {
-				   let val
-				   let ajax;
-				   if (name === 'ar' && prop === files.length - 1) {
-					   ajax = new ej.base.Ajax(location.origin + location.pathname + '/../../../lib/cldr-data/supplemental/' + files[prop], 'GET', false);
-				   } else {
-					   ajax = new ej.base.Ajax(location.origin + location.pathname + '/../../../lib/cldr-data/main/' + name + '/' + files[prop], 'GET', false);
+							formatterNumber = new Intl.NumberFormat(locale,
+							{
+								maximumFractionDigits: 3
+
+								});
+						refreshView();
+					//formatNumericElements();
+						//indPgLib.setCurrencyFormatter(formatterCurrency);
+					} catch (e) {
+						//not found keep old formater or maybe create a default one
+						console.log('Not found currency code for this id');
+					}
+				};
+			   //-------------------Currency--------------------------------------------------
+			  const loadCultureFiles = (name) => {
+				   let files = ['ca-gregorian.json', 'numbers.json', 'timeZoneNames.json', 'currencies.json'];
+				   if (name === 'ar') {
+					   files.push('numberingSystems.json');
 				   }
-				   ajax.onSuccess = function(value) {
-					   val = value;
+				   let loader = ej.base.loadCldr;
+				   let loadCulture = function(prop) {
+					   let val
+					   let ajax;
+					   if (name === 'ar' && prop === files.length - 1) {
+						   ajax = new ej.base.Ajax(location.origin + location.pathname + '/../../../lib/cldr-data/supplemental/' + files[prop], 'GET', false);
+					   } else {
+						   ajax = new ej.base.Ajax(location.origin + location.pathname + '/../../../lib/cldr-data/main/' + name + '/' + files[prop], 'GET', false);
+					   }
+					   ajax.onSuccess = function(value) {
+						   val = value;
+					   };
+					   ajax.send();
+					   loader(JSON.parse(val));
 				   };
-				   ajax.send();
-				   loader(JSON.parse(val));
+				   for (var prop = 0; prop < files.length; prop++) {
+					   loadCulture(prop);
+				   }
 			   };
-			   for (var prop = 0; prop < files.length; prop++) {
-				   loadCulture(prop);
-			   }
-		   };
-		  const loadEj2Translation = (name) => {
-			  let path = `/lib/ej2translations/${name}.json`;
-			  let ajax = new ej.base.Ajax(path, 'GET', false); //load the name json culture file
-			  ajax.send().then((e) => {
-				  var culture = JSON.parse(e);
-				  ej.base.L10n.load(
-					  culture
-				  );
+			  const loadEj2Translation = (name) => {
+				  let path = `/lib/ej2translations/${name}.json`;
+				  let ajax = new ej.base.Ajax(path, 'GET', false); //load the name json culture file
+				  ajax.send().then((e) => {
+					  var culture = JSON.parse(e);
+					  ej.base.L10n.load(
+						  culture
+					  );
 
-			  });
-		  };
+				  });
+			  };
 
-		  //------------------Company------------------------------------------------
-		  //--------------------------------------------------------------------------
-		  const loadPreviousSession = (sessionKey, sessionObject) => {
-			  let storageItemJs = localStorage.getItem(sessionKey);
-			  if (storageItemJs === undefined || storageItemJs === null) {
-				  sessionObject.currencyCode = 'EUR';
-				  sessionObject.companyCode = JSON.parse("[1]");
-				  sessionObject.periodCode = "CURMONTH";
-
-			  } else {
-				  var storageItem = JSON.parse(storageItemJs);
-				  try {
-					  let filtersValue = storageItem.find(x => x.filterKey === 'currentCurrency').filterValue;
-					  if (filtersValue === undefined || filtersValue === null) {
-						  sessionObject.currencyCode = 'EUR';
-					  } else {
-						  sessionObject.currencyCode = filtersValue;
-					  }
-				  } catch (e) {
+			  //------------------Company------------------------------------------------
+			  //--------------------------------------------------------------------------
+			  const loadPreviousSession = (sessionKey, sessionObject) => {
+				  let storageItemJs = localStorage.getItem(sessionKey);
+				  if (storageItemJs === undefined || storageItemJs === null) {
 					  sessionObject.currencyCode = 'EUR';
-				  }
-				  try {
-					  let filtersValue = storageItem.find(x => x.filterKey === 'currentCompany').filterValue;
-					  if (filtersValue === undefined || filtersValue === null) {
+					  sessionObject.companyCode = JSON.parse("[1]");
+					  sessionObject.periodCode = "CURMONTH";
+
+				  } else {
+					  var storageItem = JSON.parse(storageItemJs);
+					  try {
+						  let filtersValue = storageItem.find(x => x.filterKey === 'currentCurrency').filterValue;
+						  if (filtersValue === undefined || filtersValue === null) {
+							  sessionObject.currencyCode = 'EUR';
+						  } else {
+							  sessionObject.currencyCode = filtersValue;
+						  }
+					  } catch (e) {
+						  sessionObject.currencyCode = 'EUR';
+					  }
+					  try {
+						  let filtersValue = storageItem.find(x => x.filterKey === 'currentCompany').filterValue;
+						  if (filtersValue === undefined || filtersValue === null) {
+							  sessionObject.companyCode = JSON.parse("[1]");
+						  } else {
+
+							  sessionObject.companyCode = JSON.parse( filtersValue);
+						  }
+					  } catch (e) {
 						  sessionObject.companyCode = JSON.parse("[1]");
-					  } else {
-                          
-						  sessionObject.companyCode = JSON.parse( filtersValue);
 					  }
-				  } catch (e) {
-                      sessionObject.companyCode = JSON.parse("[1]");
-				  }
-				  try {
-					  let filtersValue = storageItem.find(x => x.filterKey === 'currentPeriod').filterValue;
-					  if (filtersValue === undefined || filtersValue === null) {
+					  try {
+						  let filtersValue = storageItem.find(x => x.filterKey === 'currentPeriod').filterValue;
+						  if (filtersValue === undefined || filtersValue === null) {
+							  sessionObject.periodCode = 'CURMONTH';
+						  } else {
+							  sessionObject.periodCode = filtersValue;
+						  }
+					  } catch (e) {
 						  sessionObject.periodCode = 'CURMONTH';
-					  } else {
-						  sessionObject.periodCode = filtersValue;
 					  }
-				  } catch (e) {
-					  sessionObject.periodCode = 'CURMONTH';
 				  }
-			  }
-		  };
-		  //------------------------------------------------------------------------
-		  //------------------------------------------------------------------------
-		const getFinancialData = (itemId, dateRange, selCompany, selCurrency, spinnerEl) => {
-				productLib.getProductFinancialSummaryData(itemId,dateRange,selCompany,selCurrency,spinnerEl)
-				.then((data)=>{
-					console.log(data);
-					$importVolume = $('[name=ImportVolume]');
-					$importValue = $('[name=ImportValue]');
-					$exportVolume = $('[name=ExportVolume]');
-					$exportValue = $('[name=ExportValue]');
-					$importVolume.text(data.sumImportVolume);
-					$importValue.text(data.sumImportValue);
-					$exportVolume.text(data.sumExportVolume);
-					$exportValue.text(data.sumExportValue);
-                    formatNumericElements();
-				})
-				.catch((error) => {
-							console.log("Error getting summary data");
-							console.log(error);
-						});
+			  };
+			  //------------------------------------------------------------------------
+			  //------------------------------------------------------------------------
+			const getFinancialData = (itemId, dateRange, selCompany, selCurrency, spinnerEl) => {
+					productLib.getProductFinancialSummaryData(itemId,dateRange,selCompany,selCurrency,spinnerEl)
+					.then((data)=>{
+						console.log(data);
+						let $importVolume = $('[name=ImportVolume]');
+						let $importValue = $('[name=ImportValue]');
+                        let $invoicedImportVolume = $('[name=InvoicedImportVolume]');
+                        let $invoicedImportValue = $('[name=InvoicedImportValue]');
+						let $exportVolume = $('[name=ExportVolume]');
+						let $exportValue = $('[name=ExportValue]');
+                        let $invoicedExportVolume = $('[name=InvoicedExportVolume]');
+						let $invoicedExportValue = $('[name=InvoicedExportValue]');
+						let $mediumInvoicedImportPrice = $('[name=MediumInvoicedImportPrice]');
+						let $mediumInvoicedExportPrice = $('[name=MediumInvoicedExportPrice]');
+                        let $volumeBalance = $('[name=VolumeBalance]');
+                        let $valueBalance = $('[name=ValueBalance]');
+						$importVolume.text(data.sumImportVolume);
+						$importValue.text(data.sumImportValue);
+                        $invoicedImportVolume.text(data.sumInvoicedImportVolume);
+                        $invoicedImportValue.text(data.sumInvoicedImportValue);
+                        $invoicedExportVolume.text(data.sumInvoicedExportVolume);
+                        $invoicedExportValue.text(data.sumInvoicedExportValue);
+						$exportVolume.text(data.sumExportVolume);
+						$exportValue.text(data.sumExportValue);
+						$mediumInvoicedImportPrice.text(data.mediumInvoicedImportPrice);
+						$mediumInvoicedExportPrice.text(data.mediumInvoicedExportPrice);
+                        $volumeBalance.text(data.volumeBalance);
+                        $valueBalance.text(data.valueBalance);
+						formatNumericElements();
+					})
+					.catch((error) => {
+								console.log("Error getting summary data");
+								console.log(error);
+							});
 			};
-		loadPreviousSession(sessionKey, sessionObj);
-			selectedCompanies.value = sessionObj.companyCode;
-			$currencySelector.val(sessionObj.currencyCode);
-        $companiesSelectionChanged.val(0);
-		  refreshView();
+			$currencySelector.change((event) => {
+				currencyChanged();
+			});
+			loadPreviousSession(sessionKey, sessionObj);
+				selectedCompanies.value = sessionObj.companyCode;
+				$currencySelector.val(sessionObj.currencyCode);
+			$companiesSelectionChanged.val(0);
+			  refreshView();
 	 });
 	$(window).on('beforeunload',
 		function(e) {
