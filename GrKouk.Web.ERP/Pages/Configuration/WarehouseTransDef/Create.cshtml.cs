@@ -30,8 +30,6 @@ namespace GrKouk.Web.Erp.Pages.Configuration.WarehouseTransDef
 
         private void LoadCombos()
         {
-            // var fMovements = _context.FinancialMovements.AsNoTracking().ToList();
-
             var inventoryActions = Enum.GetValues(typeof(InventoryActionEnum))
                 .Cast<InventoryActionEnum>()
                 .Select(c => new SelectListItem()
@@ -48,13 +46,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.WarehouseTransDef
                     Text = c.GetDescription()
                 }).ToList();
 
-            //var infoEntityActionList = Enum.GetValues(typeof(InfoEntityActionEnum))
-            //    .Cast<InfoEntityActionEnum>()
-            //    .Select(c => new SelectListItem()
-            //    {
-            //        Value = c.ToString(),
-            //        Text = c.GetDescription()
-            //    }).ToList();
+           
 
             ViewData["MaterialInventoryActions"] = new SelectList(inventoryActions, "Value", "Text");
             ViewData["MaterialInventoryValueActions"] = new SelectList(inventoryValueActions, "Value", "Text");
@@ -77,6 +69,8 @@ namespace GrKouk.Web.Erp.Pages.Configuration.WarehouseTransDef
             ViewData["RawMaterialInventoryAction"] = new SelectList(inventoryActions, "Value", "Text");
             ViewData["RawMaterialInventoryValueAction"] = new SelectList(inventoryValueActions, "Value", "Text");
 
+            ViewData["VolumeActions"] = new SelectList(inventoryActions, "Value", "Text");
+            ViewData["ValueActions"] = new SelectList(inventoryValueActions, "Value", "Text");
 
             ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(p=>p.Code).AsNoTracking(), "Id", "Code");
             var dbSeriesList = _context.TransWarehouseDocSeriesDefs.OrderBy(p => p.Name).AsNoTracking();
