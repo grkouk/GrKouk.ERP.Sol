@@ -363,41 +363,7 @@
 					}
 				};
 			   //-------------------Currency--------------------------------------------------
-			  const loadCultureFiles = (name) => {
-				   let files = ['ca-gregorian.json', 'numbers.json', 'timeZoneNames.json', 'currencies.json'];
-				   if (name === 'ar') {
-					   files.push('numberingSystems.json');
-				   }
-				   let loader = ej.base.loadCldr;
-				   let loadCulture = function(prop) {
-					   let val
-					   let ajax;
-					   if (name === 'ar' && prop === files.length - 1) {
-						   ajax = new ej.base.Ajax(location.origin + location.pathname + '/../../../lib/cldr-data/supplemental/' + files[prop], 'GET', false);
-					   } else {
-						   ajax = new ej.base.Ajax(location.origin + location.pathname + '/../../../lib/cldr-data/main/' + name + '/' + files[prop], 'GET', false);
-					   }
-					   ajax.onSuccess = function(value) {
-						   val = value;
-					   };
-					   ajax.send();
-					   loader(JSON.parse(val));
-				   };
-				   for (var prop = 0; prop < files.length; prop++) {
-					   loadCulture(prop);
-				   }
-			   };
-			  const loadEj2Translation = (name) => {
-				  let path = `/lib/ej2translations/${name}.json`;
-				  let ajax = new ej.base.Ajax(path, 'GET', false); //load the name json culture file
-				  ajax.send().then((e) => {
-					  var culture = JSON.parse(e);
-					  ej.base.L10n.load(
-						  culture
-					  );
-
-				  });
-			  };
+			 
 
 			  //------------------Company------------------------------------------------
 			  //--------------------------------------------------------------------------
@@ -485,7 +451,8 @@
 			});
 			loadPreviousSession(sessionKey, sessionObj);
 				selectedCompanies.value = sessionObj.companyCode;
-				$currencySelector.val(sessionObj.currencyCode);
+			$currencySelector.val(sessionObj.currencyCode);
+			currencyChanged();
 			$companiesSelectionChanged.val(0);
 			  refreshView();
 	 });
