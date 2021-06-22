@@ -14,57 +14,37 @@ namespace GrKouk.Erp.Domain.DocDefinitions
         public string Name { get; set; }
         [Display(Name = "Ενεργό")] public bool Active { get; set; }
 
-        [Display(Name = "Material Inv.Volume")]
+        [Display(Name = "Material Inventory")]
         public InventoryActionEnum MaterialInventoryAction { get; set; }
        
-        [Display(Name = "Material Inv.Value")]
+        [Display(Name = "Material InvValue")]
         public InventoryValueActionEnum MaterialInventoryValueAction { get; set; }
         [Display(Name = "Material Invoiced Volume")]
         public InventoryActionEnum MaterialInvoicedVolumeAction { get; set; }
         [Display(Name = "Material Invoiced Value")]
         public InventoryValueActionEnum MaterialInvoicedValueAction { get; set; }
-        [Display(Name = "Service Inv.Volume")]
+        [Display(Name = "Service InvAct")]
         public InventoryActionEnum ServiceInventoryAction { get; set; }
-        [Display(Name = "Service Inv.Value")]
+        [Display(Name = "Service InvValAct")]
         public InventoryValueActionEnum ServiceInventoryValueAction { get; set; }
-        [Display(Name = "Expense Inv.Volume")]
+        [Display(Name = "Expense InvAct")]
         public InventoryActionEnum ExpenseInventoryAction { get; set; }
-        [Display(Name = "Expense Inv.Value")]
+        [Display(Name = "Expense InvValAct")]
         public InventoryValueActionEnum ExpenseInventoryValueAction { get; set; }
-        [Display(Name = "Income Inv.Volume")]
+        [Display(Name = "Income InvAct")]
         public InventoryActionEnum IncomeInventoryAction { get; set; }
-        [Display(Name = "Income Inv.Value")]
+        [Display(Name = "Income InvValAct")]
         public InventoryValueActionEnum IncomeInventoryValueAction { get; set; }
 
-        [Display(Name = "Fixed As.Inv.Volume")]
+        [Display(Name = "Fixed As.InvAct")]
         public InventoryActionEnum FixedAssetInventoryAction { get; set; }
-        [Display(Name = "Fixed As.Inv.Value")]
+        [Display(Name = "Fixed As.InvValAct")]
         public InventoryValueActionEnum FixedAssetInventoryValueAction { get; set; }
 
-        [Display(Name = "Raw Material Inv.Volume")]
+        [Display(Name = "Raw Material InvAct")]
         public InventoryActionEnum RawMaterialInventoryAction { get; set; }
-        [Display(Name = "Raw Material Inv.Value")]
+        [Display(Name = "RawMaterial InvValAct")]
         public InventoryValueActionEnum RawMaterialInventoryValueAction { get; set; }
-
-        [Display(Name = "Sales Volume")]
-        public InventoryActionEnum SalesVolumeAction { get; set; }
-        [Display(Name = "Sales Value")]
-        public InventoryValueActionEnum SalesValueAction { get; set; }
-
-        [Display(Name = "Buy Volume")]
-        public InventoryActionEnum BuyVolumeAction { get; set; }
-        [Display(Name = "Buy Value")]
-        public InventoryValueActionEnum BuyValueAction { get; set; }
-
-        [Display(Name = "Production Volume")]
-        public InventoryActionEnum ProductionVolumeAction { get; set; }
-        [Display(Name = "Production Value")]
-        public InventoryValueActionEnum ProductionValueAction { get; set; }
-
-        [Display(Name = "Consumption Volume")]
-        public InventoryActionEnum ConsumptionVolumeAction { get; set; }
-        [Display(Name = "Consumption Value")]
-        public InventoryValueActionEnum ConsumptionValueAction { get; set; }
 
         [Display(Name = "Default Series")]
         public int DefaultDocSeriesId { get; set; }
