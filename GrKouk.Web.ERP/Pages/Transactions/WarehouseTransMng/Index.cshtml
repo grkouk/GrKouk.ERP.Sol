@@ -1,4 +1,6 @@
 ﻿@page
+@using GrKouk.Web.ERP.Helpers
+
 @model IndexModel
 
 @{
@@ -41,76 +43,23 @@
     </ul>
 </div>
 
-<div class="collapse show" id="filterCollapse">
-    <form class="form-inline" id="FiltersForm" method="get">
-        <input type="hidden" id="filtersVisible" />
-        <input type="hidden" id="rowSelectorsVisible" />
-        <input type="hidden" id="currentSort" />
-        <input type="hidden" id="currentFilter" />
-        <input type="hidden" id="totalPages" />
-        <input type="hidden" id="totalRecords" />
-        <input type="hidden" id="pageIndex" />
-        <div class="container">
-            <div class="form-row">
-                <div class="form-group col-md-auto">
-                    <div class="searchbar">
-                        <input class="search_input" type="text" name="" placeholder="Search...">
-                        <a href="#" class="search_icon"><i class="fas fa-search fa-xs"></i></a>
-                    </div>
-                </div>
 
-                <div class="form-group col-md-auto">
-                    <label class="small"> Period:</label>
-                    <select name="DatePeriodFilter" id="DatePeriodFilter" class="form-control form-control-sm small"
-                            asp-items="ViewBag.DataFilterValues"></select>
-                </div>
-                <div class="form-group col-md-auto">
-                    <label class="small">Company:</label>
-                    <select id="CompanyFilter" class="form-control form-control-sm small"
-                            asp-items="ViewBag.CompanyFilter"></select>
-                </div>
-                <div class="form-group col-md-auto">
-                    <label class="small"> Page Size:</label>
-                    <select id="PageSize" class="form-control form-control-sm small"
-                            asp-items="ViewBag.PageFilterSize"></select>
-                </div>
+@await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { })
 
-                <div class="form-group col-md-auto">
-                    <label class="small"> Currency:</label>
-                    <select id="CurrencySelector" class="form-control form-control-sm small"
-                            asp-items="ViewBag.CurrencySelector"></select>
-                </div>
-            </div>
-        </div>
-    </form>
-</div>
 <div class="row mt-1">
     <partial name="_PagerPartial" />
 </div>
-<table class="table table-bordered table-sm" id="myTable">
-    <thead class="thead-light">
-    </thead>
-    <tbody>
-    </tbody>
-</table>
+<partial name="_DataTable" />
+
+
 
 <div class="row">
     <partial name="_PagerPartial" />
 </div>
-
 <!-- Modal -->
-<div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <div class="loader"></div>
-                <div>
-                    <p>Executing request. <br><br><small>Please wait...</small></p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<partial name="_LoadMePartial" />
+
+
 
 @section Scripts
     {
@@ -279,7 +228,7 @@
                     header: 'Import Vol.',
                     text: '',
                     headerClass: 'small text-center',
-                    class: 'small text-right ',
+                    class: 'small text-end ',
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {}
@@ -297,7 +246,7 @@
                     header: 'Import Amount',
                     text: '',
                     headerClass: 'small text-center',
-                    class: 'small text-right ',
+                    class: 'small text-end ',
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
@@ -317,7 +266,7 @@
                     header: 'Export Vol.',
                     text: '',
                     headerClass: 'small text-center',
-                    class: 'small text-right ',
+                    class: 'small text-end ',
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {}
@@ -336,7 +285,7 @@
                     header: 'Export Amount',
                     text: '',
                     headerClass: 'small text-center',
-                    class: 'small text-right ',
+                    class: 'small text-end ',
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
