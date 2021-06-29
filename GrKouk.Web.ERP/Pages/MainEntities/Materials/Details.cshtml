@@ -14,7 +14,7 @@
                 <div class="col-5 gx-1">
 
                     <ejs-multiselect id="SelectedCompanies" dataSource="@ViewBag.CompaniesListJs"
-                                     placeholder="Select Companies" mode="Default"
+                                     placeholder="Select Companies" mode="CheckBox"
                                      showDropDownIcon="true" showSelectAll="false"
                                      selectAllText="Select All" unSelectAllText="unSelect All">
                         <e-multiselect-fields text="Title" value="ValueInt"></e-multiselect-fields>
@@ -282,25 +282,25 @@
 					//remove all others and keep only allcompanies selection
 					//event.value = a;
 					selectedCompanies.value = a;
-					selectedCompanies.refreshView();
+					selectedCompanies.refresh();
 				}
 				let sComp = selectedCompanies.value;
                 var selected = JSON.stringify(selectedCompanies.value);
 				$('#SelectedCompanies').val(selected);
-				refreshView();
+				//refreshView();
 
-			 //$companiesSelectionChanged.val(1);
+			    $companiesSelectionChanged.val(1);
 			});
-            //selectedCompanies.addEventListener("close", (event) => {
-				//let selectionChanged = $companiesSelectionChanged.val();
-				//if (selectionChanged) {
-				//	$companiesSelectionChanged.val(0);
-				//	let sComp = selectedCompanies.value;
-                 //   var selected = JSON.stringify(selectedCompanies.value);
-				//	$('#SelectedCompanies').val(selected);
-				//	refreshView();
-				//}
-            //});
+            selectedCompanies.addEventListener("close", (event) => {
+				let selectionChanged = $companiesSelectionChanged.val();
+				if (selectionChanged) {
+					$companiesSelectionChanged.val(0);
+					let sComp = selectedCompanies.value;
+                    var selected = JSON.stringify(selectedCompanies.value);
+					$('#SelectedCompanies').val(selected);
+					refreshView();
+				}
+            });
 			 const currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
 			 const warehouseItemId = @Model.ItemVm.Id;
 			 const refreshView = () => {
