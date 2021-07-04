@@ -257,7 +257,10 @@ namespace GrKouk.Web.ERP.Automapper {
                 .ReverseMap();
             CreateMap<WarehouseItem, WrItemDetailDto>()
                 .ForMember(x => x.Companies, opt => opt.Ignore());
-            
+
+            CreateMap<CompanyWarehouseItemMapping, WarehouseItemBigClass>()
+               .ForMember(dest => dest.Url, opt => opt.Ignore());
+
         }
     }
 }

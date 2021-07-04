@@ -3211,7 +3211,201 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
+        [HttpGet("GetIndexTblDataWarehouseItemsV3")]
+        public async Task<IActionResult> GetIndexTblDataWarehouseItemsV3([FromQuery] IndexDataTableRequest request)
+        {
+            //Thread.Sleep(10000);
+            var lst1 = _context.CompanyWarehouseItemMappings
+                .Include(p => p.WarehouseItem)
+                .Include(p => p.Company);
+            IQueryable<WarehouseItemBigClass> fullListIq = lst1.ProjectTo<WarehouseItemBigClass>(_mapper.ConfigurationProvider);
+            var t = fullListIq.ToList();
+            //IQueryable<WarehouseItem> fullListIq = _context.WarehouseItems;
+            if (!string.IsNullOrEmpty(request.WarehouseItemNatureFilter))
+            {
+                if (int.TryParse(request.WarehouseItemNatureFilter, out var warehouseItemNatureFilter))
+                {
+                    if (warehouseItemNatureFilter > 0)
+                    {
+                        var flt = (WarehouseItemNatureEnum)warehouseItemNatureFilter;
+                        fullListIq = fullListIq.Where(p => p.WarehouseItemNature == flt);
+                    }
+                }
+            }
 
+
+            if (!string.IsNullOrEmpty(request.SortData))
+            {
+                switch (request.SortData.ToLower())
+                {
+                    case "namesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.Name);
+                        break;
+                    case "namesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.Name);
+                        break;
+                    case "codesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.Code);
+                        break;
+                    case "codesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.Code);
+                        break;
+                    case "categorysort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.MaterialCategoryName);
+                        break;
+                    case "categorysort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.MaterialCategoryName);
+                        break;
+                    case "companycodesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.CompanyCode);
+                        break;
+                    case "companycodesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.CompanyCode);
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(request.CompanyFilter))
+            {
+                if (int.TryParse(request.CompanyFilter, out var companyId))
+                {
+                    if (companyId > 0)
+                    {
+                        var allCompCode =
+                            await _context.AppSettings.SingleOrDefaultAsync(
+                                p => p.Code == Constants.AllCompaniesCodeKey);
+                        if (allCompCode == null)
+                        {
+                            return NotFound("All Companies Code Setting not found");
+                        }
+
+                        var allCompaniesEntity =
+                            await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+                        if (allCompaniesEntity != null)
+                        {
+                            var allCompaniesId = allCompaniesEntity.Id;
+                            fullListIq =
+                                fullListIq.Where(p => p.CompanyId == companyId || p.CompanyId == allCompaniesId);
+                        }
+                        else
+                        {
+                            fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
+                        }
+                    }
+                }
+            }
+
+
+
+            //if (!string.IsNullOrEmpty(request.CompanyFilter))
+            //{
+            //    List<int> firmIds = JsonSerializer.Deserialize<List<int>>(request.CompanyFilter);
+            //    var allCompCode =
+            //        await _context.AppSettings.SingleOrDefaultAsync(
+            //            p => p.Code == Constants.AllCompaniesCodeKey);
+            //    if (allCompCode == null)
+            //    {
+            //        return NotFound("All Companies Code Setting not found");
+            //    }
+
+            //    var allCompaniesEntity =
+            //        await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+
+            //    if (allCompaniesEntity != null)
+            //    {
+            //        var allCompaniesId = allCompaniesEntity.Id;
+            //        firmIds.Add(allCompaniesId);
+            //    }
+
+            //    fullListIq = fullListIq.Where(p => firmIds.Contains(p.CompanyId));
+            //}
+
+            if (!string.IsNullOrEmpty(request.SearchFilter))
+            {
+                fullListIq = fullListIq.Where(p => p.Name.Contains(request.SearchFilter)
+                                                   || p.Code.Contains(request.SearchFilter)
+                                                  // || p.ShortDescription.Contains(request.SearchFilter)
+                                                  // || p.Description.Contains(request.SearchFilter)
+                                                   || p.MaterialCategoryName.Contains(request.SearchFilter));
+            }
+
+            //--------------------------------------------------------------
+            var localList = fullListIq.ToList();
+            var projectedList = localList.GroupBy(g => new
+            {
+                g.Id,
+                g.Name,
+                g.Code,
+                g.MaterialCategoryName,
+                g.MaterialType,
+                g.Active,
+                g.WarehouseItemNature
+            })
+                .Select(f => new ProductSelectorListDto()
+                {
+                    Id = f.Key.Id,
+                    Name = f.Key.Name,
+                    Code = f.Key.Code,
+                    MaterialType = f.Key.MaterialType,
+                    Active = f.Key.Active,
+                    WarehouseItemNature = f.Key.WarehouseItemNature,
+                    CompanyCode = string.Join(",", f.Select(n => n.CompanyCode))
+                });
+            // var t = projectedList.ToList();
+            //-----------------------------------------------------------
+            PagedList<ProductSelectorListDto> listItems;
+            try
+            {
+
+                var pageIndex = request.PageIndex;
+
+                var pageSize = request.PageSize;
+
+                listItems = PagedList<ProductSelectorListDto>.Create(projectedList.AsQueryable(), pageIndex, pageSize);
+            }
+            catch (Exception e)
+            {
+                string msg = e.InnerException?.Message;
+                return BadRequest(new
+                {
+                    error = e.Message + " " + msg
+                });
+            }
+
+            foreach (var productItem in listItems)
+            {
+                ProductMedia productMedia;
+
+                try
+                {
+                    productMedia = await _context.ProductMedia
+                        .Include(p => p.MediaEntry)
+                        .SingleOrDefaultAsync(p => p.ProductId == productItem.Id);
+                    if (productMedia != null)
+                    {
+                        productItem.Url = Url.Content("~/productimages/" + productMedia.MediaEntry.MediaFile);
+                    }
+                    else
+                    {
+                        productItem.Url = Url.Content("~/productimages/" + "noimage.jpg");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    productItem.Url = Url.Content("~/productimages/" + "noimage.jpg");
+                }
+            }
+
+            var response = new IndexDataTableResponse<ProductSelectorListDto>
+            {
+                TotalRecords = listItems.TotalCount,
+                TotalPages = listItems.TotalPages,
+                HasPrevious = listItems.HasPrevious,
+                HasNext = listItems.HasNext,
+                Data = listItems
+            };
+            return Ok(response);
+        }
         [HttpGet("GetIndexTblDataCfaTransactionDefs")]
         public async Task<IActionResult> GetIndexTblDataCfaTransactionDefs([FromQuery] IndexDataTableRequest request)
         {
