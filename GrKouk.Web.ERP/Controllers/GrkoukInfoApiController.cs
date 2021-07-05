@@ -3214,12 +3214,14 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpGet("GetIndexTblDataWarehouseItemsV3")]
         public async Task<IActionResult> GetIndexTblDataWarehouseItemsV3([FromQuery] IndexDataTableRequest request)
         {
-            //Thread.Sleep(10000);
+
+           
             var lst1 = _context.CompanyWarehouseItemMappings
                 .Include(p => p.WarehouseItem)
+                .ThenInclude(p=>p.FpaDef)
                 .Include(p => p.Company);
             IQueryable<WarehouseItemBigClass> fullListIq = lst1.ProjectTo<WarehouseItemBigClass>(_mapper.ConfigurationProvider);
-            var t = fullListIq.ToList();
+           // var t = fullListIq.ToList();
             //IQueryable<WarehouseItem> fullListIq = _context.WarehouseItems;
             if (!string.IsNullOrEmpty(request.WarehouseItemNatureFilter))
             {
