@@ -236,6 +236,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
             var transactorsListJs = _context.Transactors
                 .Include(p => p.TransactorType)
                 .Where(p => p.TransactorType.Code != "SYS.DTRANSACTOR")
+                .OrderBy(p=>p.Name)
                 .Select(p => new TransactorSelectListItem()
                 {
                     Id = p.Id,
