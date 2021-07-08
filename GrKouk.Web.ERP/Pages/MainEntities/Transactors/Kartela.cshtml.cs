@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NToastNotify;
 
-namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors
+namespace GrKouk.Web.ERP.Pages.MainEntities.Transactors
 {
     [Authorize(Roles = "Admin")]
     public class KartelaModel : PageModel
