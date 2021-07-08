@@ -19,8 +19,8 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.CashFlowAccounts
         private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
 
-        public string TransactorName { get; set; }
-        public int TransactorId { get; set; }
+        public string CfaName { get; set; }
+        public int CfaId { get; set; }
 
         public KartelaModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
         {
@@ -38,8 +38,8 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.CashFlowAccounts
                 return NotFound();
             }
 
-            TransactorId = transactorId;
-            TransactorName = transactor.Name;
+            CfaId = transactorId;
+            CfaName = transactor.Name;
             LoadFilters();
             return Page();
         }

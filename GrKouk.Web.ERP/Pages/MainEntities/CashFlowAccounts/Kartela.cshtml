@@ -2,14 +2,14 @@
 @using GrKouk.Web.ERP.Helpers
 @model GrKouk.Web.ERP.Pages.MainEntities.CashFlowAccounts.KartelaModel
 @{
-    ViewData["Title"] = "Καρτέλα" + @Model.TransactorName;
+    ViewData["Title"] = "Καρτέλα" + @Model.CfaName;
 }
 @section MyCss
 {
     <link rel="stylesheet" href="~/css/custom-checkbox.css" />
     <link rel="stylesheet" href="~/css/searchbar.css" />
 }
-<h4>Καρτέλα  @Model.TransactorName</h4>
+<h4>Καρτέλα  @Model.CfaName</h4>
 <div class="container ">
     <ul class="nav small justify-content-end ">
 
@@ -37,7 +37,7 @@
         </li>
     </ul>
 </div>
-<input type="hidden" asp-for="TransactorId" />
+<input type="hidden" asp-for="CfaId" />
 @await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowDateFlt = true })
 
 
@@ -248,7 +248,7 @@
                      } else {
 
                          var itemId = valueSource["id"];
-                         retUri = `/transactions/transactortransmng/Details?id=${itemId}`;
+                         retUri = `/transactions/CFATransactions/Details?id=${itemId}`;
                      }
                      return retUri;
                    },
@@ -293,7 +293,7 @@
                        } else {
 
                            var itemId = valueSource["id"];
-                           retUri = `/transactions/transactortransmng/Edit?id=${itemId}`;
+                           retUri = `/transactions/CFATransactions/Edit?id=${itemId}`;
                        }
                        return retUri;
                    },
