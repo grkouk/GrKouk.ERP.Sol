@@ -94,7 +94,7 @@
                             spinnerLoaderHide($SpElement);
                         }
                         */
-                         
+
                     }, 2000);
                 },
             });
@@ -228,6 +228,22 @@
                 });
         });
     };
+    const getProductFinancialSummaryData = (itemId, dateRange, selCompany, selCurrency, spinnerElement) => {
+        var uri = '/api/FinancialData/GetWarehouseItemFinancialSummaryData?';
+        uri += `&warehouseItemId=${itemId}`;
+        uri += `&companyFilter=${selCompany}`;
+        uri += `&dateRange=${dateRange}`;
+        uri += `&displayCurrencyId=${selCurrency}`;
+        return new Promise((resolve, reject) => {
+            makeAjaxCall(uri, spinnerElement)
+                .then((data) => {
+                    resolve(data);
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        });
+    };
     const setCompanyIdInSession = (companyId) => {
         let uri = "/api/Materials/SetCompanyInSession";
         uri += `?companyId=${companyId}`;
@@ -306,7 +322,7 @@
     };
     const prepCurrencyInputs = () => {
         let $elementsToUpdateVal = $('.currency-input');
-        $elementsToUpdateVal.each(function() {
+        $elementsToUpdateVal.each(function () {
             let $el = $(this);
             $el.blur((e) => {
                 console.log("Inside blur event");
@@ -371,30 +387,30 @@
     const setLanguageLocale = (culture, currencyCode, ejLoader) => {
         return new Promise((resolve, reject) => {
             $.when(
-                    $.get("/lib/cldr-data/supplemental/likelySubtags.json"),
-                    $.get("/lib/cldr-data/main/" + culture + "/numbers.json"),
-                    $.get("/lib/cldr-data/main/" + culture + "/currencies.json"),
-                    $.get("/lib/cldr-data/supplemental/numberingSystems.json"),
-                    $.get("/lib/cldr-data/main/" + culture + "/ca-gregorian.json"),
-                    $.get("/lib/cldr-data/main/" + culture + "/timeZoneNames.json"),
-                    $.get("/lib/cldr-data/supplemental/timeData.json"),
-                    $.get("/lib/cldr-data/supplemental/currencyData.json"),
-                    $.get("/lib/cldr-data/supplemental/weekData.json")
-                ).then(function () {
-                    // Normalize $.get results, we only need the JSON, not the request statuses.
-                    return [].slice.apply(arguments, [0]).map(function (result) {
-                        return result[0];
-                    });
-                }).then(function (data) {
-                    console.log(data);
-                    console.log(arguments);
+                $.get("/lib/cldr-data/supplemental/likelySubtags.json"),
+                $.get("/lib/cldr-data/main/" + culture + "/numbers.json"),
+                $.get("/lib/cldr-data/main/" + culture + "/currencies.json"),
+                $.get("/lib/cldr-data/supplemental/numberingSystems.json"),
+                $.get("/lib/cldr-data/main/" + culture + "/ca-gregorian.json"),
+                $.get("/lib/cldr-data/main/" + culture + "/timeZoneNames.json"),
+                $.get("/lib/cldr-data/supplemental/timeData.json"),
+                $.get("/lib/cldr-data/supplemental/currencyData.json"),
+                $.get("/lib/cldr-data/supplemental/weekData.json")
+            ).then(function () {
+                // Normalize $.get results, we only need the JSON, not the request statuses.
+                return [].slice.apply(arguments, [0]).map(function (result) {
+                    return result[0];
+                });
+            }).then(function (data) {
+                console.log(data);
+                console.log(arguments);
 
-                    Globalize.load(data);
-                    for (let i = 0; i < data.length; i++) {
-                        const element = data[i];
-                        ejLoader(element);
-                    }
-                })
+                Globalize.load(data);
+                for (let i = 0; i < data.length; i++) {
+                    const element = data[i];
+                    ejLoader(element);
+                }
+            })
 
                 .then(function () {
                     console.log("Globalize culture loaded " + culture);
@@ -421,6 +437,7 @@
         setParsers: setParsers,
         setFormatters: setFormatters,
         //For testing purposes
-        makeAjaxCallGet:makeAjaxCallGet
+        makeAjaxCallGet: makeAjaxCallGet,
+        getProductFinancialSummaryData: getProductFinancialSummaryData
     };
 })();

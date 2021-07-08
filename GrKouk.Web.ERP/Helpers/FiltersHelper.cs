@@ -112,20 +112,21 @@ namespace GrKouk.Web.ERP.Helpers
         }
         public static async Task<List<SelectListItem>> GetCompaniesFilterListAsync(ApiDbContext context)
         {
-
-            var dbCompanies = await context.Companies.Where(t => t.Id != 1).OrderBy(p => p.Code)
+            var valuesList = await context.Companies.Where(t => t.Id != 1)
+                .OrderBy(p => p.Name)
                 .AsNoTracking()
+                .Select(c => new SelectListItem() {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                })
                 .ToListAsync();
-            List<SelectListItem> companiesList = new List<SelectListItem>
-            {
-                new SelectListItem() { Value = 0.ToString(), Text = "{All Companies}" }
-            };
-            foreach (var company in dbCompanies)
-            {
-                companiesList.Add(new SelectListItem() { Value = company.Id.ToString(), Text = company.Code });
-            }
 
-            return companiesList;
+            valuesList.Insert(0, new SelectListItem() {
+                Value = 0.ToString(),
+                Text = "{All Companies}"
+            });
+
+            return valuesList;
         }
         /// <summary>
         /// Returns list of all companies without company AllComp async 
@@ -143,12 +144,7 @@ namespace GrKouk.Web.ERP.Helpers
                     Text = c.Code
                 })
                 .ToListAsync();
-            //List<SelectListItem> companiesList = new List<SelectListItem>();
            
-            //foreach (var company in dbCompanies)
-            //{
-            //    companiesList.Add(new SelectListItem() { Value = company.Id.ToString(), Text = company.Code });
-            //}
 
             return companiesList;
         }
@@ -183,22 +179,21 @@ namespace GrKouk.Web.ERP.Helpers
                 trTypeId = trTypeObject.Id;
             }
 
-            var dbTransactors = await context.Transactors.Where(t => t.TransactorTypeId == trTypeId)
+            var valuesList = await context.Transactors.Where(t => t.TransactorTypeId == trTypeId)
                 .OrderBy(p => p.Name)
                 .AsNoTracking()
+                .Select(c => new SelectListItem() {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                })
                 .ToListAsync();
 
+            valuesList.Insert(0, new SelectListItem() {
+                Value = 0.ToString(),
+                Text = "{No Transactor}"
+            });
 
-            List<SelectListItem> transactorsList = new List<SelectListItem>
-            {
-                new SelectListItem() {Value = 0.ToString(), Text = "{No Transactor}"}
-            };
-            foreach (var item in dbTransactors)
-            {
-                transactorsList.Add(new SelectListItem() { Value = item.Id.ToString(), Text = item.Code });
-            }
-
-            return transactorsList;
+            return valuesList;
         }
         public static async Task<List<SelectListItem>> GetTransactorTypeFilterListAsync(ApiDbContext context)
         {
@@ -256,15 +251,34 @@ namespace GrKouk.Web.ERP.Helpers
         }
         public static async Task<List<SelectListItem>> GetCurrenciesFilterListAsync(ApiDbContext context)
         {
-            var dbItems = await context.Currencies.OrderBy(p => p.Name).AsNoTracking().ToListAsync();
-            List<SelectListItem> itemsList = new List<SelectListItem>();
-            //itemsList.Add(new SelectListItem() { Value = 0.ToString(), Text = "{All Companies}" });
-            foreach (var item in dbItems)
+            var valuesList = await context.Currencies
+                .OrderBy(p => p.Code)
+                .AsNoTracking()
+                .Select(c => new SelectListItem() {
+                    Value = c.Id.ToString(),
+                    Text = c.Code
+                })
+                .ToListAsync();
+            
+            return valuesList;
+        }
+        public static async Task<int> GetAllCompaniesIdAsync(ApiDbContext context)
+        {
+            var allCompCode = await context.AppSettings.SingleOrDefaultAsync(
+                        p => p.Code == Constants.AllCompaniesCodeKey);
+            if (allCompCode == null)
             {
-                itemsList.Add(new SelectListItem() { Value = item.Id.ToString(), Text = item.Code });
+                return -1;
             }
+            var allCompaniesEntity =
+                    await context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
 
-            return itemsList;
+            if (allCompaniesEntity != null)
+            {
+                return allCompaniesEntity.Id;
+                
+            }
+            return -1;
         }
         public static async Task<List<SelectListItem>> GetFiscalPeriodsFilterListAsync(ApiDbContext context)
         {

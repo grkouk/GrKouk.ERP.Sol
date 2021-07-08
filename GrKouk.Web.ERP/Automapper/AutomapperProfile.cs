@@ -255,8 +255,32 @@ namespace GrKouk.Web.ERP.Automapper {
                     opt => 
                         opt.MapFrom(src => src.RefCode))
                 .ReverseMap();
+            CreateMap<WarehouseItem, WrItemDetailDto>()
+                .ForMember(x => x.Companies, opt => opt.Ignore());
 
-            
+            CreateMap<CompanyWarehouseItemMapping, WarehouseItemBigClass>()
+               .ForMember(dest => dest.Name,
+                    opt => opt.MapFrom(src => src.WarehouseItem.Name))
+               .ForMember(dest => dest.Code,
+                    opt => opt.MapFrom(src => src.WarehouseItem.Code))
+               .ForMember(dest => dest.Active,
+                    opt => opt.MapFrom(src => src.WarehouseItem.Active))
+               .ForMember(dest => dest.Id,
+                    opt => opt.MapFrom(src => src.WarehouseItemId))
+               .ForMember(dest => dest.FpaDefId,
+                    opt => opt.MapFrom(src => src.WarehouseItem.FpaDefId))
+               .ForMember(dest => dest.FpaDefName,
+                    opt => opt.MapFrom(src => src.WarehouseItem.FpaDef.Id))
+                .ForMember(dest => dest.MaterialCategoryId,
+                    opt => opt.MapFrom(src => src.WarehouseItem.MaterialCategoryId))
+                .ForMember(dest => dest.MaterialCategoryName,
+                    opt => opt.MapFrom(src => src.WarehouseItem.MaterialCaterory.Name))
+                 .ForMember(dest => dest.MaterialType,
+                    opt => opt.MapFrom(src => src.WarehouseItem.MaterialType))
+                   .ForMember(dest => dest.WarehouseItemNature,
+                    opt => opt.MapFrom(src => src.WarehouseItem.WarehouseItemNature))
+               .ForMember(dest => dest.Url, opt => opt.Ignore());
+
         }
     }
 }

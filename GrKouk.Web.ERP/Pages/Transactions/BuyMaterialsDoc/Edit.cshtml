@@ -886,6 +886,7 @@
                         $transUnitCode.val(unitToSelect.unitCode);
                         $transUnitType.val(unitToSelect.unitType);
                         $transUnitFactor.val(unitToSelect.unitFactor);
+                        $transUnitFactor.attr('data-actualValue', parseFloat(unitToSelect.unitFactor));
                     } else {
                         if (defaultUnit) {
                             $transUnitSelector.val(defaultUnit.unitId);
@@ -893,7 +894,7 @@
                             $transUnitCode.val(defaultUnit.unitCode);
                             $transUnitType.val(defaultUnit.unitType);
                             $transUnitFactor.val(defaultUnit.unitFactor);
-
+                            $transUnitFactor.attr('data-actualValue', parseFloat(defaultUnit.unitFactor));
                         }
                     }
 
@@ -1008,6 +1009,7 @@
                 var unitFactor = $sel.attr("unitfactor");
                 var unitType = $sel.attr("unittype");
                 $transUnitFactor.val(unitFactor);
+                $transUnitFactor.attr('data-actualValue', parseFloat(unitFactor));
                 $transUnitType.val(unitType);
                 $transUnitCode.val(unitCode);
                 $transUnitId.val(unitId);

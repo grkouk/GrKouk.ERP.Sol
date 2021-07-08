@@ -64,30 +64,15 @@
 <div class="row mt-1">
     <partial name="_PagerPartial" />
 </div>
-<table class="table table-bordered table-sm" id="myTable">
-    <thead class="thead-light">
+<partial name="_DataTable"/>
 
-    </thead>
-    <tbody>
-    </tbody>
-</table>
 <div class="row">
     <partial name="_PagerPartial" />
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <div class="loader"></div>
-                <div>
-                    <p>Executing request. <br><br><small>Please wait...</small></p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<partial name="_LoadMePartial" />
+
 
 
 @section Scripts {

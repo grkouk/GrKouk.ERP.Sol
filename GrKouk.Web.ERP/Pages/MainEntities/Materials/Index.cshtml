@@ -62,12 +62,8 @@
 <div class="row">
     <partial name="_PagerPartial" />
 </div>
-<table class="table table-bordered table-sm" id="myTable">
-    <thead class="thead-light">
-    </thead>
-    <tbody>
-    </tbody>
-</table>
+<partial name="_DataTable"/>
+
 
 <div class="row">
     <partial name="_PagerPartial" />
@@ -93,18 +89,8 @@
     </div>
 </div>
 <!-- Modal -->
-<div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <div class="loader"></div>
-                <div>
-                    <p>Executing request. <br><br><small>Please wait...</small></p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<partial name="_LoadMePartial" />
+
 
 @section Scripts {
     <script src="~/js/definitions.js"></script>
@@ -419,7 +405,7 @@
                 }
             ];
             const indexPageDef = {
-                uri: '/api/GrKoukInfoApi/GetIndexTblDataWarehouseItems',
+                uri: '/api/GrKoukInfoApi/GetIndexTblDataWarehouseItemsV3',
                 currencyFormatter: formatterCurrency,
                 numberFormatter: formatterNumber,
                 colDefs: colDefs,
