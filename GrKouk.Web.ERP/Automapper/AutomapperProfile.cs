@@ -255,6 +255,9 @@ namespace GrKouk.Web.ERP.Automapper {
                     opt => 
                         opt.MapFrom(src => src.RefCode))
                 .ReverseMap();
+
+            CreateMap<CashFlowAccountTransaction, CfaTransactionListDto>().ReverseMap();
+            
             CreateMap<WarehouseItem, WrItemDetailDto>()
                 .ForMember(x => x.Companies, opt => opt.Ignore());
 

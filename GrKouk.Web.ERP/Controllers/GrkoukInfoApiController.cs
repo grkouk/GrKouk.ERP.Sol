@@ -5108,8 +5108,8 @@ namespace GrKouk.Web.ERP.Controllers
                 CompanyCurrencyId = p.CompanyCurrencyId
             }).ToListAsync();
             var grandSumOfAmount = t1.Sum(p => p.Amount);
-            var grandSumOfDebit = t1.Sum(p => p.DepositAmount);
-            var grandSumOfCredit = t1.Sum(p => p.WithdrawAmount);
+            var grandSumOfDeposits = t1.Sum(p => p.DepositAmount);
+            var grandSumOfWithdraws = t1.Sum(p => p.WithdrawAmount);
             var dbTransactions = await dbTrans.ToListAsync();
             foreach (var listItem in dbTransactions)
             {
@@ -5181,46 +5181,32 @@ namespace GrKouk.Web.ERP.Controllers
             //Create before period line
             var bl1 = new
             {
-                Debit = transBeforePeriodList.Sum(x => x.DebitAmount),
-                Credit = transBeforePeriodList.Sum(x => x.CreditAmount),
+                Deposit = transBeforePeriodList.Sum(x => x.DepositAmount),
+                Withdraw = transBeforePeriodList.Sum(x => x.WithdrawAmount),
             };
 
-            var beforePeriod = new KartelaLine();
-            if (bl1.Credit >= bl1.Debit)
+            var beforePeriod = new CfaKartelaLine();
+            if (bl1.Withdraw >= bl1.Deposit)
             {
-                var amnt = bl1.Credit - bl1.Debit;
-                beforePeriod.Credit = amnt;
-                beforePeriod.Debit = 0;
+                var amnt = bl1.Withdraw - bl1.Deposit;
+                beforePeriod.Withdraw = amnt;
+                beforePeriod.Deposit = 0;
             }
             else
             {
-                var amnt = bl1.Debit - bl1.Credit;
-                beforePeriod.Credit = 0;
-                beforePeriod.Debit = amnt;
+                var amnt = bl1.Deposit - bl1.Withdraw;
+                beforePeriod.Withdraw = 0;
+                beforePeriod.Deposit = amnt;
             }
-
-            switch (transactorType.Code)
-            {
-                case "SYS.DTRANSACTOR":
-
-                    break;
-                case "SYS.CUSTOMER":
-                    beforePeriod.RunningTotal = bl1.Debit - bl1.Credit;
-                    break;
-                case "SYS.SUPPLIER":
-                    beforePeriod.RunningTotal = bl1.Credit - bl1.Debit;
-                    break;
-                default:
-                    beforePeriod.RunningTotal = bl1.Credit - bl1.Debit;
-                    break;
-            }
+            beforePeriod.RunningTotal = bl1.Deposit - bl1.Withdraw;
+            
 
             beforePeriod.TransDate = beforePeriodDate;
             beforePeriod.DocSeriesCode = "Εκ.Μεταφ.";
             beforePeriod.CreatorId = -1;
-            beforePeriod.TransactorName = "";
+            beforePeriod.CahsFlowAccountName = "";
 
-            var listWithTotal = new List<KartelaLine>
+            var listWithTotal = new List<CfaKartelaLine>
             {
                 beforePeriod
             };
@@ -5229,30 +5215,16 @@ namespace GrKouk.Web.ERP.Controllers
 
 
             decimal runningTotal = beforePeriod.RunningTotal;
+            
             foreach (var dbTransaction in dbTransactions)
             {
-                switch (transactorType.Code)
-                {
-                    case "SYS.DTRANSACTOR":
+                runningTotal = dbTransaction.DepositAmount - dbTransaction.WithdrawAmount + runningTotal;
 
-                        break;
-                    case "SYS.CUSTOMER":
-                        runningTotal = dbTransaction.DebitAmount - dbTransaction.CreditAmount + runningTotal;
-                        break;
-                    case "SYS.SUPPLIER":
-                        runningTotal = dbTransaction.CreditAmount - dbTransaction.DebitAmount + runningTotal;
-                        break;
-                    default:
-                        runningTotal = dbTransaction.CreditAmount - dbTransaction.DebitAmount + runningTotal;
-                        break;
-                }
-
-
-                listWithTotal.Add(new KartelaLine
+                listWithTotal.Add(new CfaKartelaLine
                 {
                     Id = dbTransaction.Id,
                     TransDate = dbTransaction.TransDate,
-                    DocSeriesCode = dbTransaction.TransTransactorDocSeriesCode,
+                    DocSeriesCode = dbTransaction.DocSeriesCode,
                     RefCode = dbTransaction.TransRefCode,
                     CompanyCode = dbTransaction.CompanyCode,
                     SectionCode = dbTransaction.SectionCode,
@@ -5260,9 +5232,9 @@ namespace GrKouk.Web.ERP.Controllers
                     CreatorSectionId = dbTransaction.CreatorSectionId,
                     CreatorSectionCode = dbTransaction.CreatorSectionCode,
                     RunningTotal = runningTotal,
-                    TransactorName = dbTransaction.TransactorName,
-                    Debit = dbTransaction.DebitAmount,
-                    Credit = dbTransaction.CreditAmount
+                    CahsFlowAccountName = dbTransaction.CashFlowAccountName,
+                    Deposit = dbTransaction.DepositAmount,
+                    Withdraw = dbTransaction.WithdrawAmount
                 });
             }
 
@@ -5270,48 +5242,34 @@ namespace GrKouk.Web.ERP.Controllers
             var pageIndex = request.PageIndex;
 
             var pageSize = request.PageSize;
-            decimal sumCredit = 0;
-            decimal sumDebit = 0;
+            decimal sumWithdraw = 0;
+            decimal sumDeposit = 0;
             decimal sumDifference = 0;
 
-            IQueryable<KartelaLine> fullListIq = from s in outList select s;
+            IQueryable<CfaKartelaLine> fullListIq = from s in outList select s;
 
-            var listItems = PagedList<KartelaLine>.Create(fullListIq, pageIndex, pageSize);
+            var listItems = PagedList<CfaKartelaLine>.Create(fullListIq, pageIndex, pageSize);
 
             foreach (var item in listItems)
             {
-                sumCredit += item.Credit;
-                sumDebit += item.Debit;
+                sumWithdraw += item.Withdraw;
+                sumDeposit += item.Deposit;
             }
+            sumDifference = sumDeposit - sumWithdraw;
+           
 
-            switch (transactorType.Code)
-            {
-                case "SYS.DTRANSACTOR":
-
-                    break;
-                case "SYS.CUSTOMER":
-                    sumDifference = sumDebit - sumCredit;
-                    break;
-                case "SYS.SUPPLIER":
-                    sumDifference = sumCredit - sumDebit;
-                    break;
-                default:
-                    sumDifference = sumCredit - sumDebit;
-                    break;
-            }
-
-            var response = new IndexDataTableResponse<KartelaLine>
+            var response = new IndexDataTableResponse<CfaKartelaLine>
             {
                 TotalRecords = listItems.TotalCount,
                 TotalPages = listItems.TotalPages,
                 HasPrevious = listItems.HasPrevious,
                 HasNext = listItems.HasNext,
-                SumOfDebit = sumDebit,
-                SumOfCredit = sumCredit,
+                SumOfDebit = sumDeposit,
+                SumOfCredit = sumWithdraw,
                 SumOfDifference = sumDifference,
                 GrandSumOfAmount = grandSumOfAmount,
-                GrandSumOfDebit = grandSumOfDebit,
-                GrandSumOfCredit = grandSumOfCredit,
+                GrandSumOfDebit = grandSumOfDeposits,
+                GrandSumOfCredit = grandSumOfWithdraws,
                 Data = listItems
             };
             return Ok(response);

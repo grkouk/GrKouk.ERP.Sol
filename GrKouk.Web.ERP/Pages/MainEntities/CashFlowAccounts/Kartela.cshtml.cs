@@ -30,16 +30,16 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.CashFlowAccounts
         }
 
 
-        public async Task<IActionResult> OnGetAsync(int transactorId)
+        public async Task<IActionResult> OnGetAsync(int cashFlowAccountId)
         {
-            var transactor = await _context.Transactors.FirstOrDefaultAsync(x => x.Id == transactorId);
-            if (transactor is null)
+            var trancashFlowAccount = await _context.CashFlowAccounts.FirstOrDefaultAsync(x => x.Id == cashFlowAccountId);
+            if (trancashFlowAccount is null)
             {
                 return NotFound();
             }
 
-            CfaId = transactorId;
-            CfaName = transactor.Name;
+            CfaId = cashFlowAccountId;
+            CfaName = trancashFlowAccount.Name;
             LoadFilters();
             return Page();
         }
