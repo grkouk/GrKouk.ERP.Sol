@@ -4992,12 +4992,12 @@ namespace GrKouk.Web.ERP.Controllers
             //var transactorType = await _context.TransactorTypes.Where(c => c.Id == cfAccount.TransactorTypeId)
             //    .FirstOrDefaultAsync();
 
-            IQueryable<TransactorTransaction> transactionsList = _context.TransactorTransactions
-                .Where(p => p.TransactorId == request.TransactorId);
-            IQueryable<TransactorTransaction> transListBeforePeriod = _context.TransactorTransactions
-                .Where(p => p.TransactorId == request.TransactorId);
-            IQueryable<TransactorTransaction> transListAll = _context.TransactorTransactions
-                .Where(p => p.TransactorId == request.TransactorId);
+            IQueryable<CashFlowAccountTransaction> transactionsList = _context.CashFlowAccountTransactions
+                .Where(p => p.CashFlowAccountId == request.CashFlowAccountId);
+            IQueryable<CashFlowAccountTransaction> transListBeforePeriod = _context.CashFlowAccountTransactions
+                .Where(p => p.CashFlowAccountId == request.CashFlowAccountId);
+            IQueryable<CashFlowAccountTransaction> transListAll = _context.CashFlowAccountTransactions
+                .Where(p => p.CashFlowAccountId == request.CashFlowAccountId);
             if (!string.IsNullOrEmpty(request.SortData))
             {
                 switch (request.SortData.ToLower())
@@ -5009,16 +5009,16 @@ namespace GrKouk.Web.ERP.Controllers
                         transactionsList = transactionsList.OrderByDescending(p => p.TransDate);
                         break;
                     case "transactornamesort:asc":
-                        transactionsList = transactionsList.OrderBy(p => p.Transactor.Name);
+                        transactionsList = transactionsList.OrderBy(p => p.CashFlowAccount.Name);
                         break;
                     case "transactornamesort:desc":
-                        transactionsList = transactionsList.OrderByDescending(p => p.Transactor.Name);
+                        transactionsList = transactionsList.OrderByDescending(p => p.CashFlowAccount.Name);
                         break;
                     case "seriescodesort:asc":
-                        transactionsList = transactionsList.OrderBy(p => p.TransTransactorDocSeries.Code);
+                        transactionsList = transactionsList.OrderBy(p => p.DocumentSeries.Code);
                         break;
                     case "seriescodesort:desc":
-                        transactionsList = transactionsList.OrderByDescending(p => p.TransTransactorDocSeries.Code);
+                        transactionsList = transactionsList.OrderByDescending(p => p.DocumentSeries.Code);
                         break;
                     case "companycodesort:asc":
                         transactionsList = transactionsList.OrderBy(p => p.Company.Code);
@@ -5058,18 +5058,18 @@ namespace GrKouk.Web.ERP.Controllers
             if (!string.IsNullOrEmpty(request.SearchFilter))
             {
                 transactionsList = transactionsList.Where(p =>
-                    p.TransTransactorDocSeries.Name.Contains(request.SearchFilter)
-                    || p.TransTransactorDocSeries.Code.Contains(request.SearchFilter)
-                    || p.TransRefCode.Contains(request.SearchFilter)
+                    p.DocumentSeries.Name.Contains(request.SearchFilter)
+                    || p.DocumentSeries.Code.Contains(request.SearchFilter)
+                    || p.RefCode.Contains(request.SearchFilter)
                 );
                 transListBeforePeriod = transListBeforePeriod.Where(p =>
-                    p.TransTransactorDocSeries.Name.Contains(request.SearchFilter)
-                    || p.TransTransactorDocSeries.Code.Contains(request.SearchFilter)
-                    || p.TransRefCode.Contains(request.SearchFilter)
+                    p.DocumentSeries.Name.Contains(request.SearchFilter)
+                    || p.DocumentSeries.Code.Contains(request.SearchFilter)
+                    || p.RefCode.Contains(request.SearchFilter)
                 );
-                transListAll = transListAll.Where(p => p.TransTransactorDocSeries.Name.Contains(request.SearchFilter)
-                                                       || p.TransTransactorDocSeries.Code.Contains(request.SearchFilter)
-                                                       || p.TransRefCode.Contains(request.SearchFilter)
+                transListAll = transListAll.Where(p => p.DocumentSeries.Name.Contains(request.SearchFilter)
+                                                       || p.DocumentSeries.Code.Contains(request.SearchFilter)
+                                                       || p.RefCode.Contains(request.SearchFilter)
                 );
             }
 
@@ -5101,9 +5101,9 @@ namespace GrKouk.Web.ERP.Controllers
 
                 Amount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.Amount),
 
-              
+
                 TransAmount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.TransAmount),
-              
+
                 CompanyCode = p.CompanyCode,
                 CompanyCurrencyId = p.CompanyCurrencyId
             }).ToListAsync();
@@ -5119,12 +5119,9 @@ namespace GrKouk.Web.ERP.Controllers
                         .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
                     if (r != null)
                     {
-                        listItem.AmountFpa /= r.Rate;
-                        listItem.AmountNet /= r.Rate;
-                        listItem.AmountDiscount /= r.Rate;
-                        listItem.TransFpaAmount /= r.Rate;
-                        listItem.TransNetAmount /= r.Rate;
-                        listItem.TransDiscountAmount /= r.Rate;
+                        listItem.Amount /= r.Rate;
+                        listItem.TransAmount /= r.Rate;
+
                     }
                 }
 
@@ -5134,12 +5131,9 @@ namespace GrKouk.Web.ERP.Controllers
                         .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
                     if (r != null)
                     {
-                        listItem.AmountFpa *= r.Rate;
-                        listItem.AmountNet *= r.Rate;
-                        listItem.AmountDiscount *= r.Rate;
-                        listItem.TransFpaAmount *= r.Rate;
-                        listItem.TransNetAmount *= r.Rate;
-                        listItem.TransDiscountAmount *= r.Rate;
+                        listItem.Amount *= r.Rate;
+                        listItem.TransAmount *= r.Rate;
+
                     }
                 }
 
@@ -5155,7 +5149,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             //-----------------------------------------------
             var dbTransBeforePeriod =
-                transListBeforePeriod.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
+                transListBeforePeriod.ProjectTo<CfaTransactionListDto>(_mapper.ConfigurationProvider);
             var transBeforePeriodList = await dbTransBeforePeriod.ToListAsync();
             foreach (var item in transBeforePeriodList)
             {
@@ -5165,12 +5159,9 @@ namespace GrKouk.Web.ERP.Controllers
                         .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
                     if (r != null)
                     {
-                        item.AmountFpa /= r.Rate;
-                        item.AmountNet /= r.Rate;
-                        item.AmountDiscount /= r.Rate;
-                        item.TransFpaAmount /= r.Rate;
-                        item.TransNetAmount /= r.Rate;
-                        item.TransDiscountAmount /= r.Rate;
+
+                        item.Amount /= r.Rate;
+                        item.TransAmount /= r.Rate;
                     }
                 }
 
@@ -5180,12 +5171,9 @@ namespace GrKouk.Web.ERP.Controllers
                         .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
                     if (r != null)
                     {
-                        item.AmountFpa *= r.Rate;
-                        item.AmountNet *= r.Rate;
-                        item.AmountDiscount *= r.Rate;
-                        item.TransFpaAmount *= r.Rate;
-                        item.TransNetAmount *= r.Rate;
-                        item.TransDiscountAmount *= r.Rate;
+                        item.Amount *= r.Rate;
+                        item.TransAmount *= r.Rate;
+
                     }
                 }
             }
