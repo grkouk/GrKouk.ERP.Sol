@@ -13,6 +13,7 @@ namespace GrKouk.Web.ERP.Helpers
         public string CahsFlowAccountName { get; set; }
         public string CompanyCode { get; set; }
         public string DocSeriesCode { get; set; }
+        public string DocSeriesName { get; set; }
         public string RefCode { get; set; }
         public string SectionCode { get; set; }
         public int CreatorId { get; set; }

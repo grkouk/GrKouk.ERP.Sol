@@ -5203,6 +5203,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             beforePeriod.TransDate = beforePeriodDate;
             beforePeriod.DocSeriesCode = "Εκ.Μεταφ.";
+            beforePeriod.DocSeriesName = "Εκ.Μεταφ.";
             beforePeriod.CreatorId = -1;
             beforePeriod.CahsFlowAccountName = "";
 
@@ -5225,6 +5226,7 @@ namespace GrKouk.Web.ERP.Controllers
                     Id = dbTransaction.Id,
                     TransDate = dbTransaction.TransDate,
                     DocSeriesCode = dbTransaction.DocSeriesCode,
+                    DocSeriesName = dbTransaction.DocSeriesName,
                     RefCode = dbTransaction.TransRefCode,
                     CompanyCode = dbTransaction.CompanyCode,
                     SectionCode = dbTransaction.SectionCode,
