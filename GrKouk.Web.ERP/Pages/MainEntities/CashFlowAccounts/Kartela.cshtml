@@ -1,0 +1,470 @@
+﻿@page
+@using GrKouk.Web.ERP.Helpers
+@model GrKouk.Web.ERP.Pages.MainEntities.CashFlowAccounts.KartelaModel
+@{
+    ViewData["Title"] = "Καρτέλα" + @Model.CfaName;
+}
+@section MyCss
+{
+<link rel="stylesheet" href="~/css/custom-checkbox.css" />
+<link rel="stylesheet" href="~/css/searchbar.css" />
+}
+<h4>Καρτέλα @Model.CfaName</h4>
+<div class="container ">
+    <ul class="nav small justify-content-end ">
+
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#filterCollapse" role="button" id="filtersToggle"
+                aria-expanded="false" aria-controls="filterCollapse">
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#" id="rowSelectorsToggle" role="button">
+
+            </a>
+        </li>
+        <li class="nav-item dropdown " id="SelectedRowsActionsMenu">
+            <a class="nav-link dropdown-toggle disabled" role="button" id="ddSelectedRowsActions" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">Actions</a>
+            <div class="dropdown-menu small">
+
+                <a class="dropdown-item" href="#">Another action</a>
+                <a class="dropdown-item" href="#">Something else here</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">Separated link</a>
+
+            </div>
+        </li>
+    </ul>
+</div>
+<input type="hidden" asp-for="CfaId" />
+@await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowDateFlt = true })
+
+
+<div class="row mt-1">
+    <partial name="_PagerPartial" />
+</div>
+<partial name="_DataTable" />
+<div class="row">
+    <partial name="_PagerPartial" />
+</div>
+<br />
+
+<a asp-page="./Index" class="small">Back to List</a>
+<partial name="_LoadMePartial" />
+
+
+@section Scripts
+{
+<script src="~/js/moment.min.js"></script>
+<script src="~/js/definitions.js"></script>
+<script src="~/js/indexPageIIFE.lib.js"></script>
+<script>
+    $(document).ready(function () {
+        var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
+        var formatterCurrency = new Intl.NumberFormat(currentCulture,
+            {
+                style: 'currency',
+                currency: 'EUR',
+                minimumFractionDigits: 2
+            });
+        var formatterNumber = new Intl.NumberFormat(currentCulture,
+            {
+                maximumFractionDigits: 3
+
+            });
+        //#region variables
+
+        var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
+        //#endregion
+        //#region Index page definition objects
+        const colDefs = [
+            {
+                key: 'transDate',
+                responseKey: 'transDate',
+                actualVal: '',
+                columnFormat: 'd',
+                totalKey: '',
+                grandTotalKey: '',
+                totalFormatter: '',
+                sortKey: 'DateSort',
+                sortType: 'numeric',
+                header: 'Date',
+                text: '',
+                headerClass: 'small text-center ',
+                class: 'small',
+                classWhenCondition: '',
+                classCondition: {},
+                remoteReference: {
+                }
+            },
+            {
+                key: 'docSeriesName',
+                responseKey: 'docSeriesName',
+                actualVal: '',
+                columnFormat: 't',
+                totalKey: '',
+                grandTotalKey: '',
+                totalFormatter: '',
+                sortKey: 'SeriesNameSort',
+                sortType: 'alpha',
+                header: 'Series',
+                text: '',
+                headerClass: 'small text-center',
+                class: 'small',
+                classWhenCondition: '',
+                classCondition: {},
+                remoteReference: {
+                }
+            },
+            {
+                key: 'refCode',
+                responseKey: 'refCode',
+                actualVal: '',
+                columnFormat: 't',
+                totalKey: '',
+                grandTotalKey: '',
+                totalFormatter: '',
+                sortKey: '',
+                sortType: '',
+                header: 'Ref Number',
+                text: '',
+                headerClass: 'small text-center d-none d-md-table-cell',
+                class: 'small d-none d-md-table-cell ',
+                classWhenCondition: '',
+                classCondition: {},
+                remoteReference: {
+                }
+            },
+            {
+                key: 'deposit',
+                responseKey: 'deposit',
+                actualVal: '',
+                columnFormat: 'c',
+                totalKey: 'sumOfDebit',
+                grandTotalKey: 'grandSumOfDebit',
+                totalFormatter: 'currency',
+                sortKey: '',
+                sortType: '',
+                header: 'Deposit',
+                text: '',
+                headerClass: 'small text-center',
+                class: 'small text-end ',
+                classWhenCondition: '',
+                classCondition: {},
+                remoteReference: {
+                }
+            },
+            {
+                key: 'withdraw',
+                responseKey: 'withdraw',
+                actualVal: '',
+                columnFormat: 'c',
+                totalKey: 'sumOfCredit',
+                grandTotalKey: 'grandSumOfCredit',
+                totalFormatter: 'currency',
+                sortKey: '',
+                sortType: '',
+                header: 'Withdraw',
+                text: '',
+                headerClass: 'small text-center',
+                class: 'small text-end ',
+                classWhenCondition: '',
+                classCondition: {},
+                remoteReference: {
+                }
+            },
+            {
+                key: 'runningTotal',
+                responseKey: 'runningTotal',
+                actualVal: '',
+                columnFormat: 'c',
+                totalKey: '',
+                grandTotalKey: '',
+                totalFormatter: 'currency',
+                sortKey: '',
+                sortType: '',
+                header: 'Running Total',
+                text: '',
+                headerClass: 'small text-center',
+                class: 'small text-end ',
+                classWhenCondition: '',
+                classCondition: {},
+                remoteReference: {
+                }
+            },
+            {
+                key: 'companyCode',
+                responseKey: 'companyCode',
+                actualVal: '',
+                columnFormat: 't',
+                totalKey: '',
+                grandTotalKey: '',
+                totalFormatter: '',
+                sortKey: 'CompanyCodeSort',
+                sortType: 'alpha',
+                header: 'Company',
+                text: '',
+                headerClass: 'small text-center',
+                class: 'small ',
+                classWhenCondition: '',
+                classCondition: {},
+                remoteReference: {
+                }
+            }
+        ];
+        const actionColDefs = [
+            {
+                actionType: 'defaultAction2',
+                visibility: 'always',
+                target: '_blank',
+                condition: {},
+                text: 'Edit Prototype',
+
+                dataAttributes: [
+                    {
+                        key: 'docid',
+                        valueKey: 'docid'
+                    }
+                ],
+                icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
+                uriType: 'funcHref', //funcUrl staticHref, staticUrl
+                urlKeys: [
+                    { key: 'id', valueKey: 'id' }
+                ],
+                uriFunc: function (col, valueSource) {
+                    let retUri = '';
+                    if (valueSource.creatorSectionId > 0) {
+                        switch (valueSource.creatorSectionCode) {
+                            case "SCNSELLCOMBINED":
+                                retUri = `/transactions/sellmaterialdoc/Edit?id=${valueSource["creatorId"]}`;
+                                break;
+                            case "SCNBUYMATTRANS":
+                                retUri = `/transactions/buymaterialsdoc/Details?id=${valueSource["creatorId"]}`;
+                                break;
+                            default:
+                        }
+
+                    } else {
+
+                        var itemId = valueSource["id"];
+                        retUri = `/transactions/CFATransactions/Details?id=${itemId}`;
+                    }
+                    return retUri;
+                },
+                uri: ''
+            }
+        ];
+        const actionColSubDefs = [
+
+        ];
+        const actionMobileColDefs = [
+            {
+                actionType: 'defaultAction2',
+                visibility: 'always',
+                target: '_blank',
+                condition: {},
+                text: 'Edit Prototype',
+
+                dataAttributes: [
+                    {
+                        key: 'docid',
+                        valueKey: 'docid'
+                    }
+                ],
+                icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
+                uriType: 'funcHref', //funcUrl staticHref, staticUrl
+                urlKeys: [
+                    { key: 'id', valueKey: 'id' }
+                ],
+                uriFunc: function (col, valueSource) {
+                    let retUri = '';
+                    if (valueSource.creatorSectionId > 0) {
+                        switch (valueSource.creatorSectionCode) {
+                            case "SCNSELLCOMBINED":
+                                retUri = `/transactions/sellmaterialdoc/Edit?id=${valueSource["creatorId"]}`;
+                                break;
+                            case "SCNBUYMATTRANS":
+                                retUri = `/transactions/buymaterialsdoc/Edit?id=${valueSource["creatorId"]}`;
+                                break;
+                            default:
+                        }
+
+                    } else {
+
+                        var itemId = valueSource["id"];
+                        retUri = `/transactions/CFATransactions/Edit?id=${itemId}`;
+                    }
+                    return retUri;
+                },
+                uri: ''
+            }
+        ];
+        const tableHandlersToRegister = [
+
+        ];
+        const pageHandlersToRegister = [
+            {
+                selector: '#CurrencySelector',
+                event: 'change',
+                handler: function (event) {
+                    currencyChanged();
+                    indPgLib.refreshData();
+                }
+            }
+        ];
+        const indexPageDef = {
+            uri: '/api/GrKoukInfoApi/GetIndexTblDataCfaAccountTab',
+            currencyFormatter: formatterCurrency,
+            numberFormatter: formatterNumber,
+            colDefs: colDefs,
+            actionColDefs: actionColDefs,
+            actionColSubDefs: actionColSubDefs,
+            actionMobileColDefs: actionMobileColDefs,
+            tableHandlersToRegister: tableHandlersToRegister,
+            pageHandlersToRegister: pageHandlersToRegister,
+            afterTableLoad: {
+            }
+        };
+
+        indPgLib.setIndexPageDefinition(indexPageDef);
+        //#endregion
+        var currencyChanged = () => {
+            let curCurrencySelected = parseInt($('#CurrencySelector').val());
+            var currencyCode;
+            try {
+                let currentCurrency = currencyListJs.find(x => x.id === curCurrencySelected);
+                currencyCode = currentCurrency.code;
+                let locale = currentCurrency.displayLocale;
+                formatterCurrency = new Intl.NumberFormat(locale,
+                    {
+                        style: 'currency',
+                        currency: currencyCode,
+                        minimumFractionDigits: 2
+                    });
+                indPgLib.setCurrencyFormatter(formatterCurrency);
+            } catch (e) {
+                //not found keep old formater or maybe create a default one
+                console.log('Not found currency code for this id');
+            }
+        };
+
+
+
+        var storageItemJs = localStorage.getItem('TransactorAccountTab');
+        if (storageItemJs === undefined || storageItemJs === null) {
+            $('#pageIndex').val(1);
+            $('#filtersVisible').val(true);
+            $('#rowSelectorsVisible').val(true);
+
+            $('#DatePeriodFilter').val('CURYEAR');
+            $('#CompanyFilter').val(0);
+            $('#TransactorTypeFilter').val(1);
+            $('#WarehouseItemNatureFilter').val(1);
+            $('#currentSort').val('datesort:asc');
+        } else {
+            var storageItem = JSON.parse(storageItemJs);
+            var filtersValue = storageItem.find(x => x.filterKey === 'filtersVisible').filterValue;
+
+            $('#filtersVisible').val(filtersValue);
+            filtersValue = storageItem.find(x => x.filterKey === 'rowSelectorsVisible').filterValue;
+            $('#rowSelectorsVisible').val(filtersValue);
+            filtersValue = storageItem.find(x => x.filterKey === 'dateRangeFilter').filterValue;
+            $('#DatePeriodFilter').val(filtersValue);
+            filtersValue = storageItem.find(x => x.filterKey === 'currentSort').filterValue;
+            $('#currentSort').val(filtersValue);
+            filtersValue = storageItem.find(x => x.filterKey === 'companyFilter').filterValue;
+            $('#CompanyFilter').val(filtersValue);
+            filtersValue = storageItem.find(x => x.filterKey === 'pageSize').filterValue;
+            $('#PageSize').val(filtersValue);
+            filtersValue = storageItem.find(x => x.filterKey === 'pageIndex').filterValue;
+            $('#pageIndex').val(filtersValue);
+            filtersValue = storageItem.find(x => x.filterKey === 'transactorTypeFilter').filterValue;
+            $('#TransactorTypeFilter').val(filtersValue);
+            filtersValue = storageItem.find(x => x.filterKey === 'warehouseItemNatureFilter').filterValue;
+            $('#WarehouseItemNatureFilter').val(filtersValue);
+            try {
+                filtersValue = storageItem.find(x => x.filterKey === 'currentCurrency').filterValue;
+                $('#CurrencySelector').val(filtersValue);
+            } catch (e) {
+
+            }
+        }
+        indPgLib.addPagerElementEventListeners();
+        indPgLib.registerPageHandlers();
+        //indPgLib.loadSettings('TransactorTransIndexView');
+        //----------------
+
+        indPgLib.handleFiltersUi();
+        currencyChanged();
+        indPgLib.refreshData();
+        indPgLib.rowSelectorsUi();
+    });
+
+    $(window).on('beforeunload', function (e) {
+        //#region CommentOut
+        //#region Variables
+        var filtersVisible = $('#filterCollapse').hasClass('show');
+        var $rowSelectorsColumn = $('th[name=selectAllRowsColumn]');
+
+        var rowSelectorsNotVisible = $rowSelectorsColumn.is(':hidden');
+        var rowSelectorsVisible = (rowSelectorsNotVisible) ? false : true;
+
+        var pageSize = $('#PageSize').val();
+        var dateRange = $('#DatePeriodFilter').val();
+        var currentSort = $('#currentSort').val();
+        var companyFilter = $('#CompanyFilter').val();
+        var pageIndex = $('#pageIndex').val();
+        var transactorTypeFilter = $('#TransactorTypeFilter').val();
+        var warehouseItemNatureFilter = $('#WarehouseItemNatureFilter').val();
+        var currentCurrency = $('#CurrencySelector').val();
+        var filtersArr = [];
+        //#endregion
+        filtersArr.push({
+            filterKey: 'filtersVisible',
+            filterValue: filtersVisible
+        });
+        filtersArr.push({
+            filterKey: 'rowSelectorsVisible',
+            filterValue: rowSelectorsVisible
+        });
+        filtersArr.push({
+            filterKey: 'pageIndex',
+            filterValue: pageIndex
+        });
+        filtersArr.push({
+            filterKey: 'pageSize',
+            filterValue: pageSize
+        });
+        filtersArr.push({
+            filterKey: 'dateRangeFilter',
+            filterValue: dateRange
+        });
+        filtersArr.push({
+            filterKey: 'currentSort',
+            filterValue: currentSort
+        });
+        filtersArr.push({
+            filterKey: 'companyFilter',
+            filterValue: companyFilter
+        });
+        filtersArr.push({
+            filterKey: 'transactorTypeFilter',
+            filterValue: transactorTypeFilter
+        });
+        filtersArr.push({
+            filterKey: 'warehouseItemNatureFilter',
+            filterValue: warehouseItemNatureFilter
+        });
+        filtersArr.push({
+            filterKey: 'currentCurrency',
+            filterValue: currentCurrency
+        });
+        var sessionVal = JSON.stringify(filtersArr);
+
+        localStorage.setItem('TransactorAccountTab', sessionVal);
+        //#endregion
+
+    });
+</script>
+}

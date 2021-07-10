@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NToastNotify;
 
-namespace GrKouk.Web.ERP.Pages.MainEntities.Transactors
+namespace GrKouk.Web.ERP.Pages.MainEntities.CashFlowAccounts
 {
     [Authorize(Roles = "Admin")]
     public class KartelaModel : PageModel
@@ -19,8 +19,8 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Transactors
         private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
 
-        public string TransactorName { get; set; }
-        public int TransactorId { get; set; }
+        public string CfaName { get; set; }
+        public int CfaId { get; set; }
 
         public KartelaModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
         {
@@ -29,17 +29,17 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Transactors
             _toastNotification = toastNotification;
         }
 
-       
-        public async Task<IActionResult> OnGetAsync(int transactorId)
+
+        public async Task<IActionResult> OnGetAsync(int cashFlowAccountId)
         {
-            var transactor = await _context.Transactors.FirstOrDefaultAsync(x => x.Id == transactorId);
-            if (transactor is null)
+            var trancashFlowAccount = await _context.CashFlowAccounts.FirstOrDefaultAsync(x => x.Id == cashFlowAccountId);
+            if (trancashFlowAccount is null)
             {
                 return NotFound();
             }
 
-            TransactorId = transactorId;
-            TransactorName = transactor.Name;
+            CfaId = cashFlowAccountId;
+            CfaName = trancashFlowAccount.Name;
             LoadFilters();
             return Page();
         }

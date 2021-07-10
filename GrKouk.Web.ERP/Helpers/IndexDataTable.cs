@@ -17,6 +17,7 @@ namespace GrKouk.Web.ERP.Helpers
         public string SearchFilter { get; set; }
         public int DiaryId { get; set; }
         public int TransactorId { get; set; }
+        public int CashFlowAccountId { get; set; }
         public int WarehouseItemId { get; set; }
         public string ClientProfileFilter { get; set; }
         public string CashRegCategoryFilter { get; set; }
