@@ -1301,6 +1301,12 @@ namespace GrKouk.Web.ERP.Controllers {
             #region Section Management
             var scnId = payoffSeriesType.SectionId == 0 ? doc.SectionId : payoffSeriesType.SectionId;
             #endregion
+            var transactor = await _context.Transactors
+                           .Where(p => p.Id == doc.TransactorId)
+                           .SingleOrDefaultAsync();
+            var transTransactorEtiology =
+                           $"{payoffSeries.Name} created from {docSeries.Name} for {transactor.Name}";
+
             var payoffTransaction = new TransactorTransaction {
                 TransDate = DateTime.Today,
                 TransTransactorDocSeriesId = payoffSeriesId,
@@ -1314,7 +1320,7 @@ namespace GrKouk.Web.ERP.Controllers {
                 AmountFpa = doc.AmountFpa,
                 AmountNet = doc.AmountNet,
                 AmountDiscount = doc.AmountDiscount,
-                Etiology = $"Εξοφληση παραστατικού με αριθμό {doc.TransRefCode}",
+                Etiology = transTransactorEtiology,
                 CompanyId = doc.CompanyId
             };
             ActionHandlers.TransactorFinAction(payoffTransactorTransactionDef.FinancialTransAction, payoffTransaction);
