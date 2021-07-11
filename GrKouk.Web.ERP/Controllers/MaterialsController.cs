@@ -22,6 +22,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Text;
 
 namespace GrKouk.Web.ERP.Controllers {
     [Authorize(Roles = "Admin")]
@@ -1305,7 +1306,7 @@ namespace GrKouk.Web.ERP.Controllers {
                            .Where(p => p.Id == doc.TransactorId)
                            .SingleOrDefaultAsync();
             var transTransactorEtiology =
-                           $"{payoffSeries.Name} created from {docSeries.Name} for {transactor.Name}";
+                           $"{payoffSeries.Name} created from {docSeries.Name} for {transactor.Name} with {doc.Etiology}";
 
             var payoffTransaction = new TransactorTransaction {
                 TransDate = DateTime.Today,
@@ -1327,6 +1328,7 @@ namespace GrKouk.Web.ERP.Controllers {
             await using (var transaction = await _context.Database.BeginTransactionAsync()) {
                 try {
                     await _context.TransactorTransactions.AddAsync(payoffTransaction);
+                    await _context.SaveChangesAsync();
                 }
                 catch (Exception e) {
                     Debug.WriteLine(e.Message);
@@ -1335,7 +1337,72 @@ namespace GrKouk.Web.ERP.Controllers {
                         ErrorMessage = $"Error inserting transactor transaction {e.Message}"
                     });
                 }
+                //Cash Flow Account Transaction 
+                var paymentCfAccountId = payoffSeriesType.DefaultCfaId;
+                if (paymentCfAccountId > 0)
+                {
+                    var defaultCfaSeriesId = payoffSeries.DefaultCfaTransSeriesId;
+                    if (defaultCfaSeriesId > 0)
+                    {
+                        var cfaSeries = await _context.CashFlowDocSeriesDefs.FindAsync(defaultCfaSeriesId);
+                        if (cfaSeries != null)
+                        {
+                            await _context.Entry(cfaSeries)
+                                .Reference(t => t.CashFlowDocTypeDefinition)
+                                .LoadAsync();
 
+                            var cfaType = cfaSeries.CashFlowDocTypeDefinition;
+                            if (cfaType != null)
+                            {
+                                await _context.Entry(cfaType)
+                                    .Reference(t => t.CashFlowTransactionDefinition)
+                                    .LoadAsync();
+
+                                var etiology =transTransactorEtiology;
+
+
+
+                                var cfaTransDef = cfaType.CashFlowTransactionDefinition;
+                                var cfaTrans = new CashFlowAccountTransaction
+                                {
+                                    TransDate = doc.TransDate,
+                                    CashFlowAccountId = paymentCfAccountId,
+                                    CompanyId = doc.CompanyId,
+                                    DocumentSeriesId = cfaSeries.Id,
+                                    DocumentTypeId = cfaType.Id,
+                                    Etiology = etiology,
+                                    FiscalPeriodId = doc.FiscalPeriodId,
+                                    CreatorSectionId = scnId,
+                                    CreatorId = payoffTransaction.Id,
+                                    RefCode = doc.TransRefCode,
+                                    Amount = doc.AmountNet - doc.AmountDiscount + doc.AmountFpa,
+                                    SectionId = cfaType.SectionId > 0 ? cfaType.SectionId : scnId
+                                };
+                                ActionHandlers.CashFlowFinAction(cfaTransDef.CfaAction, cfaTrans);
+                                await _context.CashFlowAccountTransactions.AddAsync(cfaTrans);
+                                payoffTransaction.CfAccountId = paymentCfAccountId;
+                                _context.Attach(payoffTransaction).State = EntityState.Modified;
+                                try
+                                {
+                                    await _context.SaveChangesAsync();
+                                }
+                                catch (Exception e)
+                                {
+                                    await transaction.RollbackAsync();
+                                    string msg = e.InnerException?.Message;
+                                    return BadRequest(new
+                                    {
+                                        error = e.Message + " " + msg
+                                    });
+                                }
+
+
+                            }
+                        }
+                    }
+                }
+
+                //End Cash Flow Account Transaction 
                 var mapping = new SellDocTransPaymentMapping() {
                     SellDocument = doc,
                     TransactorTransaction = payoffTransaction,
@@ -1349,21 +1416,19 @@ namespace GrKouk.Web.ERP.Controllers {
                     Console.WriteLine(e);
                     await transaction.RollbackAsync();
                     return BadRequest(new {
-                        ErrorMessage = $"Error inserting buy payment mapping {e.Message}"
+                        ErrorMessage = $"Error inserting sales payment mapping {e.Message}"
                     });
                 }
 
                 try {
                     var recs = await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
-                    // var ms = new StringBuilder()
-                    //     .Append("Η αντιστοίχιση εικόνων ολοκληρώθηκε")
-                    //     .Append($"</br>Στάλθηκαν:       {requested} εικόνες")
-                    //     .Append($"</br>Αντιστοιχισμένες:{allreadyAssigned} εικόνες")
-                    //     .Append($"</br>Επιτυχής :       {addedCount} εικόνες");
-                    //
-                    // string message = ms.ToString();
-                    return Ok(new { Message = $"Successfully added mappings" });
+                    var ms = new StringBuilder()
+                        .Append("Η αντιστοίχιση παραστατικών ολοκληρώθηκε")
+                        .Append($"</br>Επιτυχής :{recs} αντιστοιχίσεις");
+
+                    string message = ms.ToString();
+                    return Ok(new { Message = message });
                 }
                 catch (Exception e) {
                     Console.WriteLine(e);
