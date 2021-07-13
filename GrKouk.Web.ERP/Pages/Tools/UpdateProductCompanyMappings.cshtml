@@ -5,8 +5,24 @@
 <h1>Update warehouse item company mappings</h1>
 
 <div class="container">
-<form  method="post">
-    
-    <button type="submit">Perform Update</button>
-</form>        
+    <form method="post">
+
+        <button type="submit">Perform Update</button>
+    </form>
 </div>
+@if (Model.ResultsList.Count > 0)
+{
+<div class="container">
+        <ul>
+            @foreach(var item in Model.ResultsList)
+            {
+                <li>@item</li>        
+            }
+        </ul>
+</div>
+  <div class="container">
+      <p>All count @Model.allCount</p>
+      <p>Updated count @Model.updatedCount/p>
+      <p>Error count @Model.errorCount/p>
+  </div>  
+}
