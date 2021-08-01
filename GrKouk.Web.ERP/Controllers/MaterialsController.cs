@@ -1733,7 +1733,13 @@ namespace GrKouk.Web.ERP.Controllers {
                     sTransactorTransaction.FiscalPeriodId = fiscalPeriod.Id;
                     sTransactorTransaction.CreatorId = docId;
                     ActionHandlers.TransactorFinAction(transTransactorDef.FinancialTransAction, sTransactorTransaction);
-
+                    // Update document transaction with transamounts
+                    transToAttach.TransNetAmount=sTransactorTransaction.TransNetAmount;
+                    transToAttach.TransFpaAmount=sTransactorTransaction.TransFpaAmount;
+                    transToAttach.TransDiscountAmount=sTransactorTransaction.TransDiscountAmount;
+                    transToAttach.TransExpensesAmount = 0;
+                    _context.Entry(transToAttach).State = EntityState.Modified;
+                    //----------------------------------------------
                     await _context.TransactorTransactions.AddAsync(sTransactorTransaction);
                     try {
                         await _context.SaveChangesAsync();
@@ -2157,7 +2163,13 @@ namespace GrKouk.Web.ERP.Controllers {
                         sTransactorTransaction.CreatorId = docId;
                         ActionHandlers.TransactorFinAction(transTransactorDef.FinancialTransAction,
                             sTransactorTransaction);
-
+                        // Update document transaction with transamounts
+                        transToAttach.TransNetAmount = sTransactorTransaction.TransNetAmount;
+                        transToAttach.TransFpaAmount = sTransactorTransaction.TransFpaAmount;
+                        transToAttach.TransDiscountAmount = sTransactorTransaction.TransDiscountAmount;
+                        transToAttach.TransExpensesAmount = 0;
+                        _context.Entry(transToAttach).State = EntityState.Modified;
+                        //----------------------------------------------
                         await _context.TransactorTransactions.AddAsync(sTransactorTransaction);
                     }
                     catch (Exception e) {
