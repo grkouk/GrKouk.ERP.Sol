@@ -136,15 +136,21 @@ namespace GrKouk.Web.ERP.Controllers
                 var t = fullListIq.ProjectTo<BuyDocListDto>(_mapper.ConfigurationProvider);
                 var t1 = await t.Select(p => new BuyDocListDto {
                     AmountFpa = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
-                        p.TransFpaAmount),
+                        p.AmountFpa),
                     AmountNet = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
-                        p.TransNetAmount),
+                        p.AmountNet),
                     AmountDiscount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                        p.AmountDiscount),
+                    TransFpaAmount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                        p.TransFpaAmount),
+                    TransNetAmount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                        p.TransNetAmount),
+                    TransDiscountAmount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
                         p.TransDiscountAmount),
                     CompanyCurrencyId = p.CompanyCurrencyId
                 }).ToListAsync();
                 //var grandSumOfAmount = t1.Sum(p => p.TotalAmount);
-                r = t1.Sum(p => p.TotalNetAmount);
+                r = t1.Sum(p => p.TransTotalNetAmount);
             }
 
             if (defObj.SrcType == MainInfoSourceTypeEnum.SourceTypeSales) {
@@ -188,15 +194,21 @@ namespace GrKouk.Web.ERP.Controllers
                 var t = fullListIq.ProjectTo<SellDocListDto>(_mapper.ConfigurationProvider);
                 var t1 = await t.Select(p => new SellDocListDto {
                     AmountFpa = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
-                        p.TransFpaAmount),
+                        p.AmountFpa),
                     AmountNet = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
-                        p.TransNetAmount),
+                        p.AmountNet),
                     AmountDiscount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                        p.AmountDiscount),
+                    TransFpaAmount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                        p.TransFpaAmount),
+                    TransNetAmount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                        p.TransNetAmount),
+                    TransDiscountAmount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
                         p.TransDiscountAmount),
                     CompanyCurrencyId = p.CompanyCurrencyId
                 }).ToListAsync();
                 //var grandSumOfAmount = t1.Sum(p => p.TotalAmount);
-                r = t1.Sum(p => p.TotalNetAmount);
+                r = t1.Sum(p => p.TransTotalNetAmount);
                 // if (request.CodeToCompute=="SumOfIncomeSalesDf")
                 // {
                 //     Debug.WriteLine($"Code was SumOfincomeSalesDf doc count was {t1.Count} and value is {r}");
