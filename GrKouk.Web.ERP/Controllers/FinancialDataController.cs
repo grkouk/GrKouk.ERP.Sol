@@ -67,9 +67,9 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpGet("GetMainDashboardInfo")]
         public async Task<IActionResult> GetMainDashboardInfo([FromQuery] IndexDataTableRequest request)
         {
-            if (request.CodeToCompute == "SumOfIncomeSalesDf") {
-                Debug.WriteLine("");
-            }
+            //if (request.CodeToCompute == "SumOfIncomeSalesDf") {
+            //    Debug.WriteLine("");
+            //}
             var codeToComputeDefinition = await
                 _context.AppSettings.FirstOrDefaultAsync(p => p.Code == request.CodeToCompute);
             if (codeToComputeDefinition == null) {

@@ -39,7 +39,18 @@ namespace GrKouk.Erp.Dtos.SellDocuments
 
         [Display(Name = "Total Net Amount")]
         public decimal TotalNetAmount => AmountNet - AmountDiscount;
+        [Display(Name = "Trans Total Amount")]
+        public decimal TransTotalAmount
+        {
+            get => TransNetAmount + TransFpaAmount - TransDiscountAmount;
 
+        }
+        [Display(Name = "Trans Total Net Amount")]
+        public decimal TransTotalNetAmount
+        {
+            get => TransNetAmount - TransDiscountAmount;
+
+        }
         public int CompanyId { get; set; }
 
         [Display(Name = "Company")]
