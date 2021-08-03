@@ -33,6 +33,9 @@ namespace GrKouk.Erp.Dtos.BuyDocuments
         public decimal AmountFpa { get; set; }
         public decimal AmountNet { get; set; }
         public decimal AmountDiscount { get; set; }
+        public decimal TransFpaAmount { get; set; }
+        public decimal TransNetAmount { get; set; }
+        public decimal TransDiscountAmount { get; set; }
         [Display(Name = "Total Amount")]
         public decimal TotalAmount
         {

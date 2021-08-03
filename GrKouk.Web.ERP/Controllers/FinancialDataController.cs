@@ -136,11 +136,11 @@ namespace GrKouk.Web.ERP.Controllers
                 var t = fullListIq.ProjectTo<BuyDocListDto>(_mapper.ConfigurationProvider);
                 var t1 = await t.Select(p => new BuyDocListDto {
                     AmountFpa = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
-                        p.AmountFpa),
+                        p.TransFpaAmount),
                     AmountNet = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
-                        p.AmountNet),
+                        p.TransNetAmount),
                     AmountDiscount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
-                        p.AmountDiscount),
+                        p.TransDiscountAmount),
                     CompanyCurrencyId = p.CompanyCurrencyId
                 }).ToListAsync();
                 //var grandSumOfAmount = t1.Sum(p => p.TotalAmount);
@@ -188,11 +188,11 @@ namespace GrKouk.Web.ERP.Controllers
                 var t = fullListIq.ProjectTo<SellDocListDto>(_mapper.ConfigurationProvider);
                 var t1 = await t.Select(p => new SellDocListDto {
                     AmountFpa = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
-                        p.AmountFpa),
+                        p.TransFpaAmount),
                     AmountNet = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
-                        p.AmountNet),
+                        p.TransNetAmount),
                     AmountDiscount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
-                        p.AmountDiscount),
+                        p.TransDiscountAmount),
                     CompanyCurrencyId = p.CompanyCurrencyId
                 }).ToListAsync();
                 //var grandSumOfAmount = t1.Sum(p => p.TotalAmount);
