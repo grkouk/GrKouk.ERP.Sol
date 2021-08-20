@@ -53,8 +53,9 @@ namespace GrKouk.Web.ERP
                 // Cookie settings
                 options.Cookie.HttpOnly = true;
                 options.Cookie.SameSite = SameSiteMode.Lax;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-
+                options.ExpireTimeSpan = TimeSpan.FromHours(1);
+                //if the above is not workong then try this
+                //options.ExpireTimeSpan = DateTime.Now.Subtract(DateTime.UtcNow).Add(TimeSpan.FromMinutes(5);
                 options.LoginPath = "/Identity/Account/Login";
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied";
                 options.SlidingExpiration = true;
