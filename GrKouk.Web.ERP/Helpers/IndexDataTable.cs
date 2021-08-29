@@ -5,6 +5,9 @@ using Syncfusion.EJ2.Base;
 
 namespace GrKouk.Web.ERP.Helpers
 {
+    /// <summary>
+    /// Index page request object. Includes all filter and sort values for selecting index page table rows 
+    /// </summary>
     public class IndexDataTableRequest
     {
         public int PageIndex { get; set; }
@@ -24,6 +27,7 @@ namespace GrKouk.Web.ERP.Helpers
         public int DisplayCurrencyId { get; set; }
         public string CodeToCompute { get; set; }
         public int DocumentId { get; set; }
+        public bool ShowCarryOnAmountsInTabs { get; set; }
     }
 
     public class IndexDataTableResponse<T>

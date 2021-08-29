@@ -38,7 +38,7 @@
     </ul>
 </div>
 <input type="hidden" asp-for="TransactorId" />
-@await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowDateFlt = true })
+@await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowDateFlt = true ,ShowDisplayCarryOnLineFlt = true})
 
 
 <div class="row mt-1">
