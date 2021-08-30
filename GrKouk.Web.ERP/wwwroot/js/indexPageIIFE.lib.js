@@ -57,6 +57,7 @@
     let $transactorTypeFilter = $('#TransactorTypeFilter');
     let $transactorId = $('#TransactorId');
     let $cfaId = $('#CfaId');
+    let $showCarryOnFlt = $('#ShowCarryOnFlt');
     let $warehouseItemId = $('#WarehouseItemId');
     let $warehouseItemNatureFilter = $('#WarehouseItemNatureFilter');
     let $currencySelector = $("#CurrencySelector");
@@ -75,6 +76,7 @@
     let productNatureFilterElement;
     let tableCurrentSortElement;
     let diaryIdFilterElement;
+    let showCarryOnFilterElement;
 
     let setFilterValues;
     const setSelectorFilterValues = () => {
@@ -95,6 +97,7 @@
         warehouseItemIdFilterElement = flt.warehouseItemIdFilterElement;
         productNatureFilterElement = flt.productNatureFilterElement;
         diaryIdFilterElement = flt.diaryIdFilterElement;
+        showCarryOnFilterElement = flt.showCarryOnFilterElement;
     };
     const setIndexPageFilterValues = () => {
         var pageIndexVal = parseInt($pageIndex.val());
@@ -132,7 +135,8 @@
 
         var transTypeFlt = '';
         var transactorId = 0;
-        var cfaId = 0;
+       
+       
         if (!($transactorTypeFilter.val() === undefined)) {
             transTypeFlt = $transactorTypeFilter.val();
             transactorTypeFilterElement = transTypeFlt;
@@ -146,11 +150,19 @@
         } else {
             transactorIdFilterElement = 0;
         }
+        var cfaId = 0;
         if (!($cfaId.val() === undefined)) {
             cfaId = $cfaId.val();
             cfaIdFilterElement = cfaId;
         } else {
             cfaIdFilterElement = 0;
+        }
+        var showCarryOnValue=false;
+        if (!($showCarryOnFlt === undefined)) {
+            showCarryOnValue = $showCarryOnFlt.is(':checked');
+            showCarryOnFilterElement = showCarryOnValue;
+        } else {
+            showCarryOnFilterElement = false;
         }
         var wrItmNatureFlt = '';
         if (!($warehouseItemNatureFilter.val() === undefined)) {
@@ -782,7 +794,10 @@
             $("#GoToLast, #GoToNext").parent().addClass("disabled");
         }
     };
-    const getTableData = function (pgIndex, pgSize, sortData, dateRange, companyFlt, searchFlt, currencyFlt, transTypeFlt, wrItmNatureFlt, transactorId,warehouseItemId,diaryId,cfaId) {
+    const getTableData = function (pgIndex, pgSize, sortData, dateRange
+                                   , companyFlt, searchFlt, currencyFlt
+                                   , transTypeFlt, wrItmNatureFlt, transactorId
+                                   ,warehouseItemId,diaryId,cfaId,showCarryOnFlt) {
         let uri = indexPageDefinition.uri;
         uri += `?pageIndex=${pgIndex}`;
         uri += `&pageSize=${pgSize}`;
@@ -794,6 +809,7 @@
         uri += `&warehouseItemNatureFilter=${wrItmNatureFlt}`;
         uri += `&transactorId=${transactorId}`;
         uri += `&cashFlowAccountId=${cfaId}`;
+        uri += `&showCarryOnAmountsInTabs=${showCarryOnFlt}`;
         uri += `&warehouseItemId=${warehouseItemId}`;
         uri += `&diaryId=${diaryId}`;
         uri += `&displayCurrencyId=${currencyFlt}`;
@@ -994,7 +1010,12 @@
   
     const refreshTableData = () => {
         setFilterValues();
-        getTableData(pageIndexElement, pageSizeElement, tableCurrentSortElement, datePeriodFilterElement, companyFilterElement, searchTextElement, currencyFilterElement, transactorTypeFilterElement, productNatureFilterElement, transactorIdFilterElement, warehouseItemIdFilterElement, diaryIdFilterElement, cfaIdFilterElement)
+        getTableData(pageIndexElement, pageSizeElement, tableCurrentSortElement
+            , datePeriodFilterElement, companyFilterElement, searchTextElement
+            , currencyFilterElement, transactorTypeFilterElement
+            , productNatureFilterElement, transactorIdFilterElement
+            , warehouseItemIdFilterElement, diaryIdFilterElement
+            , cfaIdFilterElement,showCarryOnFilterElement)
             .then((data) => {
                 bindDataToTable(data, pageIndexElement);
             })

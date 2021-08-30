@@ -311,7 +311,15 @@
                         currencyChanged();
                         indPgLib.refreshData();
                     }
-                }
+                },
+                {
+                                    selector: '#ShowCarryOnFlt',
+                                    event: 'change',
+                                    handler: function(event) {
+                                        
+                                        indPgLib.refreshData();
+                                    }
+                                }
             ];
             const indexPageDef = {
                 uri: '/api/GrKoukInfoApi/GetIndexTblDataTransactorAccountTab',
@@ -362,6 +370,7 @@
                 $('#TransactorTypeFilter').val(1);
                 $('#WarehouseItemNatureFilter').val(1);
                 $('#currentSort').val('datesort:asc');
+                 $('#ShowCarryOnFlt').val(true);
             } else {
                 var storageItem = JSON.parse(storageItemJs);
                 var filtersValue = storageItem.find(x => x.filterKey === 'filtersVisible').filterValue;
@@ -388,6 +397,12 @@
                     $('#CurrencySelector').val(filtersValue);
                 } catch (e) {
 
+                }
+                 try {
+                    filtersValue = storageItem.find(x => x.filterKey === 'ShowCarryOnFlt').filterValue;
+                    $('#ShowCarryOnFlt').val(filtersValue);
+                } catch (e) {
+                    $('#ShowCarryOnFlt').val(true);
                 }
             }
             indPgLib.addPagerElementEventListeners();
@@ -416,8 +431,9 @@
                 var companyFilter = $('#CompanyFilter').val();
                 var pageIndex = $('#pageIndex').val();
                 var transactorTypeFilter = $('#TransactorTypeFilter').val();
-            var warehouseItemNatureFilter = $('#WarehouseItemNatureFilter').val();
+                var warehouseItemNatureFilter = $('#WarehouseItemNatureFilter').val();
                 var currentCurrency = $('#CurrencySelector').val();
+                var showCarryOnFlt = $('#ShowCarryOnFlt').val();
                 var filtersArr = [];
                 //#endregion
                 filtersArr.push({
@@ -459,6 +475,10 @@
                 filtersArr.push({
                     filterKey: 'currentCurrency',
                     filterValue: currentCurrency
+                });
+                filtersArr.push({
+                    filterKey: 'ShowCarryOnFlt',
+                    filterValue: showCarryOnFlt
                 });
                 var sessionVal = JSON.stringify(filtersArr);
 
