@@ -340,10 +340,17 @@
 
 @section Scripts
 {
+    <script src="~/lib/hotkeys/dist/hotkeys.js"></script>
     <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
     <ejs-scripts></ejs-scripts>
     <script>
         $(document).ready(function() {
+            //Test hotkeys
+            hotkeys('f6', function(event, handler){
+                // Prevent the default refresh event under WINDOWS system
+                //event.preventDefault() 
+                alert('you pressed F6!') 
+            });
             const sessionKey = 'MainInfoPage';
             let currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
 
