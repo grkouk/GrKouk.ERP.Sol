@@ -23,6 +23,7 @@ namespace GrKouk.Web.ERP.Helpers
         public bool ShowTransactorTypeFlt { get; set; } = false;
         public bool ShowCompaniesFlt { get; set; } = true;
         public bool ShowPageSizeFlt { get; set; } = true;
-        
+        public bool ShowDisplayCarryOnLineFlt { get; set; } = false;
+
     }
 }

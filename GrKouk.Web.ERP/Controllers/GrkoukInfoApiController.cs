@@ -5347,7 +5347,11 @@ namespace GrKouk.Web.ERP.Controllers
                 DateTime toDate = dfDates.ToDate;
 
                 transactionsList = transactionsList.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
-                transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
+                if (request.ShowCarryOnAmountsInTabs)
+                {
+                    transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);    
+                }
+                
             }
 
             if (!string.IsNullOrEmpty(request.CompanyFilter))
@@ -5357,7 +5361,6 @@ namespace GrKouk.Web.ERP.Controllers
                     if (companyId > 0)
                     {
                         transactionsList = transactionsList.Where(p => p.CompanyId == companyId);
-                        transListBeforePeriod = transListBeforePeriod.Where(p => p.CompanyId == companyId);
                         transListAll = transListAll.Where(p => p.CompanyId == companyId);
                     }
                 }
@@ -5370,11 +5373,7 @@ namespace GrKouk.Web.ERP.Controllers
                     || p.TransTransactorDocSeries.Code.Contains(request.SearchFilter)
                     || p.TransRefCode.Contains(request.SearchFilter)
                 );
-                transListBeforePeriod = transListBeforePeriod.Where(p =>
-                    p.TransTransactorDocSeries.Name.Contains(request.SearchFilter)
-                    || p.TransTransactorDocSeries.Code.Contains(request.SearchFilter)
-                    || p.TransRefCode.Contains(request.SearchFilter)
-                );
+                
                 transListAll = transListAll.Where(p => p.TransTransactorDocSeries.Name.Contains(request.SearchFilter)
                                                        || p.TransTransactorDocSeries.Code.Contains(request.SearchFilter)
                                                        || p.TransRefCode.Contains(request.SearchFilter)
@@ -5466,94 +5465,119 @@ namespace GrKouk.Web.ERP.Controllers
                 }
             }
 
-            //-----------------------------------------------
-            var dbTransBeforePeriod =
-                transListBeforePeriod.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
-            var transBeforePeriodList = await dbTransBeforePeriod.ToListAsync();
-            foreach (var item in transBeforePeriodList)
+            var listWithTotal = new List<KartelaLine>();
+            decimal runningTotal = 0;
+            //Handle before period carry on row
+            if (request.ShowCarryOnAmountsInTabs)
             {
-                if (item.CompanyCurrencyId != 1)
+                if (!string.IsNullOrEmpty(request.CompanyFilter))
                 {
-                    var r = currencyRates.Where(p => p.CurrencyId == item.CompanyCurrencyId)
-                        .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
-                    if (r != null)
+                    if (int.TryParse(request.CompanyFilter, out var companyId))
                     {
-                        item.AmountFpa /= r.Rate;
-                        item.AmountNet /= r.Rate;
-                        item.AmountDiscount /= r.Rate;
-                        item.TransFpaAmount /= r.Rate;
-                        item.TransNetAmount /= r.Rate;
-                        item.TransDiscountAmount /= r.Rate;
+                        if (companyId > 0)
+                        {
+                            if (request.ShowCarryOnAmountsInTabs)
+                            {
+                                transListBeforePeriod = transListBeforePeriod.Where(p => p.CompanyId == companyId);
+                            }
+                        }
                     }
                 }
-
-                if (request.DisplayCurrencyId != 1)
+                if (!string.IsNullOrEmpty(request.SearchFilter))
                 {
-                    var r = currencyRates.Where(p => p.CurrencyId == request.DisplayCurrencyId)
-                        .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
-                    if (r != null)
+                    
+                        transListBeforePeriod = transListBeforePeriod.Where(p =>
+                            p.TransTransactorDocSeries.Name.Contains(request.SearchFilter)
+                            || p.TransTransactorDocSeries.Code.Contains(request.SearchFilter)
+                            || p.TransRefCode.Contains(request.SearchFilter));
+                    
+                }
+                var dbTransBeforePeriod =
+                    transListBeforePeriod.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
+                var transBeforePeriodList = await dbTransBeforePeriod.ToListAsync();
+                foreach (var item in transBeforePeriodList)
+                {
+                    if (item.CompanyCurrencyId != 1)
                     {
-                        item.AmountFpa *= r.Rate;
-                        item.AmountNet *= r.Rate;
-                        item.AmountDiscount *= r.Rate;
-                        item.TransFpaAmount *= r.Rate;
-                        item.TransNetAmount *= r.Rate;
-                        item.TransDiscountAmount *= r.Rate;
+                        var r = currencyRates.Where(p => p.CurrencyId == item.CompanyCurrencyId)
+                            .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
+                        if (r != null)
+                        {
+                            item.AmountFpa /= r.Rate;
+                            item.AmountNet /= r.Rate;
+                            item.AmountDiscount /= r.Rate;
+                            item.TransFpaAmount /= r.Rate;
+                            item.TransNetAmount /= r.Rate;
+                            item.TransDiscountAmount /= r.Rate;
+                        }
+                    }
+
+                    if (request.DisplayCurrencyId != 1)
+                    {
+                        var r = currencyRates.Where(p => p.CurrencyId == request.DisplayCurrencyId)
+                            .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
+                        if (r != null)
+                        {
+                            item.AmountFpa *= r.Rate;
+                            item.AmountNet *= r.Rate;
+                            item.AmountDiscount *= r.Rate;
+                            item.TransFpaAmount *= r.Rate;
+                            item.TransNetAmount *= r.Rate;
+                            item.TransDiscountAmount *= r.Rate;
+                        }
                     }
                 }
+                //Create before period line
+                var bl1 = new
+                {
+                    Debit = transBeforePeriodList.Sum(x => x.DebitAmount),
+                    Credit = transBeforePeriodList.Sum(x => x.CreditAmount),
+                };
+
+                var beforePeriod = new KartelaLine();
+                if (bl1.Credit >= bl1.Debit)
+                {
+                    var amnt = bl1.Credit - bl1.Debit;
+                    beforePeriod.Credit = amnt;
+                    beforePeriod.Debit = 0;
+                }
+                else
+                {
+                    var amnt = bl1.Debit - bl1.Credit;
+                    beforePeriod.Credit = 0;
+                    beforePeriod.Debit = amnt;
+                }
+
+                switch (transactorType.Code)
+                {
+                    case "SYS.DTRANSACTOR":
+
+                        break;
+                    case "SYS.CUSTOMER":
+                        beforePeriod.RunningTotal = bl1.Debit - bl1.Credit;
+                        break;
+                    case "SYS.SUPPLIER":
+                        beforePeriod.RunningTotal = bl1.Credit - bl1.Debit;
+                        break;
+                    default:
+                        beforePeriod.RunningTotal = bl1.Credit - bl1.Debit;
+                        break;
+                }
+
+                beforePeriod.TransDate = beforePeriodDate;
+                beforePeriod.DocSeriesCode = "Εκ.Μεταφ.";
+                beforePeriod.CreatorId = -1;
+                beforePeriod.TransactorName = "";
+                
+                listWithTotal.Add(beforePeriod);
+                runningTotal = beforePeriod.RunningTotal;
             }
+            
+         
 
-            //Create before period line
-            var bl1 = new
-            {
-                Debit = transBeforePeriodList.Sum(x => x.DebitAmount),
-                Credit = transBeforePeriodList.Sum(x => x.CreditAmount),
-            };
+          
 
-            var beforePeriod = new KartelaLine();
-            if (bl1.Credit >= bl1.Debit)
-            {
-                var amnt = bl1.Credit - bl1.Debit;
-                beforePeriod.Credit = amnt;
-                beforePeriod.Debit = 0;
-            }
-            else
-            {
-                var amnt = bl1.Debit - bl1.Credit;
-                beforePeriod.Credit = 0;
-                beforePeriod.Debit = amnt;
-            }
-
-            switch (transactorType.Code)
-            {
-                case "SYS.DTRANSACTOR":
-
-                    break;
-                case "SYS.CUSTOMER":
-                    beforePeriod.RunningTotal = bl1.Debit - bl1.Credit;
-                    break;
-                case "SYS.SUPPLIER":
-                    beforePeriod.RunningTotal = bl1.Credit - bl1.Debit;
-                    break;
-                default:
-                    beforePeriod.RunningTotal = bl1.Credit - bl1.Debit;
-                    break;
-            }
-
-            beforePeriod.TransDate = beforePeriodDate;
-            beforePeriod.DocSeriesCode = "Εκ.Μεταφ.";
-            beforePeriod.CreatorId = -1;
-            beforePeriod.TransactorName = "";
-
-            var listWithTotal = new List<KartelaLine>
-            {
-                beforePeriod
-            };
-
-            //----------------------------------------------------
-
-
-            decimal runningTotal = beforePeriod.RunningTotal;
+           
             foreach (var dbTransaction in dbTransactions)
             {
                 switch (transactorType.Code)
