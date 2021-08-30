@@ -1,4 +1,5 @@
-﻿var selectorsLib = (function () {
+﻿//This library is used in selectors inside pages (transactors or warehouseitems)
+var selectorsLib = (function () {
     const $tblElement=$('#selectorItemsList');
     const $tblHeader = $('#selectorItemsList > thead');
     const $tblBody = $('#selectorItemsList > tbody');
