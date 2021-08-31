@@ -8,7 +8,20 @@
 {
     <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/bootstrap4.css" />
 }
-
+<style>
+    .empImage {
+        margin: 6px 16px;
+        float: left;
+        width: 50px;
+        height: 50px;
+    }
+    .ename {
+        display: block !important;
+        opacity: .87;
+        font-size: 14px;
+        margin-top: 4px;
+    }
+</style>
 @section OutOfBody
 {
     @if (User.IsInRole("Admin")) {
@@ -336,21 +349,19 @@
         <p> User is authenticated is @User.Identity.IsAuthenticated</p>
     </div>
 }
+<partial name="_ShortcutsPartial" />
 
 
 @section Scripts
 {
     <script src="~/lib/hotkeys/dist/hotkeys.js"></script>
+     <script src="~/js/product.lib.js"></script>
     <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
     <ejs-scripts></ejs-scripts>
     <script>
         $(document).ready(function() {
             //Test hotkeys
-            hotkeys('f6', function(event, handler){
-                // Prevent the default refresh event under WINDOWS system
-                //event.preventDefault() 
-                alert('you pressed F6!') 
-            });
+           
             const sessionKey = 'MainInfoPage';
             let currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
 
@@ -404,6 +415,40 @@
                 //updateBalanceGroup();
 
             };
+            //-------------Autocomplete shortcuts modal--------------------
+             const refreshAutoCompleteData=(e)=>{
+
+                let term = e.text;
+                //let selCompanyId = $companyId.val();
+                //let selSeriesId = $transDocSeriesId.val();
+                console.log(`**Inside refresh autocomplete data with term=${term}`);
+                console.log(`**cancel=${e.cancel}`);
+                 let uri = "/api/autocomplete/GetShortcutsAutoCompleteData";
+                 uri += `?term=${term}`;
+                 //uri += `?companyId=${selCompanyId}`;
+                 //uri += `&seriesId=${selSeriesId}`;
+                 //uri += `&term=${term}`;
+                 productLib.makeAjaxCallGet(uri)
+                       .then((data) => {
+                             e.updateData(data.result, null);
+                       })
+                       .catch((error) => {
+                            console.log("Error in ajax call");
+                       });
+
+
+
+            };
+             const setUpAutoComplete=()=>{
+                let autoCompleteEL = document.getElementById("ShortCutsAutoComplete").ej2_instances[0];
+                autoCompleteEL.addEventListener("filtering",(e)=>{
+                    console.log("******Inside filtering event listener");
+                    refreshAutoCompleteData(e);
+                });
+                //autocompleteel . text ---> text of selected element
+                //autocompleteel . value ---> id of  selected element
+           };
+            //-------------------------------------------------------------
             //---------------------Periods----------------------------------
             const loadPeriodSelector = (availablePeriods) => {
                 let $periodMenu = $('[name=PeriodSelector]');
@@ -885,6 +930,15 @@
             let selCurrency ='';
             var signed = $('#logged').val();
             if(signed === 'true'){
+                setUpAutoComplete();
+                 hotkeys('f6', function(event, handler){
+                // Prevent the default refresh event under WINDOWS system
+                //event.preventDefault() 
+                var myModal = new bootstrap.Modal(document.getElementById('ShortcutsModal'), {
+                     keyboard: true,focus:true
+                    });
+                myModal.show();
+            });
                 loadCurrencySelector(currencyListJs);
                 loadCompanySelector(companyListJs);
                 loadPeriodSelector(datePeriodListJs);
