@@ -400,9 +400,9 @@
                 }
                  try {
                     filtersValue = storageItem.find(x => x.filterKey === 'ShowCarryOnFlt').filterValue;
-                    $('#ShowCarryOnFlt').val(filtersValue);
+                    $('#ShowCarryOnFlt').prop('checked', filtersValue);
                 } catch (e) {
-                    $('#ShowCarryOnFlt').val(true);
+                    $('#ShowCarryOnFlt').prop('checked', true);
                 }
             }
             indPgLib.addPagerElementEventListeners();
@@ -433,7 +433,7 @@
                 var transactorTypeFilter = $('#TransactorTypeFilter').val();
                 var warehouseItemNatureFilter = $('#WarehouseItemNatureFilter').val();
                 var currentCurrency = $('#CurrencySelector').val();
-                var showCarryOnFlt = $('#ShowCarryOnFlt').val();
+                var showCarryOnFlt = $('#ShowCarryOnFlt').is(':checked')
                 var filtersArr = [];
                 //#endregion
                 filtersArr.push({
