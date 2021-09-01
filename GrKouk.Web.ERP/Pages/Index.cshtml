@@ -1,988 +1,1028 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "ERP Home";
+	ViewData["Title"] = "ERP Home";
 }
 
 @section MyCss
 {
-    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/bootstrap4.css" />
+<link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/bootstrap4.css" />
 }
 <style>
-    .empImage {
-        margin: 6px 16px;
-        float: left;
-        width: 50px;
-        height: 50px;
-    }
-    .ename {
-        display: block !important;
-        opacity: .87;
-        font-size: 14px;
-        margin-top: 4px;
-    }
+	.empImage {
+		margin: 6px 16px;
+		float: left;
+		width: 50px;
+		height: 50px;
+	}
+
+	.ename {
+		display: block !important;
+		opacity: .87;
+		font-size: 14px;
+		margin-top: 4px;
+	}
 </style>
 @section OutOfBody
 {
     @if (User.IsInRole("Admin")) {
-        <h3></h3>
+<h3></h3>
         @*<div class="container-fluid">
-                <div class="row mt-5">
+	<div class="row mt-5">
 
 
-                </div>
+	</div>
 
-            </div>*@
-        <input type="hidden" id="logged" value="true" />
+	</div>*@
+<input type="hidden" id="logged" value="true" />
 
-        <div class="container-fluid">
-            @* <div class="row pt-5 mt-5"></div> *@
-            <div class="row pt-5 mt-4">
-                <main role="main" class="col-md-12 ms-sm-auto col-lg-12 px-4">
-                    <div class="d-flex justify-content-end flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                        @* <h3 class="h3">@Model.Item.TransactorTypeName @Model.Item.Name Details</h3> *@
+<div class="container-fluid">
+	@* <div class="row pt-5 mt-5"></div> *@
+	<div class="row pt-5 mt-4">
+		<main role="main" class="col-md-12 ms-sm-auto col-lg-12 px-4">
+			<div class="d-flex justify-content-end flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+				@* <h3 class="h3">@Model.Item.TransactorTypeName @Model.Item.Name Details</h3> *@
 
-                        <div class="btn-toolbar mb-2 mb-md-0">
-                            <div class="btn-group mr-2">
-                                <button type="button" class="btn  btn-sm btn-outline-secondary selected-company-text">Reference</button>
-                                <button type="button" class="btn  btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split" id="companyMenuReference" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-reference="parent">
-                                    <span class="sr-only">Toggle Dropdown</span>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="companyMenuReference" name="CompanySelector">
-                                    <button class="dropdown-item company-item" type="button">Action</button>
-                                    <button class="dropdown-item company-item" type="button">Another Action</button>
+				<div class="btn-toolbar mb-2 mb-md-0">
+					<div class="btn-group mr-2">
+						<button type="button" class="btn  btn-sm btn-outline-secondary selected-company-text">Reference</button>
+						<button type="button" class="btn  btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split" id="companyMenuReference" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-reference="parent">
+							<span class="sr-only">Toggle Dropdown</span>
+						</button>
+						<div class="dropdown-menu dropdown-menu-right" aria-labelledby="companyMenuReference" name="CompanySelector">
+							<button class="dropdown-item company-item" type="button">Action</button>
+							<button class="dropdown-item company-item" type="button">Another Action</button>
 
-                                    <button class="dropdown-item company-item" type="button">Another Action</button>
-                                </div>
-                            </div>
-                            <div class="btn-group mr-2">
-                                <button type="button" class="btn  btn-sm btn-outline-secondary selected-period-text">Reference</button>
-                                <button type="button" class="btn  btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split" id="datePeriodMenuReference" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-reference="parent">
-                                    <span class="sr-only">Toggle Dropdown</span>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="datePeriodMenuReference" name="PeriodSelector">
-                                    <button class="dropdown-item period-item" type="button">Action</button>
-                                    <button class="dropdown-item period-item" type="button">Another Action</button>
+							<button class="dropdown-item company-item" type="button">Another Action</button>
+						</div>
+					</div>
+					<div class="btn-group mr-2">
+						<button type="button" class="btn  btn-sm btn-outline-secondary selected-period-text">Reference</button>
+						<button type="button" class="btn  btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split" id="datePeriodMenuReference" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-reference="parent">
+							<span class="sr-only">Toggle Dropdown</span>
+						</button>
+						<div class="dropdown-menu dropdown-menu-right" aria-labelledby="datePeriodMenuReference" name="PeriodSelector">
+							<button class="dropdown-item period-item" type="button">Action</button>
+							<button class="dropdown-item period-item" type="button">Another Action</button>
 
-                                    <button class="dropdown-item period-item" type="button">Another Action</button>
-                                </div>
-                            </div>
-                            <div class="btn-group">
-                                <button type="button" class="btn  btn-sm btn-outline-secondary selected-currency-text">Reference</button>
-                                <button type="button" class="btn  btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split" id="currencyMenuReference" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-reference="parent">
-                                    <span class="sr-only">Toggle Dropdown</span>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="currencyMenuReference" name="CurrencySelector">
-                                    <button class="dropdown-item currency-item" type="button">Action</button>
-                                    <button class="dropdown-item currency-item" type="button">Another Action</button>
+							<button class="dropdown-item period-item" type="button">Another Action</button>
+						</div>
+					</div>
+					<div class="btn-group">
+						<button type="button" class="btn  btn-sm btn-outline-secondary selected-currency-text">Reference</button>
+						<button type="button" class="btn  btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split" id="currencyMenuReference" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-reference="parent">
+							<span class="sr-only">Toggle Dropdown</span>
+						</button>
+						<div class="dropdown-menu dropdown-menu-right" aria-labelledby="currencyMenuReference" name="CurrencySelector">
+							<button class="dropdown-item currency-item" type="button">Action</button>
+							<button class="dropdown-item currency-item" type="button">Another Action</button>
 
-                                    <button class="dropdown-item currency-item" type="button">Another Action</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    @* <hr/> *@
-                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-2 pb-2 mb-3 border-bottom">
-                        <div class="d-flex align-items-center">
-                            <h5 class="mr-2">Financial Summary</h5>
-                            <div class="spinner-border ml-auto text-primary" role="status" aria-hidden="true" id="FinancialLoader" style="display: none"></div>
-                        </div>
-
-                    </div>
-                    <div class="container">
-                        <div class="row align-items-center justify-content-between">
-                            <div class="col-lg-4 col-sm-12">
-                                <div class="card text-center">
-                                    <div class="card-header">
-                                        <h5>Income</h5>
-                                    </div>
-                                    <div class="card-body text-center">
-                                        <table class="table-sm w-100">
-                                            <tr>
-                                                <td>Πωλ.Υλικών</td>
-                                                <td class="text-right">
-                                                    <span name="SellCodeValue"
-                                                          data-computeCode="SumOfMaterialSalesDf">
-                                                        0
-                                                    </span>
-
-                                                    <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
-                                                         data-computeCode="SumOfMaterialSalesDf"
-                                                         name="SellCodeLoader"
-                                                         style="display: none">
-
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Πωλ.Υπηρεσιών</td>
-                                                <td class="text-right">
-                                                    <span name="SellCodeValue"
-                                                          data-computeCode="SumOfServiceSalesDf">
-                                                        0
-                                                    </span>
-
-                                                    <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
-                                                         data-computeCode="SumOfServiceSalesDf"
-                                                         name="SellCodeLoader"
-                                                         style="display: none">
-
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Πωλ.παγίων</td>
-                                                <td class="text-right">
-                                                    <span name="SellCodeValue"
-                                                          data-computeCode="SumOfFixedAstSalesDf">
-                                                        0
-                                                    </span>
-
-                                                    <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
-                                                         data-computeCode="SumOfFixedAstSalesDf"
-                                                         name="SellCodeLoader"
-                                                         style="display: none">
-
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Εσοδα</td>
-
-                                                <td class="text-right">
-                                                    <span name="SellCodeValue"
-                                                          data-computeCode="SumOfIncomeSalesDf">
-                                                        0
-                                                    </span>
-
-                                                    <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
-                                                         data-computeCode="SumOfIncomeSalesDf"
-                                                         name="SellCodeLoader"
-                                                         style="display: none">
-
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </table>
-
-                                    </div>
-                                    <div class="card-footer text-muted">
-                                        <p id="IncomesSumValue">0</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4 col-sm-12">
-                                <div class="card text-center">
-                                    <div class="card-header">
-                                        <h5>Expenses</h5>
-                                    </div>
-                                    <div class="card-body text-center">
-                                        <table class="table-sm w-100">
-                                            <tr>
-                                                <td>Αγ.Υλικών</td>
-                                                <td class="text-right">
-                                                    <span name="BuyCodeValue"
-                                                          data-computeCode="SumOfMaterialBuysDf">
-                                                        0
-                                                    </span>
-
-                                                    <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
-                                                         data-computeCode="SumOfMaterialBuysDf"
-                                                         name="BuyCodeLoader"
-                                                         style="display: none">
-
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Αγ.Υπηρεσιών</td>
-                                                <td class="text-right">
-                                                    <span name="BuyCodeValue"
-                                                          data-computeCode="SumOfServiceBuysDf">
-                                                        0
-                                                    </span>
-
-                                                    <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
-                                                         data-computeCode="SumOfServiceBuysDf"
-                                                         name="BuyCodeLoader"
-                                                         style="display: none">
-
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Αγορές παγίων</td>
-                                                <td class="text-right">
-                                                    <span name="BuyCodeValue"
-                                                          data-computeCode="SumOfFixedAstBuysDf">
-                                                        0
-                                                    </span>
-
-                                                    <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
-                                                         data-computeCode="SumOfFixedAstBuysDf"
-                                                         name="BuyCodeLoader"
-                                                         style="display: none">
-
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Εξοδα</td>
-
-                                                <td class="text-right">
-                                                    <span name="BuyCodeValue"
-                                                          data-computeCode="SumOfExpenseBuysDf">
-                                                        0
-                                                    </span>
-
-                                                    <div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
-                                                         data-computeCode="SumOfExpenseBuysDf"
-                                                         name="BuyCodeLoader"
-                                                         style="display: none">
-
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </table>
-
-                                    </div>
-                                    <div class="card-footer text-muted">
-                                        <p id="ExpensesSumValue">0</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-4 col-sm-12">
-                                <div class="card text-center">
-                                    <div class="card-header">
-                                        <h5>Balance</h5>
-                                    </div>
-                                    <div class="card-body text-center">
-                                        <table class="table-sm w-100">
-                                            <tr>
-                                                <td>Υλικά</td>
-                                                <td class="text-right">
-                                                    <span name="BalanceCodeValue"
-                                                          data-dependsOnCodes="SumOfMaterialBuysDf;SumOfMaterialSalesDf">
-                                                        0
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Υπηρεσίες</td>
-                                                <td class="text-right">
-                                                    <span name="BalanceCodeValue"
-                                                          data-dependsOnCodes="SumOfServiceBuysDf;SumOfServiceSalesDf">
-                                                        0
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>πάγια</td>
-                                                <td class="text-right">
-                                                    <span name="BalanceCodeValue"
-                                                          data-dependsOnCodes="SumOfFixedAstBuysDf;SumOfFixedAstSalesDf">
-                                                        0
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Εξοδα</td>
-
-                                                <td class="text-right">
-                                                    <span name="BalanceCodeValue"
-                                                          data-dependsOnCodes="SumOfExpenseBuysDf;SumOfIncomeSalesDf">
-                                                        0
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        </table>
-
-                                    </div>
-                                    <div class="card-footer text-muted">
-                                        <p id="BalanceSumValue">0</p>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                        <h5>Transactions</h5>
-                        <div class="btn-toolbar mb-2 mb-md-0">
-                            <div class="btn-group mr-2">
-                                <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
-                            </div>
+							<button class="dropdown-item currency-item" type="button">Another Action</button>
+						</div>
+					</div>
+				</div>
+			</div>
 
 
-                        </div>
-                    </div>
-                    @* <div class="container"> *@
-                    <ejs-chart id="container" title="Εσοδα-Εξοδα-Αποτέλεσμα" width="100%">
-                        <e-chart-primaryxaxis valueType="DateTime"
-                                              labelFormat="m"
-                                              intervalType="Months"
-                                              edgeLabelPlacement="Shift">
-                        </e-chart-primaryxaxis>
-                        <e-series-collection>
-                            <e-series dataSource="ViewBag.dataSource" name="Germany" xName="xValue" width="2"
-                                      opacity="1" yName="yValue"
-                                      type="@Syncfusion.EJ2.Charts.ChartSeriesType.Line">
-                            </e-series>
-                        </e-series-collection>
-                    </ejs-chart>
-                    <hr />
-                </main>
-            </div>
-        </div>
+			@* <hr/> *@
+			<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-2 pb-2 mb-3 border-bottom">
+				<div class="d-flex align-items-center">
+					<h5 class="mr-2">Financial Summary</h5>
+					<div class="spinner-border ml-auto text-primary" role="status" aria-hidden="true" id="FinancialLoader" style="display: none"></div>
+				</div>
+
+			</div>
+			<div class="container">
+				<div class="row align-items-center justify-content-between">
+					<div class="col-lg-4 col-sm-12">
+						<div class="card text-center">
+							<div class="card-header">
+								<h5>Income</h5>
+							</div>
+							<div class="card-body text-center">
+								<table class="table-sm w-100">
+									<tr>
+										<td>Πωλ.Υλικών</td>
+										<td class="text-right">
+											<span name="SellCodeValue"
+												  data-computeCode="SumOfMaterialSalesDf">
+												0
+											</span>
+
+											<div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+												 data-computeCode="SumOfMaterialSalesDf"
+												 name="SellCodeLoader"
+												 style="display: none">
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td>Πωλ.Υπηρεσιών</td>
+										<td class="text-right">
+											<span name="SellCodeValue"
+												  data-computeCode="SumOfServiceSalesDf">
+												0
+											</span>
+
+											<div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+												 data-computeCode="SumOfServiceSalesDf"
+												 name="SellCodeLoader"
+												 style="display: none">
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td>Πωλ.παγίων</td>
+										<td class="text-right">
+											<span name="SellCodeValue"
+												  data-computeCode="SumOfFixedAstSalesDf">
+												0
+											</span>
+
+											<div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+												 data-computeCode="SumOfFixedAstSalesDf"
+												 name="SellCodeLoader"
+												 style="display: none">
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td>Εσοδα</td>
+
+										<td class="text-right">
+											<span name="SellCodeValue"
+												  data-computeCode="SumOfIncomeSalesDf">
+												0
+											</span>
+
+											<div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+												 data-computeCode="SumOfIncomeSalesDf"
+												 name="SellCodeLoader"
+												 style="display: none">
+											</div>
+										</td>
+									</tr>
+								</table>
+
+							</div>
+							<div class="card-footer text-muted">
+								<p id="IncomesSumValue">0</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 col-sm-12">
+						<div class="card text-center">
+							<div class="card-header">
+								<h5>Expenses</h5>
+							</div>
+							<div class="card-body text-center">
+								<table class="table-sm w-100">
+									<tr>
+										<td>Αγ.Υλικών</td>
+										<td class="text-right">
+											<span name="BuyCodeValue"
+												  data-computeCode="SumOfMaterialBuysDf">
+												0
+											</span>
+
+											<div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+												 data-computeCode="SumOfMaterialBuysDf"
+												 name="BuyCodeLoader"
+												 style="display: none">
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td>Αγ.Υπηρεσιών</td>
+										<td class="text-right">
+											<span name="BuyCodeValue"
+												  data-computeCode="SumOfServiceBuysDf">
+												0
+											</span>
+
+											<div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+												 data-computeCode="SumOfServiceBuysDf"
+												 name="BuyCodeLoader"
+												 style="display: none">
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td>Αγορές παγίων</td>
+										<td class="text-right">
+											<span name="BuyCodeValue"
+												  data-computeCode="SumOfFixedAstBuysDf">
+												0
+											</span>
+
+											<div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+												 data-computeCode="SumOfFixedAstBuysDf"
+												 name="BuyCodeLoader"
+												 style="display: none">
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td>Εξοδα</td>
+
+										<td class="text-right">
+											<span name="BuyCodeValue"
+												  data-computeCode="SumOfExpenseBuysDf">
+												0
+											</span>
+
+											<div class="spinner-grow spinner-grow-sm ml-auto text-primary" role="status" aria-hidden="true"
+												 data-computeCode="SumOfExpenseBuysDf"
+												 name="BuyCodeLoader"
+												 style="display: none">
+											</div>
+										</td>
+									</tr>
+								</table>
+
+							</div>
+							<div class="card-footer text-muted">
+								<p id="ExpensesSumValue">0</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4 col-sm-12">
+						<div class="card text-center">
+							<div class="card-header">
+								<h5>Balance</h5>
+							</div>
+							<div class="card-body text-center">
+								<table class="table-sm w-100">
+									<tr>
+										<td>Υλικά</td>
+										<td class="text-right">
+											<span name="BalanceCodeValue"
+												  data-dependsOnCodes="SumOfMaterialBuysDf;SumOfMaterialSalesDf">
+												0
+											</span>
+										</td>
+									</tr>
+									<tr>
+										<td>Υπηρεσίες</td>
+										<td class="text-right">
+											<span name="BalanceCodeValue"
+												  data-dependsOnCodes="SumOfServiceBuysDf;SumOfServiceSalesDf">
+												0
+											</span>
+										</td>
+									</tr>
+									<tr>
+										<td>πάγια</td>
+										<td class="text-right">
+											<span name="BalanceCodeValue"
+												  data-dependsOnCodes="SumOfFixedAstBuysDf;SumOfFixedAstSalesDf">
+												0
+											</span>
+										</td>
+									</tr>
+									<tr>
+										<td>Εξοδα</td>
+
+										<td class="text-right">
+											<span name="BalanceCodeValue"
+												  data-dependsOnCodes="SumOfExpenseBuysDf;SumOfIncomeSalesDf">
+												0
+											</span>
+										</td>
+									</tr>
+								</table>
+
+							</div>
+							<div class="card-footer text-muted">
+								<p id="BalanceSumValue">0</p>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+				<h5>Transactions</h5>
+				<div class="btn-toolbar mb-2 mb-md-0">
+					<div class="btn-group mr-2">
+						<button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+						<button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+					</div>
+
+
+				</div>
+			</div>
+			@* <div class="container"> *@
+			<ejs-chart id="container" title="Εσοδα-Εξοδα-Αποτέλεσμα" width="100%">
+				<e-chart-primaryxaxis valueType="DateTime"
+									  labelFormat="m"
+									  intervalType="Months"
+									  edgeLabelPlacement="Shift">
+				</e-chart-primaryxaxis>
+				<e-series-collection>
+					<e-series dataSource="ViewBag.dataSource" name="Germany" xName="xValue" width="2"
+							  opacity="1" yName="yValue"
+							  type="@Syncfusion.EJ2.Charts.ChartSeriesType.Line">
+					</e-series>
+				</e-series-collection>
+			</ejs-chart>
+			<hr />
+		</main>
+	</div>
+</div>
     }
 }
 
-@if (!User.IsInRole("Admin")) {
-    <div class="text-center">
-        <input type="hidden" id="logged" value="false" />
-        <h1 class="display-4">Welcome</h1>
-        <p>User Name is @User.Identity.Name</p>
+@if (!User.IsInRole("Admin"))
+{
+	<div class="text-center">
+		<input type="hidden" id="logged" value="false" />
+		<h1 class="display-4">Welcome</h1>
+		<p>User Name is @User.Identity.Name</p>
 
-        <p> User is authenticated is @User.Identity.IsAuthenticated</p>
-    </div>
+		<p> User is authenticated is @User.Identity.IsAuthenticated</p>
+	</div>
 }
 <partial name="_ShortcutsPartial" />
 
 
 @section Scripts
 {
-    <script src="~/lib/hotkeys/dist/hotkeys.js"></script>
-     <script src="~/js/product.lib.js"></script>
-    <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
-    <ejs-scripts></ejs-scripts>
-    <script>
-        $(document).ready(function() {
-            //Test hotkeys
-           
-            const sessionKey = 'MainInfoPage';
-            let currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
+<script src="~/lib/hotkeys/dist/hotkeys.js"></script>
+<script src="~/js/product.lib.js"></script>
+<script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
+<ejs-scripts></ejs-scripts>
+<script>
+	$(document).ready(function() {
+		//Test hotkeys
 
-            let formatterCurrency = new Intl.NumberFormat(currentCulture,
-                {
-                    style: 'currency',
-                    currency: 'EUR',
-                    minimumFractionDigits: 2
-                });
-            let formatterNumber = new Intl.NumberFormat(currentCulture,
-                {
-                    maximumFractionDigits: 3
+		const sessionKey = 'MainInfoPage';
+		let currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
 
-                });
-            const currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
-            const companyListJs = @Html.Raw(Json.Serialize(ViewBag.CompanyListJs));
-            const datePeriodListJs = @Html.Raw(Json.Serialize(ViewBag.DatePeriodListJs));
-            const computeLineSum= (dependentCodes)=>{
+		let formatterCurrency = new Intl.NumberFormat(currentCulture,
+			{
+				style: 'currency',
+				currency: 'EUR',
+				minimumFractionDigits: 2
+			});
+		let formatterNumber = new Intl.NumberFormat(currentCulture,
+			{
+				maximumFractionDigits: 3
 
-            };
-            const refreshView = () => {
-                console.log('Inside refreshView')
-                const $selectedCompany = $('.selected-company-text');
-                let selCompanyId = $selectedCompany.data('companyid');
-                const $selectedCurrency = $('.selected-currency-text');
-                let selCurrencyId = $selectedCurrency.data('currencyid');
-                const $selectedPeriod = $('.selected-period-text');
-                let selPeriodId = $selectedPeriod.data('periodid');
+			});
+		const currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
+		const companyListJs = @Html.Raw(Json.Serialize(ViewBag.CompanyListJs));
+		const datePeriodListJs = @Html.Raw(Json.Serialize(ViewBag.DatePeriodListJs));
+		const computeLineSum= (dependentCodes)=>{
 
-                let $expenseFieldsToCompute = $('[name=BuyCodeValue]');
-                $expenseFieldsToCompute.each(function(index) {
+		};
+		const refreshView = () => {
+			
+			const $selectedCompany = $('.selected-company-text');
+			let selCompanyId = $selectedCompany.data('companyid');
+			const $selectedCurrency = $('.selected-currency-text');
+			let selCurrencyId = $selectedCurrency.data('currencyid');
+			const $selectedPeriod = $('.selected-period-text');
+			let selPeriodId = $selectedPeriod.data('periodid');
 
-                    let $item = $(this);
-                    console.log($item.data('computecode'));
-                    let cd = $item.data('computecode');
-                    let loader = $item.next();
-                    getFinancialData(cd, selPeriodId, selCompanyId, selCurrencyId, $item, loader);
+			let $expenseFieldsToCompute = $('[name=BuyCodeValue]');
+			$expenseFieldsToCompute.each(function(index) {
 
-                });
+				let $item = $(this);
+				
+				let cd = $item.data('computecode');
+				let loader = $item.next();
+				getFinancialData(cd, selPeriodId, selCompanyId, selCurrencyId, $item, loader);
 
-                let $incomeFieldsToCompute = $('[name=SellCodeValue]');
-                $incomeFieldsToCompute.each(function(index) {
+			});
 
-                    let $item = $(this);
-                    console.log($item.data('computecode'));
-                    let cd = $item.data('computecode');
-                    let loader = $item.next();
-                    getFinancialData(cd, selPeriodId, selCompanyId, selCurrencyId, $item, loader);
+			let $incomeFieldsToCompute = $('[name=SellCodeValue]');
+			$incomeFieldsToCompute.each(function(index) {
 
-                });
-                //updateBalanceGroup();
+				let $item = $(this);
+				
+				let cd = $item.data('computecode');
+				let loader = $item.next();
+				getFinancialData(cd, selPeriodId, selCompanyId, selCurrencyId, $item, loader);
 
-            };
-            //-------------Autocomplete shortcuts modal--------------------
-             const refreshAutoCompleteData=(e)=>{
+			});
+			//updateBalanceGroup();
 
-                let term = e.text;
-                //let selCompanyId = $companyId.val();
-                //let selSeriesId = $transDocSeriesId.val();
-                console.log(`**Inside refresh autocomplete data with term=${term}`);
-                console.log(`**cancel=${e.cancel}`);
-                 let uri = "/api/autocomplete/GetShortcutsAutoCompleteData";
-                 uri += `?term=${term}`;
-                 //uri += `?companyId=${selCompanyId}`;
-                 //uri += `&seriesId=${selSeriesId}`;
-                 //uri += `&term=${term}`;
-                 productLib.makeAjaxCallGet(uri)
-                       .then((data) => {
-                             e.updateData(data.result, null);
-                       })
-                       .catch((error) => {
-                            console.log("Error in ajax call");
-                       });
+		};
+		//-------------Autocomplete shortcuts modal--------------------
+		 const refreshAutoCompleteData=(e)=>{
 
+			let term = e.text;
+			//let selCompanyId = $companyId.val();
+			//let selSeriesId = $transDocSeriesId.val();
+			
+			 let uri = "/api/autocomplete/GetShortcutsAutoCompleteData";
+			 uri += `?term=${term}`;
+			 //uri += `?companyId=${selCompanyId}`;
+			 //uri += `&seriesId=${selSeriesId}`;
+			 //uri += `&term=${term}`;
+			 productLib.makeAjaxCallGet(uri)
+				   .then((data) => {
+						 e.updateData(data.result, null);
+				   })
+				   .catch((error) => {
+						console.log("Error in ajax call");
+				   });
 
 
-            };
-             const setUpAutoComplete=()=>{
-                let autoCompleteEL = document.getElementById("ShortCutsAutoComplete").ej2_instances[0];
-                autoCompleteEL.addEventListener("filtering",(e)=>{
-                    console.log("******Inside filtering event listener");
-                    refreshAutoCompleteData(e);
-                });
-                //autocompleteel . text ---> text of selected element
-                //autocompleteel . value ---> id of  selected element
-           };
-            //-------------------------------------------------------------
-            //---------------------Periods----------------------------------
-            const loadPeriodSelector = (availablePeriods) => {
-                let $periodMenu = $('[name=PeriodSelector]');
 
-                $('.period-item').remove();
-                if (availablePeriods === undefined || availablePeriods === null) {
-                    return;
-                }
-                var d = availablePeriods;
-                d.forEach(function(item) {
-                    var $aLink = $('<button>').addClass('dropdown-item small period-item');
-                    $aLink.text(item.text);
-                    $aLink.attr('type', 'button');
-                    $aLink.data('periodid', item.value);
-                    $aLink.data('periodcode', item.text);
-                    $periodMenu.append($aLink);
-                });
-                $('.period-item').on('click',
-                    function(event) {
-                        let button = $(event.delegateTarget);
-                        let itemId = button.data('periodid');
-                        let itemCode = button.data('periodcode');
-                        console.log(`Period Id=${itemId} Period Code=${itemCode}`);
-                        setPeriod(itemId, itemCode);
+		};
+		 const setUpAutoComplete=()=>{
+			let autoCompleteEL = document.getElementById("ShortCutsAutoComplete").ej2_instances[0];
+			autoCompleteEL.addEventListener("filtering",(e)=>{
+				console.log("******Inside filtering event listener");
+				refreshAutoCompleteData(e);
+			});
+			//autocompleteel . text ---> text of selected element
+			//autocompleteel . value ---> id of  selected element
+	   };
+		//-------------------------------------------------------------
+		//---------------------Periods----------------------------------
+		const loadPeriodSelector = (availablePeriods) => {
+			let $periodMenu = $('[name=PeriodSelector]');
 
-                        refreshView();
-                    });
-            };
-            const setPeriod = (itemId, itemCode) => {
-                const $selectedItem = $('.selected-period-text');
-                $selectedItem.data('periodid', itemId);
-                $selectedItem.data('periodcode', itemCode);
-                $selectedItem.text(itemCode);
+			$('.period-item').remove();
+			if (availablePeriods === undefined || availablePeriods === null) {
+				return;
+			}
+			var d = availablePeriods;
+			d.forEach(function(item) {
+				var $aLink = $('<button>').addClass('dropdown-item small period-item');
+				$aLink.text(item.text);
+				$aLink.attr('type', 'button');
+				$aLink.data('periodid', item.value);
+				$aLink.data('periodcode', item.text);
+				$periodMenu.append($aLink);
+			});
+			$('.period-item').on('click',
+				function(event) {
+					let button = $(event.delegateTarget);
+					let itemId = button.data('periodid');
+					let itemCode = button.data('periodcode');
+					
+					setPeriod(itemId, itemCode);
 
-            };
-            const getPeriodName = (itemId, itemList) => {
-                if (!(typeof itemList != "undefined" && itemList != null && itemList.length != null && itemList.length > 0)) {
-                    return 'Current Month';
-                }
+					refreshView();
+				});
+		};
+		const setPeriod = (itemId, itemCode) => {
+			const $selectedItem = $('.selected-period-text');
+			$selectedItem.data('periodid', itemId);
+			$selectedItem.data('periodcode', itemCode);
+			$selectedItem.text(itemCode);
 
-                try {
+		};
+		const getPeriodName = (itemId, itemList) => {
+			if (!(typeof itemList != "undefined" && itemList != null && itemList.length != null && itemList.length > 0)) {
+				return 'Current Month';
+			}
 
-                    return itemList.find(x => x.value === itemId).text;
-                } catch (e) {
-                    return 'Current Month';
-                }
+			try {
 
-
-            };
-            //-------------------Currency--------------------------------------------------
-            const loadEj2Translation = (name) => {
-                let path = `/lib/ej2translations/${name}.json`;
-                let ajax = new ej.base.Ajax(path, 'GET', false); //load the name json culture file
-                ajax.send().then((e) => {
-                    var culture = JSON.parse(e);
-                    ej.base.L10n.load(
-                        culture
-                    );
-
-                });
-            };
-            const setCurrency = (currencyId, currencyCode, currencyLocale) => {
-                const $selectedCurrency = $('.selected-currency-text');
-                $selectedCurrency.data('currencyid', currencyId);
-                $selectedCurrency.data('currencycode', currencyCode);
-                $selectedCurrency.data('currencylocale', currencyLocale);
-                $selectedCurrency.text(currencyCode);
-                try {
-                    console.log(currencyCode);
-                    console.log(currentCulture);
-                    let cCulture = currencyLocale;
-                    let cBaseCulture = cCulture;
-                    if (cCulture.length > 2) {
-                        cBaseCulture = cCulture.substr(0, 2);
-                    }
-                    loadCultureFiles(cBaseCulture);
-                    ej.base.setCulture(cBaseCulture);
-                    ej.base.setCurrencyCode(currencyCode);
-                    //loadEj2Translation(cBaseCulture);
-
-                    //var grid = document.getElementById("Grid").ej2_instances[0];
-                    //grid.locale = cBaseCulture;
-
-                    formatterCurrency = new Intl.NumberFormat(cCulture,
-                        {
-                            style: 'currency',
-                            currency: currencyCode,
-                            minimumFractionDigits: 2
-                        });
-
-                } catch (e) {
-                    console.log(e);
-                    console.log('Problem setting currency formatter');
-                }
-
-            };
-            const loadCurrencySelector = (availableCurrencies) => {
-                let $currenciesMenu = $('[name=CurrencySelector]');
-
-                $('.currency-item').remove();
-                if (availableCurrencies === undefined || availableCurrencies === null) {
-                    return;
-                }
-                var d = availableCurrencies;
-                d.forEach(function(item) {
-                    var $aLink = $('<button>').addClass('dropdown-item small currency-item');
-                    $aLink.text(item.name);
-                    // var diaryHRef = '/MainEntities/Transactors/RunDiary';
-                    // diaryHRef += `?diaryId=${item.value}`;
-                    $aLink.attr('type', 'button');
-                    $aLink.data('currencyid', item.id);
-                    $aLink.data('currencycode', item.code);
-                    $aLink.data('currencylocale', item.displayLocale);
-                    $currenciesMenu.append($aLink);
-                });
-                $('.currency-item').on('click',
-                    function(event) {
-                        let button = $(event.delegateTarget);
-                        let currencyId = button.data('currencyid');
-                        let currencyCode = button.data('currencycode');
-                        let currencyLocale = button.data('currencylocale');
-                        console.log(`Currency Id=${currencyId} currency Code=${currencyCode}`);
-
-                        setCurrency(currencyId, currencyCode, currencyLocale);
-                        refreshView();
-
-                        //let $btParent = button.parent()
-                    });
-            };
-            const getCurrencyId = (currencyCode, currencyList) => {
-                if (!(typeof currencyList != "undefined" && currencyList != null && currencyList.length != null && currencyList.length > 0)) {
-                    return 0;
-                }
-
-                let ret = currencyList.find(x => x.code === currencyCode).id;
-                const parsed = parseInt(ret);
-                if (isNaN(parsed)) {
-                    return currencyList[0].id;
-                } else {
-                    return parsed;
-                }
-            };
-            const getCurrency = (currencyCode, currencyList) => {
-                if (!(typeof currencyList != "undefined" && currencyList != null && currencyList.length != null && currencyList.length > 0)) {
-                    return null;
-                }
-
-                let ret = currencyList.find(x => x.code === currencyCode);
-
-                if (ret) {
-                    return ret;
-                } else {
-                    return currencyList[0];
-                }
-            };
-            //------------------Company------------------------------------------------
-            const loadCompanySelector = (availableCompanies) => {
-                let $companiesMenu = $('[name=CompanySelector]');
-
-                $('.company-item').remove();
-                if (availableCompanies === undefined || availableCompanies === null) {
-                    return;
-                }
-                var d = availableCompanies;
-                d.forEach(function(item) {
-                    var $aLink = $('<button>').addClass('dropdown-item small company-item');
-                    $aLink.text(item.text);
-                    $aLink.attr('type', 'button');
-                    $aLink.data('companyid', item.value);
-                    $aLink.data('companycode', item.text);
-                    $companiesMenu.append($aLink);
-                });
-                $('.company-item').on('click',
-                    function(event) {
-                        let button = $(event.delegateTarget);
-                        let companyId = button.data('companyid');
-                        let companyCode = button.data('companycode');
-                        console.log(`Company Id=${companyId} Company Code=${companyCode}`);
-                        setCompany(companyId, companyCode);
-                        refreshView();
-                        //let $btParent = button.parent()
-                    });
-            };
-            const setCompany = (companyId, companyCode) => {
-                const $selectedCompany = $('.selected-company-text');
-                $selectedCompany.data('companyid', companyId);
-                $selectedCompany.data('companycode', companyCode);
-                $selectedCompany.text(companyCode);
-
-            };
-            const getCompanyName = (companyId, companyList) => {
-                if (!(typeof companyList != "undefined" && companyList != null && companyList.length != null && companyList.length > 0)) {
-                    return '{AllComp}';
-                }
-
-                try {
-
-                    return companyList.find(x => x.value === companyId).text;
-                } catch (e) {
-                    return '{AllComp}';
-                }
+				return itemList.find(x => x.value === itemId).text;
+			} catch (e) {
+				return 'Current Month';
+			}
 
 
-            };
-            //--------------------------------------------------------------------------
-            const getFinancialData = (codeToCompute, dateRange, selCompany, selCurrency, element, loader, selectionCallback) => {
-                console.log('Inside getFinancialData')
-                var timeout;
-                var uri = '/api/FinancialData/GetMainDashboardInfo?';
-                uri += `codeToCompute=${codeToCompute}`;
-                uri += `&companyFilter=${selCompany}`;
-                uri += `&dateRange=${dateRange}`;
-                uri += `&displayCurrencyId=${selCurrency}`;
-                $.ajax({
-                    contentType: 'application/json; charset=utf-8',
-                    dataType: 'json',
-                    type: 'GET',
-                    url: uri,
-                    beforeSend: function() {
-                        if (loader) {
-                            if (timeout) {
-                                clearTimeout(timeout);
-                            }
-                            timeout = setTimeout(function() {
-                                    loader.show();
+		};
+		//-------------------Currency--------------------------------------------------
+		const loadEj2Translation = (name) => {
+			let path = `/lib/ej2translations/${name}.json`;
+			let ajax = new ej.base.Ajax(path, 'GET', false); //load the name json culture file
+			ajax.send().then((e) => {
+				var culture = JSON.parse(e);
+				ej.base.L10n.load(
+					culture
+				);
 
-                                },
-                                1000);
-                        }
-                    },
-                    success: function(result) {
-                        // if (result.requestedCodeToCompute==='SumOfIncomeSalesDf'){
-                        //     console.log(`success codetocompute=${result.requestedCodeToCompute} value=${result.requestedCodeSum}`)
-                        // }
-                        let vlVal = parseFloat(result.requestedCodeSum);
-                        let vl = formatterCurrency.format(result.requestedCodeSum);
-                        element.text(vl);
-                        element.attr('value', vlVal);
-                        let $balanceFieldsToUpdate = $('[name=BalanceCodeValue]');
-                           $balanceFieldsToUpdate.each(function(index) {
-                               let $item = $(this);
-                               let cd = $item.data('dependsoncodes');
-                               if(codeToCompute==='SumOfMaterialBuysDf' && cd.includes('SumOfMaterialBuysDf')){
-                                   console.log('buy materials')
-                               }
-                               if(codeToCompute==='SumOfMaterialSalesDf' && cd.includes('SumOfMaterialSalesDf')){
-                                    console.log('sale materials')
-                               }
-                               if(codeToCompute==='SumOfIncomeSalesDf' && cd.includes('SumOfIncomeSalesDf')){
-                                   console.log('sale income')
-                               }
-                               if (cd.includes(codeToCompute)){
-                                   console.log(`Storing for code ${codeToCompute} value ${vlVal}`);
-                                   if(codeToCompute.includes('Buys')){
-                                        $item.data('buyvalue',vlVal);
-                                        $item.attr('buyvalue',vlVal);
-                                   }
-                                   if(codeToCompute.includes('Sales')){
-                                       $item.data('sellvalue',vlVal);
-                                       $item.attr('sellvalue',vlVal);
-                                   }
-                               }
-                           });
-                        updateSumForGroup(element);
-                        updateBalanceGroup();
-                    },
-                    complete: function() {
-                        if (loader) {
-                            if (timeout) {
-                                clearTimeout(timeout);
-                            }
-                            setTimeout(function() {
-                                    var isOpen = loader.is(':visible');
-                                    if (isOpen) {
-                                        loader.hide();
-                                    } else {
-                                        console.log('No open modal');
-                                    }
-                                },
-                                2000);
-                        }
+			});
+		};
+		const setCurrency = (currencyId, currencyCode, currencyLocale) => {
+			const $selectedCurrency = $('.selected-currency-text');
+			$selectedCurrency.data('currencyid', currencyId);
+			$selectedCurrency.data('currencycode', currencyCode);
+			$selectedCurrency.data('currencylocale', currencyLocale);
+			$selectedCurrency.text(currencyCode);
+			try {
+				//console.log(currencyCode);
+				//console.log(currentCulture);
+				let cCulture = currencyLocale;
+				let cBaseCulture = cCulture;
+				if (cCulture.length > 2) {
+					cBaseCulture = cCulture.substr(0, 2);
+				}
+				loadCultureFiles(cBaseCulture);
+				ej.base.setCulture(cBaseCulture);
+				ej.base.setCurrencyCode(currencyCode);
+				//loadEj2Translation(cBaseCulture);
 
-                    },
-                    error: function(e) {
-                        console.log(e);
+				//var grid = document.getElementById("Grid").ej2_instances[0];
+				//grid.locale = cBaseCulture;
 
-                    }
-                });
-            };
-            const updateBalanceGroup=()=>{
-                console.log('Inside updateBalanceGroup');
-                let $balanceFieldsToCompute = $('[name=BalanceCodeValue]');
-                let sumOfBalance = parseFloat('0');
-                   $balanceFieldsToCompute.each(function(index) {
-                       let $item = $(this);
-                       //console.log($item.data('dependsoncodes'));
-                       //let tbuyVal = $item.data('buyvalue');
-                       let tbuyVal = $item.attr('buyvalue');
-                       let buyVal = parseFloat('0');
-                       if(tbuyVal) {buyVal = parseFloat(tbuyVal);}
+				formatterCurrency = new Intl.NumberFormat(cCulture,
+					{
+						style: 'currency',
+						currency: currencyCode,
+						minimumFractionDigits: 2
+					});
 
-                       //let tSellVal = $item.data('sellvalue');
-                       let tSellVal = $item.attr('sellvalue');
-                       let sellVal = parseFloat('0');
-                       if(tSellVal) {sellVal = parseFloat(tSellVal);}
+			} catch (e) {
+				console.log(e);
+				console.log('Problem setting currency formatter');
+			}
+
+		};
+		const loadCurrencySelector = (availableCurrencies) => {
+			let $currenciesMenu = $('[name=CurrencySelector]');
+
+			$('.currency-item').remove();
+			if (availableCurrencies === undefined || availableCurrencies === null) {
+				return;
+			}
+			var d = availableCurrencies;
+			d.forEach(function(item) {
+				var $aLink = $('<button>').addClass('dropdown-item small currency-item');
+				$aLink.text(item.name);
+				// var diaryHRef = '/MainEntities/Transactors/RunDiary';
+				// diaryHRef += `?diaryId=${item.value}`;
+				$aLink.attr('type', 'button');
+				$aLink.data('currencyid', item.id);
+				$aLink.data('currencycode', item.code);
+				$aLink.data('currencylocale', item.displayLocale);
+				$currenciesMenu.append($aLink);
+			});
+			$('.currency-item').on('click',
+				function(event) {
+					let button = $(event.delegateTarget);
+					let currencyId = button.data('currencyid');
+					let currencyCode = button.data('currencycode');
+					let currencyLocale = button.data('currencylocale');
+					//console.log(`Currency Id=${currencyId} currency Code=${currencyCode}`);
+
+					setCurrency(currencyId, currencyCode, currencyLocale);
+					refreshView();
+
+					//let $btParent = button.parent()
+				});
+		};
+		const getCurrencyId = (currencyCode, currencyList) => {
+			if (!(typeof currencyList != "undefined" && currencyList != null && currencyList.length != null && currencyList.length > 0)) {
+				return 0;
+			}
+
+			let ret = currencyList.find(x => x.code === currencyCode).id;
+			const parsed = parseInt(ret);
+			if (isNaN(parsed)) {
+				return currencyList[0].id;
+			} else {
+				return parsed;
+			}
+		};
+		const getCurrency = (currencyCode, currencyList) => {
+			if (!(typeof currencyList != "undefined" && currencyList != null && currencyList.length != null && currencyList.length > 0)) {
+				return null;
+			}
+
+			let ret = currencyList.find(x => x.code === currencyCode);
+
+			if (ret) {
+				return ret;
+			} else {
+				return currencyList[0];
+			}
+		};
+		//------------------Company------------------------------------------------
+		const loadCompanySelector = (availableCompanies) => {
+			let $companiesMenu = $('[name=CompanySelector]');
+
+			$('.company-item').remove();
+			if (availableCompanies === undefined || availableCompanies === null) {
+				return;
+			}
+			var d = availableCompanies;
+			d.forEach(function(item) {
+				var $aLink = $('<button>').addClass('dropdown-item small company-item');
+				$aLink.text(item.text);
+				$aLink.attr('type', 'button');
+				$aLink.data('companyid', item.value);
+				$aLink.data('companycode', item.text);
+				$companiesMenu.append($aLink);
+			});
+			$('.company-item').on('click',
+				function(event) {
+					let button = $(event.delegateTarget);
+					let companyId = button.data('companyid');
+					let companyCode = button.data('companycode');
+					//console.log(`Company Id=${companyId} Company Code=${companyCode}`);
+					setCompany(companyId, companyCode);
+					refreshView();
+					//let $btParent = button.parent()
+				});
+		};
+		const setCompany = (companyId, companyCode) => {
+			const $selectedCompany = $('.selected-company-text');
+			$selectedCompany.data('companyid', companyId);
+			$selectedCompany.data('companycode', companyCode);
+			$selectedCompany.text(companyCode);
+
+		};
+		const getCompanyName = (companyId, companyList) => {
+			if (!(typeof companyList != "undefined" && companyList != null && companyList.length != null && companyList.length > 0)) {
+				return '{AllComp}';
+			}
+
+			try {
+
+				return companyList.find(x => x.value === companyId).text;
+			} catch (e) {
+				return '{AllComp}';
+			}
 
 
-                       let difVal = sellVal-buyVal;
-                       sumOfBalance += difVal;
-                       $item.text(formatterCurrency.format(difVal));
-                   });
-                $('#BalanceSumValue').text(formatterCurrency.format(sumOfBalance));
-            };
-            const updateSumForGroup = (element) => {
+		};
+		//--------------------------------------------------------------------------
+		const getFinancialData = (codeToCompute, dateRange, selCompany, selCurrency, element, loader, selectionCallback) => {
+			//console.log('Inside getFinancialData')
+			var timeout;
+			var uri = '/api/FinancialData/GetMainDashboardInfo?';
+			uri += `codeToCompute=${codeToCompute}`;
+			uri += `&companyFilter=${selCompany}`;
+			uri += `&dateRange=${dateRange}`;
+			uri += `&displayCurrencyId=${selCurrency}`;
+			$.ajax({
+				contentType: 'application/json; charset=utf-8',
+				dataType: 'json',
+				type: 'GET',
+				url: uri,
+				beforeSend: function() {
+					if (loader) {
+						if (timeout) {
+							clearTimeout(timeout);
+						}
+						timeout = setTimeout(function() {
+								loader.show();
 
-                let code = element.data('computecode');
-                console.log(`Inside updateSumForGroup with code=${code}`);
-                if (code.includes('Buys')) {
-                    let $fieldsToCompute = $('[name=BuyCodeValue]');
-                    let sumOfGroup = parseFloat('0');
-                    $fieldsToCompute.each(function(index) {
-                        let $item = $(this);
+							},
+							1000);
+					}
+				},
+				success: function(result) {
+					// if (result.requestedCodeToCompute==='SumOfIncomeSalesDf'){
+					//     console.log(`success codetocompute=${result.requestedCodeToCompute} value=${result.requestedCodeSum}`)
+					// }
+					let vlVal = parseFloat(result.requestedCodeSum);
+					let vl = formatterCurrency.format(result.requestedCodeSum);
+					element.text(vl);
+					element.attr('value', vlVal);
+					let $balanceFieldsToUpdate = $('[name=BalanceCodeValue]');
+					   $balanceFieldsToUpdate.each(function(index) {
+						   let $item = $(this);
+						   let cd = $item.data('dependsoncodes');
+						   if(codeToCompute==='SumOfMaterialBuysDf' && cd.includes('SumOfMaterialBuysDf')){
+							  // console.log('buy materials')
+						   }
+						   if(codeToCompute==='SumOfMaterialSalesDf' && cd.includes('SumOfMaterialSalesDf')){
+								//console.log('sale materials')
+						   }
+						   if(codeToCompute==='SumOfIncomeSalesDf' && cd.includes('SumOfIncomeSalesDf')){
+							  // console.log('sale income')
+						   }
+						   if (cd.includes(codeToCompute)){
+							  // console.log(`Storing for code ${codeToCompute} value ${vlVal}`);
+							   if(codeToCompute.includes('Buys')){
+									$item.data('buyvalue',vlVal);
+									$item.attr('buyvalue',vlVal);
+							   }
+							   if(codeToCompute.includes('Sales')){
+								   $item.data('sellvalue',vlVal);
+								   $item.attr('sellvalue',vlVal);
+							   }
+						   }
+					   });
+					updateSumForGroup(element);
+					updateBalanceGroup();
+				},
+				complete: function() {
+					if (loader) {
+						if (timeout) {
+							clearTimeout(timeout);
+						}
+						setTimeout(function() {
+								var isOpen = loader.is(':visible');
+								if (isOpen) {
+									loader.hide();
+								} else {
+									console.log('No open modal');
+								}
+							},
+							2000);
+					}
 
-                        let vlText = $item.text();
-                        let vl1 = $item.attr('value');
-                        if (vl1) {
-                            let vl = parseFloat(vl1);
-                            sumOfGroup += vl;
+				},
+				error: function(e) {
+					console.log(e);
 
-                        }
-                    });
-                    $('#ExpensesSumValue').text(formatterCurrency.format(sumOfGroup));
-                }
-                if (code.includes('Sales')) {
-                    let $fieldsToCompute = $('[name=SellCodeValue]');
-                    let sumOfGroup = parseFloat('0');
-                    $fieldsToCompute.each(function (index) {
-                        let $item = $(this);
+				}
+			});
+		};
+		const updateBalanceGroup=()=>{
+			//console.log('Inside updateBalanceGroup');
+			let $balanceFieldsToCompute = $('[name=BalanceCodeValue]');
+			let sumOfBalance = parseFloat('0');
+			   $balanceFieldsToCompute.each(function(index) {
+				   let $item = $(this);
+				   //console.log($item.data('dependsoncodes'));
+				   //let tbuyVal = $item.data('buyvalue');
+				   let tbuyVal = $item.attr('buyvalue');
+				   let buyVal = parseFloat('0');
+				   if(tbuyVal) {buyVal = parseFloat(tbuyVal);}
 
-                        let vlText = $item.text();
-                        let vl1 = $item.attr('value');
-                        if (vl1) {
-                            let vl = parseFloat(vl1);
-                            sumOfGroup += vl;
-
-                        }
-                    });
-                    $('#IncomesSumValue').text(formatterCurrency.format(sumOfGroup));
-                }
+				   //let tSellVal = $item.data('sellvalue');
+				   let tSellVal = $item.attr('sellvalue');
+				   let sellVal = parseFloat('0');
+				   if(tSellVal) {sellVal = parseFloat(tSellVal);}
 
 
-            };
-            const getTransactionsData = (transactorId, dateRange, selCompany, selCurrency, selectionCallback) => {
-                var timeout;
-                var uri = '/api/FinancialData/GetTransactorTransactions?';
-                uri += `&transactorId=${transactorId}`;
-                uri += `&companyFilter=${selCompany}`;
-                uri += `&dateRange=${dateRange}`;
-                uri += `&displayCurrencyId=${selCurrency}`;
-                $.ajax({
-                    contentType: 'application/json; charset=utf-8',
-                    dataType: 'json',
-                    type: 'GET',
-                    url: uri,
-                    beforeSend: function() {
-                        // if (timeout) {
-                        //     clearTimeout(timeout);
-                        // }
-                        // timeout = setTimeout(function() {
-                        //         $('#FinancialLoader').show();
-                        //
-                        //     },
-                        //     1000);
-                    },
-                    success: function(result) {
-                        var grid = document.getElementById("Grid").ej2_instances[0];
-                        //var grid2 = document.getElementById("transGrid").ej2_instances[0];
-                        //grid2.destroy();
-                        //var data = result.data;
-                        grid.dataSource = result.value;
-                        //document.getElementById("transGrid").innerHTML = "";
-                        //secondGrid("#transGrid", result.value);
-                        //grid.aggregateModule.refresh();
-                    },
-                    complete: function() {
-                        // if (timeout) {
-                        //     clearTimeout(timeout);
-                        // }
-                        // setTimeout(function() {
-                        //         var isOpen = $('#FinancialLoader').is(':visible');
-                        //         if (isOpen) {
-                        //             $('#FinancialLoader').hide();
-                        //         } else {
-                        //             console.log('No open modal');
-                        //         }
-                        //     },
-                        //     2000);
-                    },
-                    error: function(e) {
-                        console.log(e);
+				   let difVal = sellVal-buyVal;
+				   sumOfBalance += difVal;
+				   $item.text(formatterCurrency.format(difVal));
+			   });
+			$('#BalanceSumValue').text(formatterCurrency.format(sumOfBalance));
+		};
+		const updateSumForGroup = (element) => {
 
-                    }
-                });
-            };
-            const loadCultureFiles = (name) => {
-                let files = ['ca-gregorian.json', 'numbers.json', 'timeZoneNames.json', 'currencies.json'];
-                if (name === 'ar') {
-                    files.push('numberingSystems.json');
-                }
-                let loader = ej.base.loadCldr;
-                let loadCulture = function(prop) {
-                    let val
-                    let ajax;
-                    if (name === 'ar' && prop === files.length - 1) {
-                        ajax = new ej.base.Ajax(location.origin + location.pathname + '/../../../lib/cldr-data/supplemental/' + files[prop], 'GET', false);
-                    } else {
-                        ajax = new ej.base.Ajax(location.origin + location.pathname + '/../../../lib/cldr-data/main/' + name + '/' + files[prop], 'GET', false);
-                    }
-                    ajax.onSuccess = function(value) {
-                        val = value;
-                    };
-                    ajax.send();
-                    loader(JSON.parse(val));
-                };
-                for (var prop = 0; prop < files.length; prop++) {
-                    loadCulture(prop);
-                }
-            };
-            let sessionObj = {
-                'currencyCode': '',
-                'periodCode': '',
-                'companyCode': ''
-            };
-            //let cCulture = 'bg';
-            const loadPreviousSession = (sessionKey, sessionObject) => {
-                let storageItemJs = localStorage.getItem(sessionKey);
-                if (storageItemJs === undefined || storageItemJs === null) {
-                    sessionObject.currencyCode = 'EUR';
-                    sessionObject.companyCode = '0';
-                    sessionObject.periodCode = "CURMONTH";
+			let code = element.data('computecode');
+			//console.log(`Inside updateSumForGroup with code=${code}`);
+			if (code.includes('Buys')) {
+				let $fieldsToCompute = $('[name=BuyCodeValue]');
+				let sumOfGroup = parseFloat('0');
+				$fieldsToCompute.each(function(index) {
+					let $item = $(this);
 
-                } else {
-                    var storageItem = JSON.parse(storageItemJs);
-                    try {
-                        let filtersValue = storageItem.find(x => x.filterKey === 'currentCurrency').filterValue;
-                        if (filtersValue === undefined || filtersValue === null) {
-                            sessionObject.currencyCode = 'EUR';
-                        } else {
-                            sessionObject.currencyCode = filtersValue;
-                        }
-                    } catch (e) {
-                        sessionObject.currencyCode = 'EUR';
-                    }
-                    try {
-                        let filtersValue = storageItem.find(x => x.filterKey === 'currentCompany').filterValue;
-                        if (filtersValue === undefined || filtersValue === null) {
-                            sessionObject.companyCode = '0';
-                        } else {
-                            sessionObject.companyCode = filtersValue;
-                        }
-                    } catch (e) {
-                        sessionObject.companyCode = '0';
-                    }
-                    try {
-                        let filtersValue = storageItem.find(x => x.filterKey === 'currentPeriod').filterValue;
-                        if (filtersValue === undefined || filtersValue === null) {
-                            sessionObject.periodCode = 'CURMONTH';
-                        } else {
-                            sessionObject.periodCode = filtersValue;
-                        }
-                    } catch (e) {
-                        sessionObject.periodCode = 'CURMONTH';
-                    }
-                }
-            };
+					let vlText = $item.text();
+					let vl1 = $item.attr('value');
+					if (vl1) {
+						let vl = parseFloat(vl1);
+						sumOfGroup += vl;
 
-            loadPreviousSession(sessionKey, sessionObj);
-            console.log(sessionObj);
-            let selCurrency ='';
-            var signed = $('#logged').val();
-            if(signed === 'true'){
-                setUpAutoComplete();
-                 hotkeys('f6', function(event, handler){
-                // Prevent the default refresh event under WINDOWS system
-                //event.preventDefault() 
-                var myModal = new bootstrap.Modal(document.getElementById('ShortcutsModal'), {
-                     keyboard: true,focus:true
-                    });
-                myModal.show();
-            });
-                loadCurrencySelector(currencyListJs);
-                loadCompanySelector(companyListJs);
-                loadPeriodSelector(datePeriodListJs);
-                selCurrency = getCurrency(sessionObj.currencyCode, currencyListJs);
-                setCurrency(selCurrency.id, selCurrency.code, selCurrency.displayLocale);
-                setCompany(sessionObj.companyCode, getCompanyName(sessionObj.companyCode, companyListJs));
-                setPeriod(sessionObj.periodCode, getPeriodName(sessionObj.periodCode, datePeriodListJs));
-                setTimeout(function () {
-                    console.log('Executing refreshView')
-                    refreshView();
-                },
-                5000);
-            }
-        });
-        $(window).on('beforeunload',
-            function(e) {
-                //#region CommentOut
-                //#region Variables
-                const sessionKey = 'MainInfoPage';
-                const $selectedCurrency = $('.selected-currency-text');
-                const $selectedCompany = $('.selected-company-text');
-                const $selectedPeriod = $('.selected-period-text');
-                let currentCurrency = $selectedCurrency.data('currencycode');
-                let currentCompany = $selectedCompany.data('companyid');
-                let currentPeriod = $selectedPeriod.data('periodid');
-                var filtersArr = [];
-                //#endregion
-                filtersArr.push({
-                    filterKey: 'currentCurrency',
-                    filterValue: currentCurrency
-                });
-                filtersArr.push({
-                    filterKey: 'currentCompany',
-                    filterValue: currentCompany
-                });
-                filtersArr.push({
-                    filterKey: 'currentPeriod',
-                    filterValue: currentPeriod
-                });
-                let sessionVal = JSON.stringify(filtersArr);
+					}
+				});
+				$('#ExpensesSumValue').text(formatterCurrency.format(sumOfGroup));
+			}
+			if (code.includes('Sales')) {
+				let $fieldsToCompute = $('[name=SellCodeValue]');
+				let sumOfGroup = parseFloat('0');
+				$fieldsToCompute.each(function (index) {
+					let $item = $(this);
 
-                localStorage.setItem(sessionKey, sessionVal);
-                //#endregion
+					let vlText = $item.text();
+					let vl1 = $item.attr('value');
+					if (vl1) {
+						let vl = parseFloat(vl1);
+						sumOfGroup += vl;
 
-            });
-    </script>
+					}
+				});
+				$('#IncomesSumValue').text(formatterCurrency.format(sumOfGroup));
+			}
+
+
+		};
+		const getTransactionsData = (transactorId, dateRange, selCompany, selCurrency, selectionCallback) => {
+			var timeout;
+			var uri = '/api/FinancialData/GetTransactorTransactions?';
+			uri += `&transactorId=${transactorId}`;
+			uri += `&companyFilter=${selCompany}`;
+			uri += `&dateRange=${dateRange}`;
+			uri += `&displayCurrencyId=${selCurrency}`;
+			$.ajax({
+				contentType: 'application/json; charset=utf-8',
+				dataType: 'json',
+				type: 'GET',
+				url: uri,
+				beforeSend: function() {
+					// if (timeout) {
+					//     clearTimeout(timeout);
+					// }
+					// timeout = setTimeout(function() {
+					//         $('#FinancialLoader').show();
+					//
+					//     },
+					//     1000);
+				},
+				success: function(result) {
+					var grid = document.getElementById("Grid").ej2_instances[0];
+					//var grid2 = document.getElementById("transGrid").ej2_instances[0];
+					//grid2.destroy();
+					//var data = result.data;
+					grid.dataSource = result.value;
+					//document.getElementById("transGrid").innerHTML = "";
+					//secondGrid("#transGrid", result.value);
+					//grid.aggregateModule.refresh();
+				},
+				complete: function() {
+					// if (timeout) {
+					//     clearTimeout(timeout);
+					// }
+					// setTimeout(function() {
+					//         var isOpen = $('#FinancialLoader').is(':visible');
+					//         if (isOpen) {
+					//             $('#FinancialLoader').hide();
+					//         } else {
+					//             console.log('No open modal');
+					//         }
+					//     },
+					//     2000);
+				},
+				error: function(e) {
+					console.log(e);
+
+				}
+			});
+		};
+		const loadCultureFiles = (name) => {
+			let files = ['ca-gregorian.json', 'numbers.json', 'timeZoneNames.json', 'currencies.json'];
+			if (name === 'ar') {
+				files.push('numberingSystems.json');
+			}
+			let loader = ej.base.loadCldr;
+			let loadCulture = function(prop) {
+				let val
+				let ajax;
+				if (name === 'ar' && prop === files.length - 1) {
+					ajax = new ej.base.Ajax(location.origin + location.pathname + '/../../../lib/cldr-data/supplemental/' + files[prop], 'GET', false);
+				} else {
+					ajax = new ej.base.Ajax(location.origin + location.pathname + '/../../../lib/cldr-data/main/' + name + '/' + files[prop], 'GET', false);
+				}
+				ajax.onSuccess = function(value) {
+					val = value;
+				};
+				ajax.send();
+				loader(JSON.parse(val));
+			};
+			for (var prop = 0; prop < files.length; prop++) {
+				loadCulture(prop);
+			}
+		};
+		let sessionObj = {
+			'currencyCode': '',
+			'periodCode': '',
+			'companyCode': ''
+		};
+		//let cCulture = 'bg';
+		const loadPreviousSession = (sessionKey, sessionObject) => {
+			let storageItemJs = localStorage.getItem(sessionKey);
+			if (storageItemJs === undefined || storageItemJs === null) {
+				sessionObject.currencyCode = 'EUR';
+				sessionObject.companyCode = '0';
+				sessionObject.periodCode = "CURMONTH";
+
+			} else {
+				var storageItem = JSON.parse(storageItemJs);
+				try {
+					let filtersValue = storageItem.find(x => x.filterKey === 'currentCurrency').filterValue;
+					if (filtersValue === undefined || filtersValue === null) {
+						sessionObject.currencyCode = 'EUR';
+					} else {
+						sessionObject.currencyCode = filtersValue;
+					}
+				} catch (e) {
+					sessionObject.currencyCode = 'EUR';
+				}
+				try {
+					let filtersValue = storageItem.find(x => x.filterKey === 'currentCompany').filterValue;
+					if (filtersValue === undefined || filtersValue === null) {
+						sessionObject.companyCode = '0';
+					} else {
+						sessionObject.companyCode = filtersValue;
+					}
+				} catch (e) {
+					sessionObject.companyCode = '0';
+				}
+				try {
+					let filtersValue = storageItem.find(x => x.filterKey === 'currentPeriod').filterValue;
+					if (filtersValue === undefined || filtersValue === null) {
+						sessionObject.periodCode = 'CURMONTH';
+					} else {
+						sessionObject.periodCode = filtersValue;
+					}
+				} catch (e) {
+					sessionObject.periodCode = 'CURMONTH';
+				}
+			}
+		};
+		const SetUpAutoModal = ()=>{
+			 var myModalEl = document.getElementById('ShortcutsModal')
+			 myModalEl.addEventListener('shown.bs.modal', function (event) {
+				 var inp = document.getElementById('ShortCutsAutoComplete').ej2_instances[0];
+					inp.focusIn();
+			 })
+			 let detailButtonElements = document.getElementsByName("DetailsButton");
+			 Array.from(detailButtonElements).forEach((item) => {
+				 item.addEventListener("click", (event) => {
+					 let inp = document.getElementById('ShortCutsAutoComplete').ej2_instances[0];
+					 let selItem = inp.itemData;
+					 if(selItem===null){
+						 return;
+					 }
+					 if(selItem.itemType === 1){
+						 window.location.href='/mainentities/transactors/details?id='+selItem.value;
+					 }
+					  if(selItem.itemType === 2){
+						 window.location.href='/mainentities/materials/details?id='+selItem.value;
+					 }
+					 console.log("Autocomplete selected value is " );
+					 console.log(selItem);
+					
+				});
+			 });
+			 let tabButtonElements = document.getElementsByName("TabButton");
+			 Array.from(tabButtonElements).forEach((item) => {
+				 item.addEventListener("click", (event) => {
+					 let inp = document.getElementById('ShortCutsAutoComplete').ej2_instances[0];
+					 let selItem = inp.itemData;
+					 if(selItem===null){
+						 return;
+					 }
+					 if(selItem.itemType === 1){
+						 window.location.href='/mainentities/transactors/kartela?transactorId='+selItem.value;
+					 }
+					  if(selItem.itemType === 2){
+						 window.location.href='/mainentities/materials/kartela?warehouseItemId='+selItem.value;
+					 }
+					 console.log("Autocomplete selected value is " );
+					 console.log(selItem);
+					
+				});
+			 });
+		};
+
+		loadPreviousSession(sessionKey, sessionObj);
+		console.log(sessionObj);
+		let selCurrency ='';
+		var signed = $('#logged').val();
+		SetUpAutoModal();
+
+		if(signed === 'true'){
+			setUpAutoComplete();
+			hotkeys('alt+s', function(event, handler){
+
+			var myModal = new bootstrap.Modal(document.getElementById('ShortcutsModal'), {
+				 keyboard: true,focus:true
+				});
+			myModal.show();
+
+		});
+			loadCurrencySelector(currencyListJs);
+			loadCompanySelector(companyListJs);
+			loadPeriodSelector(datePeriodListJs);
+			selCurrency = getCurrency(sessionObj.currencyCode, currencyListJs);
+			setCurrency(selCurrency.id, selCurrency.code, selCurrency.displayLocale);
+			setCompany(sessionObj.companyCode, getCompanyName(sessionObj.companyCode, companyListJs));
+			setPeriod(sessionObj.periodCode, getPeriodName(sessionObj.periodCode, datePeriodListJs));
+			setTimeout(function () {
+				console.log('Executing refreshView')
+				refreshView();
+			},
+			5000);
+		}
+	});
+	$(window).on('beforeunload',
+		function(e) {
+			//#region CommentOut
+			//#region Variables
+			const sessionKey = 'MainInfoPage';
+			const $selectedCurrency = $('.selected-currency-text');
+			const $selectedCompany = $('.selected-company-text');
+			const $selectedPeriod = $('.selected-period-text');
+			let currentCurrency = $selectedCurrency.data('currencycode');
+			let currentCompany = $selectedCompany.data('companyid');
+			let currentPeriod = $selectedPeriod.data('periodid');
+			var filtersArr = [];
+			//#endregion
+			filtersArr.push({
+				filterKey: 'currentCurrency',
+				filterValue: currentCurrency
+			});
+			filtersArr.push({
+				filterKey: 'currentCompany',
+				filterValue: currentCompany
+			});
+			filtersArr.push({
+				filterKey: 'currentPeriod',
+				filterValue: currentPeriod
+			});
+			let sessionVal = JSON.stringify(filtersArr);
+
+			localStorage.setItem(sessionKey, sessionVal);
+			//#endregion
+
+		});
+</script>
 }
