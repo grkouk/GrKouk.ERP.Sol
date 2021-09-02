@@ -435,7 +435,7 @@
 		 const setUpAutoComplete=()=>{
 			let autoCompleteEL = document.getElementById("ShortCutsAutoComplete").ej2_instances[0];
 			autoCompleteEL.addEventListener("filtering",(e)=>{
-				console.log("******Inside filtering event listener");
+				//console.log("******Inside filtering event listener");
 				refreshAutoCompleteData(e);
 			});
 			//autocompleteel . text ---> text of selected element
@@ -932,13 +932,17 @@
 						 return;
 					 }
 					 if(selItem.itemType === 1){
-						 window.location.href='/mainentities/transactors/details?id='+selItem.value;
+						 //window.location.href='/mainentities/transactors/details?id='+selItem.value;
+						 let url = `/mainentities/transactors/details?id=${selItem.value}`;
+						 window.open(url,'_blank');
 					 }
 					 if(selItem.itemType === 2){
-						 window.location.href='/mainentities/materials/details?id='+selItem.value;
+						 //window.location.href='/mainentities/materials/details?id='+selItem.value;
+						 let url = `/mainentities/materials/details?id=${selItem.value}`;
+						 window.open(url,'_blank');
 					 }
-					 console.log("Autocomplete selected value is " );
-					 console.log(selItem);
+					 //console.log("Autocomplete selected value is " );
+					 //console.log(selItem);
 					
 				});
 			 });
@@ -951,10 +955,14 @@
 						 return;
 					 }
 					 if(selItem.itemType === 1){
-						 window.location.href='/mainentities/transactors/kartela?transactorId='+selItem.value;
+						 //window.location.href='/mainentities/transactors/kartela?transactorId='+selItem.value;
+						 let url = `/mainentities/transactors/kartela?transactorId=${selItem.value}`;
+						 window.open(url,'_blank');
 					 }
 					  if(selItem.itemType === 2){
-						 window.location.href='/mainentities/materials/kartela?warehouseItemId='+selItem.value;
+						 //window.location.href='/mainentities/materials/kartela?warehouseItemId='+selItem.value;
+						 let url = `/mainentities/materials/kartela?warehouseItemId=${selItem.value}`;
+						 window.open(url,'_blank');
 					 }
 					// console.log("Autocomplete selected value is " );
 					 //console.log(selItem);
