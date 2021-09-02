@@ -928,7 +928,7 @@
 				 item.addEventListener("click", (event) => {
 					 let inp = document.getElementById('ShortCutsAutoComplete').ej2_instances[0];
 					 let selItem = inp.itemData;
-					 if(selItem===null){
+					 if(selItem===null || selItem===undefined){
 						 return;
 					 }
 					 if(selItem.itemType === 1){
@@ -947,7 +947,7 @@
 				 item.addEventListener("click", (event) => {
 					 let inp = document.getElementById('ShortCutsAutoComplete').ej2_instances[0];
 					 let selItem = inp.itemData;
-					 if(selItem===null){
+					 if(selItem===null || selItem===undefined){
 						 return;
 					 }
 					 if(selItem.itemType === 1){
