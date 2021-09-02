@@ -6,9 +6,9 @@
     <Authors>George Koukoudis</Authors>
     <Company>GrKouk</Company>
     <Copyright>George Koukoudis</Copyright>
-    <Version>0.9.1.1</Version>
+    <Version>0.9.2.1</Version>
     <PackageVersion>0.9.2.0</PackageVersion>
-    <AssemblyVersion>0.9.2.0</AssemblyVersion>
+    <AssemblyVersion>0.9.2.1</AssemblyVersion>
     <FileVersion>0.9.2.0</FileVersion>
   </PropertyGroup>
 
