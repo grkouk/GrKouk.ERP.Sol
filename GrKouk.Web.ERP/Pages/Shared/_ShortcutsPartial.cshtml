@@ -1,0 +1,26 @@
+﻿<!-- Modal Shortcuts -->
+<div class="modal fade" id="ShortcutsModal" tabindex="-1" role="dialog" aria-labelledby="shortCutsModalLabel" aria-hidden="true" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg"  role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Shortcut search</h3>
+			</div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                     <ejs-autocomplete id="ShortCutsAutoComplete" placeholder="Selection text" popupHeight="450px" autofill="true"
+                                      itemTemplate="@Html.Raw("<div><img class=\"empImage\" src=${imgUrl} /><div class=\"ename\"> ${text} </div></div>")">
+                        <e-autocomplete-fields text="text" value="value"></e-autocomplete-fields>
+                        @* <e-data-manager url="@Url.Action("GetSellDocAutoComplete", "AutoComplete")" adaptor="UrlAdaptor"></e-data-manager> *@
+                    </ejs-autocomplete>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button name="DetailsButton" type="button" class="btn btn-primary">Details</button>
+                <button name="TabButton" type="button" class="btn btn-primary">Καρτέλα</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+

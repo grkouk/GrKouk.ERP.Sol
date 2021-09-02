@@ -33,6 +33,85 @@ namespace GrKouk.Web.ERP.Controllers
             _context = context;
             _mapper = mapper;
         }
+        [HttpGet("GetShortcutsAutoCompleteData")]
+        public async Task<IActionResult> GetShortcutsAutoCompleteData([FromQuery] ShortCutsAutoCompleteRequest request)
+        {
+            string term = request.Term;
+            //Transactors
+            IQueryable<Transactor> transactorFullListIq = _context.Transactors;
+            List<Ej2ShortcutAutoCompleteItem> items=new();
+
+            if (!string.IsNullOrEmpty(term))
+            {
+                transactorFullListIq = transactorFullListIq.Where(p => p.Name.Contains(term) || p.Code.Contains(term));
+            }
+
+            IEnumerable<Ej2ShortcutAutoCompleteItem> transactorItems = await transactorFullListIq
+
+                .Select(p => new Ej2ShortcutAutoCompleteItem
+                {
+                    Text = p.Name,
+                    Value = p.Id,
+                    ImgUrl = Url.Content("~/productimages/" + "noimage.jpg"),
+                    ItemType = Ej2ShortcutAutoCompleteItemType.ShortcutItemTransactor
+                })
+                .ToListAsync();
+
+            items.AddRange(transactorItems);
+            
+
+
+
+            IQueryable<WarehouseItem> warehouseItem4FullListIq = _context.WarehouseItems;
+
+
+            if (!string.IsNullOrEmpty(term))
+            {
+                warehouseItem4FullListIq = warehouseItem4FullListIq.Where(p => p.Name.Contains(term) || p.Code.Contains(term));
+            }
+
+            IEnumerable<Ej2ShortcutAutoCompleteItem> warehouseItems = await warehouseItem4FullListIq
+                .ProjectTo<WarehouseItemSearchListDto>(_mapper.ConfigurationProvider)
+                .Select(p => new Ej2ShortcutAutoCompleteItem { Text = p.Label, Value = p.Id, ItemType = Ej2ShortcutAutoCompleteItemType.ShortcutItemWarehouseItem })
+                .ToListAsync();
+
+            foreach (var productItem in warehouseItems)
+            {
+                ProductMedia productMedia;
+
+                try
+                {
+                    productMedia = await _context.ProductMedia
+                        .Include(p => p.MediaEntry)
+                        .AsNoTracking()
+                        .SingleOrDefaultAsync(p => p.ProductId == productItem.Value);
+                    if (productMedia != null)
+                    {
+                        productItem.ImgUrl = Url.Content("~/productimages/" + productMedia.MediaEntry.MediaFile);
+                    }
+                    else
+                    {
+                        productItem.ImgUrl = Url.Content("~/productimages/" + "noimage.jpg");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    productItem.ImgUrl = Url.Content("~/productimages/" + "noimage.jpg");
+                }
+            }
+            items.AddRange(warehouseItems);
+            items.Sort(delegate (Ej2ShortcutAutoCompleteItem x, Ej2ShortcutAutoCompleteItem y)
+            {
+                if (x.Text == null && y.Text == null) return 0;
+                else if (x.Text == null) return -1;
+                else if (y.Text == null) return 1;
+                else return x.Text.CompareTo(y.Text);
+            });
+
+            return Ok(new { result = items });
+        }
+
 
         [HttpGet("GetAutoCompleteSellProducts")]
         public async Task<IActionResult> GetAutoCompleteSellProducts([FromQuery] AutoCompleteRequest request)
@@ -60,7 +139,7 @@ namespace GrKouk.Web.ERP.Controllers
                 {
                     var natures = Array.ConvertAll(docType.SelectedWarehouseItemNatures.Split(","), int.Parse);
                     //var natures = docType.SelectedWarehouseItemNatures;
-                    fullListIq = fullListIq.Where(p => natures.Contains((int) p.WarehouseItemNature));
+                    fullListIq = fullListIq.Where(p => natures.Contains((int)p.WarehouseItemNature));
                 }
             }
 
@@ -72,9 +151,9 @@ namespace GrKouk.Web.ERP.Controllers
 
             IEnumerable<Ej2AutoCompleteItem> items = await fullListIq
                 .ProjectTo<WarehouseItemSearchListDto>(_mapper.ConfigurationProvider)
-                .Select(p => new Ej2AutoCompleteItem {Text = p.Label, Value = p.Id})
+                .Select(p => new Ej2AutoCompleteItem { Text = p.Label, Value = p.Id })
                 .ToListAsync();
-          
+
             foreach (var productItem in items)
             {
                 ProductMedia productMedia;
@@ -100,7 +179,7 @@ namespace GrKouk.Web.ERP.Controllers
                     productItem.ImgUrl = Url.Content("~/productimages/" + "noimage.jpg");
                 }
             }
-            return Ok(new {result = items});
+            return Ok(new { result = items });
         }
 
         [HttpPost("GetSellDocAutoComplete")]
@@ -129,7 +208,7 @@ namespace GrKouk.Web.ERP.Controllers
                 {
                     var natures = Array.ConvertAll(docType.SelectedWarehouseItemNatures.Split(","), int.Parse);
                     //var natures = docType.SelectedWarehouseItemNatures;
-                    fullListIq = fullListIq.Where(p => natures.Contains((int) p.WarehouseItemNature));
+                    fullListIq = fullListIq.Where(p => natures.Contains((int)p.WarehouseItemNature));
                 }
             }
 
@@ -146,7 +225,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             IEnumerable<Ej2AutoCompleteItem> items = await fullListIq
                 .ProjectTo<WarehouseItemSearchListDto>(_mapper.ConfigurationProvider)
-                .Select(p => new Ej2AutoCompleteItem {Text = p.Label, Value = p.Id})
+                .Select(p => new Ej2AutoCompleteItem { Text = p.Label, Value = p.Id })
                 .ToListAsync();
 
 
@@ -179,7 +258,7 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
 
-            return request.RequiresCounts ? Ok(new {result = items, count = resultCount}) : Ok(new {result = items});
+            return request.RequiresCounts ? Ok(new { result = items, count = resultCount }) : Ok(new { result = items });
         }
     }
 
@@ -191,5 +270,26 @@ namespace GrKouk.Web.ERP.Controllers
         public int SeriesId { get; set; }
         [JsonProperty(PropertyName = "term", Required = Required.Default)]
         public string Term { get; set; }
+    }
+    public class ShortCutsAutoCompleteRequest
+    {
+        //[JsonProperty(PropertyName = "companyId", Required = Required.Default)]
+        //public int CompanyId { get; set; }
+        //[JsonProperty(PropertyName = "seriesId", Required = Required.Default)]
+        //public int SeriesId { get; set; }
+        [JsonProperty(PropertyName = "term", Required = Required.Default)]
+        public string Term { get; set; }
+    }
+    public class Ej2ShortcutAutoCompleteItem
+    {
+        public int Value { get; set; }
+        public string Text { get; set; }
+        public Ej2ShortcutAutoCompleteItemType ItemType { get; set; }
+        public string ImgUrl { get; set; }
+    }
+    public enum Ej2ShortcutAutoCompleteItemType
+    {
+        ShortcutItemTransactor = 1,
+        ShortcutItemWarehouseItem = 2
     }
 }

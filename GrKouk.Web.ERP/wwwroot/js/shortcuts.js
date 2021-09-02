@@ -4,6 +4,7 @@
  * By Binny V A
  * License : BSD
  */
+//This file is not used becouse it is old
 shortcut = {
 	'all_shortcuts': {},//All the shortcuts are stored in this array
 	'add': function (shortcut_combination, callback, opt) {
