@@ -4017,18 +4017,31 @@ namespace GrKouk.Web.ERP.Controllers
                     error = msg
                 });
             }
-
-            var section = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == sectionCode);
-            if (section == null)
+            await _context.Entry(payoffSeries)
+               .Reference(t => t.TransTransactorDocTypeDef)
+               .LoadAsync();
+            int sectionId;
+            int paymentTypeDefaultSeriesId = payoffSeries.TransTransactorDocTypeDef == null ? 0 : payoffSeries.TransTransactorDocTypeDef.SectionId;
+            if (paymentTypeDefaultSeriesId>0)
             {
-                string msg = "Section not found";
-                return BadRequest(new
-                {
-                    error = msg
-                });
+                sectionId = paymentTypeDefaultSeriesId;
             }
+            else
+            {
+                var section = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == sectionCode);
+                if (section == null)
+                {
+                    string msg = "Section not found";
+                    return BadRequest(new
+                    {
+                        error = msg
+                    });
+                }
+                sectionId = section.Id;
+            }
+            
 
-            var sectionId = section.Id;
+           
             var transactorId = doc.TransactorId;
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
                 .Take(10)
