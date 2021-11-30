@@ -1954,6 +1954,14 @@ namespace GrKouk.Web.ERP.Controllers {
                     decimal lineNetAmount = unitPrice * units;
                     decimal lineDiscountAmount = lineNetAmount * discountRate;
                     decimal lineFpaAmount = (lineNetAmount - lineDiscountAmount) * fpaRate;
+                    var lineAmounts = new DocLineFinancialActionAmounts
+                    {
+                        AmountNet = lineNetAmount,
+                        AmountFpa = lineFpaAmount,
+                        AmountDiscount = lineDiscountAmount,
+                        AmountExpenses = 0
+                    };
+                    ActionHandlers.DocLineFinAction(transTransactorDef.FinancialTransAction, lineAmounts);
                     var buyMaterialLine = new BuyDocLine {
                         UnitPrice = unitPrice,
                         AmountFpa = lineFpaAmount,
@@ -1972,7 +1980,11 @@ namespace GrKouk.Web.ERP.Controllers {
                         TransactionUnitId = transUnitId,
                         TransactionQuantity = transUnits,
                         TransUnitPrice = transPrice,
-                        TransactionUnitFactor = transUnitFactor
+                        TransactionUnitFactor = transUnitFactor,
+                        TransNetAmount = lineAmounts.TransNetAmount,
+                        TransFpaAmount = lineAmounts.TransFpaAmount,
+                        TransDiscountAmount = lineAmounts.TransDiscountAmount,
+                        TransExpensesAmount = lineAmounts.TransExpensesAmount
                     };
                     //_context.Entry(transToAttach).Entity
                     transToAttach.BuyDocLines.Add(buyMaterialLine);
@@ -2381,6 +2393,14 @@ namespace GrKouk.Web.ERP.Controllers {
                     decimal lineNetAmount = unitPrice * units;
                     decimal lineDiscountAmount = lineNetAmount * discountRate;
                     decimal lineFpaAmount = (lineNetAmount - lineDiscountAmount) * fpaRate;
+                    var lineAmounts = new DocLineFinancialActionAmounts
+                    {
+                        AmountNet = lineNetAmount,
+                        AmountFpa = lineFpaAmount,
+                        AmountDiscount = lineDiscountAmount,
+                        AmountExpenses = 0
+                    };
+                    ActionHandlers.DocLineFinAction(transTransactorDef.FinancialTransAction, lineAmounts);
                     var warehouseItemLine = new BuyDocLine {
                         UnitPrice = unitPrice,
                         AmountFpa = lineFpaAmount,
@@ -2399,7 +2419,11 @@ namespace GrKouk.Web.ERP.Controllers {
                         TransactionUnitId = transUnitId,
                         TransactionQuantity = transUnits,
                         TransUnitPrice = transPrice,
-                        TransactionUnitFactor = transUnitFactor
+                        TransactionUnitFactor = transUnitFactor,
+                        TransNetAmount = lineAmounts.TransNetAmount,
+                        TransFpaAmount = lineAmounts.TransFpaAmount,
+                        TransDiscountAmount = lineAmounts.TransDiscountAmount,
+                        TransExpensesAmount = lineAmounts.TransExpensesAmount
                     };
 
                     //_context.Entry(transToAttach).Entity
