@@ -207,8 +207,50 @@ namespace GrKouk.Web.ERP.Helpers
                     break;
             }
         }
-
-         public static void CashFlowFinAction(CashFlowAccountActionsEnum cfaAction, CashFlowAccountTransaction transaction)
+        /// <summary>
+        /// Calculate transaction amounts based on Financial action for SellDocline and BuyDocLine
+        /// </summary>
+        /// <param name="finAction">Transaction Financial action</param>
+        /// <param name="transaction">Object containing amounts</param>
+        public static void DocLineFinAction(FinActionsEnum finAction, DocLineFinancialActionAmounts transaction)
+        {
+            switch (finAction)
+            {
+                case FinActionsEnum.FinActionsEnumNoChange:
+                    
+                    transaction.TransDiscountAmount = 0;
+                    transaction.TransFpaAmount = 0;
+                    transaction.TransNetAmount = 0;
+                    break;
+                case FinActionsEnum.FinActionsEnumDebit:
+                    
+                    transaction.TransDiscountAmount = transaction.AmountDiscount;
+                    transaction.TransFpaAmount = transaction.AmountFpa;
+                    transaction.TransNetAmount = transaction.AmountNet;
+                    break;
+                case FinActionsEnum.FinActionsEnumCredit:
+                    
+                    transaction.TransDiscountAmount = transaction.AmountDiscount;
+                    transaction.TransFpaAmount = transaction.AmountFpa;
+                    transaction.TransNetAmount = transaction.AmountNet;
+                    break;
+                case FinActionsEnum.FinActionsEnumNegativeDebit:
+                    
+                    transaction.TransDiscountAmount = transaction.AmountDiscount * -1;
+                    transaction.TransFpaAmount = transaction.AmountFpa * -1;
+                    transaction.TransNetAmount = transaction.AmountNet * -1;
+                    break;
+                case FinActionsEnum.FinActionsEnumNegativeCredit:
+                    
+                    transaction.TransDiscountAmount = transaction.AmountDiscount * -1;
+                    transaction.TransFpaAmount = transaction.AmountFpa * -1;
+                    transaction.TransNetAmount = transaction.AmountNet * -1;
+                    break;
+                default:
+                    break;
+            }
+        }
+        public static void CashFlowFinAction(CashFlowAccountActionsEnum cfaAction, CashFlowAccountTransaction transaction)
         {
             switch (cfaAction)
             {
