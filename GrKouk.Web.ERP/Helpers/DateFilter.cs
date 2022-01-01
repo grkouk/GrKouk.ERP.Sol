@@ -157,13 +157,13 @@ namespace GrKouk.Web.ERP.Helpers
                     int thisYear = DateTime.Today.Year;
                     int fYear = thisYear - 2;
                     dateFilter.FromDate = new DateTime(fYear, 1, 1);
-                    dateFilter.ToDate = new DateTime(fYear, 1, DateTime.DaysInMonth(fYear, 1));
+                    dateFilter.ToDate = new DateTime(fYear, 12, 31);
                     break;
                 case "3YEARAGO":
                     int thisYear1 = DateTime.Today.Year;
                     int fYear1 = thisYear1 - 3;
                     dateFilter.FromDate = new DateTime(fYear1, 1, 1);
-                    dateFilter.ToDate = new DateTime(fYear1, 1, DateTime.DaysInMonth(fYear1, 1));
+                    dateFilter.ToDate = new DateTime(fYear1, 12, 31);
                     break;
                 case "JANCURYEAR":
                     dateFilter.FromDate = new DateTime(DateTime.Now.Year, 1, 1);
