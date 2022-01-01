@@ -15,6 +15,9 @@ namespace GrKouk.Web.ERP.Helpers
     {
         public static List<SelectListItem> GetDateFiltersSelectList()
         {
+            var thisYear=DateTime.Today.Year;
+            int twoYearsAgo = thisYear - 2;
+            int threeYearsAgo = thisYear - 3;
             List<SelectListItem> datePeriods = new List<SelectListItem>
             {
                 new SelectListItem() {Value = "CURMONTH", Text = "Τρέχων Μήνας"},
@@ -37,6 +40,8 @@ namespace GrKouk.Web.ERP.Helpers
                 new SelectListItem() {Value = "NOVCURYEAR", Text = "Νοέβριος"},
                 new SelectListItem() {Value = "DECCURYEAR", Text = "Δεκέμβριος"},
                 new SelectListItem() {Value = "LASTYEAR", Text = "Προηγ. Ετος"},
+                new SelectListItem() {Value = "2YEARAGO", Text = twoYearsAgo.ToString()},
+                new SelectListItem() {Value = "3YEARAGO", Text = threeYearsAgo.ToString()},
                 //new SelectListItem() {Value = "JANLASTYEAR", Text = "Ιαν.Προηγ. Ετος"},
                 //new SelectListItem() {Value = "FEBLASTYEAR", Text = "Φεβ.Προηγ. Ετος"},
                 //new SelectListItem() {Value = "MARLASTYEAR", Text = "Μαρ.Προηγ. Ετος"},
@@ -55,6 +60,9 @@ namespace GrKouk.Web.ERP.Helpers
         }
         public static List<SelectListItem> GetRecTransDateFiltersSelectList()
         {
+            var thisYear = DateTime.Today.Year;
+            int twoYearsAgo = thisYear - 2;
+            int threeYearsAgo = thisYear - 3;
             List<SelectListItem> datePeriods = new List<SelectListItem>
             {
                 new SelectListItem() {Value = "CURMONTH", Text = "Τρέχων Μήνας"},
@@ -77,6 +85,8 @@ namespace GrKouk.Web.ERP.Helpers
                 new SelectListItem() {Value = "NOVCURYEAR", Text = "Νοέβριος"},
                 new SelectListItem() {Value = "DECCURYEAR", Text = "Δεκέμβριος"},
                 new SelectListItem() {Value = "LASTYEAR", Text = "Προηγ. Ετος"},
+                new SelectListItem() {Value = "2YEARAGO", Text = twoYearsAgo.ToString()},
+                new SelectListItem() {Value = "3YEARAGO", Text = threeYearsAgo.ToString()},
                 //new SelectListItem() {Value = "JANLASTYEAR", Text = "Ιαν.Προηγ. Ετος"},
                 //new SelectListItem() {Value = "FEBLASTYEAR", Text = "Φεβ.Προηγ. Ετος"},
                 //new SelectListItem() {Value = "MARLASTYEAR", Text = "Μαρ.Προηγ. Ετος"},
@@ -143,10 +153,23 @@ namespace GrKouk.Web.ERP.Helpers
                     dateFilter.FromDate = new DateTime(DateTime.Now.Year, 1, 1);
                     dateFilter.ToDate = DateTime.Now;
                     break;
+                case "2YEARAGO":
+                    int thisYear = DateTime.Today.Year;
+                    int fYear = thisYear - 2;
+                    dateFilter.FromDate = new DateTime(fYear, 1, 1);
+                    dateFilter.ToDate = new DateTime(fYear, 1, DateTime.DaysInMonth(fYear, 1));
+                    break;
+                case "3YEARAGO":
+                    int thisYear1 = DateTime.Today.Year;
+                    int fYear1 = thisYear1 - 3;
+                    dateFilter.FromDate = new DateTime(fYear1, 1, 1);
+                    dateFilter.ToDate = new DateTime(fYear1, 1, DateTime.DaysInMonth(fYear1, 1));
+                    break;
                 case "JANCURYEAR":
                     dateFilter.FromDate = new DateTime(DateTime.Now.Year, 1, 1);
                     dateFilter.ToDate = new DateTime(DateTime.Now.Year, 1, DateTime.DaysInMonth(DateTime.Now.Year, 1));
                     break;
+              
                 case "FEBCURYEAR":
                     dateFilter.FromDate = new DateTime(DateTime.Now.Year, 2, 1);
                     dateFilter.ToDate = new DateTime(DateTime.Now.Year, 2, DateTime.DaysInMonth(DateTime.Now.Year, 2));
