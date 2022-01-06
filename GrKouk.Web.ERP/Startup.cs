@@ -106,7 +106,7 @@ namespace GrKouk.Web.ERP
             });
             //Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Mzg4NTI5QDMxMzgyZTM0MmUzMEtBYjNBQ055dFJPVjhKcHJDbW5pWHJadC9OSWp5d3BDc2MxZ3JxcUpnWTA9");
         
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("NDIxNDU4QDMxMzkyZTMxMmUzMERkaDZVL0JMeE9CaEFueG5adWFaTWFHcWxLalZYZXAzY1BNbXpYTmltUjg9;NDIxNDU5QDMxMzkyZTMxMmUzMGFWWTcyc2NKcDIwaVV1a3NGWExReTVyaFlKbkxSaFdrR3grUTFCanl4UjQ9;NDIxNDYwQDMxMzkyZTMxMmUzMGdMRzVFZ2lWajlWdDQ4NkJkWHlIb2ZzbjRvakpWOURUMG1HVVhJMjFNL3c9;NDIxNDYxQDMxMzkyZTMxMmUzMGJHYjVVVmM2Tml0UFpBQXZiMk9wQUhSR1VvMEw5dnJpa04wUDFPSjROODA9");
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("NTYwMjQ1QDMxMzkyZTM0MmUzME5CRXFYRGluNEZRRUFpaE5nZTF2STlRUTZtcGJqelVQWGRudlNqVG1EVjQ9");
         }
     }
 }
