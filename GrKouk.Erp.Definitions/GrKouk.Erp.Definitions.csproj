@@ -1,16 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Authors>George Koukoudis</Authors>
     <Company>GrKouk</Company>
     <Copyright>George Koukoudis</Copyright>
-    <PackageVersion>1.0.1</PackageVersion>
+    <PackageVersion>2.0.0.0</PackageVersion>
     <Title>GrKouk.Erp.Definitions</Title>
     <Description>GrKouk.Erp.Definitions </Description>
-    <AssemblyVersion>1.3.0.0</AssemblyVersion>
-    <FileVersion>1.3.0.0</FileVersion>
-    <Version>1.3.0.0</Version>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
+    <Version>2.0.0.0</Version>
   </PropertyGroup>
 
 </Project>
