@@ -17,7 +17,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/GrKouk.Web.ERP/bin/Debug/net5.0/GrKouk.Web.ERP.dll",
+            "program": "${workspaceFolder}/GrKouk.Web.ERP/bin/Debug/net6.0/GrKouk.Web.ERP.dll",
             "args": [],
             "cwd": "${workspaceFolder}/GrKouk.Web.ERP",
             "stopAtEntry": false,
