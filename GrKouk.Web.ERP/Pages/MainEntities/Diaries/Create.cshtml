@@ -92,7 +92,18 @@
 
                 switch (selectedDocType) {
                     case 'DiaryTypeEnumBuys':
-                      
+                        $transactorTypes.prop('disabled', true);
+                       $matNatureTypes.prop('disabled', false);
+                        $docTypes.empty();
+                       $.each(buyDocTypeList, function(index, item) {
+                           $docTypes.append($('<option></option>').attr('value', item.value).text(item.title));
+                       });
+                       $transactorTypes.selectpicker('deselectAll');
+                       $matNatureTypes.selectpicker('deselectAll');
+                       $docTypes.selectpicker('refresh');
+                       $transactorTypes.selectpicker('refresh');
+                       $matNatureTypes.selectpicker('refresh');
+                        break;
                     case 'DiaryTypeEnumExpenses':
                         //$docTypes.multiselect('dataprovider', buyDocTypeList);
                         $transactorTypes.prop('disabled', true);
@@ -111,7 +122,7 @@
                     case 'DiaryTypeEnumSales':
                        // $docTypes.multiselect('dataprovider', sellDocTypeList);
                        $transactorTypes.prop('disabled', true);
-                       $matNatureTypes.prop('disabled', true);
+                       $matNatureTypes.prop('disabled', false);
                         $docTypes.empty();
                        $.each(sellDocTypeList, function(index, item) {
                            $docTypes.append($('<option></option>').attr('value', item.value).text(item.title));
