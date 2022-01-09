@@ -20,6 +20,16 @@
         <li class="nav-item">
             <a href="#" role="button" class="nav-link" id="CreateNew">Create New</a>
         </li>
+ <li class="nav-item dropdown ">
+            <a class="btn btn-sm btn-outline-secondary dropdown-toggle" role="button" id="ddDiarys" data-bs-toggle="dropdown"
+               aria-haspopup="true" aria-expanded="false">Ημερολόγια</a>
+
+            <div class="dropdown-menu small " name="diaryDropDownMenu">
+                <h6 class="dropdown-header">Σχετικά Ημερολόγια</h6>
+                <a class="dropdown-item small diaryLink">
+                </a>
+            </div>
+        </li>
         <li class="nav-item">
             <a class="nav-link" data-bs-toggle="collapse" data-bs-target="#filterCollapse" role="button" id="filtersToggle"
                aria-expanded="false" aria-controls="filterCollapse">
@@ -522,7 +532,10 @@
                 actionMobileColDefs: actionMobileColDefs,
                 tableHandlersToRegister:tableHandlersToRegister,
                 pageHandlersToRegister:pageHandlersToRegister,
-                afterTableLoad: {}
+                afterTableLoad: {
+                 callback: function(valueSource) {
+                        loadDiaries(valueSource.diaries);
+                    }}
             };
 
             indPgLib.setIndexPageDefinition(indexPageDef);
@@ -1056,7 +1069,24 @@
 
             };
             //#endregion
+             const loadDiaries = (availableDiarys) => {
+                var $diaryDd = $('[name=diaryDropDownMenu]');
+                $('.diaryLink').remove();
+                if (availableDiarys === undefined || availableDiarys === null) {
+                    return;
+                }
+                var d = availableDiarys;
 
+                d.forEach(function(item) {
+                    var $aLink = $('<a>').addClass('dropdown-item small diaryLink');
+                    $aLink.text(item.text);
+                    var diaryHRef = '/MainEntities/Transactors/RunDiary';
+                    diaryHRef += `?diaryId=${item.value}`;
+                    $aLink.attr('href', diaryHRef);
+                    $diaryDd.append($aLink);
+                });
+
+            };
             const payOfDocument = (docId) => {
                 var timeout;
                 let idsToHandle = [];
