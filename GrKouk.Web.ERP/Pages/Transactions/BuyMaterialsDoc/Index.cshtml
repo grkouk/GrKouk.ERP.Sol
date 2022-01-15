@@ -1080,7 +1080,7 @@
                 d.forEach(function(item) {
                     var $aLink = $('<a>').addClass('dropdown-item small diaryLink');
                     $aLink.text(item.text);
-                    var diaryHRef = '/MainEntities/Transactors/RunDiary';
+                    var diaryHRef = '/transactions/buymaterialsdoc/RunBuyDiary';
                     diaryHRef += `?diaryId=${item.value}`;
                     $aLink.attr('href', diaryHRef);
                     $diaryDd.append($aLink);
