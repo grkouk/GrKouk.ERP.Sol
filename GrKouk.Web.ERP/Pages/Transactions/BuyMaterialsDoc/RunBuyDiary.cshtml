@@ -48,7 +48,7 @@
     </ul>
 </div>
 <input type="hidden" asp-for="DiaryId" />
-@await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowDateFlt = true })
+@await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowDateFlt = true,ShowDisplaySumaryFlt = true })
 
 
 <div class="row mt-1">
