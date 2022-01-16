@@ -1,4 +1,6 @@
-﻿var indPgLib = (function () {
+﻿//Index pages javascript tools
+//Last update 2022/01/17
+var indPgLib = (function () {
     let indexPageDefinition;
     let colDefs;
     let actionColDefs;
