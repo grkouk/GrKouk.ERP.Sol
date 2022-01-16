@@ -58,6 +58,7 @@
     let $transactorId = $('#TransactorId');
     let $cfaId = $('#CfaId');
     let $showCarryOnFlt = $('#ShowCarryOnFlt');
+    let $showSummaryFlt = $('#ShowSummaryFlt');
     let $warehouseItemId = $('#WarehouseItemId');
     let $warehouseItemNatureFilter = $('#WarehouseItemNatureFilter');
     let $currencySelector = $("#CurrencySelector");
@@ -77,6 +78,7 @@
     let tableCurrentSortElement;
     let diaryIdFilterElement;
     let showCarryOnFilterElement;
+    let showSummaryFilterElement;
 
     let setFilterValues;
     const setSelectorFilterValues = () => {
@@ -98,6 +100,7 @@
         productNatureFilterElement = flt.productNatureFilterElement;
         diaryIdFilterElement = flt.diaryIdFilterElement;
         showCarryOnFilterElement = flt.showCarryOnFilterElement;
+        showSummaryFilterElement = flt.showSummaryFilterElement;
     };
     const setIndexPageFilterValues = () => {
         var pageIndexVal = parseInt($pageIndex.val());
@@ -163,6 +166,13 @@
             showCarryOnFilterElement = showCarryOnValue;
         } else {
             showCarryOnFilterElement = false;
+        }
+        var showSummaryValue = false;
+        if (!($showSummaryFlt === undefined)) {
+            showSummaryValue = $showSummaryFlt.is(':checked');
+            showSummaryFilterElement = showSummaryValue;
+        } else {
+            showSummaryFilterElement = false;
         }
         var wrItmNatureFlt = '';
         if (!($warehouseItemNatureFilter.val() === undefined)) {
@@ -797,7 +807,7 @@
     const getTableData = function (pgIndex, pgSize, sortData, dateRange
                                    , companyFlt, searchFlt, currencyFlt
                                    , transTypeFlt, wrItmNatureFlt, transactorId
-                                   ,warehouseItemId,diaryId,cfaId,showCarryOnFlt) {
+                                   ,warehouseItemId,diaryId,cfaId,showCarryOnFlt,showSummaryFlt) {
         let uri = indexPageDefinition.uri;
         uri += `?pageIndex=${pgIndex}`;
         uri += `&pageSize=${pgSize}`;
@@ -810,6 +820,7 @@
         uri += `&transactorId=${transactorId}`;
         uri += `&cashFlowAccountId=${cfaId}`;
         uri += `&showCarryOnAmountsInTabs=${showCarryOnFlt}`;
+        uri += `&showSummaryFilter=${showSummaryFlt}`;
         uri += `&warehouseItemId=${warehouseItemId}`;
         uri += `&diaryId=${diaryId}`;
         uri += `&displayCurrencyId=${currencyFlt}`;
@@ -1015,7 +1026,8 @@
             , currencyFilterElement, transactorTypeFilterElement
             , productNatureFilterElement, transactorIdFilterElement
             , warehouseItemIdFilterElement, diaryIdFilterElement
-            , cfaIdFilterElement,showCarryOnFilterElement)
+            , cfaIdFilterElement, showCarryOnFilterElement,
+                showSummaryFilterElement)
             .then((data) => {
                 bindDataToTable(data, pageIndexElement);
             })
