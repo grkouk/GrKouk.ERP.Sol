@@ -28,6 +28,7 @@ namespace GrKouk.Web.ERP.Helpers
         public string CodeToCompute { get; set; }
         public int DocumentId { get; set; }
         public bool ShowCarryOnAmountsInTabs { get; set; }
+        public bool ShowSummaryFilter { get; set; }
     }
 
     public class IndexDataTableResponse<T>

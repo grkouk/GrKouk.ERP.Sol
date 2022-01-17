@@ -122,7 +122,7 @@
                       totalKey: 'label',
                       grandTotalKey: 'label',
                       totalFormatter: '',
-                      sortKey: '',
+                      sortKey: 'WarehouseItemNameSort',
                       sortType: 'alpha',
                       header: 'Item',
                       text: '',
@@ -382,6 +382,7 @@
                 $('#TransactorTypeFilter').val(1);
                 $('#WarehouseItemNatureFilter').val(1);
                 $('#currentSort').val('datesort:asc');
+                $('#ShowSummaryFlt').val(true);
             } else {
                 var storageItem = JSON.parse(storageItemJs);
                 var filtersValue = storageItem.find(x => x.filterKey === 'filtersVisible').filterValue;
@@ -408,6 +409,12 @@
                     $('#CurrencySelector').val(filtersValue);
                 } catch (e) {
 
+                }
+                 try {
+                    filtersValue = storageItem.find(x => x.filterKey === 'ShowSummaryFlt').filterValue;
+                    $('#ShowSummaryFlt').prop('checked', filtersValue);
+                } catch (e) {
+                    $('#ShowSummaryFlt').prop('checked', true);
                 }
             }
               indPgLib.addPagerElementEventListeners();
@@ -438,6 +445,7 @@
                 var transactorTypeFilter = $('#TransactorTypeFilter').val();
                 var warehouseItemNatureFilter = $('#WarehouseItemNatureFilter').val();
                 var currentCurrency = $('#CurrencySelector').val();
+                 var showSummaryFlt = $('#ShowSummaryFlt').is(':checked');
                 var filtersArr = [];
                 //#endregion
                 filtersArr.push({
@@ -480,7 +488,10 @@
                     filterKey: 'currentCurrency',
                     filterValue: currentCurrency
                 });
-
+                  filtersArr.push({
+                    filterKey: 'ShowSummaryFlt',
+                    filterValue: showSummaryFlt
+                });
                 var sessionVal = JSON.stringify(filtersArr);
 
                 localStorage.setItem('RunTransactorDiaryIndexView', sessionVal);
