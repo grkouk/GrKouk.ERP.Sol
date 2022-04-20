@@ -5016,18 +5016,19 @@ namespace GrKouk.Web.ERP.Controllers
                     var t2 = await transactionsList.ToListAsync();
                     t1 = t2.GroupBy(g => new
                     {
-                        g.TransactorId,
-                        g.TransactorName,
-                      
+
+
                         //g.DocId,
                         //g.TransDate ,
-                        g.DocSeriesId,
-                        g.DocSeriesName,
                         g.DocSeriesCode,
+                        g.DocSeriesName,
+                        
                         // g.DocTypeId,
                         // g.RefCode,
-                       
-                       
+                        g.DocSeriesId,
+                        g.TransactorId,
+                        g.TransactorName,
+
                         g.ItemId,
                         g.ItemName,
                         //g.Id,
