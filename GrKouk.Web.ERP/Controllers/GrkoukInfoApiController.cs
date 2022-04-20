@@ -5006,11 +5006,11 @@ namespace GrKouk.Web.ERP.Controllers
                 }
             }
 
-          
+
             List<BuyDiaryLine> t1;
             if (request.ShowSummaryFilter)
             {
-               
+
                 try
                 {
                     var t2 = await transactionsList.ToListAsync();
@@ -5020,9 +5020,11 @@ namespace GrKouk.Web.ERP.Controllers
 
                         //g.DocId,
                         //g.TransDate ,
+                        g.CompanyId,
+                        g.CompanyCode,
                         g.DocSeriesCode,
                         g.DocSeriesName,
-                        
+
                         // g.DocTypeId,
                         // g.RefCode,
                         g.DocSeriesId,
@@ -5035,19 +5037,21 @@ namespace GrKouk.Web.ERP.Controllers
                         // g.SectionId,
                         //g.ItemNature
                     })
-                        .Select(s=> new BuyDiaryLine
+                        .Select(s => new BuyDiaryLine
                         {
-                           // Id=s.Key.Id,
-                            DocSeriesId=s.Key.DocSeriesId,
-                            DocSeriesCode=s.Key.DocSeriesCode,
-                            DocSeriesName=s.Key.DocSeriesName,
-                            TransactorId=s.Key.TransactorId,
-                            TransactorName=s.Key.TransactorName,
-                            ItemId=s.Key.ItemId,
-                            ItemName=s.Key.ItemName,
-                            AmountDiscount=s.Sum(p => p.AmountDiscount),
-                            AmountFpa=s.Sum(p=>p.AmountFpa),
-                            AmountNet=s.Sum(p=>p.AmountNet),
+                            // Id=s.Key.Id,
+                            DocSeriesId = s.Key.DocSeriesId,
+                            DocSeriesCode = s.Key.DocSeriesCode,
+                            DocSeriesName = s.Key.DocSeriesName,
+                            TransactorId = s.Key.TransactorId,
+                            TransactorName = s.Key.TransactorName,
+                            ItemId = s.Key.ItemId,
+                            ItemName = s.Key.ItemName,
+                            CompanyId = s.Key.CompanyId,
+                            CompanyCode = s.Key.CompanyCode,
+                            AmountDiscount = s.Sum(p => p.AmountDiscount),
+                            AmountFpa = s.Sum(p => p.AmountFpa),
+                            AmountNet = s.Sum(p => p.AmountNet),
                             TransDiscountAmount = s.Sum(p => p.TransDiscountAmount),
                             TransFpaAmount = s.Sum(p => p.TransFpaAmount),
                             TransNetAmount = s.Sum(p => p.TransNetAmount)
@@ -5073,7 +5077,7 @@ namespace GrKouk.Web.ERP.Controllers
             var pageSize = request.PageSize;
             var t3 = t1.AsQueryable();
             //var listItems = await PagedList<BuyDiaryLine>.CreateAsync(t, pageIndex, pageSize);
-            var listItems =  PagedList<BuyDiaryLine>.Create(t3, pageIndex, pageSize);
+            var listItems = PagedList<BuyDiaryLine>.Create(t3, pageIndex, pageSize);
             decimal sumAmountTotal = listItems.Sum(p => p.TotalAmount);
             decimal sumAmountTotalNet = listItems.Sum(p => p.TotalNetAmount);
 
