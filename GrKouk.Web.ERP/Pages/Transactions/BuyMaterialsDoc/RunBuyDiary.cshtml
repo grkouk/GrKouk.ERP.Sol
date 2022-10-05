@@ -379,7 +379,7 @@
             };
 
 
-            var storageItemJs = localStorage.getItem('RunTransactorDiaryIndexView');
+            var storageItemJs = localStorage.getItem('RunBuyDiaryIndexView');
             if (storageItemJs === undefined || storageItemJs === null) {
                 $('#pageIndex').val(1);
                 $('#filtersVisible').val(true);
@@ -502,7 +502,7 @@
             });
             var sessionVal = JSON.stringify(filtersArr);
 
-            localStorage.setItem('RunTransactorDiaryIndexView', sessionVal);
+            localStorage.setItem('RunBuyDiaryIndexView', sessionVal);
             //#endregion
 
         });
