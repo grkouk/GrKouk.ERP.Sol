@@ -357,3 +357,4 @@ healthchecksdb
 /GrKouk.Web.ERP/libman.json
 /GrKouk.Web.ERP/wwwroot/productimages
 GrKouk.Web.ERP/package-lock.json
+.DS_Store
