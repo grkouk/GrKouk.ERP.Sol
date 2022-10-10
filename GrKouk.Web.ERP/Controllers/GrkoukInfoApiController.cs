@@ -1044,6 +1044,13 @@ namespace GrKouk.Web.ERP.Controllers
             var grandSumOfAmountNew = t1.Sum(p => p.TotalAmount);
             var gransSumOfNetAmountNew = t1.Sum(p => p.TotalNetAmount);
             var grandSumOfPayedAmount = t1.Sum((p => p.PayedOfAmount));
+            var relevantDiarys = await _context.DiaryDefs.Where(p => p.DiaryType == DiaryTypeEnum.DiaryTypeEnumSales)
+                .Select(item => new SearchListItem()
+                {
+                    Value = item.Id,
+                    Text = item.Name
+                })
+               .ToListAsync();
             var pageIndex = request.PageIndex;
             var pageSize = request.PageSize;
             var listItems = await PagedList<SellDocList2Dto>.CreateAsync(t, pageIndex, pageSize);
@@ -1064,6 +1071,7 @@ namespace GrKouk.Web.ERP.Controllers
                 GrandSumOfAmount = grandSumOfAmountNew,
                 GrandSumOfNetAmount = gransSumOfNetAmountNew,
                 GrandSumOfPayedAmount = grandSumOfPayedAmount,
+                Diaries = relevantDiarys,
                 Data = listItems
             };
             return Ok(response);

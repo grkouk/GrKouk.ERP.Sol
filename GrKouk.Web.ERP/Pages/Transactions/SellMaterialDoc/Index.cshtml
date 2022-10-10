@@ -1043,6 +1043,25 @@
 
             };
             //#endregion
+            const loadDiaries = (availableDiarys) => {
+                var $diaryDd = $('[name=diaryDropDownMenu]');
+                $('.diaryLink').remove();
+                if (availableDiarys === undefined || availableDiarys === null) {
+                    return;
+                }
+                var d = availableDiarys;
+
+                d.forEach(function (item) {
+                    var $aLink = $('<a>').addClass('dropdown-item small diaryLink');
+                    $aLink.text(item.text);
+                    var diaryHRef = '/transactions/sellmaterialdoc/salesDiary';
+                    diaryHRef += `?diaryId=${item.value}`;
+                    $aLink.attr('href', diaryHRef);
+                    $aLink.attr('target', '_blank');
+                    $diaryDd.append($aLink);
+                });
+
+            };
             const payOfDocument = (docId) => {
                 var timeout;
                 let idsToHandle = [];
