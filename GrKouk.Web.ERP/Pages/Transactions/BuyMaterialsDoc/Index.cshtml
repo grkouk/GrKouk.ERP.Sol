@@ -1083,6 +1083,7 @@
                     var diaryHRef = '/transactions/buymaterialsdoc/RunBuyDiary';
                     diaryHRef += `?diaryId=${item.value}`;
                     $aLink.attr('href', diaryHRef);
+                    $aLink.attr('target', '_blank');
                     $diaryDd.append($aLink);
                 });
 
