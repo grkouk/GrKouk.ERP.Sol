@@ -20,7 +20,7 @@
         <li class="nav-item">
             <a href="#" role="button" class="nav-link" id="CreateNew">Create New</a>
         </li>
- <li class="nav-item dropdown ">
+        <li class="nav-item dropdown ">
             <a class="btn btn-sm btn-outline-secondary dropdown-toggle" role="button" id="ddDiarys" data-bs-toggle="dropdown"
                aria-haspopup="true" aria-expanded="false">Ημερολόγια</a>
 
@@ -535,7 +535,8 @@
                 afterTableLoad: {
                  callback: function(valueSource) {
                         loadDiaries(valueSource.diaries);
-                    }}
+                    }
+                }
             };
 
             indPgLib.setIndexPageDefinition(indexPageDef);
@@ -1083,6 +1084,7 @@
                     var diaryHRef = '/transactions/buymaterialsdoc/RunBuyDiary';
                     diaryHRef += `?diaryId=${item.value}`;
                     $aLink.attr('href', diaryHRef);
+                    $aLink.attr('target', '_blank');
                     $diaryDd.append($aLink);
                 });
 

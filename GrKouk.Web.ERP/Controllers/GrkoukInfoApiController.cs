@@ -1044,6 +1044,13 @@ namespace GrKouk.Web.ERP.Controllers
             var grandSumOfAmountNew = t1.Sum(p => p.TotalAmount);
             var gransSumOfNetAmountNew = t1.Sum(p => p.TotalNetAmount);
             var grandSumOfPayedAmount = t1.Sum((p => p.PayedOfAmount));
+            var relevantDiarys = await _context.DiaryDefs.Where(p => p.DiaryType == DiaryTypeEnum.DiaryTypeEnumSales)
+                .Select(item => new SearchListItem()
+                {
+                    Value = item.Id,
+                    Text = item.Name
+                })
+               .ToListAsync();
             var pageIndex = request.PageIndex;
             var pageSize = request.PageSize;
             var listItems = await PagedList<SellDocList2Dto>.CreateAsync(t, pageIndex, pageSize);
@@ -1064,6 +1071,7 @@ namespace GrKouk.Web.ERP.Controllers
                 GrandSumOfAmount = grandSumOfAmountNew,
                 GrandSumOfNetAmount = gransSumOfNetAmountNew,
                 GrandSumOfPayedAmount = grandSumOfPayedAmount,
+                Diaries = relevantDiarys,
                 Data = listItems
             };
             return Ok(response);
@@ -4246,18 +4254,31 @@ namespace GrKouk.Web.ERP.Controllers
                     error = msg
                 });
             }
-
-            var section = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == sectionCode);
-            if (section == null)
+            //---------------------------------------
+            await _context.Entry(payoffSeries)
+               .Reference(t => t.TransTransactorDocTypeDef)
+               .LoadAsync();
+            int sectionId;
+            int paymentTypeDefaultSeriesId = payoffSeries.TransTransactorDocTypeDef == null ? 0 : payoffSeries.TransTransactorDocTypeDef.SectionId;
+            if (paymentTypeDefaultSeriesId > 0)
             {
-                string msg = "Section not found";
-                return BadRequest(new
-                {
-                    error = msg
-                });
+                sectionId = paymentTypeDefaultSeriesId;
             }
-
-            var sectionId = section.Id;
+            else
+            {
+                var section = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == sectionCode);
+                if (section == null)
+                {
+                    string msg = "Section not found";
+                    return BadRequest(new
+                    {
+                        error = msg
+                    });
+                }
+                sectionId = section.Id;
+            }
+            //---------------------------------------
+           
             var transactorId = doc.TransactorId;
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
                 .Take(10)
@@ -5006,47 +5027,52 @@ namespace GrKouk.Web.ERP.Controllers
                 }
             }
 
-          
+
             List<BuyDiaryLine> t1;
             if (request.ShowSummaryFilter)
             {
-               
+
                 try
                 {
                     var t2 = await transactionsList.ToListAsync();
                     t1 = t2.GroupBy(g => new
                     {
-                        g.TransactorId,
-                        g.TransactorName,
-                      
+
+
                         //g.DocId,
                         //g.TransDate ,
-                        g.DocSeriesId,
-                        g.DocSeriesName,
+                        g.CompanyId,
+                        g.CompanyCode,
                         g.DocSeriesCode,
+                        g.DocSeriesName,
+
                         // g.DocTypeId,
                         // g.RefCode,
-                       
-                       
+                        g.DocSeriesId,
+                        g.TransactorId,
+                        g.TransactorName,
+
                         g.ItemId,
                         g.ItemName,
                         //g.Id,
                         // g.SectionId,
                         //g.ItemNature
                     })
-                        .Select(s=> new BuyDiaryLine
+                        .Select(s => new BuyDiaryLine
                         {
-                           // Id=s.Key.Id,
-                            DocSeriesId=s.Key.DocSeriesId,
-                            DocSeriesCode=s.Key.DocSeriesCode,
-                            DocSeriesName=s.Key.DocSeriesName,
-                            TransactorId=s.Key.TransactorId,
-                            TransactorName=s.Key.TransactorName,
-                            ItemId=s.Key.ItemId,
-                            ItemName=s.Key.ItemName,
-                            AmountDiscount=s.Sum(p => p.AmountDiscount),
-                            AmountFpa=s.Sum(p=>p.AmountFpa),
-                            AmountNet=s.Sum(p=>p.AmountNet),
+                            // Id=s.Key.Id,
+                            DocSeriesId = s.Key.DocSeriesId,
+                            DocSeriesCode = s.Key.DocSeriesCode,
+                            DocSeriesName = s.Key.DocSeriesName,
+                            TransactorId = s.Key.TransactorId,
+                            TransactorName = s.Key.TransactorName,
+                            ItemId = s.Key.ItemId,
+                            ItemName = s.Key.ItemName,
+                            CompanyId = s.Key.CompanyId,
+                            CompanyCode = s.Key.CompanyCode,
+                            AmountDiscount = s.Sum(p => p.AmountDiscount),
+                            AmountFpa = s.Sum(p => p.AmountFpa),
+                            AmountNet = s.Sum(p => p.AmountNet),
                             TransDiscountAmount = s.Sum(p => p.TransDiscountAmount),
                             TransFpaAmount = s.Sum(p => p.TransFpaAmount),
                             TransNetAmount = s.Sum(p => p.TransNetAmount)
@@ -5072,7 +5098,7 @@ namespace GrKouk.Web.ERP.Controllers
             var pageSize = request.PageSize;
             var t3 = t1.AsQueryable();
             //var listItems = await PagedList<BuyDiaryLine>.CreateAsync(t, pageIndex, pageSize);
-            var listItems =  PagedList<BuyDiaryLine>.Create(t3, pageIndex, pageSize);
+            var listItems = PagedList<BuyDiaryLine>.Create(t3, pageIndex, pageSize);
             decimal sumAmountTotal = listItems.Sum(p => p.TotalAmount);
             decimal sumAmountTotalNet = listItems.Sum(p => p.TotalNetAmount);
 
