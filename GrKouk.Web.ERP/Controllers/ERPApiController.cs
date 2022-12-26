@@ -16,7 +16,7 @@ namespace GrKouk.Web.ERP.Controllers
 
         public ERPApiController(ApiDbContext context)
         {
-            this._context = context;
+            _context = context;
         }
         
     }
