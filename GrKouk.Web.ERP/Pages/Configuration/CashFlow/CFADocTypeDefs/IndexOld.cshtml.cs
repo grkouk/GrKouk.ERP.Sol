@@ -6,12 +6,14 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace GrKouk.Web.ERP.Pages.Configuration.CashFlow.CFADocTypeDefs
 {
     [Authorize(Roles = "Admin")]
-    public class IndexModel : PageModel
+    public class IndexModelOld : PageModel
     {
-        private readonly ApiDbContext _context;
-
-        public IndexModel(ApiDbContext context) => _context = context;
-
+      
+        public IndexModelOld(ApiDbContext context, IMapper mapper)
+        {
+           
+        }
+      
         public void OnGet()
         {
            
