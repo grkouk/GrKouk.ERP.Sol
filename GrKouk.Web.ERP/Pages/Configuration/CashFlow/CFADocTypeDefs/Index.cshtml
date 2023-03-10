@@ -6,7 +6,7 @@
     ViewData["Title"] = "CashFlow Doc Type Definitions";
 }
 @section MyCss
-{
+    {
     <link rel="stylesheet" href="~/css/custom-checkbox.css" />
     <link rel="stylesheet" href="~/css/searchbar.css" />
 }
@@ -17,20 +17,21 @@
             <a href="#" role="button" class="btn btn-sm btn-outline-secondary " id="CreateNew">Create New</a>
 
         </li>
-       
+
         <li class="nav-item">
-            <a class="btn btn-sm btn-outline-secondary" data-toggle="collapse" href="#filterCollapse" role="button" id="filtersToggle"
-               aria-expanded="false" aria-controls="filterCollapse">
+            <a class="btn btn-sm btn-outline-secondary" data-toggle="collapse" href="#filterCollapse" role="button"
+                id="filtersToggle" aria-expanded="false" aria-controls="filterCollapse">
             </a>
         </li>
         <li class="nav-item">
-            <a class="btn btn-sm btn-outline-secondary" data-toggle="collapse" href="#" id="rowSelectorsToggle" role="button">
+            <a class="btn btn-sm btn-outline-secondary" data-toggle="collapse" href="#" id="rowSelectorsToggle"
+                role="button">
 
             </a>
         </li>
         <li class="nav-item dropdown " id="SelectedRowsActionsMenu">
-            <a class="btn btn-sm btn-outline-secondary dropdown-toggle disabled" role="button" id="ddSelectedRowsActions" data-toggle="dropdown"
-               aria-haspopup="true" aria-expanded="false">Actions</a>
+            <a class="btn btn-sm btn-outline-secondary dropdown-toggle disabled" role="button"
+                id="ddSelectedRowsActions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</a>
             <div class="dropdown-menu small">
 
                 <a class="dropdown-item" href="#">Another action</a>
@@ -44,9 +45,9 @@
 </div>
 <div class="collapse show" id="filterCollapse">
     @await Component.InvokeAsync("IndexFilters",new IndexFiltersToShow {ShowDateFlt = false,ShowCurrencyFlt = false})
-  
+
     <div class="row mt-1">
-        <partial name="_PagerPartial"/>
+        <partial name="_PagerPartial" />
     </div>
 
 </div>
@@ -60,10 +61,10 @@
 
 
 @section Scripts {
-     <script src="~/js/definitions.js"></script>
+    <script src="~/js/definitions.js"></script>
     <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
             let baseCulture = '@System.Globalization.CultureInfo.CurrentCulture.';
             var formatterCurrency = new Intl.NumberFormat(currentCulture,
@@ -80,7 +81,7 @@
             //#region variables
             var $filtersToggle = $('#filtersToggle');
             var $deleteSelectedRowsLink = $('#deleteSelectedRows');
-           
+
             //#endregion
             //#region Index page definition objects
             const colDefs = [
@@ -122,7 +123,7 @@
                     remoteReference: {
                     }
                 },
-                
+
                 {
                     key: 'companyCode',
                     responseKey: 'companyCode',
@@ -170,7 +171,7 @@
                 }
             ];
             const actionColSubDefs = [
-                
+
             ];
             const actionMobileColDefs = [
                 {
@@ -215,10 +216,10 @@
                 }
             ];
             const tableHandlersToRegister = [
-                
+
             ];
             const pageHandlersToRegister = [
-               
+
             ];
             const indexPageDef = {
                 uri: '/api/GrKoukInfoApi/GetIndexTblDataCfaDocTypeDefs',
@@ -230,16 +231,16 @@
                 actionMobileColDefs: actionMobileColDefs,
                 tableHandlersToRegister: tableHandlersToRegister,
                 pageHandlersToRegister: pageHandlersToRegister,
-                indexPageType:definitionsLib.IndexPageTypeEnum.IndexPage,
+                indexPageType: definitionsLib.IndexPageTypeEnum.IndexPage,
                 afterTableLoad: {
-                   
+
                 }
             };
 
             indPgLib.setIndexPageDefinition(indexPageDef);
             //#endregion
 
-           
+
 
 
             var deleteSelectedRows = () => {
@@ -247,7 +248,7 @@
                 var selectedRows = $rowSelectors.filter(':checked');
                 var idsToDelete = [];
                 $.each(selectedRows,
-                    function(key, value) {
+                    function (key, value) {
                         console.log(value);
                         var id = parseInt(value.dataset.itemid);
                         idsToDelete.push(id);
@@ -267,45 +268,45 @@
                         type: 'POST',
                         data: idsJs,
                         url: "/api/GrkoukInfoApi/DeletelDodsdcumentsList",
-                        beforeSend: function() {
+                        beforeSend: function () {
                             if (timeout) {
                                 clearTimeout(timeout);
                             }
-                            timeout = setTimeout(function() {
+                            timeout = setTimeout(function () {
 
-                                    $("#loadMe").modal({
-                                        backdrop: "static", //remove ability to close modal with click
-                                        keyboard: false, //remove option to close with keyboard
-                                        show: true //Display loader!
-                                    });
-                                },
+                                $("#loadMe").modal({
+                                    backdrop: "static", //remove ability to close modal with click
+                                    keyboard: false, //remove option to close with keyboard
+                                    show: true //Display loader!
+                                });
+                            },
                                 1000);
 
                         },
-                        success: function(result) {
+                        success: function (result) {
                             console.log(result);
                             toastr.success("Delete", result.message);
                             refreshTableData();
 
                         },
-                        complete: function() {
+                        complete: function () {
                             if (timeout) {
                                 clearTimeout(timeout);
                             }
                             $("#loadMe").modal("hide");
-                            setTimeout(function() {
-                                    console.log('Checking for open modals');
-                                    var isOpen = $('#loadMe').hasClass('show');
-                                    if (isOpen) {
-                                        console.log('There is an open Modal');
-                                        $("#loadMe").modal("hide");
-                                    } else {
-                                        console.log('No open modal');
-                                    }
-                                },
+                            setTimeout(function () {
+                                console.log('Checking for open modals');
+                                var isOpen = $('#loadMe').hasClass('show');
+                                if (isOpen) {
+                                    console.log('There is an open Modal');
+                                    $("#loadMe").modal("hide");
+                                } else {
+                                    console.log('No open modal');
+                                }
+                            },
                                 2000);
                         },
-                        error: function(e) {
+                        error: function (e) {
                             console.log(e);
                             toastr.error("Error", e.responseJSON.error);
 
@@ -323,7 +324,7 @@
 
             var storageItemJs = localStorage.getItem('CFTypeDefsIndexView');
             if (storageItemJs === undefined || storageItemJs === null) {
-                $('#pageIndex').val(1);
+                $('#pageIndex').val(20);
                 $('#filtersVisible').val(true);
                 $('#rowSelectorsVisible').val(true);
                 // $rowSelectorsToggle.text('Hide Row Selectors');
@@ -354,18 +355,18 @@
                 filtersValue = storageItem.find(x => x.filterKey === 'transactorTypeFilter').filterValue;
                 $('#TransactorTypeFilter').val(filtersValue);
             }
-           
+
             indPgLib.addPagerElementEventListeners();
             indPgLib.registerPageHandlers();
-           
+
             indPgLib.handleFiltersUi();
-           
+
             indPgLib.refreshData();
             indPgLib.rowSelectorsUi();
         });
 
         $(window).on('beforeunload',
-            function(e) {
+            function (e) {
                 //#region CommentOut
                 //#region Variables
                 var filtersVisible = $('#filterCollapse').hasClass('show');

@@ -1083,6 +1083,7 @@ var indPgLib = (function () {
         var storageItemJs = localStorage.getItem(localStorageKey);
         if (storageItemJs === undefined || storageItemJs === null) {
             $pageIndex.val(1);
+            $pageSize.val(20);
             $("#filtersVisible").val(true);
             $("#rowSelectorsVisible").val(true);
             // $rowSelectorsToggle.text('Hide Row Selectors');
