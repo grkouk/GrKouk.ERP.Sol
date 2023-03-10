@@ -4,12 +4,12 @@
     <TargetFramework>net7.0</TargetFramework>
     <UserSecretsId>aspnet-GrKouk.Web.ERP-9809E9E6-BFCC-497C-AA52-99A71FFC0427</UserSecretsId>
     <Authors>George Koukoudis</Authors>
-    <Company>GrKouk</Company>
+    <Company>GrKoukOrg</Company>
     <Copyright>George Koukoudis</Copyright>
-    <Version>1.0.0.1</Version>
-    <PackageVersion>1.0.0.1</PackageVersion>
-    <AssemblyVersion>1.0.0.1</AssemblyVersion>
-    <FileVersion>1.0.0.1</FileVersion>
+    <Version>1.0.0.2</Version>
+    <PackageVersion>1.0.0.2</PackageVersion>
+    <AssemblyVersion>1.0.0.2</AssemblyVersion>
+    <FileVersion>1.0.0.2</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
