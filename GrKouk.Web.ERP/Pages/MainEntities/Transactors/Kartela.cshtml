@@ -5,17 +5,17 @@
     ViewData["Title"] = "Καρτέλα" + @Model.TransactorName;
 }
 @section MyCss
-{
+    {
     <link rel="stylesheet" href="~/css/custom-checkbox.css" />
     <link rel="stylesheet" href="~/css/searchbar.css" />
 }
-<h4>Καρτέλα  @Model.TransactorName</h4>
+<h4>Καρτέλα @Model.TransactorName</h4>
 <div class="container ">
     <ul class="nav small justify-content-end ">
 
         <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#filterCollapse" role="button" id="filtersToggle"
-               aria-expanded="false" aria-controls="filterCollapse">
+                aria-expanded="false" aria-controls="filterCollapse">
             </a>
         </li>
         <li class="nav-item">
@@ -25,7 +25,7 @@
         </li>
         <li class="nav-item dropdown " id="SelectedRowsActionsMenu">
             <a class="nav-link dropdown-toggle disabled" role="button" id="ddSelectedRowsActions" data-toggle="dropdown"
-               aria-haspopup="true" aria-expanded="false">Actions</a>
+                aria-haspopup="true" aria-expanded="false">Actions</a>
             <div class="dropdown-menu small">
 
                 <a class="dropdown-item" href="#">Another action</a>
@@ -38,7 +38,8 @@
     </ul>
 </div>
 <input type="hidden" asp-for="TransactorId" />
-@await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowDateFlt = true ,ShowDisplayCarryOnLineFlt = true})
+@await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowDateFlt = true ,ShowDisplayCarryOnLineFlt =
+true})
 
 
 <div class="row mt-1">
@@ -55,12 +56,12 @@
 
 
 @section Scripts
-{
+    {
     <script src="~/js/moment.min.js"></script>
     <script src="~/js/definitions.js"></script>
     <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
-          $(document).ready(function() {
+        $(document).ready(function () {
             var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
             var formatterCurrency = new Intl.NumberFormat(currentCulture,
                 {
@@ -77,7 +78,7 @@
 
             var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
             //#endregion
-             //#region Index page definition objects
+            //#region Index page definition objects
             const colDefs = [
                 {
                     key: 'transDate',
@@ -214,91 +215,91 @@
                 }
             ];
             const actionColDefs = [
-               {
-                   actionType: 'defaultAction2',
-                   visibility: 'always',
-                   target: '_blank',
-                   condition: {},
-                   text: 'Edit Prototype',
+                {
+                    actionType: 'defaultAction2',
+                    visibility: 'always',
+                    target: '_blank',
+                    condition: {},
+                    text: 'Edit Prototype',
 
-                   dataAttributes: [
-                       {
-                           key: 'docid',
-                           valueKey: 'docid'
-                       }
-                   ],
-                   icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
-                   uriType: 'funcHref', //funcUrl staticHref, staticUrl
-                   urlKeys: [
-                       { key: 'id', valueKey: 'id' }
-                   ],
-                   uriFunc: function(col, valueSource) {
-                      let retUri = '';
-                     if (valueSource.creatorSectionId > 0 ) {
-                         switch (valueSource.creatorSectionCode) {
-                             case "SCNSELLCOMBINED":
-                                 retUri = `/transactions/sellmaterialdoc/Edit?id=${valueSource["creatorId"]}`;
-                                 break;
-                             case "SCNBUYMATTRANS":
-                                 retUri = `/transactions/buymaterialsdoc/Details?id=${valueSource["creatorId"]}`;
-                                 break;
-                         default:
-                         }
+                    dataAttributes: [
+                        {
+                            key: 'docid',
+                            valueKey: 'docid'
+                        }
+                    ],
+                    icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
+                    uriType: 'funcHref', //funcUrl staticHref, staticUrl
+                    urlKeys: [
+                        { key: 'id', valueKey: 'id' }
+                    ],
+                    uriFunc: function (col, valueSource) {
+                        let retUri = '';
+                        if (valueSource.creatorSectionId > 0) {
+                            switch (valueSource.creatorSectionCode) {
+                                case "SCNSELLCOMBINED":
+                                    retUri = `/transactions/sellmaterialdoc/Edit?id=${valueSource["creatorId"]}`;
+                                    break;
+                                case "SCNBUYMATTRANS":
+                                    retUri = `/transactions/buymaterialsdoc/Details?id=${valueSource["creatorId"]}`;
+                                    break;
+                                default:
+                            }
 
-                     } else {
+                        } else {
 
-                         var itemId = valueSource["id"];
-                         retUri = `/transactions/transactortransmng/Details?id=${itemId}`;
-                     }
-                     return retUri;
-                   },
-                   uri: ''
-               }
+                            var itemId = valueSource["id"];
+                            retUri = `/transactions/transactortransmng/Details?id=${itemId}`;
+                        }
+                        return retUri;
+                    },
+                    uri: ''
+                }
             ];
             const actionColSubDefs = [
 
             ];
             const actionMobileColDefs = [
-               {
-                   actionType: 'defaultAction2',
-                   visibility: 'always',
-                   target: '_blank',
-                   condition: {},
-                   text: 'Edit Prototype',
+                {
+                    actionType: 'defaultAction2',
+                    visibility: 'always',
+                    target: '_blank',
+                    condition: {},
+                    text: 'Edit Prototype',
 
-                   dataAttributes: [
-                       {
-                           key: 'docid',
-                           valueKey: 'docid'
-                       }
-                   ],
-                   icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
-                   uriType: 'funcHref', //funcUrl staticHref, staticUrl
-                   urlKeys: [
-                       { key: 'id', valueKey: 'id' }
-                   ],
-                   uriFunc: function(col, valueSource) {
-                       let retUri = '';
-                       if (valueSource.creatorSectionId > 0 ) {
-                           switch (valueSource.creatorSectionCode) {
-                               case "SCNSELLCOMBINED":
-                                   retUri = `/transactions/sellmaterialdoc/Edit?id=${valueSource["creatorId"]}`;
-                                   break;
-                               case "SCNBUYMATTRANS":
-                                   retUri = `/transactions/buymaterialsdoc/Edit?id=${valueSource["creatorId"]}`;
-                                   break;
-                           default:
-                           }
+                    dataAttributes: [
+                        {
+                            key: 'docid',
+                            valueKey: 'docid'
+                        }
+                    ],
+                    icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
+                    uriType: 'funcHref', //funcUrl staticHref, staticUrl
+                    urlKeys: [
+                        { key: 'id', valueKey: 'id' }
+                    ],
+                    uriFunc: function (col, valueSource) {
+                        let retUri = '';
+                        if (valueSource.creatorSectionId > 0) {
+                            switch (valueSource.creatorSectionCode) {
+                                case "SCNSELLCOMBINED":
+                                    retUri = `/transactions/sellmaterialdoc/Edit?id=${valueSource["creatorId"]}`;
+                                    break;
+                                case "SCNBUYMATTRANS":
+                                    retUri = `/transactions/buymaterialsdoc/Edit?id=${valueSource["creatorId"]}`;
+                                    break;
+                                default:
+                            }
 
-                       } else {
+                        } else {
 
-                           var itemId = valueSource["id"];
-                           retUri = `/transactions/transactortransmng/Edit?id=${itemId}`;
-                       }
-                       return retUri;
-                   },
-                   uri: ''
-               }
+                            var itemId = valueSource["id"];
+                            retUri = `/transactions/transactortransmng/Edit?id=${itemId}`;
+                        }
+                        return retUri;
+                    },
+                    uri: ''
+                }
             ];
             const tableHandlersToRegister = [
 
@@ -307,19 +308,19 @@
                 {
                     selector: '#CurrencySelector',
                     event: 'change',
-                    handler: function(event) {
+                    handler: function (event) {
                         currencyChanged();
                         indPgLib.refreshData();
                     }
                 },
                 {
-                                    selector: '#ShowCarryOnFlt',
-                                    event: 'change',
-                                    handler: function(event) {
-                                        
-                                        indPgLib.refreshData();
-                                    }
-                                }
+                    selector: '#ShowCarryOnFlt',
+                    event: 'change',
+                    handler: function (event) {
+
+                        indPgLib.refreshData();
+                    }
+                }
             ];
             const indexPageDef = {
                 uri: '/api/GrKoukInfoApi/GetIndexTblDataTransactorAccountTab',
@@ -362,15 +363,16 @@
             var storageItemJs = localStorage.getItem('TransactorAccountTab');
             if (storageItemJs === undefined || storageItemJs === null) {
                 $('#pageIndex').val(1);
+                $('#PageSize').val(10);
                 $('#filtersVisible').val(true);
-                $('#rowSelectorsVisible').val(true);
+                $('#rowSelectorsVisible').val(false);
 
                 $('#DatePeriodFilter').val('CURYEAR');
                 $('#CompanyFilter').val(0);
                 $('#TransactorTypeFilter').val(1);
                 $('#WarehouseItemNatureFilter').val(1);
                 $('#currentSort').val('datesort:asc');
-                 $('#ShowCarryOnFlt').val(true);
+                $('#ShowCarryOnFlt').val(true);
             } else {
                 var storageItem = JSON.parse(storageItemJs);
                 var filtersValue = storageItem.find(x => x.filterKey === 'filtersVisible').filterValue;
@@ -398,7 +400,7 @@
                 } catch (e) {
 
                 }
-                 try {
+                try {
                     filtersValue = storageItem.find(x => x.filterKey === 'ShowCarryOnFlt').filterValue;
                     $('#ShowCarryOnFlt').prop('checked', filtersValue);
                 } catch (e) {
@@ -416,75 +418,75 @@
             indPgLib.rowSelectorsUi();
         });
 
-        $(window).on('beforeunload',function(e) {
-                //#region CommentOut
-                //#region Variables
-                var filtersVisible = $('#filterCollapse').hasClass('show');
-                var $rowSelectorsColumn = $('th[name=selectAllRowsColumn]');
+        $(window).on('beforeunload', function (e) {
+            //#region CommentOut
+            //#region Variables
+            var filtersVisible = $('#filterCollapse').hasClass('show');
+            var $rowSelectorsColumn = $('th[name=selectAllRowsColumn]');
 
-                var rowSelectorsNotVisible = $rowSelectorsColumn.is(':hidden');
-                var rowSelectorsVisible = (rowSelectorsNotVisible) ? false : true;
+            var rowSelectorsNotVisible = $rowSelectorsColumn.is(':hidden');
+            var rowSelectorsVisible = (rowSelectorsNotVisible) ? false : true;
 
-                var pageSize = $('#PageSize').val();
-                var dateRange = $('#DatePeriodFilter').val();
-                var currentSort = $('#currentSort').val();
-                var companyFilter = $('#CompanyFilter').val();
-                var pageIndex = $('#pageIndex').val();
-                var transactorTypeFilter = $('#TransactorTypeFilter').val();
-                var warehouseItemNatureFilter = $('#WarehouseItemNatureFilter').val();
-                var currentCurrency = $('#CurrencySelector').val();
-                var showCarryOnFlt = $('#ShowCarryOnFlt').is(':checked')
-                var filtersArr = [];
-                //#endregion
-                filtersArr.push({
-                    filterKey: 'filtersVisible',
-                    filterValue: filtersVisible
-                });
-                filtersArr.push({
-                    filterKey: 'rowSelectorsVisible',
-                    filterValue: rowSelectorsVisible
-                });
-                filtersArr.push({
-                    filterKey: 'pageIndex',
-                    filterValue: pageIndex
-                });
-                filtersArr.push({
-                    filterKey: 'pageSize',
-                    filterValue: pageSize
-                });
-                filtersArr.push({
-                    filterKey: 'dateRangeFilter',
-                    filterValue: dateRange
-                });
-                filtersArr.push({
-                    filterKey: 'currentSort',
-                    filterValue: currentSort
-                });
-                filtersArr.push({
-                    filterKey: 'companyFilter',
-                    filterValue: companyFilter
-                });
-                filtersArr.push({
-                    filterKey: 'transactorTypeFilter',
-                    filterValue: transactorTypeFilter
-                });
-                filtersArr.push({
-                    filterKey: 'warehouseItemNatureFilter',
-                    filterValue: warehouseItemNatureFilter
-                });
-                filtersArr.push({
-                    filterKey: 'currentCurrency',
-                    filterValue: currentCurrency
-                });
-                filtersArr.push({
-                    filterKey: 'ShowCarryOnFlt',
-                    filterValue: showCarryOnFlt
-                });
-                var sessionVal = JSON.stringify(filtersArr);
-
-                localStorage.setItem('TransactorAccountTab', sessionVal);
-                //#endregion
-
+            var pageSize = $('#PageSize').val();
+            var dateRange = $('#DatePeriodFilter').val();
+            var currentSort = $('#currentSort').val();
+            var companyFilter = $('#CompanyFilter').val();
+            var pageIndex = $('#pageIndex').val();
+            var transactorTypeFilter = $('#TransactorTypeFilter').val();
+            var warehouseItemNatureFilter = $('#WarehouseItemNatureFilter').val();
+            var currentCurrency = $('#CurrencySelector').val();
+            var showCarryOnFlt = $('#ShowCarryOnFlt').is(':checked')
+            var filtersArr = [];
+            //#endregion
+            filtersArr.push({
+                filterKey: 'filtersVisible',
+                filterValue: filtersVisible
             });
+            filtersArr.push({
+                filterKey: 'rowSelectorsVisible',
+                filterValue: rowSelectorsVisible
+            });
+            filtersArr.push({
+                filterKey: 'pageIndex',
+                filterValue: pageIndex
+            });
+            filtersArr.push({
+                filterKey: 'pageSize',
+                filterValue: pageSize
+            });
+            filtersArr.push({
+                filterKey: 'dateRangeFilter',
+                filterValue: dateRange
+            });
+            filtersArr.push({
+                filterKey: 'currentSort',
+                filterValue: currentSort
+            });
+            filtersArr.push({
+                filterKey: 'companyFilter',
+                filterValue: companyFilter
+            });
+            filtersArr.push({
+                filterKey: 'transactorTypeFilter',
+                filterValue: transactorTypeFilter
+            });
+            filtersArr.push({
+                filterKey: 'warehouseItemNatureFilter',
+                filterValue: warehouseItemNatureFilter
+            });
+            filtersArr.push({
+                filterKey: 'currentCurrency',
+                filterValue: currentCurrency
+            });
+            filtersArr.push({
+                filterKey: 'ShowCarryOnFlt',
+                filterValue: showCarryOnFlt
+            });
+            var sessionVal = JSON.stringify(filtersArr);
+
+            localStorage.setItem('TransactorAccountTab', sessionVal);
+            //#endregion
+
+        });
     </script>
 }

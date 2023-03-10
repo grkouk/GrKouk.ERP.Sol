@@ -333,7 +333,8 @@
 
             var storageItemJs = localStorage.getItem('CFTransactionDefsIndexView');
             if (storageItemJs === undefined || storageItemJs === null) {
-                $('#pageIndex').val(20);
+                $('#pageIndex').val(1);
+                $('#PageSize').val(10);
                 $('#filtersVisible').val(true);
                 $('#rowSelectorsVisible').val(false);
                 // $rowSelectorsToggle.text('Hide Row Selectors');
