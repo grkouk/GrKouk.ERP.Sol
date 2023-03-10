@@ -1085,7 +1085,7 @@ var indPgLib = (function () {
             $pageIndex.val(1);
             $pageSize.val(20);
             $("#filtersVisible").val(true);
-            $("#rowSelectorsVisible").val(true);
+            $("#rowSelectorsVisible").val(false);
             // $rowSelectorsToggle.text('Hide Row Selectors');
             // $filtersToggle.text('Hide Filters');
             $datePeriodFilter.val("CURMONTH");
