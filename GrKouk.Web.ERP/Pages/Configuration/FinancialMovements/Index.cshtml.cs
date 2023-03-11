@@ -1,26 +1,24 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using GrKouk.Erp.Domain.DocDefinitions;
+﻿using AutoMapper;
 using GrKouk.Web.ERP.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 
-namespace GrKouk.Web.Erp.Pages.Configuration.FinancialMovements
+namespace GrKouk.Web.ERP.Pages.Configuration.FinancialMovements
 {
+    [Authorize(Roles = "Admin")]
     public class IndexModel : PageModel
     {
-        private readonly ApiDbContext _context;
 
-        public IndexModel(ApiDbContext context)
+        public IndexModel()
         {
-            _context = context;
         }
 
-        public IList<FinancialMovement> FinancialMovement { get;set; }
-
-        public async Task OnGetAsync()
+        public void OnGet()
         {
-            FinancialMovement = await _context.FinancialMovements.ToListAsync();
+
+
         }
+
+
     }
 }

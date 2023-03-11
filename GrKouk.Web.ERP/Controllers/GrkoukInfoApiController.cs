@@ -32,6 +32,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using GrKouk.Erp.Dtos.CashFlowTransactions;
+using GrKouk.Erp.Dtos.FinancialMovements;
 
 //using Remotion.Linq.Parsing.Structure.IntermediateModel;
 
@@ -3439,6 +3440,111 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
+        [HttpGet("GetIndexTblDataFinancialMovementDefs")]
+        public async Task<IActionResult> GetIndexTblDataFinancialMovementDefs([FromQuery] IndexDataTableRequest request)
+        {
+            IQueryable<FinMovementListDto> fullListIq = _context.FinancialMovements.Select(p => new FinMovementListDto()
+            {
+                Id = p.Id,
+                Code = p.Code,
+                Name = p.Name
+            });
+
+            if (!string.IsNullOrEmpty(request.SortData))
+            {
+                switch (request.SortData.ToLower())
+                {
+                    case "namesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.Name);
+                        break;
+                    case "namesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.Name);
+                        break;
+                    case "codesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.Code);
+                        break;
+                    case "codesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.Code);
+                        break;
+
+                        // case "companycodesort:asc":
+                        //     fullListIq = fullListIq.OrderBy(p => p.Company.Code);
+                        //     break;
+                        // case "companycodesort:desc":
+                        //     fullListIq = fullListIq.OrderByDescending(p => p.Company.Code);
+                        //     break;
+                }
+            }
+
+            // if (!string.IsNullOrEmpty(request.CompanyFilter))
+            // {
+            //     if (int.TryParse(request.CompanyFilter, out var companyId))
+            //     {
+            //         if (companyId > 0)
+            //         {
+            //             var allCompCode =
+            //                 await _context.AppSettings.SingleOrDefaultAsync(
+            //                     p => p.Code == Constants.AllCompaniesCodeKey);
+            //             if (allCompCode == null)
+            //             {
+            //                 return NotFound("All Companies Code Setting not found");
+            //             }
+
+            //             var allCompaniesEntity =
+            //                 await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+            //             if (allCompaniesEntity != null)
+            //             {
+            //                 var allCompaniesId = allCompaniesEntity.Id;
+            //                 fullListIq =
+            //                     fullListIq.Where(p => p.CompanyId == companyId || p.CompanyId == allCompaniesId);
+            //             }
+            //             else
+            //             {
+            //                 fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
+            //             }
+            //         }
+            //     }
+            // }
+
+            if (!string.IsNullOrEmpty(request.SearchFilter))
+            {
+                fullListIq = fullListIq.Where(p => p.Name.Contains(request.SearchFilter)
+                                                   || p.Code.Contains(request.SearchFilter)
+                                                  );
+            }
+
+            PagedList<FinMovementListDto> listItems;
+            try
+            {
+                //var projectedList = fullListIq.ProjectTo<CfaDocTypeDefListDto>(_mapper.ConfigurationProvider);
+                var pageIndex = request.PageIndex;
+
+                var pageSize = request.PageSize;
+
+                listItems = await PagedList<FinMovementListDto>.CreateAsync(fullListIq, pageIndex, pageSize);
+            }
+            catch (Exception e)
+            {
+                string msg = e.InnerException?.Message;
+                return BadRequest(new
+                {
+                    error = e.Message + " " + msg
+                });
+            }
+
+
+
+            var response = new IndexDataTableResponse<FinMovementListDto>
+            {
+                TotalRecords = listItems.TotalCount,
+                TotalPages = listItems.TotalPages,
+                HasPrevious = listItems.HasPrevious,
+                HasNext = listItems.HasNext,
+                // Diaries = relevantDiarys,
+                Data = listItems
+            };
+            return Ok(response);
+        }
         [HttpGet("GetIndexTblDataCfaTransactionDefs")]
         public async Task<IActionResult> GetIndexTblDataCfaTransactionDefs([FromQuery] IndexDataTableRequest request)
         {
@@ -4278,7 +4384,7 @@ namespace GrKouk.Web.ERP.Controllers
                 sectionId = section.Id;
             }
             //---------------------------------------
-           
+
             var transactorId = doc.TransactorId;
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
                 .Take(10)
