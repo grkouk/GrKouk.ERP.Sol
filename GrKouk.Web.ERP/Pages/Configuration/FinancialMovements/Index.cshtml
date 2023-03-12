@@ -44,7 +44,8 @@
     </ul>
 </div>
 <div class="collapse show" id="filterCollapse">
-    @await Component.InvokeAsync("IndexFilters",new IndexFiltersToShow {ShowDateFlt = false,ShowCurrencyFlt = false})
+    @await Component.InvokeAsync("IndexFilters",new IndexFiltersToShow {ShowDateFlt = false,ShowCompaniesFlt =false,
+    ShowCurrencyFlt = false})
 
     <div class="row mt-1">
         <partial name="_PagerPartial" />
@@ -124,7 +125,7 @@
                     }
                 }
 
-                
+
             ];
             const actionColDefs = [
                 {
