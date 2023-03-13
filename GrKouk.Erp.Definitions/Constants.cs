@@ -11,6 +11,7 @@
         public const string MainInfoPageSumOfServiceSales = "SumOfServiceSalesDf";
         public const string MainInfoPageSumOfIncomeSales = "SumOfIncomeSalesDf";
         public const string MainInfoPageSumOfFixedAssetSales = "SumOfFixedAstSalesDf";
+        //--------------------------------------------------------------------------------------------------------------
         public const string SectionWarehouseTransactions = "SYS-WAREHOUSE-TRANS";
         public const string SectionSupplierTransactions = "SYS-SUPPLIER-TRANS";
         public const string SectionBuyMaterials = "SYS-BUY-MATERIALS-SCN";
