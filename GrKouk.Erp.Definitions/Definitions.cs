@@ -6,9 +6,9 @@ namespace GrKouk.Erp.Definitions
     public enum RecurringDocTypeEnum
     {
         [Description("Buy Type")]
-        BuyType =1,
+        BuyType = 1,
         [Description("Sell Type")]
-        SellType =2
+        SellType = 2
     }
     public enum DiaryTransactionsKindEnum
     {
@@ -35,7 +35,15 @@ namespace GrKouk.Erp.Definitions
         [Description("Πάγιο")]
         WarehouseItemNatureFixedAsset = 5,
         [Description("Πρώτη Υλη")]
-        WarehouseItemNatureRawMaterial = 6
+        WarehouseItemNatureRawMaterial = 6,
+        [Description("Commodity")]
+        WarehouseItemNatureCommodity = 10,
+        [Description("Stock")]
+        WarehouseItemNatureStock = 9,
+        [Description("Bond")]
+        WarehouseItemNatureBond = 11,
+        [Description("Currency")]
+        WarehouseItemNatureCurrency = 12
     }
     public enum MaterialTypeEnum
     {
@@ -257,5 +265,5 @@ namespace GrKouk.Erp.Definitions
         [Description("Season 2020")]
         ProdCodeSeason2020 = 20
     }
-    
+
 }

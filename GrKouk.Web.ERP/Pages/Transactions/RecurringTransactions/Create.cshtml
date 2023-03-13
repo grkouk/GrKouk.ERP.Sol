@@ -234,37 +234,37 @@
             </table>
         </div>
         <div class="row mb-3">
-            <div class="form-group col-sm-3">
+            <div class="col-sm-3">
                 <label class=" small">Net Amount</label>
                 <input id="ItemVm_AmountNet" class="form-control form-control-sm small text-right" type="text" disabled/>
                 <span asp-validation-for="ItemVm.AmountNet" class="text-danger small"></span>
             </div>
-            <div class="form-group col-sm-3">
+            <div class="col-sm-3">
                 <label class=" small">Discount</label>
                 <input id="ItemVm_AmountDiscount" class="form-control form-control-sm small text-right" type="text" disabled/>
                 <span asp-validation-for="ItemVm.AmountDiscount" class="text-danger small"></span>
             </div>
-            <div class="form-group col-sm-3">
+            <div class="col-sm-3">
                 <label class="small">Amount VAT</label>
                 <input id="ItemVm_AmountFpa" class="form-control form-control-sm small text-right" type="text" disabled/>
                 <span asp-validation-for="ItemVm.AmountFpa" class="text-danger small"></span>
             </div>
 
 
-            <div class="form-group col-sm-3">
+            <div class="col-sm-3">
                 <label class=" small">Sum</label>
                 <input id="DocumentSum" type="text" class="form-control form-control-sm small text-right" disabled/>
 
             </div>
         </div>
         <div class="row mb-3">
-            <div class="form-group col-md-12">
+            <div class="col-md-12">
                 <label asp-for="ItemVm.Etiology" class="control-label small"></label>
                 <textarea asp-for="ItemVm.Etiology" class="form-control form-control-sm small"></textarea>
                 <span asp-validation-for="ItemVm.Etiology" class="text-danger small"></span>
             </div>
         </div>
-        <div class="form-group">
+        <div>
             <input type="submit" value="Create" class="btn btn-primary btn-sm" id="saveForm"/>
         </div>
 </fieldset>
