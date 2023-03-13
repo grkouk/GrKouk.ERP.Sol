@@ -18,11 +18,11 @@ namespace GrKouk.Erp.Domain.Shared
         [Display(Name = "Base Currency")]
         public int CurrencyId { get; set; }
         public Currency Currency { get; set; }
-        
+
         private ICollection<TransactorCompanyMapping> _transactorCompanyMappings;
         public ICollection<TransactorCompanyMapping> TransactorCompanyMappings
         {
-            get => _transactorCompanyMappings ?? (_transactorCompanyMappings = new List<TransactorCompanyMapping>());
+            get => _transactorCompanyMappings ??= new List<TransactorCompanyMapping>();
             set => _transactorCompanyMappings = value;
         }
 
@@ -30,7 +30,7 @@ namespace GrKouk.Erp.Domain.Shared
 
         public ICollection<CompanyWarehouseItemMapping> WarehouseItemCompanyMappings
         {
-            get => _warehouseItemCompanyMappings ?? (_warehouseItemCompanyMappings = new List<CompanyWarehouseItemMapping>());
+            get => _warehouseItemCompanyMappings ??= new List<CompanyWarehouseItemMapping>();
             set => _warehouseItemCompanyMappings = value;
         }
 
@@ -38,7 +38,7 @@ namespace GrKouk.Erp.Domain.Shared
 
         public ICollection<CashFlowAccountCompanyMapping> CashFlowAccountCompanyMappings
         {
-            get => _cashFlowAccountCompanyMappings ?? (_cashFlowAccountCompanyMappings = new List<CashFlowAccountCompanyMapping>());
+            get => _cashFlowAccountCompanyMappings ??= new List<CashFlowAccountCompanyMapping>();
             set => _cashFlowAccountCompanyMappings = value;
         }
     }

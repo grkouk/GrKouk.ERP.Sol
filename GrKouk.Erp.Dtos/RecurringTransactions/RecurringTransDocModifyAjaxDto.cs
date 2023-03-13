@@ -33,13 +33,13 @@ namespace GrKouk.Erp.Dtos.RecurringTransactions
         [Required]
         public int CompanyId { get; set; }
         public int PaymentMethodId { get; set; }
-      
+
         [Timestamp]
         public byte[] Timestamp { get; set; }
 
         public virtual IList<RecurringTransDocLineAjaxDto> BuyDocLines
         {
-            get { return _buyDocLines ?? (_buyDocLines = new List<RecurringTransDocLineAjaxDto>()); }
+            get { return _buyDocLines ??= new List<RecurringTransDocLineAjaxDto>(); }
             set { _buyDocLines = value; }
         }
     }

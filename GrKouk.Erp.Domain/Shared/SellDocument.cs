@@ -60,12 +60,12 @@ namespace GrKouk.Erp.Domain.Shared
         public byte[] Timestamp { get; set; }
         public virtual ICollection<SellDocLine> SellDocLines
         {
-            get => _sellDocLines ?? (_sellDocLines = new List<SellDocLine>());
+            get => _sellDocLines ??= new List<SellDocLine>();
             set => _sellDocLines = value;
         }
         public virtual ICollection<SellDocTransPaymentMapping> PaymentMappings
         {
-            get => _paymentMappings ?? (_paymentMappings = new List<SellDocTransPaymentMapping>());
+            get => _paymentMappings ??= new List<SellDocTransPaymentMapping>();
             set => _paymentMappings = value;
         }
     }

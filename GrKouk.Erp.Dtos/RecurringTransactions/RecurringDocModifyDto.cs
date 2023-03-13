@@ -59,7 +59,7 @@ namespace GrKouk.Erp.Dtos.RecurringTransactions
 
         public virtual ICollection<RecurringDocLineModifyDto> BuyDocLines
         {
-            get { return _buyDocLines ?? (_buyDocLines = new List<RecurringDocLineModifyDto>()); }
+            get { return _buyDocLines ??= new List<RecurringDocLineModifyDto>(); }
             set { _buyDocLines = value; }
         }
     }

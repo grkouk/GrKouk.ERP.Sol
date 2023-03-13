@@ -23,7 +23,7 @@ namespace GrKouk.Erp.Domain.CashFlow
         private ICollection<CashFlowAccountCompanyMapping> _companyMappings;
         public ICollection<CashFlowAccountCompanyMapping> CompanyMappings
         {
-            get => _companyMappings ?? (_companyMappings = new List<CashFlowAccountCompanyMapping>());
+            get => _companyMappings ??= new List<CashFlowAccountCompanyMapping>();
             set => _companyMappings = value;
         }
     }

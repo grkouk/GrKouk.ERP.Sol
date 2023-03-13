@@ -10,7 +10,7 @@ namespace GrKouk.Erp.Dtos.BuyDocuments
 
         public int Id { get; set; }
         [Display(Name = "Trans Date")]
-        [DataType(DataType.Date)] 
+        [DataType(DataType.Date)]
         public DateTime TransDate { get; set; }
         [Display(Name = "Ref Code")]
         public string TransRefCode { get; set; }
@@ -31,18 +31,18 @@ namespace GrKouk.Erp.Dtos.BuyDocuments
         public int BuyDocTypeId { get; set; }
         public string BuyDocTypeCode { get; set; }
         public string BuyDocTypeName { get; set; }
-        [Display(Name = "Vat Amount")] 
+        [Display(Name = "Vat Amount")]
         public decimal AmountFpa { get; set; }
-        [Display(Name = "Net Amount")] 
+        [Display(Name = "Net Amount")]
         public decimal AmountNet { get; set; }
-        [Display(Name = "Discount Amount")] 
+        [Display(Name = "Discount Amount")]
         public decimal AmountDiscount { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:C}")]
         [Display(Name = "Sum Amount")]
         public decimal AmountSum => (AmountNet + AmountFpa - AmountDiscount);
 
-        [MaxLength(500)] 
+        [MaxLength(500)]
         public string Etiology { get; set; }
         [Display(Name = "Company")]
         public int CompanyId { get; set; }
@@ -54,9 +54,8 @@ namespace GrKouk.Erp.Dtos.BuyDocuments
 
         public virtual ICollection<BuyDocLineModifyDto> BuyDocLines
         {
-            get { return _buyDocLines ?? (_buyDocLines = new List<BuyDocLineModifyDto>()); }
+            get { return _buyDocLines ??= new List<BuyDocLineModifyDto>(); }
             set { _buyDocLines = value; }
         }
     }
 }
-    
