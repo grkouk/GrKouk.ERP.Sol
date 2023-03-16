@@ -129,7 +129,19 @@ namespace GrKouk.Erp.Definitions
         [Description("Αρνητική Πίστωση")]
         FinActionsEnumNegativeCredit = 4
     }
-
+    public enum InvestmentActionsEnum
+    {
+        [Description("Καμία Μεταβολή")]
+        InvActionNoChange = 0,
+        [Description("Αγορά")]
+        InvActionBuy = 1,
+        [Description("Πώληση")]
+        InvActionSell = 2,
+        [Description("Αρνητική Αγορά")]
+        InvActionNegativeBuy = 3,
+        [Description("Αρνητική Πώληση")]
+        InvActionNegativeSell = 4
+    }
     public enum CashFlowAccountActionsEnum
     {
         [Description("Καμία Μεταβολή")]
