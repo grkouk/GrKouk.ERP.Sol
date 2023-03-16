@@ -19,10 +19,15 @@ namespace GrKouk.Erp.Domain.Investment
         [Display(Name = "Κίν.Χρημ.Λογ.")]
         public int CashFlowTransactionDefId { get; set; }
         public CashFlowTransactionDef CashFlowTransactionDefinition { get; set; }
-
+        public int InvestmentTransactionDefId { get; set; }
+        public InvestmentTransactionDef InvestmentTransactionDefinition { get; set; }
         public int CompanyId { get; set; }
         public virtual Company Company { get; set; }
         [Display(Name = "Default Section")]
         public int SectionId { get; set; }
     }
+
+    //TODO: This about how to design this class
+    // Like BuyDoctyoeDef or like CFadoctypeDef
+
 }

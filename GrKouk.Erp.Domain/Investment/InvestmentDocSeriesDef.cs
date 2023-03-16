@@ -17,7 +17,7 @@ namespace GrKouk.Erp.Domain.Investment
 
         [Display(Name = "Τύπος Παραστατικού")]
         public int CashFlowDocTypeDefId { get; set; }
-        public CashFlowDocTypeDef CashFlowDocTypeDefinition { get; set; }
+        public InvestmentDocTypeDef InvestmentDocTypeDef { get; set; }
 
         public int CompanyId { get; set; }
         public virtual Company Company { get; set; }

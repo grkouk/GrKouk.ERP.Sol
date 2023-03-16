@@ -16,7 +16,7 @@ namespace GrKouk.Erp.Domain.Investment
         public bool Active { get; set; }
 
 
-        public CashFlowAccountActionsEnum CfaAction { get; set; }
+        public InvestmentActionsEnum InvAction { get; set; }
         [Display(Name = "Default Series")]
         public int DefaultDocSeriesId { get; set; }
 
