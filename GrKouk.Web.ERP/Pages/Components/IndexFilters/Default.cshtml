@@ -37,23 +37,23 @@
                         </div>
 
                     </div>
-                    <script>
-                        document.getElementById('DatePeriodFilter').addEventListener('change', warn, true);
-                        function warn(e) {
+                    @* <script> *@
+                    //document.getElementById('DatePeriodFilter').addEventListener('change', warn, true);
+                    //function warn(e) {
 
-                            if (e.currentTarget.value === 'CUSTOM') {
-                                e.preventDefault();
-                                e.stopPropagation();
+                    // if (e.currentTarget.value === 'CUSTOM') {
+                    // e.preventDefault();
+                    // e.stopPropagation();
 
-                                var myModal = new bootstrap.Modal(document.getElementById('customDateFilter'), {
-                                    keyboard: true, focus: true
-                                });
-                                myModal.show();
-                            } else {
-                                return;
-                            }
-                        }
-                    </script>
+                    // var myModal = new bootstrap.Modal(document.getElementById('customDateFilter'), {
+                    // keyboard: true, focus: true
+                    // });
+                    // myModal.show();
+                    // } else {
+                    // return;
+                    // }
+                    // }
+                    @* </script> *@
                 }
 
             }
