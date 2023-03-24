@@ -54,7 +54,7 @@ namespace GrKouk.Web.ERP.Helpers
                 //new SelectListItem() {Value = "OKTLASTYEAR", Text = "Οκτ.Προηγ. Ετος"},
                 //new SelectListItem() {Value = "NOVLASTYEAR", Text = "Νοε.Προηγ. Ετος"},
                 //new SelectListItem() {Value = "DECLASTYEAR", Text = "Δεκ.Προηγ. Ετος"},
-                new SelectListItem() {Value = "CUSTOM", Text = "Custom"},
+               // new SelectListItem() {Value = "CUSTOM", Text = "Custom"},
                 new SelectListItem() {Value = "ALL", Text = "{All}"}
             };
             return datePeriods;

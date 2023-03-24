@@ -67,7 +67,7 @@
 <div class="row">
     <partial name="_PagerPartial" />
 </div>
-<partial name="_CustomDateFilterPartial" />
+@* <partial name="_CustomDateFilterPartial" /> *@
 <partial name="_LoadMePartial" />
 <!-- Modal Item selector for payments -->
 <div class="modal fade" id="itemSelector" tabindex="-1" role="dialog" aria-labelledby="itemsModalLabel"
@@ -166,7 +166,7 @@
 
                 });
             //#region variables
-            
+
             var $deleteSelectedRowsLink = $('#deleteSelectedRows');
             var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
             //#endregion
