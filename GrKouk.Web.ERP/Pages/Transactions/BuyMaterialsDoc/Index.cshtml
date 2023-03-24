@@ -6,7 +6,7 @@
     ViewData["Title"] = "Παραστατικά Αγορών/Εξόδων";
 }
 @section MyCss
-{
+    {
     <link rel="stylesheet" href="~/css/custom-checkbox.css" />
     <link rel="stylesheet" href="~/css/searchbar.css" />
     <link rel="stylesheet" href="~/css/search-modal.css" />
@@ -21,8 +21,8 @@
             <a href="#" role="button" class="nav-link" id="CreateNew">Create New</a>
         </li>
         <li class="nav-item dropdown ">
-            <a class="btn btn-sm btn-outline-secondary dropdown-toggle" role="button" id="ddDiarys" data-bs-toggle="dropdown"
-               aria-haspopup="true" aria-expanded="false">Ημερολόγια</a>
+            <a class="btn btn-sm btn-outline-secondary dropdown-toggle" role="button" id="ddDiarys"
+                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Ημερολόγια</a>
 
             <div class="dropdown-menu small " name="diaryDropDownMenu">
                 <h6 class="dropdown-header">Σχετικά Ημερολόγια</h6>
@@ -31,8 +31,8 @@
             </div>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" data-bs-target="#filterCollapse" role="button" id="filtersToggle"
-               aria-expanded="false" aria-controls="filterCollapse">
+            <a class="nav-link" data-bs-toggle="collapse" data-bs-target="#filterCollapse" role="button"
+                id="filtersToggle" aria-expanded="false" aria-controls="filterCollapse">
             </a>
         </li>
         <li class="nav-item">
@@ -41,8 +41,8 @@
             </a>
         </li>
         <li class="nav-item dropdown " id="SelectedRowsActionsMenu">
-            <a class="nav-link dropdown-toggle disabled" role="button" id="ddSelectedRowsActions" data-bs-toggle="dropdown"
-               aria-haspopup="true" aria-expanded="false">Actions</a>
+            <a class="nav-link dropdown-toggle disabled" role="button" id="ddSelectedRowsActions"
+                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</a>
             <div class="dropdown-menu small">
                 <a class="dropdown-item" href="#" id="deleteSelectedRows">Delete Selected</a>
                 <a class="dropdown-item" href="#">*Αντιστοίχιση Παραστατικών</a>
@@ -63,15 +63,16 @@
 <div class="row mt-1">
     <partial name="_PagerPartial" />
 </div>
-<partial name="_DataTable"/>
+<partial name="_DataTable" />
 <div class="row">
     <partial name="_PagerPartial" />
 </div>
-
+<partial name="_CustomDateFilterPartial" />
 <partial name="_LoadMePartial" />
 <!-- Modal Item selector for payments -->
-<div class="modal fade" id="itemSelector" tabindex="-1" role="dialog" aria-labelledby="itemsModalLabel" aria-hidden="true" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered modal-lg"  role="document">
+<div class="modal fade" id="itemSelector" tabindex="-1" role="dialog" aria-labelledby="itemsModalLabel"
+    aria-hidden="true" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
 
         <div class="modal-content">
             <div class="modal-header">
@@ -86,7 +87,7 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                    
+
                     </div>
                     <div class="row">
                         <div class="col-md-3 text-center">
@@ -108,11 +109,13 @@
                     </div>
                     <div class="row text-center">
                         <div class="col-11">
-                            <input class="form-control form-control-sm" name="itemsSearchText" placeholder="Search text" type="text" />
+                            <input class="form-control form-control-sm" name="itemsSearchText" placeholder="Search text"
+                                type="text" />
 
                         </div>
                         <div class="col-1">
-                            <span class="spinner-border spinner-border-sm text-primary" id="SpinnerLoader" style="display: none"></span>
+                            <span class="spinner-border spinner-border-sm text-primary" id="SpinnerLoader"
+                                style="display: none"></span>
                         </div>
 
                     </div>
@@ -141,13 +144,13 @@
     </div>
 </div>
 @section Scripts
-{
+    {
     <script src="~/lib/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script src="~/js/moment.min.js"></script>
     <script src="~/js/definitions.js"></script>
     <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
             let baseCulture = '@System.Globalization.CultureInfo.CurrentCulture.';
             currentCulture = 'el-GR';
@@ -163,7 +166,7 @@
 
                 });
             //#region variables
-
+            
             var $deleteSelectedRowsLink = $('#deleteSelectedRows');
             var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
             //#endregion
@@ -375,9 +378,9 @@
                     visibility: 'condition',
                     elementName: 'PayoffDoc',
                     condition: {
-                        val1Type:'key',
+                        val1Type: 'key',
                         val1Value: 'totalAmount',
-                        val2Type:'key',
+                        val2Type: 'key',
                         val2Value: 'payedOfAmount',
                         //val1Key: 'totalAmount',
                         //val2Key: 'payedOfAmount',
@@ -385,7 +388,7 @@
                     },
                     text: 'Εξόφληση Παραστατικού',
                     valueKey: 'id',
-                    dataKey:'docid',
+                    dataKey: 'docid',
                     icon: '<i class="fab fa-amazon-pay fa-lg" style="color:slategray"></i>',
                     url: ''
                 },
@@ -394,15 +397,15 @@
                     selectorType: 'BuyPaymentsSelector',
                     selectorTarget: '#itemSelector',
                     visibility: 'condition',
-                    elementName:'AssignPayments',
+                    elementName: 'AssignPayments',
                     condition: {
-                        val1Type:'key',
+                        val1Type: 'key',
                         val1Value: 'totalAmount',
-                        val2Type:'key',
+                        val2Type: 'key',
                         val2Value: 'payedOfAmount',
-                       // val1Key:'totalAmount',
-                       // val2Key:'payedOfAmount',
-                        operator:'notZeroDiff'
+                        // val1Key:'totalAmount',
+                        // val2Key:'payedOfAmount',
+                        operator: 'notZeroDiff'
                     },
                     text: 'Αντιστοίχιση Πληρωμών',
                     valueKey: 'id',
@@ -466,15 +469,15 @@
                     visibility: 'condition',
                     elementName: 'PayoffDoc',
                     condition: {
-                        val1Type:'key',
+                        val1Type: 'key',
                         val1Value: 'totalAmount',
-                        val2Type:'key',
+                        val2Type: 'key',
                         val2Value: 'payedOfAmount',
                         operator: 'notZeroDiff'
                     },
                     text: 'Εξόφληση Παραστατικού',
                     valueKey: 'id',
-                    dataKey:'docid',
+                    dataKey: 'docid',
                     icon: '<i class="fab fa-amazon-pay fa-lg" style="color:slategray"></i>',
                     url: ''
                 },
@@ -483,11 +486,11 @@
                     selectorType: 'BuyPaymentsSelector',
                     selectorTarget: '#itemSelector',
                     visibility: 'condition',
-                    elementName:'AssignPayments',
+                    elementName: 'AssignPayments',
                     condition: {
-                        val1Type:'key',
+                        val1Type: 'key',
                         val1Value: 'totalAmount',
-                        val2Type:'key',
+                        val2Type: 'key',
                         val2Value: 'payedOfAmount',
                         operator: 'notZeroDiff'
                     },
@@ -499,9 +502,9 @@
             ];
             const tableHandlersToRegister = [
                 {
-                    selector:'[name=PayoffDoc]',
-                    event:'click',
-                    handler: function(event) {
+                    selector: '[name=PayoffDoc]',
+                    event: 'click',
+                    handler: function (event) {
                         let button = $(event.delegateTarget);
                         let docId = button.data('docid');
                         payOfDocument(docId);
@@ -512,9 +515,9 @@
             ];
             const pageHandlersToRegister = [
                 {
-                    selector:'#CurrencySelector',
-                    event:'change',
-                    handler: function(event) {
+                    selector: '#CurrencySelector',
+                    event: 'change',
+                    handler: function (event) {
                         currencyChanged();
                         indPgLib.refreshData();
                     }
@@ -530,10 +533,10 @@
                 actionColDefs: actionColDefs,
                 actionColSubDefs: actionColSubDefs,
                 actionMobileColDefs: actionMobileColDefs,
-                tableHandlersToRegister:tableHandlersToRegister,
-                pageHandlersToRegister:pageHandlersToRegister,
+                tableHandlersToRegister: tableHandlersToRegister,
+                pageHandlersToRegister: pageHandlersToRegister,
                 afterTableLoad: {
-                 callback: function(valueSource) {
+                    callback: function (valueSource) {
                         loadDiaries(valueSource.diaries);
                     }
                 }
@@ -594,17 +597,17 @@
                     dataType: 'json',
                     type: 'GET',
                     url: uri,
-                    beforeSend: function() {
+                    beforeSend: function () {
                         if (timeout) {
                             clearTimeout(timeout);
                         }
-                        timeout = setTimeout(function() {
-                                $('#SpinnerLoader').show();
+                        timeout = setTimeout(function () {
+                            $('#SpinnerLoader').show();
 
-                            },
+                        },
                             1000);
                     },
-                    success: function(result) {
+                    success: function (result) {
                         $('#selectorItemsList > tbody').empty();
                         $('#selectorItemsList > thead').empty();
                         let colDefs = [
@@ -690,7 +693,7 @@
                             curSortAr = curSort.split(':');
                         }
                         var $trHead = $('<tr>');
-                        colDefs.forEach(function(item) {
+                        colDefs.forEach(function (item) {
                             //var $tdColHead = $('<th>').text(item.header).addClass(item.class);
                             var tdColHead = '';
                             if (item.sortKey.length !== 0) {
@@ -749,36 +752,36 @@
                         $remaining.attr('data-actualValue', remainingVal);
 
                         $.each(result.data,
-                            function(index, value) {
+                            function (index, value) {
                                 var itemId = value.id;
                                 var $tr = $('<tr>');
-                                colDefs.forEach(function(col) {
+                                colDefs.forEach(function (col) {
 
                                     let $tdCol = $('<td>');
                                     if (col.responseKey) {
                                         switch (col.columnFormat) {
-                                        case 't':
-                                            $tdCol.text(value[col.responseKey]);
-                                            break;
-                                        case 'd':
-                                            $tdCol.text(moment(value[col.responseKey]).format('DD/MM/YYYY'));
-                                            break;
-                                        case 'c':
-                                            $tdCol.text(formatterCurrency.format(value[col.responseKey]));
-                                            $tdCol.attr('data-actualValue', value[col.responseKey]);
-                                            break;
-                                        default:
+                                            case 't':
+                                                $tdCol.text(value[col.responseKey]);
+                                                break;
+                                            case 'd':
+                                                $tdCol.text(moment(value[col.responseKey]).format('DD/MM/YYYY'));
+                                                break;
+                                            case 'c':
+                                                $tdCol.text(formatterCurrency.format(value[col.responseKey]));
+                                                $tdCol.attr('data-actualValue', value[col.responseKey]);
+                                                break;
+                                            default:
                                         }
                                     } else {
                                         switch (col.columnFormat) {
-                                        case 't':
-                                            break;
-                                        case 'd':
-                                            break;
-                                        case 'c':
-                                            $tdCol.attr('data-actualValue', 0);
-                                            break;
-                                        default:
+                                            case 't':
+                                                break;
+                                            case 'd':
+                                                break;
+                                            case 'c':
+                                                $tdCol.attr('data-actualValue', 0);
+                                                break;
+                                            default:
                                         }
                                     }
                                     $tdCol.addClass(col.class);
@@ -798,7 +801,7 @@
                             });
 
                         $('[name=selectItem]').on('click',
-                            function(event) {
+                            function (event) {
                                 var checkInput = $(event.delegateTarget);
                                 var itemId = checkInput.data('itemid');
                                 let isChecked = checkInput.prop('checked');
@@ -864,7 +867,7 @@
 
                             });
                         $('[name=SelectorSortHeader]').on('click',
-                            function(event) {
+                            function (event) {
                                 var button = $(event.delegateTarget);
                                 var reqSort = button.data('sortkey');
                                 let reqSortType = button.data('sorttype');
@@ -904,26 +907,26 @@
                             });
                     },
                     complete:
-                        function() {
+                        function () {
                             if (timeout) {
                                 clearTimeout(timeout);
                             }
                             $("#loadMe").modal("hide");
-                            setTimeout(function() {
-                                    console.log('Checking for open modals');
-                                    //var isOpen = $('#loadMe').hasClass('show');
-                                    var isOpen = $('#SpinnerLoader').is(':visible');
-                                    if (isOpen) {
-                                        console.log('Spinner is showing');
+                            setTimeout(function () {
+                                console.log('Checking for open modals');
+                                //var isOpen = $('#loadMe').hasClass('show');
+                                var isOpen = $('#SpinnerLoader').is(':visible');
+                                if (isOpen) {
+                                    console.log('Spinner is showing');
 
-                                        $('#SpinnerLoader').hide();
-                                    } else {
-                                        console.log('No open modal');
-                                    }
-                                },
+                                    $('#SpinnerLoader').hide();
+                                } else {
+                                    console.log('No open modal');
+                                }
+                            },
                                 2000);
                         },
-                    error: function(e) {
+                    error: function (e) {
                         console.log(e);
 
                     }
@@ -931,7 +934,7 @@
             };
 
             $('#itemSelector').on('show.bs.modal',
-                function(event) {
+                function (event) {
                     var button = $(event.relatedTarget);
                     var selectorType = button.data('selectortype');
                     selectedDocumentId = button.data('docid');
@@ -942,15 +945,15 @@
                         ? 1
                         : parseInt($dcId.val());
                     switch (selectorType) {
-                    case "BuyPaymentsSelector":
-                        modal.find('.modal-title').text("Ευρετήριο Πληρωμών σε Προμηθευτή");
+                        case "BuyPaymentsSelector":
+                            modal.find('.modal-title').text("Ευρετήριο Πληρωμών σε Προμηθευτή");
 
-                        curSelectorType = "BuyPaymentsSelector";
-                        getPaymentsToSuppliersList(selectedDocumentId, '', '', '', 100, displayCurrencyId, '');
-                        break;
+                            curSelectorType = "BuyPaymentsSelector";
+                            getPaymentsToSuppliersList(selectedDocumentId, '', '', '', 100, displayCurrencyId, '');
+                            break;
 
 
-                    default:
+                        default:
                     }
 
                 });
@@ -958,7 +961,7 @@
 
             var timeKey;
             $('[name=itemsSearchText]').on('keyup',
-                function(event) {
+                function (event) {
                     //var button = $(event.relatedTarget);
 
                     var $this = $(this);
@@ -973,10 +976,10 @@
                         console.log("Clear timeKey");
                         clearTimeout(timeKey);
                     }
-                    timeKey = setTimeout(function() {
-                            console.log("Will execute get request in 1 sec!");
+                    timeKey = setTimeout(function () {
+                        console.log("Will execute get request in 1 sec!");
 
-                            switch (curSelectorType) {
+                        switch (curSelectorType) {
                             case "ProductsSelector":
                                 //var curSort = getProductSelectorCurrentSort();
                                 //if (curSort === undefined || curSort === null || curSort.length === 0) {
@@ -993,10 +996,10 @@
                                 //getTransactorSelectorList(selectedCompanies, selectedTransTypes, searchText,curSortTrans, 100,transactorSelected);
                                 break;
                             default:
-                            }
+                        }
 
-                            $('#itemSelector').modal('handleUpdate');
-                        },
+                        $('#itemSelector').modal('handleUpdate');
+                    },
                         1000);
                 });
             const saveMappings = (data) => {
@@ -1007,10 +1010,10 @@
                     url: "/api/Materials/AddBuyPaymentMappingList",
                     data: data,
 
-                    success: function(result) {
+                    success: function (result) {
                         toastr.success("Saved Mappings", "Saved Mappings");
                     },
-                    error: function(e) {
+                    error: function (e) {
                         console.log('Error saving ');
                         console.log(e);
                         var r = e.responseJSON.error;
@@ -1019,14 +1022,14 @@
                 });
             };
             $('#SaveItemSelector').on('click',
-                function(e) {
+                function (e) {
                     console.log('Modal save button clicked');
 
                     var linesArr = [];
                     linesArr.length = 0;
 
                     $.each($("#selectorItemsList tbody tr"),
-                        function() {
+                        function () {
                             var checkbox = $(this).find('td:eq(6)').children('input')[0];
                             var itemId = $(checkbox).attr('data-itemId');
                             let isChecked = checkbox.checked;
@@ -1050,12 +1053,12 @@
 
                     });
                     $.when(saveMappings(data))
-                        .then(function(response) {
+                        .then(function (response) {
                             console.log(response);
                             $('#itemSelector').modal('hide');
                             indPgLib.refreshData();
                         })
-                        .fail(function(err) {
+                        .fail(function (err) {
                             console.log(err);
                             //toastr.error(e.toString(), "when SaveData");
                         });
@@ -1070,7 +1073,7 @@
 
             };
             //#endregion
-             const loadDiaries = (availableDiarys) => {
+            const loadDiaries = (availableDiarys) => {
                 var $diaryDd = $('[name=diaryDropDownMenu]');
                 $('.diaryLink').remove();
                 if (availableDiarys === undefined || availableDiarys === null) {
@@ -1078,7 +1081,7 @@
                 }
                 var d = availableDiarys;
 
-                d.forEach(function(item) {
+                d.forEach(function (item) {
                     var $aLink = $('<a>').addClass('dropdown-item small diaryLink');
                     $aLink.text(item.text);
                     var diaryHRef = '/transactions/buymaterialsdoc/RunBuyDiary';
@@ -1103,45 +1106,45 @@
                     type: 'POST',
                     data: dataJs,
                     url: "/api/materials/AddBuyPaymentMapping",
-                    beforeSend: function() {
+                    beforeSend: function () {
                         if (timeout) {
                             clearTimeout(timeout);
                         }
-                        timeout = setTimeout(function() {
+                        timeout = setTimeout(function () {
 
-                                $("#loadMe").modal({
-                                    backdrop: "static", //remove ability to close modal with click
-                                    keyboard: false, //remove option to close with keyboard
-                                    show: true //Display loader!
-                                });
-                            },
+                            $("#loadMe").modal({
+                                backdrop: "static", //remove ability to close modal with click
+                                keyboard: false, //remove option to close with keyboard
+                                show: true //Display loader!
+                            });
+                        },
                             1000);
 
                     },
-                    success: function(result) {
+                    success: function (result) {
                         console.log(result);
                         toastr.success(result.message);
                         indPgLib.refreshData();
 
                     },
-                    complete: function() {
+                    complete: function () {
                         if (timeout) {
                             clearTimeout(timeout);
                         }
                         $("#loadMe").modal("hide");
-                        setTimeout(function() {
-                                console.log('Checking for open modals');
-                                var isOpen = $('#loadMe').hasClass('show');
-                                if (isOpen) {
-                                    console.log('There is an open Modal');
-                                    $("#loadMe").modal("hide");
-                                } else {
-                                    console.log('No open modal');
-                                }
-                            },
+                        setTimeout(function () {
+                            console.log('Checking for open modals');
+                            var isOpen = $('#loadMe').hasClass('show');
+                            if (isOpen) {
+                                console.log('There is an open Modal');
+                                $("#loadMe").modal("hide");
+                            } else {
+                                console.log('No open modal');
+                            }
+                        },
                             2000);
                     },
-                    error: function(e) {
+                    error: function (e) {
                         console.log(e);
                         let message = e.responseJSON.errorMessage;
                         toastr.error("Error", message);
@@ -1155,7 +1158,7 @@
                 var selectedRows = $rowSelectors.filter(':checked');
                 var idsToDelete = [];
                 $.each(selectedRows,
-                    function(key, value) {
+                    function (key, value) {
                         console.log(value);
                         var id = parseInt(value.dataset.itemid);
                         idsToDelete.push(id);
@@ -1175,45 +1178,45 @@
                         type: 'POST',
                         data: idsJs,
                         url: "/api/GrkoukInfoApi/DeleteBuyDocumentsList",
-                        beforeSend: function() {
+                        beforeSend: function () {
                             if (timeout) {
                                 clearTimeout(timeout);
                             }
-                            timeout = setTimeout(function() {
+                            timeout = setTimeout(function () {
 
-                                    $("#loadMe").modal({
-                                        backdrop: "static", //remove ability to close modal with click
-                                        keyboard: false, //remove option to close with keyboard
-                                        show: true //Display loader!
-                                    });
-                                },
+                                $("#loadMe").modal({
+                                    backdrop: "static", //remove ability to close modal with click
+                                    keyboard: false, //remove option to close with keyboard
+                                    show: true //Display loader!
+                                });
+                            },
                                 1000);
 
                         },
-                        success: function(result) {
+                        success: function (result) {
                             console.log(result);
                             toastr.success("Delete", result.message);
                             indPgLib.refreshData();
 
                         },
-                        complete: function() {
+                        complete: function () {
                             if (timeout) {
                                 clearTimeout(timeout);
                             }
                             $("#loadMe").modal("hide");
-                            setTimeout(function() {
-                                    console.log('Checking for open modals');
-                                    var isOpen = $('#loadMe').hasClass('show');
-                                    if (isOpen) {
-                                        console.log('There is an open Modal');
-                                        $("#loadMe").modal("hide");
-                                    } else {
-                                        console.log('No open modal');
-                                    }
-                                },
+                            setTimeout(function () {
+                                console.log('Checking for open modals');
+                                var isOpen = $('#loadMe').hasClass('show');
+                                if (isOpen) {
+                                    console.log('There is an open Modal');
+                                    $("#loadMe").modal("hide");
+                                } else {
+                                    console.log('No open modal');
+                                }
+                            },
                                 2000);
                         },
-                        error: function(e) {
+                        error: function (e) {
                             console.log(e);
                             toastr.error("Error", e.responseJSON.error);
 
@@ -1263,7 +1266,7 @@
         });
 
         $(window).on('beforeunload',
-            function(e) {
+            function (e) {
                 indPgLib.saveSettings('BuyDocIndexView');
             });
     </script>
