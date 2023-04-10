@@ -22,7 +22,7 @@
             "stopAtEntry": false,
             "requireExactSource": false,
             "serverReadyAction": {
-                "action": "debugWithChrome",
+                "action": "debugWithEdge",
                 "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
             },
             "env": {

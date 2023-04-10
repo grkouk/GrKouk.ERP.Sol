@@ -238,11 +238,17 @@ true})
                         if (valueSource.creatorSectionId > 0) {
                             switch (valueSource.creatorSectionCode) {
                                 case "SCNSELLCOMBINED":
-                                    retUri = `/transactions/sellmaterialdoc/Edit?id=${valueSource["creatorId"]}`;
+                                    retUri = `/transactions/sellmaterialdoc/edit?id=${valueSource["creatorId"]}`;
                                     break;
                                 case "SCNBUYMATTRANS":
                                     retUri = `/transactions/buymaterialsdoc/Details?id=${valueSource["creatorId"]}`;
                                     break;
+                                case "SCNBUYEXPTRANS":
+                                    retUri = `/transactions/buymaterialsdoc/details?id=${valueSource["creatorId"]}`;
+                                    break;
+                                case "SCNTRANSACTORTRANS":
+                                    var itemId = valueSource["id"];
+                                    retUri = `/transactions/transactortransmng/Details?id=${itemId}`;
                                 default:
                             }
 
@@ -288,7 +294,14 @@ true})
                                 case "SCNBUYMATTRANS":
                                     retUri = `/transactions/buymaterialsdoc/Edit?id=${valueSource["creatorId"]}`;
                                     break;
+                                case "SCNBUYEXPTRANS":
+                                    retUri = `/transactions/buymaterialsdoc/Edit?id=${valueSource["creatorId"]}`;
+                                    break;
+                                case "SCNTRANSACTORTRANS":
+                                    var itemId = valueSource["id"];
+                                    retUri = `/transactions/transactortransmng/Details?id=${itemId}`;
                                 default:
+
                             }
 
                         } else {
