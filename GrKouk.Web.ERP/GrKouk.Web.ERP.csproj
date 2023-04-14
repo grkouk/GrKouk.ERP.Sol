@@ -6,10 +6,10 @@
     <Authors>George Koukoudis</Authors>
     <Company>GrKoukOrg</Company>
     <Copyright>George Koukoudis</Copyright>
-    <Version>1.0.0.2</Version>
-    <PackageVersion>1.0.0.2</PackageVersion>
-    <AssemblyVersion>1.0.0.2</AssemblyVersion>
-    <FileVersion>1.0.0.2</FileVersion>
+    <Version>1.0.0.3</Version>
+    <PackageVersion>1.0.0.3</PackageVersion>
+    <AssemblyVersion>1.0.0.3</AssemblyVersion>
+    <FileVersion>1.0.0.3</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
