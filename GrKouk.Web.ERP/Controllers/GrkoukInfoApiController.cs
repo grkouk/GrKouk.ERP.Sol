@@ -1889,9 +1889,12 @@ namespace GrKouk.Web.ERP.Controllers
             return Ok(response);
         }
 
-        [HttpGet("GetIndexTblDataTransactorsBalance")]
-        public async Task<IActionResult> GetIndexTblDataTransactorsBalance([FromQuery] IndexDataTableRequest request)
+        [HttpGet("GetIndexTblDataTransactorsBalanceV1")]
+        public async Task<IActionResult> GetIndexTblDataTransactorsBalanceV1([FromQuery] IndexDataTableRequest request)
         {
+            var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
+              .Take(10)
+              .ToListAsync();
             IQueryable<TransactorTransaction> transactionsList = _context.TransactorTransactions;
             int transactorTypeId = 0;
             if (!string.IsNullOrEmpty(request.TransactorTypeFilter))
@@ -1954,30 +1957,7 @@ namespace GrKouk.Web.ERP.Controllers
                     DebitAmount = s.Sum(x => x.DebitAmount),
                     CreditAmount = s.Sum(x => x.CreditAmount)
                 }).ToList();
-            foreach (var listItem in dbTransactions)
-            {
-                if (listItem.CompanyCurrencyId != 1)
-                {
-                    var r = await _context.ExchangeRates.Where(p => p.CurrencyId == listItem.CompanyCurrencyId)
-                        .OrderByDescending(p => p.ClosingDate).FirstOrDefaultAsync();
-                    if (r != null)
-                    {
-                        listItem.DebitAmount /= r.Rate;
-                        listItem.CreditAmount /= r.Rate;
-                    }
-                }
-
-                if (request.DisplayCurrencyId != 1)
-                {
-                    var r = await _context.ExchangeRates.Where(p => p.CurrencyId == request.DisplayCurrencyId)
-                        .OrderByDescending(p => p.ClosingDate).FirstOrDefaultAsync();
-                    if (r != null)
-                    {
-                        listItem.DebitAmount *= r.Rate;
-                        listItem.CreditAmount *= r.Rate;
-                    }
-                }
-            }
+           
 
             var isozigioType = "FREE";
             var transactorType =
@@ -2102,6 +2082,286 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
+        //===========================
+        [HttpGet("GetIndexTblDataTransactorsBalance")]
+        public async Task<IActionResult> GetIndexTblDataTransactorsBalanceV2([FromQuery] IndexDataTableRequest request)
+        {
+            //--------------
+            IQueryable<TransactorTransaction> fullListIq = _context.TransactorTransactions
+                .Include(p => p.Company)
+                .Include(p => p.Section)
+                .Include(p => p.Transactor)
+                .Include(p => p.TransTransactorDocSeries)
+                .Include(p => p.TransTransactorDocType);
+
+            //if (!string.IsNullOrEmpty(request.SortData))
+            //{
+            //    switch (request.SortData.ToLower())
+            //    {
+            //        case "datesort:asc":
+            //            fullListIq = fullListIq.OrderBy(p => p.TransDate);
+            //            break;
+            //        case "datesort:desc":
+            //            fullListIq = fullListIq.OrderByDescending(p => p.TransDate);
+            //            break;
+            //        case "transactornamesort:asc":
+            //            fullListIq = fullListIq.OrderBy(p => p.Transactor.Name);
+            //            break;
+            //        case "transactornamesort:desc":
+            //            fullListIq = fullListIq.OrderByDescending(p => p.Transactor.Name);
+            //            break;
+            //        case "seriescodesort:asc":
+            //            fullListIq = fullListIq.OrderBy(p => p.TransTransactorDocSeries.Code);
+            //            break;
+            //        case "seriescodesort:desc":
+            //            fullListIq = fullListIq.OrderByDescending(p => p.TransTransactorDocSeries.Code);
+            //            break;
+            //        case "companycodesort:asc":
+            //            fullListIq = fullListIq.OrderBy(p => p.Company.Code);
+            //            break;
+            //        case "companycodesort:desc":
+            //            fullListIq = fullListIq.OrderByDescending(p => p.Company.Code);
+            //            break;
+            //        case "sectioncodesort:asc":
+            //            fullListIq = fullListIq.OrderBy(p => p.Section.Code);
+            //            break;
+            //        case "sectioncodesort:desc":
+            //            fullListIq = fullListIq.OrderByDescending(p => p.Section.Code);
+            //            break;
+            //    }
+            //}
+
+            if (!string.IsNullOrEmpty(request.DateRange))
+            {
+                var datePeriodFilter = request.DateRange;
+                DateFilterDates dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
+                DateTime fromDate = dfDates.FromDate;
+                DateTime toDate = dfDates.ToDate;
+
+                fullListIq = fullListIq.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
+            }
+
+            if (!string.IsNullOrEmpty(request.CompanyFilter))
+            {
+                if (int.TryParse(request.CompanyFilter, out var companyId))
+                {
+                    if (companyId > 0)
+                    {
+                        fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.SearchFilter))
+            {
+                fullListIq = fullListIq.Where(p => p.Transactor.Name.Contains(request.SearchFilter)) ;
+            }
+            int transactorTypeId = 0;
+            if (!string.IsNullOrEmpty(request.TransactorTypeFilter))
+            {
+                if (int.TryParse(request.TransactorTypeFilter, out transactorTypeId))
+                {
+                    if (transactorTypeId > 0)
+                    {
+                        fullListIq =
+                            fullListIq.Where(p => p.Transactor.TransactorTypeId == transactorTypeId);
+                    }
+                }
+            }
+           
+
+            var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
+              .Take(10)
+              .ToListAsync();
+            //IQueryable<TransactorTransaction> transactionsList = _context.TransactorTransactions;
+
+            var t = fullListIq.Select(p => new TransactorTransListDto
+            {
+                Id = p.Id,
+                TransDate = p.TransDate,
+                TransTransactorDocSeriesId = p.TransTransactorDocSeriesId,
+                TransTransactorDocSeriesName = p.TransTransactorDocSeries.Name,
+                TransTransactorDocSeriesCode = p.TransTransactorDocSeries.Code,
+                TransTransactorDocTypeId = p.TransTransactorDocTypeId,
+                //TransRefCode = p.TransRefCode,
+                TransactorId = p.TransactorId,
+                TransactorName = p.Transactor.Name,
+                //SectionId = p.SectionId,
+                //SectionCode = p.Section.Code,
+                //CreatorId = p.CreatorId,
+                //CreatorSectionId = p.CreatorSectionId,
+                //CreatorSectionCode = "",
+                FiscalPeriodId = p.FiscalPeriodId,
+                FinancialAction = p.FinancialAction,
+                FpaRate = p.FpaRate,
+                DiscountRate = p.DiscountRate,
+                AmountFpa = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountFpa),
+                AmountNet = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountNet),
+                AmountDiscount = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates,
+                    p.AmountDiscount),
+                TransFpaAmount = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates,
+                    p.TransFpaAmount),
+                TransNetAmount = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates,
+                    p.TransNetAmount),
+                TransDiscountAmount = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates,
+                    p.TransDiscountAmount),
+                CompanyCode = p.Company.Code,
+                CompanyCurrencyId = p.Company.CurrencyId
+            });
+            //-------------  
+
+
+
+           // var dbTrans = transactionsList.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
+            var intem = await t.ToListAsync();
+            var dbTransactions = intem.GroupBy(g => new
+            {
+                g.CompanyCode,
+                g.CompanyCurrencyId,
+                g.TransactorId,
+                g.TransactorName
+            }
+                )
+                .Select(s => new TransactorIsozygioItem
+                {
+                    Id = s.Key.TransactorId,
+                    TransactorName = s.Key.TransactorName,
+                    CompanyCode = s.Key.CompanyCode,
+                    CompanyCurrencyId = s.Key.CompanyCurrencyId,
+                    DebitAmount = s.Sum(x => x.DebitAmount),
+                    CreditAmount = s.Sum(x => x.CreditAmount)
+                }).ToList();
+
+
+            var isozigioType = "FREE";
+            var transactorType =
+                await _context.TransactorTypes.Where(c => c.Id == transactorTypeId).FirstOrDefaultAsync();
+            //var isozigioName = "";
+            if (transactorType != null)
+            {
+                switch (transactorType.Code)
+                {
+                    case "SYS.DTRANSACTOR":
+                        //isozigioName = "Συναλλασόμενων Ημερολογίου";
+                        isozigioType = "SUPPLIER";
+                        break;
+                    case "SYS.CUSTOMER":
+                        //isozigioName = "Πελατών";
+                        isozigioType = "CUSTOMER";
+                        break;
+                    case "SYS.SUPPLIER":
+                        //isozigioName = "Προμηθευτών";
+                        isozigioType = "SUPPLIER";
+                        break;
+                }
+            }
+
+            var listWithTotal = new List<KartelaLine>();
+
+            decimal runningTotal = 0;
+            foreach (var dbTransaction in dbTransactions)
+            {
+                switch (isozigioType)
+                {
+                    case "SUPPLIER":
+                        runningTotal = dbTransaction.CreditAmount - dbTransaction.DebitAmount;
+                        break;
+                    case "CUSTOMER":
+                        runningTotal = dbTransaction.DebitAmount - dbTransaction.CreditAmount;
+                        break;
+                    default:
+                        runningTotal = dbTransaction.CreditAmount - dbTransaction.DebitAmount;
+                        break;
+                }
+
+                //var transactor = await _context.Transactors.Where(c => c.Id == dbTransaction.Id).FirstOrDefaultAsync();
+                //string transName = "";
+
+                //if (transactor != null)
+                //{
+                //    transName = transactor.Name;
+                //}
+
+                listWithTotal.Add(new KartelaLine
+                {
+                    Id = dbTransaction.Id,
+                    RunningTotal = runningTotal,
+                    TransactorName = dbTransaction.TransactorName,
+                    CompanyCode = dbTransaction.CompanyCode,
+                    Debit = dbTransaction.DebitAmount,
+                    Credit = dbTransaction.CreditAmount
+                });
+            }
+
+            var outList = listWithTotal.AsQueryable();
+            if (!string.IsNullOrEmpty(request.SortData))
+            {
+                switch (request.SortData.ToLower())
+                {
+                    case "companysort:asc":
+                        outList = outList.OrderBy(p => p.CompanyCode);
+                        break;
+                    case "companysort:desc":
+                        outList = outList.OrderByDescending(p => p.CompanyCode);
+                        break;
+                    case "namesort:asc":
+                        outList = outList.OrderBy(p => p.TransactorName);
+                        break;
+                    case "namesort:desc":
+                        outList = outList.OrderByDescending(p => p.TransactorName);
+                        break;
+                }
+            }
+
+            var pageIndex = request.PageIndex;
+
+            var pageSize = request.PageSize;
+            //decimal sumCredit = 0;
+            //decimal sumDebit = 0;
+            decimal sumDifference = 0;
+
+            //IQueryable<KartelaLine> t2 = from s in outList select s;
+
+            //var listItems = PagedList<KartelaLine>.Create(t2, pageIndex, pageSize);
+            //var t3 = await t2.ToListAsync();
+           // var grandSumOfAmount = t3.Sum(p => p.);
+            var grandSumOfDebit = listWithTotal.Sum(p => p.Debit);
+            var grandSumOfCredit = listWithTotal.Sum(p => p.Credit);
+            var listItems =  PagedList<KartelaLine>.Create(outList, pageIndex, pageSize);
+            decimal sumDebit = listItems.Sum(p => p.Debit);
+            decimal sumCredit = listItems.Sum(p => p.Credit);
+           
+            
+            switch (isozigioType)
+            {
+                case "SUPPLIER":
+                    sumDifference = sumCredit - sumDebit;
+                    break;
+                case "CUSTOMER":
+                    sumDifference = sumDebit - sumCredit;
+                    break;
+                default:
+                    sumDifference = sumCredit - sumDebit;
+                    break;
+            }
+
+            var response = new IndexDataTableResponse<KartelaLine>
+            {
+                TotalRecords = listItems.TotalCount,
+                TotalPages = listItems.TotalPages,
+                HasPrevious = listItems.HasPrevious,
+                HasNext = listItems.HasNext,
+                SumOfDebit = sumDebit,
+                SumOfCredit = sumCredit,
+                SumOfDifference = sumDifference,
+                GrandSumOfDebit = grandSumOfDebit,
+                GrandSumOfCredit = grandSumOfCredit,
+                Data = listItems
+            };
+            return Ok(response);
+        }
+
+        //--------------------------
         /// <summary>
         /// Created new version 
         /// TODO: Delete when new version is ready
