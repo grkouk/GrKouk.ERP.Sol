@@ -298,6 +298,14 @@
                     }
                 },
                 {
+                    selector: '#TransactorTypeFilter',
+                    event: 'change',
+                    handler: function(event) {
+                        $('#pageIndex').val(1);
+                        indPgLib.refreshData();
+                    }
+                },
+                {
                     selector: '#ShowCarryOnFlt',
                     event: 'change',
                     handler: function (event) {
