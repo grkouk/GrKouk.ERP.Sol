@@ -60,7 +60,7 @@ var indPgLib = (function () {
     let $transactorId = $('#TransactorId');
     let $cfaId = $('#CfaId');
     let $showCarryOnFlt = $('#ShowCarryOnFlt');
-    let $showDisplayLinesWithZeroesFlt = $('#ShowDisplayLinesWithZeroesFlt');
+    let $showDisplayLinesWithZeroesFlt = $('#ShowDisplayLinesWithZeroes');
     let $showSummaryFlt = $('#ShowSummaryFlt');
     let $warehouseItemId = $('#WarehouseItemId');
     let $warehouseItemNatureFilter = $('#WarehouseItemNatureFilter');
@@ -177,7 +177,7 @@ var indPgLib = (function () {
             showSummaryFltValue = $showSummaryFlt.is(':checked'); 
             showSummaryFilterElement = showSummaryFltValue;
         } else {
-            showCarryOnFilterElement = false;
+            showSummaryFilterElement = false;
         }
          var showDisplayLinesWithZeroesValue = false;
         if (!($showDisplayLinesWithZeroesFlt === undefined)) {
