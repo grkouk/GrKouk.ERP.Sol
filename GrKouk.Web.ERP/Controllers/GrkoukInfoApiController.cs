@@ -1957,7 +1957,7 @@ namespace GrKouk.Web.ERP.Controllers
                     DebitAmount = s.Sum(x => x.DebitAmount),
                     CreditAmount = s.Sum(x => x.CreditAmount)
                 }).ToList();
-           
+
 
             var isozigioType = "FREE";
             var transactorType =
@@ -2094,42 +2094,7 @@ namespace GrKouk.Web.ERP.Controllers
                 .Include(p => p.TransTransactorDocSeries)
                 .Include(p => p.TransTransactorDocType);
 
-            //if (!string.IsNullOrEmpty(request.SortData))
-            //{
-            //    switch (request.SortData.ToLower())
-            //    {
-            //        case "datesort:asc":
-            //            fullListIq = fullListIq.OrderBy(p => p.TransDate);
-            //            break;
-            //        case "datesort:desc":
-            //            fullListIq = fullListIq.OrderByDescending(p => p.TransDate);
-            //            break;
-            //        case "transactornamesort:asc":
-            //            fullListIq = fullListIq.OrderBy(p => p.Transactor.Name);
-            //            break;
-            //        case "transactornamesort:desc":
-            //            fullListIq = fullListIq.OrderByDescending(p => p.Transactor.Name);
-            //            break;
-            //        case "seriescodesort:asc":
-            //            fullListIq = fullListIq.OrderBy(p => p.TransTransactorDocSeries.Code);
-            //            break;
-            //        case "seriescodesort:desc":
-            //            fullListIq = fullListIq.OrderByDescending(p => p.TransTransactorDocSeries.Code);
-            //            break;
-            //        case "companycodesort:asc":
-            //            fullListIq = fullListIq.OrderBy(p => p.Company.Code);
-            //            break;
-            //        case "companycodesort:desc":
-            //            fullListIq = fullListIq.OrderByDescending(p => p.Company.Code);
-            //            break;
-            //        case "sectioncodesort:asc":
-            //            fullListIq = fullListIq.OrderBy(p => p.Section.Code);
-            //            break;
-            //        case "sectioncodesort:desc":
-            //            fullListIq = fullListIq.OrderByDescending(p => p.Section.Code);
-            //            break;
-            //    }
-            //}
+
 
             if (!string.IsNullOrEmpty(request.DateRange))
             {
@@ -2154,7 +2119,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             if (!string.IsNullOrEmpty(request.SearchFilter))
             {
-                fullListIq = fullListIq.Where(p => p.Transactor.Name.Contains(request.SearchFilter)) ;
+                fullListIq = fullListIq.Where(p => p.Transactor.Name.Contains(request.SearchFilter));
             }
             int transactorTypeId = 0;
             if (!string.IsNullOrEmpty(request.TransactorTypeFilter))
@@ -2168,7 +2133,7 @@ namespace GrKouk.Web.ERP.Controllers
                     }
                 }
             }
-           
+
 
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
               .Take(10)
@@ -2212,7 +2177,7 @@ namespace GrKouk.Web.ERP.Controllers
 
 
 
-           // var dbTrans = transactionsList.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
+            // var dbTrans = transactionsList.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
             var intem = await t.ToListAsync();
             var dbTransactions = intem.GroupBy(g => new
             {
@@ -2274,14 +2239,6 @@ namespace GrKouk.Web.ERP.Controllers
                         break;
                 }
 
-                //var transactor = await _context.Transactors.Where(c => c.Id == dbTransaction.Id).FirstOrDefaultAsync();
-                //string transName = "";
-
-                //if (transactor != null)
-                //{
-                //    transName = transactor.Name;
-                //}
-
                 listWithTotal.Add(new KartelaLine
                 {
                     Id = dbTransaction.Id,
@@ -2291,6 +2248,9 @@ namespace GrKouk.Web.ERP.Controllers
                     Debit = dbTransaction.DebitAmount,
                     Credit = dbTransaction.CreditAmount
                 });
+
+
+
             }
 
             var outList = listWithTotal.AsQueryable();
@@ -2312,26 +2272,23 @@ namespace GrKouk.Web.ERP.Controllers
                         break;
                 }
             }
-
+            if (!request.ShowDisplayLinesWithZeroes)
+            {
+                outList = outList.Where(p => p.RunningTotal != 0);
+            }
             var pageIndex = request.PageIndex;
 
             var pageSize = request.PageSize;
-            //decimal sumCredit = 0;
-            //decimal sumDebit = 0;
             decimal sumDifference = 0;
 
-            //IQueryable<KartelaLine> t2 = from s in outList select s;
 
-            //var listItems = PagedList<KartelaLine>.Create(t2, pageIndex, pageSize);
-            //var t3 = await t2.ToListAsync();
-           // var grandSumOfAmount = t3.Sum(p => p.);
             var grandSumOfDebit = listWithTotal.Sum(p => p.Debit);
             var grandSumOfCredit = listWithTotal.Sum(p => p.Credit);
-            var listItems =  PagedList<KartelaLine>.Create(outList, pageIndex, pageSize);
+            var listItems = PagedList<KartelaLine>.Create(outList, pageIndex, pageSize);
             decimal sumDebit = listItems.Sum(p => p.Debit);
             decimal sumCredit = listItems.Sum(p => p.Credit);
-           
-            
+
+
             switch (isozigioType)
             {
                 case "SUPPLIER":

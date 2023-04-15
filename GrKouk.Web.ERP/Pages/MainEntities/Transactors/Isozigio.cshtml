@@ -42,7 +42,9 @@
     ShowCurrencyFlt = true,
     ShowCompaniesFlt = true,
     ShowPageSizeFlt = true,
-    ShowTransactorTypeFlt = true,ShowDateFlt=true
+    ShowTransactorTypeFlt = true
+    ,ShowDateFlt=true
+    ,ShowDisplayLinesWithZeroAmountFlt=true
 })
 
 <div class="row mt-1">
@@ -306,7 +308,7 @@
                     }
                 },
                 {
-                    selector: '#ShowCarryOnFlt',
+                    selector: '#ShowDisplayLinesWithZeroes',
                     event: 'change',
                     handler: function (event) {
 

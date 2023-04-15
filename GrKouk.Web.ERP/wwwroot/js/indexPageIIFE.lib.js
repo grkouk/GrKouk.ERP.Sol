@@ -60,6 +60,7 @@ var indPgLib = (function () {
     let $transactorId = $('#TransactorId');
     let $cfaId = $('#CfaId');
     let $showCarryOnFlt = $('#ShowCarryOnFlt');
+    let $showDisplayLinesWithZeroesFlt = $('#ShowDisplayLinesWithZeroesFlt');
     let $showSummaryFlt = $('#ShowSummaryFlt');
     let $warehouseItemId = $('#WarehouseItemId');
     let $warehouseItemNatureFilter = $('#WarehouseItemNatureFilter');
@@ -81,6 +82,7 @@ var indPgLib = (function () {
     let diaryIdFilterElement;
     let showCarryOnFilterElement;
     let showSummaryFilterElement;
+    let showDisplayLinesWithZeroesFilterElement;
 
     let setFilterValues;
     const setSelectorFilterValues = () => {
@@ -103,6 +105,7 @@ var indPgLib = (function () {
         diaryIdFilterElement = flt.diaryIdFilterElement;
         showCarryOnFilterElement = flt.showCarryOnFilterElement;
         showSummaryFilterElement = flt.showSummaryFilterElement;
+        showDisplayLinesWithZeroesFilterElement = flt.showDisplayLinesWithZeroesFilterElement;
     };
     const setIndexPageFilterValues = () => {
         var pageIndexVal = parseInt($pageIndex.val());
@@ -169,12 +172,19 @@ var indPgLib = (function () {
         } else {
             showCarryOnFilterElement = false;
         }
-        var showSummaryValue = false;
+       var showSummaryFltValue=false;
         if (!($showSummaryFlt === undefined)) {
-            showSummaryValue = $showSummaryFlt.is(':checked');
-            showSummaryFilterElement = showSummaryValue;
+            showSummaryFltValue = $showSummaryFlt.is(':checked'); 
+            showSummaryFilterElement = showSummaryFltValue;
         } else {
-            showSummaryFilterElement = false;
+            showCarryOnFilterElement = false;
+        }
+         var showDisplayLinesWithZeroesValue = false;
+        if (!($showDisplayLinesWithZeroesFlt === undefined)) {
+            showDisplayLinesWithZeroesValue = $showDisplayLinesWithZeroesFlt.is(':checked');
+            showDisplayLinesWithZeroesFilterElement = showDisplayLinesWithZeroesValue;
+        } else {
+            showDisplayLinesWithZeroesFilterElement = false;
         }
         var wrItmNatureFlt = '';
         if (!($warehouseItemNatureFilter.val() === undefined)) {
@@ -809,7 +819,8 @@ var indPgLib = (function () {
     const getTableData = function (pgIndex, pgSize, sortData, dateRange
                                    , companyFlt, searchFlt, currencyFlt
                                    , transTypeFlt, wrItmNatureFlt, transactorId
-                                   ,warehouseItemId,diaryId,cfaId,showCarryOnFlt,showSummaryFlt) {
+        , warehouseItemId, diaryId, cfaId, showCarryOnFlt
+        , showSummaryFlt, showDisplayLinesWithZeroesFlt) {
         let uri = indexPageDefinition.uri;
         uri += `?pageIndex=${pgIndex}`;
         uri += `&pageSize=${pgSize}`;
@@ -823,6 +834,7 @@ var indPgLib = (function () {
         uri += `&cashFlowAccountId=${cfaId}`;
         uri += `&showCarryOnAmountsInTabs=${showCarryOnFlt}`;
         uri += `&showSummaryFilter=${showSummaryFlt}`;
+        uri += `&showDisplayLinesWithZeroes=${showDisplayLinesWithZeroesFlt}`;
         uri += `&warehouseItemId=${warehouseItemId}`;
         uri += `&diaryId=${diaryId}`;
         uri += `&displayCurrencyId=${currencyFlt}`;
@@ -1029,7 +1041,7 @@ var indPgLib = (function () {
             , productNatureFilterElement, transactorIdFilterElement
             , warehouseItemIdFilterElement, diaryIdFilterElement
             , cfaIdFilterElement, showCarryOnFilterElement,
-                showSummaryFilterElement)
+                showSummaryFilterElement,showDisplayLinesWithZeroesFilterElement)
             .then((data) => {
                 bindDataToTable(data, pageIndexElement);
             })
