@@ -10,11 +10,11 @@ namespace GrKouk.Web.ERP.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ERPApiController : ControllerBase
+    public class ErpApiController : ControllerBase
     {
         private readonly ApiDbContext _context;
 
-        public ERPApiController(ApiDbContext context)
+        public ErpApiController(ApiDbContext context)
         {
             _context = context;
         }
