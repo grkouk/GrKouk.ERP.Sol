@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GrKouk.Web.ERP.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 
 namespace GrKouk.Web.ERP.Controllers
@@ -13,10 +14,12 @@ namespace GrKouk.Web.ERP.Controllers
     public class ErpApiController : ControllerBase
     {
         private readonly ApiDbContext _context;
+        private readonly ILogger<ErpApiController> _logger;
 
-        public ErpApiController(ApiDbContext context)
+        public ErpApiController(ApiDbContext context, ILogger<ErpApiController> logger)
         {
             _context = context;
+            _logger = logger;
         }
         
     }
