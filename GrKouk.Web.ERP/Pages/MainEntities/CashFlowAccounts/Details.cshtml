@@ -1,5 +1,5 @@
 ﻿@page
-@model GrKouk.Web.ERP.Pages.MainEntities.Materials.DetailsModel
+@model GrKouk.Web.Erp.Pages.MainEntities.CashFlowAccounts.DetailsModel
 
 @{
     Layout = "_LayoutDashboard";
@@ -232,7 +232,7 @@
 
             <hr />
             <footer>
-                <p>&copy; 2018-2021 - George Koukoudis</p>
+                <p>&copy; 2018-2023 - George Koukoudis</p>
             </footer>
 
         </main>
@@ -248,7 +248,7 @@
             const $currencySelector = $('#CurrencySelector');
             const $companiesSelectionChanged = $('#companiesSelectionChanged');
             const allCompaniesId = @ViewBag.AllCompaniesId;
-            const sessionKey = 'MaterialDetailsPage';
+            const sessionKey = 'CashFlowAccountDetailsPage';
             let currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
             let formatterCurrency = new Intl.NumberFormat(currentCulture,
                     {
@@ -448,7 +448,7 @@
         function(e) {
             //#region rrr
             //#region Variables
-            const sessionKey = 'MaterialDetailsPage';
+            const sessionKey = 'CashFlowAccountDetailsPage';
             const selectedCompanies = document.getElementById("SelectedCompanies").ej2_instances[0];
             const $selectedCurrency = $('#CurrencySelector');
             //const $selectedCompany = $('#SelectedCompanies');
