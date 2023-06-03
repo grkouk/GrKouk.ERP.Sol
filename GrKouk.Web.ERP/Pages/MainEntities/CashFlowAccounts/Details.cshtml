@@ -11,7 +11,7 @@
     <div class="row">
         <main role="main" class="col-md-12 ms-sm-auto col-lg-12 px-4">
             <div class="row justify-content-end pt-2 pb-3 px-1">
-                <div class="col-5 gx-1">
+                <div class="col-4 gx-1">
 
                     <ejs-multiselect id="SelectedCompanies" dataSource="@ViewBag.CompaniesListJs"
                                      placeholder="Select Companies" mode="CheckBox"
@@ -26,6 +26,11 @@
                             asp-items="ViewBag.CurrencyList">
                     </select>
                 </div>
+                 <div class="col-2 gx-1">
+                    <select id="PeriodSelector" class="form-select form-select-sm"
+                            asp-items="ViewBag.DatePeriodListJs">
+                    </select>
+                </div>
             </div>
             <div class="container">
                 <div class="card bg-light">
@@ -33,7 +38,7 @@
                         <h5 class="card-title">@Model.ItemVm.Code</h5>
                         <h6 class="card-subtitle mb-2 text-muted">@Model.ItemVm.Companies</h6>
                         <p class="card-text"></p>
-                        <a href="./kartela?warehouseItemId=@Model.ItemVm.Id" class="card-link">Καρτέλα</a>
+                        <a href="./kartela?cashFlowAccountId=@Model.ItemVm.Id" class="card-link">Καρτέλα</a>
                         <a href="#" class="card-link">Another link</a>
                     </div>
                 </div>
@@ -198,8 +203,8 @@
 
 
             <div id="transGrid"></div>
-            <input type="hidden" asp-for="ItemVm.Id" id="WarehouseItemId" />
-            <input type="hidden" id="SelectoedCompanies" />
+            <input type="hidden" asp-for="ItemVm.Id" id="CashFlowAccountId" />
+            <input type="hidden" id="SelectedCompanies" />
             <input type="hidden" id="CurrencyId" />
             <input type="hidden" id="PeriodId" />
             <input type="hidden" id="companiesSelectionChanged" />
@@ -247,6 +252,8 @@
             const $spinnerEl = $('#FinancialLoader');
             const $currencySelector = $('#CurrencySelector');
             const $companiesSelectionChanged = $('#companiesSelectionChanged');
+            const $periodSelector = $('#PeriodSelector');
+            //const $periodSelectionChanged = $('#companiesSelectionChanged');
             const allCompaniesId = @ViewBag.AllCompaniesId;
             const sessionKey = 'CashFlowAccountDetailsPage';
             let currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
@@ -295,17 +302,16 @@
                     refreshView();
                 }
             });
-             const currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
-             const warehouseItemId = @Model.ItemVm.Id;
-             const refreshView = () => {
+            const currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
+            const cashFlowAccountId = @Model.ItemVm.Id;
+            const refreshView = () => {
 
                  let selCurrencyId = $currencySelector.val();
                  let selCompanies = $('#SelectedCompanies').val();
-                  // const $selectedPeriod = $('.selected-period-text');
-                 //	let selPeriodId = $selectedPeriod.data('periodid');
-                 getFinancialData(warehouseItemId, "", selCompanies,selCurrencyId, $spinnerEl)
+                
+                 getFinancialData(cashFlowAccountId, "", selCompanies,selCurrencyId, $spinnerEl)
 
-              };
+            };
             const formatNumericElements = () => {
                     let $currencyElements = $('.currency-data');
                     let $numElements = $('.numeric-data');
@@ -441,6 +447,7 @@
             selectedCompanies.value = sessionObj.companyCode;
             $currencySelector.val(sessionObj.currencyCode);
             currencyChanged();
+            $periodSelector.val(sessionObj.periodCode);
             $companiesSelectionChanged.val(0);
             refreshView();
      });
@@ -452,10 +459,10 @@
             const selectedCompanies = document.getElementById("SelectedCompanies").ej2_instances[0];
             const $selectedCurrency = $('#CurrencySelector');
             //const $selectedCompany = $('#SelectedCompanies');
-            const $selectedPeriod = $('.selected-period-text');
+            const $selectedPeriod = $('#PeriodSelector');
             let currentCurrency = $selectedCurrency.val();
             let currentCompany = JSON.stringify( selectedCompanies.value);
-            let currentPeriod = $selectedPeriod.data('periodid');
+            let currentPeriod = $selectedPeriod.val();
             var filtersArr = [];
             //#endregion
             filtersArr.push({
