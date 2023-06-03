@@ -305,11 +305,11 @@
             const currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
             const cashFlowAccountId = @Model.ItemVm.Id;
             const refreshView = () => {
-
+                 let selPeriodId = $periodSelector.val();
                  let selCurrencyId = $currencySelector.val();
                  let selCompanies = $('#SelectedCompanies').val();
                 
-                 getFinancialData(cashFlowAccountId, "", selCompanies,selCurrencyId, $spinnerEl)
+                 getFinancialData(cashFlowAccountId, selPeriodId, selCompanies,selCurrencyId, $spinnerEl)
 
             };
             const formatNumericElements = () => {
