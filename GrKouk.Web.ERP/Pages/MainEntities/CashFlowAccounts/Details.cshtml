@@ -147,8 +147,8 @@
                 <e-grid-aggregates>
                     <e-grid-aggregate>
                         <e-aggregate-columns>
-                            <e-aggregate-column field="DepositAmount" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
-                            <e-aggregate-column field="WithdrawAmount" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
+                            <e-aggregate-column field="deposit" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
+                            <e-aggregate-column field="withdraw" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
 
                         </e-aggregate-columns>
 
@@ -160,8 +160,8 @@
                     <e-grid-column field="docSeriesCode" headerText="Series Code" width="60"></e-grid-column>
                     <e-grid-column field="refCode" headerText="Ref Code" width="60" textAlign="Right"></e-grid-column>
                     <e-grid-column field="companyCode" headerText="Company Code" width="60"></e-grid-column>
-                    <e-grid-column field="depositAmount" headerText="Deposit" width="50" type="number" textAlign="Right" format="C2"></e-grid-column>
-                    <e-grid-column field="withdrawAmount" headerText="Withdrawal" width="50" type="number" textAlign="Right" format="C2"></e-grid-column>
+                    <e-grid-column field="deposit" headerText="Deposit" width="50" type="number" textAlign="Right" format="C2"></e-grid-column>
+                    <e-grid-column field="withdraw" headerText="Withdrawal" width="50" type="number" textAlign="Right" format="C2"></e-grid-column>
                     <e-grid-column field="runningTotal" headerText="Running Total" type="number" width="50" textAlign="Right" format="C2"></e-grid-column>
                 </e-grid-columns>
             </ejs-grid>
@@ -243,8 +243,14 @@
                  let selCompanies = $('#SelectedCompanies').val();
                 
                  getFinancialData(cashFlowAccountId, selPeriodId, selCompanies,selCurrencyId, $spinnerEl)
-
+                 let grd = document.getElementById("Grid").ej2_instances[0];
+                 grd.query = new ej.data.Query()
+                    .addParams('entityId', cashFlowAccountId)
+                    .addParams('dateRange', selPeriodId)
+                    .addParams('companyFilter', selCompanies)
+                    .addParams('displayCurrencyId', selCurrencyId);  
             };
+            
             const formatNumericElements = () => {
                     let $currencyElements = $('.currency-data');
                     let $numElements = $('.numeric-data');

@@ -601,14 +601,7 @@ namespace GrKouk.Web.ERP.Controllers
                 });
             }
 
-            var transactor = await _context.CashFlowAccounts.FirstOrDefaultAsync(x => x.Id == request.EntityId);
-            if (transactor == null)
-            {
-                return NotFound(new
-                {
-                    Error = "Transactor not found"
-                });
-            }
+            
 
            
 
@@ -678,19 +671,19 @@ namespace GrKouk.Web.ERP.Controllers
                 FiscalPeriodId = p.FiscalPeriodId,
                 CfaAction = p.CfaAction,
                 Amount = p.Amount,
-                
+                TransAmount = p.TransAmount,
                 CompanyId = p.CompanyId,
                 CompanyCode = p.Company.Code,
                 CompanyCurrencyId = p.Company.CurrencyId
             });
-
+            var t = await dbTrans.ToListAsync();
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
                 .Take(10)
                 .ToListAsync();
             //IEnumerable<TransactorTransListDto> dbTransactions = await dbTrans.ToListAsync();
 
             //--------------------------
-            IEnumerable<CfaKartelaLine> dbTransactions = await dbTrans.Select(p => new CfaKartelaLine
+            IEnumerable<CfaKartelaLine> dbTransactions =  t.Select(p => new CfaKartelaLine
             {
                 TransDate = p.TransDate,
                 DocSeriesCode = p.DocSeriesCode,
@@ -702,7 +695,7 @@ namespace GrKouk.Web.ERP.Controllers
                 CahsFlowAccountName = p.CashFlowAccountName,
                 Deposit = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.DepositAmount),
                 Withdraw = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.WithdrawAmount),
-            }).ToListAsync();
+            }).ToList();
             //--------------------------
 
             DataOperations operation = new DataOperations();
