@@ -573,7 +573,176 @@ namespace GrKouk.Web.ERP.Controllers
                 ? Ok(new { result = dbTransactions, count = resultCount })
                 : Ok(new { result = dbTransactions });
         }
+        
+        [HttpPost("GetCashFlowAccountTransactionsForDetail")]
+        public async Task<IActionResult> GetCashFlowAccountTransactionsForDetail([FromBody] ExtendedDataManagerRequest request)
+        {
+            if (request.EntityId == null)
+            {
+                return BadRequest(new
+                {
+                    Error = "No valid transactor id specified"
+                });
+            }
 
+            if (request.DisplayCurrencyId == 0)
+            {
+                return BadRequest(new
+                {
+                    Error = "No valid Currency specified"
+                });
+            }
+
+            if (request.DateRange == null)
+            {
+                return BadRequest(new
+                {
+                    Error = "No valid date range specified"
+                });
+            }
+
+            var transactor = await _context.CashFlowAccounts.FirstOrDefaultAsync(x => x.Id == request.EntityId);
+            if (transactor == null)
+            {
+                return NotFound(new
+                {
+                    Error = "Transactor not found"
+                });
+            }
+
+           
+
+            IQueryable<CashFlowAccountTransaction> transactionsList = _context.CashFlowAccountTransactions
+                .Include(p=>p.Company)
+                .Include(p=>p.DocumentSeries)
+                .Include(p=>p.DocumentType)
+                .Include(p=>p.Section)
+                .Include(p=>p.CashFlowAccount)
+                
+                .Where(p => p.CashFlowAccountId == request.EntityId);
+            IQueryable<CashFlowAccountTransaction> transListBeforePeriod = _context.CashFlowAccountTransactions
+                .Where(p => p.CashFlowAccountId == request.EntityId);
+            IQueryable<CashFlowAccountTransaction> transListAll = _context.CashFlowAccountTransactions
+                .Where(p => p.CashFlowAccountId == request.EntityId);
+
+
+            //DateTime beforePeriodDate = DateTime.Today;
+            if (!string.IsNullOrEmpty(request.DateRange))
+            {
+                var datePeriodFilter = request.DateRange;
+                DateFilterDates dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
+                DateTime fromDate = dfDates.FromDate;
+                //beforePeriodDate = fromDate.AddDays(-1);
+                DateTime toDate = dfDates.ToDate;
+
+                transactionsList = transactionsList.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
+                transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
+            }
+            if (!string.IsNullOrEmpty(request.CompanyFilter))
+            {
+                List<int> firmIds = System.Text.Json.JsonSerializer.Deserialize<List<int>>(request.CompanyFilter);
+                var allCompCode =
+                    await _context.AppSettings.SingleOrDefaultAsync(
+                        p => p.Code == Constants.AllCompaniesCodeKey);
+                if (allCompCode == null)
+                {
+                    return NotFound("All Companies Code Setting not found");
+                }
+
+                // var allCompaniesEntity =
+                //     await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+                transactionsList = transactionsList.Where(p => firmIds.Contains(p.CompanyId));
+                transListBeforePeriod = transListBeforePeriod.Where(p => firmIds.Contains(p.CompanyId));
+                transListAll = transListAll.Where(p => firmIds.Contains(p.CompanyId));
+
+                // fullListIq = fullListIq.Where(p => firmIds.Contains(p.CompanyId));
+            }
+
+
+            var dbTrans = transactionsList.Select(p=> new CfaTransactionListDto
+            {
+                Id = p.Id,
+                TransDate = p.TransDate,
+                DocSeriesId = p.DocumentSeriesId,
+                DocSeriesName = p.DocumentSeries.Name,
+                DocSeriesCode = p.DocumentSeries.Code,
+                DocTypeId = p.DocumentTypeId,
+                TransRefCode = p.RefCode,
+                CashFlowAccountId = p.CashFlowAccountId,
+                CashFlowAccountName = p.CashFlowAccount.Name,
+                SectionId = p.SectionId,
+                SectionCode = p.Section.Code,
+                CreatorId = p.CreatorId,
+                CreatorSectionId = p.CreatorSectionId,
+                CreatorSectionCode = null,
+                FiscalPeriodId = p.FiscalPeriodId,
+                CfaAction = p.CfaAction,
+                Amount = p.Amount,
+                
+                CompanyId = p.CompanyId,
+                CompanyCode = p.Company.Code,
+                CompanyCurrencyId = p.Company.CurrencyId
+            });
+
+            var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
+                .Take(10)
+                .ToListAsync();
+            //IEnumerable<TransactorTransListDto> dbTransactions = await dbTrans.ToListAsync();
+
+            //--------------------------
+            IEnumerable<CfaKartelaLine> dbTransactions = await dbTrans.Select(p => new CfaKartelaLine
+            {
+                TransDate = p.TransDate,
+                DocSeriesCode = p.DocSeriesCode,
+                RefCode = p.TransRefCode,
+                CompanyCode = p.CompanyCode,
+                SectionCode = p.SectionCode,
+                CreatorId =  p.CreatorId,
+                RunningTotal = 0,
+                CahsFlowAccountName = p.CashFlowAccountName,
+                Deposit = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.DepositAmount),
+                Withdraw = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.WithdrawAmount),
+            }).ToListAsync();
+            //--------------------------
+
+            DataOperations operation = new DataOperations();
+            if (request.Search != null && request.Search.Count > 0)
+            {
+                dbTransactions = operation.PerformSearching(dbTransactions, request.Search); //Search
+            }
+
+            if (request.Where != null && request.Where.Count > 0) //Filtering
+            {
+                dbTransactions = operation.PerformFiltering(dbTransactions, request.Where, request.Where[0].Operator);
+            }
+
+            if (request.Sorted != null && request.Sorted.Count > 0) //Sorting
+            {
+                dbTransactions = operation.PerformSorting(dbTransactions, request.Sorted);
+                decimal runningTotal = 0;
+                foreach (var dbTransaction in dbTransactions)
+                {
+                    runningTotal = dbTransaction.Deposit - dbTransaction.Withdraw + runningTotal;
+                    dbTransaction.RunningTotal = runningTotal;
+                }
+            }
+
+            var resultCount = dbTransactions.Count();
+            if (request.Skip != 0)
+            {
+                dbTransactions = operation.PerformSkip(dbTransactions, request.Skip); //Paging
+            }
+
+            if (request.Take != 0)
+            {
+                dbTransactions = operation.PerformTake(dbTransactions, request.Take);
+            }
+
+
+            return request.RequiresCounts
+                ? Ok(new { result = dbTransactions, count = resultCount })
+                : Ok(new { result = dbTransactions });
+        }
         [HttpGet("GetTransactorTransactions")]
         public async Task<IActionResult> GetTransactorTransactions([FromQuery] IndexDataTableRequest request)
         {

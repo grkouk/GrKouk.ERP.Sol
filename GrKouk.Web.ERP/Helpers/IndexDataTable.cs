@@ -80,6 +80,8 @@ namespace GrKouk.Web.ERP.Helpers
 
         [JsonProperty(PropertyName = "transactorId", Required = Required.Default)]
         public int? TransactorId { get; set; }
+        [JsonProperty(PropertyName = "entityId", Required = Required.Default)]
+        public int? EntityId { get; set; }
         [JsonProperty(PropertyName = "displayCurrencyId", Required = Required.Default)]
         public int DisplayCurrencyId { get; set; }
         [JsonProperty(PropertyName = "companyFilter", Required = Required.Default)]

@@ -143,7 +143,7 @@
             <input type="hidden" id="companiesSelectionChanged" />
             <ejs-grid id="Grid"
                       allowPaging="true" allowResizing="true" allowSorting="true" enablePersistence="true">
-                @*<e-data-manager url="@Url.Action("", "FinancialData")" adaptor="UrlAdaptor"></e-data-manager> *@
+                <e-data-manager url="@Url.Action("GetCashFlowAccountTransactionsForDetail", "FinancialData")" adaptor="UrlAdaptor"></e-data-manager>
                 <e-grid-aggregates>
                     <e-grid-aggregate>
                         <e-aggregate-columns>
@@ -160,8 +160,8 @@
                     <e-grid-column field="docSeriesCode" headerText="Series Code" width="60"></e-grid-column>
                     <e-grid-column field="refCode" headerText="Ref Code" width="60" textAlign="Right"></e-grid-column>
                     <e-grid-column field="companyCode" headerText="Company Code" width="60"></e-grid-column>
-                    <e-grid-column field="depositAmount" headerText="Debit" width="50" type="number" textAlign="Right" format="C2"></e-grid-column>
-                    <e-grid-column field="withdrawAmount" headerText="Credit" width="50" type="number" textAlign="Right" format="C2"></e-grid-column>
+                    <e-grid-column field="depositAmount" headerText="Deposit" width="50" type="number" textAlign="Right" format="C2"></e-grid-column>
+                    <e-grid-column field="withdrawAmount" headerText="Withdrawal" width="50" type="number" textAlign="Right" format="C2"></e-grid-column>
                     <e-grid-column field="runningTotal" headerText="Running Total" type="number" width="50" textAlign="Right" format="C2"></e-grid-column>
                 </e-grid-columns>
             </ejs-grid>
