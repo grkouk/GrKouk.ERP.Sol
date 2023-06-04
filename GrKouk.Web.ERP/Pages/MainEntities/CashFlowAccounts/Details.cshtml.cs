@@ -23,7 +23,7 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.CashFlowAccounts
         private readonly ApiDbContext _context;
         private readonly IMapper _mapper;
         private int _id;
-        public DetailsModel(ApiDbContext context,IMapper mapper)
+        public DetailsModel(ApiDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -41,8 +41,8 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.CashFlowAccounts
             _id = (int)id;
             ViewData["ItemId"] = id;
             var item = await _context.CashFlowAccounts
-                .Include(t=>t.CompanyMappings)
-                .ThenInclude(x=>x.Company)
+                .Include(t => t.CompanyMappings)
+                .ThenInclude(x => x.Company)
                 .SingleOrDefaultAsync(m => m.Id == id);
 
             if (item == null)
@@ -50,16 +50,15 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.CashFlowAccounts
                 return NotFound();
             }
             //ItemVm=_mapper.Map<WrItemDetailDto>(item);
-          
+
             ItemVm = new CashFlowAccountDetailDto()
             {
                 Id = item.Id,
                 Code = item.Code,
                 Name = item.Name,
-                
                 Companies = null
             };
-            
+
             var compList = item.CompanyMappings.Select(x => x.Company.Code).ToList();
             ItemVm.Companies = String.Join(",", compList);
             var itemTitle = $"{ItemVm.Name}";
@@ -68,14 +67,17 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.CashFlowAccounts
             await LoadCombosAsync();
             return Page();
         }
-         private async Task LoadCombosAsync() {
-            Func<Task<List<SelectListItem>>> transactorListFunc = async () => {
+        private async Task LoadCombosAsync()
+        {
+            Func<Task<List<SelectListItem>>> transactorListFunc = async () =>
+            {
                 var itemList = await _context.Transactors
                     .Include(p => p.TransactorType)
                     .Where(p => p.TransactorType.Code != "SYS.DTRANSACTOR")
                     .OrderBy(s => s.Name)
                     .AsNoTracking()
-                    .Select(c => new SelectListItem() {
+                    .Select(c => new SelectListItem()
+                    {
                         Value = c.Id.ToString(),
                         Text = $"{c.Name}-{c.TransactorType.Code}"
                     })
@@ -84,23 +86,27 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.CashFlowAccounts
             };
             Func<Task<List<SelectListItem>>> companiesListFunc = async () => await FiltersHelper.GetCompaniesFilterListAsync(_context);
             Func<Task<List<SelectListItem>>> currenciesListFunc = async () => await FiltersHelper.GetCurrenciesFilterListAsync(_context);
-            Func<Task<List<SelectListItem>>> transactorTransDocSeriesListFunc = async () => {
+            Func<Task<List<SelectListItem>>> transactorTransDocSeriesListFunc = async () =>
+            {
                 var itemsList = await _context.TransTransactorDocSeriesDefs
                     .OrderBy(s => s.Name)
                     .AsNoTracking()
-                    .Select(c => new SelectListItem() {
+                    .Select(c => new SelectListItem()
+                    {
                         Value = c.Id.ToString(),
                         Text = c.Name
                     })
                     .ToListAsync();
                 return itemsList;
             };
-            Func<Task<List<TransactorSelectListItem>>> transactorsJsListFunc = async () => {
+            Func<Task<List<TransactorSelectListItem>>> transactorsJsListFunc = async () =>
+            {
                 var itemsList = await _context.Transactors
                         .Include(p => p.TransactorType)
                         .Where(p => p.TransactorType.Code != "SYS.DTRANSACTOR")
-                        .OrderBy(p=>p.Name)
-                        .Select(p => new TransactorSelectListItem() {
+                        .OrderBy(p => p.Name)
+                        .Select(p => new TransactorSelectListItem()
+                        {
                             Id = p.Id,
                             TransactorName = p.Name,
                             TransactorTypeId = p.TransactorType.Id,
@@ -115,12 +121,13 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.CashFlowAccounts
             Func<Task<List<UISelectTypeItem>>> companiesListJsFunc = async () =>
             {
                 var itemsList = await _context.Companies
-                   .OrderBy(p=>p.Code)
-                   .Select(p => new UISelectTypeItem() {
+                   .OrderBy(p => p.Code)
+                   .Select(p => new UISelectTypeItem()
+                   {
                        Title = p.Code,
                        ValueInt = p.Id,
                        Value = p.Id.ToString()
-                    })
+                   })
                     .AsNoTracking()
                     .ToListAsync();
                 return itemsList;
@@ -128,24 +135,24 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.CashFlowAccounts
             Func<Task<List<Currency>>> currenciesListJsFunc = async () =>
             {
                 var itemsList = await _context.Currencies
-                    .OrderBy(p=>p.Name)
+                    .OrderBy(p => p.Name)
                     .AsNoTracking()
                     .ToListAsync();
                 return itemsList;
             };
-           
-           
+
+
             //ViewData["CompanyId"] = await companiesListFunc();
-            
+
             ViewData["TransactorId"] = await transactorListFunc();
-            
+
             ViewData["transactorsListJs"] = await transactorsJsListFunc();
             ViewData["CurrencyListJs"] = await currenciesListJsFunc();
-            ViewData["CurrencyList"]= await FiltersHelper.GetCurrenciesFilterListAsync(_context);
+            ViewData["CurrencyList"] = await FiltersHelper.GetCurrenciesFilterListAsync(_context);
             ViewData["DatePeriodListJs"] = DateFilter.GetDateFiltersSelectList();
             ViewData["CompaniesListJs"] = await companiesListJsFunc();
-            ViewData["AllCompaniesId"]=await FiltersHelper.GetAllCompaniesIdAsync(_context);
-           
+            ViewData["AllCompaniesId"] = await FiltersHelper.GetAllCompaniesIdAsync(_context);
+
         }
     }
 }
