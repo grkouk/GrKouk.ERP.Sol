@@ -57,46 +57,19 @@
                     <div class="col-lg-4 col-sm-12">
                         <div class="card">
                             <div class="card-header text-dark text-center">
-                                <h5>Εισαγωγές</h5>
+                                <h5>Εισροές</h5>
                             </div>
                             <div class="card-body text-center">
                                 <table class="table-sm w-100">
-
+        
                                     <tr>
-                                        <td>Ποσότητες(Εισ)</td>
-                                        <td>
-                                            <span class="numeric-data" name="ImportVolume"></span>
-
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Αξία(Εισ)</td>
+                                        <td>Αξία(Εισροών)</td>
                                         <td>
 
                                             <span class="currency-data" name="ImportValue"></span>
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td>Ποσότητες(Τιμ)</td>
-                                        <td>
-                                            <span class="numeric-data" name="InvoicedImportVolume"></span>
-
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Αξία(Τιμ)</td>
-                                        <td>
-
-                                            <span class="currency-data" name="InvoicedImportValue"></span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Μέση Τιμή(Τιμ)</td>
-                                        <td>
-
-                                            <span class="currency-data" name="MediumInvoicedImportPrice"></span>
-                                        </td>
-                                    </tr>
+                                    
                                 </table>
                             </div>
                         </div>
@@ -104,40 +77,17 @@
                     <div class="col-lg-4 col-sm-12">
                         <div class="card">
                             <div class="card-header text-dark text-center">
-                                <h5>Εξαγωγές</h5>
+                                <h5>Εκροές</h5>
                             </div>
                             <div class="card-body text-center">
                                 <table class="table-sm w-100">
-
+                                    
                                     <tr>
-                                        <td>Ποσότητες(Εισ)</td>
-                                        <td><span class="numeric-data" name="ExportVolume"> </span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Αξία(Εισ)</td>
+                                        <td>Αξία(Εκροών)</td>
                                         <td><span class="currency-data" name="ExportValue"></span></td>
                                     </tr>
-                                    <tr>
-                                        <td>Ποσότητες(Τιμ)</td>
-                                        <td>
-                                            <span class="numeric-data" name="InvoicedExportVolume"></span>
 
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Αξία(Τιμ)</td>
-                                        <td>
 
-                                            <span class="currency-data" name="InvoicedExportValue"></span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Μέση Τιμή(Τιμ)</td>
-                                        <td>
-
-                                            <span class="currency-data" name="MediumInvoicedExportPrice"></span>
-                                        </td>
-                                    </tr>
                                 </table>
                             </div>
                         </div>
@@ -149,29 +99,12 @@
                             </div>
                             <div class="card-body text-center">
                                 <table class="table-sm w-100">
+                                   
                                     <tr>
-                                        <td>Ποσότητες(Εισ)</td>
-                                        <td><span class="numeric-data" name="VolumeBalance"> </span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Αξία(Εισ)</td>
+                                        <td>Αξία</td>
                                         <td><span class="currency-data" name="ValueBalance"></span></td>
                                     </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td>
-                                        </td>
-                                    </tr>
+                                    
                                 </table>
                             </div>
                         </div>
@@ -214,8 +147,8 @@
                 <e-grid-aggregates>
                     <e-grid-aggregate>
                         <e-aggregate-columns>
-                            <e-aggregate-column field="debit" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
-                            <e-aggregate-column field="credit" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
+                            <e-aggregate-column field="DepositAmount" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
+                            <e-aggregate-column field="WithdrawAmount" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
 
                         </e-aggregate-columns>
 
@@ -227,8 +160,8 @@
                     <e-grid-column field="docSeriesCode" headerText="Series Code" width="60"></e-grid-column>
                     <e-grid-column field="refCode" headerText="Ref Code" width="60" textAlign="Right"></e-grid-column>
                     <e-grid-column field="companyCode" headerText="Company Code" width="60"></e-grid-column>
-                    <e-grid-column field="debit" headerText="Debit" width="50" type="number" textAlign="Right" format="C2"></e-grid-column>
-                    <e-grid-column field="credit" headerText="Credit" width="50" type="number" textAlign="Right" format="C2"></e-grid-column>
+                    <e-grid-column field="depositAmount" headerText="Debit" width="50" type="number" textAlign="Right" format="C2"></e-grid-column>
+                    <e-grid-column field="withdrawAmount" headerText="Credit" width="50" type="number" textAlign="Right" format="C2"></e-grid-column>
                     <e-grid-column field="runningTotal" headerText="Running Total" type="number" width="50" textAlign="Right" format="C2"></e-grid-column>
                 </e-grid-columns>
             </ejs-grid>
@@ -406,33 +339,23 @@
                   }
               };
             const getFinancialData = (itemId, dateRange, selCompany, selCurrency, spinnerEl) => {
-                    productLib.getProductFinancialSummaryData(itemId,dateRange,selCompany,selCurrency,spinnerEl)
+                    productLib.getCfaFinancialSummaryData(itemId,dateRange,selCompany,selCurrency,spinnerEl)
                     .then((data)=>{
                         console.log(data);
-                        let $importVolume = $('[name=ImportVolume]');
+                       
                         let $importValue = $('[name=ImportValue]');
-                        let $invoicedImportVolume = $('[name=InvoicedImportVolume]');
-                        let $invoicedImportValue = $('[name=InvoicedImportValue]');
-                        let $exportVolume = $('[name=ExportVolume]');
+                      
                         let $exportValue = $('[name=ExportValue]');
-                        let $invoicedExportVolume = $('[name=InvoicedExportVolume]');
-                        let $invoicedExportValue = $('[name=InvoicedExportValue]');
-                        let $mediumInvoicedImportPrice = $('[name=MediumInvoicedImportPrice]');
-                        let $mediumInvoicedExportPrice = $('[name=MediumInvoicedExportPrice]');
-                        let $volumeBalance = $('[name=VolumeBalance]');
                         let $valueBalance = $('[name=ValueBalance]');
-                        $importVolume.text(data.sumImportVolume);
-                        $importValue.text(data.sumImportValue);
-                        $invoicedImportVolume.text(data.sumInvoicedImportVolume);
-                        $invoicedImportValue.text(data.sumInvoicedImportValue);
-                        $invoicedExportVolume.text(data.sumInvoicedExportVolume);
-                        $invoicedExportValue.text(data.sumInvoicedExportValue);
-                        $exportVolume.text(data.sumExportVolume);
-                        $exportValue.text(data.sumExportValue);
-                        $mediumInvoicedImportPrice.text(data.mediumInvoicedImportPrice);
-                        $mediumInvoicedExportPrice.text(data.mediumInvoicedExportPrice);
-                        $volumeBalance.text(data.volumeBalance);
-                        $valueBalance.text(data.valueBalance);
+                        
+                        $importValue.text(data.sumOfDeposits);
+                        
+                        
+                        
+                        
+                        $exportValue.text(data.sumOfWithdraws);
+                        
+                        $valueBalance.text(data.sumOfDifference);
                         formatNumericElements();
                     })
                     .catch((error) => {
@@ -443,8 +366,16 @@
             $currencySelector.change((event) => {
                 currencyChanged();
             });
+             const periodChanged = () =>  {
+                refreshView();
+             };
+             $periodSelector.change((event) => {
+                periodChanged();
+             });
             loadPreviousSession(sessionKey, sessionObj);
             selectedCompanies.value = sessionObj.companyCode;
+            var selected = JSON.stringify(selectedCompanies.value);
+            $('#SelectedCompanies').val(selected);
             $currencySelector.val(sessionObj.currencyCode);
             currencyChanged();
             $periodSelector.val(sessionObj.periodCode);

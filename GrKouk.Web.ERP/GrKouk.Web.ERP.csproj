@@ -5,11 +5,12 @@
     <UserSecretsId>aspnet-GrKouk.Web.ERP-9809E9E6-BFCC-497C-AA52-99A71FFC0427</UserSecretsId>
     <Authors>George Koukoudis</Authors>
     <Company>GrKoukOrg</Company>
-    <Copyright>George Koukoudis</Copyright>
+    <Copyright>GrKoukOrg</Copyright>
     <Version>1.0.0.3</Version>
-    <PackageVersion>1.0.0.3</PackageVersion>
-    <AssemblyVersion>1.0.0.3</AssemblyVersion>
-    <FileVersion>1.0.0.3</FileVersion>
+    <PackageVersion>1.0.1.0</PackageVersion>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>1.0.1.0</FileVersion>
+    <Title>GrKoukOrg Erp</Title>
   </PropertyGroup>
 
   <ItemGroup>

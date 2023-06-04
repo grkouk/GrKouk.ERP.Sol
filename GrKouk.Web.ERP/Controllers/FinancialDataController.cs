@@ -346,7 +346,7 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpGet("GetCfaFinancialSummaryData")]
         public async Task<IActionResult> GetCfaFinancialSummaryData([FromQuery] IndexDataTableRequest request)
         {
-            if (request.TransactorId <= 0)
+            if (request.CashFlowAccountId <= 0)
             {
                 return BadRequest();
             }
