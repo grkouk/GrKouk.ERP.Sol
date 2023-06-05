@@ -1,5 +1,9 @@
-﻿//Index pages javascript tools
-//Last update 2022/01/17
+﻿//Author: George Koukoudis
+//Version:  1.0
+//Date Created: 
+//Date Modified: 2022/01/17
+//Index pages javascript tools
+
 var indPgLib = (function () {
     let indexPageDefinition;
     let colDefs;
