@@ -10,7 +10,7 @@ namespace GrKouk.Web.ERP.Helpers
 
         public DateTime TransDate { get; set; }
 
-        public string CahsFlowAccountName { get; set; }
+        public string CashFlowAccountName { get; set; }
         public string CompanyCode { get; set; }
         public string DocSeriesCode { get; set; }
         public string DocSeriesName { get; set; }

@@ -370,8 +370,17 @@ namespace GrKouk.Web.ERP.Controllers
 
                 var allCompaniesEntity =
                     await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+              
+                if (allCompaniesEntity == null)
+                {
+                    return NotFound("All Companies entity not found");
+                }
 
-                fullListIq = fullListIq.Where(p => firmIds.Contains(p.CompanyId));
+                if (!firmIds.Contains(allCompaniesEntity.Id))
+                {
+                    fullListIq = fullListIq.Where(p => firmIds.Contains(p.CompanyId));    
+                }
+                
             }
 
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
@@ -642,12 +651,20 @@ namespace GrKouk.Web.ERP.Controllers
                     return NotFound("All Companies Code Setting not found");
                 }
 
-                // var allCompaniesEntity =
-                //     await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
-                transactionsList = transactionsList.Where(p => firmIds.Contains(p.CompanyId));
-                transListBeforePeriod = transListBeforePeriod.Where(p => firmIds.Contains(p.CompanyId));
-                transListAll = transListAll.Where(p => firmIds.Contains(p.CompanyId));
+                var allCompaniesEntity = await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+                if (allCompaniesEntity == null)
+                {
+                        return NotFound("All Companies entity not found");
+                }
 
+                if (!firmIds.Contains(allCompaniesEntity.Id))
+                {
+                    transactionsList = transactionsList.Where(p => firmIds.Contains(p.CompanyId));
+                    transListBeforePeriod = transListBeforePeriod.Where(p => firmIds.Contains(p.CompanyId));
+                    transListAll = transListAll.Where(p => firmIds.Contains(p.CompanyId));
+    
+                }
+                
                 // fullListIq = fullListIq.Where(p => firmIds.Contains(p.CompanyId));
             }
 
@@ -692,7 +709,7 @@ namespace GrKouk.Web.ERP.Controllers
                 SectionCode = p.SectionCode,
                 CreatorId =  p.CreatorId,
                 RunningTotal = 0,
-                CahsFlowAccountName = p.CashFlowAccountName,
+                CashFlowAccountName = p.CashFlowAccountName,
                 Deposit = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.DepositAmount),
                 Withdraw = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.WithdrawAmount),
             }).ToList();
