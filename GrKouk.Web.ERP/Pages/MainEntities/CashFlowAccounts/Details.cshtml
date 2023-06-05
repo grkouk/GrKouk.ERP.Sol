@@ -149,9 +149,9 @@
                         <e-aggregate-columns>
                             <e-aggregate-column field="deposit" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
                             <e-aggregate-column field="withdraw" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
-
+                
                         </e-aggregate-columns>
-
+                
                     </e-grid-aggregate>
                 </e-grid-aggregates>
                 <e-grid-pagesettings pageSizes="true"></e-grid-pagesettings>
@@ -201,6 +201,31 @@
                         maximumFractionDigits: 3
 
                     });
+            const loadCultureFiles = (name) => {
+                let files = ['ca-gregorian.json', 'numbers.json', 'timeZoneNames.json', 'currencies.json'];
+                if (name === 'ar') {
+                    files.push('numberingSystems.json');
+                }
+                let loader = ej.base.loadCldr;
+                let loadCulture = function(prop) {
+                    let val
+                    let ajax;
+                    if (name === 'ar' && prop === files.length - 1) {
+                        ajax = new ej.base.Ajax(location.origin + location.pathname + '/../../../lib/cldr-data/supplemental/' + files[prop], 'GET', false);
+                    } else {
+                        ajax = new ej.base.Ajax(location.origin + location.pathname + '/../../../lib/cldr-data/main/' + name + '/' + files[prop], 'GET', false);
+                    }
+                    ajax.onSuccess = function(value) {
+                        val = value;
+                    };
+                    ajax.send();
+                    loader(JSON.parse(val));
+                };
+                for (var prop = 0; prop < files.length; prop++) {
+                    loadCulture(prop);
+                }
+            };
+            
             let sessionObj = {
                  'currencyCode': '',
                  'periodCode': '',
@@ -283,16 +308,28 @@
                         currencyCode = currentCurrency.code;
                         let locale = currentCurrency.displayLocale;
                         formatterCurrency = new Intl.NumberFormat(locale,
-                            {
-                                style: 'currency',
-                                currency: currencyCode,
-                                minimumFractionDigits: 2
-                            });
-                            formatterNumber = new Intl.NumberFormat(locale,
-                            {
-                                maximumFractionDigits: 3
+                        {
+                            style: 'currency',
+                            currency: currencyCode,
+                            minimumFractionDigits: 2
+                        });
+                        formatterNumber = new Intl.NumberFormat(locale,
+                        {
+                            maximumFractionDigits: 3
 
-                                });
+                        });
+                        let cCulture = locale;
+                        let cBaseCulture = cCulture;
+                        if (cCulture.length > 2) {
+                            cBaseCulture = cCulture.substr(0, 2);
+                        }
+                        loadCultureFiles(cBaseCulture);
+                        ej.base.setCulture(cBaseCulture);
+                        ej.base.setCurrencyCode(currencyCode);
+                        //loadEj2Translation(cBaseCulture);
+    
+                        var grid = document.getElementById("Grid").ej2_instances[0];
+                        grid.locale = cBaseCulture;
                         refreshView();
                     //formatNumericElements();
                         //indPgLib.setCurrencyFormatter(formatterCurrency);

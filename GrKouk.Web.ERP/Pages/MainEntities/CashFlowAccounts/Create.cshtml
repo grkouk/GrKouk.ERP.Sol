@@ -6,8 +6,8 @@
 }
 @section MyCss
 {
-    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/bootstrap5.css" />
-    
+    @* <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/bootstrap5.css" /> *@
+    <partial name="Shared/_CssSyncfusionBlockPartial"/>
 }
 <h4>Create Cash Flow Account</h4>
 <hr />
@@ -59,8 +59,8 @@
 @section Scripts {
    
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
-    <ejs-scripts></ejs-scripts>
+    
+    <partial name="Shared/_JsSyncfusionBlockPartial"/>
     <script>
         $(document).ready(function() {
           

@@ -6054,7 +6054,7 @@ namespace GrKouk.Web.ERP.Controllers
             beforePeriod.DocSeriesCode = "Εκ.Μεταφ.";
             beforePeriod.DocSeriesName = "Εκ.Μεταφ.";
             beforePeriod.CreatorId = -1;
-            beforePeriod.CahsFlowAccountName = "";
+            beforePeriod.CashFlowAccountName = "";
 
             var listWithTotal = new List<CfaKartelaLine>
             {
@@ -6083,7 +6083,7 @@ namespace GrKouk.Web.ERP.Controllers
                     CreatorSectionId = dbTransaction.CreatorSectionId,
                     CreatorSectionCode = dbTransaction.CreatorSectionCode,
                     RunningTotal = runningTotal,
-                    CahsFlowAccountName = dbTransaction.CashFlowAccountName,
+                    CashFlowAccountName = dbTransaction.CashFlowAccountName,
                     Deposit = dbTransaction.DepositAmount,
                     Withdraw = dbTransaction.WithdrawAmount
                 });
