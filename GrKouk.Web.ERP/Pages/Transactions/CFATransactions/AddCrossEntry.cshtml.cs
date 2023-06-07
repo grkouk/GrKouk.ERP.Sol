@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.Shared;
-using GrKouk.Erp.Dtos.TransactorTransactions;
+using GrKouk.Erp.Dtos.CashFlowTransactions;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
@@ -15,16 +15,16 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NToastNotify;
 
-namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
+namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
 {
     [Authorize(Roles = "Admin")]
     public class AddCrossEntry : PageModel
     {
-        private const string _sectionCode = "SYS-TRANSACTOR-TRANS";
+        private const string _sectionCode = "SYS-CFA-TRANS";
         private readonly ApiDbContext _context;
         private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
-        [BindProperty] public TransactorCrossEntryDto ItemVm { get; set; }
+        [BindProperty] public CashFlowAccountCrossEntryDto ItemVm { get; set; }
 
         public AddCrossEntry(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
         {

@@ -370,7 +370,7 @@ namespace GrKouk.Web.ERP.Controllers
 
                 var allCompaniesEntity =
                     await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
-              
+
                 if (allCompaniesEntity == null)
                 {
                     return NotFound("All Companies entity not found");
@@ -378,9 +378,9 @@ namespace GrKouk.Web.ERP.Controllers
 
                 if (!firmIds.Contains(allCompaniesEntity.Id))
                 {
-                    fullListIq = fullListIq.Where(p => firmIds.Contains(p.CompanyId));    
+                    fullListIq = fullListIq.Where(p => firmIds.Contains(p.CompanyId));
                 }
-                
+
             }
 
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
@@ -582,7 +582,7 @@ namespace GrKouk.Web.ERP.Controllers
                 ? Ok(new { result = dbTransactions, count = resultCount })
                 : Ok(new { result = dbTransactions });
         }
-        
+
         [HttpPost("GetCashFlowAccountTransactionsForDetail")]
         public async Task<IActionResult> GetCashFlowAccountTransactionsForDetail([FromBody] ExtendedDataManagerRequest request)
         {
@@ -610,17 +610,17 @@ namespace GrKouk.Web.ERP.Controllers
                 });
             }
 
-            
 
-           
+
+
 
             IQueryable<CashFlowAccountTransaction> transactionsList = _context.CashFlowAccountTransactions
-                .Include(p=>p.Company)
-                .Include(p=>p.DocumentSeries)
-                .Include(p=>p.DocumentType)
-                .Include(p=>p.Section)
-                .Include(p=>p.CashFlowAccount)
-                
+                .Include(p => p.Company)
+                .Include(p => p.DocumentSeries)
+                .Include(p => p.DocumentType)
+                .Include(p => p.Section)
+                .Include(p => p.CashFlowAccount)
+
                 .Where(p => p.CashFlowAccountId == request.EntityId);
             IQueryable<CashFlowAccountTransaction> transListBeforePeriod = _context.CashFlowAccountTransactions
                 .Where(p => p.CashFlowAccountId == request.EntityId);
@@ -654,7 +654,7 @@ namespace GrKouk.Web.ERP.Controllers
                 var allCompaniesEntity = await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
                 if (allCompaniesEntity == null)
                 {
-                        return NotFound("All Companies entity not found");
+                    return NotFound("All Companies entity not found");
                 }
 
                 if (!firmIds.Contains(allCompaniesEntity.Id))
@@ -662,14 +662,14 @@ namespace GrKouk.Web.ERP.Controllers
                     transactionsList = transactionsList.Where(p => firmIds.Contains(p.CompanyId));
                     transListBeforePeriod = transListBeforePeriod.Where(p => firmIds.Contains(p.CompanyId));
                     transListAll = transListAll.Where(p => firmIds.Contains(p.CompanyId));
-    
+
                 }
-                
+
                 // fullListIq = fullListIq.Where(p => firmIds.Contains(p.CompanyId));
             }
 
 
-            var dbTrans = transactionsList.Select(p=> new CfaTransactionListDto
+            var dbTrans = transactionsList.Select(p => new CfaTransactionListDto
             {
                 Id = p.Id,
                 TransDate = p.TransDate,
@@ -684,7 +684,7 @@ namespace GrKouk.Web.ERP.Controllers
                 SectionCode = p.Section.Code,
                 CreatorId = p.CreatorId,
                 CreatorSectionId = p.CreatorSectionId,
-                CreatorSectionCode = null,
+                CreatorSectionCode = "",
                 FiscalPeriodId = p.FiscalPeriodId,
                 CfaAction = p.CfaAction,
                 Amount = p.Amount,
@@ -700,14 +700,14 @@ namespace GrKouk.Web.ERP.Controllers
             //IEnumerable<TransactorTransListDto> dbTransactions = await dbTrans.ToListAsync();
 
             //--------------------------
-            IEnumerable<CfaKartelaLine> dbTransactions =  t.Select(p => new CfaKartelaLine
+            IEnumerable<CfaKartelaLine> dbTransactions = t.Select(p => new CfaKartelaLine
             {
                 TransDate = p.TransDate,
                 DocSeriesCode = p.DocSeriesCode,
                 RefCode = p.TransRefCode,
                 CompanyCode = p.CompanyCode,
                 SectionCode = p.SectionCode,
-                CreatorId =  p.CreatorId,
+                CreatorId = p.CreatorId,
                 RunningTotal = 0,
                 CashFlowAccountName = p.CashFlowAccountName,
                 Deposit = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.DepositAmount),
@@ -715,7 +715,7 @@ namespace GrKouk.Web.ERP.Controllers
             }).ToList();
             //--------------------------
 
-            DataOperations operation = new DataOperations();
+            DataOperations operation = new();
             if (request.Search != null && request.Search.Count > 0)
             {
                 dbTransactions = operation.PerformSearching(dbTransactions, request.Search); //Search
