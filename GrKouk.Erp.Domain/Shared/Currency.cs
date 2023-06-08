@@ -21,7 +21,7 @@ namespace GrKouk.Erp.Domain.Shared
         private ICollection<ExchangeRate> _rates;
         public ICollection<ExchangeRate> Rates
         {
-            get => _rates ?? (_rates = new List<ExchangeRate>());
+            get => _rates ??= new List<ExchangeRate>();
             set => _rates = value;
         }
     }

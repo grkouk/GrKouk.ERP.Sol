@@ -8,12 +8,10 @@ namespace GrKouk.Web.ERP.Pages.Configuration.CashFlow.CFADocTypeDefs
     [Authorize(Roles = "Admin")]
     public class IndexModel : PageModel
     {
-      
-        public IndexModel(ApiDbContext context, IMapper mapper)
-        {
-           
-        }
-      
+        private readonly ApiDbContext _context;
+
+        public IndexModel(ApiDbContext context) => _context = context;
+
         public void OnGet()
         {
            

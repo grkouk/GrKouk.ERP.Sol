@@ -40,7 +40,7 @@ namespace GrKouk.Erp.Dtos.BuyDocuments
 
         public virtual IList<BuyDocLineAjaxDto> BuyDocLines
         {
-            get { return _buyDocLines ?? (_buyDocLines = new List<BuyDocLineAjaxDto>()); }
+            get { return _buyDocLines ??= new List<BuyDocLineAjaxDto>(); }
             set { _buyDocLines = value; }
         }
     }

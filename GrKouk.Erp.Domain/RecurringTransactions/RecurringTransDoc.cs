@@ -54,7 +54,7 @@ namespace GrKouk.Erp.Domain.RecurringTransactions
         public byte[] Timestamp { get; set; }
         public virtual ICollection<RecurringTransDocLine> DocLines
         {
-            get => _docLines ?? (_docLines = new List<RecurringTransDocLine>());
+            get => _docLines ??= new List<RecurringTransDocLine>();
             set => _docLines = value;
         }
 

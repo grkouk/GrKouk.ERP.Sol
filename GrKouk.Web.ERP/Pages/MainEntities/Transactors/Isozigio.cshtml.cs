@@ -32,8 +32,7 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors
         }
         private void LoadFilters()
         {
-            var pageFilterSize = PageFilter.GetPageSizeFiltersSelectList();
-            ViewData["PageFilterSize"] = new SelectList(pageFilterSize, "Value", "Text");
+           
 
             var dbTransactorTypes = _context.TransactorTypes.OrderBy(p => p.Code).AsNoTracking();
             List<SelectListItem> transactorTypes = new List<SelectListItem>();
@@ -43,6 +42,10 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors
                 transactorTypes.Add(new SelectListItem() { Value = dbTransactorType.Id.ToString(), Text = dbTransactorType.Code });
             }
             ViewData["TransactorTypeId"] = new SelectList(transactorTypes, "Value", "Text");
+                       
+
+            var pageFilterSize = PageFilter.GetPageSizeFiltersSelectList();
+            ViewData["PageFilterSize"] = new SelectList(pageFilterSize, "Value", "Text");
 
             var companiesList = FiltersHelper.GetCompaniesFilterList(_context);
             ViewData["CompanyFilter"] = new SelectList(companiesList, "Value", "Text");

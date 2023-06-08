@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GrKouk.Web.ERP.Helpers
 {
-     public class DateFilterDates
+    public class DateFilterDates
     {
         public DateTime FromDate { get; set; }
         public DateTime ToDate { get; set; }
@@ -15,7 +15,7 @@ namespace GrKouk.Web.ERP.Helpers
     {
         public static List<SelectListItem> GetDateFiltersSelectList()
         {
-            var thisYear=DateTime.Today.Year;
+            var thisYear = DateTime.Today.Year;
             int twoYearsAgo = thisYear - 2;
             int threeYearsAgo = thisYear - 3;
             List<SelectListItem> datePeriods = new List<SelectListItem>
@@ -54,6 +54,7 @@ namespace GrKouk.Web.ERP.Helpers
                 //new SelectListItem() {Value = "OKTLASTYEAR", Text = "Οκτ.Προηγ. Ετος"},
                 //new SelectListItem() {Value = "NOVLASTYEAR", Text = "Νοε.Προηγ. Ετος"},
                 //new SelectListItem() {Value = "DECLASTYEAR", Text = "Δεκ.Προηγ. Ετος"},
+               // new SelectListItem() {Value = "CUSTOM", Text = "Custom"},
                 new SelectListItem() {Value = "ALL", Text = "{All}"}
             };
             return datePeriods;
@@ -120,7 +121,7 @@ namespace GrKouk.Web.ERP.Helpers
                 case "PREMONTH":
                     var m = DateTime.Now.Month;
                     var y = DateTime.Now.Year;
-                    if (m>1)
+                    if (m > 1)
                     {
                         m--;
 
@@ -169,7 +170,7 @@ namespace GrKouk.Web.ERP.Helpers
                     dateFilter.FromDate = new DateTime(DateTime.Now.Year, 1, 1);
                     dateFilter.ToDate = new DateTime(DateTime.Now.Year, 1, DateTime.DaysInMonth(DateTime.Now.Year, 1));
                     break;
-              
+
                 case "FEBCURYEAR":
                     dateFilter.FromDate = new DateTime(DateTime.Now.Year, 2, 1);
                     dateFilter.ToDate = new DateTime(DateTime.Now.Year, 2, DateTime.DaysInMonth(DateTime.Now.Year, 2));
@@ -215,61 +216,61 @@ namespace GrKouk.Web.ERP.Helpers
                     dateFilter.ToDate = new DateTime(DateTime.Now.Year, 12, DateTime.DaysInMonth(DateTime.Now.Year, 12));
                     break;
                 case "LASTYEAR":
-                    
-                    dateFilter.FromDate = new DateTime(DateTime.Now.Year-1, 1, 1);
-                    dateFilter.ToDate = new DateTime(DateTime.Now.Year-1, 12, DateTime.DaysInMonth(DateTime.Now.Year-1, 12));
+
+                    dateFilter.FromDate = new DateTime(DateTime.Now.Year - 1, 1, 1);
+                    dateFilter.ToDate = new DateTime(DateTime.Now.Year - 1, 12, DateTime.DaysInMonth(DateTime.Now.Year - 1, 12));
                     break;
                 case "JANLASTYEAR":
-                    dateFilter.FromDate = new DateTime(DateTime.Now.Year-1, 1, 1);
-                    dateFilter.ToDate = new DateTime(DateTime.Now.Year-1, 1, DateTime.DaysInMonth(DateTime.Now.Year-1, 1));
+                    dateFilter.FromDate = new DateTime(DateTime.Now.Year - 1, 1, 1);
+                    dateFilter.ToDate = new DateTime(DateTime.Now.Year - 1, 1, DateTime.DaysInMonth(DateTime.Now.Year - 1, 1));
                     break;
                 case "FEBLASTYEAR":
-                    dateFilter.FromDate = new DateTime(DateTime.Now.Year-1, 2, 1);
-                    dateFilter.ToDate = new DateTime(DateTime.Now.Year-1, 2, DateTime.DaysInMonth(DateTime.Now.Year-1, 2));
+                    dateFilter.FromDate = new DateTime(DateTime.Now.Year - 1, 2, 1);
+                    dateFilter.ToDate = new DateTime(DateTime.Now.Year - 1, 2, DateTime.DaysInMonth(DateTime.Now.Year - 1, 2));
                     break;
                 case "MARLASTYEAR":
-                    dateFilter.FromDate = new DateTime(DateTime.Now.Year-1, 3, 1);
-                    dateFilter.ToDate = new DateTime(DateTime.Now.Year-1, 3, DateTime.DaysInMonth(DateTime.Now.Year-1, 3));
+                    dateFilter.FromDate = new DateTime(DateTime.Now.Year - 1, 3, 1);
+                    dateFilter.ToDate = new DateTime(DateTime.Now.Year - 1, 3, DateTime.DaysInMonth(DateTime.Now.Year - 1, 3));
                     break;
                 case "APRLASTYEAR":
-                    dateFilter.FromDate = new DateTime(DateTime.Now.Year-1, 4, 1);
-                    dateFilter.ToDate = new DateTime(DateTime.Now.Year-1, 4, DateTime.DaysInMonth(DateTime.Now.Year-1, 4));
+                    dateFilter.FromDate = new DateTime(DateTime.Now.Year - 1, 4, 1);
+                    dateFilter.ToDate = new DateTime(DateTime.Now.Year - 1, 4, DateTime.DaysInMonth(DateTime.Now.Year - 1, 4));
                     break;
                 case "MAILASTYEAR":
-                    dateFilter.FromDate = new DateTime(DateTime.Now.Year-1, 5, 1);
-                    dateFilter.ToDate = new DateTime(DateTime.Now.Year-1, 5, DateTime.DaysInMonth(DateTime.Now.Year-1, 5));
+                    dateFilter.FromDate = new DateTime(DateTime.Now.Year - 1, 5, 1);
+                    dateFilter.ToDate = new DateTime(DateTime.Now.Year - 1, 5, DateTime.DaysInMonth(DateTime.Now.Year - 1, 5));
                     break;
                 case "JUNLASTYEAR":
-                    dateFilter.FromDate = new DateTime(DateTime.Now.Year-1, 6, 1);
-                    dateFilter.ToDate = new DateTime(DateTime.Now.Year-1, 6, DateTime.DaysInMonth(DateTime.Now.Year-1, 6));
+                    dateFilter.FromDate = new DateTime(DateTime.Now.Year - 1, 6, 1);
+                    dateFilter.ToDate = new DateTime(DateTime.Now.Year - 1, 6, DateTime.DaysInMonth(DateTime.Now.Year - 1, 6));
                     break;
                 case "JULLASTYEAR":
-                    dateFilter.FromDate = new DateTime(DateTime.Now.Year-1, 7, 1);
-                    dateFilter.ToDate = new DateTime(DateTime.Now.Year-1, 7, DateTime.DaysInMonth(DateTime.Now.Year-1, 7));
+                    dateFilter.FromDate = new DateTime(DateTime.Now.Year - 1, 7, 1);
+                    dateFilter.ToDate = new DateTime(DateTime.Now.Year - 1, 7, DateTime.DaysInMonth(DateTime.Now.Year - 1, 7));
                     break;
                 case "AUGLASTYEAR":
-                    dateFilter.FromDate = new DateTime(DateTime.Now.Year-1, 8, 1);
-                    dateFilter.ToDate = new DateTime(DateTime.Now.Year-1, 8, DateTime.DaysInMonth(DateTime.Now.Year-1, 8));
+                    dateFilter.FromDate = new DateTime(DateTime.Now.Year - 1, 8, 1);
+                    dateFilter.ToDate = new DateTime(DateTime.Now.Year - 1, 8, DateTime.DaysInMonth(DateTime.Now.Year - 1, 8));
                     break;
                 case "SEPLASTYEAR":
-                    dateFilter.FromDate = new DateTime(DateTime.Now.Year-1, 9, 1);
-                    dateFilter.ToDate = new DateTime(DateTime.Now.Year-1, 9, DateTime.DaysInMonth(DateTime.Now.Year-1, 9));
+                    dateFilter.FromDate = new DateTime(DateTime.Now.Year - 1, 9, 1);
+                    dateFilter.ToDate = new DateTime(DateTime.Now.Year - 1, 9, DateTime.DaysInMonth(DateTime.Now.Year - 1, 9));
                     break;
                 case "OKTLASTYEAR":
-                    dateFilter.FromDate = new DateTime(DateTime.Now.Year-1, 10, 1);
-                    dateFilter.ToDate = new DateTime(DateTime.Now.Year-1, 10, DateTime.DaysInMonth(DateTime.Now.Year-1, 10));
+                    dateFilter.FromDate = new DateTime(DateTime.Now.Year - 1, 10, 1);
+                    dateFilter.ToDate = new DateTime(DateTime.Now.Year - 1, 10, DateTime.DaysInMonth(DateTime.Now.Year - 1, 10));
                     break;
                 case "NOVLASTYEAR":
-                    dateFilter.FromDate = new DateTime(DateTime.Now.Year-1, 11, 1);
-                    dateFilter.ToDate = new DateTime(DateTime.Now.Year-1, 11, DateTime.DaysInMonth(DateTime.Now.Year-1, 11));
+                    dateFilter.FromDate = new DateTime(DateTime.Now.Year - 1, 11, 1);
+                    dateFilter.ToDate = new DateTime(DateTime.Now.Year - 1, 11, DateTime.DaysInMonth(DateTime.Now.Year - 1, 11));
                     break;
                 case "DECLASTYEAR":
-                    dateFilter.FromDate = new DateTime(DateTime.Now.Year-1, 12, 1);
-                    dateFilter.ToDate = new DateTime(DateTime.Now.Year-1, 12, DateTime.DaysInMonth(DateTime.Now.Year-1, 12));
+                    dateFilter.FromDate = new DateTime(DateTime.Now.Year - 1, 12, 1);
+                    dateFilter.ToDate = new DateTime(DateTime.Now.Year - 1, 12, DateTime.DaysInMonth(DateTime.Now.Year - 1, 12));
                     break;
                 case "ALL":
                     dateFilter.FromDate = new DateTime(1966, 8, 1);
-                    dateFilter.ToDate =  DateTime.MaxValue;
+                    dateFilter.ToDate = DateTime.MaxValue;
                     break;
                 default:
                     dateFilter.FromDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
@@ -280,7 +281,7 @@ namespace GrKouk.Web.ERP.Helpers
             }
             return dateFilter;
         }
-         public static DateFilterDates GetRecTransDateFilterDates(string dateFilterName)
+        public static DateFilterDates GetRecTransDateFilterDates(string dateFilterName)
         {
 
             DateFilterDates dateFilter = new DateFilterDates
@@ -295,12 +296,12 @@ namespace GrKouk.Web.ERP.Helpers
                     var cM = DateTime.Now.Month;
                     var cY = DateTime.Now.Year;
                     var daysInCurMonth = DateTime.DaysInMonth(cY, cM);
-                    dateFilter.ToDate = new DateTime(cY, cM, daysInCurMonth);;
+                    dateFilter.ToDate = new DateTime(cY, cM, daysInCurMonth); ;
                     break;
                 case "PREMONTH":
                     var m = DateTime.Now.Month;
                     var y = DateTime.Now.Year;
-                    if (m>1)
+                    if (m > 1)
                     {
                         m--;
 
@@ -322,7 +323,7 @@ namespace GrKouk.Web.ERP.Helpers
                     dateFilter.ToDate = dateFilter.FromDate.AddDays(60);
                     break;
                 case "90DAYS":
-                    dateFilter.FromDate = DateTime.Now;;
+                    dateFilter.FromDate = DateTime.Now; ;
                     dateFilter.ToDate = dateFilter.FromDate.AddDays(90);
                     break;
                 case "360DAYS":
@@ -341,11 +342,11 @@ namespace GrKouk.Web.ERP.Helpers
                     break;
                 case "ALL":
                     dateFilter.FromDate = new DateTime(1966, 8, 1);
-                    dateFilter.ToDate =  DateTime.MaxValue;
+                    dateFilter.ToDate = DateTime.MaxValue;
                     break;
                 default:
                     dateFilter.FromDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-                    dateFilter.ToDate = new DateTime(DateTime.Now.Year, 1, 1);;
+                    dateFilter.ToDate = new DateTime(DateTime.Now.Year, 1, 1); ;
                     dateFilter.FilterName = "CURYEAR";
                     break;
 

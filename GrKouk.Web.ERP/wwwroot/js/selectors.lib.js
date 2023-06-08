@@ -1,4 +1,8 @@
-﻿//This library is used in selectors inside pages (transactors or warehouseitems)
+﻿//Author: George Koukoudis
+//Version:  1.0.0.1
+//Date Created: 
+//Date Modified: 05/06/2023
+//This library is used in selectors inside pages (transactors or warehouseitems)
 var selectorsLib = (function () {
     const $tblElement=$('#selectorItemsList');
     const $tblHeader = $('#selectorItemsList > thead');
@@ -80,7 +84,13 @@ var selectorsLib = (function () {
             currencyFilterElement : 1,
             transactorTypeFilterElement :transactorTypesSelected,
             transactorIdFilterElement : 0,
-            productNatureFilterElement : productNaturesSelected
+            cfaIdFilterElement:0,
+            warehouseItemIdFilterElement:0,
+            productNatureFilterElement : productNaturesSelected,
+            diaryIdFilterElement:0,
+            showCarryOnFilterElement:false,
+            showSummaryFilterElement:false,
+            showDisplayLinesWithZeroesFilterElement:false
         };
     };
     const colDefsTransactors = [

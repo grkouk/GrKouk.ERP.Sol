@@ -29,6 +29,7 @@ namespace GrKouk.Web.ERP.Helpers
         public int DocumentId { get; set; }
         public bool ShowCarryOnAmountsInTabs { get; set; }
         public bool ShowSummaryFilter { get; set; }
+        public bool ShowDisplayLinesWithZeroes { get; set; }
     }
 
     public class IndexDataTableResponse<T>
@@ -76,9 +77,11 @@ namespace GrKouk.Web.ERP.Helpers
 
     public class ExtendedDataManagerRequest : DataManagerRequest
     {
-      
+
         [JsonProperty(PropertyName = "transactorId", Required = Required.Default)]
         public int? TransactorId { get; set; }
+        [JsonProperty(PropertyName = "entityId", Required = Required.Default)]
+        public int? EntityId { get; set; }
         [JsonProperty(PropertyName = "displayCurrencyId", Required = Required.Default)]
         public int DisplayCurrencyId { get; set; }
         [JsonProperty(PropertyName = "companyFilter", Required = Required.Default)]
@@ -89,7 +92,7 @@ namespace GrKouk.Web.ERP.Helpers
 
     public class AutoCompleteDataManagerRequest : DataManagerRequest
     {
-      
+
         [JsonProperty(PropertyName = "searchMode", Required = Required.Default)]
         public int SearchMode { get; set; }
         [JsonProperty(PropertyName = "searchTerm", Required = Required.Default)]

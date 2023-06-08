@@ -35,7 +35,7 @@ namespace GrKouk.Erp.Dtos.SellDocuments
 
         public virtual IList<SellDocLineAjaxDto> SellDocLines
         {
-            get { return _sellDocLines ?? (_sellDocLines = new List<SellDocLineAjaxDto>()); }
+            get { return _sellDocLines ??= new List<SellDocLineAjaxDto>(); }
             set { _sellDocLines = value; }
         }
     }

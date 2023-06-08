@@ -18,20 +18,20 @@ namespace GrKouk.Erp.Dtos.BuyDocuments
         public string TransRefCode { get; set; }
         [Display(Name = "Section")]
         public int SectionId { get; set; }
-        public string  SectionCode { get; set; }
+        public string SectionCode { get; set; }
         [Display(Name = "Transactor")]
         public int TransactorId { get; set; }
-        public  string TransactorName { get; set; }
+        public string TransactorName { get; set; }
         [Display(Name = "Fiscal Period")]
         public int FiscalPeriodId { get; set; }
-        public  string FiscalPeriodCode { get; set; }
+        public string FiscalPeriodCode { get; set; }
         [Display(Name = "Doc Series")]
         public int BuyDocSeriesId { get; set; }
-        public  string BuyDocSeriesCode { get; set; }
+        public string BuyDocSeriesCode { get; set; }
         public string BuyDocSeriesName { get; set; }
 
         public int BuyDocTypeId { get; set; }
-        public  string BuyDocTypeCode { get; set; }
+        public string BuyDocTypeCode { get; set; }
         public string BuyDocTypeName { get; set; }
         [Display(Name = "VAT Amount")]
         public decimal AmountFpa { get; set; }
@@ -52,7 +52,7 @@ namespace GrKouk.Erp.Dtos.BuyDocuments
         public byte[] Timestamp { get; set; }
         public virtual ICollection<BuyDocLine> BuyDocLines
         {
-            get { return _buyDocLines ?? (_buyDocLines = new List<BuyDocLine>()); }
+            get { return _buyDocLines ??= new List<BuyDocLine>(); }
             set { _buyDocLines = value; }
         }
     }

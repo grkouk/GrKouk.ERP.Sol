@@ -19,7 +19,7 @@ namespace GrKouk.Erp.Domain.Shared
 
         public ICollection<ProductRecipeLine> ProductRecipeLines
         {
-            get { return _productRecipeLines ?? (_productRecipeLines = new List<ProductRecipeLine>()); }
+            get { return _productRecipeLines ??= new List<ProductRecipeLine>(); }
             set { _productRecipeLines = value; }
         }
 

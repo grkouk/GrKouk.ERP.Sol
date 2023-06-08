@@ -13,7 +13,7 @@ namespace GrKouk.Erp.Dtos.RecurringTransactions
         public string RecurringFrequency { get; set; }
         [Display(Name = "Doc Type")]
         public RecurringDocTypeEnum RecurringDocType { get; set; }
-        
+
         [Required]
         [Display(Name = "Next Trans Date")]
         [DataType(DataType.Date)]
@@ -41,11 +41,11 @@ namespace GrKouk.Erp.Dtos.RecurringTransactions
         [Display(Name = "Company")]
         public int CompanyId { get; set; }
 
-      
+
 
         public virtual IList<RecurringTransDocLineAjaxDto> DocLines
         {
-            get { return _docLines ?? (_docLines = new List<RecurringTransDocLineAjaxDto>()); }
+            get { return _docLines ??= new List<RecurringTransDocLineAjaxDto>(); }
             set { _docLines = value; }
         }
     }

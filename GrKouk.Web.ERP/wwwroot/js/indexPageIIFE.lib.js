@@ -1,5 +1,9 @@
-﻿//Index pages javascript tools
-//Last update 2022/01/17
+﻿//Author: George Koukoudis
+//Version:  1.0
+//Date Created: 
+//Date Modified: 2022/01/17
+//Index pages javascript tools
+
 var indPgLib = (function () {
     let indexPageDefinition;
     let colDefs;
@@ -60,6 +64,7 @@ var indPgLib = (function () {
     let $transactorId = $('#TransactorId');
     let $cfaId = $('#CfaId');
     let $showCarryOnFlt = $('#ShowCarryOnFlt');
+    let $showDisplayLinesWithZeroesFlt = $('#ShowDisplayLinesWithZeroes');
     let $showSummaryFlt = $('#ShowSummaryFlt');
     let $warehouseItemId = $('#WarehouseItemId');
     let $warehouseItemNatureFilter = $('#WarehouseItemNatureFilter');
@@ -81,6 +86,7 @@ var indPgLib = (function () {
     let diaryIdFilterElement;
     let showCarryOnFilterElement;
     let showSummaryFilterElement;
+    let showDisplayLinesWithZeroesFilterElement;
 
     let setFilterValues;
     const setSelectorFilterValues = () => {
@@ -103,6 +109,7 @@ var indPgLib = (function () {
         diaryIdFilterElement = flt.diaryIdFilterElement;
         showCarryOnFilterElement = flt.showCarryOnFilterElement;
         showSummaryFilterElement = flt.showSummaryFilterElement;
+        showDisplayLinesWithZeroesFilterElement = flt.showDisplayLinesWithZeroesFilterElement;
     };
     const setIndexPageFilterValues = () => {
         var pageIndexVal = parseInt($pageIndex.val());
@@ -169,12 +176,19 @@ var indPgLib = (function () {
         } else {
             showCarryOnFilterElement = false;
         }
-        var showSummaryValue = false;
+       var showSummaryFltValue=false;
         if (!($showSummaryFlt === undefined)) {
-            showSummaryValue = $showSummaryFlt.is(':checked');
-            showSummaryFilterElement = showSummaryValue;
+            showSummaryFltValue = $showSummaryFlt.is(':checked'); 
+            showSummaryFilterElement = showSummaryFltValue;
         } else {
             showSummaryFilterElement = false;
+        }
+         var showDisplayLinesWithZeroesValue = false;
+        if (!($showDisplayLinesWithZeroesFlt === undefined)) {
+            showDisplayLinesWithZeroesValue = $showDisplayLinesWithZeroesFlt.is(':checked');
+            showDisplayLinesWithZeroesFilterElement = showDisplayLinesWithZeroesValue;
+        } else {
+            showDisplayLinesWithZeroesFilterElement = false;
         }
         var wrItmNatureFlt = '';
         if (!($warehouseItemNatureFilter.val() === undefined)) {
@@ -809,7 +823,8 @@ var indPgLib = (function () {
     const getTableData = function (pgIndex, pgSize, sortData, dateRange
                                    , companyFlt, searchFlt, currencyFlt
                                    , transTypeFlt, wrItmNatureFlt, transactorId
-                                   ,warehouseItemId,diaryId,cfaId,showCarryOnFlt,showSummaryFlt) {
+        , warehouseItemId, diaryId, cfaId, showCarryOnFlt
+        , showSummaryFlt, showDisplayLinesWithZeroesFlt) {
         let uri = indexPageDefinition.uri;
         uri += `?pageIndex=${pgIndex}`;
         uri += `&pageSize=${pgSize}`;
@@ -823,6 +838,7 @@ var indPgLib = (function () {
         uri += `&cashFlowAccountId=${cfaId}`;
         uri += `&showCarryOnAmountsInTabs=${showCarryOnFlt}`;
         uri += `&showSummaryFilter=${showSummaryFlt}`;
+        uri += `&showDisplayLinesWithZeroes=${showDisplayLinesWithZeroesFlt}`;
         uri += `&warehouseItemId=${warehouseItemId}`;
         uri += `&diaryId=${diaryId}`;
         uri += `&displayCurrencyId=${currencyFlt}`;
@@ -1029,7 +1045,7 @@ var indPgLib = (function () {
             , productNatureFilterElement, transactorIdFilterElement
             , warehouseItemIdFilterElement, diaryIdFilterElement
             , cfaIdFilterElement, showCarryOnFilterElement,
-                showSummaryFilterElement)
+                showSummaryFilterElement,showDisplayLinesWithZeroesFilterElement)
             .then((data) => {
                 bindDataToTable(data, pageIndexElement);
             })
@@ -1083,8 +1099,9 @@ var indPgLib = (function () {
         var storageItemJs = localStorage.getItem(localStorageKey);
         if (storageItemJs === undefined || storageItemJs === null) {
             $pageIndex.val(1);
+            $pageSize.val(20);
             $("#filtersVisible").val(true);
-            $("#rowSelectorsVisible").val(true);
+            $("#rowSelectorsVisible").val(false);
             // $rowSelectorsToggle.text('Hide Row Selectors');
             // $filtersToggle.text('Hide Filters');
             $datePeriodFilter.val("CURMONTH");

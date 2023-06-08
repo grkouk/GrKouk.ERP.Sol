@@ -1,0 +1,465 @@
+﻿@page
+@model GrKouk.Web.Erp.Pages.MainEntities.CashFlowAccounts.DetailsModel
+
+@{
+    Layout = "_LayoutDashboard";
+    //ViewData["Title"] = "Product Details";
+}
+
+
+<div class="container-fluid">
+    <div class="row">
+        <main role="main" class="col-md-12 ms-sm-auto col-lg-12 px-4">
+            <div class="row justify-content-end pt-2 pb-3 px-1">
+                <div class="col-4 gx-1">
+
+                    <ejs-multiselect id="SelectedCompanies" dataSource="@ViewBag.CompaniesListJs"
+                                     placeholder="Select Companies" mode="CheckBox"
+                                     showDropDownIcon="true" showSelectAll="false"
+                                     selectAllText="Select All" unSelectAllText="unSelect All">
+                        <e-multiselect-fields text="Title" value="ValueInt"></e-multiselect-fields>
+                    </ejs-multiselect>
+
+                </div>
+                <div class="col-1 gx-1">
+                    <select id="CurrencySelector" class="form-select form-select-sm"
+                            asp-items="ViewBag.CurrencyList">
+                    </select>
+                </div>
+                 <div class="col-2 gx-1">
+                    <select id="PeriodSelector" class="form-select form-select-sm"
+                            asp-items="ViewBag.DatePeriodListJs">
+                    </select>
+                </div>
+            </div>
+            <div class="container">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5 class="card-title">@Model.ItemVm.Code</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">@Model.ItemVm.Companies</h6>
+                        <p class="card-text"></p>
+                        <a href="./kartela?cashFlowAccountId=@Model.ItemVm.Id" class="card-link" target="_blank">Καρτέλα</a>
+                        <a href="#" class="card-link">Another link</a>
+                    </div>
+                </div>
+            </div>
+
+            <hr />
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-2 pb-2 mb-3 border-bottom">
+                <div class="d-flex align-items-center">
+                    <h5 class="me-2">Financial Summary</h5>
+                    <div class="spinner-border ml-auto text-primary" role="status" aria-hidden="true" id="FinancialLoader" style="display: none"></div>
+                </div>
+
+            </div>
+            <div class="container">
+                <div class="row align-items-center justify-content-between">
+                    <div class="col-lg-4 col-sm-12">
+                        <div class="card">
+                            <div class="card-header text-dark text-center">
+                                <h5>Εισροές</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <table class="table-sm w-100">
+        
+                                    <tr>
+                                        <td>Αξία(Εισροών)</td>
+                                        <td>
+
+                                            <span class="currency-data" name="ImportValue"></span>
+                                        </td>
+                                    </tr>
+                                    
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-12">
+                        <div class="card">
+                            <div class="card-header text-dark text-center">
+                                <h5>Εκροές</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <table class="table-sm w-100">
+                                    
+                                    <tr>
+                                        <td>Αξία(Εκροών)</td>
+                                        <td><span class="currency-data" name="ExportValue"></span></td>
+                                    </tr>
+
+
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-12">
+                        <div class="card">
+                            <div class="card-header text-center">
+                                <h5>Balance</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <table class="table-sm w-100">
+                                   
+                                    <tr>
+                                        <td>Αξία</td>
+                                        <td><span class="currency-data" name="ValueBalance"></span></td>
+                                    </tr>
+                                    
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h5>Transactions</h5>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group me-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn  btn-sm btn-outline-secondary selected-period-text">Reference</button>
+                        <button type="button" class="btn  btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split" id="datePeriodMenuReference" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-reference="parent">
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="datePeriodMenuReference" name="PeriodSelector">
+                            <button class="dropdown-item period-item" type="button">Action</button>
+                            <button class="dropdown-item period-item" type="button">Another Action</button>
+
+                            <button class="dropdown-item period-item" type="button">Another Action</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div id="transGrid"></div>
+            <input type="hidden" asp-for="ItemVm.Id" id="CashFlowAccountId" />
+            <input type="hidden" id="SelectedCompanies" />
+            <input type="hidden" id="CurrencyId" />
+            <input type="hidden" id="PeriodId" />
+            <input type="hidden" id="companiesSelectionChanged" />
+            <ejs-grid id="Grid"
+                      allowPaging="true" allowResizing="true" allowSorting="true" enablePersistence="true">
+                <e-data-manager url="@Url.Action("GetCashFlowAccountTransactionsForDetail", "FinancialData")" adaptor="UrlAdaptor"></e-data-manager>
+                <e-grid-aggregates>
+                    <e-grid-aggregate>
+                        <e-aggregate-columns>
+                            <e-aggregate-column field="deposit" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
+                            <e-aggregate-column field="withdraw" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
+                
+                        </e-aggregate-columns>
+                
+                    </e-grid-aggregate>
+                </e-grid-aggregates>
+                <e-grid-pagesettings pageSizes="true"></e-grid-pagesettings>
+                <e-grid-columns>
+                    <e-grid-column field="transDate" headerText="Trans Date" textAlign="Right" width="50" type="date" format="dd/MM/yyyy"></e-grid-column>
+                    <e-grid-column field="docSeriesCode" headerText="Series Code" width="60"></e-grid-column>
+                    <e-grid-column field="refCode" headerText="Ref Code" width="60" textAlign="Right"></e-grid-column>
+                    <e-grid-column field="companyCode" headerText="Company Code" width="60"></e-grid-column>
+                    <e-grid-column field="deposit" headerText="Deposit" width="50" type="number" textAlign="Right" format="C2"></e-grid-column>
+                    <e-grid-column field="withdraw" headerText="Withdrawal" width="50" type="number" textAlign="Right" format="C2"></e-grid-column>
+                    <e-grid-column field="runningTotal" headerText="Running Total" type="number" width="50" textAlign="Right" format="C2"></e-grid-column>
+                </e-grid-columns>
+            </ejs-grid>
+
+
+
+            <hr />
+            <footer>
+                <p>&copy; 2018-2023 - George Koukoudis</p>
+            </footer>
+
+        </main>
+    </div>
+</div>
+@section Scripts
+{
+<script src="~/js/product.lib.js"></script>
+<script>
+        $(document).ready(function () {
+
+            const $spinnerEl = $('#FinancialLoader');
+            const $currencySelector = $('#CurrencySelector');
+            const $companiesSelectionChanged = $('#companiesSelectionChanged');
+            const $periodSelector = $('#PeriodSelector');
+            //const $periodSelectionChanged = $('#companiesSelectionChanged');
+            const allCompaniesId = @ViewBag.AllCompaniesId;
+            const sessionKey = 'CashFlowAccountDetailsPage';
+            let currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
+            let formatterCurrency = new Intl.NumberFormat(currentCulture,
+                    {
+                        style: 'currency',
+                        currency: 'EUR',
+                        minimumFractionDigits: 2
+                    });
+            let formatterNumber = new Intl.NumberFormat(currentCulture,
+                    {
+                        maximumFractionDigits: 3
+
+                    });
+            const loadCultureFiles = (name) => {
+                let files = ['ca-gregorian.json', 'numbers.json', 'timeZoneNames.json', 'currencies.json'];
+                if (name === 'ar') {
+                    files.push('numberingSystems.json');
+                }
+                let loader = ej.base.loadCldr;
+                let loadCulture = function(prop) {
+                    let val
+                    let ajax;
+                    if (name === 'ar' && prop === files.length - 1) {
+                        ajax = new ej.base.Ajax(location.origin + location.pathname + '/../../../lib/cldr-data/supplemental/' + files[prop], 'GET', false);
+                    } else {
+                        ajax = new ej.base.Ajax(location.origin + location.pathname + '/../../../lib/cldr-data/main/' + name + '/' + files[prop], 'GET', false);
+                    }
+                    ajax.onSuccess = function(value) {
+                        val = value;
+                    };
+                    ajax.send();
+                    loader(JSON.parse(val));
+                };
+                for (var prop = 0; prop < files.length; prop++) {
+                    loadCulture(prop);
+                }
+            };
+            
+            let sessionObj = {
+                 'currencyCode': '',
+                 'periodCode': '',
+                 'companyCode': ''
+            };
+            const selectedCompanies = document.getElementById("SelectedCompanies").ej2_instances[0];
+            selectedCompanies.changeOnBlur = false;
+            selectedCompanies.addEventListener("change", (event) => {
+                let a = [allCompaniesId];
+                console.log("Change event " + event.value);
+                let currentSelection = event.value;
+                if (currentSelection.includes(allCompaniesId)) {
+                    //remove all others and keep only allcompanies selection
+                    //event.value = a;
+                    selectedCompanies.value = a;
+                    selectedCompanies.refresh();
+                }
+                let sComp = selectedCompanies.value;
+                var selected = JSON.stringify(selectedCompanies.value);
+                $('#SelectedCompanies').val(selected);
+                //refreshView();
+
+                $companiesSelectionChanged.val(1);
+            });
+            selectedCompanies.addEventListener("close", (event) => {
+                let selectionChanged = $companiesSelectionChanged.val();
+                if (selectionChanged) {
+                    $companiesSelectionChanged.val(0);
+                    let sComp = selectedCompanies.value;
+                    var selected = JSON.stringify(selectedCompanies.value);
+                    $('#SelectedCompanies').val(selected);
+                    refreshView();
+                }
+            });
+            const currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
+            const cashFlowAccountId = @Model.ItemVm.Id;
+            const refreshView = () => {
+                 let selPeriodId = $periodSelector.val();
+                 let selCurrencyId = $currencySelector.val();
+                 let selCompanies = $('#SelectedCompanies').val();
+                
+                 getFinancialData(cashFlowAccountId, selPeriodId, selCompanies,selCurrencyId, $spinnerEl)
+                 let grd = document.getElementById("Grid").ej2_instances[0];
+                 grd.query = new ej.data.Query()
+                    .addParams('entityId', cashFlowAccountId)
+                    .addParams('dateRange', selPeriodId)
+                    .addParams('companyFilter', selCompanies)
+                    .addParams('displayCurrencyId', selCurrencyId);  
+            };
+            
+            const formatNumericElements = () => {
+                    let $currencyElements = $('.currency-data');
+                    let $numElements = $('.numeric-data');
+                    $currencyElements.each(function() {
+                        let $el = $(this);
+                        //let elValueStr = $el.attr('data-actualValue');
+                        let elValueStr = $el.text();
+                        let elValue = parseFloat(elValueStr);
+                        if (!isNaN(elValue)) {
+                            $el.text(formatterCurrency.format(elValue));
+                        }
+
+                    });
+                    $numElements.each(function() {
+                        let $el = $(this);
+                        //let elValueStr = $el.attr('data-actualValue');
+                        let elValueStr = $el.text();
+                        let elValue = parseFloat(elValueStr);
+                        if (!isNaN(elValue)) {
+                            $el.text(formatterNumber.format(elValue));
+                        }
+
+                    });
+                };
+            var currencyChanged = () => {
+                    let curCurrencySelected = parseInt($('#CurrencySelector').val());
+                    var currencyCode;
+                    try {
+                        let currentCurrency = currencyListJs.find(x => x.id === curCurrencySelected);
+                        currencyCode = currentCurrency.code;
+                        let locale = currentCurrency.displayLocale;
+                        formatterCurrency = new Intl.NumberFormat(locale,
+                        {
+                            style: 'currency',
+                            currency: currencyCode,
+                            minimumFractionDigits: 2
+                        });
+                        formatterNumber = new Intl.NumberFormat(locale,
+                        {
+                            maximumFractionDigits: 3
+
+                        });
+                        let cCulture = locale;
+                        let cBaseCulture = cCulture;
+                        if (cCulture.length > 2) {
+                            cBaseCulture = cCulture.substr(0, 2);
+                        }
+                        loadCultureFiles(cBaseCulture);
+                        ej.base.setCulture(cBaseCulture);
+                        ej.base.setCurrencyCode(currencyCode);
+                        //loadEj2Translation(cBaseCulture);
+    
+                        var grid = document.getElementById("Grid").ej2_instances[0];
+                        grid.locale = cBaseCulture;
+                        refreshView();
+                    //formatNumericElements();
+                        //indPgLib.setCurrencyFormatter(formatterCurrency);
+                    } catch (e) {
+                        //not found keep old formater or maybe create a default one
+                        console.log('Not found currency code for this id');
+                    }
+                };
+           
+            const loadPreviousSession = (sessionKey, sessionObject) => {
+                  let storageItemJs = localStorage.getItem(sessionKey);
+                  if (storageItemJs === undefined || storageItemJs === null) {
+                      sessionObject.currencyCode = 'EUR';
+                      sessionObject.companyCode = JSON.parse("[1]");
+                      sessionObject.periodCode = "CURMONTH";
+
+                  } else {
+                      var storageItem = JSON.parse(storageItemJs);
+                      try {
+                          let filtersValue = storageItem.find(x => x.filterKey === 'currentCurrency').filterValue;
+                          if (filtersValue === undefined || filtersValue === null) {
+                              sessionObject.currencyCode = 'EUR';
+                          } else {
+                              sessionObject.currencyCode = filtersValue;
+                          }
+                      } catch (e) {
+                          sessionObject.currencyCode = 'EUR';
+                      }
+                      try {
+                          let filtersValue = storageItem.find(x => x.filterKey === 'currentCompany').filterValue;
+                          if (filtersValue === undefined || filtersValue === null) {
+                              sessionObject.companyCode = JSON.parse("[1]");
+                          } else {
+
+                              sessionObject.companyCode = JSON.parse( filtersValue);
+                          }
+                      } catch (e) {
+                          sessionObject.companyCode = JSON.parse("[1]");
+                      }
+                      try {
+                          let filtersValue = storageItem.find(x => x.filterKey === 'currentPeriod').filterValue;
+                          if (filtersValue === undefined || filtersValue === null) {
+                              sessionObject.periodCode = 'CURMONTH';
+                          } else {
+                              sessionObject.periodCode = filtersValue;
+                          }
+                      } catch (e) {
+                          sessionObject.periodCode = 'CURMONTH';
+                      }
+                  }
+              };
+            const getFinancialData = (itemId, dateRange, selCompany, selCurrency, spinnerEl) => {
+                    productLib.getCfaFinancialSummaryData(itemId,dateRange,selCompany,selCurrency,spinnerEl)
+                    .then((data)=>{
+                        console.log(data);
+                       
+                        let $importValue = $('[name=ImportValue]');
+                      
+                        let $exportValue = $('[name=ExportValue]');
+                        let $valueBalance = $('[name=ValueBalance]');
+                        
+                        $importValue.text(data.sumOfDeposits);
+                        
+                        
+                        
+                        
+                        $exportValue.text(data.sumOfWithdraws);
+                        
+                        $valueBalance.text(data.sumOfDifference);
+                        formatNumericElements();
+                    })
+                    .catch((error) => {
+                                console.log("Error getting summary data");
+                                console.log(error);
+                            });
+            };
+            $currencySelector.change((event) => {
+                currencyChanged();
+            });
+             const periodChanged = () =>  {
+                refreshView();
+             };
+             $periodSelector.change((event) => {
+                periodChanged();
+             });
+            loadPreviousSession(sessionKey, sessionObj);
+            selectedCompanies.value = sessionObj.companyCode;
+            var selected = JSON.stringify(selectedCompanies.value);
+            $('#SelectedCompanies').val(selected);
+            $currencySelector.val(sessionObj.currencyCode);
+            currencyChanged();
+            $periodSelector.val(sessionObj.periodCode);
+            $companiesSelectionChanged.val(0);
+            refreshView();
+     });
+    $(window).on('beforeunload',
+        function(e) {
+            //#region rrr
+            //#region Variables
+            const sessionKey = 'CashFlowAccountDetailsPage';
+            const selectedCompanies = document.getElementById("SelectedCompanies").ej2_instances[0];
+            const $selectedCurrency = $('#CurrencySelector');
+            //const $selectedCompany = $('#SelectedCompanies');
+            const $selectedPeriod = $('#PeriodSelector');
+            let currentCurrency = $selectedCurrency.val();
+            let currentCompany = JSON.stringify( selectedCompanies.value);
+            let currentPeriod = $selectedPeriod.val();
+            var filtersArr = [];
+            //#endregion
+            filtersArr.push({
+                filterKey: 'currentCurrency',
+                filterValue: currentCurrency
+            });
+            filtersArr.push({
+                filterKey: 'currentCompany',
+                filterValue: currentCompany
+            });
+            filtersArr.push({
+                filterKey: 'currentPeriod',
+                filterValue: currentPeriod
+            });
+            let sessionVal = JSON.stringify(filtersArr);
+
+            localStorage.setItem(sessionKey, sessionVal);
+            //#endregion
+
+        });
+</script>
+}
+
+
+
+

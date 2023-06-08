@@ -11,5 +11,19 @@
         public const string MainInfoPageSumOfServiceSales = "SumOfServiceSalesDf";
         public const string MainInfoPageSumOfIncomeSales = "SumOfIncomeSalesDf";
         public const string MainInfoPageSumOfFixedAssetSales = "SumOfFixedAstSalesDf";
+        //--------------------------------------------------------------------------------------------------------------
+        public const string SectionWarehouseTransactions = "SYS-WAREHOUSE-TRANS";
+        public const string SectionSupplierTransactions = "SYS-SUPPLIER-TRANS";
+        public const string SectionBuyMaterials = "SYS-BUY-MATERIALS-SCN";
+        public const string SectionTransactorTransactions = "SYS-TRANSACTOR-TRANS";
+        public const string SectionBuyExpenses = "SYS-BUY-EXPENSE-SCN";
+        public const string SectionSellMaterials = "SYS-SELL-MATERIALS-SCN";
+        public const string SectionBuysCombined = "SYS-BUY-COMBINED-SCN";
+        public const string SectionSalesCombined = "SYS-SELL-COMBINED-SCN";
+        public const string SectionPayments = "SYS-PAYMENTS";
+        public const string SectionCollections = "SYS-COLLECTIONS";
+        public const string SectionCashFlowAccountsTransactions = "SYS-CFA-TRANS";
+        public const string SectionInvestmentsTransactions = "SYS-INVESTMENT-TRANS";
+
     }
 }

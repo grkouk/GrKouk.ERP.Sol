@@ -61,7 +61,7 @@ namespace GrKouk.Erp.Domain.Shared
         /// Τύπος υλικού, Σετ, Κανονικό, Συντιθέμενο
         /// </summary>
         [Display(Name = "Τύπος Υλικού", Prompt = "Τύπος υλικού, Σετ, Κανονικό, Συντιθέμενο")]
-      
+
         public MaterialTypeEnum MaterialType { get; set; }
         [Display(Name = "Φύση Είδους", Prompt = "Υλικό,Υπηρεσία,Παγιο,Δαπάνη")]
         public WarehouseItemNatureEnum WarehouseItemNature { get; set; }
@@ -71,14 +71,14 @@ namespace GrKouk.Erp.Domain.Shared
         public decimal PriceBrutto { get; set; }
         public virtual ICollection<WrItemCode> WarehouseItemCodes
         {
-            get => _warehouseItemCodes ?? (_warehouseItemCodes = new List<WrItemCode>());
+            get => _warehouseItemCodes ??= new List<WrItemCode>();
             set => _warehouseItemCodes = value;
         }
 
         private ICollection<CompanyWarehouseItemMapping> _companyWarehouseItemMappings;
         public virtual ICollection<CompanyWarehouseItemMapping> CompanyMappings
         {
-            get => _companyWarehouseItemMappings ?? (_companyWarehouseItemMappings = new List<CompanyWarehouseItemMapping>());
+            get => _companyWarehouseItemMappings ??= new List<CompanyWarehouseItemMapping>();
             set => _companyWarehouseItemMappings = value;
         }
 

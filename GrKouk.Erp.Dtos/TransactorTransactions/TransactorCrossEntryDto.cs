@@ -1,11 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
+namespace GrKouk.Erp.Dtos.TransactorTransactions
 {
-    public class CrossEntryDto
+    public class TransactorCrossEntryDto
     {
-        [DataType(DataType.Date)] 
+        [DataType(DataType.Date)]
         [Display(Name = "Ημερομηνία")]
         public DateTime TransDate { get; set; }
         [Display(Name = "Παραστατικο΄1")]
@@ -24,7 +24,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
         public string RefCode { get; set; }
         [Display(Name = "Αιτιολογία")]
         public string Etiology { get; set; }
-        
+
         public decimal Amount { get; set; }
         [Display(Name = "Εταιρεία")]
         public int CompanyId { get; set; }

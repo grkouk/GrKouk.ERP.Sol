@@ -244,6 +244,23 @@
                 });
         });
     };
+    ///
+    const getCfaFinancialSummaryData = (itemId, dateRange, selCompany, selCurrency, spinnerElement) => {
+        var uri = '/api/FinancialData/GetCfaFinancialSummaryData?';
+        uri += `&cashFlowAccountId=${itemId}`;
+        uri += `&companyFilter=${selCompany}`;
+        uri += `&dateRange=${dateRange}`;
+        uri += `&displayCurrencyId=${selCurrency}`;
+        return new Promise((resolve, reject) => {
+            makeAjaxCall(uri, spinnerElement)
+                .then((data) => {
+                    resolve(data);
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        });
+    };
     const setCompanyIdInSession = (companyId) => {
         let uri = "/api/Materials/SetCompanyInSession";
         uri += `?companyId=${companyId}`;
@@ -438,6 +455,7 @@
         setFormatters: setFormatters,
         //For testing purposes
         makeAjaxCallGet: makeAjaxCallGet,
+        getCfaFinancialSummaryData: getCfaFinancialSummaryData,
         getProductFinancialSummaryData: getProductFinancialSummaryData
     };
 })();

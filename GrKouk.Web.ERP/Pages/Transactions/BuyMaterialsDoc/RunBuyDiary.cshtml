@@ -9,59 +9,59 @@
     <link rel="stylesheet" href="~/css/custom-checkbox.css" />
     <link rel="stylesheet" href="~/css/searchbar.css" />
 }
-    <h4>@Model.DiaryName</h4>
-    <div class="container ">
-        <ul class="nav small justify-content-end">
+<h4>@Model.DiaryName</h4>
+<div class="container ">
+    <ul class="nav small justify-content-end">
 
 
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="collapse" href="#filterCollapse" role="button" id="filtersToggle"
-               aria-expanded="false" aria-controls="filterCollapse">
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="collapse" href="#" id="rowSelectorsToggle" role="button">
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#filterCollapse" role="button" id="filtersToggle"
+                aria-expanded="false" aria-controls="filterCollapse">
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#" id="rowSelectorsToggle" role="button">
 
-                </a>
-            </li>
-            <li class="nav-item dropdown " id="SelectedRowsActionsMenu">
-                <a class="btn btn-sm btn-outline-secondary dropdown-toggle disabled" role="button"
-               id="ddSelectedRowsActions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</a>
-                <div class="dropdown-menu small">
+            </a>
+        </li>
+        <li class="nav-item dropdown " id="SelectedRowsActionsMenu">
+            <a class="btn btn-sm btn-outline-secondary dropdown-toggle disabled" role="button"
+                id="ddSelectedRowsActions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</a>
+            <div class="dropdown-menu small">
 
-                    <a class="dropdown-item" href="#">Another action</a>
-                    <a class="dropdown-item" href="#">Something else here</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#">Separated link</a>
+                <a class="dropdown-item" href="#">Another action</a>
+                <a class="dropdown-item" href="#">Something else here</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">Separated link</a>
 
-                </div>
-            </li>
-        </ul>
-    </div>
-    <input type="hidden" asp-for="DiaryId" />
-    @await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowDateFlt = true,ShowDisplaySummaryFlt = true })
-
-
-    <div class="row mt-1">
-        <partial name="_PagerPartial" />
-    </div>
-    <partial name="_DataTable" />
-    <div class="row">
-        <partial name="_PagerPartial" />
-    </div>
-    <br />
-    <partial name="_LoadMePartial" />
+            </div>
+        </li>
+    </ul>
+</div>
+<input type="hidden" asp-for="DiaryId" />
+@await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowDateFlt = true,ShowDisplaySummaryFlt = true })
 
 
-    <a asp-page="./Index" class="small">Back to List</a>
+<div class="row mt-1">
+    <partial name="_PagerPartial" />
+</div>
+<partial name="_DataTable" />
+<div class="row">
+    <partial name="_PagerPartial" />
+</div>
+<br />
+<partial name="_LoadMePartial" />
 
-    @section Scripts
+
+<a asp-page="./Index" class="small">Back to List</a>
+
+@section Scripts
     {
     <script src="~/js/moment.min.js"></script>
     <script src="~/js/definitions.js"></script>
     <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
             var formatterCurrency = new Intl.NumberFormat(currentCulture,
                 {
@@ -249,7 +249,7 @@
                     urlKeys: [
                         { key: 'id', valueKey: 'id' }
                     ],
-                    uriFunc: function(col, valueSource) {
+                    uriFunc: function (col, valueSource) {
                         let retUri = '';
                         if (valueSource.creatorSectionId > 0) {
                             switch (valueSource.creatorSectionCode) {
@@ -294,7 +294,7 @@
                     urlKeys: [
                         { key: 'id', valueKey: 'id' }
                     ],
-                    uriFunc: function(col, valueSource) {
+                    uriFunc: function (col, valueSource) {
                         let retUri = '';
                         if (valueSource.creatorSectionId > 0) {
                             switch (valueSource.creatorSectionCode) {
@@ -324,7 +324,7 @@
                 {
                     selector: '#CurrencySelector',
                     event: 'change',
-                    handler: function(event) {
+                    handler: function (event) {
                         currencyChanged();
                         indPgLib.refreshData();
                     }
@@ -332,7 +332,7 @@
                 {
                     selector: '#ShowSummaryFlt',
                     event: 'change',
-                    handler: function(event) {
+                    handler: function (event) {
 
                         indPgLib.refreshData();
                     }
@@ -382,8 +382,9 @@
             var storageItemJs = localStorage.getItem('RunBuyDiaryIndexView');
             if (storageItemJs === undefined || storageItemJs === null) {
                 $('#pageIndex').val(1);
+                $('#PageSize').val(10);
                 $('#filtersVisible').val(true);
-                $('#rowSelectorsVisible').val(true);
+                $('#rowSelectorsVisible').val(false);
 
                 $('#DatePeriodFilter').val('CURYEAR');
                 $('#CompanyFilter').val(0);
@@ -436,7 +437,7 @@
             indPgLib.rowSelectorsUi();
         });
 
-        $(window).on('beforeunload', function(e) {
+        $(window).on('beforeunload', function (e) {
             //#region CommentOut
             //#region Variables
             var filtersVisible = $('#filterCollapse').hasClass('show');

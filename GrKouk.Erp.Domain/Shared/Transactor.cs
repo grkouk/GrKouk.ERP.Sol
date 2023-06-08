@@ -41,7 +41,7 @@ namespace GrKouk.Erp.Domain.Shared
         private ICollection<TransactorCompanyMapping> _transactorCompanyMappings;
         public ICollection<TransactorCompanyMapping> TransactorCompanyMappings
         {
-            get => _transactorCompanyMappings ?? (_transactorCompanyMappings = new List<TransactorCompanyMapping>());
+            get => _transactorCompanyMappings ??= new List<TransactorCompanyMapping>();
             set => _transactorCompanyMappings = value;
         }
         [DataType(DataType.Date)]

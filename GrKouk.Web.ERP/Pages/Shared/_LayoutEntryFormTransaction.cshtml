@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>@ViewData["Title"] - GrKouk Web ERP</title>
     <partial name="_CssBootstrapBlockPartial"/>
+    @* <partial name="_CssSyncfusionBlockPartial"/> *@
     @RenderSection("MyCss", required: false)
 </head>
 <body>
@@ -33,6 +34,7 @@
  @RenderBody()
 
 <partial name="_JsBlockPartial"/>
+@* <partial name="_JsSyncfusionBlockPartial"/> *@
 @RenderSection("Scripts", required: false)
 @await Component.InvokeAsync("NToastNotify")
 </body>

@@ -25,6 +25,6 @@ namespace GrKouk.Web.ERP.Helpers
         public bool ShowPageSizeFlt { get; set; } = true;
         public bool ShowDisplayCarryOnLineFlt { get; set; } = false;
         public bool ShowDisplaySummaryFlt { get; set; } = false;
-
+        public bool ShowDisplayLinesWithZeroAmountFlt { get; set; } = false;
     }
 }

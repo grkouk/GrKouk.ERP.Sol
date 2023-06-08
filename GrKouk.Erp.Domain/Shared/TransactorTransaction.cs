@@ -32,11 +32,11 @@ namespace GrKouk.Erp.Domain.Shared
         public int CreatorSectionId { get; set; }
         public int FiscalPeriodId { get; set; }
         public virtual FiscalPeriod FiscalPeriod { get; set; }
-      
+
         public FinActionsEnum FinancialAction { get; set; }
 
         public decimal FpaRate { get; set; }
-        
+
         public decimal DiscountRate { get; set; }
         [Column(TypeName = "decimal(18, 4)")]
         public decimal AmountFpa { get; set; }
@@ -58,15 +58,15 @@ namespace GrKouk.Erp.Domain.Shared
         public virtual Company Company { get; set; }
 
         public int CfAccountId { get; set; }
-       
+
         public virtual ICollection<BuyDocTransPaymentMapping> BuyDocPaymentMappings
         {
-            get => _buyDocPaymentMappings ?? (_buyDocPaymentMappings = new List<BuyDocTransPaymentMapping>());
+            get => _buyDocPaymentMappings ??= new List<BuyDocTransPaymentMapping>();
             set => _buyDocPaymentMappings = value;
         }
         public virtual ICollection<SellDocTransPaymentMapping> SalesDocPaymentMappings
         {
-            get => _salesDocPaymentMappings ?? (_salesDocPaymentMappings = new List<SellDocTransPaymentMapping>());
+            get => _salesDocPaymentMappings ??= new List<SellDocTransPaymentMapping>();
             set => _salesDocPaymentMappings = value;
         }
 

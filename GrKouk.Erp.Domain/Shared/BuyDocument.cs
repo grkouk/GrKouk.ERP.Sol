@@ -14,7 +14,7 @@ namespace GrKouk.Erp.Domain.Shared
         [Required]
         [DataType(DataType.Date)]
         public DateTime TransDate { get; set; }
-      
+
         public string TransRefCode { get; set; }
         [Required]
         public int SectionId { get; set; }
@@ -62,12 +62,12 @@ namespace GrKouk.Erp.Domain.Shared
         public byte[] Timestamp { get; set; }
         public virtual ICollection<BuyDocLine> BuyDocLines
         {
-            get => _buyDocLines ?? (_buyDocLines = new List<BuyDocLine>());
+            get => _buyDocLines ??= new List<BuyDocLine>();
             set => _buyDocLines = value;
         }
         public virtual ICollection<BuyDocTransPaymentMapping> PaymentMappings
         {
-            get => _paymentMappings ?? (_paymentMappings = new List<BuyDocTransPaymentMapping>());
+            get => _paymentMappings ??= new List<BuyDocTransPaymentMapping>();
             set => _paymentMappings = value;
         }
     }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.Shared;
+using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
@@ -14,28 +15,34 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NToastNotify;
 
-namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
+namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
+{
     [Authorize(Roles = "Admin")]
-    public class AddCrossEntry : PageModel {
+    public class AddCrossEntry : PageModel
+    {
         private const string _sectionCode = "SYS-TRANSACTOR-TRANS";
         private readonly ApiDbContext _context;
         private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
-        [BindProperty] public CrossEntryDto ItemVm { get; set; }
+        [BindProperty] public TransactorCrossEntryDto ItemVm { get; set; }
 
-        public AddCrossEntry(ApiDbContext context, IMapper mapper, IToastNotification toastNotification) {
+        public AddCrossEntry(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        {
             _context = context;
             _mapper = mapper;
             _toastNotification = toastNotification;
         }
-        
-        public async Task<IActionResult> OnGetAsync() {
+
+        public async Task<IActionResult> OnGetAsync()
+        {
             await LoadCombosAsync();
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync() {
-            if (!ModelState.IsValid) {
+        public async Task<IActionResult> OnPostAsync()
+        {
+            if (!ModelState.IsValid)
+            {
                 await LoadCombosAsync();
                 return Page();
             }
@@ -43,20 +50,23 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
             #region Fiscal Period
 
             var fiscalPeriod = await HelperFunctions.GetFiscalPeriod(_context, ItemVm.TransDate);
-            if (fiscalPeriod == null) {
+            if (fiscalPeriod == null)
+            {
                 ModelState.AddModelError(string.Empty, "No Fiscal Period covers Transaction Date");
                 return Page();
             }
 
             #endregion
 
-            await using (var transaction = await _context.Database.BeginTransactionAsync()) {
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
                 #region transaction 1
 
                 var docSeries1 = await
                     _context.TransTransactorDocSeriesDefs.SingleOrDefaultAsync(m =>
                         m.Id == ItemVm.DocSeries1Id);
-                if (docSeries1 is null) {
+                if (docSeries1 is null)
+                {
                     ModelState.AddModelError(string.Empty, "Δεν βρέθηκε η σειρά παραστατικού");
                     await LoadCombosAsync();
                     return Page();
@@ -73,9 +83,11 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                 #region Section Management
 
                 int sectionId1 = 0;
-                if (docTypeDef1.SectionId == 0) {
+                if (docTypeDef1.SectionId == 0)
+                {
                     var sectn = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == _sectionCode);
-                    if (sectn == null) {
+                    if (sectn == null)
+                    {
                         ModelState.AddModelError(string.Empty, "Δεν υπάρχει το Section");
                         await LoadCombosAsync();
                         return Page();
@@ -83,13 +95,15 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
 
                     sectionId1 = sectn.Id;
                 }
-                else {
+                else
+                {
                     sectionId1 = docTypeDef1.SectionId;
                 }
 
                 #endregion
 
-                TransactorTransaction spTransaction1 = new TransactorTransaction {
+                TransactorTransaction spTransaction1 = new TransactorTransaction
+                {
                     TransDate = ItemVm.TransDate,
                     TransactorId = ItemVm.Transactor1Id,
                     CfAccountId = ItemVm.Cfa1Id,
@@ -107,17 +121,21 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                 ActionHandlers.TransactorFinAction(transTransactorDef1.FinancialTransAction, spTransaction1);
                 await _context.TransactorTransactions.AddAsync(spTransaction1);
                 await _context.SaveChangesAsync();
-                if (ItemVm.Cfa1Id > 0) {
+                if (ItemVm.Cfa1Id > 0)
+                {
                     var cfaSeriesId1 = docSeries1.DefaultCfaTransSeriesId;
-                    if (cfaSeriesId1 > 0) {
+                    if (cfaSeriesId1 > 0)
+                    {
                         var cfaSeries1 = await _context.CashFlowDocSeriesDefs.FindAsync(cfaSeriesId1);
-                        if (cfaSeries1 != null) {
+                        if (cfaSeries1 != null)
+                        {
                             await _context.Entry(cfaSeries1)
                                 .Reference(t => t.CashFlowDocTypeDefinition)
                                 .LoadAsync();
 
                             var cfaType = cfaSeries1.CashFlowDocTypeDefinition;
-                            if (cfaType != null) {
+                            if (cfaType != null)
+                            {
                                 await _context.Entry(cfaType)
                                     .Reference(t => t.CashFlowTransactionDefinition)
                                     .LoadAsync();
@@ -129,7 +147,8 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                                     $"{cfaSeries1.Name} created from {docSeries1.Name} for {transactor1.Name} with {ItemVm.Etiology} ";
 
                                 var cfaTransDef1 = cfaType.CashFlowTransactionDefinition;
-                                var cfaTrans1 = new CashFlowAccountTransaction {
+                                var cfaTrans1 = new CashFlowAccountTransaction
+                                {
                                     TransDate = ItemVm.TransDate,
                                     CashFlowAccountId = ItemVm.Cfa1Id,
                                     CompanyId = ItemVm.CompanyId,
@@ -157,7 +176,8 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                 var docSeries2 = await
                     _context.TransTransactorDocSeriesDefs.SingleOrDefaultAsync(m =>
                         m.Id == ItemVm.DocSeries2Id);
-                if (docSeries2 is null) {
+                if (docSeries2 is null)
+                {
                     ModelState.AddModelError(string.Empty, "Δεν βρέθηκε η σειρά παραστατικού");
                     await LoadCombosAsync();
                     return Page();
@@ -174,9 +194,11 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                 #region Section Management
 
                 int sectionId2 = 0;
-                if (docTypeDef2.SectionId == 0) {
+                if (docTypeDef2.SectionId == 0)
+                {
                     var sectn = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == _sectionCode);
-                    if (sectn == null) {
+                    if (sectn == null)
+                    {
                         ModelState.AddModelError(string.Empty, "Δεν υπάρχει το Section");
                         await LoadCombosAsync();
                         return Page();
@@ -184,13 +206,15 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
 
                     sectionId2 = sectn.Id;
                 }
-                else {
+                else
+                {
                     sectionId2 = docTypeDef2.SectionId;
                 }
 
                 #endregion
 
-                TransactorTransaction spTransaction2 = new TransactorTransaction {
+                TransactorTransaction spTransaction2 = new TransactorTransaction
+                {
                     TransDate = ItemVm.TransDate,
                     TransactorId = ItemVm.Transactor2Id,
                     CfAccountId = ItemVm.Cfa2Id,
@@ -208,17 +232,21 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                 ActionHandlers.TransactorFinAction(transTransactorDef2.FinancialTransAction, spTransaction2);
                 await _context.TransactorTransactions.AddAsync(spTransaction2);
                 await _context.SaveChangesAsync();
-                if (ItemVm.Cfa2Id > 0) {
+                if (ItemVm.Cfa2Id > 0)
+                {
                     var cfaSeriesId2 = docSeries2.DefaultCfaTransSeriesId;
-                    if (cfaSeriesId2 > 0) {
+                    if (cfaSeriesId2 > 0)
+                    {
                         var cfaSeries2 = await _context.CashFlowDocSeriesDefs.FindAsync(cfaSeriesId2);
-                        if (cfaSeries2 != null) {
+                        if (cfaSeries2 != null)
+                        {
                             await _context.Entry(cfaSeries2)
                                 .Reference(t => t.CashFlowDocTypeDefinition)
                                 .LoadAsync();
 
                             var cfaType = cfaSeries2.CashFlowDocTypeDefinition;
-                            if (cfaType != null) {
+                            if (cfaType != null)
+                            {
                                 await _context.Entry(cfaType)
                                     .Reference(t => t.CashFlowTransactionDefinition)
                                     .LoadAsync();
@@ -230,7 +258,8 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                                     $"{cfaSeries2.Name} created from {docSeries2.Name} for {transactor2.Name} with {ItemVm.Etiology} ";
 
                                 var cfaTransDef2 = cfaType.CashFlowTransactionDefinition;
-                                var cfaTrans2 = new CashFlowAccountTransaction {
+                                var cfaTrans2 = new CashFlowAccountTransaction
+                                {
                                     TransDate = ItemVm.TransDate,
                                     CashFlowAccountId = ItemVm.Cfa1Id,
                                     CompanyId = ItemVm.CompanyId,
@@ -253,13 +282,15 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                 }
                 #endregion
 
-                try {
+                try
+                {
 
 
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     await transaction.RollbackAsync();
                     string msg = e.InnerException?.Message;
                     ModelState.AddModelError(string.Empty, msg);
@@ -321,14 +352,17 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
         //    ViewData["CfAccountId"] = SelectListHelpers.GetCfAccountsNoSelectionList(_context);
         //}
 
-        private async Task LoadCombosAsync() {
-            Func<Task<List<SelectListItem>>> transactorListFunc = async () => {
+        private async Task LoadCombosAsync()
+        {
+            Func<Task<List<SelectListItem>>> transactorListFunc = async () =>
+            {
                 var itemList = await _context.Transactors
                     .Include(p => p.TransactorType)
                     .Where(p => p.TransactorType.Code != "SYS.DTRANSACTOR")
                     .OrderBy(s => s.Name)
                     .AsNoTracking()
-                    .Select(c => new SelectListItem() {
+                    .Select(c => new SelectListItem()
+                    {
                         Value = c.Id.ToString(),
                         Text = $"{c.Name}-{c.TransactorType.Code}"
                     })
@@ -337,23 +371,27 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
             };
             Func<Task<List<SelectListItem>>> companiesListFunc = async () => await FiltersHelper.GetSolidCompaniesFilterListAsync(_context);
             Func<Task<List<SelectListItem>>> fiscalPeriodListFunc = async () => await FiltersHelper.GetFiscalPeriodsFilterListAsync(_context);
-            Func<Task<List<SelectListItem>>> transactorTransDocSeriesListFunc = async () => {
+            Func<Task<List<SelectListItem>>> transactorTransDocSeriesListFunc = async () =>
+            {
                 var itemsList = await _context.TransTransactorDocSeriesDefs
                     .OrderBy(s => s.Name)
                     .AsNoTracking()
-                    .Select(c => new SelectListItem() {
+                    .Select(c => new SelectListItem()
+                    {
                         Value = c.Id.ToString(),
                         Text = c.Name
                     })
                     .ToListAsync();
                 return itemsList;
             };
-            Func<Task<List<TransactorSelectListItem>>> transactorsJsListFunc = async () => {
+            Func<Task<List<TransactorSelectListItem>>> transactorsJsListFunc = async () =>
+            {
                 var itemsList = await _context.Transactors
                         .Include(p => p.TransactorType)
                         .Where(p => p.TransactorType.Code != "SYS.DTRANSACTOR")
-                        .OrderBy(p=>p.Name)
-                        .Select(p => new TransactorSelectListItem() {
+                        .OrderBy(p => p.Name)
+                        .Select(p => new TransactorSelectListItem()
+                        {
                             Id = p.Id,
                             TransactorName = p.Name,
                             TransactorTypeId = p.TransactorType.Id,
@@ -365,10 +403,12 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                     .ToListAsync();
                 return itemsList;
             };
-            Func<Task<List<TransactorDocTypeAllowedTransactorTypes>>> allowedTransactorTypesJsListFunc = async () => {
+            Func<Task<List<TransactorDocTypeAllowedTransactorTypes>>> allowedTransactorTypesJsListFunc = async () =>
+            {
                 var itemsList = await _context.TransTransactorDocSeriesDefs
                     .Include(p => p.TransTransactorDocTypeDef)
-                    .Select(p => new TransactorDocTypeAllowedTransactorTypes() {
+                    .Select(p => new TransactorDocTypeAllowedTransactorTypes()
+                    {
                         DocSeriesId = p.Id,
                         DocTypeId = p.TransTransactorDocTypeDefId,
                         DefaultCfaId = p.TransTransactorDocTypeDef.DefaultCfaId,
@@ -379,7 +419,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                 return itemsList;
             };
             Func<Task<List<SelectListItem>>> cfAccountsSelectListFunc = async () => await SelectListHelpers.GetCfAccountsNoSelectionListAsync(_context);
-           
+
             ViewData["CompanyId"] = await companiesListFunc();
             ViewData["FiscalPeriodId"] = await fiscalPeriodListFunc();
             ViewData["TransactorId"] = await transactorListFunc();
