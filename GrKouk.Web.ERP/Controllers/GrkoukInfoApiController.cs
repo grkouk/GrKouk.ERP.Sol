@@ -7018,8 +7018,23 @@ namespace GrKouk.Web.ERP.Controllers
                     error = "No company Id provided"
                 });
             }
+            var allCompCode =
+                    await _context.AppSettings.SingleOrDefaultAsync(
+                        p => p.Code == Constants.AllCompaniesCodeKey);
+            if (allCompCode == null)
+            {
+                return NotFound("All Companies Code Setting not found");
+            }
+
+            var allCompaniesEntity =
+                await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+
+            if (allCompaniesEntity == null)
+            {
+                return NotFound("All Companies entity not found");
+            }
             var cashFlowAccounts = await _context.CashFlowAccounts
-                .Where(cfa => cfa.CompanyMappings.Any(cfacm => cfacm.CompanyId == companyId))
+                .Where(cfa => cfa.CompanyMappings.Any(cfacm => cfacm.CompanyId == companyId || cfacm.CompanyId == allCompaniesEntity.Id))
                 .OrderBy(p => p.Name)
                 .Select(p => new SelectListItem()
                 {

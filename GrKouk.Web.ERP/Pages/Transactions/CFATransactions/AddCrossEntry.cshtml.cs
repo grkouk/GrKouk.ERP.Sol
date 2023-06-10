@@ -64,7 +64,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
                 #region transaction 1
 
                 var docSeries1 = await
-                    _context.TransTransactorDocSeriesDefs.SingleOrDefaultAsync(m =>
+                    _context.CashFlowDocSeriesDefs.SingleOrDefaultAsync(m =>
                         m.Id == ItemVm.DocSeries1Id);
                 if (docSeries1 is null)
                 {
@@ -73,13 +73,13 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
                     return Page();
                 }
 
-                await _context.Entry(docSeries1).Reference(t => t.TransTransactorDocTypeDef).LoadAsync();
-                var docTypeDef1 = docSeries1.TransTransactorDocTypeDef;
+                await _context.Entry(docSeries1).Reference(t => t.CashFlowDocTypeDefinition).LoadAsync();
+                var docTypeDef1 = docSeries1.CashFlowDocTypeDefinition;
                 await _context.Entry(docTypeDef1)
-                    .Reference(t => t.TransTransactorDef)
+                    .Reference(t => t.CashFlowTransactionDefinition)
                     .LoadAsync();
 
-                var transTransactorDef1 = docTypeDef1.TransTransactorDef;
+                var cfaTransactorDef1 = docTypeDef1.CashFlowTransactionDefinition;
 
                 #region Section Management
 
@@ -103,79 +103,32 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
 
                 #endregion
 
-                TransactorTransaction spTransaction1 = new TransactorTransaction
+                CashFlowAccountTransaction spTransaction1 = new()
                 {
                     TransDate = ItemVm.TransDate,
-                    TransactorId = ItemVm.Transactor1Id,
-                    CfAccountId = ItemVm.Cfa1Id,
+
+                    CashFlowAccountId = ItemVm.Cfa1Id,
                     SectionId = sectionId1,
-                    TransTransactorDocSeriesId = docSeries1.Id,
-                    TransTransactorDocTypeId = docSeries1.TransTransactorDocTypeDefId,
+                    CreatorSectionId = sectionId1,
+                    DocumentSeriesId = docSeries1.Id,
+                    DocumentTypeId = docSeries1.CashFlowDocTypeDefId,
                     FiscalPeriodId = fiscalPeriod.Id,
                     CompanyId = ItemVm.CompanyId,
                     Etiology = ItemVm.Etiology,
-                    AmountNet = ItemVm.Amount,
-                    TransRefCode = ItemVm.RefCode,
-
-                    FinancialAction = transTransactorDef1.FinancialTransAction
+                    Amount = ItemVm.Amount,
+                    RefCode = ItemVm.RefCode,
+                    CfaAction = cfaTransactorDef1.CfaAction
                 };
-                ActionHandlers.TransactorFinAction(transTransactorDef1.FinancialTransAction, spTransaction1);
-                await _context.TransactorTransactions.AddAsync(spTransaction1);
-                await _context.SaveChangesAsync();
-                if (ItemVm.Cfa1Id > 0)
-                {
-                    var cfaSeriesId1 = docSeries1.DefaultCfaTransSeriesId;
-                    if (cfaSeriesId1 > 0)
-                    {
-                        var cfaSeries1 = await _context.CashFlowDocSeriesDefs.FindAsync(cfaSeriesId1);
-                        if (cfaSeries1 != null)
-                        {
-                            await _context.Entry(cfaSeries1)
-                                .Reference(t => t.CashFlowDocTypeDefinition)
-                                .LoadAsync();
+                ActionHandlers.CashFlowFinAction(cfaTransactorDef1.CfaAction, spTransaction1);
+                await _context.CashFlowAccountTransactions.AddAsync(spTransaction1);
+                //await _context.SaveChangesAsync();
 
-                            var cfaType = cfaSeries1.CashFlowDocTypeDefinition;
-                            if (cfaType != null)
-                            {
-                                await _context.Entry(cfaType)
-                                    .Reference(t => t.CashFlowTransactionDefinition)
-                                    .LoadAsync();
-                                var transactor1 = await _context.Transactors
-                                    .Where(p => p.Id == ItemVm.Transactor1Id)
-                                    .AsNoTracking()
-                                    .SingleOrDefaultAsync();
-                                var etiology =
-                                    $"{cfaSeries1.Name} created from {docSeries1.Name} for {transactor1.Name} with {ItemVm.Etiology} ";
-
-                                var cfaTransDef1 = cfaType.CashFlowTransactionDefinition;
-                                var cfaTrans1 = new CashFlowAccountTransaction
-                                {
-                                    TransDate = ItemVm.TransDate,
-                                    CashFlowAccountId = ItemVm.Cfa1Id,
-                                    CompanyId = ItemVm.CompanyId,
-                                    DocumentSeriesId = cfaSeries1.Id,
-                                    DocumentTypeId = cfaType.Id,
-                                    Etiology = etiology,
-                                    FiscalPeriodId = spTransaction1.FiscalPeriodId,
-                                    CreatorSectionId = sectionId1,
-                                    CreatorId = spTransaction1.Id,
-                                    RefCode = spTransaction1.TransRefCode,
-                                    Amount = ItemVm.Amount,
-                                    SectionId = cfaType.SectionId > 0 ? cfaType.SectionId : sectionId1
-                                };
-                                ActionHandlers.CashFlowFinAction(cfaTransDef1.CfaAction, cfaTrans1);
-                                await _context.CashFlowAccountTransactions.AddAsync(cfaTrans1);
-                                await _context.SaveChangesAsync();
-                            }
-                        }
-                    }
-                }
                 #endregion
 
                 #region transaction 2
 
                 var docSeries2 = await
-                    _context.TransTransactorDocSeriesDefs.SingleOrDefaultAsync(m =>
+                    _context.CashFlowDocSeriesDefs.SingleOrDefaultAsync(m =>
                         m.Id == ItemVm.DocSeries2Id);
                 if (docSeries2 is null)
                 {
@@ -184,13 +137,13 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
                     return Page();
                 }
 
-                await _context.Entry(docSeries2).Reference(t => t.TransTransactorDocTypeDef).LoadAsync();
-                var docTypeDef2 = docSeries2.TransTransactorDocTypeDef;
+                await _context.Entry(docSeries2).Reference(t => t.CashFlowDocTypeDefinition).LoadAsync();
+                var docTypeDef2 = docSeries2.CashFlowDocTypeDefinition;
                 await _context.Entry(docTypeDef2)
-                    .Reference(t => t.TransTransactorDef)
+                    .Reference(t => t.CashFlowTransactionDefinition)
                     .LoadAsync();
 
-                var transTransactorDef2 = docTypeDef2.TransTransactorDef;
+                var cfaTransactorDef2 = docTypeDef2.CashFlowTransactionDefinition;
 
                 #region Section Management
 
@@ -214,73 +167,26 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
 
                 #endregion
 
-                TransactorTransaction spTransaction2 = new TransactorTransaction
+                CashFlowAccountTransaction spTransaction2 = new()
                 {
                     TransDate = ItemVm.TransDate,
-                    TransactorId = ItemVm.Transactor2Id,
-                    CfAccountId = ItemVm.Cfa2Id,
+                    CashFlowAccountId = ItemVm.Cfa2Id,
                     SectionId = sectionId2,
-                    TransTransactorDocSeriesId = docSeries2.Id,
-                    TransTransactorDocTypeId = docSeries2.TransTransactorDocTypeDefId,
+                    CreatorSectionId = sectionId2,
+                    DocumentSeriesId = docSeries2.Id,
+                    DocumentTypeId = docSeries2.CashFlowDocTypeDefId,
                     FiscalPeriodId = fiscalPeriod.Id,
                     CompanyId = ItemVm.CompanyId,
                     Etiology = ItemVm.Etiology,
-                    AmountNet = ItemVm.Amount,
-                    TransRefCode = ItemVm.RefCode,
+                    Amount = ItemVm.Amount,
+                    RefCode = ItemVm.RefCode,
+                    CfaAction = cfaTransactorDef2.CfaAction
 
-                    FinancialAction = transTransactorDef2.FinancialTransAction
                 };
-                ActionHandlers.TransactorFinAction(transTransactorDef2.FinancialTransAction, spTransaction2);
-                await _context.TransactorTransactions.AddAsync(spTransaction2);
-                await _context.SaveChangesAsync();
-                if (ItemVm.Cfa2Id > 0)
-                {
-                    var cfaSeriesId2 = docSeries2.DefaultCfaTransSeriesId;
-                    if (cfaSeriesId2 > 0)
-                    {
-                        var cfaSeries2 = await _context.CashFlowDocSeriesDefs.FindAsync(cfaSeriesId2);
-                        if (cfaSeries2 != null)
-                        {
-                            await _context.Entry(cfaSeries2)
-                                .Reference(t => t.CashFlowDocTypeDefinition)
-                                .LoadAsync();
+                ActionHandlers.CashFlowFinAction(cfaTransactorDef2.CfaAction, spTransaction2);
+                await _context.CashFlowAccountTransactions.AddAsync(spTransaction2);
+                //await _context.SaveChangesAsync();
 
-                            var cfaType = cfaSeries2.CashFlowDocTypeDefinition;
-                            if (cfaType != null)
-                            {
-                                await _context.Entry(cfaType)
-                                    .Reference(t => t.CashFlowTransactionDefinition)
-                                    .LoadAsync();
-                                var transactor2 = await _context.Transactors
-                                    .Where(p => p.Id == ItemVm.Transactor2Id)
-
-                                    .SingleOrDefaultAsync();
-                                var etiology =
-                                    $"{cfaSeries2.Name} created from {docSeries2.Name} for {transactor2.Name} with {ItemVm.Etiology} ";
-
-                                var cfaTransDef2 = cfaType.CashFlowTransactionDefinition;
-                                var cfaTrans2 = new CashFlowAccountTransaction
-                                {
-                                    TransDate = ItemVm.TransDate,
-                                    CashFlowAccountId = ItemVm.Cfa1Id,
-                                    CompanyId = ItemVm.CompanyId,
-                                    DocumentSeriesId = cfaSeries2.Id,
-                                    DocumentTypeId = cfaType.Id,
-                                    Etiology = etiology,
-                                    FiscalPeriodId = spTransaction2.FiscalPeriodId,
-                                    CreatorSectionId = sectionId2,
-                                    CreatorId = spTransaction2.Id,
-                                    RefCode = spTransaction2.TransRefCode,
-                                    Amount = ItemVm.Amount,
-                                    SectionId = cfaType.SectionId > 0 ? cfaType.SectionId : sectionId2
-                                };
-                                ActionHandlers.CashFlowFinAction(cfaTransDef2.CfaAction, cfaTrans2);
-                                await _context.CashFlowAccountTransactions.AddAsync(cfaTrans2);
-                                await _context.SaveChangesAsync();
-                            }
-                        }
-                    }
-                }
                 #endregion
 
                 try
