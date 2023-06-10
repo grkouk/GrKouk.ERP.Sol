@@ -122,7 +122,7 @@
                     companyId = 0;
                 }
                 if (companyId > 0) {
-
+                   
                     let loader = ej.base.loadCldr;
                     productLib.getCompanyBaseCurrencyInfo(companyId, $spinnerElement)
                         .then((data) => {
@@ -143,6 +143,14 @@
                         .catch((error) => {
                             console.log("Error getting company base currency");
                             console.log(error);
+                        });
+                    //---------------------
+                     productLib.getCompanyAllowedCashFlowAccounts(companyId,$spinnerElement)
+                        .then((data)=>{
+                            
+                        })
+                        .catch((error)=>{
+                            
                         });
                 }
             };

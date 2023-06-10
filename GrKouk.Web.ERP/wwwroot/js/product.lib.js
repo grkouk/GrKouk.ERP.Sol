@@ -214,6 +214,20 @@
                 });
         });
     };
+    const getCompanyAllowedCashFlowAccounts = (companyId, spinnerElement) => {
+        let uri = "/api/grkoukinfoapi/GetCompanyAllowedCashFlowAccounts";
+        uri += `?companyId=${companyId}`;
+
+        return new Promise((resolve, reject) => {
+            makeAjaxCall(uri, spinnerElement)
+                .then((data) => {
+                    resolve(data);
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        });
+    };
     const getCompanyCashFlowAccounts = (companyId, spinnerElement) => {
         let uri = "/api/materials/CashFlowAccountsForCompany";
         uri += `?companyId=${companyId}`;
@@ -455,6 +469,7 @@
         setFormatters: setFormatters,
         //For testing purposes
         makeAjaxCallGet: makeAjaxCallGet,
+        getCompanyAllowedCashFlowAccounts: getCompanyAllowedCashFlowAccounts,
         getCfaFinancialSummaryData: getCfaFinancialSummaryData,
         getProductFinancialSummaryData: getProductFinancialSummaryData
     };

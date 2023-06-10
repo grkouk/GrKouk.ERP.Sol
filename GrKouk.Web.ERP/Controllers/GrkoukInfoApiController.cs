@@ -7006,7 +7006,24 @@ namespace GrKouk.Web.ERP.Controllers
                 }
             }
         }
+        [HttpGet("GetCompanyAllowedCashFlowAccounts")]
+        public async Task<IActionResult> GetCompanyAllowedCashFlowAccounts(int companyId) {
+            //Thread.Sleep(10000);
+            if (companyId == 0) {
+                return BadRequest(new {
+                    error = "No company Id provided"
+                });
+            }
+            var cashFlowAccounts = await _context.CashFlowAccounts
+                .Where(cfa => cfa.CompanyMappings.Any(cfacm => cfacm.CompanyId == companyId))
+                .ToListAsync();
+            var response = new {
+                
+                AllowedCashFlowAccounts = cashFlowAccounts
 
+            };
+            return Ok(response);
+        }
         [HttpPost("AssignMediaToProduct")]
         public async Task<IActionResult> AssignMediaToProduct([FromBody] MediaListProductRequest request)
         {
