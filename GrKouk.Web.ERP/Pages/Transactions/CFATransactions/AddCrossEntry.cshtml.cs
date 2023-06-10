@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Net.Mime;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -302,55 +303,6 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
             return RedirectToPage("./Index");
         }
 
-        //private void LoadCombos() {
-        //    var transactorsListDb = _context.Transactors
-        //        .Include(p => p.TransactorType)
-        //        .Where(p => p.TransactorType.Code != "SYS.DTRANSACTOR")
-        //        .OrderBy(s => s.Name).AsNoTracking();
-        //    List<SelectListItem> transactorsList = new List<SelectListItem>();
-
-        //    foreach (var dbTransactor in transactorsListDb) {
-        //        transactorsList.Add(new SelectListItem() {
-        //            Value = dbTransactor.Id.ToString(),
-        //            Text = dbTransactor.Name + "-" + dbTransactor.TransactorType.Code
-        //        });
-        //    }
-
-        //    ViewData["CompanyId"] = FiltersHelper.GetSolidCompaniesFilterList(_context);
-        //    //new SelectList(_context.Companies.OrderBy(c => c.Code).AsNoTracking(), "Id", "Code");
-        //    ViewData["FiscalPeriodId"] =
-        //        new SelectList(_context.FiscalPeriods.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
-        //    ViewData["TransactorId"] = new SelectList(transactorsList, "Value", "Text");
-        //    ViewData["DocSeriesId"] =
-        //        new SelectList(_context.TransTransactorDocSeriesDefs.OrderBy(s => s.Name).AsNoTracking(), "Id", "Name");
-        //    //ViewData["SectionId"] = new SelectList(_context.Sections, "Id", "Code");
-        //    var transactorsListJs = _context.Transactors
-        //        .Include(p => p.TransactorType)
-        //        .Where(p => p.TransactorType.Code != "SYS.DTRANSACTOR")
-        //        .Select(p => new TransactorSelectListItem() {
-        //            Id = p.Id,
-        //            TransactorName = p.Name,
-        //            TransactorTypeId = p.TransactorType.Id,
-        //            TransactorTypeCode = p.TransactorType.Code,
-        //            Value = p.Id.ToString(),
-        //            Text = $"{p.Name} {{{p.TransactorType.Code}}}"
-        //        })
-        //        .AsNoTracking()
-        //        .ToList();
-        //    ViewData["transactorsListJs"] = transactorsListJs;
-        //    var docTypeAllowedTransactorTypesListJs = _context.TransTransactorDocSeriesDefs
-        //        .Include(p => p.TransTransactorDocTypeDef)
-        //        .Select(p => new TransactorDocTypeAllowedTransactorTypes() {
-        //            DocSeriesId = p.Id,
-        //            DocTypeId = p.TransTransactorDocTypeDefId,
-        //            DefaultCfaId = p.TransTransactorDocTypeDef.DefaultCfaId,
-        //            AllowedTypes = p.TransTransactorDocTypeDef.AllowedTransactorTypes
-        //        })
-        //        .AsNoTracking()
-        //        .ToList();
-        //    ViewData["docTypeAllowedTransactorTypesListJs"] = docTypeAllowedTransactorTypesListJs;
-        //    ViewData["CfAccountId"] = SelectListHelpers.GetCfAccountsNoSelectionList(_context);
-        //}
 
         private async Task LoadCombosAsync()
         {
@@ -383,6 +335,20 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
                     })
                     .ToListAsync();
                 return itemsList;
+            };
+            Func<Task<List<SelectListItem>>> cfaTransSeriesListFunc = async () =>
+            {
+                var itemsList = await _context.CashFlowDocSeriesDefs
+                    .OrderBy(s => s.Name)
+                    .AsNoTracking()
+                    .Select(c => new SelectListItem()
+                    {
+                        Value = c.Id.ToString(),
+                        Text = c.Name
+                    })
+                    .ToListAsync();
+                return itemsList;
+
             };
             Func<Task<List<TransactorSelectListItem>>> transactorsJsListFunc = async () =>
             {
@@ -423,7 +389,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
             ViewData["CompanyId"] = await companiesListFunc();
             ViewData["FiscalPeriodId"] = await fiscalPeriodListFunc();
             ViewData["TransactorId"] = await transactorListFunc();
-            ViewData["DocSeriesId"] = await transactorTransDocSeriesListFunc();
+            ViewData["DocSeriesId"] = await cfaTransSeriesListFunc();
             ViewData["transactorsListJs"] = await transactorsJsListFunc();
             ViewData["docTypeAllowedTransactorTypesListJs"] = await allowedTransactorTypesJsListFunc();
             ViewData["CfAccountId"] = await cfAccountsSelectListFunc();

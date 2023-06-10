@@ -36,10 +36,10 @@
                 <label asp-for="ItemVm.DocSeries1Id" class="small"></label>
                 <select asp-for="ItemVm.DocSeries1Id" class="form-select form-select-sm small" asp-items="ViewBag.DocSeriesId"></select>
             </div>
-            <div class="col-md-4">
+            @* <div class="col-md-4">
                 <label asp-for="ItemVm.Transactor1Id" class="small"></label>
                 <select asp-for="ItemVm.Transactor1Id" class="form-select form-select-sm small" asp-items="ViewBag.TransactorId"></select>
-            </div>
+            </div> *@
             <div class="col-md-4">
                 <label asp-for="ItemVm.Cfa1Id" class="small"></label>
                 <select asp-for="ItemVm.Cfa1Id" class="form-select form-select-sm small" asp-items="ViewBag.CfAccountId"></select>
@@ -50,10 +50,10 @@
                 <label asp-for="ItemVm.DocSeries2Id" class="small"></label>
                 <select asp-for="ItemVm.DocSeries2Id" class="form-select form-select-sm small" asp-items="ViewBag.DocSeriesId"></select>
             </div>
-            <div class="col-md-4">
+            @* <div class="col-md-4">
                 <label asp-for="ItemVm.Transactor2Id" class="small"></label>
                 <select asp-for="ItemVm.Transactor2Id" class="form-select form-select-sm small" asp-items="ViewBag.TransactorId"></select>
-            </div>
+            </div> *@
             <div class="col-md-4">
                 <label asp-for="ItemVm.Cfa2Id" class="small"></label>
                 <select asp-for="ItemVm.Cfa2Id" class="form-select form-select-sm small" asp-items="ViewBag.CfAccountId"></select>
@@ -94,90 +94,26 @@
         $(document).ready(function() {
             var $transDate = $('#ItemVm_TransDate');
             var amountNetEl = document.getElementById("Amount").ej2_instances[0];
-            var transactorsListJs = @Html.Raw(Json.Serialize(ViewBag.transactorsListJs));
-            var allowedTypesListJs = @Html.Raw(Json.Serialize(ViewBag.docTypeAllowedTransactorTypesListJs));
+            //var transactorsListJs = @Html.Raw(Json.Serialize(ViewBag.transactorsListJs));
+            //var allowedTypesListJs = @Html.Raw(Json.Serialize(ViewBag.docTypeAllowedTransactorTypesListJs));
             var $companyId = $('#ItemVm_CompanyId');
             var $docCurrency = $('[name=docCurrency]');
             const $spinnerElement = $('#loadMe');
             const $docSeries1El = $('#ItemVm_DocSeries1Id');
             const $docSeries2El = $('#ItemVm_DocSeries2Id');
-            const $transactorList1El = $('#ItemVm_Transactor1Id');
-            const $transactorList2El = $('#ItemVm_Transactor2Id');
+            //const $transactorList1El = $('#ItemVm_Transactor1Id');
+            //const $transactorList2El = $('#ItemVm_Transactor2Id');
             const $cfaId1El = $('#ItemVm_Cfa1Id');
             const $cfaId2El = $('#ItemVm_Cfa2Id');
 
             const docSeries1Changed=()=>{
                 const docSeriesId=$docSeries1El.val();
-                //locate inside list selected docseriesid
-                let a = allowedTypesListJs.find(o=>o.docSeriesId==docSeriesId);
-                if (a){
-                    //console.log('Found');
-                    let allowed = JSON.parse(a.allowedTypes);
-                    if (allowed){
-                        let  lst = transactorsListJs.filter(function(item){
-                            return allowed.indexOf(item.transactorTypeId) !== -1;
-                        });
-                        $transactorList1El.empty();
-
-                        $.each(lst, function(index, item) {
-                            $transactorList1El.append($('<option></option>').attr('value', item.value).text(item.text));
-                        });
-                    } else {
-                        $transactorList1El.empty();
-                        $.each(transactorsListJs, function(index, item) {
-                            $transactorList1El.append($('<option></option>').attr('value', item.value).text(item.text));
-                        });
-                    }
-                    let cfaId = parseInt( a.defaultCfaId);
-                    if (cfaId!==NaN) {
-                        $cfaId1El.val(cfaId);
-                    }
-
-                } else {
-                    console.log('Not Found');
-                    $transactorList1El.empty();
-
-                    $.each(transactorsListJs, function(index, item) {
-                        $transactorList1El.append($('<option></option>').attr('value', item.value).text(item.text));
-                    });
-                }
+               
 
             };
             const docSeries2Changed=()=>{
                 const docSeriesId=$docSeries2El.val();
-                //locate inside list selected docseriesid
-                let a = allowedTypesListJs.find(o=>o.docSeriesId==docSeriesId);
-                if (a){
-                    //console.log('Found');
-                    let allowed = JSON.parse(a.allowedTypes);
-                    if (allowed){
-                        let  lst = transactorsListJs.filter(function(item){
-                            return allowed.indexOf(item.transactorTypeId) !== -1;
-                        });
-                        $transactorList2El.empty();
-
-                        $.each(lst, function(index, item) {
-                            $transactorList2El.append($('<option></option>').attr('value', item.value).text(item.text));
-                        });
-                    } else {
-                        $transactorList2El.empty();
-                        $.each(transactorsListJs, function(index, item) {
-                            $transactorList2El.append($('<option></option>').attr('value', item.value).text(item.text));
-                        });
-                    }
-                    let cfaId = parseInt( a.defaultCfaId);
-                    if (cfaId!==NaN) {
-                        $cfaId2El.val(cfaId);
-                    }
-
-                } else {
-                    console.log('Not Found');
-                    $transactorList2El.empty();
-
-                    $.each(transactorsListJs, function(index, item) {
-                        $transactorList2El.append($('<option></option>').attr('value', item.value).text(item.text));
-                    });
-                }
+               
 
             };
             const companyChanged = () => {
