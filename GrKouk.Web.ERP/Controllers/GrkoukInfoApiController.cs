@@ -33,6 +33,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using GrKouk.Erp.Dtos.CashFlowTransactions;
 using GrKouk.Erp.Dtos.FinancialMovements;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 //using Remotion.Linq.Parsing.Structure.IntermediateModel;
 
@@ -7007,18 +7008,28 @@ namespace GrKouk.Web.ERP.Controllers
             }
         }
         [HttpGet("GetCompanyAllowedCashFlowAccounts")]
-        public async Task<IActionResult> GetCompanyAllowedCashFlowAccounts(int companyId) {
+        public async Task<IActionResult> GetCompanyAllowedCashFlowAccounts(int companyId)
+        {
             //Thread.Sleep(10000);
-            if (companyId == 0) {
-                return BadRequest(new {
+            if (companyId == 0)
+            {
+                return BadRequest(new
+                {
                     error = "No company Id provided"
                 });
             }
             var cashFlowAccounts = await _context.CashFlowAccounts
                 .Where(cfa => cfa.CompanyMappings.Any(cfacm => cfacm.CompanyId == companyId))
+                .OrderBy(p => p.Name)
+                .Select(p => new SelectListItem()
+                {
+                    Value = p.Id.ToString(),
+                    Text = p.Name
+                })
                 .ToListAsync();
-            var response = new {
-                
+            var response = new
+            {
+
                 AllowedCashFlowAccounts = cashFlowAccounts
 
             };

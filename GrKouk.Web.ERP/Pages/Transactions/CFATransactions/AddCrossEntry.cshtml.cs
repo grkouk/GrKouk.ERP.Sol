@@ -405,10 +405,10 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
             //ViewData["TransactorId"] = await transactorListFunc();
             ViewData["DocSeriesId"] = await cfaTransSeriesListFunc();
             //ViewData["transactorsListJs"] = await transactorsJsListFunc();
-            ViewData["cfaListJs"] = await cashFlowAccountsJsListFunc();
+            //ViewData["cfaListJs"] = await cashFlowAccountsJsListFunc();
             // ViewData["docTypeAllowedTransactorTypesListJs"] = await allowedTransactorTypesJsListFunc();
-            ViewData["CompanyAllowedCashFloeAccounts"] = await allowedCompanyCashFlowAccountsJsListFunc();
-            ViewData["CfAccountId"] = await cfAccountsSelectListFunc();
+            //ViewData["CompanyAllowedCashFloeAccounts"] = await allowedCompanyCashFlowAccountsJsListFunc();
+            //ViewData["CfAccountId"] = await cfAccountsSelectListFunc();
 
         }
     }
