@@ -447,10 +447,11 @@ namespace GrKouk.Web.ERP.Controllers {
                     error = "Company not found "
                 });
             }
-
+            //TODO: I have put allcompanies id directly in code. Change this with the logic I use
             var accountsForCompany = await _context.CashFlowAccountCompanyMappings
                 .Include(p => p.CashFlowAccount)
-                .Where(p => p.CompanyId == companyId)
+                .Where(p => p.CompanyId == companyId || p.CompanyId==1)
+                .OrderBy(p=>p.Company.Name)
                 .Select(x => new {
                     value = x.CashFlowAccountId,
                     text = x.CashFlowAccount.Name
