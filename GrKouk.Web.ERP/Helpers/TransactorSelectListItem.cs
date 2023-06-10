@@ -1,6 +1,6 @@
 ﻿namespace GrKouk.Web.ERP.Helpers
 {
-    public class TransactorSelectListItem    
+    public class TransactorSelectListItem
     {
         public int Id { get; set; }
         public string TransactorName { get; set; }
@@ -17,5 +17,18 @@
         public int DefaultCfaId { get; set; }
         public string[] AllowedTypesArray { get; set; }
         public string AllowedTypes { get; set; }
+    }
+    public class AllowedCompanyCashFlowAccountItem
+    {
+        public int CfaId { get; set; }
+        public int CompanyId { get; set; }
+    }
+    public class CashFlowAccountSelectListItem
+    {
+        public int Id { get; set; }
+        public int CompanyId { get; set; }
+        public string CfaName { get; set; }
+        public string Value { get; set; }
+        public string Text { get; set; }
     }
 }

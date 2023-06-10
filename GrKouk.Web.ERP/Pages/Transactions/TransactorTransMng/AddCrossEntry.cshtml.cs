@@ -302,55 +302,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
             return RedirectToPage("./Index");
         }
 
-        //private void LoadCombos() {
-        //    var transactorsListDb = _context.Transactors
-        //        .Include(p => p.TransactorType)
-        //        .Where(p => p.TransactorType.Code != "SYS.DTRANSACTOR")
-        //        .OrderBy(s => s.Name).AsNoTracking();
-        //    List<SelectListItem> transactorsList = new List<SelectListItem>();
 
-        //    foreach (var dbTransactor in transactorsListDb) {
-        //        transactorsList.Add(new SelectListItem() {
-        //            Value = dbTransactor.Id.ToString(),
-        //            Text = dbTransactor.Name + "-" + dbTransactor.TransactorType.Code
-        //        });
-        //    }
-
-        //    ViewData["CompanyId"] = FiltersHelper.GetSolidCompaniesFilterList(_context);
-        //    //new SelectList(_context.Companies.OrderBy(c => c.Code).AsNoTracking(), "Id", "Code");
-        //    ViewData["FiscalPeriodId"] =
-        //        new SelectList(_context.FiscalPeriods.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
-        //    ViewData["TransactorId"] = new SelectList(transactorsList, "Value", "Text");
-        //    ViewData["DocSeriesId"] =
-        //        new SelectList(_context.TransTransactorDocSeriesDefs.OrderBy(s => s.Name).AsNoTracking(), "Id", "Name");
-        //    //ViewData["SectionId"] = new SelectList(_context.Sections, "Id", "Code");
-        //    var transactorsListJs = _context.Transactors
-        //        .Include(p => p.TransactorType)
-        //        .Where(p => p.TransactorType.Code != "SYS.DTRANSACTOR")
-        //        .Select(p => new TransactorSelectListItem() {
-        //            Id = p.Id,
-        //            TransactorName = p.Name,
-        //            TransactorTypeId = p.TransactorType.Id,
-        //            TransactorTypeCode = p.TransactorType.Code,
-        //            Value = p.Id.ToString(),
-        //            Text = $"{p.Name} {{{p.TransactorType.Code}}}"
-        //        })
-        //        .AsNoTracking()
-        //        .ToList();
-        //    ViewData["transactorsListJs"] = transactorsListJs;
-        //    var docTypeAllowedTransactorTypesListJs = _context.TransTransactorDocSeriesDefs
-        //        .Include(p => p.TransTransactorDocTypeDef)
-        //        .Select(p => new TransactorDocTypeAllowedTransactorTypes() {
-        //            DocSeriesId = p.Id,
-        //            DocTypeId = p.TransTransactorDocTypeDefId,
-        //            DefaultCfaId = p.TransTransactorDocTypeDef.DefaultCfaId,
-        //            AllowedTypes = p.TransTransactorDocTypeDef.AllowedTransactorTypes
-        //        })
-        //        .AsNoTracking()
-        //        .ToList();
-        //    ViewData["docTypeAllowedTransactorTypesListJs"] = docTypeAllowedTransactorTypesListJs;
-        //    ViewData["CfAccountId"] = SelectListHelpers.GetCfAccountsNoSelectionList(_context);
-        //}
 
         private async Task LoadCombosAsync()
         {
@@ -428,23 +380,8 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
             ViewData["docTypeAllowedTransactorTypesListJs"] = await allowedTransactorTypesJsListFunc();
             ViewData["CfAccountId"] = await cfAccountsSelectListFunc();
 
-            #region CommentedOut
-            //var transactorListTask =  transactorListFunc();
-            //var companiesListTask = companiesListFunc();
-            //var fiscalPeriodListTask = fiscalPeriodListFunc();
-            //var transactorTransDocSeriesListTask = transactorTransDocSeriesListFunc();
-            //var transactorsJsListTask = transactorsJsListFunc();
-            //var allowedTransactorTypesJsListTask = allowedTransactorTypesJsListFunc();
-            //var cfAccountsSelectListTask = cfAccountsSelectListFunc();
 
-            //ViewData["CompanyId"] = companiesListTask.Result;
-            //ViewData["FiscalPeriodId"] = fiscalPeriodListTask.Result;
-            //ViewData["TransactorId"] = transactorListTask.Result;
-            //ViewData["DocSeriesId"] = transactorTransDocSeriesListTask.Result;
-            //ViewData["transactorsListJs"] = transactorsJsListTask.Result;
-            //ViewData["docTypeAllowedTransactorTypesListJs"] = allowedTransactorTypesJsListTask.Result;
-            //ViewData["CfAccountId"] = cfAccountsSelectListTask.Result;
-            #endregion
+
         }
     }
 }

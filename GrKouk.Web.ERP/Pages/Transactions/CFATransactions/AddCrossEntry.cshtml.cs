@@ -369,16 +369,30 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
                     .ToListAsync();
                 return itemsList;
             };
-            Func<Task<List<TransactorDocTypeAllowedTransactorTypes>>> allowedTransactorTypesJsListFunc = async () =>
+            Func<Task<List<CashFlowAccountSelectListItem>>> cashFlowAccountsJsListFunc = async () =>
             {
-                var itemsList = await _context.TransTransactorDocSeriesDefs
-                    .Include(p => p.TransTransactorDocTypeDef)
-                    .Select(p => new TransactorDocTypeAllowedTransactorTypes()
+                var itemsList = await _context.CashFlowAccounts
+                        .OrderBy(p => p.Name)
+                        .Select(p => new CashFlowAccountSelectListItem()
+                        {
+                            Id = p.Id,
+
+                            CfaName = p.Name,
+                            Value = p.Id.ToString(),
+                            Text = p.Name
+                        })
+                        .AsNoTracking()
+                    .ToListAsync();
+                return itemsList;
+            };
+
+            Func<Task<List<AllowedCompanyCashFlowAccountItem>>> allowedCompanyCashFlowAccountsJsListFunc = async () =>
+            {
+                var itemsList = await _context.CashFlowAccountCompanyMappings
+                    .Select(p => new AllowedCompanyCashFlowAccountItem()
                     {
-                        DocSeriesId = p.Id,
-                        DocTypeId = p.TransTransactorDocTypeDefId,
-                        DefaultCfaId = p.TransTransactorDocTypeDef.DefaultCfaId,
-                        AllowedTypes = p.TransTransactorDocTypeDef.AllowedTransactorTypes
+                        CfaId = p.CashFlowAccountId,
+                        CompanyId = p.CompanyId
                     })
                     .AsNoTracking()
                     .ToListAsync();
@@ -388,29 +402,14 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
 
             ViewData["CompanyId"] = await companiesListFunc();
             ViewData["FiscalPeriodId"] = await fiscalPeriodListFunc();
-            ViewData["TransactorId"] = await transactorListFunc();
+            //ViewData["TransactorId"] = await transactorListFunc();
             ViewData["DocSeriesId"] = await cfaTransSeriesListFunc();
-            ViewData["transactorsListJs"] = await transactorsJsListFunc();
-            ViewData["docTypeAllowedTransactorTypesListJs"] = await allowedTransactorTypesJsListFunc();
+            //ViewData["transactorsListJs"] = await transactorsJsListFunc();
+            ViewData["cfaListJs"] = await cashFlowAccountsJsListFunc();
+            // ViewData["docTypeAllowedTransactorTypesListJs"] = await allowedTransactorTypesJsListFunc();
+            ViewData["CompanyAllowedCashFloeAccounts"] = await allowedCompanyCashFlowAccountsJsListFunc();
             ViewData["CfAccountId"] = await cfAccountsSelectListFunc();
 
-            #region CommentedOut
-            //var transactorListTask =  transactorListFunc();
-            //var companiesListTask = companiesListFunc();
-            //var fiscalPeriodListTask = fiscalPeriodListFunc();
-            //var transactorTransDocSeriesListTask = transactorTransDocSeriesListFunc();
-            //var transactorsJsListTask = transactorsJsListFunc();
-            //var allowedTransactorTypesJsListTask = allowedTransactorTypesJsListFunc();
-            //var cfAccountsSelectListTask = cfAccountsSelectListFunc();
-
-            //ViewData["CompanyId"] = companiesListTask.Result;
-            //ViewData["FiscalPeriodId"] = fiscalPeriodListTask.Result;
-            //ViewData["TransactorId"] = transactorListTask.Result;
-            //ViewData["DocSeriesId"] = transactorTransDocSeriesListTask.Result;
-            //ViewData["transactorsListJs"] = transactorsJsListTask.Result;
-            //ViewData["docTypeAllowedTransactorTypesListJs"] = allowedTransactorTypesJsListTask.Result;
-            //ViewData["CfAccountId"] = cfAccountsSelectListTask.Result;
-            #endregion
         }
     }
 }
