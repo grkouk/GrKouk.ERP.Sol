@@ -73,7 +73,9 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
                     return Page();
                 }
 
-                await _context.Entry(docSeries1).Reference(t => t.CashFlowDocTypeDefinition).LoadAsync();
+                await _context.Entry(docSeries1)
+                    .Reference(t => t.CashFlowDocTypeDefinition)
+                    .LoadAsync();
                 var docTypeDef1 = docSeries1.CashFlowDocTypeDefinition;
                 await _context.Entry(docTypeDef1)
                     .Reference(t => t.CashFlowTransactionDefinition)
