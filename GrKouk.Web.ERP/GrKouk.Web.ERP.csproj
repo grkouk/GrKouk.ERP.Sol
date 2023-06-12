@@ -6,10 +6,10 @@
     <Authors>George Koukoudis</Authors>
     <Company>GrKoukOrg</Company>
     <Copyright>GrKoukOrg</Copyright>
-    <Version>1.0.1.1</Version>
-    <PackageVersion>1.0.1.1</PackageVersion>
-    <AssemblyVersion>1.0.1.1</AssemblyVersion>
-    <FileVersion>1.0.1.1</FileVersion>
+    <Version>1.0.1.2</Version>
+    <PackageVersion>1.0.1.2</PackageVersion>
+    <AssemblyVersion>1.0.1.2</AssemblyVersion>
+    <FileVersion>1.0.1.2</FileVersion>
     <Title>GrKoukOrg Erp</Title>
   </PropertyGroup>
 
