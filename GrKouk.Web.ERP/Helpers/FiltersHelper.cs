@@ -76,11 +76,12 @@ namespace GrKouk.Web.ERP.Helpers
                     Value = ((int)c).ToString(),
                     Text = c.GetDescription()
                 })
-                .OrderBy(c => c.Text)
+
                 .ToList();
             //Αλλαγή του στοιχείου 0 από απροσδιόριστο σε {Ολές οι φύσεις είδους}
             materialNatures[0].Text = "{All Natures}";
-            return materialNatures;
+            var orderedNatureList = materialNatures.OrderBy(p => p.Text).ToList();
+            return orderedNatureList;
         }
         public static List<SelectListItem> GetSeriesPayoffWayList()
         {
@@ -207,7 +208,7 @@ namespace GrKouk.Web.ERP.Helpers
             var dbTransactorTypes = await context.TransactorTypes.OrderBy(p => p.Code)
                 .AsNoTracking()
                 .ToListAsync();
-            List<SelectListItem> transactorTypes = new List<SelectListItem>
+            List<SelectListItem> transactorTypes = new()
             {
                 new SelectListItem() { Value = 0.ToString(), Text = "{All Types}" }
             };
@@ -232,7 +233,7 @@ namespace GrKouk.Web.ERP.Helpers
                 .AsNoTracking();
 
 
-            List<SelectListItem> transactorsList = new List<SelectListItem>
+            List<SelectListItem> transactorsList = new()
             {
                 new SelectListItem() {Value = 0.ToString(), Text = "{No Transactor}"}
             };
@@ -246,7 +247,7 @@ namespace GrKouk.Web.ERP.Helpers
         public static List<SelectListItem> GetCurrenciesFilterList(ApiDbContext context)
         {
             var dbItems = context.Currencies.OrderBy(p => p.Name).AsNoTracking();
-            List<SelectListItem> itemsList = new List<SelectListItem>();
+            List<SelectListItem> itemsList = new();
             //itemsList.Add(new SelectListItem() { Value = 0.ToString(), Text = "{All Companies}" });
             foreach (var item in dbItems)
             {
