@@ -6,10 +6,10 @@
     <Authors>George Koukoudis</Authors>
     <Company>GrKoukOrg</Company>
     <Copyright>GrKoukOrg</Copyright>
-    <Version>1.0.1.2</Version>
-    <PackageVersion>1.0.1.2</PackageVersion>
-    <AssemblyVersion>1.0.1.2</AssemblyVersion>
-    <FileVersion>1.0.1.2</FileVersion>
+    <Version>1.0.2.0</Version>
+    <PackageVersion>1.0.2.0</PackageVersion>
+    <AssemblyVersion>1.0.2.0</AssemblyVersion>
+    <FileVersion>1.0.2.0</FileVersion>
     <Title>GrKoukOrg Erp</Title>
   </PropertyGroup>
 
@@ -34,7 +34,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.0-rc.2.23509.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.0" />
     <PackageReference Include="NToastNotify" Version="8.0.0" />
     <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="21.2.8" />
   </ItemGroup>
