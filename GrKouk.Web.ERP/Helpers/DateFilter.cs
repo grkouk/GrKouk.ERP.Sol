@@ -24,6 +24,9 @@ namespace GrKouk.Web.ERP.Helpers
                 new SelectListItem() {Value = "30DAYS", Text = "30 Ημέρες"},
                 new SelectListItem() {Value = "60DAYS", Text = "60 Ημέρες"},
                 new SelectListItem() {Value = "90DAYS", Text = "90 Ημέρες"},
+                new SelectListItem() {Value = "120DAYS", Text = "120 Ημέρες/4 Μήνες"},
+                new SelectListItem() {Value = "180DAYS", Text = "180 Ημέρες/6 Μήνες"},
+                new SelectListItem() {Value = "270DAYS", Text = "270 Ημέρες/9 Μήνες"},
                 new SelectListItem() {Value = "360DAYS", Text = "360 Ημέρες"},
                 new SelectListItem() {Value = "PREMONTH", Text = "Προηγ.Μήνας"},
                 new SelectListItem() {Value = "CURYEAR", Text = "Τρέχων Ετος"},
@@ -42,18 +45,18 @@ namespace GrKouk.Web.ERP.Helpers
                 new SelectListItem() {Value = "LASTYEAR", Text = "Προηγ. Ετος"},
                 new SelectListItem() {Value = "2YEARAGO", Text = twoYearsAgo.ToString()},
                 new SelectListItem() {Value = "3YEARAGO", Text = threeYearsAgo.ToString()},
-                //new SelectListItem() {Value = "JANLASTYEAR", Text = "Ιαν.Προηγ. Ετος"},
-                //new SelectListItem() {Value = "FEBLASTYEAR", Text = "Φεβ.Προηγ. Ετος"},
-                //new SelectListItem() {Value = "MARLASTYEAR", Text = "Μαρ.Προηγ. Ετος"},
-                //new SelectListItem() {Value = "APRLASTYEAR", Text = "Απρ.Προηγ. Ετος"},
-                //new SelectListItem() {Value = "MAILASTYEAR", Text = "Μαι.Προηγ. Ετος"},
-                //new SelectListItem() {Value = "JUNLASTYEAR", Text = "Ιουν.Προηγ. Ετος"},
-                //new SelectListItem() {Value = "JULLASTYEAR", Text = "Ιουλ.Προηγ. Ετος"},
-                //new SelectListItem() {Value = "AUGLASTYEAR", Text = "Αυγ.Προηγ. Ετος"},
-                //new SelectListItem() {Value = "SEPLASTYEAR", Text = "Σεπ.Προηγ. Ετος"},
-                //new SelectListItem() {Value = "OKTLASTYEAR", Text = "Οκτ.Προηγ. Ετος"},
-                //new SelectListItem() {Value = "NOVLASTYEAR", Text = "Νοε.Προηγ. Ετος"},
-                //new SelectListItem() {Value = "DECLASTYEAR", Text = "Δεκ.Προηγ. Ετος"},
+                new SelectListItem() {Value = "JANLASTYEAR", Text = "Ιαν.Προηγ. Ετος"},
+                new SelectListItem() {Value = "FEBLASTYEAR", Text = "Φεβ.Προηγ. Ετος"},
+                new SelectListItem() {Value = "MARLASTYEAR", Text = "Μαρ.Προηγ. Ετος"},
+                new SelectListItem() {Value = "APRLASTYEAR", Text = "Απρ.Προηγ. Ετος"},
+                new SelectListItem() {Value = "MAILASTYEAR", Text = "Μαι.Προηγ. Ετος"},
+                new SelectListItem() {Value = "JUNLASTYEAR", Text = "Ιουν.Προηγ. Ετος"},
+                new SelectListItem() {Value = "JULLASTYEAR", Text = "Ιουλ.Προηγ. Ετος"},
+                new SelectListItem() {Value = "AUGLASTYEAR", Text = "Αυγ.Προηγ. Ετος"},
+                new SelectListItem() {Value = "SEPLASTYEAR", Text = "Σεπ.Προηγ. Ετος"},
+                new SelectListItem() {Value = "OKTLASTYEAR", Text = "Οκτ.Προηγ. Ετος"},
+                new SelectListItem() {Value = "NOVLASTYEAR", Text = "Νοε.Προηγ. Ετος"},
+                new SelectListItem() {Value = "DECLASTYEAR", Text = "Δεκ.Προηγ. Ετος"},
                // new SelectListItem() {Value = "CUSTOM", Text = "Custom"},
                 new SelectListItem() {Value = "ALL", Text = "{All}"}
             };
@@ -88,18 +91,18 @@ namespace GrKouk.Web.ERP.Helpers
                 new SelectListItem() {Value = "LASTYEAR", Text = "Προηγ. Ετος"},
                 new SelectListItem() {Value = "2YEARAGO", Text = twoYearsAgo.ToString()},
                 new SelectListItem() {Value = "3YEARAGO", Text = threeYearsAgo.ToString()},
-                //new SelectListItem() {Value = "JANLASTYEAR", Text = "Ιαν.Προηγ. Ετος"},
-                //new SelectListItem() {Value = "FEBLASTYEAR", Text = "Φεβ.Προηγ. Ετος"},
-                //new SelectListItem() {Value = "MARLASTYEAR", Text = "Μαρ.Προηγ. Ετος"},
-                //new SelectListItem() {Value = "APRLASTYEAR", Text = "Απρ.Προηγ. Ετος"},
-                //new SelectListItem() {Value = "MAILASTYEAR", Text = "Μαι.Προηγ. Ετος"},
-                //new SelectListItem() {Value = "JUNLASTYEAR", Text = "Ιουν.Προηγ. Ετος"},
-                //new SelectListItem() {Value = "JULLASTYEAR", Text = "Ιουλ.Προηγ. Ετος"},
-                //new SelectListItem() {Value = "AUGLASTYEAR", Text = "Αυγ.Προηγ. Ετος"},
-                //new SelectListItem() {Value = "SEPLASTYEAR", Text = "Σεπ.Προηγ. Ετος"},
-                //new SelectListItem() {Value = "OKTLASTYEAR", Text = "Οκτ.Προηγ. Ετος"},
-                //new SelectListItem() {Value = "NOVLASTYEAR", Text = "Νοε.Προηγ. Ετος"},
-                //new SelectListItem() {Value = "DECLASTYEAR", Text = "Δεκ.Προηγ. Ετος"},
+                new SelectListItem() {Value = "JANLASTYEAR", Text = "Ιαν.Προηγ. Ετος"},
+                new SelectListItem() {Value = "FEBLASTYEAR", Text = "Φεβ.Προηγ. Ετος"},
+                new SelectListItem() {Value = "MARLASTYEAR", Text = "Μαρ.Προηγ. Ετος"},
+                new SelectListItem() {Value = "APRLASTYEAR", Text = "Απρ.Προηγ. Ετος"},
+                new SelectListItem() {Value = "MAILASTYEAR", Text = "Μαι.Προηγ. Ετος"},
+                new SelectListItem() {Value = "JUNLASTYEAR", Text = "Ιουν.Προηγ. Ετος"},
+                new SelectListItem() {Value = "JULLASTYEAR", Text = "Ιουλ.Προηγ. Ετος"},
+                new SelectListItem() {Value = "AUGLASTYEAR", Text = "Αυγ.Προηγ. Ετος"},
+                new SelectListItem() {Value = "SEPLASTYEAR", Text = "Σεπ.Προηγ. Ετος"},
+                new SelectListItem() {Value = "OKTLASTYEAR", Text = "Οκτ.Προηγ. Ετος"},
+                new SelectListItem() {Value = "NOVLASTYEAR", Text = "Νοε.Προηγ. Ετος"},
+                new SelectListItem() {Value = "DECLASTYEAR", Text = "Δεκ.Προηγ. Ετος"},
                 new SelectListItem() {Value = "ALL", Text = "{All}"}
             };
             return datePeriods;
@@ -145,6 +148,18 @@ namespace GrKouk.Web.ERP.Helpers
                 case "90DAYS":
                     dateFilter.ToDate = DateTime.Now;
                     dateFilter.FromDate = dateFilter.ToDate.AddDays(-90);
+                    break;
+                case "120DAYS":
+                    dateFilter.ToDate = DateTime.Now;
+                    dateFilter.FromDate = dateFilter.ToDate.AddDays(-120);
+                    break;
+                case "180DAYS":
+                    dateFilter.ToDate = DateTime.Now;
+                    dateFilter.FromDate = dateFilter.ToDate.AddDays(-180);
+                    break;
+                case "270DAYS":
+                    dateFilter.ToDate = DateTime.Now;
+                    dateFilter.FromDate = dateFilter.ToDate.AddDays(-270);
                     break;
                 case "360DAYS":
                     dateFilter.ToDate = DateTime.Now;
