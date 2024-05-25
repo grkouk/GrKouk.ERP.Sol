@@ -211,7 +211,11 @@ namespace GrKouk.Web.ERP.Controllers {
                     unitToUse = "BUY";
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    
+                    unitFactor = 1;
+                    unitToUse = "MAIN";
+                    break;
+                    //throw new ArgumentOutOfRangeException();
             }
 
             var lastPr = await _context.WarehouseTransactions.Where(m => m.Id == material.Id)
