@@ -923,25 +923,29 @@
                         var lastPrice = r.lastPrice;
                         var fpaId = r.fpaId;
                         var unitToUse = r.unitToUse;
-                        setupUnitToUse(unitToUse);
-                        $mainUnitId.val(r.mainUnitId);
-                        $secUnitId.val(r.buyUnitId);
-                        $materialId.val(mId);
-                        $factor.val(mFactor);
-                        //$vatPercent.val(rate);
-                        vatPercentEl.value = rate;
-                        //$discount.val(0);
-                        discountPercentEl.value = 0;
-                        $materialFpaId.val(fpaId);
-                        $price.val(lastPrice);
-                        $priceNet.val(lastPrice);
-                        $lookUp.val(mName);
-                        initValUnitToUse(unitToUse);
-                        $lookupValueValid.val('OK');
+                        handleProductSelection(mId, mName);
+                        //setupUnitToUse(unitToUse);
+                        //$mainUnitId.val(r.mainUnitId);
+                        //$secUnitId.val(r.buyUnitId);
+                        //$materialId.val(mId);
+                        //$factor.val(mFactor);
+                        ////$vatPercent.val(rate);
+                        //vatPercentEl.value = rate;
+                        ////$discount.val(0);
+                        //discountPercentEl.value = 0;
+                        //$materialFpaId.val(fpaId);
+                        //$price.val(lastPrice);
+                        //$priceNet.val(lastPrice);
+                        //$lookUp.val(mName);
+                        //initValUnitToUse(unitToUse);
+                        //$lookupValueValid.val('OK');
                     },
                     error: function(e) {
                         $lookupValueValid.val('ERROR');
-                        //toastr.error("Error", "Error");
+                        toastr.error(e.toString(), "Error");
+                        $lookUp.focus();
+                        //$lookupValueValid.val('ERROR');
+                        ////toastr.error("Error", "Error");
                     }
                 });
             };
