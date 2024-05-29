@@ -175,6 +175,18 @@ namespace GrKouk.Web.ERP.Helpers
             return dbCompanies;
         }
 
+        public static List<SelectListItem> GetSeekTypesList()
+        {
+            List<SelectListItem> seekTypes = new List<SelectListItem>
+            {
+                new SelectListItem() {Value = "NAME", Text = "Name"},
+                new SelectListItem() {Value = "BARCODE", Text = "Barcode"},
+                new SelectListItem() {Value = "ALTBARCODE", Text = "Alternate Barcodes"},
+                new SelectListItem() {Value ="CODE", Text = "Supplier Code"}
+            };
+            return seekTypes;
+        }
+        
         public static async Task<List<SelectListItem>> GetTransactorsForTypeFilterListAsync(ApiDbContext context, string trType)
         {
             var trTypeObject = await context.TransactorTypes.FirstOrDefaultAsync(p => p.Code == trType);

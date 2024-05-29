@@ -747,11 +747,15 @@
                 }
             };
             var seekBarcode = () => {
+                let lookupVal = $lookUp.val();
+                let trId = $('#ItemVm_TransactorId').val();
+                let cmId = $('#ItemVm_CompanyId').val();
+                let uri = `/api/Materials/SeekBarcode?barcode=${lookupVal}&companyId=${cmId}&transactorId=${trId}`;
                 return $.ajax({
                     contentType: 'application/json; charset=utf-8',
                     dataType: 'json',
                     type: 'GET',
-                    url: "/api/WarehouseItems/SeekBarcode?barcode="+$lookUp.val(),
+                    url: uri,
 
                     success: function(result) {
 
@@ -784,6 +788,53 @@
                         $lookupValueValid.val('ERROR');
                         toastr.error(e.toString(), "Error");
                         $lookUp.focus();
+                    }
+                });
+            };
+            var seekAlternateBarcode = () => {
+                let lookupVal = $lookUp.val();
+                let trId = $('#ItemVm_TransactorId').val();
+                let cmId = $('#ItemVm_CompanyId').val();
+                let uri = `/api/Materials/SeekAlternateBarcode?barcode=${lookupVal}&companyId=${cmId}&transactorId=${trId}`;
+                return $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'GET',
+                    url: uri,
+
+                    success: function(result) {
+
+                        var r = result;
+                        console.log(r);
+                        var mName = r.name;
+                        var mFactor = r.factor;
+                        var mId = r.id;
+                        var rate = r.fpaRate;
+                        var lastPrice = r.lastPrice;
+                        var fpaId = r.fpaId;
+                        var unitToUse = r.unitToUse;
+                        handleProductSelection(mId, mName);
+                        //setupUnitToUse(unitToUse);
+                        //$mainUnitId.val(r.mainUnitId);
+                        //$secUnitId.val(r.buyUnitId);
+                        //$materialId.val(mId);
+                        //$factor.val(mFactor);
+                        ////$vatPercent.val(rate);
+                        //vatPercentEl.value = rate;
+                        ////$discount.val(0);
+                        //discountPercentEl.value = 0;
+                        //$materialFpaId.val(fpaId);
+                        //$price.val(lastPrice);
+                        //$priceNet.val(lastPrice);
+                        //$lookUp.val(mName);
+                        //initValUnitToUse(unitToUse);
+                        //$lookupValueValid.val('OK');
+                    },
+                    error: function(e) {
+                        $lookupValueValid.val('ERROR');
+                        toastr.error(e.toString(), "Error");
+                        $lookUp.focus();
+
                     }
                 });
             };
@@ -991,6 +1042,11 @@
                 case 'BARCODE':
                     $lookUp.change(() => {
                         seekBarcode();
+                    });
+                    break;
+                case 'ALTBARCODE':
+                    $lookUp.change(() => {
+                        seekAlternateBarcode();
                     });
                     break;
                 default:
