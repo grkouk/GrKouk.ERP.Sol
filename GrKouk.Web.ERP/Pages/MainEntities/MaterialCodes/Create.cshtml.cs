@@ -49,6 +49,16 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.MaterialCodes
                 ItemVm = WrItemCodeCreateDto.Map( itemToCopy);
 
             }
+            else
+            {
+                ItemVm = new WrItemCodeCreateDto();
+                
+                ItemVm.BuyCodeUsedUnit = WarehouseItemCodeUsedUnitEnum.CodeUsedUnitEnumNoUnit;
+                ItemVm.BuyRateToMainUnit = 0;
+                
+                ItemVm.SellCodeUsedUnit = WarehouseItemCodeUsedUnitEnum.CodeUsedUnitEnumNoUnit;
+                ItemVm.SellRateToMainUnit = 0;
+            }
 
 
             return Page();
@@ -58,6 +68,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.MaterialCodes
         {
             List<SelectListItem> codeTypes = new List<SelectListItem>
             {
+                
                 new SelectListItem() {Value = WarehouseItemCodeTypeEnum.CodeTypeEnumCode.ToString(), Text = "Code"},
                 new SelectListItem() {Value = WarehouseItemCodeTypeEnum.CodeTypeEnumBarcode.ToString(), Text = "Barcode"},
                 new SelectListItem() {Value = WarehouseItemCodeTypeEnum.CodeTypeEnumSupplierCode.ToString(), Text = "Supplier Code"}
@@ -66,6 +77,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.MaterialCodes
 
             List<SelectListItem> codeUsedUnits = new List<SelectListItem>
             {
+                new SelectListItem() {Value = WarehouseItemCodeUsedUnitEnum.CodeUsedUnitEnumNoUnit.ToString(), Text = "{Default Unit}"},
                 new SelectListItem() {Value = WarehouseItemCodeUsedUnitEnum.CodeUsedUnitEnumMain.ToString(), Text = "Main Unit"},
                 new SelectListItem() {Value = WarehouseItemCodeUsedUnitEnum.CodeUsedUnitEnumBuy.ToString(), Text = "Buy Unit"},
                 new SelectListItem() {Value = WarehouseItemCodeUsedUnitEnum.CodeUsedUnitEnumSecondary.ToString(), Text = "Secondary Unit"}
