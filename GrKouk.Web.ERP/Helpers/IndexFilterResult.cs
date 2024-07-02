@@ -11,7 +11,9 @@ namespace GrKouk.Web.ERP.Helpers
         public List<SelectListItem> CurrencyFilterValues { get; set; }
         public List<SelectListItem> MaterialNaturesFilterValues { get; set; }
         public List<SelectListItem> TransactorTypeFilterValues { get; set; }
+        public List<SelectListItem> MaterialCategoriesFilterValues { get; set; }
         public IndexFiltersToShow FiltersToShow { get; set; }
+       
     }
 
     public class IndexFiltersToShow
@@ -26,5 +28,6 @@ namespace GrKouk.Web.ERP.Helpers
         public bool ShowDisplayCarryOnLineFlt { get; set; } = false;
         public bool ShowDisplaySummaryFlt { get; set; } = false;
         public bool ShowDisplayLinesWithZeroAmountFlt { get; set; } = false;
+        public bool ShowMaterialCategoriesFlt { get; set; } = false;
     }
 }

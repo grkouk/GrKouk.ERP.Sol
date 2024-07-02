@@ -73,6 +73,21 @@
 
             }
             @{
+            if (Model.FiltersToShow.ShowMaterialCategoriesFlt)
+            {
+            <div class="col-md-2 col-sm-6">
+                <div class="form-floating">
+                    <select id="MaterialCategoriesFilter" class="form-select form-select-sm"
+                            asp-items="Model.MaterialCategoriesFilterValues">
+                    </select>
+                    <label class="small">Material Categories:</label>
+                </div>
+
+            </div>
+            }
+
+            }
+            @{
                 if (Model.FiltersToShow.ShowTransactorTypeFlt)
                 {
                     <div class="col-md-2 col-sm-6">

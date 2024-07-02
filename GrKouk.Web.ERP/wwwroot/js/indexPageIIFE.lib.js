@@ -68,6 +68,7 @@ var indPgLib = (function () {
     let $showSummaryFlt = $('#ShowSummaryFlt');
     let $warehouseItemId = $('#WarehouseItemId');
     let $warehouseItemNatureFilter = $('#WarehouseItemNatureFilter');
+    let $materialCategoriesFilter = $('#MaterialCategoriesFilter');
     let $currencySelector = $("#CurrencySelector");
     let $diaryId = $("#DiaryId");
     //-------------------------------------------------------
@@ -81,6 +82,7 @@ var indPgLib = (function () {
     let transactorIdFilterElement;
     let cfaIdFilterElement;
     let warehouseItemIdFilterElement;
+    let materialCategoriesFilterElement;
     let productNatureFilterElement;
     let tableCurrentSortElement;
     let diaryIdFilterElement;
@@ -110,6 +112,7 @@ var indPgLib = (function () {
         showCarryOnFilterElement = flt.showCarryOnFilterElement;
         showSummaryFilterElement = flt.showSummaryFilterElement;
         showDisplayLinesWithZeroesFilterElement = flt.showDisplayLinesWithZeroesFilterElement;
+        materialCategoriesFilterElement = flt.materialCategoriesFilterElement
     };
     const setIndexPageFilterValues = () => {
         var pageIndexVal = parseInt($pageIndex.val());
@@ -183,7 +186,7 @@ var indPgLib = (function () {
         } else {
             showSummaryFilterElement = false;
         }
-         var showDisplayLinesWithZeroesValue = false;
+        var showDisplayLinesWithZeroesValue = false;
         if (!($showDisplayLinesWithZeroesFlt === undefined)) {
             showDisplayLinesWithZeroesValue = $showDisplayLinesWithZeroesFlt.is(':checked');
             showDisplayLinesWithZeroesFilterElement = showDisplayLinesWithZeroesValue;
@@ -210,6 +213,13 @@ var indPgLib = (function () {
             diaryIdFilterElement = diaryId;
         } else {
             diaryIdFilterElement = 0;
+        }
+        var materialCategoryFlt = '';
+        if (!($materialCategoriesFilter.val() === undefined)) {
+            materialCategoryFlt = $materialCategoriesFilter.val();
+            materialCategoriesFilterElement = materialCategoryFlt;
+        } else {
+            materialCategoriesFilterElement = "";
         }
     };
     const commonTableHandlers = [
@@ -824,7 +834,7 @@ var indPgLib = (function () {
                                    , companyFlt, searchFlt, currencyFlt
                                    , transTypeFlt, wrItmNatureFlt, transactorId
         , warehouseItemId, diaryId, cfaId, showCarryOnFlt
-        , showSummaryFlt, showDisplayLinesWithZeroesFlt) {
+        , showSummaryFlt, showDisplayLinesWithZeroesFlt,materialCategoriesFlt) {
         let uri = indexPageDefinition.uri;
         uri += `?pageIndex=${pgIndex}`;
         uri += `&pageSize=${pgSize}`;
@@ -840,6 +850,7 @@ var indPgLib = (function () {
         uri += `&showSummaryFilter=${showSummaryFlt}`;
         uri += `&showDisplayLinesWithZeroes=${showDisplayLinesWithZeroesFlt}`;
         uri += `&warehouseItemId=${warehouseItemId}`;
+        uri += `&materialCategoriesFilter=${materialCategoriesFlt}`;
         uri += `&diaryId=${diaryId}`;
         uri += `&displayCurrencyId=${currencyFlt}`;
         var timeout;
@@ -1045,7 +1056,7 @@ var indPgLib = (function () {
             , productNatureFilterElement, transactorIdFilterElement
             , warehouseItemIdFilterElement, diaryIdFilterElement
             , cfaIdFilterElement, showCarryOnFilterElement,
-                showSummaryFilterElement,showDisplayLinesWithZeroesFilterElement)
+                showSummaryFilterElement,showDisplayLinesWithZeroesFilterElement,materialCategoriesFilterElement)
             .then((data) => {
                 bindDataToTable(data, pageIndexElement);
             })

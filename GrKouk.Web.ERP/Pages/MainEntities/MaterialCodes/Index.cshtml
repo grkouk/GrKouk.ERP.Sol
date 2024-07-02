@@ -46,7 +46,7 @@
         </li>
     </ul>
 </div>
-@await Component.InvokeAsync("IndexFilters",new IndexFiltersToShow {ShowTransactorTypeFlt= false,ShowDateFlt = false,ShowCurrencyFlt = false})
+@await Component.InvokeAsync("IndexFilters",new IndexFiltersToShow {ShowTransactorTypeFlt= false,ShowDateFlt = false,ShowCurrencyFlt = false,ShowMaterialCategoriesFlt = true})
 
 <div class="row mt-1">
     <partial name="_PagerPartial"/>
@@ -483,15 +483,6 @@
                     deleteSelectedRows();
                 });
 
-
-           
-
-           
-           
-           
-            
-           
-           
  
             var storageItemJs = localStorage.getItem('WarehouseCodesIndexView');
             if (storageItemJs === undefined || storageItemJs === null) {
@@ -532,6 +523,12 @@
                 } catch (e) {
 
                 }
+                try {
+                    filtersValue = storageItem.find(x => x.filterKey === 'materialCategoriesFilter').filterValue;
+                    $('#MaterialCategoriesFilter').val(filtersValue);
+                } catch (e) {
+
+                }
             }
             indPgLib.addPagerElementEventListeners();
             indPgLib.registerPageHandlers();
@@ -558,6 +555,7 @@
                 var companyFilter = $('#CompanyFilter').val();
                 var pageIndex = $('#pageIndex').val();
                 var currentCurrency = $('#CurrencySelector').val();
+                let materialCategories=$('#MaterialCategoriesFilter').val();
                 var filtersArr = [];
                 //#endregion
                 filtersArr.push({
@@ -592,7 +590,10 @@
                     filterKey: 'currentCurrency',
                     filterValue: currentCurrency
                 });
-
+                filtersArr.push({
+                    filterKey: 'materialCategoriesFilter',
+                    filterValue: materialCategories
+                });
 
                 var sessionVal = JSON.stringify(filtersArr);
 
