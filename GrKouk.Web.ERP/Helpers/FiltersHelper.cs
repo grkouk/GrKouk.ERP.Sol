@@ -101,14 +101,14 @@ namespace GrKouk.Web.ERP.Helpers
         {
 
             //TODO: Use All Companies code from settings page and chenge author?
-            var dbCompanies = context.Companies.Where(t => t.Id != 1).OrderBy(p => p.Code).AsNoTracking();
+            var dbCompanies = context.Companies.Where(t => t.Id != 1).OrderBy(p => p.Name).AsNoTracking();
             List<SelectListItem> companiesList = new List<SelectListItem>
             {
                 new SelectListItem() { Value = 0.ToString(), Text = "{All Companies}" }
             };
             foreach (var company in dbCompanies)
             {
-                companiesList.Add(new SelectListItem() { Value = company.Id.ToString(), Text = company.Code });
+                companiesList.Add(new SelectListItem() { Value = company.Id.ToString(), Text = company.Name });
             }
 
             return companiesList;
@@ -141,12 +141,12 @@ namespace GrKouk.Web.ERP.Helpers
         public static async Task<List<SelectListItem>> GetSolidCompaniesFilterListAsync(ApiDbContext context)
         {
 
-            var companiesList = await context.Companies.Where(t => t.Id != 1).OrderBy(p => p.Code)
+            var companiesList = await context.Companies.Where(t => t.Id != 1).OrderBy(p => p.Name)
                 .AsNoTracking()
                 .Select(c => new SelectListItem()
                 {
                     Value = c.Id.ToString(),
-                    Text = c.Code
+                    Text = c.Name
                 })
                 .ToListAsync();
 
@@ -167,7 +167,7 @@ namespace GrKouk.Web.ERP.Helpers
                 .Select(c => new SelectListItem()
                 {
                     Value = c.Id.ToString(),
-                    Text = c.Code
+                    Text = c.Name
                 })
                 .ToList();
 
