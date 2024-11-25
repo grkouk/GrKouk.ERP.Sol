@@ -6,7 +6,8 @@ namespace GrKouk.Erp.Dtos.Transactors
     {
         [MaxLength(15)]
         public string Code { get; set; }
-
+        [MaxLength(15)]
+        public string TaxNumber { get; set; }
         [MaxLength(200)]
         public string Name { get; set; }
 
