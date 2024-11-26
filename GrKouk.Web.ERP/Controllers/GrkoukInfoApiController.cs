@@ -2868,6 +2868,7 @@ namespace GrKouk.Web.ERP.Controllers
                     Id = t.Transactor.Id,
                     Code = t.Transactor.Code,
                     Name = t.Transactor.Name,
+                    TaxNumber = string.IsNullOrEmpty(t.Transactor.TaxNumber) ? " " : t.Transactor.TaxNumber,
                     Address = string.IsNullOrEmpty(t.Transactor.Address) ? " " : t.Transactor.Address,
                     City = string.IsNullOrEmpty(t.Transactor.City) ? " " : t.Transactor.City,
                     EMail = string.IsNullOrEmpty(t.Transactor.EMail) ? " " : t.Transactor.EMail,
@@ -2962,6 +2963,7 @@ namespace GrKouk.Web.ERP.Controllers
                 g.Id,
                 g.Name,
                 g.Code,
+                g.TaxNumber,
                 g.EMail,
                 g.TransactorTypeCode
             })
@@ -2969,6 +2971,7 @@ namespace GrKouk.Web.ERP.Controllers
                 {
                     Id = f.Key.Id,
                     Name = f.Key.Name,
+                    TaxNumber = f.Key.TaxNumber,
                     Code = f.Key.Code,
                     TransactorTypeCode = f.Key.TransactorTypeCode,
                     EMail = string.IsNullOrEmpty(f.Key.EMail) ? " " : f.Key.EMail,
