@@ -162,7 +162,7 @@ namespace GrKouk.Web.ERP.Helpers
         {
 
             var dbCompanies = context.Companies.Where(t => t.Id != 1)
-                .OrderBy(p => p.Code)
+                .OrderBy(p => p.Name)
                 .AsNoTracking()
                 .Select(c => new SelectListItem()
                 {
