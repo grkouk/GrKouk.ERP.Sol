@@ -12,6 +12,7 @@ namespace GrKouk.Web.ERP.Helpers
         public List<SelectListItem> MaterialNaturesFilterValues { get; set; }
         public List<SelectListItem> TransactorTypeFilterValues { get; set; }
         public List<SelectListItem> MaterialCategoriesFilterValues { get; set; }
+        public List<SelectListItem> SectionsFilterValues { get; set; }
         public IndexFiltersToShow FiltersToShow { get; set; }
        
     }
@@ -29,5 +30,6 @@ namespace GrKouk.Web.ERP.Helpers
         public bool ShowDisplaySummaryFlt { get; set; } = false;
         public bool ShowDisplayLinesWithZeroAmountFlt { get; set; } = false;
         public bool ShowMaterialCategoriesFlt { get; set; } = false;
+        public bool ShowSectionsFlt { get; set; } = false;
     }
 }
