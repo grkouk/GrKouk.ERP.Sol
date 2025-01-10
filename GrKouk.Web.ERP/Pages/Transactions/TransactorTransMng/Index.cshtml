@@ -44,7 +44,7 @@
         </li>
     </ul>
 </div>
-@await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { })
+@await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow {ShowSectionsFlt = true})
 
 <div class="row mt-1">
     <partial name="_PagerPartial" />
@@ -441,6 +441,14 @@
                     event: 'change',
                     handler: function(event) {
                         currencyChanged();
+                        indPgLib.refreshData();
+                    }
+                },
+                {
+                    selector: '#SectionsFilter',
+                    event: 'change',
+                    handler: function (event) {
+                        $('#pageIndex').val(1);
                         indPgLib.refreshData();
                     }
                 }

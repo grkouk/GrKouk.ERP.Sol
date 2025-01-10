@@ -248,6 +248,23 @@ namespace GrKouk.Web.ERP.Helpers
 
             return materialCategoriesList;
         }
+        public static async Task<List<SelectListItem>> GetSectionsFilterListAsync(ApiDbContext context)
+        {
+
+            var dbSections = await context.Sections.OrderBy(p => p.Name)
+                .AsNoTracking()
+                .ToListAsync();
+            List<SelectListItem> sectionsList = new()
+            {
+                new SelectListItem() { Value = 0.ToString(), Text = "{All Sections}" }
+            };
+            foreach (var dbSection in dbSections)
+            {
+                sectionsList.Add(new SelectListItem() { Value = dbSection.Id.ToString(), Text = dbSection.Name });
+            }
+
+            return sectionsList;
+        }
         public static List<SelectListItem> GetTransactorsForTypeFilterList(ApiDbContext context, string trType)
         {
             var trTypeObject = context.TransactorTypes.FirstOrDefault(p => p.Code == trType);

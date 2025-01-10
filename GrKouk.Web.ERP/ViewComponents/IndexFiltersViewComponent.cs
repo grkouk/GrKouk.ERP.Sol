@@ -49,6 +49,10 @@ namespace GrKouk.Web.ERP.ViewComponents
                     await FiltersHelper.GetMaterialCategoriesFilterListAsync(_context);
             }
 
+            if (filtersToShow.ShowSectionsFlt)
+            {
+                 indexFiltersResult.SectionsFilterValues = await FiltersHelper.GetSectionsFilterListAsync(_context);
+            }
             indexFiltersResult.FiltersToShow = filtersToShow;
             return View(indexFiltersResult);
         }

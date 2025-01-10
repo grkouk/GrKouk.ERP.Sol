@@ -103,6 +103,21 @@
 
             }
             @{
+                if (Model.FiltersToShow.ShowSectionsFlt)
+                {
+                    <div class="col-md-2 col-sm-6">
+                        <div class="form-floating">
+                            <select id="SectionsFilter" class="form-select form-select-sm"
+                                    asp-items="Model.SectionsFilterValues">
+                            </select>
+                            <label class="small">Sections:</label>
+                        </div>
+
+                    </div>
+                }
+
+            }
+            @{
                 if (Model.FiltersToShow.ShowCompaniesFlt)
                 {
                     <div class="col-md-2 col-sm-6">

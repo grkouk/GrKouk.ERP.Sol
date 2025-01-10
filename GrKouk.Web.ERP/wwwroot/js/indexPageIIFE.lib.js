@@ -68,6 +68,7 @@ var indPgLib = (function () {
     let $showSummaryFlt = $('#ShowSummaryFlt');
     let $warehouseItemId = $('#WarehouseItemId');
     let $warehouseItemNatureFilter = $('#WarehouseItemNatureFilter');
+    let $sectionsFilter = $('#SectionsFilter');
     let $materialCategoriesFilter = $('#MaterialCategoriesFilter');
     let $currencySelector = $("#CurrencySelector");
     let $diaryId = $("#DiaryId");
@@ -83,6 +84,7 @@ var indPgLib = (function () {
     let cfaIdFilterElement;
     let warehouseItemIdFilterElement;
     let materialCategoriesFilterElement;
+    let sectionsFilterElement;
     let productNatureFilterElement;
     let tableCurrentSortElement;
     let diaryIdFilterElement;
@@ -113,6 +115,7 @@ var indPgLib = (function () {
         showSummaryFilterElement = flt.showSummaryFilterElement;
         showDisplayLinesWithZeroesFilterElement = flt.showDisplayLinesWithZeroesFilterElement;
         materialCategoriesFilterElement = flt.materialCategoriesFilterElement
+        sectionsFilterElement = flt.sectionsFilterElement
     };
     const setIndexPageFilterValues = () => {
         var pageIndexVal = parseInt($pageIndex.val());
@@ -220,6 +223,13 @@ var indPgLib = (function () {
             materialCategoriesFilterElement = materialCategoryFlt;
         } else {
             materialCategoriesFilterElement = "";
+        }
+        var sectionsFlt = '';
+        if (!($sectionsFilter.val() === undefined)) {
+            sectionsFlt = $sectionsFilter.val();
+            sectionsFilterElement = sectionsFlt;
+        } else {
+            sectionsFilterElement = "";
         }
     };
     const commonTableHandlers = [
@@ -834,7 +844,7 @@ var indPgLib = (function () {
                                    , companyFlt, searchFlt, currencyFlt
                                    , transTypeFlt, wrItmNatureFlt, transactorId
         , warehouseItemId, diaryId, cfaId, showCarryOnFlt
-        , showSummaryFlt, showDisplayLinesWithZeroesFlt,materialCategoriesFlt) {
+        , showSummaryFlt, showDisplayLinesWithZeroesFlt,materialCategoriesFlt,sectionsFlt) {
         let uri = indexPageDefinition.uri;
         uri += `?pageIndex=${pgIndex}`;
         uri += `&pageSize=${pgSize}`;
@@ -851,6 +861,7 @@ var indPgLib = (function () {
         uri += `&showDisplayLinesWithZeroes=${showDisplayLinesWithZeroesFlt}`;
         uri += `&warehouseItemId=${warehouseItemId}`;
         uri += `&materialCategoriesFilter=${materialCategoriesFlt}`;
+        uri += `&sectionsFilter=${sectionsFlt}`;
         uri += `&diaryId=${diaryId}`;
         uri += `&displayCurrencyId=${currencyFlt}`;
         var timeout;
@@ -1056,7 +1067,7 @@ var indPgLib = (function () {
             , productNatureFilterElement, transactorIdFilterElement
             , warehouseItemIdFilterElement, diaryIdFilterElement
             , cfaIdFilterElement, showCarryOnFilterElement,
-                showSummaryFilterElement,showDisplayLinesWithZeroesFilterElement,materialCategoriesFilterElement)
+                showSummaryFilterElement,showDisplayLinesWithZeroesFilterElement,materialCategoriesFilterElement, sectionsFilterElement)
             .then((data) => {
                 bindDataToTable(data, pageIndexElement);
             })
