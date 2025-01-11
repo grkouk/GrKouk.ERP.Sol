@@ -43,6 +43,17 @@ namespace GrKouk.Web.ERP.ViewComponents
                 indexFiltersResult.TransactorTypeFilterValues = await FiltersHelper.GetTransactorTypeFilterListAsync(_context);
             }
 
+            if (filtersToShow.ShowMaterialCategoriesFlt)
+            {
+                indexFiltersResult.MaterialCategoriesFilterValues =
+                    await FiltersHelper.GetMaterialCategoriesFilterListAsync(_context);
+            }
+
+            if (filtersToShow.ShowSectionsFlt)
+            {
+                 indexFiltersResult.SectionsFilterValues = await FiltersHelper.GetSectionsFilterListAsync(_context);
+                 indexFiltersResult.SectionsFilterUiSelectItems =  FiltersHelper.GetSectionsFilterUiList(_context);
+            }
             indexFiltersResult.FiltersToShow = filtersToShow;
             return View(indexFiltersResult);
         }

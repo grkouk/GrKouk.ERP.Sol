@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GrKouk.Erp.Definitions;
+using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Web.ERP.Data;
 
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -101,14 +102,14 @@ namespace GrKouk.Web.ERP.Helpers
         {
 
             //TODO: Use All Companies code from settings page and chenge author?
-            var dbCompanies = context.Companies.Where(t => t.Id != 1).OrderBy(p => p.Code).AsNoTracking();
+            var dbCompanies = context.Companies.Where(t => t.Id != 1).OrderBy(p => p.Name).AsNoTracking();
             List<SelectListItem> companiesList = new List<SelectListItem>
             {
                 new SelectListItem() { Value = 0.ToString(), Text = "{All Companies}" }
             };
             foreach (var company in dbCompanies)
             {
-                companiesList.Add(new SelectListItem() { Value = company.Id.ToString(), Text = company.Code });
+                companiesList.Add(new SelectListItem() { Value = company.Id.ToString(), Text = company.Name });
             }
 
             return companiesList;
@@ -141,12 +142,12 @@ namespace GrKouk.Web.ERP.Helpers
         public static async Task<List<SelectListItem>> GetSolidCompaniesFilterListAsync(ApiDbContext context)
         {
 
-            var companiesList = await context.Companies.Where(t => t.Id != 1).OrderBy(p => p.Code)
+            var companiesList = await context.Companies.Where(t => t.Id != 1).OrderBy(p => p.Name)
                 .AsNoTracking()
                 .Select(c => new SelectListItem()
                 {
                     Value = c.Id.ToString(),
-                    Text = c.Code
+                    Text = c.Name
                 })
                 .ToListAsync();
 
@@ -162,12 +163,12 @@ namespace GrKouk.Web.ERP.Helpers
         {
 
             var dbCompanies = context.Companies.Where(t => t.Id != 1)
-                .OrderBy(p => p.Code)
+                .OrderBy(p => p.Name)
                 .AsNoTracking()
                 .Select(c => new SelectListItem()
                 {
                     Value = c.Id.ToString(),
-                    Text = c.Code
+                    Text = c.Name
                 })
                 .ToList();
 
@@ -175,6 +176,18 @@ namespace GrKouk.Web.ERP.Helpers
             return dbCompanies;
         }
 
+        public static List<SelectListItem> GetSeekTypesList()
+        {
+            List<SelectListItem> seekTypes = new List<SelectListItem>
+            {
+                new SelectListItem() {Value = "NAME", Text = "Name"},
+                new SelectListItem() {Value = "BARCODE", Text = "Barcode"},
+                new SelectListItem() {Value = "ALTBARCODE", Text = "Alternate Barcodes"},
+                new SelectListItem() {Value ="CODE", Text = "Supplier Code"}
+            };
+            return seekTypes;
+        }
+        
         public static async Task<List<SelectListItem>> GetTransactorsForTypeFilterListAsync(ApiDbContext context, string trType)
         {
             var trTypeObject = await context.TransactorTypes.FirstOrDefaultAsync(p => p.Code == trType);
@@ -218,6 +231,79 @@ namespace GrKouk.Web.ERP.Helpers
             }
 
             return transactorTypes;
+        }
+        public static async Task<List<SelectListItem>> GetMaterialCategoriesFilterListAsync(ApiDbContext context)
+        {
+
+            var dbCategories = await context.MaterialCategories.OrderBy(p => p.Name)
+                .AsNoTracking()
+                .ToListAsync();
+            List<SelectListItem> materialCategoriesList = new()
+            {
+                new SelectListItem() { Value = 0.ToString(), Text = "{All Cateories}" }
+            };
+            foreach (var dbCategory in dbCategories)
+            {
+                materialCategoriesList.Add(new SelectListItem() { Value = dbCategory.Id.ToString(), Text = dbCategory.Name });
+            }
+
+            return materialCategoriesList;
+        }
+        public static async Task<List<SelectListItem>> GetSectionsFilterListAsync(ApiDbContext context)
+        {
+
+            var dbSections = await context.Sections.OrderBy(p => p.Name)
+                .AsNoTracking()
+                .ToListAsync();
+            List<SelectListItem> sectionsList = new()
+            {
+                new SelectListItem() { Value = 0.ToString(), Text = "{All Sections}" }
+            };
+            foreach (var dbSection in dbSections)
+            {
+                sectionsList.Add(new SelectListItem() { Value = dbSection.Id.ToString(), Text = dbSection.Name });
+            }
+
+            return sectionsList;
+        }
+
+        public static async Task<List<UISelectTypeItem>> GetSectionsFilterUiListAsync(ApiDbContext context)
+        {
+            var sectionsUiListJs = await context.Sections.OrderBy(p => p.Name)
+                .Select(p => new UISelectTypeItem()
+                {
+                    Title = p.Name,
+                    Text = p.Name,
+                    ValueInt = p.Id,
+                    Value = p.Id.ToString()
+                }).ToListAsync();
+            sectionsUiListJs.Insert(0, new UISelectTypeItem()
+            {
+                Title = "{All Sections}",
+                Text = "{All Sections}",
+                ValueInt = 0,
+                Value = 0.ToString()
+            });
+            return sectionsUiListJs;
+        }
+        public static  List<UISelectTypeItem> GetSectionsFilterUiList(ApiDbContext context)
+        {
+            var sectionsUiListJs =  context.Sections.OrderBy(p => p.Name)
+                .Select(p => new UISelectTypeItem()
+                {
+                    Title = p.Name,
+                    Text = p.Name,
+                    ValueInt = p.Id,
+                    Value = p.Id.ToString()
+                }).ToList();
+            sectionsUiListJs.Insert(0, new UISelectTypeItem()
+            {
+                Title = "{All Sections}",
+                Text = "{All Sections}",
+                ValueInt = 0,
+                Value = 0.ToString()
+            });
+            return sectionsUiListJs;
         }
         public static List<SelectListItem> GetTransactorsForTypeFilterList(ApiDbContext context, string trType)
         {

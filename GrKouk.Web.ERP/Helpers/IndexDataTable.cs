@@ -16,7 +16,9 @@ namespace GrKouk.Web.ERP.Helpers
         public string DateRange { get; set; }
         public string CompanyFilter { get; set; }
         public string WarehouseItemNatureFilter { get; set; }
+        public string MaterialCategoriesFilter { get; set; }
         public string TransactorTypeFilter { get; set; }
+        public string SectionsFilter { get; set; }
         public string SearchFilter { get; set; }
         public int DiaryId { get; set; }
         public int TransactorId { get; set; }

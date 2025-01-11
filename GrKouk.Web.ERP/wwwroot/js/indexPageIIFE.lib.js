@@ -1,7 +1,7 @@
 ﻿//Author: George Koukoudis
-//Version:  1.0
-//Date Created: 
-//Date Modified: 2022/01/17
+//Version:  1.5.1
+//Date Created: 2022-01-17
+//Date Modified: 2025-01-11
 //Index pages javascript tools
 
 var indPgLib = (function () {
@@ -26,19 +26,24 @@ var indPgLib = (function () {
 
     let getTableCurrentSort;
     let setTableCurrentSort;
+    const $loadMe = $("#loadMe");
+    const loadingModal= new bootstrap.Modal(document.getElementById('loadMe'),{backdrop: "static", keyboard: false});
     const indexPageSpinnerShow = () => {
-        $("#loadMe").modal({
-            backdrop: "static",
-            keyboard: false,
-            show: true
-        });
+        // $loadMe.modal({
+        //     backdrop: "static",
+        //     keyboard: false,
+        //     show: true
+        // });
+        // $loadMe.show();
+        loadingModal.show()
+        
     };
 
     const indexPageSpinnerHide = () => {
-        $("#loadMe").modal("hide");
+        $loadMe.modal("hide");
     };
     const indexPageSpinnerIsVisible = () => {
-        return $("#loadMe").hasClass("show");
+        return $loadMe.hasClass("show");
     };
     const selectorSpinnerShow = () => {
         $('#SpinnerLoader').show();
@@ -68,8 +73,11 @@ var indPgLib = (function () {
     let $showSummaryFlt = $('#ShowSummaryFlt');
     let $warehouseItemId = $('#WarehouseItemId');
     let $warehouseItemNatureFilter = $('#WarehouseItemNatureFilter');
+    let $sectionsFilter = $('#SectionsFilter');
+    let $materialCategoriesFilter = $('#MaterialCategoriesFilter');
     let $currencySelector = $("#CurrencySelector");
     let $diaryId = $("#DiaryId");
+   // let rfSectionsFilter = document.getElementById("SectionsFilterElm").ej2_instances[0];
     //-------------------------------------------------------
     let companyFilterElement;
     let datePeriodFilterElement;
@@ -81,6 +89,8 @@ var indPgLib = (function () {
     let transactorIdFilterElement;
     let cfaIdFilterElement;
     let warehouseItemIdFilterElement;
+    let materialCategoriesFilterElement;
+    let sectionsFilterElement;
     let productNatureFilterElement;
     let tableCurrentSortElement;
     let diaryIdFilterElement;
@@ -110,6 +120,8 @@ var indPgLib = (function () {
         showCarryOnFilterElement = flt.showCarryOnFilterElement;
         showSummaryFilterElement = flt.showSummaryFilterElement;
         showDisplayLinesWithZeroesFilterElement = flt.showDisplayLinesWithZeroesFilterElement;
+        materialCategoriesFilterElement = flt.materialCategoriesFilterElement
+        sectionsFilterElement = flt.sectionsFilterElement
     };
     const setIndexPageFilterValues = () => {
         var pageIndexVal = parseInt($pageIndex.val());
@@ -183,7 +195,7 @@ var indPgLib = (function () {
         } else {
             showSummaryFilterElement = false;
         }
-         var showDisplayLinesWithZeroesValue = false;
+        var showDisplayLinesWithZeroesValue = false;
         if (!($showDisplayLinesWithZeroesFlt === undefined)) {
             showDisplayLinesWithZeroesValue = $showDisplayLinesWithZeroesFlt.is(':checked');
             showDisplayLinesWithZeroesFilterElement = showDisplayLinesWithZeroesValue;
@@ -211,6 +223,28 @@ var indPgLib = (function () {
         } else {
             diaryIdFilterElement = 0;
         }
+        var materialCategoryFlt = '';
+        if (!($materialCategoriesFilter.val() === undefined)) {
+            materialCategoryFlt = $materialCategoriesFilter.val();
+            materialCategoriesFilterElement = materialCategoryFlt;
+        } else {
+            materialCategoriesFilterElement = "";
+        }
+        var sectionsFlt = '';
+        if (!($sectionsFilter.val() === undefined)) {
+            sectionsFlt = $sectionsFilter.val();
+            sectionsFilterElement = sectionsFlt;
+        } else {
+            sectionsFilterElement = "";
+        }
+        //Not used yet
+        //Preparing for syncfusion controls
+        // let sectionsFltSF;
+        // if(!rfSectionsFilter.value === undefined){
+        //     sectionsFltSF = rfSectionsFilter.value;
+        //     //sectionsFilterElement = sectionsFltSF;
+        //    
+        // }
     };
     const commonTableHandlers = [
         {
@@ -824,7 +858,7 @@ var indPgLib = (function () {
                                    , companyFlt, searchFlt, currencyFlt
                                    , transTypeFlt, wrItmNatureFlt, transactorId
         , warehouseItemId, diaryId, cfaId, showCarryOnFlt
-        , showSummaryFlt, showDisplayLinesWithZeroesFlt) {
+        , showSummaryFlt, showDisplayLinesWithZeroesFlt,materialCategoriesFlt,sectionsFlt) {
         let uri = indexPageDefinition.uri;
         uri += `?pageIndex=${pgIndex}`;
         uri += `&pageSize=${pgSize}`;
@@ -840,6 +874,8 @@ var indPgLib = (function () {
         uri += `&showSummaryFilter=${showSummaryFlt}`;
         uri += `&showDisplayLinesWithZeroes=${showDisplayLinesWithZeroesFlt}`;
         uri += `&warehouseItemId=${warehouseItemId}`;
+        uri += `&materialCategoriesFilter=${materialCategoriesFlt}`;
+        uri += `&sectionsFilter=${sectionsFlt}`;
         uri += `&diaryId=${diaryId}`;
         uri += `&displayCurrencyId=${currencyFlt}`;
         var timeout;
@@ -862,18 +898,24 @@ var indPgLib = (function () {
                     }
                     timeout = setTimeout(function () {
                         spinnerLoaderShow();
+                        indexPageSpinnerShow() 
                     }, 1000);
                 },
                 complete: function () {
                     if (timeout) {
                         clearTimeout(timeout);
                     }
-                    $("#loadMe").modal("hide");
+                  
                     setTimeout(function () {
                         var isOpen = spinnerLoaderIsVisible();
                         if (isOpen) {
                             spinnerLoaderHide();
                         }
+                        isOpen = indexPageSpinnerIsVisible();
+                        if (isOpen) {
+                            indexPageSpinnerHide();
+                        }
+
                     }, 2000);
                 },
             });
@@ -1045,7 +1087,7 @@ var indPgLib = (function () {
             , productNatureFilterElement, transactorIdFilterElement
             , warehouseItemIdFilterElement, diaryIdFilterElement
             , cfaIdFilterElement, showCarryOnFilterElement,
-                showSummaryFilterElement,showDisplayLinesWithZeroesFilterElement)
+                showSummaryFilterElement,showDisplayLinesWithZeroesFilterElement,materialCategoriesFilterElement, sectionsFilterElement)
             .then((data) => {
                 bindDataToTable(data, pageIndexElement);
             })
@@ -1107,6 +1149,7 @@ var indPgLib = (function () {
             $datePeriodFilter.val("CURMONTH");
             $companyFilter.val(0);
             $currentSort.val("transactiondate:desc");
+            $sectionsFilter.val(0);
         }
         else {
             var storageItem = JSON.parse(storageItemJs);
@@ -1130,11 +1173,19 @@ var indPgLib = (function () {
             $pageSize.val(filtersValue);
             filtersValue = storageItem.find((x) => x.filterKey === "pageIndex").filterValue;
             $pageIndex.val(filtersValue);
-
+            try {
+                filtersValue = storageItem.find((x) => x.filterKey === "sectionsFilter").filterValue;
+                $sectionsFilter.val(filtersValue);
+            }
+            catch (e) {
+                console.log(e);
+            }
             try {
                 filtersValue = storageItem.find((x) => x.filterKey === "currentCurrency").filterValue;
                 $currencySelector.val(filtersValue);
-            } catch (e) { }
+            } catch (e) {
+                console.log(e);
+            }
         }
     };
     const saveSettings = (localStorageKey) => {
@@ -1152,6 +1203,7 @@ var indPgLib = (function () {
         var companyFilter = $companyFilter.val();
         var pageIndex = $pageIndex.val();
         var currentCurrency = $currencySelector.val();
+        var sectionsFilter = $sectionsFilter.val();
         var filtersArr = [];
         //#endregion
         filtersArr.push({
@@ -1186,7 +1238,10 @@ var indPgLib = (function () {
             filterKey: "currentCurrency",
             filterValue: currentCurrency,
         });
-
+        filtersArr.push({
+            filterKey: "sectionsFilter",
+            filterValue:sectionsFilter, 
+        });
         var sessionVal = JSON.stringify(filtersArr);
 
         localStorage.setItem(localStorageKey, sessionVal);

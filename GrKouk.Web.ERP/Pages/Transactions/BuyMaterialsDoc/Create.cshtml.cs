@@ -90,12 +90,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
 
         private void LoadCombos()
         {
-            List<SelectListItem> seekTypes = new List<SelectListItem>
-            {
-                new SelectListItem() {Value = "NAME", Text = "Name"},
-                new SelectListItem() {Value = "BARCODE", Text = "Barcode"},
-                new SelectListItem() {Value ="CODE", Text = "Supplier Code"}
-            };
+            List<SelectListItem> seekTypes = FiltersHelper.GetSeekTypesList();
             ViewData["SeekType"] = new SelectList(seekTypes, "Value", "Text");
 
             var supplierList = _context.Transactors.Where(s => s.TransactorType.Code == "SYS.SUPPLIER").OrderBy(s => s.Name).AsNoTracking();

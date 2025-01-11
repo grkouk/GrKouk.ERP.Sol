@@ -31,6 +31,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using System.Threading;
 using GrKouk.Erp.Dtos.CashFlowTransactions;
 using GrKouk.Erp.Dtos.FinancialMovements;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -169,7 +170,7 @@ namespace GrKouk.Web.ERP.Controllers
         public async Task<IActionResult> GetIndexTblDataExpenses([FromQuery] IndexDataTableRequest request)
         {
             IQueryable<FinDiaryTransaction> expensesIq = from s in _context.FinDiaryTransactions
-                                                         select s;
+                select s;
             //var q = _context.FinDiaryTransactions.Include(p => p.Company)
             //    .ThenInclude(p => p.Currency)
             //    .ThenInclude(p => p.Rates.OrderByDescending(s => s.ClosingDate));
@@ -230,6 +231,7 @@ namespace GrKouk.Web.ERP.Controllers
                                                    || p.ReferenceCode.Contains(request.SearchFilter)
                                                    || p.FinTransCategory.Name.Contains(request.SearchFilter));
             }
+
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
                 .Take(10)
                 .ToListAsync();
@@ -241,7 +243,8 @@ namespace GrKouk.Web.ERP.Controllers
                 TransactorId = p.TransactorId,
                 TransactorName = p.Transactor.Name,
                 FinTransCategoryName = p.FinTransCategory.Name,
-                AmountTotal = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountFpa + p.AmountNet),
+                AmountTotal = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates,
+                    p.AmountFpa + p.AmountNet),
                 CompanyId = p.CompanyId,
                 CompanyCode = p.Company.Code,
                 CompanyCurrencyId = p.Company.CurrencyId
@@ -334,7 +337,8 @@ namespace GrKouk.Web.ERP.Controllers
             //companiesList.Add(new UISelectTypeItem() { Value = 0.ToString(), Text = "{All Companies}" });
             foreach (var company in dbCompanies)
             {
-                companiesList.Add(new UISelectTypeItem() { ValueInt = company.Id, Value = company.Id.ToString(), Title = company.Code });
+                companiesList.Add(new UISelectTypeItem()
+                    { ValueInt = company.Id, Value = company.Id.ToString(), Title = company.Code });
             }
 
             return Ok(companiesList);
@@ -523,7 +527,7 @@ namespace GrKouk.Web.ERP.Controllers
                     Value = item.Id,
                     Text = item.Name
                 })
-               .ToListAsync();
+                .ToListAsync();
             var response = new IndexDataTableResponse<BuyDocList2Dto>
             {
                 TotalRecords = listItems.TotalCount,
@@ -698,11 +702,11 @@ namespace GrKouk.Web.ERP.Controllers
 
 
             var relevantDiarys = await _context.DiaryDefs.Where(p => p.DiaryType == DiaryTypeEnum.DiaryTypeEnumBuys)
-                 .Select(item => new SearchListItem()
-                 {
-                     Value = item.Id,
-                     Text = item.Name
-                 })
+                .Select(item => new SearchListItem()
+                {
+                    Value = item.Id,
+                    Text = item.Name
+                })
                 .ToListAsync();
 
             var response = new IndexDataTableResponse<BuyDocList2Dto>
@@ -1052,7 +1056,7 @@ namespace GrKouk.Web.ERP.Controllers
                     Value = item.Id,
                     Text = item.Name
                 })
-               .ToListAsync();
+                .ToListAsync();
             var pageIndex = request.PageIndex;
             var pageSize = request.PageSize;
             var listItems = await PagedList<SellDocList2Dto>.CreateAsync(t, pageIndex, pageSize);
@@ -1258,7 +1262,7 @@ namespace GrKouk.Web.ERP.Controllers
                 .Include(p => p.Transactor)
                 .Include(p => p.TransTransactorDocSeries)
                 .Include(p => p.TransTransactorDocType);
-
+            //Thread.Sleep(10000);
             if (!string.IsNullOrEmpty(request.SortData))
             {
                 switch (request.SortData.ToLower())
@@ -1316,7 +1320,32 @@ namespace GrKouk.Web.ERP.Controllers
                     }
                 }
             }
-
+            // if (!string.IsNullOrEmpty(request.SectionsFilter))
+            // {
+            //     if (int.TryParse(request.SectionsFilter, out var sectionId))
+            //     {
+            //         if (sectionId > 0)
+            //         {
+            //             fullListIq = fullListIq.Where(p => p.SectionId == sectionId);
+            //         }
+            //     }
+            // }
+            if (!string.IsNullOrEmpty(request.SectionsFilter))
+            { 
+               List<int> sectionIds = JsonSerializer.Deserialize<List<int>>(request.SectionsFilter);
+               if (sectionIds.Count == 0)
+               {
+                   sectionIds.Add(0);
+               }
+               bool allSections=sectionIds.Any(sectionId => sectionId == 0);
+               if (!allSections)
+               {
+                   fullListIq = fullListIq.Where(p => sectionIds.Contains(p.SectionId));   
+               }
+                
+            }
+            
+            
             if (!string.IsNullOrEmpty(request.SearchFilter))
             {
                 fullListIq = fullListIq.Where(p => p.Transactor.Name.Contains(request.SearchFilter)
@@ -1404,11 +1433,11 @@ namespace GrKouk.Web.ERP.Controllers
         public async Task<IActionResult> GetIndexTblDataCfaTrans([FromQuery] IndexDataTableRequest request)
         {
             IQueryable<CashFlowAccountTransaction> fullListIq = _context.CashFlowAccountTransactions
-                .Include(p => p.Company)
-                .Include(p => p.Section)
-                .Include(p => p.CashFlowAccount)
-                .Include(p => p.DocumentSeries)
-                .Include(p => p.DocumentType)
+                    .Include(p => p.Company)
+                    .Include(p => p.Section)
+                    .Include(p => p.CashFlowAccount)
+                    .Include(p => p.DocumentSeries)
+                    .Include(p => p.DocumentType)
                 ;
 
             if (!string.IsNullOrEmpty(request.SortData))
@@ -1497,7 +1526,8 @@ namespace GrKouk.Web.ERP.Controllers
                 FiscalPeriodId = p.FiscalPeriodId,
                 CfaAction = p.CfaAction,
                 Amount = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.Amount),
-                TransAmount = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.TransAmount),
+                TransAmount = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates,
+                    p.TransAmount),
                 CompanyCode = p.Company.Code,
                 CompanyCurrencyId = p.Company.CurrencyId
             });
@@ -1541,6 +1571,7 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
+
         [HttpGet("GetIndexTblDataTransactorTransV1")]
         public async Task<IActionResult> GetIndexTblDataTransactorTransV1([FromQuery] IndexDataTableRequest request)
         {
@@ -1603,7 +1634,7 @@ namespace GrKouk.Web.ERP.Controllers
                     }
                 }
             }
-
+           
             if (!string.IsNullOrEmpty(request.SearchFilter))
             {
                 fullListIq = fullListIq.Where(p => p.Transactor.Name.Contains(request.SearchFilter)
@@ -1894,8 +1925,8 @@ namespace GrKouk.Web.ERP.Controllers
         public async Task<IActionResult> GetIndexTblDataTransactorsBalanceV1([FromQuery] IndexDataTableRequest request)
         {
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
-              .Take(10)
-              .ToListAsync();
+                .Take(10)
+                .ToListAsync();
             IQueryable<TransactorTransaction> transactionsList = _context.TransactorTransactions;
             int transactorTypeId = 0;
             if (!string.IsNullOrEmpty(request.TransactorTypeFilter))
@@ -1943,11 +1974,11 @@ namespace GrKouk.Web.ERP.Controllers
             var dbTrans = transactionsList.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
             var intem = dbTrans.ToList();
             var dbTransactions = intem.GroupBy(g => new
-            {
-                g.CompanyCode,
-                g.CompanyCurrencyId,
-                g.TransactorId
-            }
+                    {
+                        g.CompanyCode,
+                        g.CompanyCurrencyId,
+                        g.TransactorId
+                    }
                 )
                 .Select(s => new TransactorIsozygioItem
                 {
@@ -2083,6 +2114,7 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
+
         //===========================
         [HttpGet("GetIndexTblDataTransactorsBalance")]
         public async Task<IActionResult> GetIndexTblDataTransactorsBalanceV2([FromQuery] IndexDataTableRequest request)
@@ -2094,7 +2126,6 @@ namespace GrKouk.Web.ERP.Controllers
                 .Include(p => p.Transactor)
                 .Include(p => p.TransTransactorDocSeries)
                 .Include(p => p.TransTransactorDocType);
-
 
 
             if (!string.IsNullOrEmpty(request.DateRange))
@@ -2122,6 +2153,7 @@ namespace GrKouk.Web.ERP.Controllers
             {
                 fullListIq = fullListIq.Where(p => p.Transactor.Name.Contains(request.SearchFilter));
             }
+
             int transactorTypeId = 0;
             if (!string.IsNullOrEmpty(request.TransactorTypeFilter))
             {
@@ -2137,8 +2169,8 @@ namespace GrKouk.Web.ERP.Controllers
 
 
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
-              .Take(10)
-              .ToListAsync();
+                .Take(10)
+                .ToListAsync();
             //IQueryable<TransactorTransaction> transactionsList = _context.TransactorTransactions;
 
             var t = fullListIq.Select(p => new TransactorTransListDto
@@ -2177,16 +2209,15 @@ namespace GrKouk.Web.ERP.Controllers
             //-------------  
 
 
-
             // var dbTrans = transactionsList.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
             var intem = await t.ToListAsync();
             var dbTransactions = intem.GroupBy(g => new
-            {
-                g.CompanyCode,
-                g.CompanyCurrencyId,
-                g.TransactorId,
-                g.TransactorName
-            }
+                    {
+                        g.CompanyCode,
+                        g.CompanyCurrencyId,
+                        g.TransactorId,
+                        g.TransactorName
+                    }
                 )
                 .Select(s => new TransactorIsozygioItem
                 {
@@ -2249,9 +2280,6 @@ namespace GrKouk.Web.ERP.Controllers
                     Debit = dbTransaction.DebitAmount,
                     Credit = dbTransaction.CreditAmount
                 });
-
-
-
             }
 
             var outList = listWithTotal.AsQueryable();
@@ -2273,10 +2301,12 @@ namespace GrKouk.Web.ERP.Controllers
                         break;
                 }
             }
+
             if (!request.ShowDisplayLinesWithZeroes)
             {
                 outList = outList.Where(p => p.RunningTotal != 0);
             }
+
             var pageIndex = request.PageIndex;
 
             var pageSize = request.PageSize;
@@ -2379,14 +2409,14 @@ namespace GrKouk.Web.ERP.Controllers
             try
             {
                 dbTransactions = d1.GroupBy(g => new
-                {
-                    g.CompanyId,
-                    g.CompanyCode,
-                    g.WarehouseItemId,
-                    g.WarehouseItemName,
-                    g.TransWarehouseDocSeriesCode,
-                    g.CompanyCurrencyId
-                }
+                        {
+                            g.CompanyId,
+                            g.CompanyCode,
+                            g.WarehouseItemId,
+                            g.WarehouseItemName,
+                            g.TransWarehouseDocSeriesCode,
+                            g.CompanyCurrencyId
+                        }
                     )
                     .Select(s => new WarehouseDiaryItem
                     {
@@ -2407,6 +2437,7 @@ namespace GrKouk.Web.ERP.Controllers
                 Console.WriteLine(e);
                 throw;
             }
+
             foreach (var listItem in dbTransactions)
             {
                 if (listItem.CompanyCurrencyId != 1)
@@ -2431,7 +2462,6 @@ namespace GrKouk.Web.ERP.Controllers
                     }
                 }
             }
-
 
 
             var listWithTotal = new List<WarehouseKartelaLine>();
@@ -2527,6 +2557,7 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
+
         [HttpGet("GetIndexTblDataWarehouseBalance")]
         public async Task<IActionResult> GetIndexTblDataWarehouseBalance([FromQuery] IndexDataTableRequest request)
         {
@@ -2564,12 +2595,12 @@ namespace GrKouk.Web.ERP.Controllers
             var intem = dbTrans.ToList();
 
             var dbTransactions = intem.GroupBy(g => new
-            {
-                g.CompanyId,
-                g.CompanyCode,
-                g.CompanyCurrencyId,
-                g.WarehouseItemId
-            }
+                    {
+                        g.CompanyId,
+                        g.CompanyCode,
+                        g.CompanyCurrencyId,
+                        g.WarehouseItemId
+                    }
                 )
                 .Select(s => new WarehouseIsozygioItem
                 {
@@ -2816,20 +2847,17 @@ namespace GrKouk.Web.ERP.Controllers
             if (!string.IsNullOrEmpty(request.SearchFilter))
             {
                 fullListIq = fullListIq.Where(p => p.Name.Contains(request.SearchFilter)
-
                                                    || p.Code.Contains(request.SearchFilter)
-
-                                                  );
+                );
             }
 
             var testList = fullListIq.ToList();
             var projectedList = testList.GroupBy(g => new
-            {
-                g.Id,
-                g.Name,
-                g.Code
-
-            })
+                {
+                    g.Id,
+                    g.Name,
+                    g.Code
+                })
                 .Select(f => new CashFlowAccountListDto()
                 {
                     Id = f.Key.Id,
@@ -2868,6 +2896,7 @@ namespace GrKouk.Web.ERP.Controllers
                     Id = t.Transactor.Id,
                     Code = t.Transactor.Code,
                     Name = t.Transactor.Name,
+                    TaxNumber = string.IsNullOrEmpty(t.Transactor.TaxNumber) ? " " : t.Transactor.TaxNumber,
                     Address = string.IsNullOrEmpty(t.Transactor.Address) ? " " : t.Transactor.Address,
                     City = string.IsNullOrEmpty(t.Transactor.City) ? " " : t.Transactor.City,
                     EMail = string.IsNullOrEmpty(t.Transactor.EMail) ? " " : t.Transactor.EMail,
@@ -2958,17 +2987,19 @@ namespace GrKouk.Web.ERP.Controllers
 
             var testList = fullListIq.ToList();
             var projectedList = testList.GroupBy(g => new
-            {
-                g.Id,
-                g.Name,
-                g.Code,
-                g.EMail,
-                g.TransactorTypeCode
-            })
+                {
+                    g.Id,
+                    g.Name,
+                    g.Code,
+                    g.TaxNumber,
+                    g.EMail,
+                    g.TransactorTypeCode
+                })
                 .Select(f => new TransactorListDto
                 {
                     Id = f.Key.Id,
                     Name = f.Key.Name,
+                    TaxNumber = f.Key.TaxNumber,
                     Code = f.Key.Code,
                     TransactorTypeCode = f.Key.TransactorTypeCode,
                     EMail = string.IsNullOrEmpty(f.Key.EMail) ? " " : f.Key.EMail,
@@ -3151,7 +3182,6 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpGet("GetIndexTblDataWarehouseItems")]
         public async Task<IActionResult> GetIndexTblDataWarehouseItems([FromQuery] IndexDataTableRequest request)
         {
-
             IQueryable<WarehouseItem> fullListIq = _context.WarehouseItems;
             if (!string.IsNullOrEmpty(request.WarehouseItemNatureFilter))
             {
@@ -3290,6 +3320,7 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
+
         [HttpGet("GetIndexTblDataWarehouseItemsV2")]
         public async Task<IActionResult> GetIndexTblDataWarehouseItemsV2([FromQuery] IndexDataTableRequest request)
         {
@@ -3386,15 +3417,15 @@ namespace GrKouk.Web.ERP.Controllers
             //--------------------------------------------------------------
             var localList = fullListIq.ToList();
             var projectedList = localList.GroupBy(g => new
-            {
-                g.Id,
-                g.Name,
-                g.Code,
-                g.MaterialCategoryName,
-                g.MaterialType,
-                g.Active,
-                g.WarehouseItemNature
-            })
+                {
+                    g.Id,
+                    g.Name,
+                    g.Code,
+                    g.MaterialCategoryName,
+                    g.MaterialType,
+                    g.Active,
+                    g.WarehouseItemNature
+                })
                 .Select(f => new ProductSelectorListDto()
                 {
                     Id = f.Key.Id,
@@ -3410,7 +3441,6 @@ namespace GrKouk.Web.ERP.Controllers
             PagedList<ProductSelectorListDto> listItems;
             try
             {
-
                 var pageIndex = request.PageIndex;
 
                 var pageSize = request.PageSize;
@@ -3461,16 +3491,16 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
+
         [HttpGet("GetIndexTblDataWarehouseItemsV3")]
         public async Task<IActionResult> GetIndexTblDataWarehouseItemsV3([FromQuery] IndexDataTableRequest request)
         {
-
-
             var lst1 = _context.CompanyWarehouseItemMappings
                 .Include(p => p.WarehouseItem)
                 .ThenInclude(p => p.FpaDef)
                 .Include(p => p.Company);
-            IQueryable<WarehouseItemBigClass> fullListIq = lst1.ProjectTo<WarehouseItemBigClass>(_mapper.ConfigurationProvider);
+            IQueryable<WarehouseItemBigClass> fullListIq =
+                lst1.ProjectTo<WarehouseItemBigClass>(_mapper.ConfigurationProvider);
             // var t = fullListIq.ToList();
             //IQueryable<WarehouseItem> fullListIq = _context.WarehouseItems;
             if (!string.IsNullOrEmpty(request.WarehouseItemNatureFilter))
@@ -3516,6 +3546,7 @@ namespace GrKouk.Web.ERP.Controllers
                         break;
                 }
             }
+
             if (!string.IsNullOrEmpty(request.CompanyFilter))
             {
                 if (int.TryParse(request.CompanyFilter, out var companyId))
@@ -3545,7 +3576,6 @@ namespace GrKouk.Web.ERP.Controllers
                     }
                 }
             }
-
 
 
             //if (!string.IsNullOrEmpty(request.CompanyFilter))
@@ -3583,15 +3613,15 @@ namespace GrKouk.Web.ERP.Controllers
             //--------------------------------------------------------------
             var localList = fullListIq.ToList();
             var projectedList = localList.GroupBy(g => new
-            {
-                g.Id,
-                g.Name,
-                g.Code,
-                g.MaterialCategoryName,
-                g.MaterialType,
-                g.Active,
-                g.WarehouseItemNature
-            })
+                {
+                    g.Id,
+                    g.Name,
+                    g.Code,
+                    g.MaterialCategoryName,
+                    g.MaterialType,
+                    g.Active,
+                    g.WarehouseItemNature
+                })
                 .Select(f => new ProductSelectorListDto()
                 {
                     Id = f.Key.Id,
@@ -3607,7 +3637,6 @@ namespace GrKouk.Web.ERP.Controllers
             PagedList<ProductSelectorListDto> listItems;
             try
             {
-
                 var pageIndex = request.PageIndex;
 
                 var pageSize = request.PageSize;
@@ -3658,6 +3687,7 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
+
         [HttpGet("GetIndexTblDataFinancialMovementDefs")]
         public async Task<IActionResult> GetIndexTblDataFinancialMovementDefs([FromQuery] IndexDataTableRequest request)
         {
@@ -3685,12 +3715,12 @@ namespace GrKouk.Web.ERP.Controllers
                         fullListIq = fullListIq.OrderByDescending(p => p.Code);
                         break;
 
-                        // case "companycodesort:asc":
-                        //     fullListIq = fullListIq.OrderBy(p => p.Company.Code);
-                        //     break;
-                        // case "companycodesort:desc":
-                        //     fullListIq = fullListIq.OrderByDescending(p => p.Company.Code);
-                        //     break;
+                    // case "companycodesort:asc":
+                    //     fullListIq = fullListIq.OrderBy(p => p.Company.Code);
+                    //     break;
+                    // case "companycodesort:desc":
+                    //     fullListIq = fullListIq.OrderByDescending(p => p.Company.Code);
+                    //     break;
                 }
             }
 
@@ -3728,7 +3758,7 @@ namespace GrKouk.Web.ERP.Controllers
             {
                 fullListIq = fullListIq.Where(p => p.Name.Contains(request.SearchFilter)
                                                    || p.Code.Contains(request.SearchFilter)
-                                                  );
+                );
             }
 
             PagedList<FinMovementListDto> listItems;
@@ -3751,7 +3781,6 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
 
-
             var response = new IndexDataTableResponse<FinMovementListDto>
             {
                 TotalRecords = listItems.TotalCount,
@@ -3763,6 +3792,7 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
+
         [HttpGet("GetIndexTblDataCfaTransactionDefs")]
         public async Task<IActionResult> GetIndexTblDataCfaTransactionDefs([FromQuery] IndexDataTableRequest request)
         {
@@ -3830,7 +3860,7 @@ namespace GrKouk.Web.ERP.Controllers
             {
                 fullListIq = fullListIq.Where(p => p.Name.Contains(request.SearchFilter)
                                                    || p.Code.Contains(request.SearchFilter)
-                                                  );
+                );
             }
 
             PagedList<CFATransactionDefListDto> listItems;
@@ -3853,7 +3883,6 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
 
-
             var response = new IndexDataTableResponse<CFATransactionDefListDto>
             {
                 TotalRecords = listItems.TotalCount,
@@ -3865,6 +3894,7 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
+
         [HttpGet("GetIndexTblDataCfaDocTypeDefs")]
         public async Task<IActionResult> GetIndexTblDataCfaDocTypeDefs([FromQuery] IndexDataTableRequest request)
         {
@@ -3932,7 +3962,7 @@ namespace GrKouk.Web.ERP.Controllers
             {
                 fullListIq = fullListIq.Where(p => p.Name.Contains(request.SearchFilter)
                                                    || p.Code.Contains(request.SearchFilter)
-                                                  );
+                );
             }
 
             PagedList<CfaDocTypeDefListDto> listItems;
@@ -3955,7 +3985,6 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
 
-
             var response = new IndexDataTableResponse<CfaDocTypeDefListDto>
             {
                 TotalRecords = listItems.TotalCount,
@@ -3967,6 +3996,7 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
+
         [HttpGet("GetIndexTblDataCfaDocSeriesDefs")]
         public async Task<IActionResult> GetIndexTblDataCfaDocSeriesDefs([FromQuery] IndexDataTableRequest request)
         {
@@ -4034,7 +4064,7 @@ namespace GrKouk.Web.ERP.Controllers
             {
                 fullListIq = fullListIq.Where(p => p.Name.Contains(request.SearchFilter)
                                                    || p.Code.Contains(request.SearchFilter)
-                                                  );
+                );
             }
 
             PagedList<CfaDocSeriesDefListDto> listItems;
@@ -4057,7 +4087,6 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
 
-
             var response = new IndexDataTableResponse<CfaDocSeriesDefListDto>
             {
                 TotalRecords = listItems.TotalCount,
@@ -4069,6 +4098,7 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
+
         [HttpGet("GetSelectorTransactors")]
         public async Task<IActionResult> GetSelectorTransactors([FromQuery] IndexDataTableRequest request)
         {
@@ -4171,13 +4201,13 @@ namespace GrKouk.Web.ERP.Controllers
 
             var testList = fullListIq.ToList();
             var projectedList = testList.GroupBy(g => new
-            {
-                g.Id,
-                g.Name,
-                g.Code,
-                g.EMail,
-                g.TransactorTypeCode
-            })
+                {
+                    g.Id,
+                    g.Name,
+                    g.Code,
+                    g.EMail,
+                    g.TransactorTypeCode
+                })
                 .Select(f => new TransactorListDto
                 {
                     Id = f.Key.Id,
@@ -4202,6 +4232,7 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
+
         [HttpGet("GetSelectorTransactorsV2")]
         public async Task<IActionResult> GetSelectorTransactorsV2([FromQuery] IndexDataTableRequest request)
         {
@@ -4224,7 +4255,6 @@ namespace GrKouk.Web.ERP.Controllers
                     CompanyId = t.Company.Id,
                     CompanyCode = t.Company.Code
                 });
-
 
 
             if (!string.IsNullOrEmpty(request.TransactorTypeFilter))
@@ -4295,13 +4325,13 @@ namespace GrKouk.Web.ERP.Controllers
 
             var testList = fullListIq.ToList();
             var projectedList = testList.GroupBy(g => new
-            {
-                g.Id,
-                g.Name,
-                g.Code,
-                g.EMail,
-                g.TransactorTypeCode
-            })
+                {
+                    g.Id,
+                    g.Name,
+                    g.Code,
+                    g.EMail,
+                    g.TransactorTypeCode
+                })
                 .Select(f => new TransactorListDto
                 {
                     Id = f.Key.Id,
@@ -4326,6 +4356,7 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
+
         [HttpGet("GetSelectorPaymentsToSuppliersItems")]
         public async Task<IActionResult> GetSelectorPaymentsToSuppliersItems([FromQuery] IndexDataTableRequest request)
         {
@@ -4372,11 +4403,14 @@ namespace GrKouk.Web.ERP.Controllers
                     error = msg
                 });
             }
+
             await _context.Entry(payoffSeries)
-               .Reference(t => t.TransTransactorDocTypeDef)
-               .LoadAsync();
+                .Reference(t => t.TransTransactorDocTypeDef)
+                .LoadAsync();
             int sectionId;
-            int paymentTypeDefaultSeriesId = payoffSeries.TransTransactorDocTypeDef == null ? 0 : payoffSeries.TransTransactorDocTypeDef.SectionId;
+            int paymentTypeDefaultSeriesId = payoffSeries.TransTransactorDocTypeDef == null
+                ? 0
+                : payoffSeries.TransTransactorDocTypeDef.SectionId;
             if (paymentTypeDefaultSeriesId > 0)
             {
                 sectionId = paymentTypeDefaultSeriesId;
@@ -4392,9 +4426,9 @@ namespace GrKouk.Web.ERP.Controllers
                         error = msg
                     });
                 }
+
                 sectionId = section.Id;
             }
-
 
 
             var transactorId = doc.TransactorId;
@@ -4578,12 +4612,15 @@ namespace GrKouk.Web.ERP.Controllers
                     error = msg
                 });
             }
+
             //---------------------------------------
             await _context.Entry(payoffSeries)
-               .Reference(t => t.TransTransactorDocTypeDef)
-               .LoadAsync();
+                .Reference(t => t.TransTransactorDocTypeDef)
+                .LoadAsync();
             int sectionId;
-            int paymentTypeDefaultSeriesId = payoffSeries.TransTransactorDocTypeDef == null ? 0 : payoffSeries.TransTransactorDocTypeDef.SectionId;
+            int paymentTypeDefaultSeriesId = payoffSeries.TransTransactorDocTypeDef == null
+                ? 0
+                : payoffSeries.TransTransactorDocTypeDef.SectionId;
             if (paymentTypeDefaultSeriesId > 0)
             {
                 sectionId = paymentTypeDefaultSeriesId;
@@ -4599,6 +4636,7 @@ namespace GrKouk.Web.ERP.Controllers
                         error = msg
                     });
                 }
+
                 sectionId = section.Id;
             }
             //---------------------------------------
@@ -4821,9 +4859,9 @@ namespace GrKouk.Web.ERP.Controllers
                 fullListIq = fullListIq.Where(p => p.Name.Contains(request.SearchFilter)
                                                    || p.Code.Contains(request.SearchFilter)
                                                    || p.WarehouseItemCodes.Any(t => t.Code == request.SearchFilter)
-                // || p.ShortDescription.Contains(request.SearchFilter)
-                // || p.Description.Contains(request.SearchFilter)
-                //|| p.MaterialCaterory.Name.Contains(request.SearchFilter)
+                    // || p.ShortDescription.Contains(request.SearchFilter)
+                    // || p.Description.Contains(request.SearchFilter)
+                    //|| p.MaterialCaterory.Name.Contains(request.SearchFilter)
                 );
             }
 
@@ -5161,6 +5199,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             return NotFound();
         }
+
         //----------------------------------------------------------------------------------------------------------------
         [HttpGet("GetIndexTblDataTransactorDiary")]
         public async Task<IActionResult> GetIndexTblDataSelectedDiary([FromQuery] IndexDataTableRequest request)
@@ -5181,6 +5220,7 @@ namespace GrKouk.Web.ERP.Controllers
                     Error = "Diary Id not found"
                 });
             }
+
             switch (diaryDef.DiaryType)
             {
                 case DiaryTypeEnum.DiaryTypeEnumSales:
@@ -5215,9 +5255,9 @@ namespace GrKouk.Web.ERP.Controllers
                     {
                         Error = "Unknown diary type"
                     });
-
             }
         }
+
         private async Task<IActionResult> GetIndexTblDataBuysDiary(IndexDataTableRequest request)
         {
             if (request.DiaryId <= 0)
@@ -5236,9 +5276,10 @@ namespace GrKouk.Web.ERP.Controllers
                     Error = "Diary Id not found"
                 });
             }
+
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
-               .Take(10)
-               .ToListAsync();
+                .Take(10)
+                .ToListAsync();
             IQueryable<BuyDiaryLine> transactionsList = _context.BuyDocLines
                 .Include(p => p.BuyDocument).ThenInclude(p => p.Transactor)
                 .Include(p => p.BuyDocument).ThenInclude(p => p.BuyDocSeries)
@@ -5262,12 +5303,18 @@ namespace GrKouk.Web.ERP.Controllers
                     //CreatorId = p.CreatorId,
                     // FiscalPeriodId = p.BuyDocument.FiscalPeriodId,
                     //FinancialAction = p.FinancialAction,
-                    AmountFpa = ConvertAmount(p.BuyDocument.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountFpa),
-                    AmountNet = ConvertAmount(p.BuyDocument.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountNet),
-                    AmountDiscount = ConvertAmount(p.BuyDocument.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountDiscount),
-                    TransFpaAmount = ConvertAmount(p.BuyDocument.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.TransFpaAmount),
-                    TransNetAmount = ConvertAmount(p.BuyDocument.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.TransNetAmount),
-                    TransDiscountAmount = ConvertAmount(p.BuyDocument.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.TransDiscountAmount),
+                    AmountFpa = ConvertAmount(p.BuyDocument.Company.CurrencyId, request.DisplayCurrencyId,
+                        currencyRates, p.AmountFpa),
+                    AmountNet = ConvertAmount(p.BuyDocument.Company.CurrencyId, request.DisplayCurrencyId,
+                        currencyRates, p.AmountNet),
+                    AmountDiscount = ConvertAmount(p.BuyDocument.Company.CurrencyId, request.DisplayCurrencyId,
+                        currencyRates, p.AmountDiscount),
+                    TransFpaAmount = ConvertAmount(p.BuyDocument.Company.CurrencyId, request.DisplayCurrencyId,
+                        currencyRates, p.TransFpaAmount),
+                    TransNetAmount = ConvertAmount(p.BuyDocument.Company.CurrencyId, request.DisplayCurrencyId,
+                        currencyRates, p.TransNetAmount),
+                    TransDiscountAmount = ConvertAmount(p.BuyDocument.Company.CurrencyId, request.DisplayCurrencyId,
+                        currencyRates, p.TransDiscountAmount),
 
                     CompanyId = p.BuyDocument.CompanyId,
                     CompanyCode = p.BuyDocument.Company.Code,
@@ -5279,6 +5326,7 @@ namespace GrKouk.Web.ERP.Controllers
                 var docTypes = Array.ConvertAll(diaryDef.SelectedDocTypes.Split(","), int.Parse);
                 transactionsList = transactionsList.Where(p => docTypes.Contains(p.DocTypeId));
             }
+
             if (diaryDef.SelectedMatNatures != null)
             {
                 var itemNatures = Array.ConvertAll(diaryDef.SelectedMatNatures.Split(","), int.Parse);
@@ -5297,6 +5345,7 @@ namespace GrKouk.Web.ERP.Controllers
 
                 transactionsList = transactionsList.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
             }
+
             //var test4 = transactionsList.ToList();
             if (!string.IsNullOrEmpty(request.CompanyFilter))
             {
@@ -5308,11 +5357,13 @@ namespace GrKouk.Web.ERP.Controllers
                     }
                 }
             }
+
             //var test5 = transactionsList.ToList();
             if (!string.IsNullOrEmpty(request.SearchFilter))
             {
                 transactionsList = transactionsList.Where(p => p.TransactorName.Contains(request.SearchFilter));
             }
+
             // var test6 = transactionsList.ToList();
             if (!string.IsNullOrEmpty(request.SortData))
             {
@@ -5355,33 +5406,30 @@ namespace GrKouk.Web.ERP.Controllers
             List<BuyDiaryLine> t1;
             if (request.ShowSummaryFilter)
             {
-
                 try
                 {
                     var t2 = await transactionsList.ToListAsync();
                     t1 = t2.GroupBy(g => new
-                    {
+                        {
+                            //g.DocId,
+                            //g.TransDate ,
+                            g.CompanyId,
+                            g.CompanyCode,
+                            g.DocSeriesCode,
+                            g.DocSeriesName,
 
+                            // g.DocTypeId,
+                            // g.RefCode,
+                            g.DocSeriesId,
+                            g.TransactorId,
+                            g.TransactorName,
 
-                        //g.DocId,
-                        //g.TransDate ,
-                        g.CompanyId,
-                        g.CompanyCode,
-                        g.DocSeriesCode,
-                        g.DocSeriesName,
-
-                        // g.DocTypeId,
-                        // g.RefCode,
-                        g.DocSeriesId,
-                        g.TransactorId,
-                        g.TransactorName,
-
-                        g.ItemId,
-                        g.ItemName,
-                        //g.Id,
-                        // g.SectionId,
-                        //g.ItemNature
-                    })
+                            g.ItemId,
+                            g.ItemName,
+                            //g.Id,
+                            // g.SectionId,
+                            //g.ItemNature
+                        })
                         .Select(s => new BuyDiaryLine
                         {
                             // Id=s.Key.Id,
@@ -5400,12 +5448,10 @@ namespace GrKouk.Web.ERP.Controllers
                             TransDiscountAmount = s.Sum(p => p.TransDiscountAmount),
                             TransFpaAmount = s.Sum(p => p.TransFpaAmount),
                             TransNetAmount = s.Sum(p => p.TransNetAmount)
-
                         }).ToList();
                 }
                 catch (Exception e)
                 {
-
                     Console.WriteLine(e);
                     throw;
                 }
@@ -5414,6 +5460,7 @@ namespace GrKouk.Web.ERP.Controllers
             {
                 t1 = await transactionsList.ToListAsync();
             }
+
             var grandSumOfAmountNew = t1.Sum(p => p.TotalAmount);
             var grandSumOfNetAmountNew = t1.Sum(p => p.TotalNetAmount);
 
@@ -5630,6 +5677,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             return Ok(response);
         }
+
         private async Task<IActionResult> GetIndexTblDataTransactorDiary(IndexDataTableRequest request)
         {
             if (request.DiaryId <= 0)
@@ -5952,7 +6000,8 @@ namespace GrKouk.Web.ERP.Controllers
                 Amount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.Amount),
 
 
-                TransAmount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.TransAmount),
+                TransAmount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                    p.TransAmount),
 
                 CompanyCode = p.CompanyCode,
                 CompanyCurrencyId = p.CompanyCurrencyId
@@ -5971,7 +6020,6 @@ namespace GrKouk.Web.ERP.Controllers
                     {
                         listItem.Amount /= r.Rate;
                         listItem.TransAmount /= r.Rate;
-
                     }
                 }
 
@@ -5983,7 +6031,6 @@ namespace GrKouk.Web.ERP.Controllers
                     {
                         listItem.Amount *= r.Rate;
                         listItem.TransAmount *= r.Rate;
-
                     }
                 }
 
@@ -6009,7 +6056,6 @@ namespace GrKouk.Web.ERP.Controllers
                         .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
                     if (r != null)
                     {
-
                         item.Amount /= r.Rate;
                         item.TransAmount /= r.Rate;
                     }
@@ -6023,7 +6069,6 @@ namespace GrKouk.Web.ERP.Controllers
                     {
                         item.Amount *= r.Rate;
                         item.TransAmount *= r.Rate;
-
                     }
                 }
             }
@@ -6048,6 +6093,7 @@ namespace GrKouk.Web.ERP.Controllers
                 beforePeriod.Withdraw = 0;
                 beforePeriod.Deposit = amnt;
             }
+
             beforePeriod.RunningTotal = bl1.Deposit - bl1.Withdraw;
 
 
@@ -6107,6 +6153,7 @@ namespace GrKouk.Web.ERP.Controllers
                 sumWithdraw += item.Withdraw;
                 sumDeposit += item.Deposit;
             }
+
             sumDifference = sumDeposit - sumWithdraw;
 
 
@@ -6201,7 +6248,6 @@ namespace GrKouk.Web.ERP.Controllers
                 {
                     transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
                 }
-
             }
 
             if (!string.IsNullOrEmpty(request.CompanyFilter))
@@ -6333,15 +6379,15 @@ namespace GrKouk.Web.ERP.Controllers
                         }
                     }
                 }
+
                 if (!string.IsNullOrEmpty(request.SearchFilter))
                 {
-
                     transListBeforePeriod = transListBeforePeriod.Where(p =>
                         p.TransTransactorDocSeries.Name.Contains(request.SearchFilter)
                         || p.TransTransactorDocSeries.Code.Contains(request.SearchFilter)
                         || p.TransRefCode.Contains(request.SearchFilter));
-
                 }
+
                 var dbTransBeforePeriod =
                     transListBeforePeriod.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
                 var transBeforePeriodList = await dbTransBeforePeriod.ToListAsync();
@@ -6377,6 +6423,7 @@ namespace GrKouk.Web.ERP.Controllers
                         }
                     }
                 }
+
                 //Create before period line
                 var bl1 = new
                 {
@@ -6422,10 +6469,6 @@ namespace GrKouk.Web.ERP.Controllers
                 listWithTotal.Add(beforePeriod);
                 runningTotal = beforePeriod.RunningTotal;
             }
-
-
-
-
 
 
             foreach (var dbTransaction in dbTransactions)
@@ -6505,6 +6548,392 @@ namespace GrKouk.Web.ERP.Controllers
                 TotalPages = listItems.TotalPages,
                 HasPrevious = listItems.HasPrevious,
                 HasNext = listItems.HasNext,
+                SumOfDebit = sumDebit,
+                SumOfCredit = sumCredit,
+                SumOfDifference = sumDifference,
+                GrandSumOfAmount = grandSumOfAmount,
+                GrandSumOfDebit = grandSumOfDebit,
+                GrandSumOfCredit = grandSumOfCredit,
+                Data = listItems
+            };
+            return Ok(response);
+        }
+
+        [HttpGet("GetIndexTblDataTransactorAccountTabPdf")]
+        public async Task<IActionResult> GetIndexTblDataTransactorAccountTabPdf(
+            [FromQuery] IndexDataTableRequest request)
+        {
+            if (request.TransactorId <= 0)
+            {
+                return BadRequest(new
+                {
+                    Error = "No valid transactor id specified"
+                });
+            }
+
+            var transactor = await _context.Transactors.FirstOrDefaultAsync(x => x.Id == request.TransactorId);
+            if (transactor == null)
+            {
+                return NotFound(new
+                {
+                    Error = "Transactor not found"
+                });
+            }
+
+            var transactorType = await _context.TransactorTypes.Where(c => c.Id == transactor.TransactorTypeId)
+                .FirstOrDefaultAsync();
+
+            IQueryable<TransactorTransaction> transactionsList = _context.TransactorTransactions
+                .Where(p => p.TransactorId == request.TransactorId);
+            IQueryable<TransactorTransaction> transListBeforePeriod = _context.TransactorTransactions
+                .Where(p => p.TransactorId == request.TransactorId);
+            IQueryable<TransactorTransaction> transListAll = _context.TransactorTransactions
+                .Where(p => p.TransactorId == request.TransactorId);
+            if (!string.IsNullOrEmpty(request.SortData))
+            {
+                switch (request.SortData.ToLower())
+                {
+                    case "datesort:asc":
+                        transactionsList = transactionsList.OrderBy(p => p.TransDate);
+                        break;
+                    case "datesort:desc":
+                        transactionsList = transactionsList.OrderByDescending(p => p.TransDate);
+                        break;
+                    case "transactornamesort:asc":
+                        transactionsList = transactionsList.OrderBy(p => p.Transactor.Name);
+                        break;
+                    case "transactornamesort:desc":
+                        transactionsList = transactionsList.OrderByDescending(p => p.Transactor.Name);
+                        break;
+                    case "seriescodesort:asc":
+                        transactionsList = transactionsList.OrderBy(p => p.TransTransactorDocSeries.Code);
+                        break;
+                    case "seriescodesort:desc":
+                        transactionsList = transactionsList.OrderByDescending(p => p.TransTransactorDocSeries.Code);
+                        break;
+                    case "companycodesort:asc":
+                        transactionsList = transactionsList.OrderBy(p => p.Company.Code);
+                        break;
+                    case "companycodesort:desc":
+                        transactionsList = transactionsList.OrderByDescending(p => p.Company.Code);
+                        break;
+                }
+            }
+
+            DateTime beforePeriodDate = DateTime.Today;
+            if (!string.IsNullOrEmpty(request.DateRange))
+            {
+                var datePeriodFilter = request.DateRange;
+                DateFilterDates dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
+                DateTime fromDate = dfDates.FromDate;
+                beforePeriodDate = fromDate.AddDays(-1);
+                DateTime toDate = dfDates.ToDate;
+
+                transactionsList = transactionsList.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
+                if (request.ShowCarryOnAmountsInTabs)
+                {
+                    transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.CompanyFilter))
+            {
+                if (int.TryParse(request.CompanyFilter, out var companyId))
+                {
+                    if (companyId > 0)
+                    {
+                        transactionsList = transactionsList.Where(p => p.CompanyId == companyId);
+                        transListAll = transListAll.Where(p => p.CompanyId == companyId);
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.SearchFilter))
+            {
+                transactionsList = transactionsList.Where(p =>
+                    p.TransTransactorDocSeries.Name.Contains(request.SearchFilter)
+                    || p.TransTransactorDocSeries.Code.Contains(request.SearchFilter)
+                    || p.TransRefCode.Contains(request.SearchFilter)
+                );
+
+                transListAll = transListAll.Where(p => p.TransTransactorDocSeries.Name.Contains(request.SearchFilter)
+                                                       || p.TransTransactorDocSeries.Code.Contains(request.SearchFilter)
+                                                       || p.TransRefCode.Contains(request.SearchFilter)
+                );
+            }
+
+            var dbTrans = transactionsList.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
+
+            var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
+                .Take(10)
+                .ToListAsync();
+            var t = transListAll.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
+            var t1 = await t.Select(p => new TransactorTransListDto
+            {
+                Id = p.Id,
+                TransDate = p.TransDate,
+                TransTransactorDocSeriesId = p.TransTransactorDocSeriesId,
+                TransTransactorDocSeriesName = p.TransTransactorDocSeriesName,
+                TransTransactorDocSeriesCode = p.TransTransactorDocSeriesCode,
+                TransTransactorDocTypeId = p.TransTransactorDocTypeId,
+                TransRefCode = p.TransRefCode,
+                TransactorId = p.TransactorId,
+                TransactorName = p.TransactorName,
+                SectionId = p.SectionId,
+                SectionCode = p.SectionCode,
+                CreatorId = p.CreatorId,
+                CreatorSectionId = p.CreatorSectionId,
+                CreatorSectionCode = "",
+                FiscalPeriodId = p.FiscalPeriodId,
+                FinancialAction = p.FinancialAction,
+                FpaRate = p.FpaRate,
+                DiscountRate = p.DiscountRate,
+                AmountFpa = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountFpa),
+                AmountNet = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountNet),
+                AmountDiscount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                    p.AmountDiscount),
+                TransFpaAmount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                    p.TransFpaAmount),
+                TransNetAmount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                    p.TransNetAmount),
+                TransDiscountAmount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                    p.TransDiscountAmount),
+                CompanyCode = p.CompanyCode,
+                CompanyCurrencyId = p.CompanyCurrencyId
+            }).ToListAsync();
+            var grandSumOfAmount = t1.Sum(p => p.TotalAmount);
+            var grandSumOfDebit = t1.Sum(p => p.DebitAmount);
+            var grandSumOfCredit = t1.Sum(p => p.CreditAmount);
+            var dbTransactions = await dbTrans.ToListAsync();
+            foreach (var listItem in dbTransactions)
+            {
+                if (listItem.CompanyCurrencyId != 1)
+                {
+                    var r = currencyRates.Where(p => p.CurrencyId == listItem.CompanyCurrencyId)
+                        .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
+                    if (r != null)
+                    {
+                        listItem.AmountFpa /= r.Rate;
+                        listItem.AmountNet /= r.Rate;
+                        listItem.AmountDiscount /= r.Rate;
+                        listItem.TransFpaAmount /= r.Rate;
+                        listItem.TransNetAmount /= r.Rate;
+                        listItem.TransDiscountAmount /= r.Rate;
+                    }
+                }
+
+                if (request.DisplayCurrencyId != 1)
+                {
+                    var r = currencyRates.Where(p => p.CurrencyId == request.DisplayCurrencyId)
+                        .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
+                    if (r != null)
+                    {
+                        listItem.AmountFpa *= r.Rate;
+                        listItem.AmountNet *= r.Rate;
+                        listItem.AmountDiscount *= r.Rate;
+                        listItem.TransFpaAmount *= r.Rate;
+                        listItem.TransNetAmount *= r.Rate;
+                        listItem.TransDiscountAmount *= r.Rate;
+                    }
+                }
+
+                if (listItem.CreatorSectionId >= 0)
+                {
+                    var creatorSection = await _context.Sections.FindAsync(listItem.CreatorSectionId);
+                    if (creatorSection != null)
+                    {
+                        listItem.CreatorSectionCode = creatorSection.Code;
+                    }
+                }
+            }
+
+            var listWithTotal = new List<KartelaLine>();
+            decimal runningTotal = 0;
+            //Handle before period carry on row
+            if (request.ShowCarryOnAmountsInTabs)
+            {
+                if (!string.IsNullOrEmpty(request.CompanyFilter))
+                {
+                    if (int.TryParse(request.CompanyFilter, out var companyId))
+                    {
+                        if (companyId > 0)
+                        {
+                            if (request.ShowCarryOnAmountsInTabs)
+                            {
+                                transListBeforePeriod = transListBeforePeriod.Where(p => p.CompanyId == companyId);
+                            }
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(request.SearchFilter))
+                {
+                    transListBeforePeriod = transListBeforePeriod.Where(p =>
+                        p.TransTransactorDocSeries.Name.Contains(request.SearchFilter)
+                        || p.TransTransactorDocSeries.Code.Contains(request.SearchFilter)
+                        || p.TransRefCode.Contains(request.SearchFilter));
+                }
+
+                var dbTransBeforePeriod =
+                    transListBeforePeriod.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
+                var transBeforePeriodList = await dbTransBeforePeriod.ToListAsync();
+                foreach (var item in transBeforePeriodList)
+                {
+                    if (item.CompanyCurrencyId != 1)
+                    {
+                        var r = currencyRates.Where(p => p.CurrencyId == item.CompanyCurrencyId)
+                            .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
+                        if (r != null)
+                        {
+                            item.AmountFpa /= r.Rate;
+                            item.AmountNet /= r.Rate;
+                            item.AmountDiscount /= r.Rate;
+                            item.TransFpaAmount /= r.Rate;
+                            item.TransNetAmount /= r.Rate;
+                            item.TransDiscountAmount /= r.Rate;
+                        }
+                    }
+
+                    if (request.DisplayCurrencyId != 1)
+                    {
+                        var r = currencyRates.Where(p => p.CurrencyId == request.DisplayCurrencyId)
+                            .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
+                        if (r != null)
+                        {
+                            item.AmountFpa *= r.Rate;
+                            item.AmountNet *= r.Rate;
+                            item.AmountDiscount *= r.Rate;
+                            item.TransFpaAmount *= r.Rate;
+                            item.TransNetAmount *= r.Rate;
+                            item.TransDiscountAmount *= r.Rate;
+                        }
+                    }
+                }
+
+                //Create before period line
+                var bl1 = new
+                {
+                    Debit = transBeforePeriodList.Sum(x => x.DebitAmount),
+                    Credit = transBeforePeriodList.Sum(x => x.CreditAmount),
+                };
+
+                var beforePeriod = new KartelaLine();
+                if (bl1.Credit >= bl1.Debit)
+                {
+                    var amnt = bl1.Credit - bl1.Debit;
+                    beforePeriod.Credit = amnt;
+                    beforePeriod.Debit = 0;
+                }
+                else
+                {
+                    var amnt = bl1.Debit - bl1.Credit;
+                    beforePeriod.Credit = 0;
+                    beforePeriod.Debit = amnt;
+                }
+
+                switch (transactorType.Code)
+                {
+                    case "SYS.DTRANSACTOR":
+
+                        break;
+                    case "SYS.CUSTOMER":
+                        beforePeriod.RunningTotal = bl1.Debit - bl1.Credit;
+                        break;
+                    case "SYS.SUPPLIER":
+                        beforePeriod.RunningTotal = bl1.Credit - bl1.Debit;
+                        break;
+                    default:
+                        beforePeriod.RunningTotal = bl1.Credit - bl1.Debit;
+                        break;
+                }
+
+                beforePeriod.TransDate = beforePeriodDate;
+                beforePeriod.DocSeriesCode = "Εκ.Μεταφ.";
+                beforePeriod.CreatorId = -1;
+                beforePeriod.TransactorName = "";
+
+                listWithTotal.Add(beforePeriod);
+                runningTotal = beforePeriod.RunningTotal;
+            }
+
+
+            foreach (var dbTransaction in dbTransactions)
+            {
+                switch (transactorType.Code)
+                {
+                    case "SYS.DTRANSACTOR":
+
+                        break;
+                    case "SYS.CUSTOMER":
+                        runningTotal = dbTransaction.DebitAmount - dbTransaction.CreditAmount + runningTotal;
+                        break;
+                    case "SYS.SUPPLIER":
+                        runningTotal = dbTransaction.CreditAmount - dbTransaction.DebitAmount + runningTotal;
+                        break;
+                    default:
+                        runningTotal = dbTransaction.CreditAmount - dbTransaction.DebitAmount + runningTotal;
+                        break;
+                }
+
+
+                listWithTotal.Add(new KartelaLine
+                {
+                    Id = dbTransaction.Id,
+                    TransDate = dbTransaction.TransDate,
+                    DocSeriesCode = dbTransaction.TransTransactorDocSeriesCode,
+                    RefCode = dbTransaction.TransRefCode,
+                    CompanyCode = dbTransaction.CompanyCode,
+                    SectionCode = dbTransaction.SectionCode,
+                    CreatorId = dbTransaction.CreatorId,
+                    CreatorSectionId = dbTransaction.CreatorSectionId,
+                    CreatorSectionCode = dbTransaction.CreatorSectionCode,
+                    RunningTotal = runningTotal,
+                    TransactorName = dbTransaction.TransactorName,
+                    Debit = dbTransaction.DebitAmount,
+                    Credit = dbTransaction.CreditAmount
+                });
+            }
+
+            var outList = listWithTotal.AsQueryable();
+            var pageIndex = request.PageIndex;
+
+            var pageSize = request.PageSize;
+            decimal sumCredit = 0;
+            decimal sumDebit = 0;
+            decimal sumDifference = 0;
+
+            IQueryable<KartelaLine> fullListIq = from s in outList select s;
+
+            //var listItems = PagedList<KartelaLine>.Create(fullListIq, pageIndex, pageSize);
+            var listItems = fullListIq.ToList();
+            foreach (var item in listItems)
+            {
+                sumCredit += item.Credit;
+                sumDebit += item.Debit;
+            }
+
+            switch (transactorType.Code)
+            {
+                case "SYS.DTRANSACTOR":
+
+                    break;
+                case "SYS.CUSTOMER":
+                    sumDifference = sumDebit - sumCredit;
+                    break;
+                case "SYS.SUPPLIER":
+                    sumDifference = sumCredit - sumDebit;
+                    break;
+                default:
+                    sumDifference = sumCredit - sumDebit;
+                    break;
+            }
+
+            var response = new IndexDataTableResponse<KartelaLine>
+            {
+                //TotalRecords = listItems.TotalCount,
+                //TotalPages = listItems.TotalPages,
+                //HasPrevious = listItems.HasPrevious,
+                //HasNext = listItems.HasNext,
                 SumOfDebit = sumDebit,
                 SumOfCredit = sumCredit,
                 SumOfDifference = sumDifference,
@@ -7007,6 +7436,7 @@ namespace GrKouk.Web.ERP.Controllers
                 }
             }
         }
+
         [HttpGet("GetCompanyAllowedCashFlowAccounts")]
         public async Task<IActionResult> GetCompanyAllowedCashFlowAccounts(int companyId)
         {
@@ -7018,9 +7448,10 @@ namespace GrKouk.Web.ERP.Controllers
                     error = "No company Id provided"
                 });
             }
+
             var allCompCode =
-                    await _context.AppSettings.SingleOrDefaultAsync(
-                        p => p.Code == Constants.AllCompaniesCodeKey);
+                await _context.AppSettings.SingleOrDefaultAsync(
+                    p => p.Code == Constants.AllCompaniesCodeKey);
             if (allCompCode == null)
             {
                 return NotFound("All Companies Code Setting not found");
@@ -7033,8 +7464,10 @@ namespace GrKouk.Web.ERP.Controllers
             {
                 return NotFound("All Companies entity not found");
             }
+
             var cashFlowAccounts = await _context.CashFlowAccounts
-                .Where(cfa => cfa.CompanyMappings.Any(cfacm => cfacm.CompanyId == companyId || cfacm.CompanyId == allCompaniesEntity.Id))
+                .Where(cfa => cfa.CompanyMappings.Any(cfacm =>
+                    cfacm.CompanyId == companyId || cfacm.CompanyId == allCompaniesEntity.Id))
                 .OrderBy(p => p.Name)
                 .Select(p => new SelectListItem()
                 {
@@ -7044,12 +7477,11 @@ namespace GrKouk.Web.ERP.Controllers
                 .ToListAsync();
             var response = new
             {
-
                 AllowedCashFlowAccounts = cashFlowAccounts
-
             };
             return Ok(response);
         }
+
         [HttpPost("AssignMediaToProduct")]
         public async Task<IActionResult> AssignMediaToProduct([FromBody] MediaListProductRequest request)
         {

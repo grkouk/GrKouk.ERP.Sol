@@ -43,6 +43,13 @@
           
         </div>
         <div class="row mb-3">
+            <div class="col-md-3">
+                <label asp-for="ItemVm.TaxNumber" class="form-label small"></label>
+                <input asp-for="ItemVm.TaxNumber" class="form-control form-control-sm" />
+                <span asp-validation-for="ItemVm.TaxNumber" class="text-danger small"></span>
+            </div>
+        </div>
+        <div class="row mb-3">
             <div class="col-md-6">
                 <label asp-for="ItemVm.Address" class="form-label small"></label>
                 <input asp-for="ItemVm.Address" class="form-control form-control-sm" />

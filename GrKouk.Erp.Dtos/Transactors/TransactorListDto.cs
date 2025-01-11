@@ -5,8 +5,8 @@ namespace GrKouk.Erp.Dtos.Transactors
     public class TransactorListDto
     {
         public int Id { get; set; }
-        public string Code { get; set; }
-        
+        public string Code { get; set; } 
+        public string TaxNumber { get; set; }
         public string Name { get; set; }
         
         public string EMail { get; set; }

@@ -171,7 +171,8 @@ namespace GrKouk.Web.ERP.Controllers
                     CompanyCurrencyId = p.CompanyCurrencyId
                 }).ToListAsync();
                 //var grandSumOfAmount = t1.Sum(p => p.TotalAmount);
-                r = t1.Sum(p => p.TransTotalNetAmount);
+                //r = t1.Sum(p => p.TransTotalNetAmount);
+                r = t1.Sum(p => p.TransTotalAmount);
             }
 
             if (defObj.SrcType == MainInfoSourceTypeEnum.SourceTypeSales)
@@ -238,7 +239,8 @@ namespace GrKouk.Web.ERP.Controllers
                     CompanyCurrencyId = p.CompanyCurrencyId
                 }).ToListAsync();
                 //var grandSumOfAmount = t1.Sum(p => p.TotalAmount);
-                r = t1.Sum(p => p.TransTotalNetAmount);
+                //r = t1.Sum(p => p.TransTotalNetAmount);
+                r = t1.Sum(p => p.TransTotalAmount);
                 // if (request.CodeToCompute=="SumOfIncomeSalesDf")
                 // {
                 //     Debug.WriteLine($"Code was SumOfincomeSalesDf doc count was {t1.Count} and value is {r}");

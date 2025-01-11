@@ -539,6 +539,7 @@ namespace GrKouk.Web.ERP.Data
             modelBuilder.Entity<Transactor>(entity =>
            {
                entity.HasIndex(c => c.Code).IsUnique();
+               entity.HasIndex(c => c.TaxNumber).IsUnique();
                entity.HasOne(bd => bd.TransactorType)
                    .WithMany()
                    .OnDelete(DeleteBehavior.Restrict);

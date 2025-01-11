@@ -104,9 +104,9 @@ namespace GrKouk.Web.ERP
                 endpoints.MapRazorPages();
                 endpoints.MapDefaultControllerRoute();
             });
-            //Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Mzg4NTI5QDMxMzgyZTM0MmUzMEtBYjNBQ055dFJPVjhKcHJDbW5pWHJadC9OSWp5d3BDc2MxZ3JxcUpnWTA9");
+            //Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("");
         
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Mgo+DSMBMAY9C3t2VFhiQllPd11dXmJWd1p/THNYflR1fV9DaUwxOX1dQl9gSXhTckRjXHxcdnZURWU=");
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Mgo+DSMBMAY9C3t2UlhhQlVMfV5AQmBIYVp/TGpJfl96cVxMZVVBJAtUQF1hTX9SdkFiWX9edHRSQ2BZ;MzU2MTgyM0AzMjM3MmUzMDJlMzBBSGtQMTJmRVlHZXZhd2NKYUhqSkFHajlYbHp0U3h1bTAvdXhMYWdTOUJNPQ==;MzU2MTgyNEAzMjM3MmUzMDJlMzBIeWpIdk5BdzhsMnZVaWhnQ3lPajRicjlzWlNQQzI0dVppQVc3bUJHM3RNPQ==");
         }
     }
 }

@@ -24,55 +24,67 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Text;
 
-namespace GrKouk.Web.ERP.Controllers {
+namespace GrKouk.Web.ERP.Controllers
+{
     [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
-    public class MaterialsController : ControllerBase {
+    public class MaterialsController : ControllerBase
+    {
         private readonly ApiDbContext _context;
         private readonly IMapper _mapper;
 
-        public MaterialsController(ApiDbContext context, IMapper mapper) {
+        public MaterialsController(ApiDbContext context, IMapper mapper)
+        {
             _context = context;
             _mapper = mapper;
         }
 
         // GET: api/WarehouseItems
         [HttpGet]
-        public IEnumerable<WarehouseItem> GetMaterials() {
+        public IEnumerable<WarehouseItem> GetMaterials()
+        {
             return _context.WarehouseItems;
         }
 
         [HttpGet("SetCompanyInSession")]
-        public IActionResult CompanyInSession(string companyId) {
+        public IActionResult CompanyInSession(string companyId)
+        {
             HttpContext.Session.SetString("CompanyId", companyId);
             return Ok(new { });
         }
+
         [HttpGet("SetTransactorInSession")]
-        public IActionResult TransactorInSession(string transactorId) {
+        public IActionResult TransactorInSession(string transactorId)
+        {
             HttpContext.Session.SetString("TransactorId", transactorId);
             return Ok(new { });
         }
+
         [HttpGet("SetBuySeriesInSession")]
-        public IActionResult BuySeriesInSession(string seriesId) {
+        public IActionResult BuySeriesInSession(string seriesId)
+        {
             HttpContext.Session.SetString("BuySeriesId", seriesId);
             return Ok(new { });
         }
 
         [HttpGet("SetDocSeriesInSession")]
-        public IActionResult DocSeriesInSession(string seriesId) {
+        public IActionResult DocSeriesInSession(string seriesId)
+        {
             HttpContext.Session.SetString("SeriesId", seriesId);
             return Ok(new { });
         }
 
         [HttpGet("SetSaleSeriesInSession")]
-        public IActionResult SaleSeriesInSession(string seriesId) {
+        public IActionResult SaleSeriesInSession(string seriesId)
+        {
             HttpContext.Session.SetString("SalesSeriesId", seriesId);
             return Ok(new { });
         }
 
         [HttpGet("SeekCompanyBarcode")]
-        public async Task<IActionResult> GetCompanyMaterialFromBarcode(string barcode, int companyId) {
+        public async Task<IActionResult> GetCompanyMaterialFromBarcode(string barcode, int companyId)
+        {
             var materials = await _context.WrItemCodes
                 .Include(p => p.WarehouseItem).ThenInclude(p => p.FpaDef)
                 .Include(p => p.WarehouseItem).ThenInclude(p => p.MainMeasureUnit)
@@ -82,14 +94,18 @@ namespace GrKouk.Web.ERP.Controllers {
                             p.CompanyId == companyId)
                 .ToListAsync();
 
-            if (materials == null) {
-                return NotFound(new {
+            if (materials == null)
+            {
+                return NotFound(new
+                {
                     Error = "WarehouseItem Not Found"
                 });
             }
 
-            if (materials.Count > 1) {
-                return NotFound(new {
+            if (materials.Count > 1)
+            {
+                return NotFound(new
+                {
                     Error = "More than one material found"
                 });
             }
@@ -99,7 +115,8 @@ namespace GrKouk.Web.ERP.Controllers {
             var usedUnit = materials[0].CodeUsedUnit;
             double unitFactor = materials[0].RateToMainUnit;
             string unitToUse;
-            switch (usedUnit) {
+            switch (usedUnit)
+            {
                 case WarehouseItemCodeUsedUnitEnum.CodeUsedUnitEnumMain:
                     unitFactor = 1;
                     unitToUse = "MAIN";
@@ -115,13 +132,15 @@ namespace GrKouk.Web.ERP.Controllers {
             }
 
             var lastPr = await _context.WarehouseTransactions.Where(m => m.Id == material.Id)
-                .Select(k => new {
+                .Select(k => new
+                {
                     LastPrice = k.UnitPrice
                 }).FirstOrDefaultAsync();
 
             var lastPrice = lastPr?.LastPrice ?? 0;
 
-            return Ok(new {
+            return Ok(new
+            {
                 material.Id,
                 material.Name,
                 fpaId = material.FpaDefId,
@@ -141,26 +160,22 @@ namespace GrKouk.Web.ERP.Controllers {
         }
 
         [HttpGet("SeekBarcode")]
-        public async Task<IActionResult> GetMaterialFromBarcode(string barcode, string companyId, string transactorId) {
-            var materials = _context.WrItemCodes
-                .Include(p => p.WarehouseItem).ThenInclude(p => p.FpaDef)
-                .Include(p => p.WarehouseItem).ThenInclude(p => p.MainMeasureUnit)
-                .Include(p => p.WarehouseItem).ThenInclude(p => p.SecondaryMeasureUnit)
-                .Include(p => p.WarehouseItem).ThenInclude(p => p.BuyMeasureUnit)
-                .Where(p => p.Code == barcode && p.CodeType == WarehouseItemCodeTypeEnum.CodeTypeEnumBarcode);
-            int transId = 0;
-            if (!string.IsNullOrEmpty(transactorId)) {
-                if (int.TryParse(transactorId, out transId)) {
-                    if (transId > 0) {
-                        materials = materials.Where(p => p.TransactorId == transId || p.TransactorId == 0);
-                    }
-                }
-            }
-
+        public async Task<IActionResult> GetMaterialFromBarcode(string barcode, string companyId, string transactorId)
+        {
+            var materials = _context.WarehouseItems
+                .Include(p => p.FpaDef)
+                .Include(p => p.BuyMeasureUnit)
+                .Include(p => p.MainMeasureUnit)
+                .Include(p => p.SecondaryMeasureUnit)
+                .Where(p => p.BarCode == barcode && p.Active);
+            
             int compId = 0;
-            if (!string.IsNullOrEmpty(companyId)) {
-                if (int.TryParse(companyId, out compId)) {
-                    if (compId > 0) {
+            if (!string.IsNullOrEmpty(companyId))
+            {
+                if (int.TryParse(companyId, out compId))
+                {
+                    if (compId > 0)
+                    {
                         materials = materials.Where(p => p.CompanyId == compId || p.CompanyId == 1);
                     }
                 }
@@ -168,27 +183,148 @@ namespace GrKouk.Web.ERP.Controllers {
 
             var materialList = await materials.ToListAsync();
 
-            if (materialList == null) {
-                return NotFound(new {
+           
+            if (materialList.Count == 0)
+            {
+                return NotFound(new
+                {
                     Error = "WarehouseItem Not Found"
                 });
             }
 
-            if (materialList.Count == 0) {
-                return NotFound(new {
+            List<WarehouseItem> retMaterials;
+            retMaterials = materialList;
+            // if (materialList.Count > 1)
+            // {
+            //     //return NotFound(new
+            //     //{
+            //     //    Error = "More than one material found"
+            //     //});
+            //     //retMaterials = materialList.OrderByDescending(p => p.TransactorId).ToList();
+            // }
+            // else
+            // {
+            //     retMaterials = materialList;
+            // }
+
+            var material = retMaterials[0];
+
+            // var usedUnit = retMaterials[0].CodeUsedUnit;
+            // double unitFactor;
+            // string unitToUse;
+            // switch (usedUnit)
+            // {
+            //     case WarehouseItemCodeUsedUnitEnum.CodeUsedUnitEnumMain:
+            //         unitFactor = 1;
+            //         unitToUse = "MAIN";
+            //         break;
+            //     case WarehouseItemCodeUsedUnitEnum.CodeUsedUnitEnumSecondary:
+            //         unitFactor = retMaterials[0].RateToMainUnit;
+            //         unitToUse = "SEC";
+            //         break;
+            //     case WarehouseItemCodeUsedUnitEnum.CodeUsedUnitEnumBuy:
+            //         unitFactor = retMaterials[0].RateToMainUnit;
+            //         unitToUse = "BUY";
+            //         break;
+            //     default:
+            //
+            //         unitFactor = 1;
+            //         unitToUse = "MAIN";
+            //         break;
+            //     //throw new ArgumentOutOfRangeException();
+            // }
+
+            var lastPr = await _context.WarehouseTransactions.Where(m => m.Id == material.Id)
+                .Select(k => new
+                {
+                    LastPrice = k.UnitPrice
+                }).FirstOrDefaultAsync();
+
+            var lastPrice = lastPr?.LastPrice ?? 0;
+
+            return Ok(new
+            {
+                material.Id,
+                material.Name,
+                fpaId = material.FpaDefId,
+                lastPrice,
+                fpaRate = material.FpaDef.Rate,
+                unitToUse="MAIN",
+                Factor = 1,
+                mainUnitId = material.MainMeasureUnitId,
+                secUnitId = material.SecondaryMeasureUnitId,
+                buyUnitId = material.BuyMeasureUnitId,
+                mainUnitCode = material.MainMeasureUnit.Code,
+                secUnitCode = material.SecondaryMeasureUnit.Code,
+                buyUnitCode = material.BuyMeasureUnit.Code,
+                factorSeq = material.SecondaryUnitToMainRate,
+                factorBuy = material.BuyUnitToMainRate,
+            });
+        }
+
+        [HttpGet("SeekAlternateBarcode")]
+        public async Task<IActionResult> GetMaterialFromAlternateBarcode(string barcode, string companyId,
+            string transactorId)
+        {
+            var materials = _context.WrItemCodes
+                .Include(p => p.WarehouseItem).ThenInclude(p => p.FpaDef)
+                .Include(p => p.WarehouseItem).ThenInclude(p => p.MainMeasureUnit)
+                .Include(p => p.WarehouseItem).ThenInclude(p => p.SecondaryMeasureUnit)
+                .Include(p => p.WarehouseItem).ThenInclude(p => p.BuyMeasureUnit)
+                .Where(p => p.Code == barcode && p.CodeType == WarehouseItemCodeTypeEnum.CodeTypeEnumBarcode);
+            int transId = 0;
+            if (!string.IsNullOrEmpty(transactorId))
+            {
+                if (int.TryParse(transactorId, out transId))
+                {
+                    if (transId > 0)
+                    {
+                        materials = materials.Where(p => p.TransactorId == transId || p.TransactorId == 0);
+                    }
+                }
+            }
+
+            int compId = 0;
+            if (!string.IsNullOrEmpty(companyId))
+            {
+                if (int.TryParse(companyId, out compId))
+                {
+                    if (compId > 0)
+                    {
+                        materials = materials.Where(p => p.CompanyId == compId || p.CompanyId == 1);
+                    }
+                }
+            }
+
+            var materialList = await materials.ToListAsync();
+
+            if (materialList == null)
+            {
+                return NotFound(new
+                {
+                    Error = "WarehouseItem Not Found"
+                });
+            }
+
+            if (materialList.Count == 0)
+            {
+                return NotFound(new
+                {
                     Error = "WarehouseItem Not Found"
                 });
             }
 
             List<WrItemCode> retMaterials;
-            if (materialList.Count > 1) {
+            if (materialList.Count > 1)
+            {
                 //return NotFound(new
                 //{
                 //    Error = "More than one material found"
                 //});
                 retMaterials = materialList.OrderByDescending(p => p.TransactorId).ToList();
             }
-            else {
+            else
+            {
                 retMaterials = materialList;
             }
 
@@ -197,7 +333,8 @@ namespace GrKouk.Web.ERP.Controllers {
             var usedUnit = retMaterials[0].CodeUsedUnit;
             double unitFactor;
             string unitToUse;
-            switch (usedUnit) {
+            switch (usedUnit)
+            {
                 case WarehouseItemCodeUsedUnitEnum.CodeUsedUnitEnumMain:
                     unitFactor = 1;
                     unitToUse = "MAIN";
@@ -211,17 +348,23 @@ namespace GrKouk.Web.ERP.Controllers {
                     unitToUse = "BUY";
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+
+                    unitFactor = 1;
+                    unitToUse = "MAIN";
+                    break;
+                //throw new ArgumentOutOfRangeException();
             }
 
             var lastPr = await _context.WarehouseTransactions.Where(m => m.Id == material.Id)
-                .Select(k => new {
+                .Select(k => new
+                {
                     LastPrice = k.UnitPrice
                 }).FirstOrDefaultAsync();
 
             var lastPrice = lastPr?.LastPrice ?? 0;
 
-            return Ok(new {
+            return Ok(new
+            {
                 material.Id,
                 material.Name,
                 fpaId = material.FpaDefId,
@@ -241,29 +384,36 @@ namespace GrKouk.Web.ERP.Controllers {
         }
 
         [HttpGet("SearchWarehouseItemsForBuy")]
-        public async Task<IActionResult> GetWarehouseItemsForBuy(string term) {
+        public async Task<IActionResult> GetWarehouseItemsForBuy(string term)
+        {
             var sessionCompanyId = HttpContext.Session.GetString("CompanyId");
             var sessionSeriesId = HttpContext.Session.GetString("BuySeriesId");
             IQueryable<WarehouseItem> fullListIq = _context.WarehouseItems;
-            if (sessionCompanyId != null) {
+            if (sessionCompanyId != null)
+            {
                 bool isInt = int.TryParse(sessionCompanyId, out var companyId);
-                if (isInt) {
-                    if (companyId > 1) {
+                if (isInt)
+                {
+                    if (companyId > 1)
+                    {
                         //Not all companies 
                         fullListIq = fullListIq.Where(p => p.CompanyId == companyId || p.CompanyId == 1);
                     }
                 }
             }
 
-            if (sessionSeriesId != null) {
+            if (sessionSeriesId != null)
+            {
                 bool isInt = int.TryParse(sessionSeriesId, out int seriesId);
                 var series = await _context.BuyDocSeriesDefs
                     .Include(p => p.BuyDocTypeDef)
                     .SingleOrDefaultAsync(p => p.Id == seriesId);
-                if (series != null) {
+                if (series != null)
+                {
                     var docType = series.BuyDocTypeDef;
                     var itemNatures = docType.SelectedWarehouseItemNatures;
-                    if (!string.IsNullOrEmpty(itemNatures)) {
+                    if (!string.IsNullOrEmpty(itemNatures))
+                    {
                         var natures = Array.ConvertAll(docType.SelectedWarehouseItemNatures.Split(","), int.Parse);
                         //var natures = docType.SelectedWarehouseItemNatures;
                         fullListIq = fullListIq.Where(p => natures.Contains((int)p.WarehouseItemNature));
@@ -276,7 +426,6 @@ namespace GrKouk.Web.ERP.Controllers {
             var m = await fullListIq
                 .ProjectTo<WarehouseItemSearchListDto>(_mapper.ConfigurationProvider)
                 .Select(p => new { label = p.Label, value = p.Id })
-
                 .ToListAsync();
 
             var materials = m.OrderBy(p => p.label);
@@ -284,39 +433,44 @@ namespace GrKouk.Web.ERP.Controllers {
 
             return Ok(materials);
         }
+
         [HttpGet("AutoCompleteProductsBySupplierCode")]
-        public async Task<IActionResult> GetAutoCompleteProductsBySupplierCode(string term) {
+        public async Task<IActionResult> GetAutoCompleteProductsBySupplierCode(string term)
+        {
             var sessionCompanyId = HttpContext.Session.GetString("CompanyId");
             var sessionSeriesId = HttpContext.Session.GetString("BuySeriesId");
             var sessionTransactorId = HttpContext.Session.GetString("TransactorId");
             IQueryable<WarehouseItem> fullListIq = _context.WarehouseItems.Include(x => x.WarehouseItemCodes);
             int companyId = 0;
-            if (sessionCompanyId != null) {
+            if (sessionCompanyId != null)
+            {
                 int.TryParse(sessionCompanyId, out companyId);
             }
 
 
-            if (sessionTransactorId != null) {
+            if (sessionTransactorId != null)
+            {
                 int.TryParse(sessionTransactorId, out int transactorId);
 
-                if (transactorId > 1) {
+                if (transactorId > 1)
+                {
                     //var transactorsList = Array.ConvertAll(transactorId.ToString().Split(","), int.Parse);
-                    if (companyId > 0) {
+                    if (companyId > 0)
+                    {
                         fullListIq = fullListIq
                             .Where(m => m.WarehouseItemCodes
-                                .Any(x => x.TransactorId == transactorId && x.CompanyId == companyId && x.Code.Contains(term)));
-
+                                .Any(x => x.TransactorId == transactorId && x.CompanyId == companyId &&
+                                          x.Code.Contains(term)));
                     }
-                    else {
+                    else
+                    {
                         fullListIq = fullListIq
                             .Where(m => m.WarehouseItemCodes
                                 .Any(x => x.TransactorId == transactorId && x.Code.Contains(term)));
-
                     }
-
                 }
-
             }
+
             fullListIq = fullListIq.Where(p => p.Active);
             //fullListIq = fullListIq.Where(p => p.Name.Contains(term) || p.Code.Contains(term));
 
@@ -325,36 +479,45 @@ namespace GrKouk.Web.ERP.Controllers {
                 .Select(p => new { label = p.Label, value = p.Id })
                 .ToListAsync();
 
-            if (materials == null) {
+            if (materials == null)
+            {
                 return NotFound();
             }
 
             return Ok(materials);
         }
+
         [HttpGet("SearchWarehouseItemsForSale")]
-        public async Task<IActionResult> GetWarehouseItemsForSale(string term) {
+        public async Task<IActionResult> GetWarehouseItemsForSale(string term)
+        {
             var sessionCompanyId = HttpContext.Session.GetString("CompanyId");
             var sessionSeriesId = HttpContext.Session.GetString("BuySeriesId");
             IQueryable<WarehouseItem> fullListIq = _context.WarehouseItems;
-            if (sessionCompanyId != null) {
+            if (sessionCompanyId != null)
+            {
                 bool isInt = int.TryParse(sessionCompanyId, out var companyId);
-                if (isInt) {
-                    if (companyId > 1) {
+                if (isInt)
+                {
+                    if (companyId > 1)
+                    {
                         //Not all companies 
                         fullListIq = fullListIq.Where(p => p.CompanyId == companyId || p.CompanyId == 1);
                     }
                 }
             }
 
-            if (sessionSeriesId != null) {
+            if (sessionSeriesId != null)
+            {
                 bool isInt = int.TryParse(sessionSeriesId, out int seriesId);
                 var series = await _context.SellDocSeriesDefs
                     .Include(p => p.SellDocTypeDef)
                     .SingleOrDefaultAsync(p => p.Id == seriesId);
-                if (series != null) {
+                if (series != null)
+                {
                     var docType = series.SellDocTypeDef;
                     var itemNatures = docType.SelectedWarehouseItemNatures;
-                    if (!string.IsNullOrEmpty(itemNatures)) {
+                    if (!string.IsNullOrEmpty(itemNatures))
+                    {
                         var natures = Array.ConvertAll(docType.SelectedWarehouseItemNatures.Split(","), int.Parse);
                         //var natures = docType.SelectedWarehouseItemNatures;
                         fullListIq = fullListIq.Where(p => natures.Contains((int)p.WarehouseItemNature));
@@ -369,7 +532,8 @@ namespace GrKouk.Web.ERP.Controllers {
             var materials = await fullListIq
                 .ProjectTo<WarehouseItemSearchListDto>(_mapper.ConfigurationProvider)
                 .Select(p => new { label = p.Label, value = p.Id }).ToListAsync();
-            if (materials == null) {
+            if (materials == null)
+            {
                 return NotFound();
             }
 
@@ -377,13 +541,15 @@ namespace GrKouk.Web.ERP.Controllers {
         }
 
         [HttpGet("SearchForServices")]
-        public async Task<IActionResult> GetServices(string term) {
+        public async Task<IActionResult> GetServices(string term)
+        {
             var materials = await _context.WarehouseItems.Where(p =>
                     p.Name.Contains(term) &&
                     p.WarehouseItemNature == WarehouseItemNatureEnum.WarehouseItemNatureService)
                 .Select(p => new { label = p.Name, value = p.Id }).ToListAsync();
 
-            if (materials == null) {
+            if (materials == null)
+            {
                 return NotFound();
             }
 
@@ -391,97 +557,121 @@ namespace GrKouk.Web.ERP.Controllers {
         }
 
         [HttpGet("SearchForExpenses")]
-        public async Task<IActionResult> GetExpenses(string term) {
+        public async Task<IActionResult> GetExpenses(string term)
+        {
             var materials = await _context.WarehouseItems.Where(p =>
                     p.Name.Contains(term) &&
                     p.WarehouseItemNature == WarehouseItemNatureEnum.WarehouseItemNatureExpense)
                 .Select(p => new { label = p.Name, value = p.Id }).ToListAsync();
 
-            if (materials == null) {
+            if (materials == null)
+            {
                 return NotFound();
             }
 
             return Ok(materials);
         }
+
         [HttpGet("companyBaseCurrencyInfo")]
-        public async Task<IActionResult> CompanyBaseCurrencyInfoAsync(int companyId) {
-            if (companyId == 0) {
-                return BadRequest(new {
+        public async Task<IActionResult> CompanyBaseCurrencyInfoAsync(int companyId)
+        {
+            if (companyId == 0)
+            {
+                return BadRequest(new
+                {
                     error = "No company Id provided "
                 });
             }
+
             var theCompany = await _context.Companies
                 .Include(p => p.Currency)
                 .Where(p => p.Id == companyId)
                 .SingleOrDefaultAsync();
 
-            if (theCompany == null) {
-                return NotFound(new {
+            if (theCompany == null)
+            {
+                return NotFound(new
+                {
                     error = "Company not found "
                 });
             }
 
-            var response = new {
+            var response = new
+            {
                 CurrencyCode = theCompany.Currency.Code,
                 CurrencyLocale = theCompany.Currency.DisplayLocale
-
-
             };
             return Ok(response);
         }
+
         [HttpGet("CashFlowAccountsForCompany")]
-        public async Task<IActionResult> CashFlowAccountsForCompanyAsync(int companyId) {
+        public async Task<IActionResult> CashFlowAccountsForCompanyAsync(int companyId)
+        {
             //Thread.Sleep(10000);
-            if (companyId == 0) {
-                return BadRequest(new {
+            if (companyId == 0)
+            {
+                return BadRequest(new
+                {
                     error = "No company Id provided"
                 });
             }
+
             var theCompany = await _context.Companies
                 .Include(p => p.Currency)
                 .Where(p => p.Id == companyId)
                 .SingleOrDefaultAsync();
 
-            if (theCompany == null) {
-                return NotFound(new {
+            if (theCompany == null)
+            {
+                return NotFound(new
+                {
                     error = "Company not found "
                 });
             }
+
             //TODO: I have put allcompanies id directly in code. Change this with the logic I use
             var accountsForCompany = await _context.CashFlowAccountCompanyMappings
                 .Include(p => p.CashFlowAccount)
-                .Where(p => p.CompanyId == companyId || p.CompanyId==1)
-                .OrderBy(p=>p.Company.Name)
-                .Select(x => new {
-                    value = x.CashFlowAccountId,
-                    text = x.CashFlowAccount.Name
-                }
+                .Where(p => p.CompanyId == companyId || p.CompanyId == 1)
+                .OrderBy(p => p.Company.Name)
+                .Select(x => new
+                    {
+                        value = x.CashFlowAccountId,
+                        text = x.CashFlowAccount.Name
+                    }
                 ).ToListAsync();
-            var response = new {
+            var response = new
+            {
                 CurrencyCode = theCompany.Currency.Code,
                 CurrencyLocale = theCompany.Currency.DisplayLocale,
                 Accounts = accountsForCompany
-
             };
             return Ok(response);
         }
+
         [HttpGet("productdata")]
-        public async Task<IActionResult> GetProductDataAsync(int warehouseItemId, int transactorId, int companyId) {
-            if (warehouseItemId == 0) {
-                return BadRequest(new {
+        public async Task<IActionResult> GetProductDataAsync(int warehouseItemId, int transactorId, int companyId)
+        {
+            if (warehouseItemId == 0)
+            {
+                return BadRequest(new
+                {
                     error = "No warehouse item Id provided "
                 });
             }
+
             //Get last price for product 
             IQueryable<WarehouseTransaction> lastPriceQr = _context.WarehouseTransactions;
             lastPriceQr = lastPriceQr.Where(m => m.WarehouseItemId == warehouseItemId);
-            if (companyId > 0) {
+            if (companyId > 0)
+            {
                 lastPriceQr = lastPriceQr.Where(m => m.CompanyId == companyId);
             }
 
             var lastPr = await lastPriceQr
                 .OrderByDescending(p => p.TransDate)
-                .Select(k => new {
+                .Select(k => new
+                {
                     LastPrice = k.UnitPrice
                 })
                 .FirstOrDefaultAsync();
@@ -497,11 +687,14 @@ namespace GrKouk.Web.ERP.Controllers {
                 .FirstOrDefaultAsync();
 
 
-            if (materialData == null) {
-                return NotFound(new {
+            if (materialData == null)
+            {
+                return NotFound(new
+                {
                     error = "WarehouseItem not found "
                 });
             }
+
             var unitList = new List<ProductUnit>
             {
                 new ProductUnit()
@@ -544,7 +737,8 @@ namespace GrKouk.Web.ERP.Controllers {
             //        UnitFactor = spCode.BuyUnitToMainRate
             //    });
             //}
-            var response = new ProductInfoResponse() {
+            var response = new ProductInfoResponse()
+            {
                 WarehouseItemName = materialData.Name,
                 FpaId = materialData.FpaDefId,
                 FpaRate = materialData.FpaDef.Rate,
@@ -560,12 +754,15 @@ namespace GrKouk.Web.ERP.Controllers {
             };
             return Ok(response);
         }
+
         [HttpGet("materialdata")]
-        public async Task<IActionResult> GetMaterialData(int warehouseItemId) {
+        public async Task<IActionResult> GetMaterialData(int warehouseItemId)
+        {
             //TODO: Να βρίσκει τιμές μόνο για κινήσεις αγοράς ισως LasrPriceImport LastPriceExport???
             var lastPr = await _context.WarehouseTransactions.OrderByDescending(p => p.TransDate)
                 .Where(m => m.WarehouseItemId == warehouseItemId)
-                .Select(k => new {
+                .Select(k => new
+                {
                     LastPrice = k.UnitPrice
                 }).FirstOrDefaultAsync();
 
@@ -573,7 +770,8 @@ namespace GrKouk.Web.ERP.Controllers {
 
             var materialData = await _context.WarehouseItems
                 .Where(p => p.Id == warehouseItemId && p.Active)
-                .Select(p => new {
+                .Select(p => new
+                {
                     mainUnitId = p.MainMeasureUnitId,
                     secUnitId = p.SecondaryMeasureUnitId,
                     buyUnitId = p.BuyMeasureUnitId,
@@ -590,8 +788,10 @@ namespace GrKouk.Web.ERP.Controllers {
                     fpaRate = p.FpaDef.Rate
                 }).FirstOrDefaultAsync();
 
-            if (materialData == null) {
-                return NotFound(new {
+            if (materialData == null)
+            {
+                return NotFound(new
+                {
                     error = "WarehouseItem not found "
                 });
             }
@@ -601,15 +801,18 @@ namespace GrKouk.Web.ERP.Controllers {
         }
 
         [HttpGet("FiscalPeriod")]
-        public async Task<IActionResult> GetFiscalPeriod(DateTime forDate) {
+        public async Task<IActionResult> GetFiscalPeriod(DateTime forDate)
+        {
             //Debug.Print("******Inside GetFiscal period " + forDate.ToString());
             var dateOfTrans = forDate;
             var fiscalPeriod = await _context.FiscalPeriods.FirstOrDefaultAsync(p =>
                 dateOfTrans >= p.StartDate && dateOfTrans <= p.EndDate);
-            if (fiscalPeriod == null) {
+            if (fiscalPeriod == null)
+            {
                 Debug.Print("******Inside GetFiscal period No Fiscal Period found");
                 ModelState.AddModelError(string.Empty, "No Fiscal Period covers Transaction Date");
-                return NotFound(new {
+                return NotFound(new
+                {
                     error = "No fiscal period includes date"
                 });
             }
@@ -619,12 +822,15 @@ namespace GrKouk.Web.ERP.Controllers {
         }
 
         [HttpGet("SalesSeriesData")]
-        public async Task<IActionResult> GetSalesSeriesData(int seriesId) {
+        public async Task<IActionResult> GetSalesSeriesData(int seriesId)
+        {
             Debug.Print("Inside GetSalesSeriesData " + seriesId.ToString());
             var salesSeriesDef = await _context.SellDocSeriesDefs.SingleOrDefaultAsync(p => p.Id == seriesId);
-            if (salesSeriesDef == null) {
+            if (salesSeriesDef == null)
+            {
                 Debug.Print("Inside GetSalesSeriesData No Series found");
-                return NotFound(new {
+                return NotFound(new
+                {
                     error = "No Series Found"
                 });
             }
@@ -640,13 +846,17 @@ namespace GrKouk.Web.ERP.Controllers {
         }
 
         [HttpGet("RecSeriesData")]
-        public async Task<IActionResult> GetRecSeriesData(int seriesId, RecurringDocTypeEnum docType) {
-            switch (docType) {
+        public async Task<IActionResult> GetRecSeriesData(int seriesId, RecurringDocTypeEnum docType)
+        {
+            switch (docType)
+            {
                 case RecurringDocTypeEnum.BuyType:
                     var buySeriesDef = await _context.BuyDocSeriesDefs.SingleOrDefaultAsync(p => p.Id == seriesId);
-                    if (buySeriesDef == null) {
+                    if (buySeriesDef == null)
+                    {
                         Debug.Print("Inside GetBuySeriesData No Series found");
-                        return NotFound(new {
+                        return NotFound(new
+                        {
                             error = "No Series Found"
                         });
                     }
@@ -663,9 +873,11 @@ namespace GrKouk.Web.ERP.Controllers {
                 case RecurringDocTypeEnum.SellType:
                     Debug.Print("Inside GetSalesSeriesData " + seriesId.ToString());
                     var salesSeriesDef = await _context.SellDocSeriesDefs.SingleOrDefaultAsync(p => p.Id == seriesId);
-                    if (salesSeriesDef == null) {
+                    if (salesSeriesDef == null)
+                    {
                         Debug.Print("Inside GetSalesSeriesData No Series found");
-                        return NotFound(new {
+                        return NotFound(new
+                        {
                             error = "No Series Found"
                         });
                     }
@@ -684,12 +896,15 @@ namespace GrKouk.Web.ERP.Controllers {
         }
 
         [HttpGet("BuySeriesData")]
-        public async Task<IActionResult> GetBuySeriesData(int seriesId) {
+        public async Task<IActionResult> GetBuySeriesData(int seriesId)
+        {
             Debug.Print("Inside GetBuySeriesData " + seriesId.ToString());
             var buySeriesDef = await _context.BuyDocSeriesDefs.SingleOrDefaultAsync(p => p.Id == seriesId);
-            if (buySeriesDef == null) {
+            if (buySeriesDef == null)
+            {
                 Debug.Print("Inside GetBuySeriesData No Series found");
-                return NotFound(new {
+                return NotFound(new
+                {
                     error = "No Series Found"
                 });
             }
@@ -706,15 +921,18 @@ namespace GrKouk.Web.ERP.Controllers {
         }
 
         [HttpGet("WarehouseTransType")]
-        public async Task<IActionResult> GetWarehouseTransType(int seriesId) {
+        public async Task<IActionResult> GetWarehouseTransType(int seriesId)
+        {
             Debug.Print("******Inside GetWarehouseTransType for series ID " + seriesId.ToString());
 
             var transWarehouseDocSeriesDef = await _context.TransWarehouseDocSeriesDefs.FirstOrDefaultAsync(p =>
                 p.Id == seriesId);
-            if (transWarehouseDocSeriesDef == null) {
+            if (transWarehouseDocSeriesDef == null)
+            {
                 Debug.Print("******Inside GetWarehouseTransType No Series found");
                 ModelState.AddModelError(string.Empty, "No Series found");
-                return NotFound(new {
+                return NotFound(new
+                {
                     error = "No Series found"
                 });
             }
@@ -725,7 +943,8 @@ namespace GrKouk.Web.ERP.Controllers {
             var transWarehouseDef = transWarehouseDocTypeDef.TransWarehouseDef;
             var inventoryActionType = transWarehouseDef.MaterialInventoryAction;
             string transType = "";
-            switch (inventoryActionType) {
+            switch (inventoryActionType)
+            {
                 case InventoryActionEnum.InventoryActionEnumNoChange:
                     transType = "WarehouseTransactionTypeIgnore";
                     break;
@@ -750,7 +969,8 @@ namespace GrKouk.Web.ERP.Controllers {
         }
 
         [HttpPost("CreateRecurringDoc")]
-        public async Task<IActionResult> CreateRecurringDoc([FromBody] RecurringTransDocCreateAjaxDto data) {
+        public async Task<IActionResult> CreateRecurringDoc([FromBody] RecurringTransDocCreateAjaxDto data)
+        {
             const string defaultBuySectionCode = "SYS-BUY-MATERIALS-SCN";
             const string defaultSellSectionCode = "SYS-SELL-COMBINED-SCN";
             // bool noSupplierTrans = false;
@@ -761,63 +981,78 @@ namespace GrKouk.Web.ERP.Controllers {
             RecurringTransDoc transToAttach;
             DateTime dateOfTrans;
 
-            if (data == null) {
-                return BadRequest(new {
+            if (data == null)
+            {
+                return BadRequest(new
+                {
                     error = "Empty request data"
                 });
             }
 
-            try {
+            try
+            {
                 transToAttachNoLines = _mapper.Map<RecurringDocCreateAjaxNoLinesDto>(data);
                 transToAttach = _mapper.Map<RecurringTransDoc>(transToAttachNoLines);
                 dateOfTrans = data.NextTransDate;
             }
-            catch (Exception e) {
-                return BadRequest(new {
+            catch (Exception e)
+            {
+                return BadRequest(new
+                {
                     error = e.Message
                 });
             }
 
-            using (var transaction = _context.Database.BeginTransaction()) {
+            using (var transaction = _context.Database.BeginTransaction())
+            {
                 int sectionId = 0;
-                switch (transToAttach.RecurringDocType) {
+                switch (transToAttach.RecurringDocType)
+                {
                     case RecurringDocTypeEnum.BuyType:
                         var buySeries =
                             await _context.BuyDocSeriesDefs.SingleOrDefaultAsync(m => m.Id == data.DocSeriesId);
-                        if (buySeries is null) {
+                        if (buySeries is null)
+                        {
                             transaction.Rollback();
                             ModelState.AddModelError(string.Empty, "Δεν βρέθηκε η σειρά παραστατικού");
-                            return NotFound(new {
+                            return NotFound(new
+                            {
                                 error = "Buy Doc Series not found"
                             });
                         }
 
                         await _context.Entry(buySeries).Reference(t => t.BuyDocTypeDef).LoadAsync();
                         var buyTypeDef = buySeries.BuyDocTypeDef;
-                        if (buyTypeDef == null) {
+                        if (buyTypeDef == null)
+                        {
                             transaction.Rollback();
-                            return NotFound(new {
+                            return NotFound(new
+                            {
                                 error = "Doc Series has not doc type definition"
                             });
                         }
 
                         #region Section Management
 
-                        if (buyTypeDef.SectionId == 0) {
+                        if (buyTypeDef.SectionId == 0)
+                        {
                             var section =
                                 await _context.Sections.SingleOrDefaultAsync(s =>
                                     s.SystemName == defaultBuySectionCode);
-                            if (section == null) {
+                            if (section == null)
+                            {
                                 transaction.Rollback();
                                 ModelState.AddModelError(string.Empty, "Δεν υπάρχει το Section");
-                                return NotFound(new {
+                                return NotFound(new
+                                {
                                     error = "Could not locate section "
                                 });
                             }
 
                             sectionId = section.Id;
                         }
-                        else {
+                        else
+                        {
                             sectionId = buyTypeDef.SectionId;
                         }
 
@@ -827,40 +1062,48 @@ namespace GrKouk.Web.ERP.Controllers {
                     case RecurringDocTypeEnum.SellType:
                         var sellSeries =
                             await _context.SellDocSeriesDefs.SingleOrDefaultAsync(m => m.Id == data.DocSeriesId);
-                        if (sellSeries is null) {
+                        if (sellSeries is null)
+                        {
                             transaction.Rollback();
                             ModelState.AddModelError(string.Empty, "Δεν βρέθηκε η σειρά παραστατικού");
-                            return NotFound(new {
+                            return NotFound(new
+                            {
                                 error = "Sell Doc Series not found"
                             });
                         }
 
                         await _context.Entry(sellSeries).Reference(t => t.SellDocTypeDef).LoadAsync();
                         var sellTypeDef = sellSeries.SellDocTypeDef;
-                        if (sellTypeDef == null) {
+                        if (sellTypeDef == null)
+                        {
                             transaction.Rollback();
-                            return NotFound(new {
+                            return NotFound(new
+                            {
                                 error = "Doc Series has not doc type definition"
                             });
                         }
 
                         #region Section Management
 
-                        if (sellTypeDef.SectionId == 0) {
+                        if (sellTypeDef.SectionId == 0)
+                        {
                             var section =
                                 await _context.Sections.SingleOrDefaultAsync(
                                     s => s.SystemName == defaultSellSectionCode);
-                            if (section == null) {
+                            if (section == null)
+                            {
                                 transaction.Rollback();
                                 ModelState.AddModelError(string.Empty, "Δεν υπάρχει το Section");
-                                return NotFound(new {
+                                return NotFound(new
+                                {
                                     error = "Could not locate section "
                                 });
                             }
 
                             sectionId = section.Id;
                         }
-                        else {
+                        else
+                        {
                             sectionId = sellTypeDef.SectionId;
                         }
 
@@ -875,28 +1118,34 @@ namespace GrKouk.Web.ERP.Controllers {
                 transToAttach.DocTypeId = data.DocSeriesId;
                 _context.RecurringTransDocs.Add(transToAttach);
 
-                try {
+                try
+                {
                     await _context.SaveChangesAsync();
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     Console.WriteLine(e);
                     transaction.Rollback();
                     string msg = e.InnerException?.Message;
-                    return BadRequest(new {
+                    return BadRequest(new
+                    {
                         error = e.Message + " " + msg
                     });
                 }
 
                 var docId = _context.Entry(transToAttach).Entity.Id;
 
-                foreach (var dataBuyDocLine in data.DocLines) {
+                foreach (var dataBuyDocLine in data.DocLines)
+                {
                     var warehouseItemId = dataBuyDocLine.WarehouseItemId;
                     var material = await _context.WarehouseItems.SingleOrDefaultAsync(p => p.Id == warehouseItemId);
-                    if (material is null) {
+                    if (material is null)
+                    {
                         //Handle error
                         transaction.Rollback();
                         ModelState.AddModelError(string.Empty, "Doc Line error null WarehouseItem");
-                        return NotFound(new {
+                        return NotFound(new
+                        {
                             error = "Could not locate material in Doc Line "
                         });
                     }
@@ -927,15 +1176,18 @@ namespace GrKouk.Web.ERP.Controllers {
                     transToAttach.DocLines.Add(docLine);
                 }
 
-                try {
+                try
+                {
                     await _context.SaveChangesAsync();
                     transaction.Commit();
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     Console.WriteLine(e);
                     transaction.Rollback();
                     string msg = e.InnerException.Message;
-                    return BadRequest(new {
+                    return BadRequest(new
+                    {
                         error = e.Message + " " + msg
                     });
                 }
@@ -945,71 +1197,87 @@ namespace GrKouk.Web.ERP.Controllers {
         }
 
         [HttpPost("UpdateRecurringDoc")]
-        public async Task<IActionResult> UpdateRecurringDoc([FromBody] RecurringTransDocModifyAjaxDto data) {
+        public async Task<IActionResult> UpdateRecurringDoc([FromBody] RecurringTransDocModifyAjaxDto data)
+        {
             const string defaultBuySectionCode = "SYS-BUY-MATERIALS-SCN";
             const string defaultSellSectionCode = "SYS-SELL-COMBINED-SCN";
             RecurringTransDocModifyAjaxNoLinesDto transToAttachNoLines;
             RecurringTransDoc transToAttach;
             DateTime dateOfTrans;
-            if (data == null) {
-                return BadRequest(new {
+            if (data == null)
+            {
+                return BadRequest(new
+                {
                     error = "Empty request data"
                 });
             }
 
-            try {
+            try
+            {
                 transToAttachNoLines = _mapper.Map<RecurringTransDocModifyAjaxNoLinesDto>(data);
                 transToAttach = _mapper.Map<RecurringTransDoc>(transToAttachNoLines);
                 dateOfTrans = data.NextTransDate;
             }
-            catch (Exception e) {
-                return BadRequest(new {
+            catch (Exception e)
+            {
+                return BadRequest(new
+                {
                     error = e.Message
                 });
             }
 
-            using (var transaction = _context.Database.BeginTransaction()) {
+            using (var transaction = _context.Database.BeginTransaction())
+            {
                 _context.RecurringTransDocLines.RemoveRange(
                     _context.RecurringTransDocLines.Where(p => p.RecurringTransDocId == data.Id));
                 int sectionId = 0;
-                switch (transToAttach.RecurringDocType) {
+                switch (transToAttach.RecurringDocType)
+                {
                     case RecurringDocTypeEnum.BuyType:
                         var buySeries =
                             await _context.BuyDocSeriesDefs.SingleOrDefaultAsync(m => m.Id == data.DocSeriesId);
-                        if (buySeries is null) {
+                        if (buySeries is null)
+                        {
                             transaction.Rollback();
                             ModelState.AddModelError(string.Empty, "Δεν βρέθηκε η σειρά παραστατικού");
-                            return NotFound(new {
+                            return NotFound(new
+                            {
                                 error = "Buy Doc Series not found"
                             });
                         }
 
                         await _context.Entry(buySeries).Reference(t => t.BuyDocTypeDef).LoadAsync();
                         var buyTypeDef = buySeries.BuyDocTypeDef;
-                        if (buyTypeDef == null) {
+                        if (buyTypeDef == null)
+                        {
                             transaction.Rollback();
-                            return NotFound(new {
+                            return NotFound(new
+                            {
                                 error = "Doc Series has not doc type definition"
                             });
                         }
 
                         #region Section Management
 
-                        if (buyTypeDef.SectionId == 0) {
+                        if (buyTypeDef.SectionId == 0)
+                        {
                             var section =
                                 await _context.Sections.SingleOrDefaultAsync(s =>
                                     s.SystemName == defaultBuySectionCode);
-                            if (section == null) {
+                            if (section == null)
+                            {
                                 transaction.Rollback();
                                 ModelState.AddModelError(string.Empty, "Δεν υπάρχει το Section");
-                                return NotFound(new {
+                                return NotFound(new
+                                {
                                     error = "Could not locate section "
                                 });
                             }
 
                             sectionId = section.Id;
                         }
-                        else {
+                        else
+                        {
                             sectionId = buyTypeDef.SectionId;
                         }
 
@@ -1019,40 +1287,48 @@ namespace GrKouk.Web.ERP.Controllers {
                     case RecurringDocTypeEnum.SellType:
                         var sellSeries =
                             await _context.SellDocSeriesDefs.SingleOrDefaultAsync(m => m.Id == data.DocSeriesId);
-                        if (sellSeries is null) {
+                        if (sellSeries is null)
+                        {
                             transaction.Rollback();
                             ModelState.AddModelError(string.Empty, "Δεν βρέθηκε η σειρά παραστατικού");
-                            return NotFound(new {
+                            return NotFound(new
+                            {
                                 error = "Sell Doc Series not found"
                             });
                         }
 
                         await _context.Entry(sellSeries).Reference(t => t.SellDocTypeDef).LoadAsync();
                         var sellTypeDef = sellSeries.SellDocTypeDef;
-                        if (sellTypeDef == null) {
+                        if (sellTypeDef == null)
+                        {
                             transaction.Rollback();
-                            return NotFound(new {
+                            return NotFound(new
+                            {
                                 error = "Doc Series has not doc type definition"
                             });
                         }
 
                         #region Section Management
 
-                        if (sellTypeDef.SectionId == 0) {
+                        if (sellTypeDef.SectionId == 0)
+                        {
                             var section =
                                 await _context.Sections.SingleOrDefaultAsync(
                                     s => s.SystemName == defaultSellSectionCode);
-                            if (section == null) {
+                            if (section == null)
+                            {
                                 transaction.Rollback();
                                 ModelState.AddModelError(string.Empty, "Δεν υπάρχει το Section");
-                                return NotFound(new {
+                                return NotFound(new
+                                {
                                     error = "Could not locate section "
                                 });
                             }
 
                             sectionId = section.Id;
                         }
-                        else {
+                        else
+                        {
                             sectionId = sellTypeDef.SectionId;
                         }
 
@@ -1070,14 +1346,17 @@ namespace GrKouk.Web.ERP.Controllers {
                 var docId = transToAttach.Id;
                 //--------------------------------------
 
-                foreach (var dataBuyDocLine in data.BuyDocLines) {
+                foreach (var dataBuyDocLine in data.BuyDocLines)
+                {
                     var warehouseItemId = dataBuyDocLine.WarehouseItemId;
                     var material = await _context.WarehouseItems.SingleOrDefaultAsync(p => p.Id == warehouseItemId);
-                    if (material is null) {
+                    if (material is null)
+                    {
                         //Handle error
                         transaction.Rollback();
                         ModelState.AddModelError(string.Empty, "Doc Line error null WarehouseItem");
-                        return NotFound(new {
+                        return NotFound(new
+                        {
                             error = "Could not locate material in Doc Line "
                         });
                     }
@@ -1108,13 +1387,16 @@ namespace GrKouk.Web.ERP.Controllers {
                     docLine.Etiology = transToAttach.Etiology;
                     //_context.Entry(transToAttach).Entity
 
-                    try {
+                    try
+                    {
                         transToAttach.DocLines.Add(docLine);
                     }
-                    catch (Exception e) {
+                    catch (Exception e)
+                    {
                         transaction.Rollback();
                         string msg = e.InnerException.Message;
-                        return BadRequest(new {
+                        return BadRequest(new
+                        {
                             error = e.Message + " " + msg
                         });
                     }
@@ -1122,14 +1404,17 @@ namespace GrKouk.Web.ERP.Controllers {
                     #endregion
                 }
 
-                try {
+                try
+                {
                     await _context.SaveChangesAsync();
                     transaction.Commit();
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     transaction.Rollback();
                     string msg = e.InnerException?.Message;
-                    return BadRequest(new {
+                    return BadRequest(new
+                    {
                         error = e.Message + " " + msg
                     });
                 }
@@ -1139,54 +1424,73 @@ namespace GrKouk.Web.ERP.Controllers {
         }
 
         [HttpPost("AddBuyPaymentMapping")]
-        public async Task<IActionResult> PostBuyPaymentMapping([FromBody] IdList docIds) {
-
-            if (docIds == null) {
-                return BadRequest(new {
+        public async Task<IActionResult> PostBuyPaymentMapping([FromBody] IdList docIds)
+        {
+            if (docIds == null)
+            {
+                return BadRequest(new
+                {
                     ErrorMessage = "Empty request data"
                 });
             }
 
             var docId = docIds.Ids[0];
             var doc = await _context.BuyDocuments.FindAsync(docId);
-            if (doc == null) {
-                return BadRequest(new {
+            if (doc == null)
+            {
+                return BadRequest(new
+                {
                     ErrorMessage = "Requested document not found"
                 });
             }
+
             await _context.Entry(doc)
                 .Reference(t => t.BuyDocSeries)
                 .LoadAsync();
             var docSeries = doc.BuyDocSeries;
-            if (docSeries.PayoffSeriesId == null || docSeries.PayoffSeriesId == 0) {
-                return BadRequest(new {
+            if (docSeries.PayoffSeriesId == null || docSeries.PayoffSeriesId == 0)
+            {
+                return BadRequest(new
+                {
                     ErrorMessage = "No payoff series defined"
                 });
             }
+
             int payoffSeriesId = (int)docSeries.PayoffSeriesId;
             var payoffSeries = await _context.TransTransactorDocSeriesDefs.FindAsync(payoffSeriesId);
 
-            if (payoffSeries == null) {
-                return BadRequest(new {
+            if (payoffSeries == null)
+            {
+                return BadRequest(new
+                {
                     ErrorMessage = "Payoff series definition not found"
                 });
             }
+
             await _context.Entry(payoffSeries).Reference(t => t.TransTransactorDocTypeDef)
                 .LoadAsync();
             var payoffSeriesType = payoffSeries.TransTransactorDocTypeDef;
-            if (payoffSeriesType == null) {
-                return BadRequest(new {
+            if (payoffSeriesType == null)
+            {
+                return BadRequest(new
+                {
                     ErrorMessage = "Payoff series type Definition not found"
                 });
             }
+
             await _context.Entry(payoffSeriesType)
                 .Reference(t => t.TransTransactorDef)
                 .LoadAsync();
             var payoffTransactorTransactionDef = payoffSeriesType.TransTransactorDef;
+
             #region Section Management
+
             var scnId = payoffSeriesType.SectionId == 0 ? doc.SectionId : payoffSeriesType.SectionId;
+
             #endregion
-            var payoffTransaction = new TransactorTransaction {
+
+            var payoffTransaction = new TransactorTransaction
+            {
                 TransDate = DateTime.Today,
                 TransTransactorDocSeriesId = payoffSeriesId,
                 TransTransactorDocTypeId = payoffSeries.TransTransactorDocTypeDefId,
@@ -1203,36 +1507,45 @@ namespace GrKouk.Web.ERP.Controllers {
                 CompanyId = doc.CompanyId
             };
             ActionHandlers.TransactorFinAction(payoffTransactorTransactionDef.FinancialTransAction, payoffTransaction);
-            await using (var transaction = await _context.Database.BeginTransactionAsync()) {
-                try {
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
                     await _context.TransactorTransactions.AddAsync(payoffTransaction);
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     Debug.WriteLine(e.Message);
                     await transaction.RollbackAsync();
-                    return BadRequest(new {
+                    return BadRequest(new
+                    {
                         ErrorMessage = $"Error inserting transactor transaction {e.Message}"
                     });
                 }
 
-                var mapping = new BuyDocTransPaymentMapping {
+                var mapping = new BuyDocTransPaymentMapping
+                {
                     BuyDocument = doc,
                     TransactorTransaction = payoffTransaction,
                     AmountUsed = payoffTransaction.AmountNet + payoffTransaction.AmountFpa -
                                  payoffTransaction.AmountDiscount
                 };
-                try {
+                try
+                {
                     await _context.BuyDocTransPaymentMappings.AddAsync(mapping);
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     Console.WriteLine(e);
                     await transaction.RollbackAsync();
-                    return BadRequest(new {
+                    return BadRequest(new
+                    {
                         ErrorMessage = $"Error inserting buy payment mapping {e.Message}"
                     });
                 }
 
-                try {
+                try
+                {
                     var recs = await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                     // var ms = new StringBuilder()
@@ -1244,72 +1557,92 @@ namespace GrKouk.Web.ERP.Controllers {
                     // string message = ms.ToString();
                     return Ok(new { Message = $"Successfully added mappings" });
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     Console.WriteLine(e);
                     await transaction.RollbackAsync();
-                    return BadRequest(new {
+                    return BadRequest(new
+                    {
                         ErrorMessage = $"Error updating database {e.Message}"
                     });
                 }
             }
-
-
         }
-        [HttpPost("AddSalePaymentMapping")]
-        public async Task<IActionResult> PostSalePaymentMapping([FromBody] IdList docIds) {
 
-            if (docIds == null) {
-                return BadRequest(new {
+        [HttpPost("AddSalePaymentMapping")]
+        public async Task<IActionResult> PostSalePaymentMapping([FromBody] IdList docIds)
+        {
+            if (docIds == null)
+            {
+                return BadRequest(new
+                {
                     ErrorMessage = "Empty request data"
                 });
             }
 
             var docId = docIds.Ids[0];
             var doc = await _context.SellDocuments.FindAsync(docId);
-            if (doc == null) {
-                return BadRequest(new {
+            if (doc == null)
+            {
+                return BadRequest(new
+                {
                     ErrorMessage = "Requested document not found"
                 });
             }
+
             await _context.Entry(doc)
                 .Reference(t => t.SellDocSeries)
                 .LoadAsync();
             var docSeries = doc.SellDocSeries;
-            if (docSeries.PayoffSeriesId == null || docSeries.PayoffSeriesId == 0) {
-                return BadRequest(new {
+            if (docSeries.PayoffSeriesId == null || docSeries.PayoffSeriesId == 0)
+            {
+                return BadRequest(new
+                {
                     ErrorMessage = "No payoff series defined"
                 });
             }
+
             int payoffSeriesId = (int)docSeries.PayoffSeriesId;
             var payoffSeries = await _context.TransTransactorDocSeriesDefs.FindAsync(payoffSeriesId);
 
-            if (payoffSeries == null) {
-                return BadRequest(new {
+            if (payoffSeries == null)
+            {
+                return BadRequest(new
+                {
                     ErrorMessage = "Payoff series definition not found"
                 });
             }
+
             await _context.Entry(payoffSeries).Reference(t => t.TransTransactorDocTypeDef)
                 .LoadAsync();
             var payoffSeriesType = payoffSeries.TransTransactorDocTypeDef;
-            if (payoffSeriesType == null) {
-                return BadRequest(new {
+            if (payoffSeriesType == null)
+            {
+                return BadRequest(new
+                {
                     ErrorMessage = "Payoff series type Definition not found"
                 });
             }
+
             await _context.Entry(payoffSeriesType)
                 .Reference(t => t.TransTransactorDef)
                 .LoadAsync();
             var payoffTransactorTransactionDef = payoffSeriesType.TransTransactorDef;
-            #region Section Management
-            var scnId = payoffSeriesType.SectionId == 0 ? doc.SectionId : payoffSeriesType.SectionId;
-            #endregion
-            var transactor = await _context.Transactors
-                           .Where(p => p.Id == doc.TransactorId)
-                           .SingleOrDefaultAsync();
-            var transTransactorEtiology =
-                           $"{payoffSeries.Name} created from {docSeries.Name} for {transactor.Name} with {doc.Etiology}";
 
-            var payoffTransaction = new TransactorTransaction {
+            #region Section Management
+
+            var scnId = payoffSeriesType.SectionId == 0 ? doc.SectionId : payoffSeriesType.SectionId;
+
+            #endregion
+
+            var transactor = await _context.Transactors
+                .Where(p => p.Id == doc.TransactorId)
+                .SingleOrDefaultAsync();
+            var transTransactorEtiology =
+                $"{payoffSeries.Name} created from {docSeries.Name} for {transactor.Name} with {doc.Etiology}";
+
+            var payoffTransaction = new TransactorTransaction
+            {
                 TransDate = DateTime.Today,
                 TransTransactorDocSeriesId = payoffSeriesId,
                 TransTransactorDocTypeId = payoffSeries.TransTransactorDocTypeDefId,
@@ -1326,18 +1659,23 @@ namespace GrKouk.Web.ERP.Controllers {
                 CompanyId = doc.CompanyId
             };
             ActionHandlers.TransactorFinAction(payoffTransactorTransactionDef.FinancialTransAction, payoffTransaction);
-            await using (var transaction = await _context.Database.BeginTransactionAsync()) {
-                try {
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
                     await _context.TransactorTransactions.AddAsync(payoffTransaction);
                     await _context.SaveChangesAsync();
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     Debug.WriteLine(e.Message);
                     await transaction.RollbackAsync();
-                    return BadRequest(new {
+                    return BadRequest(new
+                    {
                         ErrorMessage = $"Error inserting transactor transaction {e.Message}"
                     });
                 }
+
                 //Cash Flow Account Transaction 
                 var paymentCfAccountId = payoffSeriesType.DefaultCfaId;
                 if (paymentCfAccountId > 0)
@@ -1359,8 +1697,7 @@ namespace GrKouk.Web.ERP.Controllers {
                                     .Reference(t => t.CashFlowTransactionDefinition)
                                     .LoadAsync();
 
-                                var etiology =transTransactorEtiology;
-
+                                var etiology = transTransactorEtiology;
 
 
                                 var cfaTransDef = cfaType.CashFlowTransactionDefinition;
@@ -1396,32 +1733,35 @@ namespace GrKouk.Web.ERP.Controllers {
                                         error = e.Message + " " + msg
                                     });
                                 }
-
-
                             }
                         }
                     }
                 }
 
                 //End Cash Flow Account Transaction 
-                var mapping = new SellDocTransPaymentMapping() {
+                var mapping = new SellDocTransPaymentMapping()
+                {
                     SellDocument = doc,
                     TransactorTransaction = payoffTransaction,
                     AmountUsed = payoffTransaction.AmountNet + payoffTransaction.AmountFpa -
                                  payoffTransaction.AmountDiscount
                 };
-                try {
+                try
+                {
                     await _context.SellDocTransPaymentMappings.AddAsync(mapping);
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     Console.WriteLine(e);
                     await transaction.RollbackAsync();
-                    return BadRequest(new {
+                    return BadRequest(new
+                    {
                         ErrorMessage = $"Error inserting sales payment mapping {e.Message}"
                     });
                 }
 
-                try {
+                try
+                {
                     var recs = await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                     var ms = new StringBuilder()
@@ -1431,37 +1771,46 @@ namespace GrKouk.Web.ERP.Controllers {
                     string message = ms.ToString();
                     return Ok(new { Message = message });
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     Console.WriteLine(e);
                     await transaction.RollbackAsync();
-                    return BadRequest(new {
+                    return BadRequest(new
+                    {
                         ErrorMessage = $"Error updating database {e.Message}"
                     });
                 }
             }
-
-
         }
+
         [HttpPost("AddBuyPaymentMappingList")]
-        public async Task<IActionResult> AddBuyPaymentMappingList([FromBody] PaymentMappingCreateDto data) {
-            if (data == null) {
-                return BadRequest(new {
+        public async Task<IActionResult> AddBuyPaymentMappingList([FromBody] PaymentMappingCreateDto data)
+        {
+            if (data == null)
+            {
+                return BadRequest(new
+                {
                     error = "Empty request data"
                 });
             }
 
-            if (data.DocId <= 0) {
-                return BadRequest(new {
+            if (data.DocId <= 0)
+            {
+                return BadRequest(new
+                {
                     error = "Document Id Out of range"
                 });
             }
 
             var doc = await _context.BuyDocuments.FindAsync(data.DocId);
-            if (doc == null) {
-                return BadRequest(new {
+            if (doc == null)
+            {
+                return BadRequest(new
+                {
                     error = "Document not found"
                 });
             }
+
             await _context.Entry(doc)
                 .Reference(t => t.Company)
                 .LoadAsync();
@@ -1471,77 +1820,98 @@ namespace GrKouk.Web.ERP.Controllers {
                 .ToListAsync();
 
             await using var transaction = await _context.Database.BeginTransactionAsync();
-            foreach (var paymentMapping in data.PaymentMappingLines) {
-                if (companyCurrencyId != data.DisplayCurrencyId) {
-                    if (data.DisplayCurrencyId != 1) {
+            foreach (var paymentMapping in data.PaymentMappingLines)
+            {
+                if (companyCurrencyId != data.DisplayCurrencyId)
+                {
+                    if (data.DisplayCurrencyId != 1)
+                    {
                         var r = currencyRates.Where(p => p.CurrencyId == data.DisplayCurrencyId)
                             .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
-                        if (r != null) {
+                        if (r != null)
+                        {
                             paymentMapping.AmountUsed /= r.Rate;
                         }
-
                     }
-                    else {
+                    else
+                    {
                         var r = currencyRates.Where(p => p.CurrencyId == companyCurrencyId)
                             .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
-                        if (r != null) {
+                        if (r != null)
+                        {
                             paymentMapping.AmountUsed *= r.Rate;
-
                         }
                     }
                 }
 
-                var mapping = new BuyDocTransPaymentMapping {
+                var mapping = new BuyDocTransPaymentMapping
+                {
                     BuyDocumentId = data.DocId,
                     TransactorTransactionId = paymentMapping.ReceiptId,
                     AmountUsed = paymentMapping.AmountUsed
                 };
-                try {
+                try
+                {
                     await _context.BuyDocTransPaymentMappings.AddAsync(mapping);
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     Console.WriteLine(e);
                     await transaction.RollbackAsync();
-                    return BadRequest(new {
+                    return BadRequest(new
+                    {
                         ErrorMessage = $"Error inserting buy payment mapping {e.Message}"
                     });
                 }
             }
 
 
-            try {
+            try
+            {
                 var recs = await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
                 return Ok(new { Message = $"Successfully added {recs} mappings" });
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 Console.WriteLine(e);
                 await transaction.RollbackAsync();
-                return BadRequest(new {
+                return BadRequest(new
+                {
                     ErrorMessage = $"Error updating database {e.Message}"
                 });
             }
         }
+
         [HttpPost("AddSalePaymentMappingList")]
-        public async Task<IActionResult> AddSalePaymentMappingList([FromBody] PaymentMappingCreateDto data) {
-            if (data == null) {
-                return BadRequest(new {
+        public async Task<IActionResult> AddSalePaymentMappingList([FromBody] PaymentMappingCreateDto data)
+        {
+            if (data == null)
+            {
+                return BadRequest(new
+                {
                     error = "Empty request data"
                 });
             }
-            if (data.DocId <= 0) {
-                return BadRequest(new {
+
+            if (data.DocId <= 0)
+            {
+                return BadRequest(new
+                {
                     error = "Document Id Out of range"
                 });
             }
 
             var doc = await _context.SellDocuments.FindAsync(data.DocId);
-            if (doc == null) {
-                return BadRequest(new {
+            if (doc == null)
+            {
+                return BadRequest(new
+                {
                     error = "Document not found"
                 });
             }
+
             await _context.Entry(doc)
                 .Reference(t => t.Company)
                 .LoadAsync();
@@ -1550,59 +1920,73 @@ namespace GrKouk.Web.ERP.Controllers {
                 .Take(10)
                 .ToListAsync();
             await using var transaction = await _context.Database.BeginTransactionAsync();
-            foreach (var paymentMapping in data.PaymentMappingLines) {
-                if (companyCurrencyId != data.DisplayCurrencyId) {
-                    if (data.DisplayCurrencyId != 1) {
+            foreach (var paymentMapping in data.PaymentMappingLines)
+            {
+                if (companyCurrencyId != data.DisplayCurrencyId)
+                {
+                    if (data.DisplayCurrencyId != 1)
+                    {
                         var r = currencyRates.Where(p => p.CurrencyId == data.DisplayCurrencyId)
                             .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
-                        if (r != null) {
+                        if (r != null)
+                        {
                             paymentMapping.AmountUsed /= r.Rate;
                         }
-
                     }
-                    else {
+                    else
+                    {
                         var r = currencyRates.Where(p => p.CurrencyId == companyCurrencyId)
                             .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
-                        if (r != null) {
+                        if (r != null)
+                        {
                             paymentMapping.AmountUsed *= r.Rate;
-
                         }
                     }
                 }
-                var mapping = new SellDocTransPaymentMapping() {
+
+                var mapping = new SellDocTransPaymentMapping()
+                {
                     SellDocumentId = data.DocId,
                     TransactorTransactionId = paymentMapping.ReceiptId,
                     AmountUsed = paymentMapping.AmountUsed
                 };
-                try {
+                try
+                {
                     await _context.SellDocTransPaymentMappings.AddAsync(mapping);
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     Console.WriteLine(e);
                     await transaction.RollbackAsync();
-                    return BadRequest(new {
+                    return BadRequest(new
+                    {
                         ErrorMessage = $"Error inserting buy payment mapping {e.Message}"
                     });
                 }
             }
 
 
-            try {
+            try
+            {
                 var recs = await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
                 return Ok(new { Message = $"Successfully added {recs} mappings" });
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 Console.WriteLine(e);
                 await transaction.RollbackAsync();
-                return BadRequest(new {
+                return BadRequest(new
+                {
                     ErrorMessage = $"Error updating database {e.Message}"
                 });
             }
         }
+
         [HttpPost("MaterialBuyDoc")]
-        public async Task<IActionResult> PostMaterialBuyDoc([FromBody] BuyDocCreateAjaxDto data) {
+        public async Task<IActionResult> PostMaterialBuyDoc([FromBody] BuyDocCreateAjaxDto data)
+        {
             const string sectionCode = "SYS-BUY-MATERIALS-SCN";
             // bool noSupplierTrans = false;
             bool noWarehouseTrans = false;
@@ -1612,33 +1996,41 @@ namespace GrKouk.Web.ERP.Controllers {
             BuyDocument transToAttach;
             DateTime dateOfTrans;
 
-            if (data == null) {
-                return BadRequest(new {
+            if (data == null)
+            {
+                return BadRequest(new
+                {
                     error = "Empty request data"
                 });
             }
 
-            try {
+            try
+            {
                 transToAttachNoLines = _mapper.Map<BuyDocCreateAjaxNoLinesDto>(data);
                 transToAttach = _mapper.Map<BuyDocument>(transToAttachNoLines);
                 dateOfTrans = data.TransDate;
             }
-            catch (Exception e) {
-                return BadRequest(new {
+            catch (Exception e)
+            {
+                return BadRequest(new
+                {
                     error = e.Message
                 });
             }
 
             //var tr = _context.Database.CurrentTransaction;
-            await using (var transaction = await _context.Database.BeginTransactionAsync()) {
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
                 #region Fiscal Period
 
                 var fiscalPeriod = await _context.FiscalPeriods.AsNoTracking().FirstOrDefaultAsync(p =>
                     dateOfTrans >= p.StartDate && dateOfTrans <= p.EndDate);
-                if (fiscalPeriod == null) {
+                if (fiscalPeriod == null)
+                {
                     await transaction.RollbackAsync();
                     ModelState.AddModelError(string.Empty, "No Fiscal Period covers Transaction Date");
-                    return NotFound(new {
+                    return NotFound(new
+                    {
                         error = "No Fiscal Period covers Transaction Date"
                     });
                 }
@@ -1648,10 +2040,12 @@ namespace GrKouk.Web.ERP.Controllers {
                 var docSeries = await
                     _context.BuyDocSeriesDefs.SingleOrDefaultAsync(m => m.Id == data.BuyDocSeriesId);
 
-                if (docSeries is null) {
+                if (docSeries is null)
+                {
                     await transaction.RollbackAsync();
                     ModelState.AddModelError(string.Empty, "Δεν βρέθηκε η σειρά παραστατικού");
-                    return NotFound(new {
+                    return NotFound(new
+                    {
                         error = "Buy Doc Series not found"
                     });
                 }
@@ -1669,19 +2063,24 @@ namespace GrKouk.Web.ERP.Controllers {
                 #region Section Management
 
                 int sectionId = 0;
-                if (docTypeDef.SectionId == 0) {
-                    var sectn = await _context.Sections.AsNoTracking().SingleOrDefaultAsync(s => s.SystemName == sectionCode);
-                    if (sectn == null) {
+                if (docTypeDef.SectionId == 0)
+                {
+                    var sectn = await _context.Sections.AsNoTracking()
+                        .SingleOrDefaultAsync(s => s.SystemName == sectionCode);
+                    if (sectn == null)
+                    {
                         await transaction.RollbackAsync();
                         ModelState.AddModelError(string.Empty, "Δεν υπάρχει το Section");
-                        return NotFound(new {
+                        return NotFound(new
+                        {
                             error = "Could not locate section "
                         });
                     }
 
                     sectionId = sectn.Id;
                 }
-                else {
+                else
+                {
                     sectionId = docTypeDef.SectionId;
                 }
 
@@ -1696,14 +2095,17 @@ namespace GrKouk.Web.ERP.Controllers {
                 transToAttach.BuyDocTypeId = docSeries.BuyDocTypeDefId;
                 await _context.BuyDocuments.AddAsync(transToAttach);
 
-                try {
+                try
+                {
                     await _context.SaveChangesAsync();
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     Console.WriteLine(e);
                     await transaction.RollbackAsync();
                     string msg = e.InnerException?.Message;
-                    return BadRequest(new {
+                    return BadRequest(new
+                    {
                         error = e.Message + " " + msg
                     });
                 }
@@ -1711,14 +2113,17 @@ namespace GrKouk.Web.ERP.Controllers {
                 var docId = _context.Entry(transToAttach).Entity.Id;
 
 
-                if (transTransactorDef.DefaultDocSeriesId > 0) {
+                if (transTransactorDef.DefaultDocSeriesId > 0)
+                {
                     var transTransactorDefaultSeries = await
                         _context.TransTransactorDocSeriesDefs.FirstOrDefaultAsync(p =>
                             p.Id == transTransactorDef.DefaultDocSeriesId);
-                    if (transTransactorDefaultSeries == null) {
+                    if (transTransactorDefaultSeries == null)
+                    {
                         await transaction.RollbackAsync();
                         ModelState.AddModelError(string.Empty, "Default series for transactor transaction not found");
-                        return NotFound(new {
+                        return NotFound(new
+                        {
                             error = "Default series for transactor transaction not found"
                         });
                     }
@@ -1735,21 +2140,24 @@ namespace GrKouk.Web.ERP.Controllers {
                     sTransactorTransaction.CreatorId = docId;
                     ActionHandlers.TransactorFinAction(transTransactorDef.FinancialTransAction, sTransactorTransaction);
                     // Update document transaction with transamounts
-                    transToAttach.TransNetAmount=sTransactorTransaction.TransNetAmount;
-                    transToAttach.TransFpaAmount=sTransactorTransaction.TransFpaAmount;
-                    transToAttach.TransDiscountAmount=sTransactorTransaction.TransDiscountAmount;
+                    transToAttach.TransNetAmount = sTransactorTransaction.TransNetAmount;
+                    transToAttach.TransFpaAmount = sTransactorTransaction.TransFpaAmount;
+                    transToAttach.TransDiscountAmount = sTransactorTransaction.TransDiscountAmount;
                     transToAttach.TransExpensesAmount = 0;
                     _context.Entry(transToAttach).State = EntityState.Modified;
                     //----------------------------------------------
                     await _context.TransactorTransactions.AddAsync(sTransactorTransaction);
-                    try {
+                    try
+                    {
                         await _context.SaveChangesAsync();
                     }
-                    catch (Exception e) {
+                    catch (Exception e)
+                    {
                         Console.WriteLine(e);
                         await transaction.RollbackAsync();
                         string msg = e.InnerException?.Message;
-                        return BadRequest(new {
+                        return BadRequest(new
+                        {
                             error = e.Message + " " + msg
                         });
                     }
@@ -1758,31 +2166,38 @@ namespace GrKouk.Web.ERP.Controllers {
                 //Αυτόματη εξόφληση
                 var paymentMethod =
                     await _context.PaymentMethods.FirstOrDefaultAsync(p => p.Id == transToAttach.PaymentMethodId);
-                if (paymentMethod is null) {
+                if (paymentMethod is null)
+                {
                     await transaction.RollbackAsync();
                     ModelState.AddModelError(string.Empty, "Δεν βρέθηκε ο τρόπος πληρωμής");
-                    return NotFound(new {
+                    return NotFound(new
+                    {
                         error = "Δεν βρέθηκε ο τρόπος πληρωμής"
                     });
                 }
 
-                if (paymentMethod.AutoPayoffWay == SeriesAutoPayoffEnum.SeriesAutoPayoffEnumAuto) {
+                if (paymentMethod.AutoPayoffWay == SeriesAutoPayoffEnum.SeriesAutoPayoffEnumAuto)
+                {
                     var autoPaySeriesId = transToAttach.BuyDocSeries.PayoffSeriesId;
                     var paymentCfAccountId = paymentMethod.CfAccountId;
-                    if (autoPaySeriesId > 0) {
+                    if (autoPaySeriesId > 0)
+                    {
                         var transTransactorPayOffSeries = await
                             _context.TransTransactorDocSeriesDefs.FirstOrDefaultAsync(p =>
                                 p.Id == autoPaySeriesId);
-                        if (transTransactorPayOffSeries == null) {
+                        if (transTransactorPayOffSeries == null)
+                        {
                             await transaction.RollbackAsync();
                             ModelState.AddModelError(string.Empty, "AutoPayOff series not found");
-                            return NotFound(new {
+                            return NotFound(new
+                            {
                                 error = "AutoPayOff series not found"
                             });
                         }
+
                         var transactor = await _context.Transactors
                             .Where(p => p.Id == data.TransactorId)
-                           .SingleOrDefaultAsync();
+                            .SingleOrDefaultAsync();
                         var sTransactorTransaction = _mapper.Map<TransactorTransaction>(data);
                         var transTransactorEtiology =
                             $"{transTransactorPayOffSeries.Name} created from {docSeries.Name} for {transactor.Name} with {data.Etiology} ";
@@ -1799,14 +2214,20 @@ namespace GrKouk.Web.ERP.Controllers {
                             .Reference(t => t.TransTransactorDocTypeDef)
                             .LoadAsync();
                         var transTransactorDocTypeDef = transTransactorPayOffSeries.TransTransactorDocTypeDef;
+
                         #region Section Management
-                        if (transTransactorDocTypeDef.SectionId == 0) {
+
+                        if (transTransactorDocTypeDef.SectionId == 0)
+                        {
                             sTransactorTransaction.SectionId = sectionId;
                         }
-                        else {
+                        else
+                        {
                             sTransactorTransaction.SectionId = transTransactorDocTypeDef.SectionId;
                         }
+
                         #endregion
+
                         await _context.Entry(transTransactorDocTypeDef)
                             .Reference(t => t.TransTransactorDef)
                             .LoadAsync();
@@ -1815,29 +2236,37 @@ namespace GrKouk.Web.ERP.Controllers {
                         ActionHandlers.TransactorFinAction(transPaymentTransactorDef.FinancialTransAction,
                             sTransactorTransaction);
                         await _context.TransactorTransactions.AddAsync(sTransactorTransaction);
-                        try {
+                        try
+                        {
                             await _context.SaveChangesAsync();
                         }
-                        catch (Exception e) {
+                        catch (Exception e)
+                        {
                             Console.WriteLine(e);
                             await transaction.RollbackAsync();
                             string msg = e.InnerException?.Message;
-                            return BadRequest(new {
+                            return BadRequest(new
+                            {
                                 error = e.Message + " " + msg
                             });
                         }
+
                         //Cash Flow Account Transaction 
-                        if (paymentCfAccountId > 0) {
+                        if (paymentCfAccountId > 0)
+                        {
                             var defaultCfaSeriesId = transTransactorPayOffSeries.DefaultCfaTransSeriesId;
-                            if (defaultCfaSeriesId > 0) {
+                            if (defaultCfaSeriesId > 0)
+                            {
                                 var cfaSeries = await _context.CashFlowDocSeriesDefs.FindAsync(defaultCfaSeriesId);
-                                if (cfaSeries != null) {
+                                if (cfaSeries != null)
+                                {
                                     await _context.Entry(cfaSeries)
                                         .Reference(t => t.CashFlowDocTypeDefinition)
                                         .LoadAsync();
 
                                     var cfaType = cfaSeries.CashFlowDocTypeDefinition;
-                                    if (cfaType != null) {
+                                    if (cfaType != null)
+                                    {
                                         await _context.Entry(cfaType)
                                             .Reference(t => t.CashFlowTransactionDefinition)
                                             .LoadAsync();
@@ -1846,9 +2275,9 @@ namespace GrKouk.Web.ERP.Controllers {
                                             $"{cfaSeries.Name} created from {docSeries.Name} for {transactor.Name} with {data.Etiology} ";
 
 
-
                                         var cfaTransDef = cfaType.CashFlowTransactionDefinition;
-                                        var cfaTrans = new CashFlowAccountTransaction {
+                                        var cfaTrans = new CashFlowAccountTransaction
+                                        {
                                             TransDate = data.TransDate,
                                             CashFlowAccountId = paymentCfAccountId,
                                             CompanyId = data.CompanyId,
@@ -1859,34 +2288,39 @@ namespace GrKouk.Web.ERP.Controllers {
                                             CreatorSectionId = sectionId,
                                             CreatorId = docId,
                                             RefCode = data.TransRefCode,
-                                            Amount = sTransactorTransaction.AmountNet - sTransactorTransaction.AmountDiscount + sTransactorTransaction.AmountFpa,
+                                            Amount = sTransactorTransaction.AmountNet -
+                                                     sTransactorTransaction.AmountDiscount +
+                                                     sTransactorTransaction.AmountFpa,
                                             SectionId = cfaType.SectionId > 0 ? cfaType.SectionId : sectionId
                                         };
                                         ActionHandlers.CashFlowFinAction(cfaTransDef.CfaAction, cfaTrans);
                                         await _context.CashFlowAccountTransactions.AddAsync(cfaTrans);
                                         sTransactorTransaction.CfAccountId = paymentCfAccountId;
                                         _context.Attach(sTransactorTransaction).State = EntityState.Modified;
-                                        try {
+                                        try
+                                        {
                                             await _context.SaveChangesAsync();
                                         }
-                                        catch (Exception e) {
+                                        catch (Exception e)
+                                        {
                                             await transaction.RollbackAsync();
                                             string msg = e.InnerException?.Message;
-                                            return BadRequest(new {
+                                            return BadRequest(new
+                                            {
                                                 error = e.Message + " " + msg
                                             });
                                         }
-
-
                                     }
                                 }
                             }
                         }
 
                         //End Cash Flow Account Transaction 
-                        try {
+                        try
+                        {
                             var payOfTransactionId = _context.Entry(sTransactorTransaction).Entity.Id;
-                            var payOffMapping = new BuyDocTransPaymentMapping() {
+                            var payOffMapping = new BuyDocTransPaymentMapping()
+                            {
                                 BuyDocumentId = docId,
                                 TransactorTransactionId = payOfTransactionId,
                                 AmountUsed = sTransactorTransaction.AmountNet + sTransactorTransaction.AmountFpa -
@@ -1894,10 +2328,12 @@ namespace GrKouk.Web.ERP.Controllers {
                             };
                             await _context.BuyDocTransPaymentMappings.AddAsync(payOffMapping);
                         }
-                        catch (Exception e) {
+                        catch (Exception e)
+                        {
                             await transaction.RollbackAsync();
                             string msg = e.InnerException?.Message;
-                            return BadRequest(new {
+                            return BadRequest(new
+                            {
                                 error = e.Message + " " + msg
                             });
                         }
@@ -1907,14 +2343,17 @@ namespace GrKouk.Web.ERP.Controllers {
                 int warehouseSeriesId = 0;
                 int warehouseTypeId = 0;
 
-                if (transWarehouseDef.DefaultDocSeriesId > 0) {
+                if (transWarehouseDef.DefaultDocSeriesId > 0)
+                {
                     var transWarehouseDefaultSeries =
                         await _context.TransWarehouseDocSeriesDefs.FirstOrDefaultAsync(p =>
                             p.Id == transWarehouseDef.DefaultDocSeriesId);
-                    if (transWarehouseDefaultSeries == null) {
+                    if (transWarehouseDefaultSeries == null)
+                    {
                         await transaction.RollbackAsync();
                         ModelState.AddModelError(string.Empty, "Default series for warehouse transaction not found");
-                        return NotFound(new {
+                        return NotFound(new
+                        {
                             error = "Default series for warehouse transaction not found"
                         });
                     }
@@ -1923,26 +2362,29 @@ namespace GrKouk.Web.ERP.Controllers {
                     warehouseSeriesId = transWarehouseDef.DefaultDocSeriesId;
                     warehouseTypeId = transWarehouseDefaultSeries.TransWarehouseDocTypeDefId;
                 }
-                else {
+                else
+                {
                     noWarehouseTrans = true;
                 }
 
-                foreach (var dataBuyDocLine in data.BuyDocLines) {
+                foreach (var dataBuyDocLine in data.BuyDocLines)
+                {
                     var warehouseItemId = dataBuyDocLine.WarehouseItemId;
                     var material = await _context.WarehouseItems
                         .SingleOrDefaultAsync(p => p.Id == warehouseItemId);
-                    if (material is null) {
+                    if (material is null)
+                    {
                         //Handle error
                         await transaction.RollbackAsync();
                         ModelState.AddModelError(string.Empty, "Doc Line error null WarehouseItem");
-                        return NotFound(new {
+                        return NotFound(new
+                        {
                             error = "Could not locate material in Doc Line "
                         });
                     }
 
                     #region MaterialLine
 
-                    
                     var transUnitId = dataBuyDocLine.TransactionUnitId;
                     var transUnitFactor = dataBuyDocLine.TransactionUnitFactor;
                     // var factor = dataBuyDocLine.Factor;
@@ -1963,7 +2405,8 @@ namespace GrKouk.Web.ERP.Controllers {
                         AmountExpenses = 0
                     };
                     ActionHandlers.DocLineFinAction(transTransactorDef.FinancialTransAction, lineAmounts);
-                    var buyMaterialLine = new BuyDocLine {
+                    var buyMaterialLine = new BuyDocLine
+                    {
                         UnitPrice = unitPrice,
                         AmountFpa = lineFpaAmount,
                         AmountNet = lineNetAmount,
@@ -1992,10 +2435,12 @@ namespace GrKouk.Web.ERP.Controllers {
 
                     #endregion
 
-                    if (!noWarehouseTrans) {
+                    if (!noWarehouseTrans)
+                    {
                         #region Warehouse transaction
 
-                        var warehouseTrans = new WarehouseTransaction {
+                        var warehouseTrans = new WarehouseTransaction
+                        {
                             FpaRate = fpaRate,
                             DiscountRate = discountRate,
                             UnitPrice = unitPrice,
@@ -2030,15 +2475,18 @@ namespace GrKouk.Web.ERP.Controllers {
                     }
                 }
 
-                try {
+                try
+                {
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     Console.WriteLine(e);
                     await transaction.RollbackAsync();
                     string msg = e.InnerException?.Message;
-                    return BadRequest(new {
+                    return BadRequest(new
+                    {
                         error = e.Message + " " + msg
                     });
                 }
@@ -2049,31 +2497,38 @@ namespace GrKouk.Web.ERP.Controllers {
 
 
         [HttpPost("MaterialBuyDocUpdate")]
-        public async Task<IActionResult> PutMaterialBuyDoc([FromBody] BuyDocModifyAjaxDto data) {
+        public async Task<IActionResult> PutMaterialBuyDoc([FromBody] BuyDocModifyAjaxDto data)
+        {
             const string sectionCode = "SYS-BUY-MATERIALS-SCN";
             bool noWarehouseTrans;
 
             BuyDocModifyAjaxNoLinesDto transToAttachNoLines;
             BuyDocument transToAttach;
             DateTime dateOfTrans;
-            if (data == null) {
-                return BadRequest(new {
+            if (data == null)
+            {
+                return BadRequest(new
+                {
                     error = "Empty request data"
                 });
             }
 
-            try {
+            try
+            {
                 transToAttachNoLines = _mapper.Map<BuyDocModifyAjaxNoLinesDto>(data);
                 transToAttach = _mapper.Map<BuyDocument>(transToAttachNoLines);
                 dateOfTrans = data.TransDate;
             }
-            catch (Exception e) {
-                return BadRequest(new {
+            catch (Exception e)
+            {
+                return BadRequest(new
+                {
                     error = e.Message
                 });
             }
 
-            await using (var transaction = await _context.Database.BeginTransactionAsync()) {
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
                 _context.BuyDocLines.RemoveRange(_context.BuyDocLines.Where(p => p.BuyDocumentId == data.Id));
                 _context.TransactorTransactions.RemoveRange(
                     _context.TransactorTransactions.Where(p =>
@@ -2083,15 +2538,19 @@ namespace GrKouk.Web.ERP.Controllers {
                 _context.BuyDocTransPaymentMappings.RemoveRange(
                     _context.BuyDocTransPaymentMappings.Where(p => p.BuyDocumentId == data.Id));
                 _context.CashFlowAccountTransactions.RemoveRange(
-                    _context.CashFlowAccountTransactions.Where(p => p.CreatorSectionId == data.SectionId && p.CreatorId == data.Id));
+                    _context.CashFlowAccountTransactions.Where(p =>
+                        p.CreatorSectionId == data.SectionId && p.CreatorId == data.Id));
+
                 #region Fiscal Period
 
                 var fiscalPeriod = await _context.FiscalPeriods.AsNoTracking().FirstOrDefaultAsync(p =>
                     dateOfTrans >= p.StartDate && dateOfTrans <= p.EndDate);
-                if (fiscalPeriod == null) {
+                if (fiscalPeriod == null)
+                {
                     await transaction.RollbackAsync();
                     ModelState.AddModelError(string.Empty, "No Fiscal Period covers Transaction Date");
-                    return NotFound(new {
+                    return NotFound(new
+                    {
                         error = "No Fiscal Period covers Transaction Date"
                     });
                 }
@@ -2101,10 +2560,12 @@ namespace GrKouk.Web.ERP.Controllers {
                 var docSeries = await
                     _context.BuyDocSeriesDefs.SingleOrDefaultAsync(m => m.Id == data.BuyDocSeriesId);
 
-                if (docSeries is null) {
+                if (docSeries is null)
+                {
                     await transaction.RollbackAsync();
                     ModelState.AddModelError(string.Empty, "Δεν βρέθηκε η σειρά παραστατικού");
-                    return NotFound(new {
+                    return NotFound(new
+                    {
                         error = "Buy Doc Series not found"
                     });
                 }
@@ -2120,19 +2581,24 @@ namespace GrKouk.Web.ERP.Controllers {
                 #region Section Management
 
                 int sectionId = 0;
-                if (docTypeDef.SectionId == 0) {
-                    var sectn = await _context.Sections.AsNoTracking().SingleOrDefaultAsync(s => s.SystemName == sectionCode);
-                    if (sectn == null) {
+                if (docTypeDef.SectionId == 0)
+                {
+                    var sectn = await _context.Sections.AsNoTracking()
+                        .SingleOrDefaultAsync(s => s.SystemName == sectionCode);
+                    if (sectn == null)
+                    {
                         await transaction.RollbackAsync();
                         ModelState.AddModelError(string.Empty, "Δεν υπάρχει το Section");
-                        return NotFound(new {
+                        return NotFound(new
+                        {
                             error = "Could not locate section "
                         });
                     }
 
                     sectionId = sectn.Id;
                 }
-                else {
+                else
+                {
                     sectionId = docTypeDef.SectionId;
                 }
 
@@ -2149,19 +2615,23 @@ namespace GrKouk.Web.ERP.Controllers {
                 _context.Entry(transToAttach).State = EntityState.Modified;
                 var docId = transToAttach.Id;
                 //--------------------------------------
-                if (transTransactorDef.DefaultDocSeriesId > 0) {
+                if (transTransactorDef.DefaultDocSeriesId > 0)
+                {
                     var transTransactorDefaultSeries = await
                         _context.TransTransactorDocSeriesDefs.FirstOrDefaultAsync(p =>
                             p.Id == transTransactorDef.DefaultDocSeriesId);
-                    if (transTransactorDefaultSeries == null) {
+                    if (transTransactorDefaultSeries == null)
+                    {
                         await transaction.RollbackAsync();
                         ModelState.AddModelError(string.Empty, "Default series for transactor transaction not found");
-                        return NotFound(new {
+                        return NotFound(new
+                        {
                             error = "Default series for transactor transaction not found"
                         });
                     }
 
-                    try {
+                    try
+                    {
                         var spTransactorCreateDto = _mapper.Map<TransactorTransCreateDto>(data);
                         //Ετσι δεν μεταφέρει το Id απο το data
                         var sTransactorTransaction = _mapper.Map<TransactorTransaction>(spTransactorCreateDto);
@@ -2185,10 +2655,12 @@ namespace GrKouk.Web.ERP.Controllers {
                         //----------------------------------------------
                         await _context.TransactorTransactions.AddAsync(sTransactorTransaction);
                     }
-                    catch (Exception e) {
+                    catch (Exception e)
+                    {
                         await transaction.RollbackAsync();
                         string msg = e.InnerException?.Message;
-                        return BadRequest(new {
+                        return BadRequest(new
+                        {
                             error = e.Message + " " + msg
                         });
                     }
@@ -2197,28 +2669,35 @@ namespace GrKouk.Web.ERP.Controllers {
                 //Αυτόματη εξόφληση
                 var paymentMethod =
                     await _context.PaymentMethods.FirstOrDefaultAsync(p => p.Id == transToAttach.PaymentMethodId);
-                if (paymentMethod is null) {
+                if (paymentMethod is null)
+                {
                     await transaction.RollbackAsync();
                     ModelState.AddModelError(string.Empty, "Δεν βρέθηκε ο τρόπος πληρωμής");
-                    return NotFound(new {
+                    return NotFound(new
+                    {
                         error = "Δεν βρέθηκε ο τρόπος πληρωμής"
                     });
                 }
 
-                if (paymentMethod.AutoPayoffWay == SeriesAutoPayoffEnum.SeriesAutoPayoffEnumAuto) {
+                if (paymentMethod.AutoPayoffWay == SeriesAutoPayoffEnum.SeriesAutoPayoffEnumAuto)
+                {
                     var autoPaySeriesId = transToAttach.BuyDocSeries.PayoffSeriesId;
                     var paymentCfAccountId = paymentMethod.CfAccountId;
-                    if (autoPaySeriesId > 0) {
+                    if (autoPaySeriesId > 0)
+                    {
                         var transTransactorPayOffSeries = await
                             _context.TransTransactorDocSeriesDefs.FirstOrDefaultAsync(p =>
                                 p.Id == autoPaySeriesId);
-                        if (transTransactorPayOffSeries == null) {
+                        if (transTransactorPayOffSeries == null)
+                        {
                             await transaction.RollbackAsync();
                             ModelState.AddModelError(string.Empty, "AutoPayOff series not found");
-                            return NotFound(new {
+                            return NotFound(new
+                            {
                                 error = "AutoPayOff series not found"
                             });
                         }
+
                         var transactor = await _context.Transactors
                             .Where(p => p.Id == data.TransactorId)
                             .SingleOrDefaultAsync();
@@ -2240,14 +2719,20 @@ namespace GrKouk.Web.ERP.Controllers {
                             .Reference(t => t.TransTransactorDocTypeDef)
                             .LoadAsync();
                         var transTransactorDocTypeDef = transTransactorPayOffSeries.TransTransactorDocTypeDef;
+
                         #region Section Management
-                        if (transTransactorDocTypeDef.SectionId == 0) {
+
+                        if (transTransactorDocTypeDef.SectionId == 0)
+                        {
                             sTransactorTransaction.SectionId = sectionId;
                         }
-                        else {
+                        else
+                        {
                             sTransactorTransaction.SectionId = transTransactorDocTypeDef.SectionId;
                         }
+
                         #endregion
+
                         await _context.Entry(transTransactorDocTypeDef)
                             .Reference(t => t.TransTransactorDef)
                             .LoadAsync();
@@ -2256,28 +2741,36 @@ namespace GrKouk.Web.ERP.Controllers {
                             sTransactorTransaction);
 
                         await _context.TransactorTransactions.AddAsync(sTransactorTransaction);
-                        try {
+                        try
+                        {
                             await _context.SaveChangesAsync();
                         }
-                        catch (Exception e) {
+                        catch (Exception e)
+                        {
                             await transaction.RollbackAsync();
                             string msg = e.InnerException?.Message;
-                            return BadRequest(new {
+                            return BadRequest(new
+                            {
                                 error = e.Message + " " + msg
                             });
                         }
+
                         //Cash Flow Account Transaction 
-                        if (paymentCfAccountId > 0) {
+                        if (paymentCfAccountId > 0)
+                        {
                             var defaultCfaSeriesId = transTransactorPayOffSeries.DefaultCfaTransSeriesId;
-                            if (defaultCfaSeriesId > 0) {
+                            if (defaultCfaSeriesId > 0)
+                            {
                                 var cfaSeries = await _context.CashFlowDocSeriesDefs.FindAsync(defaultCfaSeriesId);
-                                if (cfaSeries != null) {
+                                if (cfaSeries != null)
+                                {
                                     await _context.Entry(cfaSeries)
                                         .Reference(t => t.CashFlowDocTypeDefinition)
                                         .LoadAsync();
 
                                     var cfaType = cfaSeries.CashFlowDocTypeDefinition;
-                                    if (cfaType != null) {
+                                    if (cfaType != null)
+                                    {
                                         await _context.Entry(cfaType)
                                             .Reference(t => t.CashFlowTransactionDefinition)
                                             .LoadAsync();
@@ -2286,9 +2779,9 @@ namespace GrKouk.Web.ERP.Controllers {
                                             $"{cfaSeries.Name} created from {docSeries.Name} for {transactor.Name} with {data.Etiology} ";
 
 
-
                                         var cfaTransDef = cfaType.CashFlowTransactionDefinition;
-                                        var cfaTrans = new CashFlowAccountTransaction {
+                                        var cfaTrans = new CashFlowAccountTransaction
+                                        {
                                             TransDate = data.TransDate,
                                             CashFlowAccountId = paymentCfAccountId,
                                             CompanyId = data.CompanyId,
@@ -2299,45 +2792,53 @@ namespace GrKouk.Web.ERP.Controllers {
                                             CreatorSectionId = sectionId,
                                             CreatorId = docId,
                                             RefCode = data.TransRefCode,
-                                            Amount = sTransactorTransaction.AmountNet - sTransactorTransaction.AmountDiscount + sTransactorTransaction.AmountFpa,
+                                            Amount = sTransactorTransaction.AmountNet -
+                                                     sTransactorTransaction.AmountDiscount +
+                                                     sTransactorTransaction.AmountFpa,
                                             SectionId = cfaType.SectionId > 0 ? cfaType.SectionId : sectionId
                                         };
                                         ActionHandlers.CashFlowFinAction(cfaTransDef.CfaAction, cfaTrans);
                                         await _context.CashFlowAccountTransactions.AddAsync(cfaTrans);
                                         sTransactorTransaction.CfAccountId = paymentCfAccountId;
                                         _context.Attach(sTransactorTransaction).State = EntityState.Modified;
-                                        try {
+                                        try
+                                        {
                                             await _context.SaveChangesAsync();
                                         }
-                                        catch (Exception e) {
+                                        catch (Exception e)
+                                        {
                                             await transaction.RollbackAsync();
                                             string msg = e.InnerException?.Message;
-                                            return BadRequest(new {
+                                            return BadRequest(new
+                                            {
                                                 error = e.Message + " " + msg
                                             });
                                         }
-
-
                                     }
                                 }
                             }
                         }
 
                         //End Cash Flow Account Transaction 
-                        try {
+                        try
+                        {
                             var payOfTransactionId = _context.Entry(sTransactorTransaction).Entity.Id;
-                            var payOffMapping = new BuyDocTransPaymentMapping() {
+                            var payOffMapping = new BuyDocTransPaymentMapping()
+                            {
                                 BuyDocumentId = docId,
                                 TransactorTransactionId = payOfTransactionId,
-                                AmountUsed = sTransactorTransaction.TransNetAmount + sTransactorTransaction.TransFpaAmount -
+                                AmountUsed = sTransactorTransaction.TransNetAmount +
+                                             sTransactorTransaction.TransFpaAmount -
                                              sTransactorTransaction.TransDiscountAmount
                             };
                             await _context.BuyDocTransPaymentMappings.AddAsync(payOffMapping);
                         }
-                        catch (Exception e) {
+                        catch (Exception e)
+                        {
                             await transaction.RollbackAsync();
                             string msg = e.InnerException?.Message;
-                            return BadRequest(new {
+                            return BadRequest(new
+                            {
                                 error = e.Message + " " + msg
                             });
                         }
@@ -2348,14 +2849,17 @@ namespace GrKouk.Web.ERP.Controllers {
                 int warehouseSeriesId = 0;
                 int warehouseTypeId = 0;
 
-                if (transWarehouseDef.DefaultDocSeriesId > 0) {
+                if (transWarehouseDef.DefaultDocSeriesId > 0)
+                {
                     var transWarehouseDefaultSeries =
                         await _context.TransWarehouseDocSeriesDefs.FirstOrDefaultAsync(p =>
                             p.Id == transWarehouseDef.DefaultDocSeriesId);
-                    if (transWarehouseDefaultSeries == null) {
+                    if (transWarehouseDefaultSeries == null)
+                    {
                         await transaction.RollbackAsync();
                         ModelState.AddModelError(string.Empty, "Default series for warehouse transaction not found");
-                        return NotFound(new {
+                        return NotFound(new
+                        {
                             error = "Default series for warehouse transaction not found"
                         });
                     }
@@ -2364,25 +2868,28 @@ namespace GrKouk.Web.ERP.Controllers {
                     warehouseSeriesId = transWarehouseDef.DefaultDocSeriesId;
                     warehouseTypeId = transWarehouseDefaultSeries.TransWarehouseDocTypeDefId;
                 }
-                else {
+                else
+                {
                     noWarehouseTrans = true;
                 }
 
-                foreach (var dataBuyDocLine in data.BuyDocLines) {
+                foreach (var dataBuyDocLine in data.BuyDocLines)
+                {
                     var warehouseItemId = dataBuyDocLine.WarehouseItemId;
                     var material = await _context.WarehouseItems.SingleOrDefaultAsync(p => p.Id == warehouseItemId);
-                    if (material is null) {
+                    if (material is null)
+                    {
                         //Handle error
                         await transaction.RollbackAsync();
                         ModelState.AddModelError(string.Empty, "Doc Line error null WarehouseItem");
-                        return NotFound(new {
+                        return NotFound(new
+                        {
                             error = "Could not locate material in Doc Line "
                         });
                     }
 
                     #region MaterialLine
 
-                   
                     var transUnitId = dataBuyDocLine.TransactionUnitId;
                     var transUnitFactor = dataBuyDocLine.TransactionUnitFactor;
                     decimal transPrice = dataBuyDocLine.TransUnitPrice;
@@ -2402,7 +2909,8 @@ namespace GrKouk.Web.ERP.Controllers {
                         AmountExpenses = 0
                     };
                     ActionHandlers.DocLineFinAction(transTransactorDef.FinancialTransAction, lineAmounts);
-                    var warehouseItemLine = new BuyDocLine {
+                    var warehouseItemLine = new BuyDocLine
+                    {
                         UnitPrice = unitPrice,
                         AmountFpa = lineFpaAmount,
                         AmountNet = lineNetAmount,
@@ -2429,23 +2937,28 @@ namespace GrKouk.Web.ERP.Controllers {
 
                     //_context.Entry(transToAttach).Entity
 
-                    try {
+                    try
+                    {
                         transToAttach.BuyDocLines.Add(warehouseItemLine);
                     }
-                    catch (Exception e) {
+                    catch (Exception e)
+                    {
                         await transaction.RollbackAsync();
                         string msg = e.InnerException?.Message;
-                        return BadRequest(new {
+                        return BadRequest(new
+                        {
                             error = e.Message + " " + msg
                         });
                     }
 
                     #endregion
 
-                    if (!noWarehouseTrans) {
+                    if (!noWarehouseTrans)
+                    {
                         #region Warehouse transaction
 
-                        var warehouseTrans = new WarehouseTransaction {
+                        var warehouseTrans = new WarehouseTransaction
+                        {
                             FpaRate = fpaRate,
                             DiscountRate = discountRate,
                             UnitPrice = unitPrice,
@@ -2475,13 +2988,16 @@ namespace GrKouk.Web.ERP.Controllers {
                         ActionHandlers.ItemInventoryValueActionHandler(warehouseTrans.InventoryValueAction,
                             warehouseTrans);
 
-                        try {
+                        try
+                        {
                             await _context.WarehouseTransactions.AddAsync(warehouseTrans);
                         }
-                        catch (Exception e) {
+                        catch (Exception e)
+                        {
                             await transaction.RollbackAsync();
                             string msg = e.InnerException?.Message;
-                            return BadRequest(new {
+                            return BadRequest(new
+                            {
                                 error = e.Message + " " + msg
                             });
                         }
@@ -2491,14 +3007,17 @@ namespace GrKouk.Web.ERP.Controllers {
                 }
 
 
-                try {
+                try
+                {
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     await transaction.RollbackAsync();
                     string msg = e.InnerException?.Message;
-                    return BadRequest(new {
+                    return BadRequest(new
+                    {
                         error = e.Message + " " + msg
                     });
                 }
@@ -2509,7 +3028,8 @@ namespace GrKouk.Web.ERP.Controllers {
 
 
         [HttpPost("SalesDoc")]
-        public async Task<IActionResult> PostSalesDoc([FromBody] SellDocCreateAjaxDto data) {
+        public async Task<IActionResult> PostSalesDoc([FromBody] SellDocCreateAjaxDto data)
+        {
             const string sectionCode = "SYS-SELL-COMBINED-SCN";
 
             // var sessionCompanyId = HttpContext.Session.GetString("CompanyId");
@@ -2521,32 +3041,40 @@ namespace GrKouk.Web.ERP.Controllers {
             SellDocument transToAttach;
             DateTime dateOfTrans;
 
-            if (data == null) {
-                return BadRequest(new {
+            if (data == null)
+            {
+                return BadRequest(new
+                {
                     error = "Empty request data"
                 });
             }
 
-            try {
+            try
+            {
                 transToAttachNoLines = _mapper.Map<SellDocCreateAjaxNoLinesDto>(data);
                 transToAttach = _mapper.Map<SellDocument>(transToAttachNoLines);
                 dateOfTrans = data.TransDate;
             }
-            catch (Exception e) {
-                return BadRequest(new {
+            catch (Exception e)
+            {
+                return BadRequest(new
+                {
                     error = e.Message
                 });
             }
 
-            await using (var transaction = await _context.Database.BeginTransactionAsync()) {
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
                 #region Fiscal Period
 
                 var fiscalPeriod = await _context.FiscalPeriods.AsNoTracking().FirstOrDefaultAsync(p =>
                     dateOfTrans >= p.StartDate && dateOfTrans <= p.EndDate);
-                if (fiscalPeriod == null) {
+                if (fiscalPeriod == null)
+                {
                     await transaction.RollbackAsync();
                     ModelState.AddModelError(string.Empty, "No Fiscal Period covers Transaction Date");
-                    return NotFound(new {
+                    return NotFound(new
+                    {
                         error = "No Fiscal Period covers Transaction Date"
                     });
                 }
@@ -2556,10 +3084,12 @@ namespace GrKouk.Web.ERP.Controllers {
                 var docSeries = await
                     _context.SellDocSeriesDefs.SingleOrDefaultAsync(m => m.Id == data.SellDocSeriesId);
 
-                if (docSeries is null) {
+                if (docSeries is null)
+                {
                     await transaction.RollbackAsync();
                     ModelState.AddModelError(string.Empty, "Δεν βρέθηκε η σειρά παραστατικού");
-                    return NotFound(new {
+                    return NotFound(new
+                    {
                         error = "Buy Doc Series not found"
                     });
                 }
@@ -2577,19 +3107,24 @@ namespace GrKouk.Web.ERP.Controllers {
                 #region Section Management
 
                 int sectionId = 0;
-                if (docTypeDef.SectionId == 0) {
-                    var sectn = await _context.Sections.AsNoTracking().SingleOrDefaultAsync(s => s.SystemName == sectionCode);
-                    if (sectn == null) {
+                if (docTypeDef.SectionId == 0)
+                {
+                    var sectn = await _context.Sections.AsNoTracking()
+                        .SingleOrDefaultAsync(s => s.SystemName == sectionCode);
+                    if (sectn == null)
+                    {
                         await transaction.RollbackAsync();
                         ModelState.AddModelError(string.Empty, "Δεν υπάρχει το Section");
-                        return NotFound(new {
+                        return NotFound(new
+                        {
                             error = "Could not locate section "
                         });
                     }
 
                     sectionId = sectn.Id;
                 }
-                else {
+                else
+                {
                     sectionId = docTypeDef.SectionId;
                 }
 
@@ -2603,14 +3138,17 @@ namespace GrKouk.Web.ERP.Controllers {
                 transToAttach.SellDocTypeId = docSeries.SellDocTypeDefId;
                 await _context.SellDocuments.AddAsync(transToAttach);
 
-                try {
+                try
+                {
                     await _context.SaveChangesAsync();
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     Console.WriteLine(e);
                     await transaction.RollbackAsync();
                     string msg = e.InnerException?.Message;
-                    return BadRequest(new {
+                    return BadRequest(new
+                    {
                         error = e.Message + " " + msg
                     });
                 }
@@ -2618,14 +3156,17 @@ namespace GrKouk.Web.ERP.Controllers {
                 var docId = _context.Entry(transToAttach).Entity.Id;
 
 
-                if (transTransactorDef.DefaultDocSeriesId > 0) {
+                if (transTransactorDef.DefaultDocSeriesId > 0)
+                {
                     var transTransactorDefaultSeries = await
                         _context.TransTransactorDocSeriesDefs.FirstOrDefaultAsync(p =>
                             p.Id == transTransactorDef.DefaultDocSeriesId);
-                    if (transTransactorDefaultSeries == null) {
+                    if (transTransactorDefaultSeries == null)
+                    {
                         await transaction.RollbackAsync();
                         ModelState.AddModelError(string.Empty, "Default series for transactor transaction not found");
-                        return NotFound(new {
+                        return NotFound(new
+                        {
                             error = "Default series for transactor transaction not found"
                         });
                     }
@@ -2649,13 +3190,16 @@ namespace GrKouk.Web.ERP.Controllers {
                     _context.Entry(transToAttach).State = EntityState.Modified;
                     //----------------------------------------------
                     await _context.TransactorTransactions.AddAsync(sTransactorTransaction);
-                    try {
+                    try
+                    {
                         await _context.SaveChangesAsync();
                     }
-                    catch (Exception e) {
+                    catch (Exception e)
+                    {
                         await transaction.RollbackAsync();
                         string msg = e.InnerException?.Message;
-                        return BadRequest(new {
+                        return BadRequest(new
+                        {
                             error = e.Message + " " + msg
                         });
                     }
@@ -2666,28 +3210,35 @@ namespace GrKouk.Web.ERP.Controllers {
                 //Αυτόματη εξόφληση
                 var paymentMethod =
                     await _context.PaymentMethods.FirstOrDefaultAsync(p => p.Id == transToAttach.PaymentMethodId);
-                if (paymentMethod is null) {
+                if (paymentMethod is null)
+                {
                     await transaction.RollbackAsync();
                     ModelState.AddModelError(string.Empty, "Δεν βρέθηκε ο τρόπος πληρωμής");
-                    return NotFound(new {
+                    return NotFound(new
+                    {
                         error = "Δεν βρέθηκε ο τρόπος πληρωμής"
                     });
                 }
 
-                if (paymentMethod.AutoPayoffWay == SeriesAutoPayoffEnum.SeriesAutoPayoffEnumAuto) {
+                if (paymentMethod.AutoPayoffWay == SeriesAutoPayoffEnum.SeriesAutoPayoffEnumAuto)
+                {
                     var autoPaySeriesId = transToAttach.SellDocSeries.PayoffSeriesId;
                     var paymentCfAccountId = paymentMethod.CfAccountId;
-                    if (autoPaySeriesId > 0) {
+                    if (autoPaySeriesId > 0)
+                    {
                         var transTransactorPayOffSeries = await
                             _context.TransTransactorDocSeriesDefs.FirstOrDefaultAsync(p =>
                                 p.Id == autoPaySeriesId);
-                        if (transTransactorPayOffSeries == null) {
+                        if (transTransactorPayOffSeries == null)
+                        {
                             await transaction.RollbackAsync();
                             ModelState.AddModelError(string.Empty, "AutoPayOff series not found");
-                            return NotFound(new {
+                            return NotFound(new
+                            {
                                 error = "AutoPayOff series not found"
                             });
                         }
+
                         var transactor = await _context.Transactors
                             .Where(p => p.Id == data.TransactorId)
                             .SingleOrDefaultAsync();
@@ -2708,14 +3259,20 @@ namespace GrKouk.Web.ERP.Controllers {
                             .Reference(t => t.TransTransactorDocTypeDef)
                             .LoadAsync();
                         var transTransactorDocTypeDef = transTransactorPayOffSeries.TransTransactorDocTypeDef;
+
                         #region Section Management
-                        if (transTransactorDocTypeDef.SectionId == 0) {
+
+                        if (transTransactorDocTypeDef.SectionId == 0)
+                        {
                             sTransactorTransaction.SectionId = sectionId;
                         }
-                        else {
+                        else
+                        {
                             sTransactorTransaction.SectionId = transTransactorDocTypeDef.SectionId;
                         }
+
                         #endregion
+
                         await _context.Entry(transTransactorDocTypeDef)
                             .Reference(t => t.TransTransactorDef)
                             .LoadAsync();
@@ -2724,28 +3281,36 @@ namespace GrKouk.Web.ERP.Controllers {
                             sTransactorTransaction);
 
                         await _context.TransactorTransactions.AddAsync(sTransactorTransaction);
-                        try {
+                        try
+                        {
                             await _context.SaveChangesAsync();
                         }
-                        catch (Exception e) {
+                        catch (Exception e)
+                        {
                             await transaction.RollbackAsync();
                             string msg = e.InnerException?.Message;
-                            return BadRequest(new {
+                            return BadRequest(new
+                            {
                                 error = e.Message + " " + msg
                             });
                         }
+
                         //Cash Flow Account Transaction 
-                        if (paymentCfAccountId > 0) {
+                        if (paymentCfAccountId > 0)
+                        {
                             var defaultCfaSeriesId = transTransactorPayOffSeries.DefaultCfaTransSeriesId;
-                            if (defaultCfaSeriesId > 0) {
+                            if (defaultCfaSeriesId > 0)
+                            {
                                 var cfaSeries = await _context.CashFlowDocSeriesDefs.FindAsync(defaultCfaSeriesId);
-                                if (cfaSeries != null) {
+                                if (cfaSeries != null)
+                                {
                                     await _context.Entry(cfaSeries)
                                         .Reference(t => t.CashFlowDocTypeDefinition)
                                         .LoadAsync();
 
                                     var cfaType = cfaSeries.CashFlowDocTypeDefinition;
-                                    if (cfaType != null) {
+                                    if (cfaType != null)
+                                    {
                                         await _context.Entry(cfaType)
                                             .Reference(t => t.CashFlowTransactionDefinition)
                                             .LoadAsync();
@@ -2754,9 +3319,9 @@ namespace GrKouk.Web.ERP.Controllers {
                                             $"{cfaSeries.Name} created from {docSeries.Name} for {transactor.Name} with {data.Etiology} ";
 
 
-
                                         var cfaTransDef = cfaType.CashFlowTransactionDefinition;
-                                        var cfaTrans = new CashFlowAccountTransaction {
+                                        var cfaTrans = new CashFlowAccountTransaction
+                                        {
                                             TransDate = data.TransDate,
                                             CashFlowAccountId = paymentCfAccountId,
                                             CompanyId = data.CompanyId,
@@ -2767,34 +3332,39 @@ namespace GrKouk.Web.ERP.Controllers {
                                             CreatorSectionId = sectionId,
                                             CreatorId = docId,
                                             RefCode = data.TransRefCode,
-                                            Amount = sTransactorTransaction.AmountNet - sTransactorTransaction.AmountDiscount + sTransactorTransaction.AmountFpa,
+                                            Amount = sTransactorTransaction.AmountNet -
+                                                     sTransactorTransaction.AmountDiscount +
+                                                     sTransactorTransaction.AmountFpa,
                                             SectionId = cfaType.SectionId > 0 ? cfaType.SectionId : sectionId
                                         };
                                         ActionHandlers.CashFlowFinAction(cfaTransDef.CfaAction, cfaTrans);
                                         await _context.CashFlowAccountTransactions.AddAsync(cfaTrans);
                                         sTransactorTransaction.CfAccountId = paymentCfAccountId;
                                         _context.Attach(sTransactorTransaction).State = EntityState.Modified;
-                                        try {
+                                        try
+                                        {
                                             await _context.SaveChangesAsync();
                                         }
-                                        catch (Exception e) {
+                                        catch (Exception e)
+                                        {
                                             await transaction.RollbackAsync();
                                             string msg = e.InnerException?.Message;
-                                            return BadRequest(new {
+                                            return BadRequest(new
+                                            {
                                                 error = e.Message + " " + msg
                                             });
                                         }
-
-
                                     }
                                 }
                             }
                         }
 
                         //End Cash Flow Account Transaction 
-                        try {
+                        try
+                        {
                             var payOfTransactionId = _context.Entry(sTransactorTransaction).Entity.Id;
-                            var payOffMapping = new SellDocTransPaymentMapping() {
+                            var payOffMapping = new SellDocTransPaymentMapping()
+                            {
                                 SellDocumentId = docId,
                                 TransactorTransactionId = payOfTransactionId,
                                 AmountUsed = sTransactorTransaction.AmountNet + sTransactorTransaction.AmountFpa -
@@ -2802,10 +3372,12 @@ namespace GrKouk.Web.ERP.Controllers {
                             };
                             await _context.SellDocTransPaymentMappings.AddAsync(payOffMapping);
                         }
-                        catch (Exception e) {
+                        catch (Exception e)
+                        {
                             await transaction.RollbackAsync();
                             string msg = e.InnerException?.Message;
-                            return BadRequest(new {
+                            return BadRequest(new
+                            {
                                 error = e.Message + " " + msg
                             });
                         }
@@ -2817,15 +3389,18 @@ namespace GrKouk.Web.ERP.Controllers {
                 int warehouseSeriesId = 0;
                 int warehouseTypeId = 0;
 
-                if (transWarehouseDef.DefaultDocSeriesId > 0) {
+                if (transWarehouseDef.DefaultDocSeriesId > 0)
+                {
                     var transWarehouseDefaultSeries =
                         await _context.TransWarehouseDocSeriesDefs
                             .FirstOrDefaultAsync(p =>
-                            p.Id == transWarehouseDef.DefaultDocSeriesId);
-                    if (transWarehouseDefaultSeries == null) {
+                                p.Id == transWarehouseDef.DefaultDocSeriesId);
+                    if (transWarehouseDefaultSeries == null)
+                    {
                         await transaction.RollbackAsync();
                         ModelState.AddModelError(string.Empty, "Default series for warehouse transaction not found");
-                        return NotFound(new {
+                        return NotFound(new
+                        {
                             error = "Default series for warehouse transaction not found"
                         });
                     }
@@ -2834,25 +3409,28 @@ namespace GrKouk.Web.ERP.Controllers {
                     warehouseSeriesId = transWarehouseDef.DefaultDocSeriesId;
                     warehouseTypeId = transWarehouseDefaultSeries.TransWarehouseDocTypeDefId;
                 }
-                else {
+                else
+                {
                     noWarehouseTrans = true;
                 }
 
-                foreach (var docLine in data.SellDocLines) {
+                foreach (var docLine in data.SellDocLines)
+                {
                     var warehouseItemId = docLine.WarehouseItemId;
                     var material = await _context.WarehouseItems.SingleOrDefaultAsync(p => p.Id == warehouseItemId);
-                    if (material is null) {
+                    if (material is null)
+                    {
                         //Handle error
                         await transaction.RollbackAsync();
                         ModelState.AddModelError(string.Empty, "Doc Line error null WarehouseItem");
-                        return NotFound(new {
+                        return NotFound(new
+                        {
                             error = "Could not locate material in Doc Line "
                         });
                     }
 
                     #region MaterialLine
 
-                   
                     var transUnitId = docLine.TransactionUnitId;
                     var transUnitFactor = docLine.TransactionUnitFactor;
                     // var factor = dataBuyDocLine.Factor;
@@ -2874,7 +3452,8 @@ namespace GrKouk.Web.ERP.Controllers {
                     };
                     ActionHandlers.DocLineFinAction(transTransactorDef.FinancialTransAction, lineAmounts);
 
-                    var sellDocLine = new SellDocLine {
+                    var sellDocLine = new SellDocLine
+                    {
                         UnitPrice = unitPrice,
                         AmountFpa = lineFpaAmount,
                         AmountNet = lineNetAmount,
@@ -2898,14 +3477,15 @@ namespace GrKouk.Web.ERP.Controllers {
                         TransDiscountAmount = lineAmounts.TransDiscountAmount,
                         TransExpensesAmount = lineAmounts.TransExpensesAmount
                     };
-                   
-                   
+
+
                     //_context.Entry(transToAttach).Entity
                     transToAttach.SellDocLines.Add(sellDocLine);
 
                     #endregion
 
-                    if (!noWarehouseTrans) {
+                    if (!noWarehouseTrans)
+                    {
                         #region Warehouse transaction
 
                         var warehouseTrans = new WarehouseTransaction
@@ -2926,7 +3506,7 @@ namespace GrKouk.Web.ERP.Controllers {
                             CreatorId = transToAttach.Id,
                             TransDate = transToAttach.TransDate,
                             TransRefCode = transToAttach.TransRefCode,
-                            UnitFactor = (decimal) docLine.Factor,
+                            UnitFactor = (decimal)docLine.Factor,
                             TransWarehouseDocSeriesId = warehouseSeriesId,
                             TransWarehouseDocTypeId = warehouseTypeId
                         };
@@ -2946,14 +3526,17 @@ namespace GrKouk.Web.ERP.Controllers {
                     }
                 }
 
-                try {
+                try
+                {
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     await transaction.RollbackAsync();
                     string msg = e.InnerException?.Message;
-                    return BadRequest(new {
+                    return BadRequest(new
+                    {
                         error = e.Message + " " + msg
                     });
                 }
@@ -2963,31 +3546,38 @@ namespace GrKouk.Web.ERP.Controllers {
         }
 
         [HttpPost("SalesDocUpdate")]
-        public async Task<IActionResult> PutSalesDoc([FromBody] SellDocModifyAjaxDto data) {
+        public async Task<IActionResult> PutSalesDoc([FromBody] SellDocModifyAjaxDto data)
+        {
             const string sectionCode = "SYS-SELL-COMBINED-SCN";
             bool noWarehouseTrans;
 
             SellDocModifyAjaxNoLinesDto transToAttachNoLines;
             SellDocument transToAttach;
             DateTime dateOfTrans;
-            if (data == null) {
-                return BadRequest(new {
+            if (data == null)
+            {
+                return BadRequest(new
+                {
                     error = "Empty request data"
                 });
             }
 
-            try {
+            try
+            {
                 transToAttachNoLines = _mapper.Map<SellDocModifyAjaxNoLinesDto>(data);
                 transToAttach = _mapper.Map<SellDocument>(transToAttachNoLines);
                 dateOfTrans = data.TransDate;
             }
-            catch (Exception e) {
-                return BadRequest(new {
+            catch (Exception e)
+            {
+                return BadRequest(new
+                {
                     error = e.Message
                 });
             }
 
-            await using (var transaction = await _context.Database.BeginTransactionAsync()) {
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
                 _context.SellDocLines.RemoveRange(_context.SellDocLines.Where(p => p.SellDocumentId == data.Id));
                 _context.TransactorTransactions.RemoveRange(
                     _context.TransactorTransactions.Where(p =>
@@ -2997,16 +3587,19 @@ namespace GrKouk.Web.ERP.Controllers {
                 _context.SellDocTransPaymentMappings.RemoveRange(
                     _context.SellDocTransPaymentMappings.Where(p => p.SellDocumentId == data.Id));
                 _context.CashFlowAccountTransactions.RemoveRange(
-                    _context.CashFlowAccountTransactions.Where(p => p.CreatorSectionId == data.SectionId && p.CreatorId == data.Id));
+                    _context.CashFlowAccountTransactions.Where(p =>
+                        p.CreatorSectionId == data.SectionId && p.CreatorId == data.Id));
 
                 #region Fiscal Period
 
                 var fiscalPeriod = await _context.FiscalPeriods.AsNoTracking().FirstOrDefaultAsync(p =>
                     dateOfTrans >= p.StartDate && dateOfTrans <= p.EndDate);
-                if (fiscalPeriod == null) {
+                if (fiscalPeriod == null)
+                {
                     await transaction.RollbackAsync();
                     ModelState.AddModelError(string.Empty, "No Fiscal Period covers Transaction Date");
-                    return NotFound(new {
+                    return NotFound(new
+                    {
                         error = "No Fiscal Period covers Transaction Date"
                     });
                 }
@@ -3016,10 +3609,12 @@ namespace GrKouk.Web.ERP.Controllers {
                 var docSeries = await
                     _context.SellDocSeriesDefs.SingleOrDefaultAsync(m => m.Id == data.SellDocSeriesId);
 
-                if (docSeries is null) {
+                if (docSeries is null)
+                {
                     await transaction.RollbackAsync();
                     ModelState.AddModelError(string.Empty, "Δεν βρέθηκε η σειρά παραστατικού");
-                    return NotFound(new {
+                    return NotFound(new
+                    {
                         error = "Buy Doc Series not found"
                     });
                 }
@@ -3037,19 +3632,24 @@ namespace GrKouk.Web.ERP.Controllers {
                 #region Section Management
 
                 int sectionId = 0;
-                if (docTypeDef.SectionId == 0) {
-                    var sectn = await _context.Sections.AsNoTracking().SingleOrDefaultAsync(s => s.SystemName == sectionCode);
-                    if (sectn == null) {
+                if (docTypeDef.SectionId == 0)
+                {
+                    var sectn = await _context.Sections.AsNoTracking()
+                        .SingleOrDefaultAsync(s => s.SystemName == sectionCode);
+                    if (sectn == null)
+                    {
                         await transaction.RollbackAsync();
                         ModelState.AddModelError(string.Empty, "Δεν υπάρχει το Section");
-                        return NotFound(new {
+                        return NotFound(new
+                        {
                             error = "Could not locate section "
                         });
                     }
 
                     sectionId = sectn.Id;
                 }
-                else {
+                else
+                {
                     sectionId = docTypeDef.SectionId;
                 }
 
@@ -3066,14 +3666,17 @@ namespace GrKouk.Web.ERP.Controllers {
                 _context.Entry(transToAttach).State = EntityState.Modified;
                 var docId = transToAttach.Id;
                 //--------------------------------------
-                if (transTransactorDef.DefaultDocSeriesId > 0) {
+                if (transTransactorDef.DefaultDocSeriesId > 0)
+                {
                     var transTransactorDefaultSeries = await
                         _context.TransTransactorDocSeriesDefs.FirstOrDefaultAsync(p =>
                             p.Id == transTransactorDef.DefaultDocSeriesId);
-                    if (transTransactorDefaultSeries == null) {
+                    if (transTransactorDefaultSeries == null)
+                    {
                         await transaction.RollbackAsync();
                         ModelState.AddModelError(string.Empty, "Default series for transactor transaction not found");
-                        return NotFound(new {
+                        return NotFound(new
+                        {
                             error = "Default series for transactor transaction not found"
                         });
                     }
@@ -3106,29 +3709,36 @@ namespace GrKouk.Web.ERP.Controllers {
                 var paymentMethod =
                     await _context.PaymentMethods
                         .FirstOrDefaultAsync(p => p.Id == transToAttach.PaymentMethodId);
-                if (paymentMethod is null) {
+                if (paymentMethod is null)
+                {
                     await transaction.RollbackAsync();
                     ModelState.AddModelError(string.Empty, "Δεν βρέθηκε ο τρόπος πληρωμής");
-                    return NotFound(new {
+                    return NotFound(new
+                    {
                         error = "Δεν βρέθηκε ο τρόπος πληρωμής"
                     });
                 }
 
-                if (paymentMethod.AutoPayoffWay == SeriesAutoPayoffEnum.SeriesAutoPayoffEnumAuto) {
+                if (paymentMethod.AutoPayoffWay == SeriesAutoPayoffEnum.SeriesAutoPayoffEnumAuto)
+                {
                     var autoPaySeriesId = transToAttach.SellDocSeries.PayoffSeriesId;
                     var paymentCfAccountId = paymentMethod.CfAccountId;
-                    if (autoPaySeriesId > 0) {
+                    if (autoPaySeriesId > 0)
+                    {
                         var transTransactorPayOffSeries = await
                             _context.TransTransactorDocSeriesDefs
                                 .FirstOrDefaultAsync(p =>
-                                p.Id == autoPaySeriesId);
-                        if (transTransactorPayOffSeries == null) {
+                                    p.Id == autoPaySeriesId);
+                        if (transTransactorPayOffSeries == null)
+                        {
                             await transaction.RollbackAsync();
                             ModelState.AddModelError(string.Empty, "AutoPayOff series not found");
-                            return NotFound(new {
+                            return NotFound(new
+                            {
                                 error = "AutoPayOff series not found"
                             });
                         }
+
                         var transactor = await _context.Transactors
                             .Where(p => p.Id == data.TransactorId)
                             .SingleOrDefaultAsync();
@@ -3151,14 +3761,20 @@ namespace GrKouk.Web.ERP.Controllers {
                             .Reference(t => t.TransTransactorDocTypeDef)
                             .LoadAsync();
                         var transTransactorDocTypeDef = transTransactorPayOffSeries.TransTransactorDocTypeDef;
+
                         #region Section Management
-                        if (transTransactorDocTypeDef.SectionId == 0) {
+
+                        if (transTransactorDocTypeDef.SectionId == 0)
+                        {
                             sTransactorTransaction.SectionId = sectionId;
                         }
-                        else {
+                        else
+                        {
                             sTransactorTransaction.SectionId = transTransactorDocTypeDef.SectionId;
                         }
+
                         #endregion
+
                         await _context.Entry(transTransactorDocTypeDef)
                             .Reference(t => t.TransTransactorDef)
                             .LoadAsync();
@@ -3167,28 +3783,36 @@ namespace GrKouk.Web.ERP.Controllers {
                             sTransactorTransaction);
 
                         await _context.TransactorTransactions.AddAsync(sTransactorTransaction);
-                        try {
+                        try
+                        {
                             await _context.SaveChangesAsync();
                         }
-                        catch (Exception e) {
+                        catch (Exception e)
+                        {
                             await transaction.RollbackAsync();
                             string msg = e.InnerException?.Message;
-                            return BadRequest(new {
+                            return BadRequest(new
+                            {
                                 error = e.Message + " " + msg
                             });
                         }
+
                         //Cash Flow Account Transaction 
-                        if (paymentCfAccountId > 0) {
+                        if (paymentCfAccountId > 0)
+                        {
                             var defaultCfaSeriesId = transTransactorPayOffSeries.DefaultCfaTransSeriesId;
-                            if (defaultCfaSeriesId > 0) {
+                            if (defaultCfaSeriesId > 0)
+                            {
                                 var cfaSeries = await _context.CashFlowDocSeriesDefs.FindAsync(defaultCfaSeriesId);
-                                if (cfaSeries != null) {
+                                if (cfaSeries != null)
+                                {
                                     await _context.Entry(cfaSeries)
                                         .Reference(t => t.CashFlowDocTypeDefinition)
                                         .LoadAsync();
 
                                     var cfaType = cfaSeries.CashFlowDocTypeDefinition;
-                                    if (cfaType != null) {
+                                    if (cfaType != null)
+                                    {
                                         await _context.Entry(cfaType)
                                             .Reference(t => t.CashFlowTransactionDefinition)
                                             .LoadAsync();
@@ -3197,9 +3821,9 @@ namespace GrKouk.Web.ERP.Controllers {
                                             $"{cfaSeries.Name} created from {docSeries.Name} for {transactor.Name} with {data.Etiology} ";
 
 
-
                                         var cfaTransDef = cfaType.CashFlowTransactionDefinition;
-                                        var cfaTrans = new CashFlowAccountTransaction {
+                                        var cfaTrans = new CashFlowAccountTransaction
+                                        {
                                             TransDate = data.TransDate,
                                             CashFlowAccountId = paymentCfAccountId,
                                             CompanyId = data.CompanyId,
@@ -3210,34 +3834,39 @@ namespace GrKouk.Web.ERP.Controllers {
                                             CreatorSectionId = sectionId,
                                             CreatorId = docId,
                                             RefCode = data.TransRefCode,
-                                            Amount = sTransactorTransaction.AmountNet - sTransactorTransaction.AmountDiscount + sTransactorTransaction.AmountFpa,
+                                            Amount = sTransactorTransaction.AmountNet -
+                                                     sTransactorTransaction.AmountDiscount +
+                                                     sTransactorTransaction.AmountFpa,
                                             SectionId = cfaType.SectionId > 0 ? cfaType.SectionId : sectionId
                                         };
                                         ActionHandlers.CashFlowFinAction(cfaTransDef.CfaAction, cfaTrans);
                                         await _context.CashFlowAccountTransactions.AddAsync(cfaTrans);
                                         sTransactorTransaction.CfAccountId = paymentCfAccountId;
                                         _context.Attach(sTransactorTransaction).State = EntityState.Modified;
-                                        try {
+                                        try
+                                        {
                                             await _context.SaveChangesAsync();
                                         }
-                                        catch (Exception e) {
+                                        catch (Exception e)
+                                        {
                                             await transaction.RollbackAsync();
                                             string msg = e.InnerException?.Message;
-                                            return BadRequest(new {
+                                            return BadRequest(new
+                                            {
                                                 error = e.Message + " " + msg
                                             });
                                         }
-
-
                                     }
                                 }
                             }
                         }
 
                         //End Cash Flow Account Transaction 
-                        try {
+                        try
+                        {
                             var payOfTransactionId = _context.Entry(sTransactorTransaction).Entity.Id;
-                            var payOffMapping = new SellDocTransPaymentMapping() {
+                            var payOffMapping = new SellDocTransPaymentMapping()
+                            {
                                 SellDocumentId = docId,
                                 TransactorTransactionId = payOfTransactionId,
                                 AmountUsed = sTransactorTransaction.AmountNet + sTransactorTransaction.AmountFpa -
@@ -3245,10 +3874,12 @@ namespace GrKouk.Web.ERP.Controllers {
                             };
                             await _context.SellDocTransPaymentMappings.AddAsync(payOffMapping);
                         }
-                        catch (Exception e) {
+                        catch (Exception e)
+                        {
                             await transaction.RollbackAsync();
                             string msg = e.InnerException?.Message;
-                            return BadRequest(new {
+                            return BadRequest(new
+                            {
                                 error = e.Message + " " + msg
                             });
                         }
@@ -3258,15 +3889,18 @@ namespace GrKouk.Web.ERP.Controllers {
                 int warehouseSeriesId = 0;
                 int warehouseTypeId = 0;
 
-                if (transWarehouseDef.DefaultDocSeriesId > 0) {
+                if (transWarehouseDef.DefaultDocSeriesId > 0)
+                {
                     var transWarehouseDefaultSeries =
                         await _context.TransWarehouseDocSeriesDefs
                             .FirstOrDefaultAsync(p =>
-                            p.Id == transWarehouseDef.DefaultDocSeriesId);
-                    if (transWarehouseDefaultSeries == null) {
+                                p.Id == transWarehouseDef.DefaultDocSeriesId);
+                    if (transWarehouseDefaultSeries == null)
+                    {
                         await transaction.RollbackAsync();
                         ModelState.AddModelError(string.Empty, "Default series for warehouse transaction not found");
-                        return NotFound(new {
+                        return NotFound(new
+                        {
                             error = "Default series for warehouse transaction not found"
                         });
                     }
@@ -3275,25 +3909,28 @@ namespace GrKouk.Web.ERP.Controllers {
                     warehouseSeriesId = transWarehouseDef.DefaultDocSeriesId;
                     warehouseTypeId = transWarehouseDefaultSeries.TransWarehouseDocTypeDefId;
                 }
-                else {
+                else
+                {
                     noWarehouseTrans = true;
                 }
 
-                foreach (var docLine in data.SellDocLines) {
+                foreach (var docLine in data.SellDocLines)
+                {
                     var warehouseItemId = docLine.WarehouseItemId;
                     var material = await _context.WarehouseItems.SingleOrDefaultAsync(p => p.Id == warehouseItemId);
-                    if (material is null) {
+                    if (material is null)
+                    {
                         //Handle error
                         await transaction.RollbackAsync();
                         ModelState.AddModelError(string.Empty, "Doc Line error null WarehouseItem");
-                        return NotFound(new {
+                        return NotFound(new
+                        {
                             error = "Could not locate material in Doc Line "
                         });
                     }
 
                     #region MaterialLine
 
-                   
                     var transUnitId = docLine.TransactionUnitId;
                     var transUnitFactor = docLine.TransactionUnitFactor;
                     decimal transPrice = docLine.TransUnitPrice;
@@ -3313,7 +3950,8 @@ namespace GrKouk.Web.ERP.Controllers {
                         AmountExpenses = 0
                     };
                     ActionHandlers.DocLineFinAction(transTransactorDef.FinancialTransAction, lineAmounts);
-                    var sellDocLine = new SellDocLine {
+                    var sellDocLine = new SellDocLine
+                    {
                         UnitPrice = unitPrice,
                         AmountFpa = lineFpaAmount,
                         AmountNet = lineNetAmount,
@@ -3342,10 +3980,12 @@ namespace GrKouk.Web.ERP.Controllers {
 
                     #endregion
 
-                    if (!noWarehouseTrans) {
+                    if (!noWarehouseTrans)
+                    {
                         #region Warehouse transaction
 
-                        var warehouseTrans = new WarehouseTransaction {
+                        var warehouseTrans = new WarehouseTransaction
+                        {
                             FpaRate = fpaRate,
                             DiscountRate = discountRate,
                             UnitPrice = unitPrice,
@@ -3381,14 +4021,17 @@ namespace GrKouk.Web.ERP.Controllers {
                     }
                 }
 
-                try {
+                try
+                {
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     await transaction.RollbackAsync();
                     string msg = e.InnerException?.Message;
-                    return BadRequest(new {
+                    return BadRequest(new
+                    {
                         error = e.Message + " " + msg
                     });
                 }

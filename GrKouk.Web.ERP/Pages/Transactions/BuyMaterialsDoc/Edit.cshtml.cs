@@ -84,14 +84,9 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
 
         private void LoadCombos()
         {
-            List<SelectListItem> seekTypes = new List<SelectListItem>
-            {
-                new SelectListItem() {Value = "NAME", Text = "Name"},
-                new SelectListItem() {Value ="CODE", Text = "Code"},
-                new SelectListItem() {Value = "BARCODE", Text = "Barcode"}
-            };
+            List<SelectListItem> seekTypes = FiltersHelper.GetSeekTypesList();
             ViewData["SeekType"] = new SelectList(seekTypes, "Value", "Text");
-
+            
             var supplierList = _context.Transactors.Where(s => s.TransactorType.Code == "SYS.SUPPLIER").OrderBy(s => s.Name).AsNoTracking();
             //ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
             ViewData["BuyDocSeriesId"] = new SelectList(_context.BuyDocSeriesDefs.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");

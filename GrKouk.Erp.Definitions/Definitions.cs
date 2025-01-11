@@ -180,6 +180,8 @@ namespace GrKouk.Erp.Definitions
 
     public enum WarehouseItemCodeUsedUnitEnum
     {
+        [Description("{Default Unit}")]
+        CodeUsedUnitEnumNoUnit = 0,
         [Description("Κύρια")]
         CodeUsedUnitEnumMain = 1,
         [Description("Δευτερεύουσα")]
