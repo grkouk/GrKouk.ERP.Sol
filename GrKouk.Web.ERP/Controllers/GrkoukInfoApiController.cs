@@ -31,6 +31,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using System.Threading;
 using GrKouk.Erp.Dtos.CashFlowTransactions;
 using GrKouk.Erp.Dtos.FinancialMovements;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -1261,7 +1262,7 @@ namespace GrKouk.Web.ERP.Controllers
                 .Include(p => p.Transactor)
                 .Include(p => p.TransTransactorDocSeries)
                 .Include(p => p.TransTransactorDocType);
-
+            //Thread.Sleep(10000);
             if (!string.IsNullOrEmpty(request.SortData))
             {
                 switch (request.SortData.ToLower())

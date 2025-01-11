@@ -1,7 +1,7 @@
 ﻿//Author: George Koukoudis
-//Version:  1.0
-//Date Created: 
-//Date Modified: 2022/01/17
+//Version:  1.5.1
+//Date Created: 2022-01-17
+//Date Modified: 2025-01-11
 //Index pages javascript tools
 
 var indPgLib = (function () {
@@ -26,19 +26,24 @@ var indPgLib = (function () {
 
     let getTableCurrentSort;
     let setTableCurrentSort;
+    const $loadMe = $("#loadMe");
+    const loadingModal= new bootstrap.Modal(document.getElementById('loadMe'),{backdrop: "static", keyboard: false});
     const indexPageSpinnerShow = () => {
-        $("#loadMe").modal({
-            backdrop: "static",
-            keyboard: false,
-            show: true
-        });
+        // $loadMe.modal({
+        //     backdrop: "static",
+        //     keyboard: false,
+        //     show: true
+        // });
+        // $loadMe.show();
+        loadingModal.show()
+        
     };
 
     const indexPageSpinnerHide = () => {
-        $("#loadMe").modal("hide");
+        $loadMe.modal("hide");
     };
     const indexPageSpinnerIsVisible = () => {
-        return $("#loadMe").hasClass("show");
+        return $loadMe.hasClass("show");
     };
     const selectorSpinnerShow = () => {
         $('#SpinnerLoader').show();
@@ -893,18 +898,24 @@ var indPgLib = (function () {
                     }
                     timeout = setTimeout(function () {
                         spinnerLoaderShow();
+                        indexPageSpinnerShow() 
                     }, 1000);
                 },
                 complete: function () {
                     if (timeout) {
                         clearTimeout(timeout);
                     }
-                    $("#loadMe").modal("hide");
+                  
                     setTimeout(function () {
                         var isOpen = spinnerLoaderIsVisible();
                         if (isOpen) {
                             spinnerLoaderHide();
                         }
+                        isOpen = indexPageSpinnerIsVisible();
+                        if (isOpen) {
+                            indexPageSpinnerHide();
+                        }
+
                     }, 2000);
                 },
             });
