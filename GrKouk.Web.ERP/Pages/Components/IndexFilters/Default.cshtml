@@ -3,7 +3,9 @@
 @{
     Layout = null;
 }
-
+<style>
+  
+</style>
 <div class="collapse show" id="filterCollapse">
     <form class="form-inline" id="FiltersForm" method="get">
         <input type="hidden" id="filtersVisible" />
@@ -13,7 +15,8 @@
         <input type="hidden" id="totalPages" />
         <input type="hidden" id="totalRecords" />
         <input type="hidden" id="pageIndex" />
-
+        <input type="hidden" id="SectionsFilter" />
+        
         <div class="row align-items-center">
             <div class="col-md-auto">
                 <div class="searchbar">
@@ -31,7 +34,7 @@
                         <div class="form-floating">
 
                             <select name="DatePeriodFilter" id="DatePeriodFilter" class="form-select form-select-sm"
-                        asp-items="Model.DateFilterValues">
+                                    asp-items="Model.DateFilterValues">
                             </select>
                             <label class="small">Period:</label>
                         </div>
@@ -63,7 +66,7 @@
                     <div class="col-md-2 col-sm-6">
                         <div class="form-floating">
                             <select id="WarehouseItemNatureFilter" class="form-select form-select-sm"
-                        asp-items="Model.MaterialNaturesFilterValues">
+                                    asp-items="Model.MaterialNaturesFilterValues">
                             </select>
                             <label class="small">Material Nature:</label>
                         </div>
@@ -73,18 +76,18 @@
 
             }
             @{
-            if (Model.FiltersToShow.ShowMaterialCategoriesFlt)
-            {
-            <div class="col-md-2 col-sm-6">
-                <div class="form-floating">
-                    <select id="MaterialCategoriesFilter" class="form-select form-select-sm"
-                            asp-items="Model.MaterialCategoriesFilterValues">
-                    </select>
-                    <label class="small">Material Categories:</label>
-                </div>
+                if (Model.FiltersToShow.ShowMaterialCategoriesFlt)
+                {
+                    <div class="col-md-2 col-sm-6">
+                        <div class="form-floating">
+                            <select id="MaterialCategoriesFilter" class="form-select form-select-sm"
+                                    asp-items="Model.MaterialCategoriesFilterValues">
+                            </select>
+                            <label class="small">Material Categories:</label>
+                        </div>
 
-            </div>
-            }
+                    </div>
+                }
 
             }
             @{
@@ -93,7 +96,7 @@
                     <div class="col-md-2 col-sm-6">
                         <div class="form-floating">
                             <select id="TransactorTypeFilter" class="form-select form-select-sm"
-                        asp-items="Model.TransactorTypeFilterValues">
+                                    asp-items="Model.TransactorTypeFilterValues">
                             </select>
                             <label class="small">Transactor Type:</label>
                         </div>
@@ -102,18 +105,19 @@
                 }
 
             }
+          
             @{
                 if (Model.FiltersToShow.ShowSectionsFlt)
                 {
                     <div class="col-md-2 col-sm-6">
-                        <div class="form-floating">
-                            <select id="SectionsFilter" class="form-select form-select-sm"
-                                    asp-items="Model.SectionsFilterValues">
-                            </select>
-                            <label class="small">Sections:</label>
-                        </div>
-
-                    </div>
+                      <ejs-multiselect id="SectionsFilterElm" dataSource="@Model.SectionsFilterUiSelectItems" placeholder="Select sections" mode="CheckBox"
+                                         showDropDownIcon="true"
+                                         floatLabelType="Auto"
+                                         allowResize ="true"
+                                         showSelectAll="false">
+                            <e-multiselect-fields text="Text" value="ValueInt"></e-multiselect-fields>
+                        </ejs-multiselect>
+                      </div>
                 }
 
             }
@@ -152,7 +156,7 @@
                         <div class="form-floating">
 
                             <select id="CurrencySelector" class="form-select form-select-sm"
-                        asp-items="Model.CurrencyFilterValues">
+                                    asp-items="Model.CurrencyFilterValues">
                             </select>
                             <label class="small"> Currency:</label>
                         </div>
@@ -196,3 +200,4 @@
 
     </form>
 </div>
+

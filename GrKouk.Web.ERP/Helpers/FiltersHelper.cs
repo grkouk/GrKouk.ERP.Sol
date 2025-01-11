@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GrKouk.Erp.Definitions;
+using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Web.ERP.Data;
 
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -264,6 +265,45 @@ namespace GrKouk.Web.ERP.Helpers
             }
 
             return sectionsList;
+        }
+
+        public static async Task<List<UISelectTypeItem>> GetSectionsFilterUiListAsync(ApiDbContext context)
+        {
+            var sectionsUiListJs = await context.Sections.OrderBy(p => p.Name)
+                .Select(p => new UISelectTypeItem()
+                {
+                    Title = p.Name,
+                    Text = p.Name,
+                    ValueInt = p.Id,
+                    Value = p.Id.ToString()
+                }).ToListAsync();
+            sectionsUiListJs.Insert(0, new UISelectTypeItem()
+            {
+                Title = "{All Sections}",
+                Text = "{All Sections}",
+                ValueInt = 0,
+                Value = 0.ToString()
+            });
+            return sectionsUiListJs;
+        }
+        public static  List<UISelectTypeItem> GetSectionsFilterUiList(ApiDbContext context)
+        {
+            var sectionsUiListJs =  context.Sections.OrderBy(p => p.Name)
+                .Select(p => new UISelectTypeItem()
+                {
+                    Title = p.Name,
+                    Text = p.Name,
+                    ValueInt = p.Id,
+                    Value = p.Id.ToString()
+                }).ToList();
+            sectionsUiListJs.Insert(0, new UISelectTypeItem()
+            {
+                Title = "{All Sections}",
+                Text = "{All Sections}",
+                ValueInt = 0,
+                Value = 0.ToString()
+            });
+            return sectionsUiListJs;
         }
         public static List<SelectListItem> GetTransactorsForTypeFilterList(ApiDbContext context, string trType)
         {

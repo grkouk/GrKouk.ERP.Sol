@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GrKouk.Erp.Dtos.Diaries;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GrKouk.Web.ERP.Helpers
@@ -13,6 +14,7 @@ namespace GrKouk.Web.ERP.Helpers
         public List<SelectListItem> TransactorTypeFilterValues { get; set; }
         public List<SelectListItem> MaterialCategoriesFilterValues { get; set; }
         public List<SelectListItem> SectionsFilterValues { get; set; }
+        public List<UISelectTypeItem> SectionsFilterUiSelectItems { get; set; }
         public IndexFiltersToShow FiltersToShow { get; set; }
        
     }

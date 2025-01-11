@@ -1319,7 +1319,32 @@ namespace GrKouk.Web.ERP.Controllers
                     }
                 }
             }
-
+            // if (!string.IsNullOrEmpty(request.SectionsFilter))
+            // {
+            //     if (int.TryParse(request.SectionsFilter, out var sectionId))
+            //     {
+            //         if (sectionId > 0)
+            //         {
+            //             fullListIq = fullListIq.Where(p => p.SectionId == sectionId);
+            //         }
+            //     }
+            // }
+            if (!string.IsNullOrEmpty(request.SectionsFilter))
+            { 
+               List<int> sectionIds = JsonSerializer.Deserialize<List<int>>(request.SectionsFilter);
+               if (sectionIds.Count == 0)
+               {
+                   sectionIds.Add(0);
+               }
+               bool allSections=sectionIds.Any(sectionId => sectionId == 0);
+               if (!allSections)
+               {
+                   fullListIq = fullListIq.Where(p => sectionIds.Contains(p.SectionId));   
+               }
+                
+            }
+            
+            
             if (!string.IsNullOrEmpty(request.SearchFilter))
             {
                 fullListIq = fullListIq.Where(p => p.Transactor.Name.Contains(request.SearchFilter)
@@ -1608,7 +1633,7 @@ namespace GrKouk.Web.ERP.Controllers
                     }
                 }
             }
-
+           
             if (!string.IsNullOrEmpty(request.SearchFilter))
             {
                 fullListIq = fullListIq.Where(p => p.Transactor.Name.Contains(request.SearchFilter)
