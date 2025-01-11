@@ -72,6 +72,7 @@ var indPgLib = (function () {
     let $materialCategoriesFilter = $('#MaterialCategoriesFilter');
     let $currencySelector = $("#CurrencySelector");
     let $diaryId = $("#DiaryId");
+   // let rfSectionsFilter = document.getElementById("SectionsFilterElm").ej2_instances[0];
     //-------------------------------------------------------
     let companyFilterElement;
     let datePeriodFilterElement;
@@ -231,6 +232,14 @@ var indPgLib = (function () {
         } else {
             sectionsFilterElement = "";
         }
+        //Not used yet
+        //Preparing for syncfusion controls
+        // let sectionsFltSF;
+        // if(!rfSectionsFilter.value === undefined){
+        //     sectionsFltSF = rfSectionsFilter.value;
+        //     //sectionsFilterElement = sectionsFltSF;
+        //    
+        // }
     };
     const commonTableHandlers = [
         {
@@ -1129,6 +1138,7 @@ var indPgLib = (function () {
             $datePeriodFilter.val("CURMONTH");
             $companyFilter.val(0);
             $currentSort.val("transactiondate:desc");
+            $sectionsFilter.val(0);
         }
         else {
             var storageItem = JSON.parse(storageItemJs);
@@ -1152,11 +1162,19 @@ var indPgLib = (function () {
             $pageSize.val(filtersValue);
             filtersValue = storageItem.find((x) => x.filterKey === "pageIndex").filterValue;
             $pageIndex.val(filtersValue);
-
+            try {
+                filtersValue = storageItem.find((x) => x.filterKey === "sectionsFilter").filterValue;
+                $sectionsFilter.val(filtersValue);
+            }
+            catch (e) {
+                console.log(e);
+            }
             try {
                 filtersValue = storageItem.find((x) => x.filterKey === "currentCurrency").filterValue;
                 $currencySelector.val(filtersValue);
-            } catch (e) { }
+            } catch (e) {
+                console.log(e);
+            }
         }
     };
     const saveSettings = (localStorageKey) => {
@@ -1174,6 +1192,7 @@ var indPgLib = (function () {
         var companyFilter = $companyFilter.val();
         var pageIndex = $pageIndex.val();
         var currentCurrency = $currencySelector.val();
+        var sectionsFilter = $sectionsFilter.val();
         var filtersArr = [];
         //#endregion
         filtersArr.push({
@@ -1208,7 +1227,10 @@ var indPgLib = (function () {
             filterKey: "currentCurrency",
             filterValue: currentCurrency,
         });
-
+        filtersArr.push({
+            filterKey: "sectionsFilter",
+            filterValue:sectionsFilter, 
+        });
         var sessionVal = JSON.stringify(filtersArr);
 
         localStorage.setItem(localStorageKey, sessionVal);

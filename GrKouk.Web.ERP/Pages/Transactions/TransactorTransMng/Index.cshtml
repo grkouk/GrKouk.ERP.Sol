@@ -569,8 +569,15 @@
 
             indPgLib.handleFiltersUi();
             const selectedSections = document.getElementById("SectionsFilterElm").ej2_instances[0];
+            let sectionsFilterValue = $('#SectionsFilter').val();
+            if (sectionsFilterValue != null && sectionsFilterValue.length > 0) {
+                selectedSections.value = JSON.parse( sectionsFilterValue);
+            }
             selectedSections.changeOnBlur = false;
             selectedSections.addEventListener("change", (event) => {
+                if ((event.value==null|| event.value.length===0) && event.oldValue.includes(0)) {
+                    return
+                }
                 if (event.value.includes(0)) {
                     event.value = [0];
                     selectedSections.value = [0];
