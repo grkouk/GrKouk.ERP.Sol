@@ -404,6 +404,7 @@ namespace GrKouk.Web.ERP.Controllers
                 .Include(p => p.Company)
                 .Include(p => p.Section)
                 .Include(p => p.Transactor)
+                .Include(p=>p.PaymentMethod)
                 .Select(p => new BuyDocList2Dto()
                 {
                     Id = p.Id,
@@ -422,6 +423,7 @@ namespace GrKouk.Web.ERP.Controllers
                     TransactorId = p.TransactorId,
                     TransactorName = p.Transactor.Name,
                     TransRefCode = p.TransRefCode,
+                    PaymentMethod = p.PaymentMethod.Name,
                     PayedOfAmount = p.PaymentMappings.Sum(q => q.AmountUsed)
                 });
             if (!string.IsNullOrEmpty(request.SortData))
@@ -505,6 +507,7 @@ namespace GrKouk.Web.ERP.Controllers
                     p.AmountDiscount),
                 CompanyId = p.CompanyId,
                 CompanyCode = p.CompanyCode,
+                PaymentMethod = p.PaymentMethod,
                 PayedOfAmount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
                     p.PayedOfAmount),
                 CompanyCurrencyId = p.CompanyCurrencyId
