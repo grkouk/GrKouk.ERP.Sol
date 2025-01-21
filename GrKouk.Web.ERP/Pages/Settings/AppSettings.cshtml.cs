@@ -81,7 +81,17 @@ namespace GrKouk.Web.ERP.Pages.Settings
                     Value = ((int) c).ToString(),
                     Text = c.GetDescription()
                 }).ToList();
+            var aggregationTypeList = Enum.GetValues(typeof(MainInfoAggregationTypeEnum))
+                .Cast<MainInfoAggregationTypeEnum>()
+                .Select(c=> new SelectListItem()
+                {
+                    Value = ((int)c).ToString(), 
+                    Text = c.GetDescription()
+                    
+                }).ToList();
+                    
             ViewData["SourceType"] = sourceTypeList;
+            ViewData["AggregationType"] = aggregationTypeList;
         }
 
         public async Task<IActionResult> OnPostAsync()

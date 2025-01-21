@@ -216,6 +216,20 @@ namespace GrKouk.Erp.Definitions
         [Description("Κινήσεις Συναλλασσόμενων")]
         SourceTypeTransactorTransactions = 6
     }
+
+    public enum MainInfoAggregationTypeEnum
+    {
+        [Description("Sum Of")]
+        AggregationTypeSum = 1,
+        [Description("Average Of")]
+        AggregationTypeAverage = 2,
+        [Description("Count Of")]
+        AggregationTypeCount = 3,
+        [Description("Max Of")]
+        AggregationTypeMax = 4,
+        [Description("Min Of")]
+        AggregationTypeMin = 5
+    }
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1712:Do not prefix enum values with type name", Justification = "<Pending>")]
     public enum InfoEntityActionEnum
     {

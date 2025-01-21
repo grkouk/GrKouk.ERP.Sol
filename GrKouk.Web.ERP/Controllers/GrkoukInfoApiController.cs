@@ -1265,7 +1265,7 @@ namespace GrKouk.Web.ERP.Controllers
                 .Include(p => p.Transactor)
                 .Include(p => p.TransTransactorDocSeries)
                 .Include(p => p.TransTransactorDocType);
-            Thread.Sleep(10000);
+            //Thread.Sleep(10000);
             if (!string.IsNullOrEmpty(request.SortData))
             {
                 switch (request.SortData.ToLower())
