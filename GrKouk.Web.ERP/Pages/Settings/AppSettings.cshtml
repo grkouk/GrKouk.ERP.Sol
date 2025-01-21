@@ -1,5 +1,9 @@
 ﻿@page
 @using GrKouk.Erp.Definitions
+@using GrKouk.Web.ERP.Helpers
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Syncfusion.EJ2
+@using Syncfusion.EJ2.DropDowns
 @model AppSettingsModel
 
 @{
@@ -66,7 +70,7 @@
                     </div>
                 </div>
             </div>
-
+            
             <div class="row">
                 <div class="col-md-10 col-sm-10 col-lg-10">
                     <label class="" small>Sum Of Service Sales Definition</label>
@@ -111,7 +115,7 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group">
+           <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary btn-sm" id="saveForm"/>
             </div>
         </fieldset>
