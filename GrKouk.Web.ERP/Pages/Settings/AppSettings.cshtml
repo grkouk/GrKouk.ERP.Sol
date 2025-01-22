@@ -115,6 +115,94 @@
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Average Of Material Buys Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[9].Value" id="BuyAvgMaterialsValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="BuyAvgMaterialsSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Average Of Expenses Buys Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[10].Value" id="BuyAvgExpensesValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="BuyAvgExpensesSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Average Of Services Buys Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[11].Value" id="BuyAvgServicesValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="BuyAvgServicesSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Average Of Materials Sales Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[12].Value" id="SalesAvgMaterialsValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="SalesAvgMaterialsSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Average Of Services Sales Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[13].Value" id="SalesAvgServicesValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="SalesAvgServicesSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Average Of Income Sales Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[14].Value" id="SalesAvgIncomeValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="SalesAvgIncomeSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Average Of Fixed Assets Buys Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[15].Value" id="BuysAvgFixedAssetsValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="BuysAvgFixedAssetsSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Average Of Fixed Assets Sales Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[16].Value" id="SalesAvgFixedAssetsValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="SalesAvgFixedAssetsSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
            <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary btn-sm" id="saveForm"/>
             </div>
@@ -464,7 +552,7 @@
                         case "SellServicesSettings":
                             $('#SellServicesValue').val(jsJSON);
                             break;
-                         case "SellIncomeSettings":
+                        case "SellIncomeSettings":
                             $('#SellIncomeValue').val(jsJSON);
                             break;
                         case "SellFixedSettings":
@@ -473,6 +561,36 @@
                         case "BuyFixedSettings":
                             $('#BuyFixedValue').val(jsJSON);
                             break;
+                        case "SalesAvgMaterialsSettings":
+                            $('#SalesAvgMaterialsValue').val(jsJSON);
+                            break;
+                        case "SalesAvgExpensesSettings":
+                            $('#SalesAvgExpensesValue').val(jsJSON);
+                            break;
+                        case "SalesAvgServicesSettings":
+                            $('#SalesAvgServicesValue').val(jsJSON);
+                            break;
+                        case "SalesAvgIncomeSettings":
+                            $('#SalesAvgIncomeValue').val(jsJSON);
+                            break;
+                        case "SalesAvgFixedAssetsSettings":
+                            $('#SalesAvgFixedAssetsValue').val(jsJSON);
+                            break;
+                        case "BuysAvgFixedAssetsSettings":
+                            $('#BuysAvgFixedAssetsValue').val(jsJSON);
+                            break;
+                        case "BuysAvgMaterialsSettings":
+                            $('#BuysAvgMaterialsValue').val(jsJSON);
+                            break;
+                        case "BuysAvgExpensesSettings":
+                            $('#BuysAvgExpensesValue').val(jsJSON);
+                            break;
+                        case "BuysAvgServicesSettings":
+                            $('#BuysAvgServicesValue').val(jsJSON);
+                            break;
+                            
+                     
+                            
                         default:
                     }
 
@@ -515,7 +633,34 @@
                             break;
                         case "BuyFixedSettings":
                             oldVal = $('#BuyFixedValue').val();
-                            break;     
+                            break;
+                        case "SalesAvgMaterialsSettings":
+                            oldVal = $('#SalesAvgMaterialsValue').val();
+                            break;
+                        case "SalesAvgExpensesSettings":
+                            oldVal = $('#SalesAvgExpensesValue').val();
+                            break;
+                        case "SalesAvgServicesSettings":
+                            oldVal = $('#SalesAvgServicesValue').val();
+                            break;
+                        case "SalesAvgIncomeSettings":
+                            oldVal = $('#SalesAvgIncomeValue').val();
+                            break;
+                        case "SalesAvgFixedAssetsSettings":
+                            oldVal = $('#SalesAvgFixedAssetsValue').val();
+                            break;
+                        case "BuysAvgFixedAssetsSettings":
+                           oldVal = $('#BuysAvgFixedAssetsValue').val();
+                            break;
+                        case "BuysAvgMaterialsSettings":
+                           oldVal = $('#BuysAvgMaterialsValue').val();
+                            break;
+                        case "BuysAvgExpensesSettings":
+                            oldVal = $('#BuysAvgExpensesValue').val();
+                            break;
+                        case "BuysAvgServicesSettings":
+                            oldVal = $('#BuysAvgServicesValue').val();
+                            break;    
                         default:
                     }
                     if (oldVal.length > 0) {
@@ -570,7 +715,35 @@
                             break;    
                         case "BuyFixedSettings":
                             modal.find('.modal-title').text("Buy Fixed Assets Setting");
-                            break;    
+                            break;
+                        case "SalesAvgMaterialsSettings":
+                            modal.find('.modal-title').text("Sales Average Materials Setting");
+                            break;
+                        case "SalesAvgExpensesSettings":
+                            modal.find('.modal-title').text("Sales Average Expenses Setting");
+                            break;
+                        case "SalesAvgServicesSettings":
+                            modal.find('.modal-title').text("Sales Average Services Setting");
+                            break;
+                        case "SalesAvgIncomeSettings":
+                            modal.find('.modal-title').text("Sales Average Income Setting");
+                            break;
+                        case "SalesAvgFixedAssetsSettings":
+                            modal.find('.modal-title').text("Sales Average Fixed Assets Setting");
+                            break;
+                        case "BuysAvgFixedAssetsSettings":
+                            modal.find('.modal-title').text("Buy Average Fixed Assets Setting");
+                            break;
+                        case "BuysAvgMaterialsSettings":
+                            modal.find('.modal-title').text("Buy Average Materials Setting");
+                            break;
+                        case "BuysAvgExpensesSettings":
+                            modal.find('.modal-title').text("Buy Average Expenses Setting");
+                            break;
+                        case "BuysAvgServicesSettings":
+                            modal.find('.modal-title').text("Buy Average Services Setting");
+                            break;
+
                         default:
                     }
                 });

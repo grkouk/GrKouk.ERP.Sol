@@ -563,6 +563,28 @@
 				getFinancialData(cd, selPeriodId, selCompanyId, selCurrencyId, $item, loader);
 
 			});
+
+			let $averageSellFieldsToCompute = $('[name=AverageSellCodeValue]');
+			$averageSellFieldsToCompute.each(function(index) {
+
+				let $item = $(this);
+
+				let cd = $item.data('computecode');
+				let loader = $item.next();
+				getFinancialData(cd, selPeriodId, selCompanyId, selCurrencyId, $item, loader);
+
+			});
+
+			let $averageBuyFieldsToCompute = $('[name=AverageBuyCodeValue]');
+			$averageBuyFieldsToCompute.each(function(index) {
+
+				let $item = $(this);
+
+				let cd = $item.data('computecode');
+				let loader = $item.next();
+				getFinancialData(cd, selPeriodId, selCompanyId, selCurrencyId, $item, loader);
+
+			});
 			//updateBalanceGroup();
 
 		};

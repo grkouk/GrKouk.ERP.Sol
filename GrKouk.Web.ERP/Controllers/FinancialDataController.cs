@@ -91,6 +91,7 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
             decimal r = 0;
+            
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
                 .Take(10)
                 .ToListAsync();
@@ -170,9 +171,27 @@ namespace GrKouk.Web.ERP.Controllers
                         p.TransDiscountAmount),
                     CompanyCurrencyId = p.CompanyCurrencyId
                 }).ToListAsync();
-                //var grandSumOfAmount = t1.Sum(p => p.TotalAmount);
-                //r = t1.Sum(p => p.TransTotalNetAmount);
-                r = t1.Sum(p => p.TransTotalAmount);
+                if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeSum)
+                {
+                    r = t1.Sum(p => p.TransTotalAmount);    
+                }
+                if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeAverage)
+                {
+                    r = t1.Average (p => p.TransTotalAmount);    
+                }
+                if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeCount)
+                {
+                    r = t1.Count;
+                }
+                if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeMax)
+                {
+                    r = t1.Max(p => p.TransTotalAmount);    
+                }
+                if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeMin)
+                {
+                    r = t1.Min(p => p.TransTotalAmount);    
+                }
+                
             }
 
             if (defObj.SrcType == MainInfoSourceTypeEnum.SourceTypeSales)
@@ -200,8 +219,6 @@ namespace GrKouk.Web.ERP.Controllers
                     beforePeriodDate = fromDate.AddDays(-1);
                     DateTime toDate = dfDates.ToDate;
                     fullListIq = fullListIq.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
-                    //transactionsList = transactionsList.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
-                    //transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
                 }
 
                 if (defObj.TransTypes != null)
@@ -238,13 +255,27 @@ namespace GrKouk.Web.ERP.Controllers
                         p.TransDiscountAmount),
                     CompanyCurrencyId = p.CompanyCurrencyId
                 }).ToListAsync();
-                //var grandSumOfAmount = t1.Sum(p => p.TotalAmount);
-                //r = t1.Sum(p => p.TransTotalNetAmount);
-                r = t1.Sum(p => p.TransTotalAmount);
-                // if (request.CodeToCompute=="SumOfIncomeSalesDf")
-                // {
-                //     Debug.WriteLine($"Code was SumOfincomeSalesDf doc count was {t1.Count} and value is {r}");
-                // }
+                if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeSum)
+                {
+                    r = t1.Sum(p => p.TransTotalAmount);    
+                }
+                if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeAverage)
+                {
+                    r = t1.Average (p => p.TransTotalAmount);    
+                }
+                if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeCount)
+                {
+                    r = t1.Count;
+                }
+                if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeMax)
+                {
+                    r = t1.Max(p => p.TransTotalAmount);    
+                }
+                if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeMin)
+                {
+                    r = t1.Min(p => p.TransTotalAmount);    
+                }
+                
             }
 
             var response = new MainDashboardInfoResponse
