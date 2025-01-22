@@ -157,6 +157,7 @@ namespace GrKouk.Web.ERP.Controllers
                 var t = fullListIq.ProjectTo<BuyDocListDto>(_mapper.ConfigurationProvider);
                 var t1 = await t.Select(p => new BuyDocListDto
                 {
+                    TransDate = p.TransDate,
                     AmountFpa = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
                         p.AmountFpa),
                     AmountNet = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
@@ -171,27 +172,39 @@ namespace GrKouk.Web.ERP.Controllers
                         p.TransDiscountAmount),
                     CompanyCurrencyId = p.CompanyCurrencyId
                 }).ToListAsync();
-                if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeSum)
+                if (t1.Count > 0)
                 {
-                    r = t1.Sum(p => p.TransTotalAmount);    
-                }
-                if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeAverage)
+                    if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeSum)
+                    {
+                        r = t1.Sum(p => p.TransTotalAmount);
+                    }
+
+                    if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeAverage)
+                    {
+                        // r = t1.Average (p => p.TransTotalAmount);
+                        r = t1.GroupBy(p => p.TransDate.Date)
+                            .Select(g => g.Sum(x => x.TransTotalAmount))
+                            .Average();
+                    }
+
+                    if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeCount)
+                    {
+                        r = t1.Count;
+                    }
+
+                    if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeMax)
+                    {
+                        r = t1.Max(p => p.TransTotalAmount);
+                    }
+
+                    if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeMin)
+                    {
+                        r = t1.Min(p => p.TransTotalAmount);
+                    }
+                } else
                 {
-                    r = t1.Average (p => p.TransTotalAmount);    
+                    r = 0;
                 }
-                if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeCount)
-                {
-                    r = t1.Count;
-                }
-                if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeMax)
-                {
-                    r = t1.Max(p => p.TransTotalAmount);    
-                }
-                if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeMin)
-                {
-                    r = t1.Min(p => p.TransTotalAmount);    
-                }
-                
             }
 
             if (defObj.SrcType == MainInfoSourceTypeEnum.SourceTypeSales)
@@ -241,6 +254,7 @@ namespace GrKouk.Web.ERP.Controllers
                 var t = fullListIq.ProjectTo<SellDocListDto>(_mapper.ConfigurationProvider);
                 var t1 = await t.Select(p => new SellDocListDto
                 {
+                    TransDate = p.TransDate,
                     AmountFpa = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
                         p.AmountFpa),
                     AmountNet = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
@@ -255,27 +269,41 @@ namespace GrKouk.Web.ERP.Controllers
                         p.TransDiscountAmount),
                     CompanyCurrencyId = p.CompanyCurrencyId
                 }).ToListAsync();
-                if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeSum)
+                if (t1.Count > 0)
                 {
-                    r = t1.Sum(p => p.TransTotalAmount);    
+                    if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeSum)
+                    {
+                        r = t1.Sum(p => p.TransTotalAmount);
+                    }
+
+                    if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeAverage)
+                    {
+                        //r = t1.Average (p => p.TransTotalAmount);
+                        r = t1.GroupBy(p => p.TransDate.Date)
+                            .Select(g => g.Sum(x => x.TransTotalAmount))
+                            .Average();
+                    }
+
+                    if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeCount)
+                    {
+                        r = t1.Count;
+                    }
+
+                    if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeMax)
+                    {
+                        r = t1.Max(p => p.TransTotalAmount);
+                    }
+
+                    if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeMin)
+                    {
+                        r = t1.Min(p => p.TransTotalAmount);
+                    }
                 }
-                if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeAverage)
+                else
                 {
-                    r = t1.Average (p => p.TransTotalAmount);    
+                    r = 0;
                 }
-                if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeCount)
-                {
-                    r = t1.Count;
-                }
-                if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeMax)
-                {
-                    r = t1.Max(p => p.TransTotalAmount);    
-                }
-                if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeMin)
-                {
-                    r = t1.Min(p => p.TransTotalAmount);    
-                }
-                
+
             }
 
             var response = new MainDashboardInfoResponse

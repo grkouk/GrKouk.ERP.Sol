@@ -119,9 +119,9 @@
                 <div class="col-md-10 col-sm-10 col-lg-10">
                     <label class="" small>Average Of Material Buys Definition</label>
                     <div class="input-group input-group-sm">
-                        <textarea class="form-control" asp-for="ItemVm[9].Value" id="BuyAvgMaterialsValue" rows="2"></textarea>
+                        <textarea class="form-control" asp-for="ItemVm[9].Value" id="BuysAvgMaterialsValue" rows="2"></textarea>
                         <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="BuyAvgMaterialsSettings" type="button">...</button>
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="BuysAvgMaterialsSettings" type="button">...</button>
                         </div>
                     </div>
                 </div>
@@ -130,9 +130,9 @@
                 <div class="col-md-10 col-sm-10 col-lg-10">
                     <label class="" small>Average Of Expenses Buys Definition</label>
                     <div class="input-group input-group-sm">
-                        <textarea class="form-control" asp-for="ItemVm[10].Value" id="BuyAvgExpensesValue" rows="2"></textarea>
+                        <textarea class="form-control" asp-for="ItemVm[10].Value" id="BuysAvgExpensesValue" rows="2"></textarea>
                         <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="BuyAvgExpensesSettings" type="button">...</button>
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="BuysAvgExpensesSettings" type="button">...</button>
                         </div>
                     </div>
                 </div>
@@ -141,9 +141,9 @@
                 <div class="col-md-10 col-sm-10 col-lg-10">
                     <label class="" small>Average Of Services Buys Definition</label>
                     <div class="input-group input-group-sm">
-                        <textarea class="form-control" asp-for="ItemVm[11].Value" id="BuyAvgServicesValue" rows="2"></textarea>
+                        <textarea class="form-control" asp-for="ItemVm[11].Value" id="BuysAvgServicesValue" rows="2"></textarea>
                         <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="BuyAvgServicesSettings" type="button">...</button>
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="BuysAvgServicesSettings" type="button">...</button>
                         </div>
                     </div>
                 </div>
@@ -592,6 +592,7 @@
                      
                             
                         default:
+                            console.log(`Unknown selector type: ${currentSelectorType} in SaveItemSelector Click event`);
                     }
 
                     console.log(js);
@@ -662,6 +663,7 @@
                             oldVal = $('#BuysAvgServicesValue').val();
                             break;    
                         default:
+                            console.log(`Unknown selector type: ${currentSelectorType} in itemSelector shown.bs.modal event`);
                     }
                     if (oldVal.length > 0) {
                         let oldValObj = JSON.parse(oldVal);
@@ -745,6 +747,7 @@
                             break;
 
                         default:
+                            console.log(`Unknown selector type: ${selectorType} in itemSelector show.bs.modal event`);
                     }
                 });
             $('#itemSelector').on('hidden.bs.modal',
