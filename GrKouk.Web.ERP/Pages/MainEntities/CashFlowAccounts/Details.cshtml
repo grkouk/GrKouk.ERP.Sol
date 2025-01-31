@@ -143,15 +143,17 @@
             <input type="hidden" id="companiesSelectionChanged" />
             <ejs-grid id="GridCFADetailPage"
                       allowPaging="true" allowResizing="true" allowSorting="true" enablePersistence="true">
-                <e-data-manager url="@Url.Action("GetCashFlowAccountTransactionsForDetail", "FinancialData")" adaptor="UrlAdaptor"></e-data-manager>
+                <e-grid-loadingindicator indicatorType="Spinner"/>
+                <e-data-manager url="@Url.Action("GetCashFlowAccountTransactionsForDetail", "FinancialData")"
+                                adaptor="UrlAdaptor"></e-data-manager>
                 <e-grid-aggregates>
                     <e-grid-aggregate>
                         <e-aggregate-columns>
                             <e-aggregate-column field="deposit" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
                             <e-aggregate-column field="withdraw" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
-                
+
                         </e-aggregate-columns>
-                
+
                     </e-grid-aggregate>
                 </e-grid-aggregates>
                 <e-grid-pagesettings pageSizes="true"></e-grid-pagesettings>
@@ -225,7 +227,39 @@
                     loadCulture(prop);
                 }
             };
-            
+            const loadCultureFiles1 = (culture) => {
+                let files = ['ca-gregorian.json',  'currencies.json', 'timeZoneNames.json', 'numbers.json'];
+                if (culture === 'ar') {
+                    files.push('numberingSystems.json');
+                }
+                const loader = ej.base.loadCldr;
+                const loadCulture = function (prop) {
+                    let fetch;
+                    if (culture === 'ar' && prop === files.length - 1) {
+                        fetch = new ej.base.Fetch(location.origin + location.pathname + '/../../../lib/cldr-data/supplemental/' + files[prop], 'GET', false);
+                    } else {
+                        fetch = new ej.base.Fetch(location.origin + location.pathname + '/../../../lib/cldr-data/main/' + culture + '/' + files[prop], 'GET', false);
+                    }
+                    //fetch = new ej.base.Fetch(location.origin + location.pathname + '/../../../lib/cldr-data/main/' + culture + '/' + files[prop], 'GET', false);
+                    fetch.onSuccess = function (response) {
+                        if (typeof response === 'object') {
+                            // If the response is an object, convert it to a JSON string
+                            var jsonString = JSON.stringify(response);
+                            loader(JSON.parse(jsonString));
+                        } else if (typeof response === 'string') {
+                            // If the response is already a JSON string, parse and load it
+                            loader(JSON.parse(response));
+                        } else {
+                            console.error('Invalid responsetype received:', response);
+                        }
+                       
+                    };
+                    fetch.send();
+                };
+                for (var prop = 0; prop < files.length; prop++) {
+                    loadCulture(prop);
+                }
+            };
             let sessionObj = {
                  'currencyCode': '',
                  'periodCode': '',
@@ -321,7 +355,7 @@
                         let cCulture = locale;
                         let cBaseCulture = cCulture;
                         if (cCulture.length > 2) {
-                            cBaseCulture = cCulture.substr(0, 2);
+                            cBaseCulture = cCulture.substring(0, 2);
                         }
                         loadCultureFiles(cBaseCulture);
                         ej.base.setCulture(cBaseCulture);
