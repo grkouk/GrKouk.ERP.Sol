@@ -2314,7 +2314,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             var pageSize = request.PageSize;
             decimal sumDifference = 0;
-
+            decimal grandSumDifference = 0;
 
             var grandSumOfDebit = listWithTotal.Sum(p => p.Debit);
             var grandSumOfCredit = listWithTotal.Sum(p => p.Credit);
@@ -2327,12 +2327,15 @@ namespace GrKouk.Web.ERP.Controllers
             {
                 case "SUPPLIER":
                     sumDifference = sumCredit - sumDebit;
+                    grandSumDifference = grandSumOfCredit - grandSumOfDebit;
                     break;
                 case "CUSTOMER":
                     sumDifference = sumDebit - sumCredit;
+                    grandSumDifference = grandSumOfDebit - grandSumOfCredit;
                     break;
                 default:
                     sumDifference = sumCredit - sumDebit;
+                    grandSumDifference = grandSumOfCredit - grandSumOfDebit;
                     break;
             }
 
@@ -2347,6 +2350,7 @@ namespace GrKouk.Web.ERP.Controllers
                 SumOfDifference = sumDifference,
                 GrandSumOfDebit = grandSumOfDebit,
                 GrandSumOfCredit = grandSumOfCredit,
+                GrandSumOfDifference = grandSumDifference,
                 Data = listItems
             };
             return Ok(response);
