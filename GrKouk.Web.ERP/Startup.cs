@@ -1,14 +1,20 @@
 using System;
+using System.Security.Claims;
+using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using GrKouk.Web.ERP.Data;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
+using Microsoft.CodeAnalysis.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using NToastNotify;
 
 namespace GrKouk.Web.ERP
@@ -25,21 +31,54 @@ namespace GrKouk.Web.ERP
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-           
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => false;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-                
-            });
+           var jwtSettings = Configuration.GetSection("JwtSettings");
+           var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+
+            // services.Configure<CookiePolicyOptions>(options =>
+            // {
+            //     // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+            //     options.CheckConsentNeeded = context => false;
+            //     options.MinimumSameSitePolicy = SameSiteMode.None;
+            //     
+            //     
+            // });
             services.AddDbContext<ApiDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddIdentity<IdentityUser, IdentityRole>()
+            services.AddIdentity<IdentityUser, IdentityRole>(options=>
+            {
+                options.ClaimsIdentity.RoleClaimType = ClaimTypes.Role; // Ensure roles are stored in claims
+            })
                 .AddDefaultUI()
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApiDbContext>();
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; 
+               
+            }) .AddCookie(options =>
+            {
+                options.LoginPath = "/Account/Login";
+            })
+
+                .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidIssuer = jwtSettings["Issuer"],
+                    ValidAudience = jwtSettings["Audience"]
+                };
+            });
+            services.AddAuthorization();
             services.AddMvc()
                 .AddNToastNotifyToastr(new ToastrOptions()
                 {
@@ -48,18 +87,19 @@ namespace GrKouk.Web.ERP
                     TimeOut = 5000,
                     ExtendedTimeOut = 1000
                 });
-            services.ConfigureApplicationCookie(options =>
-            {
-                // Cookie settings
-                options.Cookie.HttpOnly = true;
-                options.Cookie.SameSite = SameSiteMode.Lax;
-                options.ExpireTimeSpan = TimeSpan.FromHours(1);
-                //if the above is not workong then try this
-                //options.ExpireTimeSpan = DateTime.Now.Subtract(DateTime.UtcNow).Add(TimeSpan.FromMinutes(5);
-                options.LoginPath = "/Identity/Account/Login";
-                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-                options.SlidingExpiration = true;
-            });
+            // services.ConfigureApplicationCookie(options =>
+            // {
+            //     // Cookie settings
+            //     options.Cookie.HttpOnly = true;
+            //     options.Cookie.SameSite = SameSiteMode.Lax;
+            //     options.ExpireTimeSpan = TimeSpan.FromHours(1);
+            //     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            //     //if the above is not workong then try this
+            //     //options.ExpireTimeSpan = DateTime.Now.Subtract(DateTime.UtcNow).Add(TimeSpan.FromMinutes(5);
+            //     options.LoginPath = "/Identity/Account/Login";
+            //     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+            //     options.SlidingExpiration = true;
+            // });
             //services.AddSession(options => { options.IdleTimeout = TimeSpan.FromMinutes(30); });
             services.AddDistributedMemoryCache();
 
