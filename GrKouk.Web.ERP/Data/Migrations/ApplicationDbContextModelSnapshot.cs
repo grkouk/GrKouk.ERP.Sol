@@ -544,6 +544,12 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.Property<int>("SellDocTypeDefId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("TransTransactorDocSeriesDefId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TransWarehouseDocSeriesDefId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Code")
@@ -552,6 +558,10 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasIndex("CompanyId");
 
                     b.HasIndex("SellDocTypeDefId");
+
+                    b.HasIndex("TransTransactorDocSeriesDefId");
+
+                    b.HasIndex("TransWarehouseDocSeriesDefId");
 
                     b.ToTable("SellDocSeriesDefs");
                 });
@@ -3017,9 +3027,21 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("GrKouk.Erp.Domain.DocDefinitions.TransTransactorDocSeriesDef", "TransTransactorDocSeriesDef")
+                        .WithMany()
+                        .HasForeignKey("TransTransactorDocSeriesDefId");
+
+                    b.HasOne("GrKouk.Erp.Domain.DocDefinitions.TransWarehouseDocSeriesDef", "TransWarehouseDocSeriesDef")
+                        .WithMany()
+                        .HasForeignKey("TransWarehouseDocSeriesDefId");
+
                     b.Navigation("Company");
 
                     b.Navigation("SellDocTypeDef");
+
+                    b.Navigation("TransTransactorDocSeriesDef");
+
+                    b.Navigation("TransWarehouseDocSeriesDef");
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.SellDocTypeDef", b =>
