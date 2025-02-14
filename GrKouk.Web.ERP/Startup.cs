@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using GrKouk.Web.ERP.Data;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
@@ -57,6 +58,7 @@ namespace GrKouk.Web.ERP
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; 
+                
                
             }) .AddCookie(options =>
             {
@@ -78,7 +80,26 @@ namespace GrKouk.Web.ERP
                     ValidAudience = jwtSettings["Audience"]
                 };
             });
-            services.AddAuthorization();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("ApiPolicy", policy =>
+                {
+                    policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireRole("Admin"); // Ensures a role match
+                });
+                options.AddPolicy("ApiPolicy2", policy =>
+                {
+                    policy.AddAuthenticationSchemes(CookieAuthenticationDefaults.AuthenticationScheme, JwtBearerDefaults.AuthenticationScheme);
+                    policy.RequireAuthenticatedUser(); // The user must be authenticated
+                    policy.RequireRole("Admin");      // The user must have the Admin role
+                });
+
+
+                // Default (Web Cookie Authentication): No need to add schemes, relies on cookie
+            });
+
+           
             services.AddMvc()
                 .AddNToastNotifyToastr(new ToastrOptions()
                 {
@@ -139,6 +160,23 @@ namespace GrKouk.Web.ERP
             app.UseNToastNotify();
             app.UseSession();
             //app.UseMvc();
+            //---------------
+            // app.Use(async (context, next) =>
+            // {
+            //     // Check if the request contains a Bearer token in the headers
+            //     var authHeader = context.Request.Headers["Authorization"];
+            //     if (authHeader.ToString().StartsWith("Bearer "))
+            //     {
+            //         // Switch scheme to JwtBearer for this request
+            //       //  context.User = null; // Reset claims to avoid conflicts
+            //       //  await context.RequestServices.GetRequiredService<IAuthenticationService>()
+            //       //      .AuthenticateAsync(context, JwtBearerDefaults.AuthenticationScheme);
+            //     }
+            //
+            //     await next();
+            // });
+
+            //--------------
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
