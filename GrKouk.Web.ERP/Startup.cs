@@ -62,6 +62,9 @@ namespace GrKouk.Web.ERP
                
             }) .AddCookie(options =>
             {
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60); // Set to 60 minutes or your desired time
+                options.SlidingExpiration = true;
+
                 options.LoginPath = "/Account/Login";
             })
 
