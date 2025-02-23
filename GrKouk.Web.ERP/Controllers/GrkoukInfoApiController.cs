@@ -59,7 +59,7 @@ namespace GrKouk.Web.ERP.Controllers
         public List<int> ProductIdList { get; set; }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin, Operator")]
     [Route("api/[controller]")]
     [ApiController]
     public class GrkoukInfoApiController : ControllerBase

@@ -17,7 +17,7 @@ using Microsoft.EntityFrameworkCore;
 using NToastNotify;
 
 namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Operator")]
     public class EditModel : PageModel {
         private const string _sectionCode = "SYS-TRANSACTOR-TRANS";
         private readonly ApiDbContext _context;

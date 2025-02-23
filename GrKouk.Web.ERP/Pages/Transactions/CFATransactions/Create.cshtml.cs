@@ -18,7 +18,7 @@ using NToastNotify;
 
 namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Operator")]
     public class CreateModel : PageModel
     {
         private const string _sectionCode = "SYS-CFA-TRANS";

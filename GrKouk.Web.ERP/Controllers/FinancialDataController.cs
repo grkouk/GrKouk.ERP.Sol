@@ -26,7 +26,7 @@ using Syncfusion.EJ2.Base;
 
 namespace GrKouk.Web.ERP.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin, Operator")]
     [Route("api/[controller]")]
     [ApiController]
     public class FinancialDataController : ControllerBase

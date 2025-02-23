@@ -5,6 +5,7 @@ using AutoMapper;
 using GrKouk.Erp.Dtos.BuyDocuments;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -13,6 +14,7 @@ using NToastNotify;
 
 namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
 {
+    [Authorize(Roles = "Admin, Operator")]
     public class EditModel : PageModel
     {
         private readonly ApiDbContext _context;

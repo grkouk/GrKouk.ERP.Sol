@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Operator")]
     public class DetailsModel : PageModel
     {
         private readonly ApiDbContext _context;

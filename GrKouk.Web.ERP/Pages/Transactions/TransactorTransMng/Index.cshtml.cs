@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Operator")]
     public class IndexModel : PageModel
     {
         private readonly ApiDbContext _context;

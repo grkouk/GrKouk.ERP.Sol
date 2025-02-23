@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GrKouk.Web.ERP.Pages.MainEntities.Diaries
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Operator")]
     public class IndexModel : PageModel
     {
         private readonly ApiDbContext _context;

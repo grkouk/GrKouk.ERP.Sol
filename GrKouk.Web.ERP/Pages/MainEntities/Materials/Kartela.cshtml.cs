@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Operator")]
     public class KartelaModel : PageModel
     {
         private readonly ApiDbContext _context;
