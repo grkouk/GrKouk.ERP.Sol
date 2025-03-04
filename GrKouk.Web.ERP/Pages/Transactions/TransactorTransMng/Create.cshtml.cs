@@ -6,6 +6,7 @@ using AutoMapper;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.Shared;
+using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
@@ -216,13 +217,20 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
                 .Where(p => p.TransactorType.Code != "SYS.DTRANSACTOR")
                 .OrderBy(s => s.Name).AsNoTracking();
             List<SelectListItem> transactorsList = new List<SelectListItem>();
-
+            List<UISelectTypeItem> transactorsListUi = new List<UISelectTypeItem>();
             foreach (var dbTransactor in transactorsListDb)
             {
                 transactorsList.Add(new SelectListItem()
                 {
                     Value = dbTransactor.Id.ToString(),
                     Text = dbTransactor.Name + "-" + dbTransactor.TransactorType.Code
+                });
+                transactorsListUi.Add(new ()
+                {
+                    Value = dbTransactor.Id.ToString(),
+                    Text = dbTransactor.Name + "-" + dbTransactor.TransactorType.Code,
+                    Title = dbTransactor.Name + "-" + dbTransactor.TransactorType.Code,
+                    ValueInt = dbTransactor.Id
                 });
             }
 
@@ -231,6 +239,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
             ViewData["FiscalPeriodId"] =
                 new SelectList(_context.FiscalPeriods.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
             ViewData["TransactorId"] = new SelectList(transactorsList, "Value", "Text");
+            ViewData["TransactorIdUi"] = transactorsListUi;
             ViewData["TransTransactorDocSeriesId"] =
                 new SelectList(_context.TransTransactorDocSeriesDefs.OrderBy(s => s.Name).AsNoTracking(), "Id", "Name");
             var transactorsListJs = _context.Transactors
