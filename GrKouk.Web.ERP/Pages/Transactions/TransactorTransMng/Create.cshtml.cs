@@ -225,13 +225,13 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
                     Value = dbTransactor.Id.ToString(),
                     Text = dbTransactor.Name + "-" + dbTransactor.TransactorType.Code
                 });
-                transactorsListUi.Add(new ()
-                {
-                    Value = dbTransactor.Id.ToString(),
-                    Text = dbTransactor.Name + "-" + dbTransactor.TransactorType.Code,
-                    Title = dbTransactor.Name + "-" + dbTransactor.TransactorType.Code,
-                    ValueInt = dbTransactor.Id
-                });
+                // transactorsListUi.Add(new ()
+                // {
+                //     Value = dbTransactor.Id.ToString(),
+                //     Text = dbTransactor.Name + "-" + dbTransactor.TransactorType.Code,
+                //     Title = dbTransactor.Name + "-" + dbTransactor.TransactorType.Code,
+                //     ValueInt = dbTransactor.Id
+                // });
             }
 
             ViewData["CompanyId"] =

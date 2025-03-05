@@ -68,7 +68,8 @@
                 <div class="col-md-6">
                     <div class="form-floating">
                         @* <select asp-for="ItemVm.TransactorId" class="form-select form-select-sm" asp-items="ViewBag.TransactorId"></select> *@
-                        <ejs-dropdownlist id="TransactorSelector" dataSource="@ViewBag.TransactorIdUi"
+                        @* dataSource="@ViewBag.TransactorIdUi" *@
+                        <ejs-dropdownlist id="TransactorSelector"
                                           allowFiltering="true"
                                           ignoreAccent="true"
                                           floatLabelType="Auto"
@@ -218,9 +219,70 @@
                 amountSumEl.value = amountNet + amountFpa - amountDic;
 
             };
+            const docSeriesChanged=()=>{
+                const docSeriesId=$docSeriesEl.val();
+                const oldTransactorId=transactorSelectorEl.value;
+                //locate inside list selected docseriesid
+                let a = allowedTypesListJs.find(o=>o.docSeriesId==docSeriesId);
+                if (a){
+                    //console.log('Found');
+                    let allowed = JSON.parse(a.allowedTypes);
+                    if (allowed){
+                        let  lst = transactorsListJs.filter(function(item){
+                            return allowed.indexOf(item.transactorTypeId) !== -1;
+                        });
+                        transactorSelectorEl.dataSource = lst.map(item => ({
+                            Value: item.value,
+                            Text: item.text,
+                            ValueInt: parseInt(item.value),
+                            Title: item.text
+                        }));
+                        transactorSelectorEl.dataBind();
+                        transactorSelectorEl.value = null;
+                        if (oldTransactorId && transactorSelectorEl.dataSource.some(item => item.ValueInt === parseInt(oldTransactorId))) {
+                            transactorSelectorEl.value = oldTransactorId;
+                        }
 
 
-            const docSeriesChanged = () => {
+                    } else {
+
+                        transactorSelectorEl.dataSource = transactorsListJs.map(item => ({
+                            Value: item.value,
+                            Text: item.text,
+                            ValueInt: parseInt(item.value),
+                            Title: item.text
+                        }));
+                        transactorSelectorEl.dataBind();
+                        transactorSelectorEl.value = null;
+                        if (oldTransactorId && transactorSelectorEl.dataSource.some(item => item.ValueInt === parseInt(oldTransactorId))) {
+                            transactorSelectorEl.value = oldTransactorId;
+                        }
+
+                    }
+                    let cfaId = parseInt( a.defaultCfaId);
+                    if (cfaId!==NaN) {
+                        $cfAccountId.val(cfaId);
+                    }
+
+                } else {
+                    console.log('Not Found');
+                    transactorSelectorEl.dataSource = transactorsListJs.map(item => ({
+                        Value: item.value,
+                        Text: item.text,
+                        ValueInt: parseInt(item.value),
+                        Title: item.text
+                    }));
+                    transactorSelectorEl.dataBind();
+                    transactorSelectorEl.value = null;
+                    if (oldTransactorId && transactorSelectorEl.dataSource.some(item => item.ValueInt === parseInt(oldTransactorId))) {
+                        transactorSelectorEl.value = oldTransactorId;
+                    }
+
+                }
+
+            };
+
+            const docSeriesChangedOld = () => {
                 let cfaId = $cfaId.val();
                 const docSeriesId = $('#ItemVm_TransTransactorDocSeriesId').val();
                 //locate inside list selected docseriesid
