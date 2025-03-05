@@ -75,9 +75,9 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpGet("GetMainDashboardInfo")]
         public async Task<IActionResult> GetMainDashboardInfo([FromQuery] IndexDataTableRequest request)
         {
-            //if (request.CodeToCompute == "SumOfIncomeSalesDf") {
-            //    Debug.WriteLine("");
-            //}
+          
+            //Number of days for average calculation
+            int numberOfDays = 0;
             var codeToComputeDefinition = await
                 _context.AppSettings.FirstOrDefaultAsync(p => p.Code == request.CodeToCompute);
             if (codeToComputeDefinition == null)
@@ -132,6 +132,7 @@ namespace GrKouk.Web.ERP.Controllers
                     //beforePeriodDate = fromDate.AddDays(-1);
                     DateTime toDate = dfDates.ToDate;
                     fullListIq = fullListIq.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
+                    numberOfDays = (int) (toDate - fromDate).TotalDays +1;
                     //transactionsList = transactionsList.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
                     //transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
                 }
@@ -181,10 +182,10 @@ namespace GrKouk.Web.ERP.Controllers
 
                     if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeAverage)
                     {
-                        // r = t1.Average (p => p.TransTotalAmount);
-                        r = t1.GroupBy(p => p.TransDate.Date)
-                            .Select(g => g.Sum(x => x.TransTotalAmount))
-                            .Average();
+                        r = t1.Sum(p => p.TransTotalAmount) / (numberOfDays > 0 ? numberOfDays : 1);
+                        // r = t1.GroupBy(p => p.TransDate.Date)
+                        //     .Select(g => g.Sum(x => x.TransTotalAmount))
+                        //     .Average();
                     }
 
                     if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeCount)
@@ -231,6 +232,7 @@ namespace GrKouk.Web.ERP.Controllers
                     DateTime fromDate = dfDates.FromDate;
                     beforePeriodDate = fromDate.AddDays(-1);
                     DateTime toDate = dfDates.ToDate;
+                    numberOfDays = (int) (toDate - fromDate).TotalDays +1;
                     fullListIq = fullListIq.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
                 }
 
@@ -278,10 +280,11 @@ namespace GrKouk.Web.ERP.Controllers
 
                     if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeAverage)
                     {
-                        //r = t1.Average (p => p.TransTotalAmount);
-                        r = t1.GroupBy(p => p.TransDate.Date)
-                            .Select(g => g.Sum(x => x.TransTotalAmount))
-                            .Average();
+                        r = t1.Sum(p => p.TransTotalAmount) / (numberOfDays > 0 ? numberOfDays : 1);
+                        
+                        // r = t1.GroupBy(p => p.TransDate.Date)
+                        //     .Select(g => g.Sum(x => x.TransTotalAmount))
+                        //     .Average();
                     }
 
                     if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeCount)

@@ -199,16 +199,24 @@
                         let  lst = transactorsListJs.filter(function(item){
                             return allowed.indexOf(item.transactorTypeId) !== -1;
                         });
-                        $transactorListEl.empty();
+                        transactorSelectorEl.dataSource = lst.map(item => ({
+                            Value: item.value,
+                            Text: item.text,
+                            ValueInt: parseInt(item.value),
+                            Title: item.text
+                        }));
+                        transactorSelectorEl.dataBind();
 
-                        $.each(lst, function(index, item) {
-                            $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
-                        });
+                       
                     } else {
-                        $transactorListEl.empty();
-                        $.each(transactorsListJs, function(index, item) {
-                            $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
-                        });
+                       
+                        transactorSelectorEl.dataSource = transactorsListJs.map(item => ({
+                            Value: item.value,
+                            Text: item.text,
+                            ValueInt: parseInt(item.value),
+                            Title: item.text
+                        }));
+                        transactorSelectorEl.dataBind();
                     }
                     let cfaId = parseInt( a.defaultCfaId);
                     if (cfaId!==NaN) {
@@ -217,11 +225,13 @@
 
                 } else {
                     console.log('Not Found');
-                    $transactorListEl.empty();
-
-                    $.each(transactorsListJs, function(index, item) {
-                        $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
-                    });
+                    transactorSelectorEl.dataSource = transactorsListJs.map(item => ({
+                        Value: item.value,
+                        Text: item.text,
+                        ValueInt: parseInt(item.value),
+                        Title: item.text
+                    }));
+                    transactorSelectorEl.dataBind();
                 }
 
             };
