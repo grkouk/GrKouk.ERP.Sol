@@ -63,25 +63,22 @@
                     </div>
                 </div>
             </div>
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <ejs-dropdownlist id="TransactorSelector" dataSource="@ViewBag.TransactorIdUi"
-                                      allowFiltering="true"
-                                      ignoreAccent="true"
-                                      floatLabelType="Auto"
-                                      placeholder="Transactor"
-                                      filterType="Contains"
-                                      ejs-for="ItemVm.TransactorId"
-                    >
-                        <e-dropdownlist-fields text="Text" value="ValueInt"></e-dropdownlist-fields>
-                    </ejs-dropdownlist>
-                </div>
-            </div>
+           
             <div class="row mb-3">
                 <div class="col-md-6">
                     <div class="form-floating">
                         @* <select asp-for="ItemVm.TransactorId" class="form-select form-select-sm" asp-items="ViewBag.TransactorId"></select> *@
-                        <label asp-for="ItemVm.TransactorId" class="form-label small"></label>
+                        <ejs-dropdownlist id="TransactorSelector" dataSource="@ViewBag.TransactorIdUi"
+                                          allowFiltering="true"
+                                          ignoreAccent="true"
+                                          floatLabelType="Auto"
+                                          placeholder="Transactor"
+                                          filterType="Contains"
+                                          ejs-for="ItemVm.TransactorId"
+                        >
+                            <e-dropdownlist-fields text="Text" value="ValueInt"></e-dropdownlist-fields>
+                        </ejs-dropdownlist>
+                        @* <label asp-for="ItemVm.TransactorId" class="form-label small"></label> *@
                         <span asp-validation-for="ItemVm.TransactorId" class="text-danger"></span>
                     </div>
                 </div>
