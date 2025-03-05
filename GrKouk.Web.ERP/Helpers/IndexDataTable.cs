@@ -70,6 +70,7 @@ namespace GrKouk.Web.ERP.Helpers
     public class CodeToComputeDefinition
     {
         public MainInfoSourceTypeEnum SrcType { get; set; }
+        public MainInfoAggregationTypeEnum AggType { get; set; }
         public string[] MatNatures { get; set; }
         public int[] TransTypes { get; set; }
         public string[] CompSelected { get; set; }

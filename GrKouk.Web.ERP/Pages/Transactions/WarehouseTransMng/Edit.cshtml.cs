@@ -16,7 +16,7 @@ using NToastNotify;
 
 namespace GrKouk.Web.ERP.Pages.Transactions.WarehouseTransMng
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Operator")]
     public class EditModel : PageModel
     {
         private readonly ApiDbContext _context;

@@ -109,7 +109,7 @@
             @{
                 if (Model.FiltersToShow.ShowSectionsFlt)
                 {
-                    <div class="col-md-2 col-sm-6">
+                    <div class="col-md-3 col-sm-6">
                       <ejs-multiselect id="SectionsFilterElm" dataSource="@Model.SectionsFilterUiSelectItems" placeholder="Select sections" mode="CheckBox"
                                          showDropDownIcon="true"
                                          floatLabelType="Auto"
@@ -138,12 +138,12 @@
             @{
                 if (Model.FiltersToShow.ShowPageSizeFlt)
                 {
-                    <div class="col-md-2 col-sm-6">
+                    <div class="col-md-1 col-sm-6">
                         <div class="form-floating">
 
                             <select id="PageSize" class="form-select form-select-sm" asp-items="Model.PageSizeFilterValues">
                             </select>
-                            <label class="small"> Page Size:</label>
+                            <label class="small"> Page:</label>
                         </div>
                     </div>
                 }
@@ -152,7 +152,7 @@
             @{
                 if (Model.FiltersToShow.ShowCurrencyFlt)
                 {
-                    <div class="col-md-2 col-sm-6">
+                    <div class="col-md-1 col-sm-6">
                         <div class="form-floating">
 
                             <select id="CurrencySelector" class="form-select form-select-sm"
@@ -167,7 +167,7 @@
             @{
                 if (Model.FiltersToShow.ShowDisplayCarryOnLineFlt)
                 {
-                    <div class="form-check form-switch col-md-2 col-sm-6">
+                    <div class="form-check form-switch col-md-1 col-sm-6">
                         <input class="form-check-input" type="checkbox" id="ShowCarryOnFlt">
                         <label class="form-check-label" for="ShowCarryOnFlt">Carry Ons</label>
                     </div>
@@ -179,7 +179,7 @@
             @{
                 if (Model.FiltersToShow.ShowDisplaySummaryFlt)
                 {
-                    <div class="form-check form-switch col-md-2 col-sm-6">
+                    <div class="form-check form-switch col-md-1 col-sm-6">
                         <input class="form-check-input" type="checkbox" id="ShowSummaryFlt">
                         <label class="form-check-label" for="ShowSummaryFlt">Summary</label>
                     </div>
@@ -189,7 +189,7 @@
             }
             @{
                 if (Model.FiltersToShow.ShowDisplayLinesWithZeroAmountFlt){
-                    <div class="form-check form-switch col-md-2 col-sm-6">
+                    <div class="form-check form-switch col-md-1 col-sm-6">
                         <input class="form-check-input" type="checkbox" id="ShowDisplayLinesWithZeroes">
                         <label class="form-check-label" for="ShowDisplayLinesWithZeroes">Show Zeroes</label>
                     </div>

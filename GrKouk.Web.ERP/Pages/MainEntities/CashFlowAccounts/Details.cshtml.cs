@@ -17,7 +17,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GrKouk.Web.Erp.Pages.MainEntities.CashFlowAccounts
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Operator")]
     public class DetailsModel : PageModel
     {
         private readonly ApiDbContext _context;

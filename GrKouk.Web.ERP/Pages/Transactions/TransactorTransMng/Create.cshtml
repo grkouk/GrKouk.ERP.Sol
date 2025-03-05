@@ -41,11 +41,21 @@
                 </div>
             </div>
         </div>
+        
         <div class="row mb-3">
             <div class="col-md-6">
                 <div class="form-floating">
-                    <select asp-for="ItemVm.TransactorId" class="form-select form-select-sm" asp-items="ViewBag.TransactorId"></select>
-                    <label asp-for="ItemVm.TransactorId" class="form-label small"></label>
+                     <ejs-dropdownlist id="TransactorSelector"  
+                                      allowFiltering="true"
+                                      ignoreAccent="true"
+                                      floatLabelType="Auto"
+                                      placeholder="Transactor"
+                                      ejs-for="ItemVm.TransactorId"
+                                      filterType="Contains">
+                        <e-dropdownlist-fields text="Text" value="ValueInt"></e-dropdownlist-fields>
+                    </ejs-dropdownlist>
+                    @* <select asp-for="ItemVm.TransactorId" class="form-select form-select-sm" asp-items="ViewBag.TransactorId"></select> *@
+                    @* <label asp-for="ItemVm.TransactorId" class="form-label small"></label> *@
                     <span asp-validation-for="ItemVm.TransactorId" class="text-danger"></span>
                 </div>
             </div>
@@ -155,6 +165,7 @@
             var fpaRateEl = document.getElementById("fpaRate").ej2_instances[0];
             var amountSumEl = document.getElementById("ItemVm_AmountSum").ej2_instances[0];
             var $cfAccountId = $('#ItemVm_CfAccountId');
+            const transactorSelectorEl = document.getElementById("TransactorSelector").ej2_instances[0];
             
             const $docSeriesEl=$('#ItemVm_TransTransactorDocSeriesId');
             const $transactorListEl = $('#ItemVm_TransactorId');
@@ -179,6 +190,7 @@
            
             const docSeriesChanged=()=>{
                 const docSeriesId=$docSeriesEl.val();
+                const oldTransactorId=transactorSelectorEl.value;
                 //locate inside list selected docseriesid
                 let a = allowedTypesListJs.find(o=>o.docSeriesId==docSeriesId);
                 if (a){
@@ -188,16 +200,33 @@
                         let  lst = transactorsListJs.filter(function(item){
                             return allowed.indexOf(item.transactorTypeId) !== -1;
                         });
-                        $transactorListEl.empty();
-
-                        $.each(lst, function(index, item) {
-                            $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
-                        });
+                        transactorSelectorEl.dataSource = lst.map(item => ({
+                            Value: item.value,
+                            Text: item.text,
+                            ValueInt: parseInt(item.value),
+                            Title: item.text
+                        }));
+                        transactorSelectorEl.dataBind();
+                        transactorSelectorEl.value = null;
+                        if (oldTransactorId && transactorSelectorEl.dataSource.some(item => item.ValueInt === parseInt(oldTransactorId))) {
+                            transactorSelectorEl.value = oldTransactorId;
+                        }
+                       
+                       
                     } else {
-                        $transactorListEl.empty();
-                        $.each(transactorsListJs, function(index, item) {
-                            $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
-                        });
+                       
+                        transactorSelectorEl.dataSource = transactorsListJs.map(item => ({
+                            Value: item.value,
+                            Text: item.text,
+                            ValueInt: parseInt(item.value),
+                            Title: item.text
+                        }));
+                        transactorSelectorEl.dataBind();
+                        transactorSelectorEl.value = null;
+                        if (oldTransactorId && transactorSelectorEl.dataSource.some(item => item.ValueInt === parseInt(oldTransactorId))) {
+                            transactorSelectorEl.value = oldTransactorId;
+                        }
+                        
                     }
                     let cfaId = parseInt( a.defaultCfaId);
                     if (cfaId!==NaN) {
@@ -206,11 +235,18 @@
 
                 } else {
                     console.log('Not Found');
-                    $transactorListEl.empty();
-
-                    $.each(transactorsListJs, function(index, item) {
-                        $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
-                    });
+                    transactorSelectorEl.dataSource = transactorsListJs.map(item => ({
+                        Value: item.value,
+                        Text: item.text,
+                        ValueInt: parseInt(item.value),
+                        Title: item.text
+                    }));
+                    transactorSelectorEl.dataBind();
+                    transactorSelectorEl.value = null;
+                    if (oldTransactorId && transactorSelectorEl.dataSource.some(item => item.ValueInt === parseInt(oldTransactorId))) {
+                        transactorSelectorEl.value = oldTransactorId;
+                    }
+                    
                 }
 
             };
@@ -286,6 +322,7 @@
             companyChanged();
             if (selectTransactor!==0) {
                 $transactorListEl.val(selectTransactor);
+                transactorSelectorEl.value=selectTransactor;
             }
         });
 

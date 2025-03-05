@@ -34,7 +34,16 @@ namespace GrKouk.Web.ERP.Pages.Settings
                 new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfServiceSales, Value = ""},
                 new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfIncomeSales, Value = ""},
                 new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfFixedAssetBuys, Value = ""},
-                new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfFixedAssetSales, Value = ""}
+                new AppSetting {Code = GrKouk.Erp.Definitions.Constants.MainInfoPageSumOfFixedAssetSales, Value = ""},
+                new AppSetting {Code=GrKouk.Erp.Definitions.Constants.MainInfoPageAverageOfMaterialBuys,Value = ""},
+                new AppSetting {Code=GrKouk.Erp.Definitions.Constants.MainInfoPageAverageOfExpenseBuys,Value = ""},
+                new AppSetting {Code=GrKouk.Erp.Definitions.Constants.MainInfoPageAverageOfServiceBuys,Value = ""},
+                new AppSetting {Code=GrKouk.Erp.Definitions.Constants.MainInfoPageAverageOfMaterialSales,Value = ""},
+                new AppSetting {Code=GrKouk.Erp.Definitions.Constants.MainInfoPageAverageOfServiceSales,Value = ""},
+                new AppSetting {Code=GrKouk.Erp.Definitions.Constants.MainInfoPageAverageOfIncomeSales,Value = ""},
+                new AppSetting {Code=GrKouk.Erp.Definitions.Constants.MainInfoPageAverageOfFixedAssetBuys,Value = ""},
+                new AppSetting {Code=GrKouk.Erp.Definitions.Constants.MainInfoPageAverageOfFixedAssetSales,Value = ""},
+                
             };
         }
 
@@ -81,7 +90,17 @@ namespace GrKouk.Web.ERP.Pages.Settings
                     Value = ((int) c).ToString(),
                     Text = c.GetDescription()
                 }).ToList();
+            var aggregationTypeList = Enum.GetValues(typeof(MainInfoAggregationTypeEnum))
+                .Cast<MainInfoAggregationTypeEnum>()
+                .Select(c=> new SelectListItem()
+                {
+                    Value = ((int)c).ToString(), 
+                    Text = c.GetDescription()
+                    
+                }).ToList();
+                    
             ViewData["SourceType"] = sourceTypeList;
+            ViewData["AggregationType"] = aggregationTypeList;
         }
 
         public async Task<IActionResult> OnPostAsync()

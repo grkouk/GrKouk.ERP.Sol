@@ -544,6 +544,12 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.Property<int>("SellDocTypeDefId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("TransTransactorDocSeriesDefId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TransWarehouseDocSeriesDefId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Code")
@@ -552,6 +558,10 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasIndex("CompanyId");
 
                     b.HasIndex("SellDocTypeDefId");
+
+                    b.HasIndex("TransTransactorDocSeriesDefId");
+
+                    b.HasIndex("TransWarehouseDocSeriesDefId");
 
                     b.ToTable("SellDocSeriesDefs");
                 });
@@ -2631,6 +2641,40 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.ToTable("WrItemCodes");
                 });
 
+            modelBuilder.Entity("GrKouk.Web.ERP.Helpers.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CreatedByIp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Token")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -3017,9 +3061,21 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("GrKouk.Erp.Domain.DocDefinitions.TransTransactorDocSeriesDef", "TransTransactorDocSeriesDef")
+                        .WithMany()
+                        .HasForeignKey("TransTransactorDocSeriesDefId");
+
+                    b.HasOne("GrKouk.Erp.Domain.DocDefinitions.TransWarehouseDocSeriesDef", "TransWarehouseDocSeriesDef")
+                        .WithMany()
+                        .HasForeignKey("TransWarehouseDocSeriesDefId");
+
                     b.Navigation("Company");
 
                     b.Navigation("SellDocTypeDef");
+
+                    b.Navigation("TransTransactorDocSeriesDef");
+
+                    b.Navigation("TransWarehouseDocSeriesDef");
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.SellDocTypeDef", b =>

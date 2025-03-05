@@ -7,7 +7,7 @@
 			</div>
             <div class="modal-body">
                 <div class="container-fluid">
-                     <ejs-autocomplete id="ShortCutsAutoComplete" placeholder="Selection text" popupHeight="450px" autofill="true"
+                     <ejs-autocomplete id="ShortCutsAutoComplete" placeholder="Selection text" popupHeight="450px" @* autofill="true" *@
                                       itemTemplate="@Html.Raw("<div><img class=\"empImage\" src=${imgUrl} /><div class=\"ename\"> ${text} </div></div>")">
                         <e-autocomplete-fields text="text" value="value"></e-autocomplete-fields>
                         @* <e-data-manager url="@Url.Action("GetSellDocAutoComplete", "AutoComplete")" adaptor="UrlAdaptor"></e-data-manager> *@

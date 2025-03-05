@@ -122,7 +122,7 @@
             <input type="hidden" id="CurrencyId" />
             <input type="hidden" id="PeriodId" />
             
-            <ejs-grid id="Grid"  
+            <ejs-grid id="GridTransactorDetailsPage"  
                       allowPaging="true" allowResizing="true" allowSorting="true" enablePersistence="true">
                   <e-data-manager url="@Url.Action("GetTrTransTest", "FinancialData")" adaptor="UrlAdaptor"></e-data-manager> 
                 <e-grid-aggregates>
@@ -197,20 +197,20 @@
 
                 getFinancialData(transactorId, selPeriodId, selCompanyId, selCurrencyId);
                 //getTransactionsData(transactorId, selPeriodId, selCompanyId, selCurrencyId);
-                let grd = document.getElementById("Grid").ej2_instances[0];
+                let grd = document.getElementById("GridTransactorDetailsPage").ej2_instances[0];
                 grd.query = new ej.data.Query()
                     .addParams('transactorId', transactorId)
                     .addParams('dateRange', selPeriodId)
                     .addParams('companyFilter', selCompanyId)
                     .addParams('displayCurrencyId', selCurrencyId);  
             };
-            //---------------------Grid-------------------
+            //---------------------GridTransactorDetailsPage-------------------
             //const iam = function() {
             //    //this.aggregates[0].columns[0].setPropertiesSilent({ customAggregate: customAggregateFn, type: ['Sum', 'Custom'] });
-            //    console.log('Grid Load function called');
+            //    console.log('GridTransactorDetailsPage Load function called');
             //    console.log(this.aggregates[0].columns[0]);
             //};
-            //let grd = document.getElementById("Grid").ej2_instances[0];
+            //let grd = document.getElementById("GridTransactorDetailsPage").ej2_instances[0];
             //grd.addEventListener("actionBegin",
             //    function(args) {
             //        console.log('actionBegin event called');
@@ -225,7 +225,7 @@
             //        //var dateRange = 11;
             //        //var selCurrency = 1;
 
-            //        //var grid = document.getElementById("Grid").ej2_instances[0];
+            //        //var grid = document.getElementById("GridTransactorDetailsPage").ej2_instances[0];
 
             //        //var uri = '/api/FinancialData/GetTrTransTest?';
             //        //uri += `&transactorId=${transactorId}`;
@@ -326,7 +326,7 @@
                     ej.base.setCurrencyCode(currencyCode);
                     //loadEj2Translation(cBaseCulture);
 
-                    var grid = document.getElementById("Grid").ej2_instances[0];
+                    var grid = document.getElementById("GridTransactorDetailsPage").ej2_instances[0];
                     grid.locale = cBaseCulture;
 
                     formatterCurrency = new Intl.NumberFormat(cCulture,
@@ -565,7 +565,7 @@
                         //     1000);
                     },
                     success: function(result) {
-                        var grid = document.getElementById("Grid").ej2_instances[0];
+                        var grid = document.getElementById("GridTransactorDetailsPage").ej2_instances[0];
                         //var grid2 = document.getElementById("transGrid").ej2_instances[0];
                         //grid2.destroy();
                         //var data = result.data;

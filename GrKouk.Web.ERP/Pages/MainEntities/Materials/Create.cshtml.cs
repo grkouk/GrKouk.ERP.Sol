@@ -19,7 +19,7 @@ using NToastNotify;
 
 namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Operator")]
     public class CreateModel : PageModel
     {
         private readonly ApiDbContext _context;

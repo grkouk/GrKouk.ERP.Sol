@@ -11,6 +11,15 @@
         public const string MainInfoPageSumOfServiceSales = "SumOfServiceSalesDf";
         public const string MainInfoPageSumOfIncomeSales = "SumOfIncomeSalesDf";
         public const string MainInfoPageSumOfFixedAssetSales = "SumOfFixedAstSalesDf";
+        public const string MainInfoPageAverageOfMaterialSales = "AvgOfMaterialSalesDf";
+        public const string MainInfoPageAverageOfServiceSales = "AvgOfServiceSalesDf";
+        public const string MainInfoPageAverageOfIncomeSales = "AvgOfIncomeSalesDf";
+        public const string MainInfoPageAverageOfFixedAssetSales = "AvgOfFixedAstSalesDf";
+        public const string MainInfoPageAverageOfMaterialBuys = "AvgOfMaterialBuysDf";
+        public const string MainInfoPageAverageOfServiceBuys = "AvgOfServiceBuysDf";
+        public const string MainInfoPageAverageOfExpenseBuys = "AvgOfExpenseBuysDf";
+        public const string MainInfoPageAverageOfFixedAssetBuys = "AvgOfFixedAstBuysDf";
+        
         //--------------------------------------------------------------------------------------------------------------
         public const string SectionWarehouseTransactions = "SYS-WAREHOUSE-TRANS";
         public const string SectionSupplierTransactions = "SYS-SUPPLIER-TRANS";

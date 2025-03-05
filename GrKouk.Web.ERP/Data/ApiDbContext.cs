@@ -3,6 +3,7 @@ using GrKouk.Erp.Domain.DocDefinitions;
 using GrKouk.Erp.Domain.MediaEntities;
 using GrKouk.Erp.Domain.RecurringTransactions;
 using GrKouk.Erp.Domain.Shared;
+using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -78,6 +79,7 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<CashFlowDocSeriesDef> CashFlowDocSeriesDefs { get; set; }
         public DbSet<CashFlowAccountTransaction> CashFlowAccountTransactions { get; set; }
         public DbSet<CashFlowAccountCompanyMapping> CashFlowAccountCompanyMappings { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

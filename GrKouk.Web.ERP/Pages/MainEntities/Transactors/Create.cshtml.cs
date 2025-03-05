@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using NToastNotify;
 
 namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Operator")]
     public class CreateModel : PageModel {
         private readonly ApiDbContext _context;
         private readonly IToastNotification _toastNotification;

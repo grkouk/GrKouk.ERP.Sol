@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GrKouk.Web.ERP.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -21,7 +22,14 @@ namespace GrKouk.Web.ERP.Controllers
             _context = context;
             _logger = logger;
         }
-        
+
+        [HttpGet("GetTest1")]
+        [Authorize(Policy = "ApiPolicy2")]
+
+        public async Task<IActionResult> GetTest1()
+        {
+            return Ok("Test1");
+        }
     }
 }
 

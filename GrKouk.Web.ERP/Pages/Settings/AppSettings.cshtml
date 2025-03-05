@@ -1,4 +1,9 @@
 ﻿@page
+@using GrKouk.Erp.Definitions
+@using GrKouk.Web.ERP.Helpers
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Syncfusion.EJ2
+@using Syncfusion.EJ2.DropDowns
 @model AppSettingsModel
 
 @{
@@ -65,7 +70,7 @@
                     </div>
                 </div>
             </div>
-
+            
             <div class="row">
                 <div class="col-md-10 col-sm-10 col-lg-10">
                     <label class="" small>Sum Of Service Sales Definition</label>
@@ -110,7 +115,95 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group">
+            <div class="row">
+                <div class="col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Average Of Material Buys Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[9].Value" id="BuysAvgMaterialsValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="BuysAvgMaterialsSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Average Of Expenses Buys Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[10].Value" id="BuysAvgExpensesValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="BuysAvgExpensesSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Average Of Services Buys Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[11].Value" id="BuysAvgServicesValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="BuysAvgServicesSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Average Of Materials Sales Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[12].Value" id="SalesAvgMaterialsValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="SalesAvgMaterialsSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Average Of Services Sales Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[13].Value" id="SalesAvgServicesValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="SalesAvgServicesSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Average Of Income Sales Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[14].Value" id="SalesAvgIncomeValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="SalesAvgIncomeSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Average Of Fixed Assets Buys Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[15].Value" id="BuysAvgFixedAssetsValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="BuysAvgFixedAssetsSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-10 col-sm-10 col-lg-10">
+                    <label class="" small>Average Of Fixed Assets Sales Definition</label>
+                    <div class="input-group input-group-sm">
+                        <textarea class="form-control" asp-for="ItemVm[16].Value" id="SalesAvgFixedAssetsValue" rows="2"></textarea>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#itemSelector" data-selectorType="SalesAvgFixedAssetsSettings" type="button">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary btn-sm" id="saveForm"/>
             </div>
         </fieldset>
@@ -147,7 +240,15 @@
 
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <label>Select Aggregation Type</label>
+                            <ejs-combobox id="AggregationType" dataSource="@ViewBag.AggregationType" placeholder="Aggregation Type">
+                                <e-combobox-fields value="Value" text="Text"></e-combobox-fields>
+                            </ejs-combobox>
 
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-12" id="MaterialNatureTypesDiv">
                             <label>Select Material Natures</label>
@@ -414,17 +515,20 @@
                 function (e) {
                     console.log('Modal save button clicked');
                     var sourceType = document.getElementById("SourceType").ej2_instances[0];
+                    var aggregationType = document.getElementById("AggregationType").ej2_instances[0];
                     var materialNatures = document.getElementById("MultiSelectMaterialNatures").ej2_instances[0];
                     var transactorTypes = document.getElementById("MultiSelectTransactorTypes").ej2_instances[0];
                     var selectedCompanies = document.getElementById("MultiSelectCompanies").ej2_instances[0];
                     var selectedDocTypes = document.getElementById("MultiSelectDocumentTypes").ej2_instances[0];
                     let sourceTypeSelected = sourceType.value;
+                    let aggregationTypeSelected = aggregationType.value;
                     let materialNaturesSelected = materialNatures.value;
                     let transactorTypesSelected = transactorTypes.value;
                     let companiesSelected = selectedCompanies.value;
                     let docTypesSelected = selectedDocTypes.value;
                     let js = {
                         srcType: sourceTypeSelected,
+                        aggType: aggregationTypeSelected,
                         matNatures: materialNaturesSelected,
                         transTypes: transactorTypesSelected,
                         compSelected: companiesSelected,
@@ -448,7 +552,7 @@
                         case "SellServicesSettings":
                             $('#SellServicesValue').val(jsJSON);
                             break;
-                         case "SellIncomeSettings":
+                        case "SellIncomeSettings":
                             $('#SellIncomeValue').val(jsJSON);
                             break;
                         case "SellFixedSettings":
@@ -457,7 +561,38 @@
                         case "BuyFixedSettings":
                             $('#BuyFixedValue').val(jsJSON);
                             break;
+                        case "SalesAvgMaterialsSettings":
+                            $('#SalesAvgMaterialsValue').val(jsJSON);
+                            break;
+                        case "SalesAvgExpensesSettings":
+                            $('#SalesAvgExpensesValue').val(jsJSON);
+                            break;
+                        case "SalesAvgServicesSettings":
+                            $('#SalesAvgServicesValue').val(jsJSON);
+                            break;
+                        case "SalesAvgIncomeSettings":
+                            $('#SalesAvgIncomeValue').val(jsJSON);
+                            break;
+                        case "SalesAvgFixedAssetsSettings":
+                            $('#SalesAvgFixedAssetsValue').val(jsJSON);
+                            break;
+                        case "BuysAvgFixedAssetsSettings":
+                            $('#BuysAvgFixedAssetsValue').val(jsJSON);
+                            break;
+                        case "BuysAvgMaterialsSettings":
+                            $('#BuysAvgMaterialsValue').val(jsJSON);
+                            break;
+                        case "BuysAvgExpensesSettings":
+                            $('#BuysAvgExpensesValue').val(jsJSON);
+                            break;
+                        case "BuysAvgServicesSettings":
+                            $('#BuysAvgServicesValue').val(jsJSON);
+                            break;
+                            
+                     
+                            
                         default:
+                            console.log(`Unknown selector type: ${currentSelectorType} in SaveItemSelector Click event`);
                     }
 
                     console.log(js);
@@ -467,6 +602,7 @@
             $('#itemSelector').on('shown.bs.modal',
                 () => {
                     var sourceType = document.getElementById("SourceType").ej2_instances[0];
+                    var aggregationType = document.getElementById("AggregationType").ej2_instances[0];
                     var materialNatures = document.getElementById("MultiSelectMaterialNatures").ej2_instances[0];
                     var transactorTypes = document.getElementById("MultiSelectTransactorTypes").ej2_instances[0];
                     var selectedCompanies = document.getElementById("MultiSelectCompanies").ej2_instances[0];
@@ -498,15 +634,49 @@
                             break;
                         case "BuyFixedSettings":
                             oldVal = $('#BuyFixedValue').val();
-                            break;     
+                            break;
+                        case "SalesAvgMaterialsSettings":
+                            oldVal = $('#SalesAvgMaterialsValue').val();
+                            break;
+                        case "SalesAvgExpensesSettings":
+                            oldVal = $('#SalesAvgExpensesValue').val();
+                            break;
+                        case "SalesAvgServicesSettings":
+                            oldVal = $('#SalesAvgServicesValue').val();
+                            break;
+                        case "SalesAvgIncomeSettings":
+                            oldVal = $('#SalesAvgIncomeValue').val();
+                            break;
+                        case "SalesAvgFixedAssetsSettings":
+                            oldVal = $('#SalesAvgFixedAssetsValue').val();
+                            break;
+                        case "BuysAvgFixedAssetsSettings":
+                           oldVal = $('#BuysAvgFixedAssetsValue').val();
+                            break;
+                        case "BuysAvgMaterialsSettings":
+                           oldVal = $('#BuysAvgMaterialsValue').val();
+                            break;
+                        case "BuysAvgExpensesSettings":
+                            oldVal = $('#BuysAvgExpensesValue').val();
+                            break;
+                        case "BuysAvgServicesSettings":
+                            oldVal = $('#BuysAvgServicesValue').val();
+                            break;    
                         default:
+                            console.log(`Unknown selector type: ${currentSelectorType} in itemSelector shown.bs.modal event`);
                     }
                     if (oldVal.length > 0) {
                         let oldValObj = JSON.parse(oldVal);
                         sourceType.value = oldValObj.srcType;
+                       
                         if (sourceType.value) {
                             getDocumentTypeList(sourceType.value, oldValObj.docTypesSelected);
                         }
+                        aggregationType.value = oldValObj.aggType ?? "1";
+                       // if (oldValObj.aggType) {
+                       //     aggregationType.value = oldValObj.aggType;                           
+                       // }
+ 
                         materialNatures.value = oldValObj.matNatures;
                         transactorTypes.value = oldValObj.transTypes;
                         selectedCompanies.value = oldValObj.compSelected;
@@ -547,8 +717,37 @@
                             break;    
                         case "BuyFixedSettings":
                             modal.find('.modal-title').text("Buy Fixed Assets Setting");
-                            break;    
+                            break;
+                        case "SalesAvgMaterialsSettings":
+                            modal.find('.modal-title').text("Sales Average Materials Setting");
+                            break;
+                        case "SalesAvgExpensesSettings":
+                            modal.find('.modal-title').text("Sales Average Expenses Setting");
+                            break;
+                        case "SalesAvgServicesSettings":
+                            modal.find('.modal-title').text("Sales Average Services Setting");
+                            break;
+                        case "SalesAvgIncomeSettings":
+                            modal.find('.modal-title').text("Sales Average Income Setting");
+                            break;
+                        case "SalesAvgFixedAssetsSettings":
+                            modal.find('.modal-title').text("Sales Average Fixed Assets Setting");
+                            break;
+                        case "BuysAvgFixedAssetsSettings":
+                            modal.find('.modal-title').text("Buy Average Fixed Assets Setting");
+                            break;
+                        case "BuysAvgMaterialsSettings":
+                            modal.find('.modal-title').text("Buy Average Materials Setting");
+                            break;
+                        case "BuysAvgExpensesSettings":
+                            modal.find('.modal-title').text("Buy Average Expenses Setting");
+                            break;
+                        case "BuysAvgServicesSettings":
+                            modal.find('.modal-title').text("Buy Average Services Setting");
+                            break;
+
                         default:
+                            console.log(`Unknown selector type: ${selectorType} in itemSelector show.bs.modal event`);
                     }
                 });
             $('#itemSelector').on('hidden.bs.modal',
@@ -556,17 +755,20 @@
                     var button = $(event.relatedTarget);
                     var modal = $(this);
                     var sourceType = document.getElementById("SourceType").ej2_instances[0];
+                    var aggregationType = document.getElementById("AggregationType").ej2_instances[0];
                     var materialNatures = document.getElementById("MultiSelectMaterialNatures").ej2_instances[0];
                     var transactorTypes = document.getElementById("MultiSelectTransactorTypes").ej2_instances[0];
                     var selectedCompanies = document.getElementById("MultiSelectCompanies").ej2_instances[0];
                     var selectedDocTypes = document.getElementById("MultiSelectDocumentTypes").ej2_instances[0];
                     sourceType.value = "";
+                    aggregationType.value = "";
                     materialNatures.value = "";
                     transactorTypes.value = "";
                     selectedCompanies.value = "";
                     selectedDocTypes.value = "";
                 });
             var sourceType = document.getElementById("SourceType").ej2_instances[0];
+            //var aggregationType = document.getElementById("AggregationType").ej2_instances[0];
             sourceType.addEventListener('change',
                 function (e) {
                     console.log(`Source Type changed value is ${e.value}`);

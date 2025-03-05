@@ -16,7 +16,7 @@ using GrKouk.Web.ERP.Helpers;
 
 namespace GrKouk.Web.ERP.Pages.Transactions.WarehouseTransMng
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Operator")]
     public class CreateModel : PageModel
     {
         private const string SectionSystemCode = "SYS-WAREHOUSE-TRANS";

@@ -16,4 +16,8 @@
     <ProjectReference Include="..\GrKouk.Erp.Definitions\GrKouk.Erp.Definitions.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="CashDiary\" />
+  </ItemGroup>
+
 </Project>

@@ -16,7 +16,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Operator")]
     public class Index3Model : PageModel
     {
         private readonly ApiDbContext _context;

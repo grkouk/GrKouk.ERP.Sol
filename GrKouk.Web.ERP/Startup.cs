@@ -1,14 +1,21 @@
 using System;
+using System.Security.Claims;
+using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using GrKouk.Web.ERP.Data;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
+using Microsoft.CodeAnalysis.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using NToastNotify;
 
 namespace GrKouk.Web.ERP
@@ -25,21 +32,77 @@ namespace GrKouk.Web.ERP
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-           
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => false;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-                
-            });
+           var jwtSettings = Configuration.GetSection("JwtSettings");
+           var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+
+            // services.Configure<CookiePolicyOptions>(options =>
+            // {
+            //     // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+            //     options.CheckConsentNeeded = context => false;
+            //     options.MinimumSameSitePolicy = SameSiteMode.None;
+            //     
+            //     
+            // });
             services.AddDbContext<ApiDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddIdentity<IdentityUser, IdentityRole>()
+            services.AddIdentity<IdentityUser, IdentityRole>(options=>
+            {
+                options.ClaimsIdentity.RoleClaimType = ClaimTypes.Role; // Ensure roles are stored in claims
+            })
                 .AddDefaultUI()
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApiDbContext>();
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; 
+                
+               
+            }) .AddCookie(options =>
+            {
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60); // Set to 60 minutes or your desired time
+                options.SlidingExpiration = true;
+
+                options.LoginPath = "/Identity/Account/Login";
+            })
+
+                .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidIssuer = jwtSettings["Issuer"],
+                    ValidAudience = jwtSettings["Audience"]
+                };
+            });
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("ApiPolicy", policy =>
+                {
+                    policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireRole("Admin"); // Ensures a role match
+                });
+                options.AddPolicy("ApiPolicy2", policy =>
+                {
+                    policy.AddAuthenticationSchemes(CookieAuthenticationDefaults.AuthenticationScheme, JwtBearerDefaults.AuthenticationScheme);
+                    policy.RequireAuthenticatedUser(); // The user must be authenticated
+                    policy.RequireRole("Admin");      // The user must have the Admin role
+                });
+
+
+                // Default (Web Cookie Authentication): No need to add schemes, relies on cookie
+            });
+
+           
             services.AddMvc()
                 .AddNToastNotifyToastr(new ToastrOptions()
                 {
@@ -48,18 +111,19 @@ namespace GrKouk.Web.ERP
                     TimeOut = 5000,
                     ExtendedTimeOut = 1000
                 });
-            services.ConfigureApplicationCookie(options =>
-            {
-                // Cookie settings
-                options.Cookie.HttpOnly = true;
-                options.Cookie.SameSite = SameSiteMode.Lax;
-                options.ExpireTimeSpan = TimeSpan.FromHours(1);
-                //if the above is not workong then try this
-                //options.ExpireTimeSpan = DateTime.Now.Subtract(DateTime.UtcNow).Add(TimeSpan.FromMinutes(5);
-                options.LoginPath = "/Identity/Account/Login";
-                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-                options.SlidingExpiration = true;
-            });
+            // services.ConfigureApplicationCookie(options =>
+            // {
+            //     // Cookie settings
+            //     options.Cookie.HttpOnly = true;
+            //     options.Cookie.SameSite = SameSiteMode.Lax;
+            //     options.ExpireTimeSpan = TimeSpan.FromHours(1);
+            //     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            //     //if the above is not workong then try this
+            //     //options.ExpireTimeSpan = DateTime.Now.Subtract(DateTime.UtcNow).Add(TimeSpan.FromMinutes(5);
+            //     options.LoginPath = "/Identity/Account/Login";
+            //     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+            //     options.SlidingExpiration = true;
+            // });
             //services.AddSession(options => { options.IdleTimeout = TimeSpan.FromMinutes(30); });
             services.AddDistributedMemoryCache();
 
@@ -99,6 +163,23 @@ namespace GrKouk.Web.ERP
             app.UseNToastNotify();
             app.UseSession();
             //app.UseMvc();
+            //---------------
+            // app.Use(async (context, next) =>
+            // {
+            //     // Check if the request contains a Bearer token in the headers
+            //     var authHeader = context.Request.Headers["Authorization"];
+            //     if (authHeader.ToString().StartsWith("Bearer "))
+            //     {
+            //         // Switch scheme to JwtBearer for this request
+            //       //  context.User = null; // Reset claims to avoid conflicts
+            //       //  await context.RequestServices.GetRequiredService<IAuthenticationService>()
+            //       //      .AuthenticateAsync(context, JwtBearerDefaults.AuthenticationScheme);
+            //     }
+            //
+            //     await next();
+            // });
+
+            //--------------
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
@@ -106,7 +187,7 @@ namespace GrKouk.Web.ERP
             });
             //Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("");
         
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Mgo+DSMBMAY9C3t2UlhhQlVMfV5AQmBIYVp/TGpJfl96cVxMZVVBJAtUQF1hTX9SdkFiWX9edHRSQ2BZ;MzU2MTgyM0AzMjM3MmUzMDJlMzBBSGtQMTJmRVlHZXZhd2NKYUhqSkFHajlYbHp0U3h1bTAvdXhMYWdTOUJNPQ==;MzU2MTgyNEAzMjM3MmUzMDJlMzBIeWpIdk5BdzhsMnZVaWhnQ3lPajRicjlzWlNQQzI0dVppQVc3bUJHM3RNPQ==");
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Mgo+DSMBMAY9C3t2XVhhQlJHfV5AQmBIYVp/TGpJfl96cVxMZVVBJAtUQF1hTH5Sd0RiXn9ccHFXTmNZ");
         }
     }
 }

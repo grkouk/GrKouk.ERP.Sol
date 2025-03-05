@@ -3,12 +3,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Web.ERP.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
 {
+    [Authorize(Roles = "Admin, Operator")]
     public class DeleteModel : PageModel
     {
         private readonly ApiDbContext _context;

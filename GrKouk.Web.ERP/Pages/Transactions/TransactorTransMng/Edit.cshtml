@@ -7,13 +7,16 @@
     ViewData["Title"] = "Edit Transactor Transaction";
     var formDisabled = Model.NotUpdatable ? "disabled" : "";
 }
+
 @section MyCss
 {
     <partial name="Shared/_CssSyncfusionBlockPartial"/>
 }
+
 @* <h4>Edit Transactor Transaction</h4> *@
 @{
-    if (Model.NotUpdatable) {
+    if (Model.NotUpdatable)
+    {
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             <strong>Not updateable!</strong> This transaction is created from other section and cannot be updated.
             <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
@@ -24,58 +27,74 @@
 }
 
 
-<hr />
+<hr/>
 <div class="container">
 
     <form method="post">
         <fieldset @formDisabled>
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="ItemVm.Id" />
-            <input type="hidden" asp-for="ItemVm.Timestamp" />
-            <input type="hidden" asp-for="ItemVm.SectionId" />
+            <input type="hidden" asp-for="ItemVm.Id"/>
+            <input type="hidden" asp-for="ItemVm.Timestamp"/>
+            <input type="hidden" asp-for="ItemVm.SectionId"/>
             <input type="hidden" asp-for="@Model.EntityInTransactionId" id="cfaId"/>
-            <input type="hidden" asp-for="ItemVm.TransTransactorDocTypeId" />
-            <input type="hidden" asp-for="@Model.InitialLoad" id="IsInitialLoad" />
+            <input type="hidden" asp-for="ItemVm.TransTransactorDocTypeId"/>
+            <input type="hidden" asp-for="@Model.InitialLoad" id="IsInitialLoad"/>
             <div class="row mb-3">
                 <div class="col-md-3">
                     <div class="form-floating">
-                        <input asp-for="ItemVm.TransDate" class="form-control form-control-sm" autofocus />
+                        <input asp-for="ItemVm.TransDate" class="form-control form-control-sm" autofocus/>
                         <label asp-for="ItemVm.TransDate" class="form-label small"></label>
                         <span asp-validation-for="ItemVm.TransDate" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <select asp-for="ItemVm.TransTransactorDocSeriesId" class="form-select form-select-sm" asp-items="ViewBag.TransTransactorDocSeriesId"></select>
+                        <select asp-for="ItemVm.TransTransactorDocSeriesId" class="form-select form-select-sm"
+                                asp-items="ViewBag.TransTransactorDocSeriesId"></select>
                         <label asp-for="ItemVm.TransTransactorDocSeriesId" class="form-label small"></label>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating">
-                        <input asp-for="ItemVm.TransRefCode" class="form-control form-control-sm" placeholder="Ref Code" />
+                        <input asp-for="ItemVm.TransRefCode" class="form-control form-control-sm"
+                               placeholder="Ref Code"/>
                         <label asp-for="ItemVm.TransRefCode" class="form-label small"></label>
                         <span asp-validation-for="ItemVm.TransRefCode" class="text-danger"></span>
                     </div>
                 </div>
             </div>
+           
             <div class="row mb-3">
                 <div class="col-md-6">
                     <div class="form-floating">
-                        <select asp-for="ItemVm.TransactorId" class="form-select form-select-sm" asp-items="ViewBag.TransactorId"></select>
-                        <label asp-for="ItemVm.TransactorId" class="form-label small"></label>
+                        @* <select asp-for="ItemVm.TransactorId" class="form-select form-select-sm" asp-items="ViewBag.TransactorId"></select> *@
+                        @* dataSource="@ViewBag.TransactorIdUi" *@
+                        <ejs-dropdownlist id="TransactorSelector"
+                                          allowFiltering="true"
+                                          ignoreAccent="true"
+                                          floatLabelType="Auto"
+                                          placeholder="Transactor"
+                                          filterType="Contains"
+                                          ejs-for="ItemVm.TransactorId"
+                        >
+                            <e-dropdownlist-fields text="Text" value="ValueInt"></e-dropdownlist-fields>
+                        </ejs-dropdownlist>
+                        @* <label asp-for="ItemVm.TransactorId" class="form-label small"></label> *@
                         <span asp-validation-for="ItemVm.TransactorId" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating">
-                        <select asp-for="ItemVm.CfAccountId" class="form-select form-select-sm" asp-items="ViewBag.CfAccountId"></select>
+                        <select asp-for="ItemVm.CfAccountId" class="form-select form-select-sm"
+                                asp-items="ViewBag.CfAccountId"></select>
                         <label asp-for="ItemVm.CfAccountId" class="form-label small"></label>
                         <span asp-validation-for="ItemVm.CfAccountId" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-floating">
-                        <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm" asp-items="ViewBag.CompanyId"></select>
+                        <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm"
+                                asp-items="ViewBag.CompanyId"></select>
                         <label asp-for="ItemVm.CompanyId" class="form-label small"></label>
                     </div>
                 </div>
@@ -108,8 +127,10 @@
                 </div>
                 <div class="col-md-2">
 
-                    <ejs-numerictextbox id="AmountDiscount" placeholder="Discount Amount" format="c2" showSpinButton="false"
-                                        ejs-for="@Model.ItemVm.AmountDiscount" floatLabelType="Auto"></ejs-numerictextbox>
+                    <ejs-numerictextbox id="AmountDiscount" placeholder="Discount Amount" format="c2"
+                                        showSpinButton="false"
+                                        ejs-for="@Model.ItemVm.AmountDiscount"
+                                        floatLabelType="Auto"></ejs-numerictextbox>
 
                     <div class="invalid-feedback">
                         <span asp-validation-for="ItemVm.AmountDiscount" class="text-danger"></span>
@@ -129,7 +150,8 @@
             <div class="row mb-3">
                 <div class="col-md-12">
                     <div class="form-floating">
-                        <textarea asp-for="ItemVm.Etiology" class="form-control form-control-sm" placeholder="Αιτιολογία Κίνησης"> </textarea>
+                        <textarea asp-for="ItemVm.Etiology" class="form-control form-control-sm"
+                                  placeholder="Αιτιολογία Κίνησης"> </textarea>
                         <label asp-for="ItemVm.Etiology" class="form-label small"></label>
                     </div>
                     <div class="invalid-feedback">
@@ -139,7 +161,7 @@
             </div>
             <div class="row mb-3">
                 <div class="col">
-                    <input type="submit" value="Update" class="btn btn-primary btn-sm" />
+                    <input type="submit" value="Update" class="btn btn-primary btn-sm"/>
                 </div>
             </div>
         </fieldset>
@@ -149,9 +171,10 @@
 @* <div> *@
 @*     <a class="small" asp-page="./Index">Back to List</a> *@
 @* </div> *@
-<partial name="_LoadMePartial" />
+<partial name="_LoadMePartial"/>
+
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsStrippedPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsStrippedPartial"); }
     <!--Begin syncfusion integration-->
     <script>
         //I have to define this function here otherwise there is an error
@@ -172,64 +195,127 @@
 
             var $transDate = $('#ItemVm_TransDate');
             var amountNetEl = document.getElementById("AmountNet").ej2_instances[0];
-           var amountFpaEl = document.getElementById("AmountFpa").ej2_instances[0];
-           var amountDicEl = document.getElementById("AmountDiscount").ej2_instances[0];
-           var fpaRateEl = document.getElementById("fpaRate").ej2_instances[0];
-           var amountSumEl = document.getElementById("ItemVm_AmountSum").ej2_instances[0];
+            var amountFpaEl = document.getElementById("AmountFpa").ej2_instances[0];
+            var amountDicEl = document.getElementById("AmountDiscount").ej2_instances[0];
+            var fpaRateEl = document.getElementById("fpaRate").ej2_instances[0];
+            var amountSumEl = document.getElementById("ItemVm_AmountSum").ej2_instances[0];
+            const transactorSelectorEl = document.getElementById("TransactorSelector").ej2_instances[0];
+            
             var $cfAccountId = $('#ItemVm_CfAccountId');
-           const $docSeriesEl=$('#ItemVm_TransTransactorDocSeriesId');
+            const $docSeriesEl = $('#ItemVm_TransTransactorDocSeriesId');
             const $transactorListEl = $('#ItemVm_TransactorId');
             var transactorsListJs = @Html.Raw(Json.Serialize(ViewBag.transactorsListJs));
             var allowedTypesListJs = @Html.Raw(Json.Serialize(ViewBag.docTypeAllowedTransactorTypesListJs));
             const $cfaId = $('#cfaId');
 
             const calculateAmounts = () => {
-               console.log("Calculate Values called");
-               var fpaRate = fpaRateEl.value;
-               var amountNet = amountNetEl.value;
-               var amountDic = amountDicEl.value;
-               var amountForFpa = amountNet - amountDic;
-               var amountFpa = amountForFpa * fpaRate;
-               amountFpaEl.value=amountFpa;
-               amountSumEl.value=amountNet + amountFpa - amountDic;
+                console.log("Calculate Values called");
+                var fpaRate = fpaRateEl.value;
+                var amountNet = amountNetEl.value;
+                var amountDic = amountDicEl.value;
+                var amountForFpa = amountNet - amountDic;
+                var amountFpa = amountForFpa * fpaRate;
+                amountFpaEl.value = amountFpa;
+                amountSumEl.value = amountNet + amountFpa - amountDic;
+
+            };
+            const docSeriesChanged=()=>{
+                const docSeriesId=$docSeriesEl.val();
+                const oldTransactorId=transactorSelectorEl.value;
+                //locate inside list selected docseriesid
+                let a = allowedTypesListJs.find(o=>o.docSeriesId==docSeriesId);
+                if (a){
+                    //console.log('Found');
+                    let allowed = JSON.parse(a.allowedTypes);
+                    if (allowed){
+                        let  lst = transactorsListJs.filter(function(item){
+                            return allowed.indexOf(item.transactorTypeId) !== -1;
+                        });
+                        transactorSelectorEl.dataSource = lst.map(item => ({
+                            Value: item.value,
+                            Text: item.text,
+                            ValueInt: parseInt(item.value),
+                            Title: item.text
+                        }));
+                        transactorSelectorEl.dataBind();
+                        transactorSelectorEl.value = null;
+                        if (oldTransactorId && transactorSelectorEl.dataSource.some(item => item.ValueInt === parseInt(oldTransactorId))) {
+                            transactorSelectorEl.value = oldTransactorId;
+                        }
+
+
+                    } else {
+
+                        transactorSelectorEl.dataSource = transactorsListJs.map(item => ({
+                            Value: item.value,
+                            Text: item.text,
+                            ValueInt: parseInt(item.value),
+                            Title: item.text
+                        }));
+                        transactorSelectorEl.dataBind();
+                        transactorSelectorEl.value = null;
+                        if (oldTransactorId && transactorSelectorEl.dataSource.some(item => item.ValueInt === parseInt(oldTransactorId))) {
+                            transactorSelectorEl.value = oldTransactorId;
+                        }
+
+                    }
+                    let cfaId = parseInt( a.defaultCfaId);
+                    if (cfaId!==NaN) {
+                        $cfAccountId.val(cfaId);
+                    }
+
+                } else {
+                    console.log('Not Found');
+                    transactorSelectorEl.dataSource = transactorsListJs.map(item => ({
+                        Value: item.value,
+                        Text: item.text,
+                        ValueInt: parseInt(item.value),
+                        Title: item.text
+                    }));
+                    transactorSelectorEl.dataBind();
+                    transactorSelectorEl.value = null;
+                    if (oldTransactorId && transactorSelectorEl.dataSource.some(item => item.ValueInt === parseInt(oldTransactorId))) {
+                        transactorSelectorEl.value = oldTransactorId;
+                    }
+
+                }
 
             };
 
-
-            const docSeriesChanged=()=>{
+            const docSeriesChangedOld = () => {
                 let cfaId = $cfaId.val();
-               const docSeriesId=$('#ItemVm_TransTransactorDocSeriesId').val();
-               //locate inside list selected docseriesid
-               let a = allowedTypesListJs.find(o=>o.docSeriesId==docSeriesId);
-               if (a){
-                   console.log('Found');
-                   let allowed = JSON.parse(a.allowedTypes);
-                   if (allowed){
-                        let  lst = transactorsListJs.filter(function(item){
-                                return allowed.indexOf(item.transactorTypeId) !== -1;
-                              });
-                         $transactorListEl.empty();
+                const docSeriesId = $('#ItemVm_TransTransactorDocSeriesId').val();
+                //locate inside list selected docseriesid
+                let a = allowedTypesListJs.find(o => o.docSeriesId == docSeriesId);
+                if (a) {
+                    console.log('Found');
+                    let allowed = JSON.parse(a.allowedTypes);
+                    if (allowed) {
+                        let lst = transactorsListJs.filter(function (item) {
+                            return allowed.indexOf(item.transactorTypeId) !== -1;
+                        });
+                        $transactorListEl.empty();
 
-                        $.each(lst, function(index, item) {
+                        $.each(lst, function (index, item) {
                             $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
                         });
-                   } else {
-                     $transactorListEl.empty();
-                     $.each(transactorsListJs, function(index, item) {
+                    } else {
+                        $transactorListEl.empty();
+                        $.each(transactorsListJs, function (index, item) {
+                            $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
+                        });
+                    }
+
+
+                } else {
+                    console.log('Not Found');
+                    $transactorListEl.empty();
+
+                    $.each(transactorsListJs, function (index, item) {
                         $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
-                     });
-                   }
-
-
-               } else {
-                   console.log('Not Found');
-                   $transactorListEl.empty();
-
-                  $.each(transactorsListJs, function(index, item) {
-                      $transactorListEl.append($('<option></option>').attr('value', item.value).text(item.text));
-                  });
-               }
-               $transactorListEl.val(cfaId);
+                    });
+                }
+                $transactorListEl.val(cfaId);
             };
             const companyChanged = () => {
                 let companyId = parseInt($companyId.val());
@@ -243,7 +329,7 @@
                         .then((data) => {
                             let currencyCode = data.currencyCode;
                             let locale = data.currencyLocale.substring(0, 2);
-                            productLib.setLanguageLocale(locale,currencyCode,loader)
+                            productLib.setLanguageLocale(locale, currencyCode, loader)
                                 .then(() => {
                                     ej.base.setCulture(locale);
                                     ej.base.setCurrencyCode(currencyCode);
@@ -265,7 +351,7 @@
             const setupEventManagers = () => {
 
 
-                fpaRateEl.addEventListener("change",(event) => {
+                fpaRateEl.addEventListener("change", (event) => {
                     calculateAmounts();
                 });
                 amountNetEl.addEventListener("change", (event) => {
@@ -276,10 +362,10 @@
                 });
 
             };
-            $docSeriesEl.change((e)=> {
+            $docSeriesEl.change((e) => {
                 console.log(e);
                 let cfaId = $cfaId.val();
-               
+
                 docSeriesChanged();
                 $transactorListEl.val(cfaId);
             });
@@ -287,7 +373,7 @@
                 let newId = $transactorListEl.val();
                 $cfaId.val(newId);
             });
-            let selectTransactor=0;
+            let selectTransactor = 0;
             setupEventManagers();
             docSeriesChanged();
             companyChanged();

@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Operator")]
     public class Index3Model : PageModel
     {
         private readonly ApiDbContext _context;
