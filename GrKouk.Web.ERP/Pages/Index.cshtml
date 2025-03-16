@@ -491,17 +491,19 @@
 </div>
     }
 }
+<div class="text-center">
+	<input type="hidden" id="logged" value="false" />
+	@if (User.Identity is { IsAuthenticated: true })
+	{
+		<p>Current user: @User.Identity.Name</p>
+	}
+	else
+	{
+		<p>Anonymous User</p>
+	}
+	
+</div>
 
-@if (!User.IsInRole("Admin"))
-{
-	<div class="text-center">
-		<input type="hidden" id="logged" value="false" />
-		<h1 class="display-4">Welcome</h1>
-		<p>User Name is @User.Identity.Name</p>
-
-		<p> User is authenticated is @User.Identity.IsAuthenticated</p>
-	</div>
-}
 <partial name="_ShortcutsPartial" />
 
 
