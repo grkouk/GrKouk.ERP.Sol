@@ -598,6 +598,9 @@
 			//let selCompanyId = $companyId.val();
 			//let selSeriesId = $transDocSeriesId.val();
 			
+			 if (!term || term.trim() === "") {
+				 return;
+			 }
 			 let uri = "/api/autocomplete/GetShortcutsAutoCompleteData";
 			 uri += `?term=${term}`;
 			 //uri += `?companyId=${selCompanyId}`;
@@ -616,9 +619,13 @@
 		};
 		 const setUpAutoComplete=()=>{
 			let autoCompleteEL = document.getElementById("ShortCutsAutoComplete").ej2_instances[0];
+			let debounceTimeout;
 			autoCompleteEL.addEventListener("filtering",(e)=>{
 				//console.log("******Inside filtering event listener");
-				refreshAutoCompleteData(e);
+				clearTimeout(debounceTimeout);
+				debounceTimeout = setTimeout(()=> {
+					refreshAutoCompleteData(e);
+				},1000);
 			});
 			//autocompleteel . text ---> text of selected element
 			//autocompleteel . value ---> id of  selected element

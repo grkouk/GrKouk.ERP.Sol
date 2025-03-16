@@ -109,9 +109,9 @@ namespace GrKouk.Web.ERP.Controllers
             items.Sort(delegate (Ej2ShortcutAutoCompleteItem x, Ej2ShortcutAutoCompleteItem y)
             {
                 if (x.Text == null && y.Text == null) return 0;
-                else if (x.Text == null) return -1;
-                else if (y.Text == null) return 1;
-                else return x.Text.CompareTo(y.Text);
+                if (x.Text == null) return -1;
+                if (y.Text == null) return 1;
+                return x.Text.CompareTo(y.Text);
             });
 
             return Ok(new { result = items });
