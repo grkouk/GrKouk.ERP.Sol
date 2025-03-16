@@ -38,19 +38,19 @@ namespace GrKouk.Web.ERP.Controllers
         {
             string term = request.Term;
             //Transactors
-            IQueryable<Transactor> transactorFullListIq = _context.Transactors;
+            IQueryable<Transactor> transactorFullListIq = _context.Transactors.Include(p=>p.TransactorType);
             List<Ej2ShortcutAutoCompleteItem> items=new();
 
             if (!string.IsNullOrEmpty(term))
             {
-                transactorFullListIq = transactorFullListIq.Where(p => p.Name.Contains(term) || p.Code.Contains(term));
+                transactorFullListIq = transactorFullListIq.Where(p => p.Name.Contains(term) || p.Code.Contains(term) || p.TaxNumber.Contains(term));
             }
 
             IEnumerable<Ej2ShortcutAutoCompleteItem> transactorItems = await transactorFullListIq
 
                 .Select(p => new Ej2ShortcutAutoCompleteItem
                 {
-                    Text = p.Name,
+                    Text = p.Name + "-" + p.TransactorType.Code,
                     Value = p.Id,
                     ImgUrl = Url.Content("~/productimages/" + "noimage.jpg"),
                     ItemType = Ej2ShortcutAutoCompleteItemType.ShortcutItemTransactor
@@ -72,7 +72,12 @@ namespace GrKouk.Web.ERP.Controllers
 
             IEnumerable<Ej2ShortcutAutoCompleteItem> warehouseItems = await warehouseItem4FullListIq
                 .ProjectTo<WarehouseItemSearchListDto>(_mapper.ConfigurationProvider)
-                .Select(p => new Ej2ShortcutAutoCompleteItem { Text = p.Label, Value = p.Id, ItemType = Ej2ShortcutAutoCompleteItemType.ShortcutItemWarehouseItem })
+                .Select(p => new Ej2ShortcutAutoCompleteItem 
+                    {
+                        Text = p.Label, 
+                        Value = p.Id, 
+                        ItemType = Ej2ShortcutAutoCompleteItemType.ShortcutItemWarehouseItem
+                    })
                 .ToListAsync();
 
             foreach (var productItem in warehouseItems)
