@@ -50,7 +50,7 @@ namespace GrKouk.Web.ERP.Controllers
 
                 .Select(p => new Ej2ShortcutAutoCompleteItem
                 {
-                    Text = p.Name + "-" + p.TransactorType.Code,
+                    Text = p.Name + "-{" + p.TransactorType.Code + "}-{" + p.TaxNumber + "}",
                     Value = p.Id,
                     ImgUrl = Url.Content("~/productimages/" + "noimage.jpg"),
                     ItemType = Ej2ShortcutAutoCompleteItemType.ShortcutItemTransactor

@@ -79,6 +79,55 @@ true
 
             var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
             //#endregion
+            //#region Action Col Defs Object definitions
+            const editPrototypeActionColDef= {
+                actionType: 'defaultAction2',
+                visibility: 'always',
+                target: '_blank',
+                condition: {},
+                text: 'Edit Prototype',
+
+                dataAttributes: [
+                    {
+                        key: 'docid',
+                        valueKey: 'docid'
+                    }
+                ],
+                icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
+                uriType: 'funcHref', //funcUrl staticHref, staticUrl
+                urlKeys: [
+                    { key: 'id', valueKey: 'id' }
+                ],
+                uriFunc: function (col, valueSource) {
+                    let retUri = '';
+                    if (valueSource.creatorSectionId > 0) {
+                        switch (valueSource.creatorSectionCode) {
+                            case "SCNSELLCOMBINED":
+                                retUri = `/transactions/sellmaterialdoc/edit?id=${valueSource["creatorId"]}`;
+                                break;
+                            case "SCNBUYCOMBINED":
+                            case "SCNBUYMATTRANS":
+                                retUri = `/transactions/buymaterialsdoc/Details?id=${valueSource["creatorId"]}`;
+                                break;
+                            case "SCNBUYEXPTRANS":
+                                retUri = `/transactions/buymaterialsdoc/details?id=${valueSource["creatorId"]}`;
+                                break;
+                            case "SCNTRANSACTORTRANS":
+                                var itemId = valueSource["id"];
+                                retUri = `/transactions/transactortransmng/Details?id=${itemId}`;
+                            default:
+                        }
+
+                    } else {
+
+                        var itemId = valueSource["id"];
+                        retUri = `/transactions/transactortransmng/Details?id=${itemId}`;
+                    }
+                    return retUri;
+                },
+                uri: ''
+            };
+            //#endregion
             //#region Index page definition objects
             const colDefs = [
                 {
@@ -216,104 +265,13 @@ true
                 }
             ];
             const actionColDefs = [
-                {
-                    actionType: 'defaultAction2',
-                    visibility: 'always',
-                    target: '_blank',
-                    condition: {},
-                    text: 'Edit Prototype',
-
-                    dataAttributes: [
-                        {
-                            key: 'docid',
-                            valueKey: 'docid'
-                        }
-                    ],
-                    icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
-                    uriType: 'funcHref', //funcUrl staticHref, staticUrl
-                    urlKeys: [
-                        { key: 'id', valueKey: 'id' }
-                    ],
-                    uriFunc: function (col, valueSource) {
-                        let retUri = '';
-                        if (valueSource.creatorSectionId > 0) {
-                            switch (valueSource.creatorSectionCode) {
-                                case "SCNSELLCOMBINED":
-                                    retUri = `/transactions/sellmaterialdoc/edit?id=${valueSource["creatorId"]}`;
-                                    break;
-                                case "SCNBUYMATTRANS":
-                                    retUri = `/transactions/buymaterialsdoc/Details?id=${valueSource["creatorId"]}`;
-                                    break;
-                                case "SCNBUYEXPTRANS":
-                                    retUri = `/transactions/buymaterialsdoc/details?id=${valueSource["creatorId"]}`;
-                                    break;
-                                case "SCNTRANSACTORTRANS":
-                                    var itemId = valueSource["id"];
-                                    retUri = `/transactions/transactortransmng/Details?id=${itemId}`;
-                                default:
-                            }
-
-                        } else {
-
-                            var itemId = valueSource["id"];
-                            retUri = `/transactions/transactortransmng/Details?id=${itemId}`;
-                        }
-                        return retUri;
-                    },
-                    uri: ''
-                }
+                editPrototypeActionColDef
             ];
             const actionColSubDefs = [
 
             ];
             const actionMobileColDefs = [
-                {
-                    actionType: 'defaultAction2',
-                    visibility: 'always',
-                    target: '_blank',
-                    condition: {},
-                    text: 'Edit Prototype',
-
-                    dataAttributes: [
-                        {
-                            key: 'docid',
-                            valueKey: 'docid'
-                        }
-                    ],
-                    icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
-                    uriType: 'funcHref', //funcUrl staticHref, staticUrl
-                    urlKeys: [
-                        { key: 'id', valueKey: 'id' }
-                    ],
-                    uriFunc: function (col, valueSource) {
-                        let retUri = '';
-                        if (valueSource.creatorSectionId > 0) {
-                            switch (valueSource.creatorSectionCode) {
-                                case "SCNSELLCOMBINED":
-                                    retUri = `/transactions/sellmaterialdoc/Edit?id=${valueSource["creatorId"]}`;
-                                    break;
-                                case "SCNBUYMATTRANS":
-                                    retUri = `/transactions/buymaterialsdoc/Edit?id=${valueSource["creatorId"]}`;
-                                    break;
-                                case "SCNBUYEXPTRANS":
-                                    retUri = `/transactions/buymaterialsdoc/Edit?id=${valueSource["creatorId"]}`;
-                                    break;
-                                case "SCNTRANSACTORTRANS":
-                                    var itemId = valueSource["id"];
-                                    retUri = `/transactions/transactortransmng/Details?id=${itemId}`;
-                                default:
-
-                            }
-
-                        } else {
-
-                            var itemId = valueSource["id"];
-                            retUri = `/transactions/transactortransmng/Edit?id=${itemId}`;
-                        }
-                        return retUri;
-                    },
-                    uri: ''
-                }
+               editPrototypeActionColDef
             ];
             const tableHandlersToRegister = [
 
