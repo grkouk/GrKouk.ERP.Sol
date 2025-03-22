@@ -22,7 +22,9 @@ namespace GrKouk.Web.Erp.Pages.CommonEntities.MaterialCategories
 
         public async Task OnGetAsync()
         {
-            MaterialCategory = await _context.MaterialCategories.ToListAsync();
+            MaterialCategory = await _context.MaterialCategories
+                .Include(p=>p.Company)
+                .ToListAsync();
         }
     }
 }
