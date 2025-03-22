@@ -4,6 +4,7 @@ using GrKouk.Web.ERP.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GrKouk.Web.ERP.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250322114404_MaterialCategoriesAddCompany")]
+    partial class MaterialCategoriesAddCompany
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1744,10 +1747,6 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Code");
-
-                    b.HasIndex("CompanyId");
 
                     b.ToTable("MaterialCategories");
                 });
@@ -3511,17 +3510,6 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.Navigation("RevenueCentre");
 
                     b.Navigation("Transactor");
-                });
-
-            modelBuilder.Entity("GrKouk.Erp.Domain.Shared.MaterialCategory", b =>
-                {
-                    b.HasOne("GrKouk.Erp.Domain.Shared.Company", "Company")
-                        .WithMany()
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.ProductRecipe", b =>
