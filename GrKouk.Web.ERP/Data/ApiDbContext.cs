@@ -79,6 +79,7 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<CashFlowDocSeriesDef> CashFlowDocSeriesDefs { get; set; }
         public DbSet<CashFlowAccountTransaction> CashFlowAccountTransactions { get; set; }
         public DbSet<CashFlowAccountCompanyMapping> CashFlowAccountCompanyMappings { get; set; }
+        public DbSet<ProfitCentre> ProfitCentres { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -670,6 +671,13 @@ namespace GrKouk.Web.ERP.Data
             {
                 entity.HasIndex(p => p.Code);
                 
+                entity.HasOne(p => p.Company)
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<ProfitCentre>(entity =>
+            {
+                entity.HasIndex(p => p.Code);
                 entity.HasOne(p => p.Company)
                     .WithMany()
                     .OnDelete(DeleteBehavior.Restrict);
