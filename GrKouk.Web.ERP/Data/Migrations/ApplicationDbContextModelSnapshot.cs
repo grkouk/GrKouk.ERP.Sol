@@ -1878,6 +1878,36 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.ToTable("ProductRecipeLines");
                 });
 
+            modelBuilder.Entity("GrKouk.Erp.Domain.Shared.ProfitCentre", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("ProfitCentres");
+                });
+
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.RevenueCentre", b =>
                 {
                     b.Property<int>("Id")
@@ -3564,6 +3594,17 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("ProductRecipe");
+                });
+
+            modelBuilder.Entity("GrKouk.Erp.Domain.Shared.ProfitCentre", b =>
+                {
+                    b.HasOne("GrKouk.Erp.Domain.Shared.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.SellDocLine", b =>
