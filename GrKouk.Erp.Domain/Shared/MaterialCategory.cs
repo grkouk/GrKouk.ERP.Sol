@@ -13,5 +13,9 @@ namespace GrKouk.Erp.Domain.Shared
         [MaxLength(200)]
         [Required]
         public string Name { get; set; }
+
+        public int CompanyId { get; set; } = 1;
+        public virtual Company Company { get; set; }
+        
     }
 }

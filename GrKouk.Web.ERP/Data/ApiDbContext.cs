@@ -666,6 +666,15 @@ namespace GrKouk.Web.ERP.Data
                     .OnDelete(DeleteBehavior.Restrict)
                     .HasForeignKey(p => p.CashFlowAccountId);
             });
+            modelBuilder.Entity<MaterialCategory>(entity =>
+            {
+                entity.HasIndex(p => p.Code);
+                
+                entity.HasOne(p => p.Company)
+                    .WithMany()
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
         }
+        
     }
 }
