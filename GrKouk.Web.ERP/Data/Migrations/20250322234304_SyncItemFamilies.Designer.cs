@@ -4,6 +4,7 @@ using GrKouk.Web.ERP.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GrKouk.Web.ERP.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250322234304_SyncItemFamilies")]
+    partial class SyncItemFamilies
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2702,74 +2705,6 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasIndex("ErpId");
 
                     b.ToTable("SyncItemFamilies");
-                });
-
-            modelBuilder.Entity("GrKouk.Erp.Domain.Sync.SyncUnitOfMeasurement", b =>
-                {
-                    b.Property<int>("ErpId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BusId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("SourceChecksum")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.HasKey("ErpId", "BusId");
-
-                    b.HasIndex("BusId");
-
-                    b.HasIndex("ErpId");
-
-                    b.ToTable("SyncUnitOfMeasurements");
-                });
-
-            modelBuilder.Entity("GrKouk.Erp.Domain.Sync.SynchronizationLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("EntityId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("EntityName")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("OperationType")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("Source")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<Guid>("SyncSessionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("SyncedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SyncSessionId");
-
-                    b.HasIndex("SyncedAt");
-
-                    b.HasIndex("EntityName", "EntityId");
-
-                    b.ToTable("SynchronizationLogs");
                 });
 
             modelBuilder.Entity("GrKouk.Web.ERP.Helpers.RefreshToken", b =>

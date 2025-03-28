@@ -3,6 +3,7 @@ using GrKouk.Erp.Domain.DocDefinitions;
 using GrKouk.Erp.Domain.MediaEntities;
 using GrKouk.Erp.Domain.RecurringTransactions;
 using GrKouk.Erp.Domain.Shared;
+using GrKouk.Erp.Domain.Sync;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -81,6 +82,12 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<CashFlowAccountCompanyMapping> CashFlowAccountCompanyMappings { get; set; }
         public DbSet<ProfitCentre> ProfitCentres { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<SyncItemFamily> SyncItemFamilies { get; set; }
+        public DbSet<SynchronizationLog> SynchronizationLogs { get; set; }
+        public DbSet<SyncUnitOfMeasurement> SyncUnitOfMeasurements { get; set; }
+        
+       // public DbSet<SyncItem> SyncItems { get; set; }
+        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -681,6 +688,40 @@ namespace GrKouk.Web.ERP.Data
                 entity.HasOne(p => p.Company)
                     .WithMany()
                     .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<SyncItemFamily>(entity =>
+            {
+                entity.HasKey(p => new
+                {
+                    p.ErpId,
+                    p.BusId
+                });
+                entity.HasIndex(p => p.ErpId);
+                entity.HasIndex(p => p.BusId);
+            });
+            modelBuilder.Entity<SynchronizationLog>(entity =>
+            {
+                entity.HasIndex(p=>p.SyncSessionId);
+                entity.Property(p => p.SyncedAt)
+                      .HasDefaultValueSql("GETDATE()");
+                
+                entity.HasIndex(p => p.SyncedAt);
+                entity.HasIndex(p => new
+                {
+                    p.EntityName,
+                    p.EntityId,
+                });
+                
+            });
+            modelBuilder.Entity<SyncUnitOfMeasurement>(entity =>
+            {
+                entity.HasKey(p => new
+                {
+                    p.ErpId,
+                    p.BusId
+                });
+                entity.HasIndex(p => p.ErpId);
+                entity.HasIndex(p => p.BusId);
             });
         }
         

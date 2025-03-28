@@ -4,6 +4,7 @@ using GrKouk.Web.ERP.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GrKouk.Web.ERP.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250324202218_SynchronizationLog")]
+    partial class SynchronizationLog
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2702,32 +2705,6 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasIndex("ErpId");
 
                     b.ToTable("SyncItemFamilies");
-                });
-
-            modelBuilder.Entity("GrKouk.Erp.Domain.Sync.SyncUnitOfMeasurement", b =>
-                {
-                    b.Property<int>("ErpId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BusId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("SourceChecksum")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.HasKey("ErpId", "BusId");
-
-                    b.HasIndex("BusId");
-
-                    b.HasIndex("ErpId");
-
-                    b.ToTable("SyncUnitOfMeasurements");
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Sync.SynchronizationLog", b =>
