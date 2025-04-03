@@ -53,6 +53,44 @@ public class SyncItem
     [MaxLength(32)]
     public string SourceChecksum { get; set; }
 }
+
+public class SyncBuyDocument
+{
+    [Required]
+    public int BusId { get; set; }
+    [Required]
+    public int ErpId { get; set; }
+
+    [Required]
+    public DateTime TransDate { get; set; }
+    [Required]
+    public int SupplierId { get; set; }
+    [Required]
+    public int RefNumber { get; set; }
+  
+    [Required]
+    [MaxLength(32)]
+    public string SourceChecksum { get; set; }
+}
+
+public class SyncSaleDocument
+{
+    [Required]
+    public int BusId { get; set; }
+    [Required]
+    public int ErpId { get; set; }
+
+    [Required]
+    public DateTime TransDate { get; set; }
+    [Required]
+    public int CustomerId { get; set; }
+    [Required]
+    public int RefNumber { get; set; }
+  
+    [Required]
+    [MaxLength(32)]
+    public string SourceChecksum { get; set; }
+}
 public class SynchronizationLog
 {
     public int Id { get; set; }
