@@ -9,6 +9,10 @@ public class SyncItemFamily
     public int BusId { get; set; }
     [Required]
     public int ErpId { get; set; }
+    
+    [MaxLength(15)]
+    public string CompanyCode { get; set; }
+
     [MaxLength(50)]
     public string Name { get; set; }
     [Required]
@@ -21,6 +25,8 @@ public class SyncUnitOfMeasurement
     public int BusId { get; set; }
     [Required]
     public int ErpId { get; set; }
+    [MaxLength(15)]
+    public string CompanyCode { get; set; }
     [MaxLength(50)]
     public string Name { get; set; }
     [Required]
@@ -33,6 +39,8 @@ public class SyncVatCategories
     public int BusId { get; set; }
     [Required]
     public int ErpId { get; set; }
+    [MaxLength(15)]
+    public string CompanyCode { get; set; }
     [MaxLength(5)]
     public string Name { get; set; }
     [Required]
@@ -43,6 +51,25 @@ public class SyncItem
 {
     [Required]
     public int BusId { get; set; }
+    [Required]
+    public int ErpId { get; set; }
+    [MaxLength(15)]
+    public string CompanyCode { get; set; }
+    [MaxLength(30)]
+    public string BusCode { get; set; }
+    [MaxLength(200)]
+    public string Name { get; set; }
+    
+    [Required]
+    [MaxLength(32)]
+    public string SourceChecksum { get; set; }
+}
+public class SyncSupplier
+{
+    [Required]
+    public int BusId { get; set; }
+    [MaxLength(15)]
+    public string CompanyCode { get; set; }
     [MaxLength(30)]
     public string BusCode { get; set; }
     [MaxLength(200)]
@@ -60,7 +87,8 @@ public class SyncBuyDocument
     public int BusId { get; set; }
     [Required]
     public int ErpId { get; set; }
-
+    [MaxLength(15)]
+    public string CompanyCode { get; set; }
     [Required]
     public DateTime TransDate { get; set; }
     [Required]
@@ -79,7 +107,8 @@ public class SyncSaleDocument
     public int BusId { get; set; }
     [Required]
     public int ErpId { get; set; }
-
+    [MaxLength(15)]
+    public string CompanyCode { get; set; }
     [Required]
     public DateTime TransDate { get; set; }
     [Required]
@@ -95,6 +124,8 @@ public class SynchronizationLog
 {
     public int Id { get; set; }
     public Guid SyncSessionId { get; set; }
+    [MaxLength(15)]
+    public string CompanyCode { get; set; }
     public DateTime SyncedAt { get; set; }
     [MaxLength(100)]
     public string EntityName { get; set; }

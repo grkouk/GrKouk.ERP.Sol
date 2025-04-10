@@ -85,7 +85,9 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<SyncItemFamily> SyncItemFamilies { get; set; }
         public DbSet<SynchronizationLog> SynchronizationLogs { get; set; }
         public DbSet<SyncUnitOfMeasurement> SyncUnitOfMeasurements { get; set; }
-        
+        public DbSet<SyncBuyDocument> SyncBuyDocuments { get; set; }
+        public DbSet<SyncBuyDocument> SyncSaleDocuments { get; set; }
+        public DbSet<SyncSupplier> SyncSuppliers { get; set; }
        // public DbSet<SyncItem> SyncItems { get; set; }
         
 
@@ -698,6 +700,7 @@ namespace GrKouk.Web.ERP.Data
                 });
                 entity.HasIndex(p => p.ErpId);
                 entity.HasIndex(p => p.BusId);
+                entity.HasIndex(p => p.CompanyCode);
             });
             modelBuilder.Entity<SynchronizationLog>(entity =>
             {
@@ -706,6 +709,7 @@ namespace GrKouk.Web.ERP.Data
                       .HasDefaultValueSql("GETDATE()");
                 
                 entity.HasIndex(p => p.SyncedAt);
+                entity.HasIndex(p => p.CompanyCode);
                 entity.HasIndex(p => new
                 {
                     p.EntityName,
@@ -722,6 +726,49 @@ namespace GrKouk.Web.ERP.Data
                 });
                 entity.HasIndex(p => p.ErpId);
                 entity.HasIndex(p => p.BusId);
+                entity.HasIndex(p => p.CompanyCode);
+            });
+            modelBuilder.Entity<SyncBuyDocument>(entity =>
+            {
+                entity.HasKey(p => new
+                {
+                    p.ErpId,
+                    p.BusId
+                });
+                entity.HasIndex(p => p.ErpId);
+                entity.HasIndex(p => p.BusId);
+                entity.HasIndex(p => p.CompanyCode);
+                entity.HasIndex(p => p.TransDate);
+                entity.HasIndex(p => p.SupplierId);
+                entity.HasIndex(p => p.RefNumber);
+                
+            });
+            modelBuilder.Entity<SyncSaleDocument>(entity =>
+            {
+                entity.HasKey(p => new
+                {
+                    p.ErpId,
+                    p.BusId
+                });
+                entity.HasIndex(p => p.ErpId);
+                entity.HasIndex(p => p.BusId);
+                entity.HasIndex(p => p.CompanyCode);
+                entity.HasIndex(p => p.TransDate);
+                entity.HasIndex(p => p.CustomerId);
+                entity.HasIndex(p => p.RefNumber);
+                
+            });
+            modelBuilder.Entity<SyncSupplier>(entity =>
+            {
+                entity.HasKey(p => new
+                {
+                    p.ErpId,
+                    p.BusId
+                });
+                entity.HasIndex(p => p.ErpId);
+                entity.HasIndex(p => p.BusId);
+                entity.HasIndex(p => p.CompanyCode);
+                entity.HasIndex(p => p.BusCode);
             });
         }
         

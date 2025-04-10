@@ -2678,6 +2678,49 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.ToTable("WrItemCodes");
                 });
 
+            modelBuilder.Entity("GrKouk.Erp.Domain.Sync.SyncBuyDocument", b =>
+                {
+                    b.Property<int>("ErpId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BusId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CompanyCode")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<int>("RefNumber")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SourceChecksum")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<int>("SupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TransDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ErpId", "BusId");
+
+                    b.HasIndex("BusId");
+
+                    b.HasIndex("CompanyCode");
+
+                    b.HasIndex("ErpId");
+
+                    b.HasIndex("RefNumber");
+
+                    b.HasIndex("SupplierId");
+
+                    b.HasIndex("TransDate");
+
+                    b.ToTable("SyncBuyDocument");
+                });
+
             modelBuilder.Entity("GrKouk.Erp.Domain.Sync.SyncItemFamily", b =>
                 {
                     b.Property<int>("ErpId")
@@ -2685,6 +2728,10 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.Property<int>("BusId")
                         .HasColumnType("int");
+
+                    b.Property<string>("CompanyCode")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("Name")
                         .HasMaxLength(50)
@@ -2699,9 +2746,92 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("BusId");
 
+                    b.HasIndex("CompanyCode");
+
                     b.HasIndex("ErpId");
 
                     b.ToTable("SyncItemFamilies");
+                });
+
+            modelBuilder.Entity("GrKouk.Erp.Domain.Sync.SyncSaleDocument", b =>
+                {
+                    b.Property<int>("ErpId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BusId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CompanyCode")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RefNumber")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SourceChecksum")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<DateTime>("TransDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ErpId", "BusId");
+
+                    b.HasIndex("BusId");
+
+                    b.HasIndex("CompanyCode");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("ErpId");
+
+                    b.HasIndex("RefNumber");
+
+                    b.HasIndex("TransDate");
+
+                    b.ToTable("SyncSaleDocument");
+                });
+
+            modelBuilder.Entity("GrKouk.Erp.Domain.Sync.SyncSupplier", b =>
+                {
+                    b.Property<int>("ErpId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BusId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("BusCode")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("CompanyCode")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("SourceChecksum")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.HasKey("ErpId", "BusId");
+
+                    b.HasIndex("BusCode");
+
+                    b.HasIndex("BusId");
+
+                    b.HasIndex("CompanyCode");
+
+                    b.HasIndex("ErpId");
+
+                    b.ToTable("SyncSuppliers");
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Sync.SyncUnitOfMeasurement", b =>
@@ -2712,6 +2842,10 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.Property<int>("BusId")
                         .HasColumnType("int");
 
+                    b.Property<string>("CompanyCode")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
                     b.Property<string>("Name")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -2724,6 +2858,8 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasKey("ErpId", "BusId");
 
                     b.HasIndex("BusId");
+
+                    b.HasIndex("CompanyCode");
 
                     b.HasIndex("ErpId");
 
@@ -2737,6 +2873,10 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CompanyCode")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<int>("EntityId")
                         .HasColumnType("int");
@@ -2762,6 +2902,8 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .HasDefaultValueSql("GETDATE()");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CompanyCode");
 
                     b.HasIndex("SyncSessionId");
 

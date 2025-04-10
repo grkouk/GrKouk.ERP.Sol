@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace GrKouk.Erp.Dtos.Sync;
 
-public class SyncBusinessFamilyItemDto
+public class SyncBusinessUnitOfMeasurementDto
 {
     [JsonPropertyName("id")]
     public int Id { get; set; }
