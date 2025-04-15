@@ -582,17 +582,6 @@ namespace GrKouk.Web.ERP.Controllers
                         });
                     }
 
-                    // item.ErpId = newMainItem.Entity.Id;
-                    // var newSyncItem = _context.SyncUnitOfMeasurements.Add(item);
-                    // _context.SynchronizationLogs.Add(new SynchronizationLog
-                    // {
-                    //     SyncSessionId = syncSessionId,
-                    //     EntityName = syncEntityName,
-                    //     EntityId = item.BusId,
-                    //     OperationType = "INSERT",
-                    //     Source = syncSource,
-                    // });
-
                     _context.SynchronizationLogs.Add(new SynchronizationLog
                     {
                         SyncSessionId = syncSessionId,
