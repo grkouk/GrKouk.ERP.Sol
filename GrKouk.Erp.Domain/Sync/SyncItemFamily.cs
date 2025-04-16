@@ -95,7 +95,8 @@ public class SyncBuyDocument
     public int SupplierId { get; set; }
     [Required]
     public int RefNumber { get; set; }
-  
+    public decimal TotalAmount { get; set; }
+    public decimal PayedAmount { get; set; }
     [Required]
     [MaxLength(32)]
     public string SourceChecksum { get; set; }
@@ -115,7 +116,8 @@ public class SyncSaleDocument
     public int CustomerId { get; set; }
     [Required]
     public int RefNumber { get; set; }
-  
+    public decimal TotalAmount { get; set; }
+    public decimal PayedAmount { get; set; }
     [Required]
     [MaxLength(32)]
     public string SourceChecksum { get; set; }

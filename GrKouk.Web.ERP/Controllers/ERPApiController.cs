@@ -519,9 +519,12 @@ namespace GrKouk.Web.ERP.Controllers
                     TransDate = item.TransDate,
                     SupplierId = item.SupplierId,
                     RefNumber = item.RefNumber,
-                    SourceChecksum = ChecksumHelper.CalculateChecksum(item.Id.ToString(),
-                        item.TransDate.ToString(CultureInfo.InvariantCulture), item.SupplierId.ToString(),
-                        item.RefNumber.ToString())
+                    TotalAmount = item.TotalAmount,
+                    PayedAmount = item.PayedAmount,
+                    SourceChecksum = ChecksumHelper.CalculateChecksum(item.Id.ToString()
+                        , item.TransDate.ToString(CultureInfo.InvariantCulture), item.SupplierId.ToString()
+                        , item.RefNumber.ToString(), item.TotalAmount.ToString(CultureInfo.InvariantCulture)
+                        , item.PayedAmount.ToString(CultureInfo.InvariantCulture))
                 };
                 sourceList.Add(sourceItem);
             }
@@ -559,8 +562,8 @@ namespace GrKouk.Web.ERP.Controllers
             {
                 foreach (var item in toInsert)
                 {
-                    //Check is 
-                    //Insert to the main entities 
+                   //Create a new buy document create Dto
+                   //Must find erp supplier transactor id based on business supplier id
                     var newMainItem = _context.MeasureUnits.Add(new MeasureUnit()
                     {
                         Code = item.BusId.ToString(),

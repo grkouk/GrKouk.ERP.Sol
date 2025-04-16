@@ -13,5 +13,8 @@ public class SyncBusinessBuyDocumentDto
     public int SupplierId { get; set; }
     [JsonPropertyName("refNumber")]
     public int RefNumber { get; set; }
-  
+    [JsonPropertyName("totalAmount")]
+    public decimal TotalAmount { get; set; }
+    [JsonPropertyName("payedAmount")]
+    public decimal PayedAmount { get; set; }
 }
