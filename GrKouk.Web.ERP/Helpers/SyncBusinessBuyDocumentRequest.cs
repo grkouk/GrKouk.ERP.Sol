@@ -17,3 +17,4 @@ public class SyncBusinessBuyDocumentRequest
         set => _items = value;
     }
 }
+
