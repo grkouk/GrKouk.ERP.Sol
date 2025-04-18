@@ -665,7 +665,7 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpPost("SyncMatchedBusinessSuppliers")]
         [Authorize(Policy = "ApiPolicy2")]
         public async Task<IActionResult> SyncMatchedBusinessSuppliers(
-            [FromBody] SyncBusinessEntityRequest<SyncBusinessSupplierDto> request)
+            [FromBody] SyncBusinessEntityRequest<SyncSupplierDto> request)
         {
             #region BoilerPlate Code
 
@@ -715,7 +715,61 @@ namespace GrKouk.Web.ERP.Controllers
             int companyId = company.Id;
 
             #endregion
-
+            var syncSessionId = Guid.NewGuid(); // Unique session ID for this sync operation
+            var syncSource = "MAUI Client"; // Source of the sync operation
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+            foreach (var item in request.Items)
+            {
+                var newItem = new SyncSupplier
+                {
+                    BusId = item.BusId,
+                    ErpId = item.ErpId,
+                    Name = item.Name,
+                    TaxNumber = item.TaxNumber,
+                    BusCode = item.BusCode,
+                    SourceChecksum = item.SourceChecksum
+                };
+                var newMainItem= _context.SyncSuppliers.Add(newItem);
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    _logger.LogError("An error occurred during synchronization: {Error}", ex.Message);
+                    failedToAddCount++;
+                    return BadRequest(new
+                    {
+                        error = "SyncSupplier error " + ex.Message
+                    });
+                }
+                // _context.SynchronizationLogs.Add(new SynchronizationLog
+                // {
+                //     SyncSessionId = syncSessionId,
+                //     EntityName = mainEntityName,
+                //     EntityId = newMainItem.Entity.,
+                //     OperationType = "INSERT",
+                //     Source = syncSource,
+                // });
+                addedCount++;
+                try
+                {
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    _logger.LogError("An error occurred during synchronization: {Error}", ex.Message);
+                    failedToAddCount++;
+                    return BadRequest(new
+                    {
+                        error = "SyncSupplier error " + ex.Message
+                    });
+                }
+                
+            }
             return Ok();
         }
         [HttpPost("SyncBusinessSuppliers")]

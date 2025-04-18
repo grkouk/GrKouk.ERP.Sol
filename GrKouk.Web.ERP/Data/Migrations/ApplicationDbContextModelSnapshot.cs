@@ -50,7 +50,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .IsUnique()
                         .HasFilter("[Code] IS NOT NULL");
 
-                    b.ToTable("CashFlowAccounts");
+                    b.ToTable("CashFlowAccounts", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.CashFlow.CashFlowAccountCompanyMapping", b =>
@@ -65,7 +65,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("CashFlowAccountId");
 
-                    b.ToTable("CashFlowAccountCompanyMappings");
+                    b.ToTable("CashFlowAccountCompanyMappings", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.CashFlow.CashFlowAccountTransaction", b =>
@@ -144,7 +144,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("TransDate");
 
-                    b.ToTable("CashFlowAccountTransactions");
+                    b.ToTable("CashFlowAccountTransactions", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.CashFlow.CashFlowDocSeriesDef", b =>
@@ -182,7 +182,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("CashFlowDocSeriesDefs");
+                    b.ToTable("CashFlowDocSeriesDefs", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.CashFlow.CashFlowDocTypeDef", b =>
@@ -223,7 +223,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("CashFlowDocTypeDefs");
+                    b.ToTable("CashFlowDocTypeDefs", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.CashFlow.CashFlowTransactionDef", b =>
@@ -262,7 +262,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("CashFlowTransactionDefs");
+                    b.ToTable("CashFlowTransactionDefs", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.BuyDocSeriesDef", b =>
@@ -310,7 +310,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("BuyDocSeriesDefs");
+                    b.ToTable("BuyDocSeriesDefs", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.BuyDocTypeDef", b =>
@@ -375,7 +375,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("TransWarehouseDefId");
 
-                    b.ToTable("BuyDocTypeDefs");
+                    b.ToTable("BuyDocTypeDefs", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.FinancialMovement", b =>
@@ -403,7 +403,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .IsUnique()
                         .HasFilter("[Code] IS NOT NULL");
 
-                    b.ToTable("FinancialMovements");
+                    b.ToTable("FinancialMovements", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.FpaDef", b =>
@@ -432,7 +432,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasIndex("Code")
                         .IsUnique();
 
-                    b.ToTable("FpaKategories");
+                    b.ToTable("FpaKategories", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.GlobalSettings", b =>
@@ -456,7 +456,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("GlobalSettings");
+                    b.ToTable("GlobalSettings", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.PaymentMethod", b =>
@@ -484,7 +484,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PaymentMethods");
+                    b.ToTable("PaymentMethods", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.SalesChannel", b =>
@@ -505,7 +505,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SalesChannels");
+                    b.ToTable("SalesChannels", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.SellDocSeriesDef", b =>
@@ -563,7 +563,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("TransWarehouseDocSeriesDefId");
 
-                    b.ToTable("SellDocSeriesDefs");
+                    b.ToTable("SellDocSeriesDefs", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.SellDocTypeDef", b =>
@@ -628,7 +628,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("TransWarehouseDefId");
 
-                    b.ToTable("SellDocTypeDefs");
+                    b.ToTable("SellDocTypeDefs", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.TransExpenseDef", b =>
@@ -670,7 +670,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("TransExpenseDefs");
+                    b.ToTable("TransExpenseDefs", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.TransTransactorDef", b =>
@@ -714,7 +714,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("TurnOverTransId");
 
-                    b.ToTable("TransTransactorDefs");
+                    b.ToTable("TransTransactorDefs", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.TransTransactorDocSeriesDef", b =>
@@ -755,7 +755,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("TransTransactorDocTypeDefId");
 
-                    b.ToTable("TransTransactorDocSeriesDefs");
+                    b.ToTable("TransTransactorDocSeriesDefs", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.TransTransactorDocTypeDef", b =>
@@ -803,7 +803,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("TransTransactorDefId");
 
-                    b.ToTable("TransTransactorDocTypeDefs");
+                    b.ToTable("TransTransactorDocTypeDefs", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.TransWarehouseDef", b =>
@@ -881,7 +881,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("TransWarehouseDefs");
+                    b.ToTable("TransWarehouseDefs", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.TransWarehouseDocSeriesDef", b =>
@@ -919,7 +919,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("TransWarehouseDocTypeDefId");
 
-                    b.ToTable("TransWarehouseDocSeriesDefs");
+                    b.ToTable("TransWarehouseDocSeriesDefs", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.TransWarehouseDocTypeDef", b =>
@@ -957,7 +957,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("TransWarehouseDefId");
 
-                    b.ToTable("TransWarehouseDocTypeDefs");
+                    b.ToTable("TransWarehouseDocTypeDefs", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.MediaEntities.MediaEntry", b =>
@@ -978,7 +978,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MediaEntries");
+                    b.ToTable("MediaEntries", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.MediaEntities.ProductMedia", b =>
@@ -1002,7 +1002,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasIndex("ProductId", "MediaEntryId")
                         .IsUnique();
 
-                    b.ToTable("ProductMedia");
+                    b.ToTable("ProductMedia", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.RecurringTransactions.RecurringTransDoc", b =>
@@ -1072,7 +1072,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("TransactorId");
 
-                    b.ToTable("RecurringTransDocs");
+                    b.ToTable("RecurringTransDocs", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.RecurringTransactions.RecurringTransDocLine", b =>
@@ -1135,7 +1135,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("WarehouseItemId");
 
-                    b.ToTable("RecurringTransDocLines");
+                    b.ToTable("RecurringTransDocLines", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.AppSetting", b =>
@@ -1151,7 +1151,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasKey("Code");
 
-                    b.ToTable("AppSettings");
+                    b.ToTable("AppSettings", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.BuyDocLine", b =>
@@ -1243,7 +1243,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("WarehouseItemId");
 
-                    b.ToTable("BuyDocLines");
+                    b.ToTable("BuyDocLines", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.BuyDocTransPaymentMapping", b =>
@@ -1270,7 +1270,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasIndex("BuyDocumentId", "TransactorTransactionId")
                         .IsUnique();
 
-                    b.ToTable("BuyDocTransPaymentMappings");
+                    b.ToTable("BuyDocTransPaymentMappings", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.BuyDocument", b =>
@@ -1359,7 +1359,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("TransactorId");
 
-                    b.ToTable("BuyDocuments");
+                    b.ToTable("BuyDocuments", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.CashRegCategory", b =>
@@ -1382,7 +1382,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CashRegCategories");
+                    b.ToTable("CashRegCategories", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.ClientProfile", b =>
@@ -1419,7 +1419,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("ClientProfiles");
+                    b.ToTable("ClientProfiles", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.Company", b =>
@@ -1447,7 +1447,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("CurrencyId");
 
-                    b.ToTable("Companies");
+                    b.ToTable("Companies", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.CompanyWarehouseItemMapping", b =>
@@ -1462,7 +1462,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("WarehouseItemId");
 
-                    b.ToTable("CompanyWarehouseItemMappings");
+                    b.ToTable("CompanyWarehouseItemMappings", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.CostCentre", b =>
@@ -1485,7 +1485,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CostCentres");
+                    b.ToTable("CostCentres", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.CrCatWarehouseItem", b =>
@@ -1514,7 +1514,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasIndex("ClientProfileId", "CashRegCategoryId", "WarehouseItemId")
                         .IsUnique();
 
-                    b.ToTable("CrCatWarehouseItems");
+                    b.ToTable("CrCatWarehouseItems", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.Currency", b =>
@@ -1541,7 +1541,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Currencies");
+                    b.ToTable("Currencies", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.DiaryDef", b =>
@@ -1572,7 +1572,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DiaryDefs");
+                    b.ToTable("DiaryDefs", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.ExchangeRate", b =>
@@ -1598,7 +1598,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("CurrencyId");
 
-                    b.ToTable("ExchangeRates");
+                    b.ToTable("ExchangeRates", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.FinDiaryTransaction", b =>
@@ -1663,7 +1663,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("TransactorId");
 
-                    b.ToTable("FinDiaryTransactions");
+                    b.ToTable("FinDiaryTransactions", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.FinTransCategory", b =>
@@ -1688,7 +1688,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("Code");
 
-                    b.ToTable("FinTransCategories");
+                    b.ToTable("FinTransCategories", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.FiscalPeriod", b =>
@@ -1719,7 +1719,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .IsUnique()
                         .HasFilter("[Code] IS NOT NULL");
 
-                    b.ToTable("FiscalPeriods");
+                    b.ToTable("FiscalPeriods", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.MaterialCategory", b =>
@@ -1749,7 +1749,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("MaterialCategories");
+                    b.ToTable("MaterialCategories", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.MeasureUnit", b =>
@@ -1781,7 +1781,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasIndex("Code")
                         .IsUnique();
 
-                    b.ToTable("MeasureUnits");
+                    b.ToTable("MeasureUnits", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.ProductRecipe", b =>
@@ -1819,7 +1819,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductRecipes");
+                    b.ToTable("ProductRecipes", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.ProductRecipeLine", b =>
@@ -1875,7 +1875,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("ProductRecipeId1");
 
-                    b.ToTable("ProductRecipeLines");
+                    b.ToTable("ProductRecipeLines", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.ProfitCentre", b =>
@@ -1905,7 +1905,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("ProfitCentres");
+                    b.ToTable("ProfitCentres", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.RevenueCentre", b =>
@@ -1928,7 +1928,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RevenueCentres");
+                    b.ToTable("RevenueCentres", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.Section", b =>
@@ -1959,7 +1959,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasIndex("Code")
                         .IsUnique();
 
-                    b.ToTable("Sections");
+                    b.ToTable("Sections", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.SellDocLine", b =>
@@ -2046,7 +2046,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("WarehouseItemId");
 
-                    b.ToTable("SellDocLines");
+                    b.ToTable("SellDocLines", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.SellDocTransPaymentMapping", b =>
@@ -2073,7 +2073,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasIndex("SellDocumentId", "TransactorTransactionId")
                         .IsUnique();
 
-                    b.ToTable("SellDocTransPaymentMappings");
+                    b.ToTable("SellDocTransPaymentMappings", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.SellDocument", b =>
@@ -2164,7 +2164,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("TransactorId");
 
-                    b.ToTable("SellDocuments");
+                    b.ToTable("SellDocuments", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.Transactor", b =>
@@ -2240,7 +2240,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("TransactorTypeId");
 
-                    b.ToTable("Transactors");
+                    b.ToTable("Transactors", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.TransactorCompanyMapping", b =>
@@ -2255,7 +2255,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("TransactorId");
 
-                    b.ToTable("TransactorCompanyMappings");
+                    b.ToTable("TransactorCompanyMappings", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.TransactorTransaction", b =>
@@ -2355,7 +2355,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("TransactorId");
 
-                    b.ToTable("TransactorTransactions");
+                    b.ToTable("TransactorTransactions", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.TransactorType", b =>
@@ -2381,7 +2381,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TransactorTypes");
+                    b.ToTable("TransactorTypes", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.WarehouseItem", b =>
@@ -2483,7 +2483,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("SecondaryMeasureUnitId");
 
-                    b.ToTable("WarehouseItems");
+                    b.ToTable("WarehouseItems", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.WarehouseTransaction", b =>
@@ -2620,7 +2620,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasIndex("WarehouseItemId");
 
-                    b.ToTable("WarehouseTransactions");
+                    b.ToTable("WarehouseTransactions", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.WrItemCode", b =>
@@ -2675,259 +2675,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .IsUnique()
                         .HasFilter("[Code] IS NOT NULL");
 
-                    b.ToTable("WrItemCodes");
-                });
-
-            modelBuilder.Entity("GrKouk.Erp.Domain.Sync.SyncBuyDocument", b =>
-                {
-                    b.Property<int>("ErpId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BusId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CompanyCode")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<decimal>("PayedAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("RefNumber")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SourceChecksum")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.Property<int>("SupplierId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("TransDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("ErpId", "BusId");
-
-                    b.HasIndex("BusId");
-
-                    b.HasIndex("CompanyCode");
-
-                    b.HasIndex("ErpId");
-
-                    b.HasIndex("RefNumber");
-
-                    b.HasIndex("SupplierId");
-
-                    b.HasIndex("TransDate");
-
-                    b.ToTable("SyncBuyDocument");
-                });
-
-            modelBuilder.Entity("GrKouk.Erp.Domain.Sync.SyncItemFamily", b =>
-                {
-                    b.Property<int>("ErpId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BusId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CompanyCode")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("SourceChecksum")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.HasKey("ErpId", "BusId");
-
-                    b.HasIndex("BusId");
-
-                    b.HasIndex("CompanyCode");
-
-                    b.HasIndex("ErpId");
-
-                    b.ToTable("SyncItemFamilies");
-                });
-
-            modelBuilder.Entity("GrKouk.Erp.Domain.Sync.SyncSaleDocument", b =>
-                {
-                    b.Property<int>("ErpId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BusId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CompanyCode")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("PayedAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("RefNumber")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SourceChecksum")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("TransDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("ErpId", "BusId");
-
-                    b.HasIndex("BusId");
-
-                    b.HasIndex("CompanyCode");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("ErpId");
-
-                    b.HasIndex("RefNumber");
-
-                    b.HasIndex("TransDate");
-
-                    b.ToTable("SyncSaleDocument");
-                });
-
-            modelBuilder.Entity("GrKouk.Erp.Domain.Sync.SyncSupplier", b =>
-                {
-                    b.Property<int>("ErpId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BusId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("BusCode")
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<string>("CompanyCode")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("SourceChecksum")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.Property<string>("TaxNumber")
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
-
-                    b.HasKey("ErpId", "BusId");
-
-                    b.HasIndex("BusCode");
-
-                    b.HasIndex("BusId");
-
-                    b.HasIndex("CompanyCode");
-
-                    b.HasIndex("ErpId");
-
-                    b.ToTable("SyncSuppliers");
-                });
-
-            modelBuilder.Entity("GrKouk.Erp.Domain.Sync.SyncUnitOfMeasurement", b =>
-                {
-                    b.Property<int>("ErpId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BusId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CompanyCode")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("SourceChecksum")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.HasKey("ErpId", "BusId");
-
-                    b.HasIndex("BusId");
-
-                    b.HasIndex("CompanyCode");
-
-                    b.HasIndex("ErpId");
-
-                    b.ToTable("SyncUnitOfMeasurements");
-                });
-
-            modelBuilder.Entity("GrKouk.Erp.Domain.Sync.SynchronizationLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CompanyCode")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<int>("EntityId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("EntityName")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("OperationType")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("Source")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<Guid>("SyncSessionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("SyncedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompanyCode");
-
-                    b.HasIndex("SyncSessionId");
-
-                    b.HasIndex("SyncedAt");
-
-                    b.HasIndex("EntityName", "EntityId");
-
-                    b.ToTable("SynchronizationLogs");
+                    b.ToTable("WrItemCodes", (string)null);
                 });
 
             modelBuilder.Entity("GrKouk.Web.ERP.Helpers.RefreshToken", b =>
@@ -2961,7 +2709,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
