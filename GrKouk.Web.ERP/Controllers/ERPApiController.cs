@@ -661,10 +661,69 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(res);
         }
+
+        [HttpPost("SyncMatchedBusinessSuppliers")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public async Task<IActionResult> SyncMatchedBusinessSuppliers(
+            [FromBody] SyncBusinessEntityRequest<SyncBusinessSupplierDto> request)
+        {
+            #region BoilerPlate Code
+
+            string mainEntityName = "Transactor";
+            string syncEntityName = "SyncSupplier";
+            _logger.LogInformation("SyncMatchedBusinessSuppliers");
+            int addedCount = 0;
+            int failedToAddCount = 0;
+            int updatedCount = 0;
+            int failedToUpdateCount = 0;
+            int deletedCount = 0;
+            int failedToDeleteCount = 0;
+            if (request == null)
+            {
+                return BadRequest(new
+                {
+                    error = "Empty request data"
+                });
+            }
+
+            if (request.Items == null)
+            {
+                return BadRequest(new
+                {
+                    error = "No Items"
+                });
+            }
+
+            if (request.CompanyCode == null)
+            {
+                return BadRequest(new
+                {
+                    error = "No Company Code"
+                });
+            }
+
+            string businessCompanyCode = request.CompanyCode;
+            var company = await _context.Companies.SingleOrDefaultAsync(p => p.Code == businessCompanyCode);
+            if (company == null)
+            {
+                return BadRequest(new
+                {
+                    error = "No Company for this company code"
+                });
+            }
+
+            int companyId = company.Id;
+
+            #endregion
+
+            return Ok();
+        }
         [HttpPost("SyncBusinessSuppliers")]
         [Authorize(Policy = "ApiPolicy2")]
         public async Task<IActionResult> SyncBusinessSuppliers([FromBody] SyncBusinessEntityRequest<SyncBusinessSupplierDto> request)
         {
+            #region BoilerPlate Code
+
             string mainEntityName = "Transactor";
             string syncEntityName = "SyncSupplier";
             _logger.LogInformation("SyncBusinessSuppliers");
@@ -709,6 +768,8 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
             int companyId = company.Id;
+
+            #endregion
 
             var sourceList = new List<SyncSupplier>();
 
@@ -882,7 +943,9 @@ namespace GrKouk.Web.ERP.Controllers
                 });
             }
                 
-            var items = await _context.SyncSuppliers.Where(p=>p.CompanyCode==companyCode).ToListAsync();
+            var items = await _context.SyncSuppliers.Where(p=>p.CompanyCode==companyCode)
+                .OrderBy(p=>p.Name)
+                .ToListAsync();
             return Ok(items);
         }
         [HttpGet("GetErpSuppliers")]
@@ -949,7 +1012,7 @@ namespace GrKouk.Web.ERP.Controllers
                     Afm = f.Key.TaxNumber
                     
                 });
-            var listItems = projectedList.ToList();
+            var listItems = projectedList.OrderBy(p=>p.Name).ToList();
            
             return Ok(listItems);
         }
