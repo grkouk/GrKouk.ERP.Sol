@@ -693,11 +693,11 @@ namespace GrKouk.Web.ERP.Data
             });
             modelBuilder.Entity<SyncItemFamily>(entity =>
             {
-                entity.HasKey(p => new
+                entity.HasIndex(p => new
                 {
                     p.ErpId,
                     p.BusId
-                });
+                }).IsUnique();
                 entity.HasIndex(p => p.ErpId);
                 entity.HasIndex(p => p.BusId);
                 entity.HasIndex(p => p.CompanyCode);
@@ -719,22 +719,22 @@ namespace GrKouk.Web.ERP.Data
             });
             modelBuilder.Entity<SyncUnitOfMeasurement>(entity =>
             {
-                entity.HasKey(p => new
+                entity.HasIndex(p => new
                 {
                     p.ErpId,
                     p.BusId
-                });
+                }).IsUnique();
                 entity.HasIndex(p => p.ErpId);
                 entity.HasIndex(p => p.BusId);
                 entity.HasIndex(p => p.CompanyCode);
             });
             modelBuilder.Entity<SyncBuyDocument>(entity =>
             {
-                entity.HasKey(p => new
+                entity.HasIndex(p => new
                 {
                     p.ErpId,
                     p.BusId
-                });
+                }).IsUnique();
                 entity.HasIndex(p => p.ErpId);
                 entity.HasIndex(p => p.BusId);
                 entity.HasIndex(p => p.CompanyCode);
@@ -745,11 +745,11 @@ namespace GrKouk.Web.ERP.Data
             });
             modelBuilder.Entity<SyncSaleDocument>(entity =>
             {
-                entity.HasKey(p => new
+                entity.HasIndex(p => new
                 {
                     p.ErpId,
                     p.BusId
-                });
+                }).IsUnique();
                 entity.HasIndex(p => p.ErpId);
                 entity.HasIndex(p => p.BusId);
                 entity.HasIndex(p => p.CompanyCode);

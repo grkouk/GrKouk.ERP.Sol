@@ -1,9 +1,11 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace GrKouk.Erp.Domain.Sync;
 
 public class SyncSupplier
 {
+    public Guid Id { get; set; }
     [Required]
     public int BusId { get; set; }
     [MaxLength(15)]

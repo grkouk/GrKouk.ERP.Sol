@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
@@ -17,7 +18,7 @@ public class SyncBusinessSupplierDto
 
 public class SyncSupplierDto
 {
-  
+    public Guid Id { get; set; }
     public int BusId { get; set; }
   
     public string CompanyCode { get; set; }

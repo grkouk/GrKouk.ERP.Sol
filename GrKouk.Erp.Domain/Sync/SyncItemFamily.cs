@@ -1,9 +1,11 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace GrKouk.Erp.Domain.Sync;
 
 public class SyncItemFamily
 {
+    public Guid Id { get; set; }
     [Required]
     public int BusId { get; set; }
     [Required]
@@ -20,6 +22,7 @@ public class SyncItemFamily
 }
 public class SyncUnitOfMeasurement
 {
+    public Guid Id { get; set; }
     [Required]
     public int BusId { get; set; }
     [Required]
@@ -34,6 +37,7 @@ public class SyncUnitOfMeasurement
 }
 public class SyncVatCategories
 {
+    public Guid Id { get; set; }
     [Required]
     public int BusId { get; set; }
     [Required]
@@ -48,6 +52,7 @@ public class SyncVatCategories
 }
 public class SyncItem
 {
+    public Guid Id { get; set; }
     [Required]
     public int BusId { get; set; }
     [Required]

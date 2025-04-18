@@ -5,6 +5,7 @@ namespace GrKouk.Erp.Domain.Sync;
 
 public class SyncSaleDocument
 {
+    public Guid Id { get; set; }
     [Required]
     public int BusId { get; set; }
     [Required]
