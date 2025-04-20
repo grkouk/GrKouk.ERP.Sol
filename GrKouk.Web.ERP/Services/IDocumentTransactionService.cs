@@ -8,7 +8,6 @@ using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.BuyDocuments;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,7 +32,6 @@ public class DocumentTransactionService : IDocumentTransactionService
     public async Task<IActionResult> AddBuyDocument(BuyDocCreateAjaxDto docTrans)
     {
         const string sectionCode = "SYS-BUY-MATERIALS-SCN";
-        // bool noSupplierTrans = false;
         bool noWarehouseTrans = false;
         int newDocumentId = 0;
 
@@ -63,8 +61,11 @@ public class DocumentTransactionService : IDocumentTransactionService
             });
         }
 
-        //var tr = _context.Database.CurrentTransaction;
-        await using (var transaction = await _context.Database.BeginTransactionAsync())
+        // Check if a transaction is already active
+        bool ownsTransaction = _context.Database.CurrentTransaction == null;
+        var transaction = ownsTransaction ? await _context.Database.BeginTransactionAsync() : _context.Database.CurrentTransaction;
+
+        try
         {
             #region Fiscal Period
 
@@ -72,7 +73,7 @@ public class DocumentTransactionService : IDocumentTransactionService
                 dateOfTrans >= p.StartDate && dateOfTrans <= p.EndDate);
             if (fiscalPeriod == null)
             {
-                await transaction.RollbackAsync();
+                if (ownsTransaction) await transaction.RollbackAsync();
                 return new NotFoundObjectResult(new
                 {
                     error = "No Fiscal Period covers Transaction Date"
@@ -86,7 +87,7 @@ public class DocumentTransactionService : IDocumentTransactionService
 
             if (docSeries is null)
             {
-                await transaction.RollbackAsync();
+                if (ownsTransaction) await transaction.RollbackAsync();
                 return new NotFoundObjectResult(new
                 {
                     error = "Buy Doc Series not found"
@@ -112,7 +113,7 @@ public class DocumentTransactionService : IDocumentTransactionService
                     .SingleOrDefaultAsync(s => s.SystemName == sectionCode);
                 if (sectn == null)
                 {
-                    await transaction.RollbackAsync();
+                    if (ownsTransaction) await transaction.RollbackAsync();
                     return new NotFoundObjectResult(new
                     {
                         error = "Could not locate section "
@@ -128,7 +129,6 @@ public class DocumentTransactionService : IDocumentTransactionService
 
             #endregion
 
-            //var transSupplierDef = docTypeDef.TransSupplierDef;
             var transTransactorDef = docTypeDef.TransTransactorDef;
             var transWarehouseDef = docTypeDef.TransWarehouseDef;
 
@@ -144,7 +144,7 @@ public class DocumentTransactionService : IDocumentTransactionService
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                await transaction.RollbackAsync();
+                if (ownsTransaction) await transaction.RollbackAsync();
                 string msg = e.InnerException?.Message;
                 return new BadRequestObjectResult(new
                 {
@@ -162,7 +162,7 @@ public class DocumentTransactionService : IDocumentTransactionService
                         p.Id == transTransactorDef.DefaultDocSeriesId);
                 if (transTransactorDefaultSeries == null)
                 {
-                    await transaction.RollbackAsync();
+                    if (ownsTransaction) await transaction.RollbackAsync();
                     return new NotFoundObjectResult(new
                     {
                         error = "Default series for transactor transaction not found"
@@ -180,13 +180,11 @@ public class DocumentTransactionService : IDocumentTransactionService
                 sTransactorTransaction.FiscalPeriodId = fiscalPeriod.Id;
                 sTransactorTransaction.CreatorId = docId;
                 ActionHandlers.TransactorFinAction(transTransactorDef.FinancialTransAction, sTransactorTransaction);
-                // Update document transaction with transamounts
                 transToAttach.TransNetAmount = sTransactorTransaction.TransNetAmount;
                 transToAttach.TransFpaAmount = sTransactorTransaction.TransFpaAmount;
                 transToAttach.TransDiscountAmount = sTransactorTransaction.TransDiscountAmount;
                 transToAttach.TransExpensesAmount = 0;
                 _context.Entry(transToAttach).State = EntityState.Modified;
-                //----------------------------------------------
                 await _context.TransactorTransactions.AddAsync(sTransactorTransaction);
                 try
                 {
@@ -195,7 +193,7 @@ public class DocumentTransactionService : IDocumentTransactionService
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
-                    await transaction.RollbackAsync();
+                    if (ownsTransaction) await transaction.RollbackAsync();
                     string msg = e.InnerException?.Message;
                     return new BadRequestObjectResult(new
                     {
@@ -204,13 +202,11 @@ public class DocumentTransactionService : IDocumentTransactionService
                 }
             }
 
-            //Αυτόματη εξόφληση
             var paymentMethod =
                 await _context.PaymentMethods.FirstOrDefaultAsync(p => p.Id == transToAttach.PaymentMethodId);
             if (paymentMethod is null)
             {
-                await transaction.RollbackAsync();
-                //ModelState.AddModelError(string.Empty, "Δεν βρέθηκε ο τρόπος πληρωμής");
+                if (ownsTransaction) await transaction.RollbackAsync();
                 return new NotFoundObjectResult(new
                 {
                     error = "Δεν βρέθηκε ο τρόπος πληρωμής"
@@ -228,8 +224,7 @@ public class DocumentTransactionService : IDocumentTransactionService
                             p.Id == autoPaySeriesId);
                     if (transTransactorPayOffSeries == null)
                     {
-                        await transaction.RollbackAsync();
-                        //ModelState.AddModelError(string.Empty, "AutoPayOff series not found");
+                        if (ownsTransaction) await transaction.RollbackAsync();
                         return new NotFoundObjectResult(new
                         {
                             error = "AutoPayOff series not found"
@@ -243,7 +238,6 @@ public class DocumentTransactionService : IDocumentTransactionService
                     var transTransactorEtiology =
                         $"{transTransactorPayOffSeries.Name} created from {docSeries.Name} for {transactor.Name} with {docTrans.Etiology} ";
                     sTransactorTransaction.TransactorId = docTrans.TransactorId;
-
                     sTransactorTransaction.TransTransactorDocTypeId =
                         transTransactorPayOffSeries.TransTransactorDocTypeDefId;
                     sTransactorTransaction.TransTransactorDocSeriesId = transTransactorPayOffSeries.Id;
@@ -284,7 +278,7 @@ public class DocumentTransactionService : IDocumentTransactionService
                     catch (Exception e)
                     {
                         Console.WriteLine(e);
-                        await transaction.RollbackAsync();
+                        if (ownsTransaction) await transaction.RollbackAsync();
                         string msg = e.InnerException?.Message;
                         return new BadRequestObjectResult(new
                         {
@@ -292,7 +286,7 @@ public class DocumentTransactionService : IDocumentTransactionService
                         });
                     }
 
-                    //Cash Flow Account Transaction 
+                    
                     if (paymentCfAccountId > 0)
                     {
                         var defaultCfaSeriesId = transTransactorPayOffSeries.DefaultCfaTransSeriesId;
@@ -314,7 +308,6 @@ public class DocumentTransactionService : IDocumentTransactionService
 
                                     var etiology =
                                         $"{cfaSeries.Name} created from {docSeries.Name} for {transactor.Name} with {docTrans.Etiology} ";
-
 
                                     var cfaTransDef = cfaType.CashFlowTransactionDefinition;
                                     var cfaTrans = new CashFlowAccountTransaction
@@ -341,10 +334,11 @@ public class DocumentTransactionService : IDocumentTransactionService
                                     try
                                     {
                                         await _context.SaveChangesAsync();
+                                        //throw new Exception("Test");;
                                     }
                                     catch (Exception e)
                                     {
-                                        await transaction.RollbackAsync();
+                                        if (ownsTransaction) await transaction.RollbackAsync();
                                         string msg = e.InnerException?.Message;
                                         return new BadRequestObjectResult(new
                                         {
@@ -356,7 +350,6 @@ public class DocumentTransactionService : IDocumentTransactionService
                         }
                     }
 
-                    //End Cash Flow Account Transaction 
                     try
                     {
                         var payOfTransactionId = _context.Entry(sTransactorTransaction).Entity.Id;
@@ -371,7 +364,7 @@ public class DocumentTransactionService : IDocumentTransactionService
                     }
                     catch (Exception e)
                     {
-                        await transaction.RollbackAsync();
+                        if (ownsTransaction) await transaction.RollbackAsync();
                         string msg = e.InnerException?.Message;
                         return new BadRequestObjectResult(new
                         {
@@ -391,8 +384,7 @@ public class DocumentTransactionService : IDocumentTransactionService
                         p.Id == transWarehouseDef.DefaultDocSeriesId);
                 if (transWarehouseDefaultSeries == null)
                 {
-                    await transaction.RollbackAsync();
-                    //ModelState.AddModelError(string.Empty, "Default series for warehouse transaction not found");
+                    if (ownsTransaction) await transaction.RollbackAsync();
                     return new NotFoundObjectResult(new
                     {
                         error = "Default series for warehouse transaction not found"
@@ -415,9 +407,7 @@ public class DocumentTransactionService : IDocumentTransactionService
                     .SingleOrDefaultAsync(p => p.Id == warehouseItemId);
                 if (material is null)
                 {
-                    //Handle error
-                    await transaction.RollbackAsync();
-                    //ModelState.AddModelError(string.Empty, "Doc Line error null WarehouseItem");
+                    if (ownsTransaction) await transaction.RollbackAsync();
                     return new NotFoundObjectResult(new
                     {
                         error = "Could not locate material in Doc Line "
@@ -428,7 +418,6 @@ public class DocumentTransactionService : IDocumentTransactionService
 
                 var transUnitId = dataBuyDocLine.TransactionUnitId;
                 var transUnitFactor = dataBuyDocLine.TransactionUnitFactor;
-                // var factor = dataBuyDocLine.Factor;
                 decimal transPrice = dataBuyDocLine.TransUnitPrice;
                 double transUnits = dataBuyDocLine.TransactionQuantity;
                 decimal units = (decimal)dataBuyDocLine.Q1;
@@ -471,7 +460,6 @@ public class DocumentTransactionService : IDocumentTransactionService
                     TransDiscountAmount = lineAmounts.TransDiscountAmount,
                     TransExpensesAmount = lineAmounts.TransExpensesAmount
                 };
-                //_context.Entry(transToAttach).Entity
                 transToAttach.BuyDocLines.Add(buyMaterialLine);
 
                 #endregion
@@ -519,12 +507,12 @@ public class DocumentTransactionService : IDocumentTransactionService
             try
             {
                 await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
+                if (ownsTransaction) await transaction.CommitAsync();
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                await transaction.RollbackAsync();
+                if (ownsTransaction) await transaction.RollbackAsync();
                 string msg = e.InnerException?.Message;
                 return new BadRequestObjectResult(new
                 {
@@ -532,7 +520,15 @@ public class DocumentTransactionService : IDocumentTransactionService
                 });
             }
         }
+        finally
+        {
+            // Dispose the transaction only if we created it
+            if (ownsTransaction && transaction != null)
+            {
+                await transaction.DisposeAsync();
+            }
+        }
 
-        return new OkObjectResult(new { newDocumentId });
+        return new OkObjectResult(newDocumentId);
     }
 }

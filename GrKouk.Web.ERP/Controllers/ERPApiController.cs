@@ -1335,15 +1335,17 @@ namespace GrKouk.Web.ERP.Controllers
                     return BadRequest(badRequestResult.Value);
                 }
 
+                int newDocId = 0;
                 if (result is OkObjectResult okResult)
                 {
-                    var newDocId = (int)okResult.Value;
+                    newDocId = (int)okResult.Value;
                 }
 
                 var newSyncEntity = new SyncBuyDocument()
                 {
                     Id = Guid.NewGuid(),
                     BusId = request.Id,
+                    ErpId = newDocId,
                     BuyDocDefId = request.BuyDocDefId,
                     TransDate = request.TransDate,
                     RefNumber = request.RefNumber,
@@ -1364,6 +1366,7 @@ namespace GrKouk.Web.ERP.Controllers
                         request.TotalAmount.ToString(CultureInfo.InvariantCulture),
                         request.PayedAmount.ToString(CultureInfo.InvariantCulture))
                 };
+                _context.SyncBuyDocuments.Add(newSyncEntity);
                 _context.SynchronizationLogs.Add(new SynchronizationLog
                 {
                     Id = Guid.NewGuid(),
@@ -1387,7 +1390,7 @@ namespace GrKouk.Web.ERP.Controllers
                     failedToAddCount++;
                     return BadRequest(new
                     {
-                        error = "SyncSupplier error " + ex.Message
+                        error = "SyncBuyDoc error " + ex.Message
                     });
                 }
 
