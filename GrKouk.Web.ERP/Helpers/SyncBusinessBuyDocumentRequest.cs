@@ -1,6 +1,5 @@
-using System.Collections.Generic;
+using System;
 using System.Text.Json.Serialization;
-using GrKouk.Erp.Dtos.Sync;
 
 namespace GrKouk.Web.ERP.Helpers;
 
@@ -8,13 +7,17 @@ public class SyncBusinessBuyDocumentRequest
 {
     [JsonPropertyName("companyCode")]
     public string CompanyCode { get; set; }
-    
-    private IList<SyncBusinessBuyDocumentDto> _items;
-    [JsonPropertyName("items")]
-    public IList<SyncBusinessBuyDocumentDto> Items
-    {
-        get { return _items ??= new List<SyncBusinessBuyDocumentDto>() ; }
-        set => _items = value;
-    }
+    [JsonPropertyName("id")]
+    public int Id { get; set; }
+    [JsonPropertyName("transDate")]
+    public DateTime TransDate { get; set; }
+    [JsonPropertyName("supplierId")]
+    public int SupplierId { get; set; }
+    [JsonPropertyName("refNumber")]
+    public int RefNumber { get; set; }
+    [JsonPropertyName("totalAmount")]
+    public decimal TotalAmount { get; set; }
+    [JsonPropertyName("payedAmount")]
+    public decimal PayedAmount { get; set; } 
+   
 }
-

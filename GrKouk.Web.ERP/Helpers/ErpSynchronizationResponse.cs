@@ -29,3 +29,13 @@ public class ErpSynchronizationResponse<T>
     [JsonPropertyName("syncItems")]
     public List<T> SyncItems { get; set; }
 }
+
+public class ErpCheckDocumentResponse
+{
+    [JsonPropertyName("canInsert")]
+    public bool CanInsert { get; set; }
+    [JsonPropertyName("message")]
+    public string Message { get; set; }
+    [JsonPropertyName("documentId")]
+    public int DocumentId { get; set; }
+}
