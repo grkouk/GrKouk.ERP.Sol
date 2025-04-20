@@ -10,6 +10,7 @@ using GrKouk.Erp.Dtos.BuyDocuments;
 using GrKouk.Erp.Dtos.SellDocuments;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
+using GrKouk.Web.ERP.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,11 +24,13 @@ namespace GrKouk.Web.ERP.Controllers
     {
         private readonly ApiDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IDocumentTransactionService _docTransSrv;
 
-        public RecurringTransactionsController(ApiDbContext context, IMapper mapper)
+        public RecurringTransactionsController(ApiDbContext context, IMapper mapper, IDocumentTransactionService docTransSrv)
         {
             _context = context;
             _mapper = mapper;
+            _docTransSrv = docTransSrv;
         }
 
         [HttpPost("ApplyRecTransIdList")]
@@ -106,12 +109,12 @@ namespace GrKouk.Web.ERP.Controllers
             {
                 case RecurringDocTypeEnum.BuyType:
                     var buyDocDto = _mapper.Map<BuyDocCreateAjaxDto>(recDef);
-                    var buyUpdController = new MaterialsController(_context, _mapper);
+                    var buyUpdController = new MaterialsController(_context, _mapper, _docTransSrv);
                     actionResult = await CreateBuyDocFromRecTrans(buyDocDto, recDef);
                     break;
                 case RecurringDocTypeEnum.SellType:
                     var sellDocDto = _mapper.Map<SellDocCreateAjaxDto>(recDef);
-                    var sellUpdController = new MaterialsController(_context, _mapper);
+                    var sellUpdController = new MaterialsController(_context, _mapper,_docTransSrv);
                     actionResult = await CreateSellDocFromRecTrans(sellDocDto, recDef);
 
                     break;

@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Text;
+using GrKouk.Web.ERP.Services;
 
 namespace GrKouk.Web.ERP.Controllers
 {
@@ -33,11 +34,15 @@ namespace GrKouk.Web.ERP.Controllers
     {
         private readonly ApiDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IDocumentTransactionService _docTransSrv;
 
-        public MaterialsController(ApiDbContext context, IMapper mapper)
+        public MaterialsController(ApiDbContext context, IMapper mapper
+            , IDocumentTransactionService docTransSrv
+            )
         {
             _context = context;
             _mapper = mapper;
+            _docTransSrv = docTransSrv;
         }
 
         // GET: api/WarehouseItems
@@ -1985,6 +1990,12 @@ namespace GrKouk.Web.ERP.Controllers
         }
 
         [HttpPost("MaterialBuyDoc")]
+        public async Task<IActionResult> PostMaterialBuyDocV2([FromBody] BuyDocCreateAjaxDto data)
+        {
+            return await _docTransSrv.AddBuyDocument(data);
+
+           
+        } 
         public async Task<IActionResult> PostMaterialBuyDoc([FromBody] BuyDocCreateAjaxDto data)
         {
             const string sectionCode = "SYS-BUY-MATERIALS-SCN";

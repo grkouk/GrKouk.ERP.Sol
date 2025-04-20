@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -136,6 +137,8 @@ namespace GrKouk.Web.ERP
             services.AddAutoMapper(typeof(Startup));
             services.AddRazorPages();
             services.AddControllers().AddNewtonsoftJson();
+
+            services.AddTransient<IDocumentTransactionService, DocumentTransactionService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

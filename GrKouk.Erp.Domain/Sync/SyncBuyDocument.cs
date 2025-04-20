@@ -10,6 +10,8 @@ public class SyncBuyDocument
     public int BusId { get; set; }
     [Required]
     public int ErpId { get; set; }
+   
+    public int BuyDocDefId { get; set; }
     [MaxLength(15)]
     public string CompanyCode { get; set; }
     [Required]
@@ -18,6 +20,10 @@ public class SyncBuyDocument
     public int SupplierId { get; set; }
     [Required]
     public int RefNumber { get; set; }
+    public decimal NetAmount { get; set; }
+    public decimal VatAmount { get; set; }
+    public decimal DiscountAmount { get; set; }
+    
     public decimal TotalAmount { get; set; }
     public decimal PayedAmount { get; set; }
     [Required]
