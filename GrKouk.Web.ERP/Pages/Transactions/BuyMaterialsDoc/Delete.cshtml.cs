@@ -65,6 +65,16 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
                     _context.CashFlowAccountTransactions.RemoveRange(_context.CashFlowAccountTransactions.Where(p => p.CreatorSectionId == BuyDocument.SectionId && p.CreatorId == id));
                     _context.WarehouseTransactions.RemoveRange(_context.WarehouseTransactions.Where(p => p.SectionId == BuyDocument.SectionId && p.CreatorId == id));
                     _context.BuyDocTransPaymentMappings.RemoveRange(_context.BuyDocTransPaymentMappings.Where(p=>p.BuyDocumentId==id));
+                    var syncDoc = await _context.SyncBuyDocuments.SingleOrDefaultAsync(p => p.ErpId == BuyDocument.Id);
+                    if (syncDoc is not null)
+                    {
+                        var syncLog = await _context.SynchronizationLogs.SingleOrDefaultAsync(p => p.EntityId == syncDoc.Id);
+                        if (syncLog is not null)
+                        {
+                            _context.SynchronizationLogs.Remove(syncLog);
+                        }
+                        _context.SyncBuyDocuments.Remove(syncDoc);
+                    }
                     _context.BuyDocuments.Remove(BuyDocument);
 
                     await _context.SaveChangesAsync();
