@@ -1155,7 +1155,8 @@ namespace GrKouk.Web.ERP.Controllers
             var res = new ErpCheckDocumentResponse()
             {
                 Message = message,
-                CanInsert = !hasBeenSynced,
+                IsSynced = hasBeenSynced,
+                CanSync = !hasBeenSynced && hasSupplierBeenSynced,
                 DocumentId = request.Id
             };
             return Ok(res);
@@ -1214,7 +1215,7 @@ namespace GrKouk.Web.ERP.Controllers
             int paymentMethodCashId = 0;
             string paymentMethodPistosiCode = "Επι Πιστώσει";
             int paymentMethodPistosiId = 0;
-            string docSeriesCode = "ΤΙΜΑΓ";
+            string docSeriesCode = "TIMDAAGSYNC";
             int docSeriesId = 0;
             int syncSupplierId = 0;
             int paymentMethodId = 0;
@@ -1411,7 +1412,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             var res = new ErpSynchronizationResponse<SyncBuyDocument>
             {
-                Message = "SyncAddBusinessBuyDocument",
+                Message = "Document synced successfully",
                 AddedCount = addedCount,
                 FailedToAddCount = failedToAddCount,
                 UpdatedCount = updatedCount,
