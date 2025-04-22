@@ -1382,6 +1382,7 @@ namespace GrKouk.Web.ERP.Controllers
                 try
                 {
                     await _context.SaveChangesAsync();
+                   // throw new Exception("Test");
                     addedCount++;
                 }
                 catch (Exception ex)
