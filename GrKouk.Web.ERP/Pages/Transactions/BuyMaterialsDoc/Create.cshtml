@@ -524,7 +524,7 @@
                     break;
                 }
             };
-             const setupEventManagers = () => {
+            const setupEventManagers = () => {
                 vatPercentEl.addEventListener("change",(event) => {
                     priceChanged();
                 });
@@ -1069,10 +1069,10 @@
                 }
                 var productName = $lookUp.val();
                 var baseUnitPriceNet = parseFloat($priceNet.val());
-               var quantity1Str = $q1.val();
-               var quantity1 = parseFloat(quantity1Str);
-               var quantity2Str = $q2.val();
-               var quantity2 = parseFloat(quantity2Str);
+                var quantity1Str = $q1.val();
+                var quantity1 = parseFloat(quantity1Str);
+                var quantity2Str = $q2.val();
+                var quantity2 = parseFloat(quantity2Str);
                 var discount = discountPercentEl.value;
                 var vatPercent = vatPercentEl.value;
                 var transQuantity = transQuantityEl.value;
@@ -1299,10 +1299,10 @@
                                 $lineEditing.val(lineEdit);
                                 $materialId.val(materialId);
                                 $lookUp.val(materialName);
-                               transQuantityEl.value = transQ;
-                               priceOnTransUnitEl.value = transPrice;
-                               vatPercentEl.value = fpaRate;
-                               discountPercentEl.value = discountRate;
+                                transQuantityEl.value = transQ;
+                                priceOnTransUnitEl.value = transPrice;
+                                vatPercentEl.value = fpaRate;
+                                discountPercentEl.value = discountRate;
                                 $transUnitId.val(transUnitId);
                                 $transUnitType.val(transUnitType);
                                 

@@ -21,6 +21,9 @@
             <th class="small">
                 @Html.DisplayNameFor(model => model.MaterialCategory[0].Name)
             </th>
+            <th class="small">
+                @Html.DisplayNameFor(model => model.MaterialCategory[0].Company.Name)
+            </th>
             <th class="small"></th>
         </tr>
     </thead>
@@ -32,6 +35,9 @@
             </td>
             <td class="small">
                 @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td class="small">
+                @Html.DisplayFor(modelItem => item.Company.Name)
             </td>
             <td class="small">
                 <a asp-page="./Edit" asp-route-id="@item.Id"><i class="fas fa-edit"></i></a> |

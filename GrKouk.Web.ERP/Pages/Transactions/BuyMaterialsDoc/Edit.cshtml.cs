@@ -22,7 +22,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
         private readonly IToastNotification _toastNotification;
         public string SeekType { get; set; }
         public bool InitialLoad = true;
-
+        public bool FromSyncing;
         public EditModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
         {
             _context = context;
@@ -60,6 +60,16 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
             if (ItemVm == null)
             {
                 return NotFound();
+            }
+
+            var syncDoc = await _context.SyncBuyDocuments.SingleOrDefaultAsync(p => p.ErpId == ItemVm.Id);
+            if (syncDoc != null)
+            {
+                FromSyncing = true;
+            }
+            else
+            {
+                FromSyncing = false;
             }
             //check for new values or old values
             var vmLines = ItemVm.BuyDocLines;

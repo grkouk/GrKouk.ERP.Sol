@@ -38,19 +38,19 @@ namespace GrKouk.Web.ERP.Controllers
         {
             string term = request.Term;
             //Transactors
-            IQueryable<Transactor> transactorFullListIq = _context.Transactors;
+            IQueryable<Transactor> transactorFullListIq = _context.Transactors.Include(p=>p.TransactorType);
             List<Ej2ShortcutAutoCompleteItem> items=new();
 
             if (!string.IsNullOrEmpty(term))
             {
-                transactorFullListIq = transactorFullListIq.Where(p => p.Name.Contains(term) || p.Code.Contains(term));
+                transactorFullListIq = transactorFullListIq.Where(p => p.Name.Contains(term) || p.Code.Contains(term) || p.TaxNumber.Contains(term));
             }
 
             IEnumerable<Ej2ShortcutAutoCompleteItem> transactorItems = await transactorFullListIq
 
                 .Select(p => new Ej2ShortcutAutoCompleteItem
                 {
-                    Text = p.Name,
+                    Text = p.Name + "-{" + p.TransactorType.Code + "}-{" + p.TaxNumber + "}",
                     Value = p.Id,
                     ImgUrl = Url.Content("~/productimages/" + "noimage.jpg"),
                     ItemType = Ej2ShortcutAutoCompleteItemType.ShortcutItemTransactor
@@ -72,7 +72,12 @@ namespace GrKouk.Web.ERP.Controllers
 
             IEnumerable<Ej2ShortcutAutoCompleteItem> warehouseItems = await warehouseItem4FullListIq
                 .ProjectTo<WarehouseItemSearchListDto>(_mapper.ConfigurationProvider)
-                .Select(p => new Ej2ShortcutAutoCompleteItem { Text = p.Label, Value = p.Id, ItemType = Ej2ShortcutAutoCompleteItemType.ShortcutItemWarehouseItem })
+                .Select(p => new Ej2ShortcutAutoCompleteItem 
+                    {
+                        Text = p.Label, 
+                        Value = p.Id, 
+                        ItemType = Ej2ShortcutAutoCompleteItemType.ShortcutItemWarehouseItem
+                    })
                 .ToListAsync();
 
             foreach (var productItem in warehouseItems)
@@ -104,9 +109,9 @@ namespace GrKouk.Web.ERP.Controllers
             items.Sort(delegate (Ej2ShortcutAutoCompleteItem x, Ej2ShortcutAutoCompleteItem y)
             {
                 if (x.Text == null && y.Text == null) return 0;
-                else if (x.Text == null) return -1;
-                else if (y.Text == null) return 1;
-                else return x.Text.CompareTo(y.Text);
+                if (x.Text == null) return -1;
+                if (y.Text == null) return 1;
+                return x.Text.CompareTo(y.Text);
             });
 
             return Ok(new { result = items });

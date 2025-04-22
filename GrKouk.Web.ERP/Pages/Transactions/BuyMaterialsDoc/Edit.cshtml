@@ -13,7 +13,16 @@
     <link rel="stylesheet" href="~/css/search-modal.css" />
     <link rel="stylesheet" href="~/lib/bootstrap-select/css/bootstrap-select.min.css" />
 }
-
+@{
+    if (Model.FromSyncing) {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>Synced!</strong> This transaction was created from a syncing process.
+            <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+}
 <style>
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button {

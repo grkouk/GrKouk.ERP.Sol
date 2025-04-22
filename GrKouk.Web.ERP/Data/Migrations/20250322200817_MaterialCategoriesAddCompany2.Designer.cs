@@ -4,6 +4,7 @@ using GrKouk.Web.ERP.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GrKouk.Web.ERP.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250322200817_MaterialCategoriesAddCompany2")]
+    partial class MaterialCategoriesAddCompany2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1878,36 +1881,6 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.ToTable("ProductRecipeLines");
                 });
 
-            modelBuilder.Entity("GrKouk.Erp.Domain.Shared.ProfitCentre", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Code");
-
-                    b.HasIndex("CompanyId");
-
-                    b.ToTable("ProfitCentres");
-                });
-
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.RevenueCentre", b =>
                 {
                     b.Property<int>("Id")
@@ -2676,303 +2649,6 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .HasFilter("[Code] IS NOT NULL");
 
                     b.ToTable("WrItemCodes");
-                });
-
-            modelBuilder.Entity("GrKouk.Erp.Domain.Sync.SyncBuyDocument", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("BusId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BuyDocDefId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CompanyCode")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<decimal>("DiscountAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("ErpId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("NetAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("PayedAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("RefNumber")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SourceChecksum")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.Property<int>("SupplierId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("TransDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("VatAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BusId");
-
-                    b.HasIndex("CompanyCode");
-
-                    b.HasIndex("ErpId");
-
-                    b.HasIndex("RefNumber");
-
-                    b.HasIndex("SupplierId");
-
-                    b.HasIndex("TransDate");
-
-                    b.ToTable("SyncBuyDocument");
-                });
-
-            modelBuilder.Entity("GrKouk.Erp.Domain.Sync.SyncItemFamily", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("BusId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CompanyCode")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<int>("ErpId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("SourceChecksum")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BusId");
-
-                    b.HasIndex("CompanyCode");
-
-                    b.HasIndex("ErpId");
-
-                    b.HasIndex("ErpId", "BusId")
-                        .IsUnique();
-
-                    b.ToTable("SyncItemFamilies");
-                });
-
-            modelBuilder.Entity("GrKouk.Erp.Domain.Sync.SyncSaleDocument", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("BusId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BuyDocDefId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CompanyCode")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("DiscountAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("ErpId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("NetAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("PayedAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("RefNumber")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SourceChecksum")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("TransDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("VatAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BusId");
-
-                    b.HasIndex("CompanyCode");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("ErpId");
-
-                    b.HasIndex("RefNumber");
-
-                    b.HasIndex("TransDate");
-
-                    b.ToTable("SyncSaleDocument");
-                });
-
-            modelBuilder.Entity("GrKouk.Erp.Domain.Sync.SyncSupplier", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("BusCode")
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<int>("BusId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CompanyCode")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<int>("ErpId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("SourceChecksum")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.Property<string>("TaxNumber")
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BusCode");
-
-                    b.HasIndex("BusId");
-
-                    b.HasIndex("CompanyCode");
-
-                    b.HasIndex("ErpId");
-
-                    b.ToTable("SyncSuppliers");
-                });
-
-            modelBuilder.Entity("GrKouk.Erp.Domain.Sync.SyncUnitOfMeasurement", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("BusId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CompanyCode")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<int>("ErpId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("SourceChecksum")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("nvarchar(32)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BusId");
-
-                    b.HasIndex("CompanyCode");
-
-                    b.HasIndex("ErpId");
-
-                    b.ToTable("SyncUnitOfMeasurements");
-                });
-
-            modelBuilder.Entity("GrKouk.Erp.Domain.Sync.SynchronizationLog", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CompanyCode")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<Guid>("EntityId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("EntityName")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("OperationType")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("Source")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<Guid>("SyncSessionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("SyncedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompanyCode");
-
-                    b.HasIndex("SyncSessionId");
-
-                    b.HasIndex("SyncedAt");
-
-                    b.HasIndex("EntityName", "EntityId");
-
-                    b.ToTable("SynchronizationLogs");
                 });
 
             modelBuilder.Entity("GrKouk.Web.ERP.Helpers.RefreshToken", b =>
@@ -3891,17 +3567,6 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("ProductRecipe");
-                });
-
-            modelBuilder.Entity("GrKouk.Erp.Domain.Shared.ProfitCentre", b =>
-                {
-                    b.HasOne("GrKouk.Erp.Domain.Shared.Company", "Company")
-                        .WithMany()
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.SellDocLine", b =>
