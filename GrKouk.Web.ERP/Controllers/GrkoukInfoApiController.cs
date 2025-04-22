@@ -32,9 +32,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Threading;
+using GrKouk.Erp.Domain.Sync;
 using GrKouk.Erp.Dtos.CashFlowTransactions;
 using GrKouk.Erp.Dtos.FinancialMovements;
+using GrKouk.Erp.Dtos.Sync;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Syncfusion.EJ2.Linq;
 
 //using Remotion.Linq.Parsing.Structure.IntermediateModel;
 
@@ -7348,7 +7351,120 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
+        [HttpGet("GetIndexTblDataSyncLog")]
+        public async Task<IActionResult> GetIndexTblDataSyncLog([FromQuery] IndexDataTableRequest request)
+        {
+            IQueryable<SynchronizationLogListDto> fullListIq = _context.SynchronizationLogs
+                .Join(
+                    _context.Companies,
+                    log=>log.CompanyCode,
+                    company=>company.Code,
+                    (log,company) => new SynchronizationLogListDto
+                    {
+                        Id = log.Id,
+                        SyncedAt = log.SyncedAt,
+                        EntityName = log.EntityName,
+                        CompanyCode = log.CompanyCode,
+                        CompanyName = company.Name,
+                        CompanyId = company.Id,
+                        CompanyCurrencyId = company.CurrencyId,
+                        OperationType = log.OperationType,
+                        EntityId = log.EntityId,
+                        Source = log.Source,
+                        SyncSessionId = log.SyncSessionId,
+                    }
+                    );
 
+            if (!string.IsNullOrEmpty(request.SortData))
+            {
+                switch (request.SortData.ToLower())
+                {
+                    case "datesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.SyncedAt);
+                        break;
+                    case "datesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.SyncedAt);
+                        break;
+                    case "namesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.EntityName);
+                        break;
+                    case "namesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.EntityName);
+                        break;
+                   
+                    case "companycodesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.CompanyCode);
+                        break;
+                    case "companycodesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.CompanyCode);
+                        break;
+                    // case "sectioncodesort:asc":
+                    //     fullListIq = fullListIq.OrderBy(p => p.Section.Code);
+                    //     break;
+                    // case "sectioncodesort:desc":
+                    //     fullListIq = fullListIq.OrderByDescending(p => p.Section.Code);
+                    //     break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.DateRange))
+            {
+                var datePeriodFilter = request.DateRange;
+                DateFilterDates dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
+                DateTime fromDate = dfDates.FromDate;
+                DateTime toDate = dfDates.ToDate;
+
+                fullListIq = fullListIq.Where(p => p.SyncedAt >= fromDate && p.SyncedAt <= toDate);
+            }
+
+            if (!string.IsNullOrEmpty(request.CompanyFilter))
+            {
+                if (int.TryParse(request.CompanyFilter, out var companyId))
+                {
+                    if (companyId > 0)
+                    {
+                        fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.SearchFilter))
+            {
+                fullListIq = fullListIq.Where(p => 
+                                                    p.EntityName.Contains(request.SearchFilter));
+            }
+
+
+            //var t = await fullListIq.ToListAsync();
+            var grandSumOfAmount = 0;
+            var grandSumOfDebit = 0;
+            var grandSumOfCredit = 0;
+            var pageIndex = request.PageIndex;
+
+            var pageSize = request.PageSize;
+
+            var listItems = await PagedList<SynchronizationLogListDto>.CreateAsync(fullListIq, pageIndex, pageSize);
+            
+
+            decimal sumAmountTotal = 0;
+            decimal sumDebit = 0;
+            decimal sumCredit = 0;
+            var response = new IndexDataTableResponse<SynchronizationLogListDto>
+            {
+                TotalRecords = listItems.TotalCount,
+                TotalPages = listItems.TotalPages,
+                HasPrevious = listItems.HasPrevious,
+                HasNext = listItems.HasNext,
+                SumOfAmount = sumAmountTotal,
+                SumOfDebit = sumDebit,
+                SumOfCredit = sumCredit,
+                GrandSumOfAmount = grandSumOfAmount,
+                GrandSumOfDebit = grandSumOfDebit,
+                GrandSumOfCredit = grandSumOfCredit,
+                Data = listItems
+            };
+            return Ok(response);
+        }
         [HttpGet("GetIndexTblDataMediaEntryItems")]
         public async Task<IActionResult> GetIndexTblDataMediaEntryItems([FromQuery] IndexDataTableRequest request)
         {

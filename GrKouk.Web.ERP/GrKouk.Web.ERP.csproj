@@ -64,4 +64,8 @@
     <Folder Include="wwwroot\productimages\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AdditionalFiles Include="Pages\Sync\Logging\Index.cshtml" />
+  </ItemGroup>
+
 </Project>
