@@ -27,4 +27,5 @@ public class SyncSupplierDto
     public int ErpId { get; set; }
     public string TaxNumber { get; set; }
     public string SourceChecksum { get; set; }
+   
 }

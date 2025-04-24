@@ -1,8 +1,13 @@
 ﻿using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace GrKouk.Erp.Definitions
 {
-
+    public enum SyncEntityNamesEnum
+    {
+        [EnumMember(Value = "SyncSupplier")]
+        EntityNameSyncSupplier
+    }
     public enum RecurringDocTypeEnum
     {
         [Description("Buy Type")]

@@ -7465,6 +7465,141 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
+        
+         [HttpGet("GetIndexTblDataSyncSuppliers")]
+        public async Task<IActionResult> GetIndexTblDataSyncSuppliers([FromQuery] IndexDataTableRequest request)
+        {
+            // IQueryable<SyncSupplierListDto> fullListIq = _context.SyncSuppliers
+            //     .Join(
+            //         _context.Companies,
+            //         log=>log.CompanyCode,
+            //         company=>company.Code,
+            //         (log,company) => new SyncSupplierListDto
+            //         {
+            //             Id = log.Id,
+            //             BusCode = log.BusCode,
+            //             BusId = log.BusId,
+            //             Name = log.Name,
+            //             ErpId = log.ErpId,
+            //             TaxNumber = log.TaxNumber,
+            //             CompanyCode = log.CompanyCode,
+            //             CompanyName = company.Name,
+            //             CompanyId = company.Id,
+            //             CompanyCurrencyId = company.CurrencyId,
+            //            
+            //            
+            //         });
+            IQueryable<SyncSupplierListDto> fullListIq = _context.SyncSuppliers
+                .Join(
+                    _context.Companies,
+                    supplier => supplier.CompanyCode,
+                    company => company.Code,
+                    (supplier, company) => new { supplier, company })
+                .Join(
+                    _context.SynchronizationLogs,
+                    sc => sc.supplier.Id,  
+                    log => log.EntityId,   
+                    (sc, log) => new SyncSupplierListDto
+                    {
+                        Id = sc.supplier.Id,
+                        BusCode = sc.supplier.BusCode,
+                        BusId = sc.supplier.BusId,
+                        Name = sc.supplier.Name,
+                        ErpId = sc.supplier.ErpId,
+                        TaxNumber = sc.supplier.TaxNumber,
+                        CompanyCode = sc.company.Code,
+                        CompanyName = sc.company.Name,
+                        CompanyId = sc.company.Id,
+                        CompanyCurrencyId = sc.company.CurrencyId,
+
+                        // Fields from SynchronizationLog
+                       
+                        SyncedAt = log.SyncedAt,
+                        OperationType = log.OperationType,
+                        Source = log.Source,
+                        
+                        SyncLogId = log.Id
+                    });
+            if (!string.IsNullOrEmpty(request.SortData))
+            {
+                switch (request.SortData.ToLower())
+                {
+                    case "datesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.SyncedAt);
+                        break;
+                    case "datesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.SyncedAt);
+                        break;
+                    case "namesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.Name);
+                        break;
+                    case "namesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.Name);
+                        break;
+                   
+                    case "companycodesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.CompanyCode);
+                        break;
+                    case "companycodesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.CompanyCode);
+                        break;
+                    // case "sectioncodesort:asc":
+                    //     fullListIq = fullListIq.OrderBy(p => p.Section.Code);
+                    //     break;
+                    // case "sectioncodesort:desc":
+                    //     fullListIq = fullListIq.OrderByDescending(p => p.Section.Code);
+                    //     break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.DateRange))
+            {
+                var datePeriodFilter = request.DateRange;
+                DateFilterDates dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
+                DateTime fromDate = dfDates.FromDate;
+                DateTime toDate = dfDates.ToDate;
+
+                fullListIq = fullListIq.Where(p => p.SyncedAt >= fromDate && p.SyncedAt <= toDate);
+            }
+
+            if (!string.IsNullOrEmpty(request.CompanyFilter))
+            {
+                if (int.TryParse(request.CompanyFilter, out var companyId))
+                {
+                    if (companyId > 0)
+                    {
+                        fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.SearchFilter))
+            {
+                fullListIq = fullListIq.Where(p => 
+                                                    p.Name.Contains(request.SearchFilter));
+            }
+            
+            var pageIndex = request.PageIndex;
+            var pageSize = request.PageSize;
+
+            var listItems = await PagedList<SyncSupplierListDto>.CreateAsync(fullListIq, pageIndex, pageSize);
+            
+            var response = new IndexDataTableResponse<SyncSupplierListDto>
+            {
+                TotalRecords = listItems.TotalCount,
+                TotalPages = listItems.TotalPages,
+                HasPrevious = listItems.HasPrevious,
+                HasNext = listItems.HasNext,
+                SumOfAmount = 0,
+                SumOfDebit = 0,
+                SumOfCredit = 0,
+                GrandSumOfAmount = 0,
+                GrandSumOfDebit = 0,
+                GrandSumOfCredit = 0,
+                Data = listItems
+            };
+            return Ok(response);
+        }
         [HttpGet("GetIndexTblDataMediaEntryItems")]
         public async Task<IActionResult> GetIndexTblDataMediaEntryItems([FromQuery] IndexDataTableRequest request)
         {

@@ -1,4 +1,6 @@
-﻿namespace GrKouk.Erp.Definitions
+﻿using System.Collections.Generic;
+
+namespace GrKouk.Erp.Definitions
 {
     public static class Constants
     {

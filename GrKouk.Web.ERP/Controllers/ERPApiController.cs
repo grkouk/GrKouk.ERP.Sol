@@ -249,7 +249,7 @@ namespace GrKouk.Web.ERP.Controllers
         public async Task<IActionResult> SyncBusinessUnitsOfMeasurement(
             [FromBody] SyncBusinessUnitsOfMeasurementRequest request)
         {
-            // string mainEntityName = "MeasureUnit";
+            // string mainEntityName = "SyncUnitOfMeasurement";
             // string syncEntityName = "SyncUnitOfMeasurement";
             // _logger.LogInformation("SyncBusinessUnitsOfMeasurement");
             // int addedCount = 0;
@@ -464,9 +464,8 @@ namespace GrKouk.Web.ERP.Controllers
         public async Task<IActionResult> SyncBuyDocuments([FromBody] SyncBusinessBuyDocumentsRequest request)
         {
             #region Boiler Plate Code
-
-            string mainEntityName = "BuyDocument";
-            string syncEntityName = "SyncBuyDocument";
+            string mainEntityName = SyncEntityNames.SyncBuyDocument;
+            string syncEntityName = SyncEntityNames.SyncBuyDocument;;
             _logger.LogInformation("SyncBuyDocuments");
             int addedCount = 0;
             int failedToAddCount = 0;
@@ -680,7 +679,7 @@ namespace GrKouk.Web.ERP.Controllers
         {
             #region BoilerPlate Code
 
-            string mainEntityName = "Transactor-Supplier";
+            string mainEntityName = "SyncSupplier";
             string syncEntityName = "SyncSupplier";
             _logger.LogInformation("SyncMatchedBusinessSuppliers");
             int addedCount = 0;
@@ -796,7 +795,7 @@ namespace GrKouk.Web.ERP.Controllers
         {
             // #region BoilerPlate Code
             //
-            // string mainEntityName = "Transactor";
+            // string mainEntityName = "SyncSupplier";
             // string syncEntityName = "SyncSupplier";
             // _logger.LogInformation("SyncBusinessSuppliers");
             // int addedCount = 0;
@@ -1168,7 +1167,7 @@ namespace GrKouk.Web.ERP.Controllers
         {
             #region Boiler Plate Code
 
-            string mainEntityName = "BuyDocument";
+            string mainEntityName = "SyncBuyDocument";
             string syncEntityName = "SyncBuyDocument";
             _logger.LogInformation("SyncBusinessBuyDocumentRequest");
             int addedCount = 0;
