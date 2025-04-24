@@ -1206,7 +1206,8 @@ namespace GrKouk.Web.ERP.Controllers
             #endregion
 
             int companyId = company.Id;
-
+            const int busDocTypeTimologioAgId = 12;
+            const int busDocTypePistorikoEpId = 17;
             var syncSessionId = Guid.NewGuid(); // Unique session ID for this sync operation
             var syncSource = "MAUI Client"; // Source of the sync operation
             var syncMerchItemCode = "SYNCMERCH";
@@ -1215,7 +1216,8 @@ namespace GrKouk.Web.ERP.Controllers
             int paymentMethodCashId = 0;
             string paymentMethodPistosiCode = "Επι Πιστώσει";
             int paymentMethodPistosiId = 0;
-            string docSeriesCode = "TIMDAAGSYNC";
+            string docSeriesTimAgCode = "TIMDAAGSYNC";
+            string docSeriesPistotikoEpAgCode = "PISTIMAGSYNC";
             int docSeriesId = 0;
             int syncSupplierId = 0;
             int paymentMethodId = 0;
@@ -1227,6 +1229,7 @@ namespace GrKouk.Web.ERP.Controllers
                 var merchItem = await _context.WarehouseItems.SingleOrDefaultAsync(p => p.Code == syncMerchItemCode);
                 if (merchItem == null)
                 {
+                    await transaction.RollbackAsync();
                     return BadRequest(new
                     {
                         error = "Default Merch item not found"
@@ -1237,6 +1240,7 @@ namespace GrKouk.Web.ERP.Controllers
                 var paymentCash = await _context.PaymentMethods.SingleOrDefaultAsync(p => p.Name == paymentMethodCashCode);
                 if (paymentCash == null)
                 {
+                    await transaction.RollbackAsync();
                     return BadRequest(new
                     {
                         error = "Default Cash Payment not found"
@@ -1248,6 +1252,7 @@ namespace GrKouk.Web.ERP.Controllers
                 var paymentPistosi = await _context.PaymentMethods.SingleOrDefaultAsync(p => p.Name == paymentMethodPistosiCode);
                 if (paymentPistosi == null)
                 {
+                    await transaction.RollbackAsync();
                     return BadRequest(new
                     {
                         error = "Default Pistosi Payment not found"
@@ -1255,10 +1260,26 @@ namespace GrKouk.Web.ERP.Controllers
                 }
 
                 paymentMethodPistosiId = paymentPistosi.Id;
-                
+                string docSeriesCode;
+                switch (request.BuyDocDefId)
+                {
+                    case busDocTypeTimologioAgId:
+                        docSeriesCode = docSeriesTimAgCode;
+                        break;
+                    case busDocTypePistorikoEpId:
+                        docSeriesCode = docSeriesPistotikoEpAgCode;
+                        break;
+                    default:
+                        await transaction.RollbackAsync();
+                        return BadRequest(new
+                        {
+                            error = "Unknown Buy Document Type"
+                        });
+                }
                 var docSeries = await _context.BuyDocSeriesDefs.SingleOrDefaultAsync(p => p.Code == docSeriesCode);
                 if (docSeries == null)
                 {
+                    await transaction.RollbackAsync();
                     return BadRequest(new
                     {
                         error = "Default Doc Series not found"
@@ -1272,6 +1293,7 @@ namespace GrKouk.Web.ERP.Controllers
                 var syncSupplier = await _context.SyncSuppliers.SingleOrDefaultAsync(p => p.BusId == request.SupplierId);
                 if (syncSupplier == null)
                 {
+                    await transaction.RollbackAsync();
                     return BadRequest(new
                     {
                         error = "Sync Supplier not found"
