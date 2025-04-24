@@ -66,6 +66,7 @@
 
   <ItemGroup>
     <AdditionalFiles Include="Pages\Sync\Logging\Index.cshtml" />
+    <AdditionalFiles Include="Pages\Sync\SyncBuyDocs\Index.cshtml" />
   </ItemGroup>
 
 </Project>

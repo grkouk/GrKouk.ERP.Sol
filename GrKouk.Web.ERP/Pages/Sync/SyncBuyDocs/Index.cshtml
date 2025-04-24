@@ -3,14 +3,14 @@
 @model IndexModel
 
 @{
-    ViewData["Title"] = "Synchronization Log";
+    ViewData["Title"] = "Synchronization Buy Docs";
 }
 @section MyCss
     {
     <link rel="stylesheet" href="~/css/custom-checkbox.css" />
     <link rel="stylesheet" href="~/css/searchbar.css" />
 }
-<h4>Synchronization Log</h4>
+<h4>Synchronization Buy Docs</h4>
 
 <div class="container ">
     <ul class="nav small justify-content-end ">
@@ -84,24 +84,46 @@
             //#region Index page definition objects
             const colDefs = [
                 {
-                    key: 'syncSessionId',
-                    responseKey: 'syncSessionId',
+                    key: 'id',
+                    responseKey: 'id',
                     actualVal: '',
                     columnFormat: 't',
-                    totalKey: '',
-                    grandTotalKey: '',
+                    totalKey: 'label',
+                    grandTotalKey: 'label',
                     totalFormatter: '',
                     sortKey: '',
                     sortType: 'alpha',
-                    header: 'Sync Session Id',
+                    header: 'Id',
                     text: '',
-                    headerClass: 'small text-center d-none d-md-table-cell',
-                    class: 'small d-none d-md-table-cell ',
+                    headerClass: 'small text-center',
+                    class: 'small',
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
+
                     }
                 },
+                {
+                    key: 'name',
+                    responseKey: 'name',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: 'label',
+                    grandTotalKey: 'label',
+                    totalFormatter: '',
+                    sortKey: 'NameSort',
+                    sortType: 'alpha',
+                    header: 'Name',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {
+
+                    }
+                },
+                
                 {
                     key: 'syncedAt',
                     responseKey: 'syncedAt',
@@ -121,46 +143,7 @@
                     remoteReference: {
                     }
                 },
-                {
-                    key: 'entityName',
-                    responseKey: 'entityName',
-                    actualVal: '',
-                    columnFormat: 't',
-                    totalKey: 'label',
-                    grandTotalKey: 'label',
-                    totalFormatter: '',
-                    sortKey: 'NameSort',
-                    sortType: 'alpha',
-                    header: 'Entity Name',
-                    text: '',
-                    headerClass: 'small text-center',
-                    class: 'small',
-                    classWhenCondition: '',
-                    classCondition: {},
-                    remoteReference: {
-                       
-                    }
-                },
-                {
-                    key: 'entityId',
-                    responseKey: 'entityId',
-                    actualVal: '',
-                    columnFormat: 't',
-                    totalKey: 'label',
-                    grandTotalKey: 'label',
-                    totalFormatter: '',
-                    sortKey: '',
-                    sortType: 'alpha',
-                    header: 'Entity Id',
-                    text: '',
-                    headerClass: 'small text-center',
-                    class: 'small',
-                    classWhenCondition: '',
-                    classCondition: {},
-                    remoteReference: {
-
-                    }
-                },
+                
                 {
                     key: 'operationType',
                     responseKey: 'operationType',
@@ -199,6 +182,25 @@
                     classCondition: {},
                     remoteReference: {
 
+                    }
+                },
+                {
+                    key: 'syncLogId',
+                    responseKey: 'syncLogId',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: '',
+                    sortType: 'alpha',
+                    header: 'Sync Log Id',
+                    text: '',
+                    headerClass: 'small text-center d-none d-md-table-cell',
+                    class: 'small d-none d-md-table-cell ',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {
                     }
                 },
                 {
@@ -409,7 +411,7 @@
                 }
             ];
             const indexPageDef = {
-                uri: '/api/GrKoukInfoApi/GetIndexTblDataSyncLog',
+                uri: '/api/GrKoukInfoApi/GetIndexTblDataSyncSuppliers',
                 currencyFormatter: formatterCurrency,
                 numberFormatter: formatterNumber,
                 colDefs: colDefs,
@@ -524,7 +526,7 @@
             };
             indPgLib.addPagerElementEventListeners();
             indPgLib.registerPageHandlers();
-            indPgLib.loadSettings('SynchronizationLogIndexView');
+            indPgLib.loadSettings('SyncSuppliersIndexView');
             //----------------
 
             indPgLib.handleFiltersUi();
@@ -537,7 +539,7 @@
 
         $(window).on('beforeunload',
             function(e) {
-                indPgLib.saveSettings('SynchronizationLogIndexView');
+                indPgLib.saveSettings('SyncSuppliersIndexView');
 
             });
     </script>

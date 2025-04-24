@@ -11,12 +11,14 @@ public class SyncSaleDocument
     [Required]
     public int ErpId { get; set; }
     public int BuyDocDefId { get; set; }
+    public string? BuyDocDefName { get; set; }
     [MaxLength(15)]
     public string CompanyCode { get; set; }
     [Required]
     public DateTime TransDate { get; set; }
     [Required]
     public int CustomerId { get; set; }
+    public string? CustomerName { get; set; }
     [Required]
     public int RefNumber { get; set; }
     public decimal NetAmount { get; set; }

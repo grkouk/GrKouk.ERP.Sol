@@ -7466,29 +7466,9 @@ namespace GrKouk.Web.ERP.Controllers
             return Ok(response);
         }
         
-         [HttpGet("GetIndexTblDataSyncSuppliers")]
+        [HttpGet("GetIndexTblDataSyncSuppliers")]
         public async Task<IActionResult> GetIndexTblDataSyncSuppliers([FromQuery] IndexDataTableRequest request)
         {
-            // IQueryable<SyncSupplierListDto> fullListIq = _context.SyncSuppliers
-            //     .Join(
-            //         _context.Companies,
-            //         log=>log.CompanyCode,
-            //         company=>company.Code,
-            //         (log,company) => new SyncSupplierListDto
-            //         {
-            //             Id = log.Id,
-            //             BusCode = log.BusCode,
-            //             BusId = log.BusId,
-            //             Name = log.Name,
-            //             ErpId = log.ErpId,
-            //             TaxNumber = log.TaxNumber,
-            //             CompanyCode = log.CompanyCode,
-            //             CompanyName = company.Name,
-            //             CompanyId = company.Id,
-            //             CompanyCurrencyId = company.CurrencyId,
-            //            
-            //            
-            //         });
             IQueryable<SyncSupplierListDto> fullListIq = _context.SyncSuppliers
                 .Join(
                     _context.Companies,
@@ -7585,6 +7565,125 @@ namespace GrKouk.Web.ERP.Controllers
             var listItems = await PagedList<SyncSupplierListDto>.CreateAsync(fullListIq, pageIndex, pageSize);
             
             var response = new IndexDataTableResponse<SyncSupplierListDto>
+            {
+                TotalRecords = listItems.TotalCount,
+                TotalPages = listItems.TotalPages,
+                HasPrevious = listItems.HasPrevious,
+                HasNext = listItems.HasNext,
+                SumOfAmount = 0,
+                SumOfDebit = 0,
+                SumOfCredit = 0,
+                GrandSumOfAmount = 0,
+                GrandSumOfDebit = 0,
+                GrandSumOfCredit = 0,
+                Data = listItems
+            };
+            return Ok(response);
+        }
+         [HttpGet("GetIndexTblDataSyncBuyDocs")]
+        public async Task<IActionResult> GetIndexTblDataSyncBuyDocs([FromQuery] IndexDataTableRequest request)
+        {
+            IQueryable<SyncBuyDocumentListDto> fullListIq = _context.SyncBuyDocuments
+                .Join(
+                    _context.Companies,
+                    doc => doc.CompanyCode,
+                    company => company.Code,
+                    (doc, company) => new { doc, company })
+                .Join(
+                    _context.SynchronizationLogs,
+                    sc => sc.doc.Id,  
+                    log => log.EntityId,   
+                    (sc, log) => new SyncBuyDocumentListDto
+                    {
+                        Id = sc.doc.Id,
+                        BusId = sc.doc.BusId,
+                        TransDate = sc.doc.TransDate,
+                        ErpId = sc.doc.ErpId,
+                        CompanyCode = sc.company.Code,
+                        CompanyName = sc.company.Name,
+                        CompanyId = sc.company.Id,
+                        CompanyCurrencyId = sc.company.CurrencyId,
+                        DiscountAmount = sc.doc.DiscountAmount,
+                        NetAmount = sc.doc.NetAmount,
+                        VatAmount = sc.doc.VatAmount,
+                        TotalAmount = sc.doc.TotalAmount,
+                        PayedAmount = sc.doc.PayedAmount,
+                        SupplierId = sc.doc.SupplierId,
+                        BuyDocDefName = sc.doc.BuyDocDefName,
+                        BuyDocDefId = sc.doc.BuyDocDefId,
+                        // Fields from SynchronizationLog
+                       
+                        SyncedAt = log.SyncedAt,
+                        OperationType = log.OperationType,
+                        Source = log.Source,
+                        
+                        SyncLogId = log.Id
+                    });
+            if (!string.IsNullOrEmpty(request.SortData))
+            {
+                switch (request.SortData.ToLower())
+                {
+                    case "datesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.SyncedAt);
+                        break;
+                    case "datesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.SyncedAt);
+                        break;
+                    case "namesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.SupplierName);
+                        break;
+                    case "namesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.SupplierName);
+                        break;
+                   
+                    case "companycodesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.CompanyCode);
+                        break;
+                    case "companycodesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.CompanyCode);
+                        break;
+                    // case "sectioncodesort:asc":
+                    //     fullListIq = fullListIq.OrderBy(p => p.Section.Code);
+                    //     break;
+                    // case "sectioncodesort:desc":
+                    //     fullListIq = fullListIq.OrderByDescending(p => p.Section.Code);
+                    //     break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.DateRange))
+            {
+                var datePeriodFilter = request.DateRange;
+                DateFilterDates dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
+                DateTime fromDate = dfDates.FromDate;
+                DateTime toDate = dfDates.ToDate;
+
+                fullListIq = fullListIq.Where(p => p.SyncedAt >= fromDate && p.SyncedAt <= toDate);
+            }
+
+            if (!string.IsNullOrEmpty(request.CompanyFilter))
+            {
+                if (int.TryParse(request.CompanyFilter, out var companyId))
+                {
+                    if (companyId > 0)
+                    {
+                        fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.SearchFilter))
+            {
+                fullListIq = fullListIq.Where(p => p.BuyDocDefName.Contains(request.SearchFilter) ||
+                                                    p.SupplierName.Contains(request.SearchFilter));
+            }
+            
+            var pageIndex = request.PageIndex;
+            var pageSize = request.PageSize;
+
+            var listItems = await PagedList<SyncBuyDocumentListDto>.CreateAsync(fullListIq, pageIndex, pageSize);
+            
+            var response = new IndexDataTableResponse<SyncBuyDocumentListDto>
             {
                 TotalRecords = listItems.TotalCount,
                 TotalPages = listItems.TotalPages,
