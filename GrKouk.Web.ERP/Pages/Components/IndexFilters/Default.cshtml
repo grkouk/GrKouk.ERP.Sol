@@ -1,8 +1,15 @@
-﻿@model GrKouk.Web.ERP.Helpers.IndexFilterResult
+﻿@using GrKouk.Web.ERP.Helpers
+@model GrKouk.Web.ERP.Helpers.IndexFilterResult
 
+@{
+    var viewContext = (ViewContext)ViewData["ViewContext"];
+    ScriptHelper.AddScript(viewContext, "<script>console.log('Script from ViewComponent');</script>");
+}
 @{
     Layout = null;
 }
+
+
 <style>
   
 </style>
@@ -40,23 +47,7 @@
                         </div>
 
                     </div>
-                    @* <script> *@
-                    //document.getElementById('DatePeriodFilter').addEventListener('change', warn, true);
-                    //function warn(e) {
-
-                    // if (e.currentTarget.value === 'CUSTOM') {
-                    // e.preventDefault();
-                    // e.stopPropagation();
-
-                    // var myModal = new bootstrap.Modal(document.getElementById('customDateFilter'), {
-                    // keyboard: true, focus: true
-                    // });
-                    // myModal.show();
-                    // } else {
-                    // return;
-                    // }
-                    // }
-                    @* </script> *@
+                    
                 }
 
             }
