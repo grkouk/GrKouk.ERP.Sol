@@ -1118,12 +1118,23 @@ namespace GrKouk.Web.ERP.Controllers
 
             bool hasBeenSynced = false;
             bool hasSupplierBeenSynced = false;
+            bool hasPayedAmountEqualWithTotalAmountOrZero = false;
             try
             {
                 hasBeenSynced = _context.SyncBuyDocuments.Any(p =>
                     p.CompanyCode == businessCompanyCode && p.BusId == request.Id);
                 hasSupplierBeenSynced = _context.SyncSuppliers.Any(p =>
                     p.CompanyCode == businessCompanyCode && p.BusId == request.SupplierId);
+                if (request.PayedAmount == 0)
+                {
+                    hasPayedAmountEqualWithTotalAmountOrZero = true;
+                }
+                else
+                {
+                    decimal dif = request.PayedAmount -decimal.Abs(request.TotalAmount);
+                    hasPayedAmountEqualWithTotalAmountOrZero = decimal.Abs(dif) < 0.01m;
+
+                }
             }
             catch (Exception ex)
             {
@@ -1135,27 +1146,36 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
             string message = "Unknown condition";
-            if (!hasSupplierBeenSynced && !hasBeenSynced)
-            {
-                message = "Supplier and document have not been synced";
-            }
-
-            if (hasSupplierBeenSynced && !hasBeenSynced)
-            {
-                message = "Document has not been synced and supplier is synced";
-            }
-
             if (hasBeenSynced)
             {
                 message = "Document is synced";
             }
-
-
+            else
+            {
+                message = "Document is not synced-";
+                if (hasSupplierBeenSynced)
+                {
+                    message += "Supplier is synced-";
+                }
+                else
+                {
+                    message += "Supplier is not synced-";
+                }
+                if (hasPayedAmountEqualWithTotalAmountOrZero)
+                {
+                    message += "Payed amount Ok";
+                }
+                else
+                {
+                    message += "Payed amount is not equal with total amount";
+                }
+            }
+            
             var res = new ErpCheckDocumentResponse()
             {
                 Message = message,
                 IsSynced = hasBeenSynced,
-                CanSync = !hasBeenSynced && hasSupplierBeenSynced,
+                CanSync = !hasBeenSynced && hasSupplierBeenSynced && hasPayedAmountEqualWithTotalAmountOrZero,
                 DocumentId = request.Id
             };
             return Ok(res);
