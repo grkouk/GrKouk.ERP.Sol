@@ -21,6 +21,8 @@ public class SyncBusinessBuyDocumentRequest
     public decimal VatAmount { get; set; }
     [JsonPropertyName("supplierId")]
     public int SupplierId { get; set; }
+    [JsonPropertyName("supplierName")]
+    public string SupplierName { get; set; }
     [JsonPropertyName("refNumber")]
     public int RefNumber { get; set; }
     [JsonPropertyName("totalAmount")]

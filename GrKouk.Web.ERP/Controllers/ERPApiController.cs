@@ -1205,7 +1205,7 @@ namespace GrKouk.Web.ERP.Controllers
             #endregion
 
             int companyId = company.Id;
-            const int busDocTypeTimologioAgId = 12;
+            const int busDocTypeTimologioAgId = 9;
             const int busDocTypePistorikoEpId = 17;
             var syncSessionId = Guid.NewGuid(); // Unique session ID for this sync operation
             var syncSource = "MAUI Client"; // Source of the sync operation
@@ -1369,10 +1369,12 @@ namespace GrKouk.Web.ERP.Controllers
                     BusId = request.Id,
                     ErpId = newDocId,
                     BuyDocDefId = request.BuyDocDefId,
+                    BuyDocDefName = request.BuyDocDefName,
                     TransDate = request.TransDate,
                     RefNumber = request.RefNumber,
                     CompanyCode = request.CompanyCode,
                     SupplierId = request.SupplierId,
+                    SupplierName = request.SupplierName,
                     VatAmount = request.VatAmount,
                     NetAmount = request.NetAmount,
                     TotalAmount = request.TotalAmount,

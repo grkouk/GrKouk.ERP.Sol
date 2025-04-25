@@ -104,8 +104,27 @@
                     }
                 },
                 {
-                    key: 'name',
-                    responseKey: 'name',
+                    key: 'transDate',
+                    responseKey: 'transDate',
+                    actualVal: '',
+                    columnFormat: 'd',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: 'DateSort',
+                    sortType: 'numeric',
+                    header: 'Trans Date',
+                    text: '',
+                    headerClass: 'small text-center ',
+                    class: 'small',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {
+                    }
+                },
+                {
+                    key: 'supplierName',
+                    responseKey: 'supplierName',
                     actualVal: '',
                     columnFormat: 't',
                     totalKey: 'label',
@@ -113,7 +132,7 @@
                     totalFormatter: '',
                     sortKey: 'NameSort',
                     sortType: 'alpha',
-                    header: 'Name',
+                    header: 'Supplier Name',
                     text: '',
                     headerClass: 'small text-center',
                     class: 'small',
@@ -123,7 +142,86 @@
 
                     }
                 },
-                
+                {
+                    key: 'buyDocDefName',
+                    responseKey: 'buyDocDefName',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: 'label',
+                    grandTotalKey: 'label',
+                    totalFormatter: '',
+                    sortKey: 'DocNameSort',
+                    sortType: 'alpha',
+                    header: 'Document Name',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {
+
+                    }
+                },
+                {
+                    key: 'refNumber',
+                    responseKey: 'refNumber',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: 'label',
+                    grandTotalKey: 'label',
+                    totalFormatter: '',
+                    sortKey: '',
+                    sortType: 'alpha',
+                    header: 'Reference Number',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {
+
+                    }
+                },
+                {
+                    key: 'totalAmount',
+                    responseKey: 'totalAmount',
+                    actualVal: '',
+                    columnFormat: 'c',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: '',
+                    sortType: '',
+                    header: 'Amount',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small text-end ',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {
+
+                    }
+                },
+                {
+                    key: 'payedAmount',
+                    responseKey: 'payedAmount',
+                    actualVal: '',
+                    columnFormat: 'c',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: '',
+                    sortType: '',
+                    header: 'Payed Amount',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small text-end ',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {
+
+                    }
+                },
                 {
                     key: 'syncedAt',
                     responseKey: 'syncedAt',
@@ -411,7 +509,7 @@
                 }
             ];
             const indexPageDef = {
-                uri: '/api/GrKoukInfoApi/GetIndexTblDataSyncSuppliers',
+                uri: '/api/GrKoukInfoApi/GetIndexTblDataSyncBuyDocs',
                 currencyFormatter: formatterCurrency,
                 numberFormatter: formatterNumber,
                 colDefs: colDefs,

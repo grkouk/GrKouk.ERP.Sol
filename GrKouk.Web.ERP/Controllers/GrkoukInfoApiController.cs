@@ -7611,6 +7611,8 @@ namespace GrKouk.Web.ERP.Controllers
                         SupplierId = sc.doc.SupplierId,
                         BuyDocDefName = sc.doc.BuyDocDefName,
                         BuyDocDefId = sc.doc.BuyDocDefId,
+                        SupplierName = sc.doc.SupplierName,
+                        RefNumber = sc.doc.RefNumber,
                         // Fields from SynchronizationLog
                        
                         SyncedAt = log.SyncedAt,
@@ -7635,7 +7637,13 @@ namespace GrKouk.Web.ERP.Controllers
                     case "namesort:desc":
                         fullListIq = fullListIq.OrderByDescending(p => p.SupplierName);
                         break;
-                   
+                    case "docnamesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.BuyDocDefName);
+                        break;
+                    case "docnamesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.BuyDocDefName);
+                        break;
+
                     case "companycodesort:asc":
                         fullListIq = fullListIq.OrderBy(p => p.CompanyCode);
                         break;
