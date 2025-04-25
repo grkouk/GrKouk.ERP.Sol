@@ -10,8 +10,8 @@ public class SyncSaleDocument
     public int BusId { get; set; }
     [Required]
     public int ErpId { get; set; }
-    public int BuyDocDefId { get; set; }
-    public string? BuyDocDefName { get; set; }
+    public int SaleDocDefId { get; set; }
+    public string? SaleDocDefName { get; set; }
     [MaxLength(15)]
     public string CompanyCode { get; set; }
     [Required]

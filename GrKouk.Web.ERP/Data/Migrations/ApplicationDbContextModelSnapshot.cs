@@ -2797,12 +2797,6 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.Property<int>("BusId")
                         .HasColumnType("int");
 
-                    b.Property<int>("BuyDocDefId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("BuyDocDefName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("CompanyCode")
                         .HasMaxLength(15)
                         .HasColumnType("nvarchar(15)");
@@ -2827,6 +2821,12 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.Property<int>("RefNumber")
                         .HasColumnType("int");
+
+                    b.Property<int>("SaleDocDefId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SaleDocDefName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SourceChecksum")
                         .IsRequired()
