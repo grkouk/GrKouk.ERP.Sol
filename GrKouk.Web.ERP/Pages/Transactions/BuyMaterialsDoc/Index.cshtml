@@ -143,47 +143,7 @@
         </div>
     </div>
 </div>
-<!-- Modal Custom Date Filter -->>
-<div class="modal fade" id="customDateFilter" tabindex="-1" role="dialog" aria-labelledby="customDateFilter"
-     aria-hidden="true" data-bs-keyboard="false">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
 
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="container-fluid">
-                    <div class="row mb-1">
-                        <div class="col-6">
-                            <p class="modal-title font-weight-bold" id="filterModalLabel">Selector</p>
-                        </div>
-                        <div class="col-6 text-end">
-
-                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-
-                    </div>
-                    
-                   
-                </div>
-
-            </div>
-            <div class="modal-body ">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-12">
-                            
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="SaveItemSelector">Save changes</button>
-            </div>
-        </div>
-    </div>
-</div>
 @section Scripts
 {
     <script src="~/lib/bootstrap-select/js/bootstrap-select.min.js"></script>
@@ -284,8 +244,8 @@
                     totalKey: '',
                     grandTotalKey: '',
                     totalFormatter: '',
-                    sortKey: '',
-                    sortType: '',
+                    sortKey: 'RefNumberSort',
+                    sortType: 'alpha',
                     header: 'Ref Number',
                     text: '',
                     headerClass: 'small text-center d-none d-md-table-cell',

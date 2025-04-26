@@ -458,6 +458,12 @@ namespace GrKouk.Web.ERP.Controllers
                     case "companycodesort:desc":
                         fullListIq = fullListIq.OrderByDescending(p => p.CompanyCode);
                         break;
+                    case "refnumbersort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.TransRefCode);
+                        break;
+                    case "refnumbersort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.TransRefCode);
+                        break;
                 }
             }
 
@@ -996,6 +1002,12 @@ namespace GrKouk.Web.ERP.Controllers
                     case "companycodesort:desc":
                         fullListIq = fullListIq.OrderByDescending(p => p.CompanyCode);
                         break;
+                    case "refnumbersort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.TransRefCode);
+                        break;
+                    case "refnumbersort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.TransRefCode);
+                        break;
                 }
             }
 
@@ -1302,6 +1314,12 @@ namespace GrKouk.Web.ERP.Controllers
                         break;
                     case "sectioncodesort:desc":
                         fullListIq = fullListIq.OrderByDescending(p => p.Section.Code);
+                        break;
+                    case "refnumbersort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.TransRefCode);
+                        break;
+                    case "refnumbersort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.TransRefCode);
                         break;
                 }
             }
@@ -5748,6 +5766,12 @@ namespace GrKouk.Web.ERP.Controllers
                         break;
                     case "companycodesort:desc":
                         transactionsList = transactionsList.OrderByDescending(p => p.Company.Name);
+                        break;
+                    case "refnumbersort:asc":
+                        transactionsList = transactionsList.OrderBy(p => p.TransRefCode);
+                        break;
+                    case "refnumbersort:desc":
+                        transactionsList = transactionsList.OrderByDescending(p => p.TransRefCode);
                         break;
                 }
             }
