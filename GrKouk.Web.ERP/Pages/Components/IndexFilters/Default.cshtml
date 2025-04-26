@@ -3,7 +3,25 @@
 
 @{
     var viewContext = (ViewContext)ViewData["ViewContext"];
-    ScriptHelper.AddScript(viewContext, "<script>console.log('Script from ViewComponent');</script>");
+    var script = @"
+                             <script>
+                                 document.getElementById('DatePeriodFilter').addEventListener('change', warn, true);
+                                 function warn(e) {
+                                     if (e.currentTarget.value === 'CUSTOM') {
+                                         e.preventDefault();
+                                         e.stopPropagation();
+                                         var myModal = new bootstrap.Modal(document.getElementById('customDateFilter'), {
+                                             keyboard: true, focus: true
+                                         });
+                                         myModal.show();
+                                     } else {
+                                         return;
+                                     }
+                                 }
+                             </script>
+                             ";
+   // ScriptHelper.AddScript(viewContext, "<script>console.log('Script from ViewComponent');</script>");
+    ScriptHelper.AddScript(viewContext, script);
 }
 @{
     Layout = null;
