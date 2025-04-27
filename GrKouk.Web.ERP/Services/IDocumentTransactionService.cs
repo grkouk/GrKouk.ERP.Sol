@@ -560,7 +560,7 @@ public class DocumentTransactionService : IDocumentTransactionService
         {
             return ServiceResult.Error("No Document Found", "NOT_FOUND");
         }
-
+        // bool generateTestError = buyDocument.TransRefCode == "7752";
 
         try
         {
@@ -589,6 +589,10 @@ public class DocumentTransactionService : IDocumentTransactionService
             _context.BuyDocuments.Remove(buyDocument);
 
             await _context.SaveChangesAsync();
+            // if (generateTestError)
+            // {
+            //     throw new Exception("Test Error");
+            // }
             if (ownsTransaction) await transaction.CommitAsync();
         }
         catch (Exception ex)
