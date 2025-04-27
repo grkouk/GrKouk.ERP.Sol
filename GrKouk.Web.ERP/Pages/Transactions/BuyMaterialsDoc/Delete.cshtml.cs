@@ -6,11 +6,13 @@ using AutoMapper;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.BuyDocuments;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using NToastNotify;
 
 namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
 {
@@ -19,10 +21,15 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
     {
         private readonly ApiDbContext _context;
         private readonly IMapper _mapper;
-        public DeleteModel(ApiDbContext context, IMapper mapper)
+        private readonly IDocumentTransactionService _docTransSrv;
+        private readonly IToastNotification _toastNotification;
+
+        public DeleteModel(ApiDbContext context, IMapper mapper, IDocumentTransactionService docTransSrv,IToastNotification toastNotification)
         {
             _context = context;
             _mapper = mapper;
+            _docTransSrv = docTransSrv;
+            _toastNotification = toastNotification;
         }
 
         [BindProperty]
@@ -76,44 +83,16 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
             {
                 return NotFound();
             }
-           
-            var buyDocument = await _context.BuyDocuments.FindAsync(id);
 
-            if (buyDocument != null)
+            var srvResult = await _docTransSrv.DeleteBuyDocument((int)id);
+            if (!srvResult.Success)
             {
-                await using var transaction = await _context.Database.BeginTransactionAsync();
-                try
-                {
-                    _context.BuyDocLines.RemoveRange(_context.BuyDocLines.Where(p => p.BuyDocumentId == id));
-                    _context.TransactorTransactions.RemoveRange(_context.TransactorTransactions.Where(p => p.CreatorSectionId == buyDocument.SectionId && p.CreatorId == id));
-                    _context.CashFlowAccountTransactions.RemoveRange(_context.CashFlowAccountTransactions.Where(p => p.CreatorSectionId == buyDocument.SectionId && p.CreatorId == id));
-                    _context.WarehouseTransactions.RemoveRange(_context.WarehouseTransactions.Where(p => p.SectionId == buyDocument.SectionId && p.CreatorId == id));
-                    _context.BuyDocTransPaymentMappings.RemoveRange(_context.BuyDocTransPaymentMappings.Where(p=>p.BuyDocumentId==id));
-                    var syncDoc = await _context.SyncBuyDocuments.SingleOrDefaultAsync(p => p.ErpId == buyDocument.Id);
-                    if (syncDoc is not null)
-                    {
-                        var syncLog = await _context.SynchronizationLogs.SingleOrDefaultAsync(p => p.EntityId == syncDoc.Id);
-                        if (syncLog is not null)
-                        {
-                            _context.SynchronizationLogs.Remove(syncLog);
-                        }
-                        _context.SyncBuyDocuments.Remove(syncDoc);
-                    }
-                    _context.BuyDocuments.Remove(buyDocument);
-
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-                }
-                catch (Exception ex)
-                {
-                    await transaction.RollbackAsync();
-                    string msg = $"Error  {ex.Message} inner exception->{ex.InnerException?.Message}";
-                    ModelState.AddModelError(string.Empty, msg);
-                    //LoadCombos();
-                    return Page();
-                }
-               
+                ModelState.AddModelError("", srvResult.ErrorMessage);
+                _toastNotification.AddErrorToastMessage(srvResult.ErrorMessage);
+                return Page();
             }
+            _toastNotification.AddSuccessToastMessage("Delete operation was successfull");
+           
 
             return RedirectToPage("./Index");
         }

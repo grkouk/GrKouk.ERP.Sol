@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,6 +37,7 @@ using GrKouk.Erp.Domain.Sync;
 using GrKouk.Erp.Dtos.CashFlowTransactions;
 using GrKouk.Erp.Dtos.FinancialMovements;
 using GrKouk.Erp.Dtos.Sync;
+using GrKouk.Web.ERP.Services;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Syncfusion.EJ2.Linq;
 
@@ -69,11 +71,13 @@ namespace GrKouk.Web.ERP.Controllers
     {
         private readonly ApiDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IDocumentTransactionService _docTransSrv;
 
-        public GrkoukInfoApiController(ApiDbContext context, IMapper mapper)
+        public GrkoukInfoApiController(ApiDbContext context, IMapper mapper, IDocumentTransactionService docTransSrv)
         {
             _context = context;
             _mapper = mapper;
+            _docTransSrv = docTransSrv;
         }
 
         [HttpGet("UnlinkProductImages")]
@@ -119,17 +123,25 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpPost("DeleteBuyDocumentsList")]
         public async Task<IActionResult> DeleteBuyDocumentList([FromBody] IdList docIds)
         {
-            // await using (var transaction = await _context.Database.BeginTransactionAsync())
-            // {
-            //     foreach (var itemId in docIds.Ids)
-            //     {
-            //         Debug.Write("test");
-            //     }
+            await using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                foreach (var itemId in docIds.Ids)
+                {
+                   var srvResult = await _docTransSrv.DeleteBuyDocument(itemId);
+                   if (!srvResult.Success)
+                   {
+                       await transaction.RollbackAsync();
+                       return BadRequest(new
+                       {
+                           Error = srvResult.ErrorMessage
+                       });
+                   }
+                }
 
-            //     await transaction.CommitAsync();
-            // }
+                await transaction.CommitAsync();
+            }
 
-            return Ok();
+            return Ok(new { message = "Operation Successfull" }); 
         }
 
         [HttpPost("DeleteExpenseTransactionList")]

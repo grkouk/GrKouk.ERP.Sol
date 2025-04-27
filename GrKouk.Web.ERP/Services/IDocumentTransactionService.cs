@@ -10,27 +10,32 @@ using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace GrKouk.Web.ERP.Services;
 
 public interface IDocumentTransactionService
 {
     Task<IActionResult> AddBuyDocument(BuyDocCreateAjaxDto docTrans);
+    Task<ServiceResult> DeleteBuyDocument(int docId);
 }
 
 public class DocumentTransactionService : IDocumentTransactionService
 {
     private readonly ApiDbContext _context;
+    private readonly ILogger<DocumentTransactionService> _logger;
     private readonly IMapper _mapper;
 
-    public DocumentTransactionService(ApiDbContext context, IMapper mapper)
+    public DocumentTransactionService(ApiDbContext context, ILogger<DocumentTransactionService> logger, IMapper mapper)
     {
         _context = context;
+        _logger = logger;
         _mapper = mapper;
     }
 
     public async Task<IActionResult> AddBuyDocument(BuyDocCreateAjaxDto docTrans)
     {
+        _logger.LogInformation("AddBuyDocument");
         const string sectionCode = "SYS-BUY-MATERIALS-SCN";
         bool noWarehouseTrans = false;
         int newDocumentId = 0;
@@ -63,7 +68,9 @@ public class DocumentTransactionService : IDocumentTransactionService
 
         // Check if a transaction is already active
         bool ownsTransaction = _context.Database.CurrentTransaction == null;
-        var transaction = ownsTransaction ? await _context.Database.BeginTransactionAsync() : _context.Database.CurrentTransaction;
+        var transaction = ownsTransaction
+            ? await _context.Database.BeginTransactionAsync()
+            : _context.Database.CurrentTransaction;
 
         try
         {
@@ -275,7 +282,7 @@ public class DocumentTransactionService : IDocumentTransactionService
                     try
                     {
                         await _context.SaveChangesAsync();
-                       // throw new Exception("Test");;
+                        // throw new Exception("Test");;
                     }
                     catch (Exception e)
                     {
@@ -288,7 +295,7 @@ public class DocumentTransactionService : IDocumentTransactionService
                         });
                     }
 
-                    
+
                     if (paymentCfAccountId > 0)
                     {
                         var defaultCfaSeriesId = transTransactorPayOffSeries.DefaultCfaTransSeriesId;
@@ -532,5 +539,72 @@ public class DocumentTransactionService : IDocumentTransactionService
         }
 
         return new OkObjectResult(newDocumentId);
+    }
+
+    public async Task<ServiceResult> DeleteBuyDocument(int docId)
+    {
+        if (docId < 0)
+        {
+            return ServiceResult.Error("No Document Id", "ARGUMENT_ERROR");
+        }
+
+        // Check if a transaction is already active
+        bool ownsTransaction = _context.Database.CurrentTransaction == null;
+        var transaction = ownsTransaction
+            ? await _context.Database.BeginTransactionAsync()
+            : _context.Database.CurrentTransaction;
+
+
+        var buyDocument = await _context.BuyDocuments.FindAsync(docId);
+        if (buyDocument == null)
+        {
+            return ServiceResult.Error("No Document Found", "NOT_FOUND");
+        }
+
+
+        try
+        {
+            _context.BuyDocLines.RemoveRange(_context.BuyDocLines.Where(p => p.BuyDocumentId == docId));
+            _context.TransactorTransactions.RemoveRange(_context.TransactorTransactions.Where(p =>
+                p.CreatorSectionId == buyDocument.SectionId && p.CreatorId == docId));
+            _context.CashFlowAccountTransactions.RemoveRange(
+                _context.CashFlowAccountTransactions.Where(p =>
+                    p.CreatorSectionId == buyDocument.SectionId && p.CreatorId == docId));
+            _context.WarehouseTransactions.RemoveRange(
+                _context.WarehouseTransactions.Where(p => p.SectionId == buyDocument.SectionId && p.CreatorId == docId));
+            _context.BuyDocTransPaymentMappings.RemoveRange(
+                _context.BuyDocTransPaymentMappings.Where(p => p.BuyDocumentId == docId));
+            var syncDoc = await _context.SyncBuyDocuments.SingleOrDefaultAsync(p => p.ErpId == buyDocument.Id);
+            if (syncDoc is not null)
+            {
+                var syncLog = await _context.SynchronizationLogs.SingleOrDefaultAsync(p => p.EntityId == syncDoc.Id);
+                if (syncLog is not null)
+                {
+                    _context.SynchronizationLogs.Remove(syncLog);
+                }
+
+                _context.SyncBuyDocuments.Remove(syncDoc);
+            }
+
+            _context.BuyDocuments.Remove(buyDocument);
+
+            await _context.SaveChangesAsync();
+            if (ownsTransaction) await transaction.CommitAsync();
+        }
+        catch (Exception ex)
+        {
+            if (ownsTransaction) await transaction.RollbackAsync();
+            string msg = $"Error  {ex.Message} inner exception->{ex.InnerException?.Message}";
+            return ServiceResult.Error(msg, "ERROR");
+        }
+        finally
+        {
+            // Dispose the transaction only if we created it
+            if (ownsTransaction && transaction != null)
+            {
+                await transaction.DisposeAsync();
+            }
+        }
+        return ServiceResult.Ok();
     }
 }
