@@ -189,6 +189,7 @@ public class DocumentTransactionService : IDocumentTransactionService
                 try
                 {
                     await _context.SaveChangesAsync();
+                    //throw new Exception("Test");;
                 }
                 catch (Exception e)
                 {
@@ -274,7 +275,7 @@ public class DocumentTransactionService : IDocumentTransactionService
                     try
                     {
                         await _context.SaveChangesAsync();
-                        //throw new Exception("Test");;
+                       // throw new Exception("Test");;
                     }
                     catch (Exception e)
                     {
