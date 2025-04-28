@@ -1992,6 +1992,13 @@ namespace GrKouk.Web.ERP.Controllers
         [HttpPost("MaterialBuyDoc")]
         public async Task<IActionResult> PostMaterialBuyDocV2([FromBody] BuyDocCreateAjaxDto data)
         {
+            if (data == null)
+            {
+                return BadRequest(new
+                {
+                    error = "Empty request data"
+                });
+            }
             return await _docTransSrv.AddBuyDocument(data);
 
            
@@ -2508,6 +2515,19 @@ namespace GrKouk.Web.ERP.Controllers
 
 
         [HttpPost("MaterialBuyDocUpdate")]
+        public async Task<IActionResult> ModifyBuyDocV2([FromBody] BuyDocModifyAjaxDto data)
+        {
+            // New version for PutMaterialBuyDoc
+            // i have renamed it 
+            if (data == null)
+            {
+                return BadRequest(new
+                {
+                    error = "Empty request data"
+                });
+            }
+            return await _docTransSrv.ModifyBuyDocument(data);
+        }
         public async Task<IActionResult> PutMaterialBuyDoc([FromBody] BuyDocModifyAjaxDto data)
         {
             const string sectionCode = "SYS-BUY-MATERIALS-SCN";
