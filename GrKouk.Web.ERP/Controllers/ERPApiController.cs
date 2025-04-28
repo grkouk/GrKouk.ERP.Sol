@@ -1244,7 +1244,13 @@ namespace GrKouk.Web.ERP.Controllers
                     error = "No Documents to sync"
                 });
             }
-
+            if (request.Items.Count == 0)
+            {
+                return BadRequest(new
+                {
+                    error = "List has no documents to sync"
+                });
+            }
             #endregion
             #region Boiler Plate Code
             _logger.LogInformation("SyncBuyDocuments");
