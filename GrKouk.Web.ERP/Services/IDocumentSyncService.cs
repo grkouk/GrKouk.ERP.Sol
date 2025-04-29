@@ -75,7 +75,7 @@ public class SyncBusinessDocService : IDocumentSyncService
 
         var syncId = syncSessionId ?? Guid.NewGuid();
         var syncSource = "MAUI Client"; // Source of the sync operation
-        var syncMerchItemCode = "SYNCMERCH";
+        string syncMerchItemCode = string.Empty;;
         int syncMerchitemId = 0;
         string paymentMethodCashCode = "Μετρητοίς";
         int paymentMethodCashId = 0;
@@ -88,7 +88,19 @@ public class SyncBusinessDocService : IDocumentSyncService
         int paymentMethodId = 0;
 
         #endregion
+        #region Find Doc series id
 
+        (docSeriesId,syncMerchItemCode) = await FindDocSeriesIdForBusDocIdAndCompanyCode(request.BuyDocDefId, request.CompanyCode);
+        switch (docSeriesId)
+        {
+            case -1:
+                return ServiceResult.Error("Default Doc Series not found", "BADREQUEST");
+
+            case -2:
+                return ServiceResult.Error("Business Doc Id is not syncable (yet)", "BADREQUEST");
+        }
+
+        #endregion
         #region Get default Merch item id
 
         syncMerchitemId = await FindWarehouseItemIdByCode(syncMerchItemCode);
@@ -114,21 +126,7 @@ public class SyncBusinessDocService : IDocumentSyncService
         }
 
         #endregion
-
-        #region Find Doc series id
-
-        docSeriesId = await FindDocSeriesIdForBusDocIdAndCompanyCode(request.BuyDocDefId, request.CompanyCode);
-        switch (docSeriesId)
-        {
-            case -1:
-                return ServiceResult.Error("Default Doc Series not found", "BADREQUEST");
-
-            case -2:
-                return ServiceResult.Error("Business Doc Id is not syncable (yet)", "BADREQUEST");
-        }
-
-        #endregion
-
+       
         #region "Find Synced Supplier"
 
         (syncSupplierId, syncSupplierName) = await FindSyncedErpSupplierId(request.SupplierId);
@@ -151,7 +149,11 @@ public class SyncBusinessDocService : IDocumentSyncService
             paymentMethodId = paymentMethodPistosiId;
         }
 
-        await using var transaction = await _context.Database.BeginTransactionAsync();
+        // Check if a transaction is already active
+        bool ownsTransaction = _context.Database.CurrentTransaction == null;
+        var transaction = ownsTransaction
+            ? await _context.Database.BeginTransactionAsync()
+            : _context.Database.CurrentTransaction;
         try
         {
             BuyDocLineAjaxDto docLine = new BuyDocLineAjaxDto
@@ -191,7 +193,7 @@ public class SyncBusinessDocService : IDocumentSyncService
             var result = await _docTransSrv.AddBuyDocument(docTrans);
             if (result is BadRequestObjectResult badRequestResult)
             {
-                await transaction.RollbackAsync();
+                if (ownsTransaction) await transaction.RollbackAsync();
                 return ServiceResult.Error(badRequestResult.Value.ToString(), "BADREQUEST");;
             }
 
@@ -242,13 +244,13 @@ public class SyncBusinessDocService : IDocumentSyncService
 
             try
             {
-                await _context.SaveChangesAsync();
+                if (ownsTransaction) await _context.SaveChangesAsync();
                 // throw new Exception("Test");
                 addedCount++;
             }
             catch (Exception ex)
             {
-                await transaction.RollbackAsync();
+                if (ownsTransaction) await transaction.RollbackAsync();
                 _logger.LogError("An error occurred during synchronization: {Error}", ex.Message);
                 failedToAddCount++;
                 return ServiceResult.Error($"Error:{ex.Message}");
@@ -256,15 +258,22 @@ public class SyncBusinessDocService : IDocumentSyncService
 
 
             await _context.SaveChangesAsync();
-            await transaction.CommitAsync();
+            if (ownsTransaction) await transaction.CommitAsync();
         }
         catch (Exception ex)
         {
-            await transaction.RollbackAsync();
+            if (ownsTransaction) await transaction.RollbackAsync();
             _logger.LogError("An error occurred during synchronization: {Error}", ex.Message);
             return ServiceResult.Error($"Error:{ex.Message}");
         }
-
+        finally
+        {
+            // Dispose the transaction only if we created it
+            if (ownsTransaction && transaction != null)
+            {
+                await transaction.DisposeAsync();
+            }
+        }
 
         var res = new ErpSynchronizationResponse<SyncBuyDocument>
         {
@@ -281,9 +290,14 @@ public class SyncBusinessDocService : IDocumentSyncService
         };
         return ServiceResult.Ok(res);
     }
-
-    private async Task<int> FindDocSeriesIdForBusDocIdAndCompanyCode(int busBuyDocDefId, string companyCode)
+#region Helper Methods
+    private async Task<(int docId,string merchCode)> FindDocSeriesIdForBusDocIdAndCompanyCode(int busBuyDocDefId, string companyCode)
     {
+        //To use for ilika in timologio agoron
+        const string syncMerchItemCode = "SYNCMERCH";
+        //To use for ipiresia in timologio paroxis
+        const string syncMerchYpiresiaItemCode = "ΥΠΕΙΚ";
+        string merchItemCode = string.Empty;
         const int busDocTypeTimologioAgId = 9;
         const int busDocTypePistorikoEpId = 17;
         const int busDocTypeTimParYpiresionAgId = 11;
@@ -295,24 +309,27 @@ public class SyncBusinessDocService : IDocumentSyncService
         {
             case busDocTypeTimologioAgId:
                 docSeriesCode = docSeriesTimAgCode;
+                merchItemCode = syncMerchItemCode;
                 break;
             case busDocTypePistorikoEpId:
                 docSeriesCode = docSeriesPistotikoEpAgCode;
+                merchItemCode = syncMerchItemCode;
                 break;
             case busDocTypeTimParYpiresionAgId:
                 docSeriesCode = docSeriesTimParYpiresionikoAgCode;
+                merchItemCode = syncMerchYpiresiaItemCode;
                 break;
             default:
-                return -2;
+                return (-2, string.Empty);
         }
 
         var docSeries = await _context.BuyDocSeriesDefs.SingleOrDefaultAsync(p => p.Code == docSeriesCode);
         if (docSeries == null)
         {
-            return -1;
+            return (-1, string.Empty);
         }
 
-        return docSeries.Id;
+        return (docSeries.Id, merchItemCode) ;
     }
 
     private async Task<int> FindCompanyIdByCode(string companyCode)
@@ -359,4 +376,5 @@ public class SyncBusinessDocService : IDocumentSyncService
 
         return (syncSupplier.ErpId, syncSupplier.Name);
     }
+    #endregion
 }
