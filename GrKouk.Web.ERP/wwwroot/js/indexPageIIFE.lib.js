@@ -921,6 +921,93 @@ var indPgLib = (function () {
             });
         });
     };
+    const callExportToPdfEndpoint = function (
+        pgIndex, pgSize, sortData, dateRange,
+        companyFlt, searchFlt, currencyFlt,
+        transTypeFlt, wrItmNatureFlt, transactorId,
+        warehouseItemId, diaryId, cfaId, showCarryOnFlt,
+        showSummaryFlt, showDisplayLinesWithZeroesFlt,
+        materialCategoriesFlt, sectionsFlt
+    ) {
+        let uri = indexPageDefinition.pdfExportUri;
+
+        if (!uri) {
+            return Promise.reject("Export URI is not defined.");
+        }
+
+        uri += `?pageIndex=${pgIndex}`;
+        uri += `&pageSize=${pgSize}`;
+        uri += `&companyFilter=${companyFlt}`;
+        uri += `&dateRange=${dateRange}`;
+        uri += `&sortData=${sortData}`;
+        uri += `&searchFilter=${searchFlt}`;
+        uri += `&transactorTypeFilter=${transTypeFlt}`;
+        uri += `&warehouseItemNatureFilter=${wrItmNatureFlt}`;
+        uri += `&transactorId=${transactorId}`;
+        uri += `&cashFlowAccountId=${cfaId}`;
+        uri += `&showCarryOnAmountsInTabs=${showCarryOnFlt}`;
+        uri += `&showSummaryFilter=${showSummaryFlt}`;
+        uri += `&showDisplayLinesWithZeroes=${showDisplayLinesWithZeroesFlt}`;
+        uri += `&warehouseItemId=${warehouseItemId}`;
+        uri += `&materialCategoriesFilter=${materialCategoriesFlt}`;
+        uri += `&sectionsFilter=${sectionsFlt}`;
+        uri += `&diaryId=${diaryId}`;
+        uri += `&displayCurrencyId=${currencyFlt}`;
+
+        var timeout;
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                type: "GET",
+                url: uri,
+                xhrFields: {
+                    responseType: 'blob' // Tell jQuery to expect a binary file
+                },
+                success: function (data) {
+                    // Use predefined filename directly
+                    const filename = "FinancialReport.pdf";
+
+                    // Create a download link for the file
+                    const blob = new Blob([data], { type: 'application/pdf' });
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    resolve(data);
+                },
+                error: function (error) {
+                    reject(error);
+                },
+                beforeSend: function () {
+                    if (timeout) {
+                        clearTimeout(timeout);
+                    }
+                    timeout = setTimeout(function () {
+                        spinnerLoaderShow();
+                        indexPageSpinnerShow();
+                    }, 1000);
+                },
+                complete: function () {
+                    if (timeout) {
+                        clearTimeout(timeout);
+                    }
+
+                    setTimeout(function () {
+                        var isOpen = spinnerLoaderIsVisible();
+                        if (isOpen) {
+                            spinnerLoaderHide();
+                        }
+                        isOpen = indexPageSpinnerIsVisible();
+                        if (isOpen) {
+                            indexPageSpinnerHide();
+                        }
+                    }, 2000);
+                },
+            });
+        });
+    };
     const bindDataToTable = (result, pgIndex) => {
         handlePagingUi(result.totalPages, result.totalRecords, pgIndex, result.hasPrevious, result.hasNext);
 
@@ -1095,7 +1182,24 @@ var indPgLib = (function () {
                 console.log(error);
             });
     };
+    const exportToPdfHandler = () => {
+        setFilterValues();
+        callExportToPdfEndpoint(pageIndexElement, pageSizeElement, tableCurrentSortElement
+            , datePeriodFilterElement, companyFilterElement, searchTextElement
+            , currencyFilterElement, transactorTypeFilterElement
+            , productNatureFilterElement, transactorIdFilterElement
+            , warehouseItemIdFilterElement, diaryIdFilterElement
+            , cfaIdFilterElement, showCarryOnFilterElement,
+            showSummaryFilterElement,showDisplayLinesWithZeroesFilterElement,materialCategoriesFilterElement, sectionsFilterElement)
+            .then((data) => {
+                console.log("PDF download started!");
 
+            })
+            .catch((error) => {
+                console.error("Error downloading PDF:", error);
+
+            });
+    };
     const addPagerElementEventListeners = () => {
         let pagerElements = document.getElementsByClassName("page-link");
         Array.from(pagerElements).forEach((item) => {
@@ -1254,6 +1358,7 @@ var indPgLib = (function () {
         getIndexPageDefinition: getIndexPageDefinition,
         setIndexPageDefinition: setIndexPageDefinition,
         refreshData: refreshTableData,
+        exportToPdfHandler: exportToPdfHandler,
         addPagerElementEventListeners: addPagerElementEventListeners,
         getTableCurrentSort: getTableCurrentSort,
         setTableCurrentSort: setTableCurrentSort,

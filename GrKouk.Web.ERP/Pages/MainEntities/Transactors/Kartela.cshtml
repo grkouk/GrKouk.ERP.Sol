@@ -12,10 +12,14 @@
 <h4>Καρτέλα @Model.TransactorName</h4>
 <div class="container ">
     <ul class="nav small justify-content-end ">
+        <li class="nav-item">
+            <a href="#" role="button" class="btn btn-sm btn-outline-secondary " id="ExportToPdf">Export To Pdf</a>
 
+        </li>
+       
         <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#filterCollapse" role="button" id="filtersToggle"
-                aria-expanded="false" aria-controls="filterCollapse">
+               aria-expanded="false" aria-controls="filterCollapse">
             </a>
         </li>
         <li class="nav-item">
@@ -25,7 +29,7 @@
         </li>
         <li class="nav-item dropdown " id="SelectedRowsActionsMenu">
             <a class="nav-link dropdown-toggle disabled" role="button" id="ddSelectedRowsActions" data-toggle="dropdown"
-                aria-haspopup="true" aria-expanded="false">Actions</a>
+               aria-haspopup="true" aria-expanded="false">Actions</a>
             <div class="dropdown-menu small">
 
                 <a class="dropdown-item" href="#">Another action</a>
@@ -292,10 +296,19 @@ true
 
                         indPgLib.refreshData();
                     }
+                },
+                {
+                    selector: '#ExportToPdf',
+                    event: 'click',
+                    handler: function (event) {
+
+                        indPgLib.exportToPdfHandler();
+                    }
                 }
             ];
             const indexPageDef = {
                 uri: '/api/GrKoukInfoApi/GetIndexTblDataTransactorAccountTab',
+                pdfExportUri: '/api/GrKoukInfoApi/GetIndexTblDataTransactorExportAccountTab',
                 currencyFormatter: formatterCurrency,
                 numberFormatter: formatterNumber,
                 colDefs: colDefs,

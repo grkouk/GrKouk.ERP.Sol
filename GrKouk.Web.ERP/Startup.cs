@@ -99,7 +99,7 @@ namespace GrKouk.Web.ERP
                     policy.RequireRole("Admin");      // The user must have the Admin role
                 });
 
-
+               
                 // Default (Web Cookie Authentication): No need to add schemes, relies on cookie
             });
 
@@ -140,6 +140,7 @@ namespace GrKouk.Web.ERP
 
             services.AddTransient<IDocumentTransactionService, DocumentTransactionService>();
             services.AddTransient<IDocumentSyncService, SyncBusinessDocService>();
+            services.AddTransient<PdfExportService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
