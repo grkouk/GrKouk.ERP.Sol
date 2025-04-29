@@ -69,9 +69,10 @@
 </div>
 @* <partial name="_CustomDateFilterPartial" /> *@
 <partial name="_LoadMePartial" />
+<partial name="_DeleteConfirmationPartial" />
 <!-- Modal Item selector for payments -->
 <div class="modal fade" id="itemSelector" tabindex="-1" role="dialog" aria-labelledby="itemsModalLabel"
-    aria-hidden="true" data-bs-keyboard="false">
+     aria-hidden="true" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
 
         <div class="modal-content">
@@ -110,12 +111,12 @@
                     <div class="row text-center">
                         <div class="col-11">
                             <input class="form-control form-control-sm" name="itemsSearchText" placeholder="Search text"
-                                type="text" />
+                                   type="text" />
 
                         </div>
                         <div class="col-1">
                             <span class="spinner-border spinner-border-sm text-primary" id="SpinnerLoader"
-                                style="display: none"></span>
+                                  style="display: none"></span>
                         </div>
 
                     </div>
@@ -143,8 +144,9 @@
         </div>
     </div>
 </div>
+
 @section Scripts
-    {
+{
     <script src="~/lib/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script src="~/js/moment.min.js"></script>
     <script src="~/js/definitions.js"></script>
@@ -243,8 +245,8 @@
                     totalKey: '',
                     grandTotalKey: '',
                     totalFormatter: '',
-                    sortKey: '',
-                    sortType: '',
+                    sortKey: 'RefNumberSort',
+                    sortType: 'alpha',
                     header: 'Ref Number',
                     text: '',
                     headerClass: 'small text-center d-none d-md-table-cell',
@@ -1215,7 +1217,7 @@
                         },
                         success: function (result) {
                             console.log(result);
-                            toastr.success("Delete", result.message);
+                            toastr.success("Delete Operation completed");
                             indPgLib.refreshData();
 
                         },
@@ -1249,10 +1251,14 @@
 
             $deleteSelectedRowsLink.on('click',
                 () => {
-                    deleteSelectedRows();
+                    $('#confirmDeleteModal').modal('show');
                 });
 
 
+            $('#confirmDelete').on('click', () => {
+                $('#confirmDeleteModal').modal('hide');
+                deleteSelectedRows();
+            });
 
             var currencyChanged = () => {
                 let curCurrencySelected = parseInt($('#CurrencySelector').val());
@@ -1290,5 +1296,5 @@
                 indPgLib.saveSettings('BuyDocIndexView');
             });
     </script>
+    @ScriptHelper.RenderScripts(HttpContext)
 }
-

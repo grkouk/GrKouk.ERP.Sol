@@ -220,6 +220,7 @@
 
             };
             const docSeriesChanged=()=>{
+                
                 const docSeriesId=$docSeriesEl.val();
                 const oldTransactorId=transactorSelectorEl.value;
                 //locate inside list selected docseriesid
@@ -259,10 +260,14 @@
                         }
 
                     }
-                    let cfaId = parseInt( a.defaultCfaId);
-                    if (cfaId!==NaN) {
-                        $cfAccountId.val(cfaId);
-                    }
+                    //Something is wrong here
+                    // if(oldCfaId==null || oldCfaId==NaN){
+                    //     let cfaId = parseInt( a.defaultCfaId);
+                    //     if (cfaId!==NaN) {
+                    //         $cfAccountId.val(cfaId);
+                    //     }    
+                    // }
+                    
 
                 } else {
                     console.log('Not Found');

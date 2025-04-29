@@ -3,20 +3,14 @@
 @model IndexModel
 
 @{
-    ViewData["Title"] = "Transactor Transactions";
+    ViewData["Title"] = "Synchronization Suppliers";
 }
-
 @section MyCss
-{
-    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/28.1.37/fluent.css"/>
-    <link rel="stylesheet" href="~/css/custom-checkbox.css"/>
-    <link rel="stylesheet" href="~/css/searchbar.css"/>
-    <link rel="stylesheet" href="~/css/spinner.css"/>
+    {
+    <link rel="stylesheet" href="~/css/custom-checkbox.css" />
+    <link rel="stylesheet" href="~/css/searchbar.css" />
 }
-
-
-
-<h4>Transactor Transactions Index</h4>
+<h4>Synchronization Suppliers</h4>
 
 <div class="container ">
     <ul class="nav small justify-content-end ">
@@ -24,8 +18,7 @@
             <a href="#" role="button" class="nav-link" id="CreateNew">Create New</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" data-bs-target="#filterCollapse" href="#filterCollapse"
-               role="button" id="filtersToggle"
+            <a class="nav-link" data-bs-toggle="collapse" data-bs-target="#filterCollapse" href="#filterCollapse" role="button" id="filtersToggle"
                aria-expanded="false" aria-controls="filterCollapse">
             </a>
         </li>
@@ -51,36 +44,25 @@
         </li>
     </ul>
 </div>
-@await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowSectionsFlt = true })
+@await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { })
 
 <div class="row mt-1">
-    <partial name="_PagerPartial"/>
+    <partial name="_PagerPartial" />
 </div>
-<table class="table table-bordered table-sm" id="myTable">
-    <thead class="thead-light">
-
-    </thead>
-    <tbody>
-    </tbody>
-
-</table>
+<partial name="_DataTable" />
 
 <div class="row">
-    <partial name="_PagerPartial"/>
+    <partial name="_PagerPartial" />
 </div>
-
-<!-- Modal -->
 <partial name="_LoadMePartial" />
 
 @section Scripts
 {
-    <script src="https://cdn.syncfusion.com/ej2/28.1.37/dist/ej2.min.js"></script>
-    <ejs-scripts></ejs-scripts>
     <script src="~/js/moment.min.js"></script>
     <script src="~/js/definitions.js"></script>
     <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
             let baseCulture = '@System.Globalization.CultureInfo.CurrentCulture.';
             var formatterCurrency = new Intl.NumberFormat(currentCulture,
@@ -102,8 +84,49 @@
             //#region Index page definition objects
             const colDefs = [
                 {
-                    key: 'transDate',
-                    responseKey: 'transDate',
+                    key: 'id',
+                    responseKey: 'id',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: 'label',
+                    grandTotalKey: 'label',
+                    totalFormatter: '',
+                    sortKey: '',
+                    sortType: 'alpha',
+                    header: 'Id',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {
+
+                    }
+                },
+                {
+                    key: 'name',
+                    responseKey: 'name',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: 'label',
+                    grandTotalKey: 'label',
+                    totalFormatter: '',
+                    sortKey: 'NameSort',
+                    sortType: 'alpha',
+                    header: 'Name',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {
+
+                    }
+                },
+                
+                {
+                    key: 'syncedAt',
+                    responseKey: 'syncedAt',
                     actualVal: '',
                     columnFormat: 'd',
                     totalKey: '',
@@ -117,83 +140,68 @@
                     class: 'small',
                     classWhenCondition: '',
                     classCondition: {},
-                    remoteReference: {}
+                    remoteReference: {
+                    }
                 },
+                
                 {
-                    key: 'transactorName',
-                    responseKey: 'transactorName',
+                    key: 'operationType',
+                    responseKey: 'operationType',
                     actualVal: '',
                     columnFormat: 't',
                     totalKey: 'label',
                     grandTotalKey: 'label',
                     totalFormatter: '',
-                    sortKey: 'TransactorNameSort',
+                    sortKey: '',
                     sortType: 'alpha',
-                    header: 'Transactor',
+                    header: 'Operation',
                     text: '',
                     headerClass: 'small text-center',
                     class: 'small',
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
-                        isRemoteReference: true,
-                        valueKey: 'transactorId',
-                        url: '@Url.Page("/mainentities/transactors/details")?id='
+
                     }
                 },
                 {
-                    key: 'transTransactorDocSeriesCode',
-                    responseKey: 'transTransactorDocSeriesCode',
+                    key: 'source',
+                    responseKey: 'source',
                     actualVal: '',
                     columnFormat: 't',
-                    totalKey: '',
-                    grandTotalKey: '',
+                    totalKey: 'label',
+                    grandTotalKey: 'label',
                     totalFormatter: '',
-                    sortKey: 'SeriesCodeSort',
+                    sortKey: '',
                     sortType: 'alpha',
-                    header: 'Series',
-                    text: '',
-                    headerClass: 'small text-center d-none d-md-table-cell',
-                    class: 'small d-none d-md-table-cell ',
-                    classWhenCondition: '',
-                    classCondition: {},
-                    remoteReference: {}
-                },
-                {
-                    key: 'transRefCode',
-                    responseKey: 'transRefCode',
-                    actualVal: '',
-                    columnFormat: 't',
-                    totalKey: '',
-                    grandTotalKey: '',
-                    totalFormatter: '',
-                    sortKey: 'RefNumberSort',
-                    sortType: 'alpha',
-                    header: 'Ref Number',
-                    text: '',
-                    headerClass: 'small text-center d-none d-md-table-cell',
-                    class: 'small d-none d-md-table-cell ',
-                    classWhenCondition: '',
-                    classCondition: {},
-                    remoteReference: {}
-                },
-                {
-                    key: 'sectionCode',
-                    responseKey: 'sectionCode',
-                    actualVal: '',
-                    columnFormat: 't',
-                    totalKey: '',
-                    grandTotalKey: '',
-                    totalFormatter: '',
-                    sortKey: 'SectionCodeSort',
-                    sortType: 'alpha',
-                    header: 'Section',
+                    header: 'Source',
                     text: '',
                     headerClass: 'small text-center',
-                    class: 'small ',
+                    class: 'small',
                     classWhenCondition: '',
                     classCondition: {},
-                    remoteReference: {}
+                    remoteReference: {
+
+                    }
+                },
+                {
+                    key: 'syncLogId',
+                    responseKey: 'syncLogId',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: '',
+                    sortType: 'alpha',
+                    header: 'Sync Log Id',
+                    text: '',
+                    headerClass: 'small text-center d-none d-md-table-cell',
+                    class: 'small d-none d-md-table-cell ',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {
+                    }
                 },
                 {
                     key: 'companyCode',
@@ -211,43 +219,8 @@
                     class: 'small ',
                     classWhenCondition: '',
                     classCondition: {},
-                    remoteReference: {}
-                },
-                {
-                    key: 'debitAmount',
-                    responseKey: 'debitAmount',
-                    actualVal: '',
-                    columnFormat: 'c',
-                    totalKey: 'sumOfDebit',
-                    grandTotalKey: 'grandSumOfDebit',
-                    totalFormatter: 'currency',
-                    sortKey: '',
-                    sortType: '',
-                    header: 'Debit',
-                    text: '',
-                    headerClass: 'small text-center',
-                    class: 'small text-end',
-                    classWhenCondition: '',
-                    classCondition: {},
-                    remoteReference: {}
-                },
-                {
-                    key: 'creditAmount',
-                    responseKey: 'creditAmount',
-                    actualVal: '',
-                    columnFormat: 'c',
-                    totalKey: 'sumOfCredit',
-                    grandTotalKey: 'grandSumOfCredit',
-                    totalFormatter: 'currency',
-                    sortKey: '',
-                    sortType: '',
-                    header: 'Credit',
-                    text: '',
-                    headerClass: 'small text-center',
-                    class: 'small text-end',
-                    classWhenCondition: '',
-                    classCondition: {},
-                    remoteReference: {}
+                    remoteReference: {
+                    }
                 }
             ];
             const actionColDefs = [
@@ -300,11 +273,11 @@
                     icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
                     uriType: 'funcHref', //funcUrl staticHref, staticUrl
                     urlKeys: [
-                        {key: 'id', valueKey: 'id'}
+                        { key: 'id', valueKey: 'id' }
                     ],
-                    uriFunc: function (col, valueSource) {
+                    uriFunc: function(col, valueSource) {
                         let retUri = '';
-                        if (valueSource.creatorSectionId > 0) {
+                        if (valueSource.creatorSectionId > 0 ) {
                             switch (valueSource.creatorSectionCode) {
                                 case "SCNSELLCOMBINED":
                                     retUri = `/transactions/sellmaterialdoc/Edit?id=${valueSource["creatorId"]}`;
@@ -312,7 +285,7 @@
                                 case "SCNBUYMATTRANS":
                                     retUri = `/transactions/buymaterialsdoc/Edit?id=${valueSource["creatorId"]}`;
                                     break;
-                                default:
+                            default:
                             }
 
                         } else {
@@ -392,11 +365,11 @@
                     icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
                     uriType: 'funcHref', //funcUrl staticHref, staticUrl
                     urlKeys: [
-                        {key: 'id', valueKey: 'id'}
+                        { key: 'id', valueKey: 'id' }
                     ],
-                    uriFunc: function (col, valueSource) {
+                    uriFunc: function(col, valueSource) {
                         let retUri = '';
-                        if (valueSource.creatorSectionId > 0) {
+                        if (valueSource.creatorSectionId > 0 ) {
                             switch (valueSource.creatorSectionCode) {
                                 case "SCNSELLCOMBINED":
                                     retUri = `/transactions/sellmaterialdoc/Edit?id=${valueSource["creatorId"]}`;
@@ -404,7 +377,7 @@
                                 case "SCNBUYMATTRANS":
                                     retUri = `/transactions/buymaterialsdoc/Edit?id=${valueSource["creatorId"]}`;
                                     break;
-                                default:
+                            default:
                             }
 
                         } else {
@@ -425,20 +398,20 @@
                     uri: ''
                 },
             ];
-            const tableHandlersToRegister = [];
+            const tableHandlersToRegister = [
+            ];
             const pageHandlersToRegister = [
                 {
                     selector: '#CurrencySelector',
                     event: 'change',
-                    handler: function (event) {
+                    handler: function(event) {
                         currencyChanged();
                         indPgLib.refreshData();
                     }
-                },
-
+                }
             ];
             const indexPageDef = {
-                uri: '/api/GrKoukInfoApi/GetIndexTblDataTransactorTrans',
+                uri: '/api/GrKoukInfoApi/GetIndexTblDataSyncSuppliers',
                 currencyFormatter: formatterCurrency,
                 numberFormatter: formatterNumber,
                 colDefs: colDefs,
@@ -458,7 +431,7 @@
                 var selectedRows = $rowSelectors.filter(':checked');
                 var idsToDelete = [];
                 $.each(selectedRows,
-                    function (key, value) {
+                    function(key, value) {
                         console.log(value);
                         var id = parseInt(value.dataset.itemid);
                         idsToDelete.push(id);
@@ -478,11 +451,11 @@
                         type: 'POST',
                         data: idsJs,
                         url: "/api/GrkoukInfoApi/DeletesellDoοοcumentsList",
-                        beforeSend: function () {
+                        beforeSend: function() {
                             if (timeout) {
                                 clearTimeout(timeout);
                             }
-                            timeout = setTimeout(function () {
+                            timeout = setTimeout(function() {
 
                                     $("#loadMe").modal({
                                         backdrop: "static", //remove ability to close modal with click
@@ -493,18 +466,18 @@
                                 1000);
 
                         },
-                        success: function (result) {
+                        success: function(result) {
                             console.log(result);
                             toastr.success("Delete", result.message);
                             refreshTableData();
 
                         },
-                        complete: function () {
+                        complete: function() {
                             if (timeout) {
                                 clearTimeout(timeout);
                             }
                             $("#loadMe").modal("hide");
-                            setTimeout(function () {
+                            setTimeout(function() {
                                     console.log('Checking for open modals');
                                     var isOpen = $('#loadMe').hasClass('show');
                                     if (isOpen) {
@@ -516,7 +489,7 @@
                                 },
                                 2000);
                         },
-                        error: function (e) {
+                        error: function(e) {
                             console.log(e);
                             toastr.error("Error", e.responseJSON.error);
 
@@ -551,42 +524,12 @@
                     console.log('Not found currency code for this id');
                 }
             };
-
             indPgLib.addPagerElementEventListeners();
             indPgLib.registerPageHandlers();
-            indPgLib.loadSettings('TransactorTransIndexView');
+            indPgLib.loadSettings('SyncSuppliersIndexView');
             //----------------
 
             indPgLib.handleFiltersUi();
-            const selectedSections = document.getElementById("SectionsFilterElm").ej2_instances[0];
-            let sectionsFilterValue = $('#SectionsFilter').val();
-            if (sectionsFilterValue != null && sectionsFilterValue.length > 0) {
-                selectedSections.value = JSON.parse( sectionsFilterValue);
-            }
-            selectedSections.changeOnBlur = false;
-            selectedSections.addEventListener("change", (event) => {
-                if ((event.value==null|| event.value.length===0) && event.oldValue.includes(0)) {
-                    return
-                }
-                if (event.value.includes(0)) {
-                    event.value = [0];
-                    selectedSections.value = [0];
-                }
-                var selected = JSON.stringify(event.value);
-                $('#SectionsFilter').val(selected);
-            });
-            selectedSections.addEventListener("blur", (event) => {
-                const allSectionsId = 0;
-                if (selectedSections.value == null || selectedSections.value.length === 0) {
-                    selectedSections.value = [allSectionsId];
-                }
-
-                indPgLib.refreshData();
-            });
-            selectedSections.addEventListener("close", (event) => {
-                indPgLib.refreshData();
-            });
-
             currencyChanged();
             indPgLib.refreshData();
             indPgLib.rowSelectorsUi();
@@ -595,8 +538,8 @@
         });
 
         $(window).on('beforeunload',
-            function (e) {
-                indPgLib.saveSettings('TransactorTransIndexView');
+            function(e) {
+                indPgLib.saveSettings('SyncSuppliersIndexView');
 
             });
     </script>

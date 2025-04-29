@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,12 +28,15 @@ namespace GrKouk.Web.ERP.Controllers
         private readonly ApiDbContext _context;
         private readonly ILogger<ErpApiController> _logger;
         private readonly IDocumentTransactionService _docTransSrv;
+        private readonly IDocumentSyncService _docSyncSrv;
 
-        public ErpApiController(ApiDbContext context, ILogger<ErpApiController> logger, IDocumentTransactionService docTransSrv)
+        public ErpApiController(ApiDbContext context, ILogger<ErpApiController> logger,
+            IDocumentTransactionService docTransSrv, IDocumentSyncService docSyncSrv)
         {
             _context = context;
             _logger = logger;
             _docTransSrv = docTransSrv;
+            _docSyncSrv = docSyncSrv;
         }
 
         [HttpPost("SyncBusinessItemFamilies")]
@@ -249,7 +253,7 @@ namespace GrKouk.Web.ERP.Controllers
         public async Task<IActionResult> SyncBusinessUnitsOfMeasurement(
             [FromBody] SyncBusinessUnitsOfMeasurementRequest request)
         {
-            // string mainEntityName = "MeasureUnit";
+            // string mainEntityName = "SyncUnitOfMeasurement";
             // string syncEntityName = "SyncUnitOfMeasurement";
             // _logger.LogInformation("SyncBusinessUnitsOfMeasurement");
             // int addedCount = 0;
@@ -465,8 +469,9 @@ namespace GrKouk.Web.ERP.Controllers
         {
             #region Boiler Plate Code
 
-            string mainEntityName = "BuyDocument";
-            string syncEntityName = "SyncBuyDocument";
+            string mainEntityName = SyncEntityNames.SyncBuyDocument;
+            string syncEntityName = SyncEntityNames.SyncBuyDocument;
+            ;
             _logger.LogInformation("SyncBuyDocuments");
             int addedCount = 0;
             int failedToAddCount = 0;
@@ -680,7 +685,7 @@ namespace GrKouk.Web.ERP.Controllers
         {
             #region BoilerPlate Code
 
-            string mainEntityName = "Transactor-Supplier";
+            string mainEntityName = "SyncSupplier";
             string syncEntityName = "SyncSupplier";
             _logger.LogInformation("SyncMatchedBusinessSuppliers");
             int addedCount = 0;
@@ -796,7 +801,7 @@ namespace GrKouk.Web.ERP.Controllers
         {
             // #region BoilerPlate Code
             //
-            // string mainEntityName = "Transactor";
+            // string mainEntityName = "SyncSupplier";
             // string syncEntityName = "SyncSupplier";
             // _logger.LogInformation("SyncBusinessSuppliers");
             // int addedCount = 0;
@@ -1119,12 +1124,22 @@ namespace GrKouk.Web.ERP.Controllers
 
             bool hasBeenSynced = false;
             bool hasSupplierBeenSynced = false;
+            bool hasPayedAmountEqualWithTotalAmountOrZero = false;
             try
             {
                 hasBeenSynced = _context.SyncBuyDocuments.Any(p =>
                     p.CompanyCode == businessCompanyCode && p.BusId == request.Id);
                 hasSupplierBeenSynced = _context.SyncSuppliers.Any(p =>
                     p.CompanyCode == businessCompanyCode && p.BusId == request.SupplierId);
+                if (request.PayedAmount == 0)
+                {
+                    hasPayedAmountEqualWithTotalAmountOrZero = true;
+                }
+                else
+                {
+                    decimal dif = request.PayedAmount - decimal.Abs(request.TotalAmount);
+                    hasPayedAmountEqualWithTotalAmountOrZero = decimal.Abs(dif) < 0.01m;
+                }
             }
             catch (Exception ex)
             {
@@ -1136,27 +1151,37 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
             string message = "Unknown condition";
-            if (!hasSupplierBeenSynced && !hasBeenSynced)
-            {
-                message = "Supplier and document have not been synced";
-            }
-
-            if (hasSupplierBeenSynced && !hasBeenSynced)
-            {
-                message = "Document has not been synced and supplier is synced";
-            }
-
             if (hasBeenSynced)
             {
                 message = "Document is synced";
             }
+            else
+            {
+                message = "Document is not synced-";
+                if (hasSupplierBeenSynced)
+                {
+                    message += "Supplier is synced-";
+                }
+                else
+                {
+                    message += "Supplier is not synced-";
+                }
 
+                if (hasPayedAmountEqualWithTotalAmountOrZero)
+                {
+                    message += "Payed amount Ok";
+                }
+                else
+                {
+                    message += "Payed amount is not equal with total amount";
+                }
+            }
 
             var res = new ErpCheckDocumentResponse()
             {
                 Message = message,
                 IsSynced = hasBeenSynced,
-                CanSync = !hasBeenSynced && hasSupplierBeenSynced,
+                CanSync = !hasBeenSynced && hasSupplierBeenSynced && hasPayedAmountEqualWithTotalAmountOrZero,
                 DocumentId = request.Id
             };
             return Ok(res);
@@ -1166,17 +1191,6 @@ namespace GrKouk.Web.ERP.Controllers
         [Authorize(Policy = "ApiPolicy2")]
         public async Task<IActionResult> SyncAddBusinessBuyDocument([FromBody] SyncBusinessBuyDocumentRequest request)
         {
-            #region Boiler Plate Code
-
-            string mainEntityName = "BuyDocument";
-            string syncEntityName = "SyncBuyDocument";
-            _logger.LogInformation("SyncBusinessBuyDocumentRequest");
-            int addedCount = 0;
-            int failedToAddCount = 0;
-            int updatedCount = 0;
-            int failedToUpdateCount = 0;
-            int deletedCount = 0;
-            int failedToDeleteCount = 0;
             if (request == null)
             {
                 return BadRequest(new
@@ -1185,246 +1199,110 @@ namespace GrKouk.Web.ERP.Controllers
                 });
             }
 
-            if (string.IsNullOrEmpty(request.CompanyCode))
-            {
-                return BadRequest(new
-                {
-                    error = "No Company Code"
-                });
-            }
-
-            string businessCompanyCode = request.CompanyCode;
-            var company = await _context.Companies.SingleOrDefaultAsync(p => p.Code == businessCompanyCode);
-            if (company == null)
-            {
-                return BadRequest(new
-                {
-                    error = "No Company for this company code"
-                });
-            }
-
-            #endregion
-
-            int companyId = company.Id;
-
-            var syncSessionId = Guid.NewGuid(); // Unique session ID for this sync operation
-            var syncSource = "MAUI Client"; // Source of the sync operation
-            var syncMerchItemCode = "SYNCMERCH";
-            int syncMerchitemId = 0;
-            string paymentMethodCashCode = "Μετρητοίς";
-            int paymentMethodCashId = 0;
-            string paymentMethodPistosiCode = "Επι Πιστώσει";
-            int paymentMethodPistosiId = 0;
-            string docSeriesCode = "TIMDAAGSYNC";
-            int docSeriesId = 0;
-            int syncSupplierId = 0;
-            int paymentMethodId = 0;
-            await using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                #region Get default Merch item id
-
-                var merchItem = await _context.WarehouseItems.SingleOrDefaultAsync(p => p.Code == syncMerchItemCode);
-                if (merchItem == null)
+                var syncServiceResult = await _docSyncSrv.SyncAddBusinessBuyDocument(request);
+                if (syncServiceResult is null)
                 {
-                    return BadRequest(new
+                    return StatusCode(500, new
                     {
-                        error = "Default Merch item not found"
+                        error = "Internal server error occurred during business buy document synchronization"
                     });
                 }
 
-                syncMerchitemId = merchItem.Id;
-                var paymentCash = await _context.PaymentMethods.SingleOrDefaultAsync(p => p.Name == paymentMethodCashCode);
-                if (paymentCash == null)
+                if (!syncServiceResult.Success)
                 {
-                    return BadRequest(new
-                    {
-                        error = "Default Cash Payment not found"
-                    });
+                    return BadRequest(new { error = syncServiceResult.ErrorMessage });
                 }
 
-                paymentMethodCashId = paymentCash.Id;
-                
-                var paymentPistosi = await _context.PaymentMethods.SingleOrDefaultAsync(p => p.Name == paymentMethodPistosiCode);
-                if (paymentPistosi == null)
-                {
-                    return BadRequest(new
-                    {
-                        error = "Default Pistosi Payment not found"
-                    });
-                }
+                var res = syncServiceResult.Data;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.ToString() });
+            }
+        }
 
-                paymentMethodPistosiId = paymentPistosi.Id;
-                
-                var docSeries = await _context.BuyDocSeriesDefs.SingleOrDefaultAsync(p => p.Code == docSeriesCode);
-                if (docSeries == null)
-                {
-                    return BadRequest(new
-                    {
-                        error = "Default Doc Series not found"
-                    });
-                }
+        [HttpPost("SyncAddBusinessBuyDocuments")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public async Task<IActionResult> SyncAddBusinessBuyDocuments([FromBody]SyncBusinessEntityRequest<SyncBusinessBuyDocumentRequest> request)
+        {
+            #region Error Checking
 
-                docSeriesId = docSeries.Id;
-                
-                #endregion
-                #region "Find Synced Supplier"
-                var syncSupplier = await _context.SyncSuppliers.SingleOrDefaultAsync(p => p.BusId == request.SupplierId);
-                if (syncSupplier == null)
+            if (request == null)
+            {
+                return BadRequest(new
                 {
-                    return BadRequest(new
-                    {
-                        error = "Sync Supplier not found"
-                    });
-                }
-
-                syncSupplierId = syncSupplier.ErpId;
- 
-                string etiologyMessage =
-                    $"Synced Buy Document for {syncSupplier.Name} Transaction date {request.TransDate:dddd dd/MM/yyyy} Amount {request.TotalAmount:C2}";
-                if (request.PayedAmount > 0)
-                {
-                    paymentMethodId = paymentMethodCashId;
-                }
-                else
-                {
-                    paymentMethodId = paymentMethodPistosiId;
-                }
-                #endregion
-
-                BuyDocLineAjaxDto docLine = new BuyDocLineAjaxDto
-                {
-                    WarehouseItemId = syncMerchitemId,
-                    TransactionUnitId = 1,
-                    TransactionQuantity = 1,
-                    TransactionUnitFactor = 1,
-                    TransUnitPrice = request.TotalAmount,
-                    Q1 = 1,
-                    Q2 = 1,
-                    Price = request.TotalAmount,
-                    Amount = 0,
-                    AmountDiscount = 0,
-                    AmountExpenses = 0,
-                    DiscountRate = 0,
-                    MainUnitId = 1,
-                    SecUnitId = 1,
-                    Factor = 1,
-                    FpaRate = 0,
-
-
-                };
-                
-                var docTrans = new BuyDocCreateAjaxDto
-                {
-                    TransDate = request.TransDate,
-                    TransactorId = syncSupplierId,
-                    BuyDocSeriesId = docSeriesId,
-                    TransRefCode = request.RefNumber.ToString(),
-                    AmountDiscount = 0,
-                    Etiology = etiologyMessage,
-                    PaymentMethodId = paymentMethodId,
-                    CompanyId = companyId,
-                    BuyDocLines = new List<BuyDocLineAjaxDto> { docLine },
-                    AmountFpa = request.VatAmount,
-                    AmountNet = request.NetAmount,
-                    
-                };
-                var result = await _docTransSrv.AddBuyDocument(docTrans);
-                if (result is BadRequestObjectResult badRequestResult)
-                {
-                    await transaction.RollbackAsync();
-                    return BadRequest(badRequestResult.Value);
-                }
-
-                int newDocId = 0;
-                if (result is OkObjectResult okResult)
-                {
-                    newDocId = (int)okResult.Value;
-                }
-
-                var newSyncEntity = new SyncBuyDocument()
-                {
-                    Id = Guid.NewGuid(),
-                    BusId = request.Id,
-                    ErpId = newDocId,
-                    BuyDocDefId = request.BuyDocDefId,
-                    TransDate = request.TransDate,
-                    RefNumber = request.RefNumber,
-                    CompanyCode = request.CompanyCode,
-                    SupplierId = request.SupplierId,
-                    VatAmount = request.VatAmount,
-                    NetAmount = request.NetAmount,
-                    TotalAmount = request.TotalAmount,
-                    PayedAmount = request.PayedAmount,
-                    SourceChecksum = ChecksumHelper.CalculateChecksum(request.Id.ToString(),
-                        request.BuyDocDefId.ToString(),
-                        request.TransDate.ToString(CultureInfo.InvariantCulture),
-                        request.RefNumber.ToString(),
-                        request.CompanyCode,
-                        request.SupplierId.ToString(),
-                        request.VatAmount.ToString(CultureInfo.InvariantCulture),
-                        request.NetAmount.ToString(CultureInfo.InvariantCulture),
-                        request.TotalAmount.ToString(CultureInfo.InvariantCulture),
-                        request.PayedAmount.ToString(CultureInfo.InvariantCulture))
-                };
-                _context.SyncBuyDocuments.Add(newSyncEntity);
-                _context.SynchronizationLogs.Add(new SynchronizationLog
-                {
-                    Id = Guid.NewGuid(),
-                    SyncSessionId = syncSessionId,
-                    EntityName = mainEntityName,
-                    EntityId = newSyncEntity.Id,
-                    CompanyCode = newSyncEntity.CompanyCode,
-                    OperationType = "INSERT",
-                    Source = syncSource,
+                    error = "Empty request data"
                 });
-               
+            }
+            if (request.Items == null)
+            {
+                return BadRequest(new
+                {
+                    error = "No Documents to sync"
+                });
+            }
+            if (request.Items.Count == 0)
+            {
+                return BadRequest(new
+                {
+                    error = "List has no documents to sync"
+                });
+            }
+            #endregion
+            #region Boiler Plate Code
+            _logger.LogInformation("SyncBuyDocuments");
+            int addedCount = 0;
+            int failedToAddCount = 0;
+            int updatedCount = 0;
+            int failedToUpdateCount = 0;
+            int deletedCount = 0;
+            int failedToDeleteCount = 0;
+            Guid syncSessionId = Guid.NewGuid(); 
+            #endregion
+            foreach (var item in request.Items)
+            {
                 try
                 {
-                    await _context.SaveChangesAsync();
-                   // throw new Exception("Test");
+                    item.CompanyCode = request.CompanyCode;
+                    var syncServiceResult = await _docSyncSrv.SyncAddBusinessBuyDocument(item, syncSessionId);;
+                    if (syncServiceResult is null)
+                    {
+                       failedToAddCount++;
+                       continue;
+                    }
+                    if (!syncServiceResult.Success)
+                    {
+                       failedToAddCount++;
+                       continue;
+                    }
                     addedCount++;
                 }
                 catch (Exception ex)
                 {
-                    await transaction.RollbackAsync();
-                    _logger.LogError("An error occurred during synchronization: {Error}", ex.Message);
+                    Debug.WriteLine(ex.Message);
+                    _logger.LogError("An error occurred during document sync: {Error}", ex.Message);
                     failedToAddCount++;
-                    return BadRequest(new
-                    {
-                        error = "SyncBuyDoc error " + ex.Message
-                    });
                 }
-
-
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
+                
             }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                _logger.LogError("An error occurred during synchronization: {Error}", ex.Message);
-                return BadRequest(new
-                {
-                    error = "SyncAddBusinessBuyDocument error " + ex.Message
-                });
-            }
-
-
             var res = new ErpSynchronizationResponse<SyncBuyDocument>
             {
-                Message = "Document synced successfully",
+                Message = "SyncBuyDocuments",
                 AddedCount = addedCount,
                 FailedToAddCount = failedToAddCount,
                 UpdatedCount = updatedCount,
                 FailedToUpdateCount = failedToUpdateCount,
                 DeletedCount = deletedCount,
-                FailedToDeleteCount = failedToDeleteCount,
+                FailedToDeleteCount = failedToDeleteCount, 
                 SyncSessionId = syncSessionId,
-                SyncSource = syncSource,
-                // SyncItems = toInsert.Concat(toUpdate).Concat(toDelete).ToList()
+                //SyncSource = syncSource,
+                //SyncItems = toInsert.Concat(toUpdate).Concat(toDelete).ToList()
             };
             return Ok(res);
         }
+        
     }
 }

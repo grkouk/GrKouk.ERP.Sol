@@ -31,19 +31,7 @@
                 </a>
             </div>
         </li>
-        <li class="nav-item dropdown " id="IndexActionsMenu">
-            <a class="nav-link dropdown-toggle" role="button" id="ddIndexActionsActions" data-bs-toggle="dropdown"
-               aria-haspopup="true" aria-expanded="false">
-                Actions
-            </a>
-            <div class="dropdown-menu small">
-
-                <a class="dropdown-item" href="@Url.Page("./salesdiary")">Sales Diary</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">Separated link</a>
-
-            </div>
-        </li>
+       
         <li class="nav-item">
             <a class="nav-link" data-bs-toggle="collapse" data-bs-target="#filterCollapse" role="button" id="filtersToggle"
                aria-expanded="false" aria-controls="filterCollapse">
@@ -252,8 +240,8 @@
                     totalKey: '',
                     grandTotalKey: '',
                     totalFormatter: '',
-                    sortKey: '',
-                    sortType: '',
+                    sortKey: 'RefNumberSort',
+                    sortType: 'alpha',
                     header: 'Ref Number',
                     text: '',
                     headerClass: 'small text-center d-none d-md-table-cell',
@@ -1214,7 +1202,7 @@
 
             $deleteSelectedRowsLink.on('click',
                 () => {
-                    deleteSelectedRows();
+                   //deleteSelectedRows();
                 });
 
 
