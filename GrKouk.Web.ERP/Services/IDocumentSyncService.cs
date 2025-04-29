@@ -286,8 +286,10 @@ public class SyncBusinessDocService : IDocumentSyncService
     {
         const int busDocTypeTimologioAgId = 9;
         const int busDocTypePistorikoEpId = 17;
+        const int busDocTypeTimParYpiresionAgId = 11;
         const string docSeriesTimAgCode = "TIMDAAGSYNC";
         const string docSeriesPistotikoEpAgCode = "PISTIMAGSYNC";
+        const string docSeriesTimParYpiresionikoAgCode = "ΤΜΠΑΡΑΓΣΥΓΧ";
         string docSeriesCode;
         switch (busBuyDocDefId)
         {
@@ -296,6 +298,9 @@ public class SyncBusinessDocService : IDocumentSyncService
                 break;
             case busDocTypePistorikoEpId:
                 docSeriesCode = docSeriesPistotikoEpAgCode;
+                break;
+            case busDocTypeTimParYpiresionAgId:
+                docSeriesCode = docSeriesTimParYpiresionikoAgCode;
                 break;
             default:
                 return -2;
