@@ -6629,6 +6629,10 @@ namespace GrKouk.Web.ERP.Controllers
                 });
             }
 
+            await _context.Entry(transactor).Reference(p => p.TransactorType).LoadAsync();
+            string transactorName = transactor.Name;
+            string transactorTypeName= transactor.TransactorType?.Name;
+            string reportTitle = $"Καρτέλα {transactorTypeName} {transactorName}";
             var transactorType = await _context.TransactorTypes.Where(c => c.Id == transactor.TransactorTypeId)
                 .FirstOrDefaultAsync();
 
@@ -6982,7 +6986,7 @@ namespace GrKouk.Web.ERP.Controllers
             // });
             try
             {
-                var pdfBytes = _pdfService.GenerateFinancialPdf(listWithTotal ?? new());
+                var pdfBytes = _pdfService.GenerateFinancialPdf(listWithTotal ?? new(),reportTitle);
                 return File(pdfBytes, "application/pdf", "FinancialReport.pdf");
             }
             catch (Exception ex)
