@@ -6989,7 +6989,7 @@ namespace GrKouk.Web.ERP.Controllers
             // });
             try
             {
-                var pdfBytes = _pdfService.GenerateFinancialPdf(listWithTotal ?? new(),reportTitle);
+                var pdfBytes = _pdfService.GenerateTransactionPdf(listWithTotal ?? new(),reportTitle);
                 Response.Headers.Append("Content-Disposition", "inline; filename=FinancialReport.pdf");
 
                 return File(pdfBytes, "application/pdf");

@@ -1,88 +1,272 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using GrKouk.Erp.Domain.DocDefinitions;
 using GrKouk.Web.ERP.Helpers;
+using Microsoft.AspNetCore.Hosting;
+using Syncfusion.Drawing;
+using Syncfusion.Pdf;
+using Syncfusion.Pdf.Graphics;
+using Syncfusion.Pdf.Grid;
 
 namespace GrKouk.Web.ERP.Services;
 
-using QuestPDF.Fluent;
-using QuestPDF.Helpers;
-using QuestPDF.Infrastructure;
+// using QuestPDF.Fluent;
+// using QuestPDF.Helpers;
+// using QuestPDF.Infrastructure;
 using QuestPDF.Drawing;
 
 public class PdfExportService
 {
-    public byte[] GenerateFinancialPdf(List<KartelaLine> movements,string reportTitle)
+    private readonly IWebHostEnvironment _webHostEnvironment;
+
+    public PdfExportService(IWebHostEnvironment webHostEnvironment
+    )
     {
-        QuestPDF.Settings.License = LicenseType.Community; 
-        var document = Document.Create(container =>
+        _webHostEnvironment = webHostEnvironment;
+    }
+    // public byte[] GenerateFinancialPdf(List<KartelaLine> movements, string reportTitle)
+    // {
+    //     QuestPDF.Settings.License = LicenseType.Community;
+    //     var document = Document.Create(container =>
+    //     {
+    //         container.Page(page =>
+    //         {
+    //             page.Size(PageSizes.A4);
+    //             page.Margin(30);
+    //             page.DefaultTextStyle(x => x.FontSize(8));
+    //             page.Header().Row(row =>
+    //             {
+    //                 // Left: Logo
+    //                 // row.RelativeColumn().Image(logoPath, ImageScaling.FitHeight).Height(50);
+    //
+    //                 // Right: Title
+    //                 row.ConstantItem(500).AlignCenter().Text(reportTitle)
+    //                     .Bold().FontSize(12);
+    //                 row.Spacing(20);
+    //             });
+    //             page.Content().Table(table =>
+    //             {
+    //                 table.ColumnsDefinition(columns =>
+    //                 {
+    //                     columns.RelativeColumn(1); // Date
+    //                     columns.RelativeColumn(2); // Document Name
+    //                     columns.RelativeColumn(2); // Reference
+    //                     columns.RelativeColumn(1); // Debit
+    //                     columns.RelativeColumn(1); // Credit
+    //                     columns.RelativeColumn(1); // Total
+    //                 });
+    //
+    //                 // Header row
+    //                 table.Header(header =>
+    //                 {
+    //                     header.Cell().Element(CellStyle).Text("Date").AlignCenter().Bold();
+    //                     header.Cell().Element(CellStyle).Text("Document").AlignCenter().Bold();
+    //                     header.Cell().Element(CellStyle).Text("Reference").AlignCenter().Bold();
+    //                     header.Cell().Element(CellStyle).Text("Debit").AlignCenter().Bold();
+    //                     header.Cell().Element(CellStyle).Text("Credit").AlignCenter().Bold();
+    //                     header.Cell().Element(CellStyle).Text("Total").AlignCenter().Bold();
+    //                 });
+    //
+    //                 // Data rows
+    //                 foreach (var movement in movements)
+    //                 {
+    //                     table.Cell().Element(CellStyle).Text(movement.TransDate.ToShortDateString());
+    //                     table.Cell().Element(CellStyle).Text(movement.DocSeriesName);
+    //                     table.Cell().Element(CellStyle).Text(movement.RefCode);
+    //                     table.Cell().Element(CellStyle).AlignRight().Text($"{movement.Debit:C}");
+    //                     table.Cell().Element(CellStyle).AlignRight().Text($"{movement.Credit:C}");
+    //                     table.Cell().Element(CellStyle).AlignRight().Text($"{movement.RunningTotal:C}");
+    //                 }
+    //
+    //                 IContainer CellStyle(IContainer cont) =>
+    //                     cont.PaddingVertical(5).PaddingHorizontal(2);
+    //             });
+    //             page.Footer().Row(row =>
+    //             {
+    //                 row.RelativeItem().AlignLeft().Text($"Generated: {DateTime.Now:g}").FontSize(9);
+    //                 row.RelativeItem().AlignRight().Text(text =>
+    //                 {
+    //                     text.Span("Page ").FontSize(9);
+    //                     text.CurrentPageNumber().Bold();
+    //                     text.Span(" of ");
+    //                     text.TotalPages().Bold();
+    //                 });
+    //             });
+    //         });
+    //     });
+    //     //throw new Exception("Test error from pdf export");
+    //     return document.GeneratePdf();
+    // }
+
+
+    public byte[] GenerateTransactionPdf(List<KartelaLine> items, string reportTitle)
+    {
+        using (PdfDocument document = new PdfDocument())
         {
-            container.Page(page =>
+            document.PageSettings.Size = PdfPageSize.A4;
+            // Load a Unicode-compatible TrueType font from embedded resource
+            PdfFont titleFont;;
+            PdfFont bodyFont;;
+            PdfFont bodyTitleFont;
+            PdfFont footerFont;
+            string fontFilePath = Path.Combine(_webHostEnvironment.WebRootPath, "fonts","NotoSans-Regular.ttf" );
+            if (!File.Exists(fontFilePath))
             {
-                page.Size(PageSizes.A4);
-                page.Margin(30);
-                page.DefaultTextStyle(x => x.FontSize(8));
-                page.Header().Row(row =>
+                throw new FileNotFoundException($"The file 'NotoSans-Regular.ttf' was not found in 'wwwroot/fonts'.");
+            }
+            FileStream fontStream = new FileStream(fontFilePath, FileMode.Open, FileAccess.Read);
+            //Create a new PDF font instance 
+           
+
+          
+                    PdfTrueTypeFont titleFont1 = new PdfTrueTypeFont(fontStream, 14, PdfFontStyle.Bold);;
+                    PdfTrueTypeFont bodyFont1 = new PdfTrueTypeFont(fontStream, 8);
+                    PdfTrueTypeFont bodyTitleFont1 = new PdfTrueTypeFont(fontStream, 8,PdfFontStyle.Bold);
+                    PdfTrueTypeFont footerFont1 = new PdfTrueTypeFont(fontStream, 8);
+                    titleFont = titleFont1;
+                    bodyFont = bodyFont1;
+                    bodyTitleFont = bodyTitleFont1;
+                    footerFont = footerFont1;
+            
+            // Add a page
+            PdfPage page = document.Pages.Add();
+            RectangleF bounds = new RectangleF(0, 0, document.Pages[0].GetClientSize().Width, 50);
+            // Create header template
+            PdfPageTemplateElement header = new PdfPageTemplateElement(bounds);
+            header.Graphics.DrawString(reportTitle, titleFont, PdfBrushes.Black, new PointF(0, 10));
+
+            // Apply header to all pages
+            document.Template.Top = header;
+            PdfPageTemplateElement footer = new PdfPageTemplateElement(document.PageSettings.Width, 40);
+           
+            string currentDate = $"Generated: {DateTime.Now:g}";
+            footer.Graphics.DrawString(currentDate, footerFont, PdfBrushes.Black, new PointF(0, 20));
+
+            // Draw pagination on the right
+            PdfPageNumberField pageNumber = new PdfPageNumberField
+            {
+                Font = footerFont,
+                Brush = PdfBrushes.Black
+            };
+            PdfPageCountField pageCount = new PdfPageCountField
+            {
+                Font = footerFont,
+                Brush = PdfBrushes.Black
+            };
+            PdfCompositeField pagination = new PdfCompositeField(footerFont, PdfBrushes.Black, "Page {0} of {1}", pageNumber, pageCount);
+            // PdfCompositeField pagination = new PdfCompositeField
+            // {
+            //     Font = footerFont,
+            //     Brush = PdfBrushes.Black,
+            //     Text = "Page {0} of {1}",
+            //     AutomaticFields = [pageNumber, pageCount]
+            // };
+            SizeF pageSize = document.PageSettings.Size;
+            pagination.Draw(footer.Graphics, new PointF(pageSize.Width - 150, 20));
+
+            // Apply footer to all pages
+            document.Template.Bottom = footer;
+            
+            //Create a Page template that can be used as footer.
+            // PdfPageTemplateElement footer = new PdfPageTemplateElement(bounds);
+            // PdfFont font = new PdfStandardFont(PdfFontFamily.Helvetica, 7);
+            // PdfBrush brush = new PdfSolidBrush(Syncfusion.Drawing.Color.Black);
+            // //Create page number field.
+            // PdfPageNumberField pageNumber = new PdfPageNumberField(font, brush);
+            // //Create page count field.
+            // PdfPageCountField count = new PdfPageCountField(font, brush);
+            // //Add the fields in composite fields.
+            // PdfCompositeField compositeField = new PdfCompositeField(font, brush, "Page {0} of {1}", pageNumber, count);
+            // compositeField.Bounds = footer.Bounds;
+            // //Draw the composite field in footer.
+            // compositeField.Draw(footer.Graphics, new PointF(470, 40));
+            // //Add the footer template at the bottom.
+            // document.Template.Bottom = footer;
+            
+            
+            PdfGraphics graphics = page.Graphics;
+
+
+            // Create PDF grid
+            PdfGrid pdfGrid = new PdfGrid();
+
+            // Create data source
+            List<object> data = new List<object>();
+            foreach (var item in items)
+            {
+                data.Add(new
                 {
-                    // Left: Logo
-                   // row.RelativeColumn().Image(logoPath, ImageScaling.FitHeight).Height(50);
-
-                    // Right: Title
-                    row.ConstantItem(500).AlignCenter().Text(reportTitle)
-                        .Bold().FontSize(12);
-                    row.Spacing(20);
+                    TransactionDate = item.TransDate.ToString("dd-MM-yyyy"),
+                    DocumentName = item.DocSeriesName,
+                    ReferenceNumber = item.RefCode,
+                    Debit = item.Debit.ToString("C"),
+                    Credit = item.Credit.ToString("C"),
+                    RunningTotal = item.RunningTotal.ToString("C")
                 });
-                page.Content().Table(table =>
-                {
-                    table.ColumnsDefinition(columns =>
-                    {
-                        columns.RelativeColumn(1); // Date
-                        columns.RelativeColumn(2); // Document Name
-                        columns.RelativeColumn(2); // Reference
-                        columns.RelativeColumn(1); // Debit
-                        columns.RelativeColumn(1); // Credit
-                        columns.RelativeColumn(1); // Total
-                    });
+            }
 
-                    // Header row
-                    table.Header(header =>
-                    {
-                        header.Cell().Element(CellStyle).Text("Date").AlignCenter().Bold();
-                        header.Cell().Element(CellStyle).Text("Document").AlignCenter().Bold();
-                        header.Cell().Element(CellStyle).Text("Reference").AlignCenter().Bold();
-                        header.Cell().Element(CellStyle).Text("Debit").AlignCenter().Bold();
-                        header.Cell().Element(CellStyle).Text("Credit").AlignCenter().Bold();
-                        header.Cell().Element(CellStyle).Text("Total").AlignCenter().Bold();
-                    });
+            // Assign data source
+            pdfGrid.DataSource = data;
+            // Set custom column widths
+            pdfGrid.Columns[0].Width = 80; 
+            pdfGrid.Columns[1].Width = 135; 
+            pdfGrid.Columns[2].Width = 90;  // ReferenceNumber (wider)
+            pdfGrid.Columns[3].Width = 70;  // Debit (narrow)
+            pdfGrid.Columns[4].Width = 70;  // Credit (narrow)
+            pdfGrid.Columns[5].Width = 70;  // RunningTotal (narrow)
+            // Customize header text
+            PdfGridRow rowHeader = pdfGrid.Headers[0];
+            rowHeader.Cells[0].Value = "Ημ/νία";
+            rowHeader.Cells[1].Value = "Παραστατικό";
+            rowHeader.Cells[2].Value = "Αρ.Παρ.";
+            rowHeader.Cells[3].Value = "Χρέωση";
+            rowHeader.Cells[4].Value = "Πίστωση";
+            rowHeader.Cells[5].Value = "Υπόλοιπο";
 
-                    // Data rows
-                    foreach (var movement in movements)
-                    {
-                        table.Cell().Element(CellStyle).Text(movement.TransDate.ToShortDateString());
-                        table.Cell().Element(CellStyle).Text(movement.DocSeriesName);
-                        table.Cell().Element(CellStyle).Text(movement.RefCode);
-                        table.Cell().Element(CellStyle).AlignRight().Text($"{movement.Debit:C}");
-                        table.Cell().Element(CellStyle).AlignRight().Text($"{movement.Credit:C}");
-                        table.Cell().Element(CellStyle).AlignRight().Text($"{movement.RunningTotal:C}");
-                    }
+            // Apply header style
+            PdfGridCellStyle headerStyle = new PdfGridCellStyle
+            {
+                BackgroundBrush = PdfBrushes.LightGray,
+                Font = bodyTitleFont,
+            };
+            for (int i = 0; i < rowHeader.Cells.Count; i++)
+            {
+                rowHeader.Cells[i].Style = headerStyle;
+            }
+            // Apply cell style with right alignment for Debit and Credit columns
+            PdfGridCellStyle numberCellStyle = new PdfGridCellStyle
+            {
+                Font = bodyFont,
+                StringFormat = new PdfStringFormat(PdfTextAlignment.Right)
+            };
+            foreach (PdfGridRow row in pdfGrid.Rows)
+            {
+                row.Cells[3].Style = numberCellStyle; // Debit
+                row.Cells[4].Style = numberCellStyle; // Credit
+                row.Cells[5].Style = numberCellStyle; // Running Total
+            }
+            // Customize grid style
+            PdfGridStyle gridStyle = new PdfGridStyle
+            {
+                CellPadding = new PdfPaddings(5, 5, 5, 5),
+                BackgroundBrush = PdfBrushes.White,
+                TextBrush = PdfBrushes.Black,
+                Font = bodyFont,
+            };
+            pdfGrid.Style = gridStyle;
 
-                    IContainer CellStyle(IContainer cont) =>
-                        cont.PaddingVertical(5).PaddingHorizontal(2);
-                });
-                page.Footer().Row(row =>
-                {
-                    row.RelativeItem().AlignLeft().Text($"Generated: {DateTime.Now:g}").FontSize(9);
-                    row.RelativeItem().AlignRight().Text(text =>
-                    {
-                        text.Span("Page ").FontSize(9);
-                        text.CurrentPageNumber().Bold();
-                        text.Span(" of ");
-                        text.TotalPages().Bold();
-                    });
-                });
-            });
-        });
-        //throw new Exception("Test error from pdf export");
-        return document.GeneratePdf();
+            // Draw grid on the page
+            pdfGrid.Draw(page, new PointF(0, 50));
+
+            // Save to memory stream
+            using (MemoryStream stream = new MemoryStream())
+            {
+                document.Save(stream);
+                return stream.ToArray();
+            }
+        }
     }
 }
