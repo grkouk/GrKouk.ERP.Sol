@@ -104,169 +104,159 @@ public class PdfExportService
 
     public byte[] GenerateTransactionPdf(List<KartelaLine> items, string reportTitle)
     {
-        using (PdfDocument document = new PdfDocument())
+        try
         {
-            document.PageSettings.Size = PdfPageSize.A4;
-            // Load a Unicode-compatible TrueType font from embedded resource
-            PdfFont titleFont;;
-            PdfFont bodyFont;;
-            PdfFont bodyTitleFont;
-            PdfFont footerFont;
-            string fontFilePath = Path.Combine(_webHostEnvironment.WebRootPath, "fonts","NotoSans-Regular.ttf" );
-            if (!File.Exists(fontFilePath))
+            using (PdfDocument document = new PdfDocument())
             {
-                throw new FileNotFoundException($"The file 'NotoSans-Regular.ttf' was not found in 'wwwroot/fonts'.");
-            }
-            FileStream fontStream = new FileStream(fontFilePath, FileMode.Open, FileAccess.Read);
-            //Create a new PDF font instance 
-           
-
-          
-                    PdfTrueTypeFont titleFont1 = new PdfTrueTypeFont(fontStream, 14, PdfFontStyle.Bold);;
-                    PdfTrueTypeFont bodyFont1 = new PdfTrueTypeFont(fontStream, 8);
-                    PdfTrueTypeFont bodyTitleFont1 = new PdfTrueTypeFont(fontStream, 8,PdfFontStyle.Bold);
-                    PdfTrueTypeFont footerFont1 = new PdfTrueTypeFont(fontStream, 8);
-                    titleFont = titleFont1;
-                    bodyFont = bodyFont1;
-                    bodyTitleFont = bodyTitleFont1;
-                    footerFont = footerFont1;
-            
-            // Add a page
-            PdfPage page = document.Pages.Add();
-            RectangleF bounds = new RectangleF(0, 0, document.Pages[0].GetClientSize().Width, 50);
-            // Create header template
-            PdfPageTemplateElement header = new PdfPageTemplateElement(bounds);
-            header.Graphics.DrawString(reportTitle, titleFont, PdfBrushes.Black, new PointF(0, 10));
-
-            // Apply header to all pages
-            document.Template.Top = header;
-            PdfPageTemplateElement footer = new PdfPageTemplateElement(document.PageSettings.Width, 40);
-           
-            string currentDate = $"Generated: {DateTime.Now:g}";
-            footer.Graphics.DrawString(currentDate, footerFont, PdfBrushes.Black, new PointF(0, 20));
-
-            // Draw pagination on the right
-            PdfPageNumberField pageNumber = new PdfPageNumberField
-            {
-                Font = footerFont,
-                Brush = PdfBrushes.Black
-            };
-            PdfPageCountField pageCount = new PdfPageCountField
-            {
-                Font = footerFont,
-                Brush = PdfBrushes.Black
-            };
-            PdfCompositeField pagination = new PdfCompositeField(footerFont, PdfBrushes.Black, "Page {0} of {1}", pageNumber, pageCount);
-            // PdfCompositeField pagination = new PdfCompositeField
-            // {
-            //     Font = footerFont,
-            //     Brush = PdfBrushes.Black,
-            //     Text = "Page {0} of {1}",
-            //     AutomaticFields = [pageNumber, pageCount]
-            // };
-            SizeF pageSize = document.PageSettings.Size;
-            pagination.Draw(footer.Graphics, new PointF(pageSize.Width - 150, 20));
-
-            // Apply footer to all pages
-            document.Template.Bottom = footer;
-            
-            //Create a Page template that can be used as footer.
-            // PdfPageTemplateElement footer = new PdfPageTemplateElement(bounds);
-            // PdfFont font = new PdfStandardFont(PdfFontFamily.Helvetica, 7);
-            // PdfBrush brush = new PdfSolidBrush(Syncfusion.Drawing.Color.Black);
-            // //Create page number field.
-            // PdfPageNumberField pageNumber = new PdfPageNumberField(font, brush);
-            // //Create page count field.
-            // PdfPageCountField count = new PdfPageCountField(font, brush);
-            // //Add the fields in composite fields.
-            // PdfCompositeField compositeField = new PdfCompositeField(font, brush, "Page {0} of {1}", pageNumber, count);
-            // compositeField.Bounds = footer.Bounds;
-            // //Draw the composite field in footer.
-            // compositeField.Draw(footer.Graphics, new PointF(470, 40));
-            // //Add the footer template at the bottom.
-            // document.Template.Bottom = footer;
-            
-            
-            PdfGraphics graphics = page.Graphics;
-
-
-            // Create PDF grid
-            PdfGrid pdfGrid = new PdfGrid();
-
-            // Create data source
-            List<object> data = new List<object>();
-            foreach (var item in items)
-            {
-                data.Add(new
+                document.PageSettings.Size = PdfPageSize.A4;
+                // Load a Unicode-compatible TrueType font from embedded resource
+                PdfFont titleFont;
+                ;
+                PdfFont bodyFont;
+                ;
+                PdfFont bodyTitleFont;
+                PdfFont footerFont;
+                string fontFilePath = Path.Combine(_webHostEnvironment.WebRootPath, "fonts", "NotoSans-Regular.ttf");
+                if (!File.Exists(fontFilePath))
                 {
-                    TransactionDate = item.TransDate.ToString("dd-MM-yyyy"),
-                    DocumentName = item.DocSeriesName,
-                    ReferenceNumber = item.RefCode,
-                    Debit = item.Debit.ToString("C"),
-                    Credit = item.Credit.ToString("C"),
-                    RunningTotal = item.RunningTotal.ToString("C")
-                });
-            }
+                    throw new FileNotFoundException(
+                        $"The file 'NotoSans-Regular.ttf' was not found in 'wwwroot/fonts'.");
+                }
 
-            // Assign data source
-            pdfGrid.DataSource = data;
-            // Set custom column widths
-            pdfGrid.Columns[0].Width = 80; 
-            pdfGrid.Columns[1].Width = 135; 
-            pdfGrid.Columns[2].Width = 90;  // ReferenceNumber (wider)
-            pdfGrid.Columns[3].Width = 70;  // Debit (narrow)
-            pdfGrid.Columns[4].Width = 70;  // Credit (narrow)
-            pdfGrid.Columns[5].Width = 70;  // RunningTotal (narrow)
-            // Customize header text
-            PdfGridRow rowHeader = pdfGrid.Headers[0];
-            rowHeader.Cells[0].Value = "Ημ/νία";
-            rowHeader.Cells[1].Value = "Παραστατικό";
-            rowHeader.Cells[2].Value = "Αρ.Παρ.";
-            rowHeader.Cells[3].Value = "Χρέωση";
-            rowHeader.Cells[4].Value = "Πίστωση";
-            rowHeader.Cells[5].Value = "Υπόλοιπο";
+                FileStream fontStream = new FileStream(fontFilePath, FileMode.Open, FileAccess.Read);
 
-            // Apply header style
-            PdfGridCellStyle headerStyle = new PdfGridCellStyle
-            {
-                BackgroundBrush = PdfBrushes.LightGray,
-                Font = bodyTitleFont,
-            };
-            for (int i = 0; i < rowHeader.Cells.Count; i++)
-            {
-                rowHeader.Cells[i].Style = headerStyle;
-            }
-            // Apply cell style with right alignment for Debit and Credit columns
-            PdfGridCellStyle numberCellStyle = new PdfGridCellStyle
-            {
-                Font = bodyFont,
-                StringFormat = new PdfStringFormat(PdfTextAlignment.Right)
-            };
-            foreach (PdfGridRow row in pdfGrid.Rows)
-            {
-                row.Cells[3].Style = numberCellStyle; // Debit
-                row.Cells[4].Style = numberCellStyle; // Credit
-                row.Cells[5].Style = numberCellStyle; // Running Total
-            }
-            // Customize grid style
-            PdfGridStyle gridStyle = new PdfGridStyle
-            {
-                CellPadding = new PdfPaddings(5, 5, 5, 5),
-                BackgroundBrush = PdfBrushes.White,
-                TextBrush = PdfBrushes.Black,
-                Font = bodyFont,
-            };
-            pdfGrid.Style = gridStyle;
+                PdfTrueTypeFont titleFont1 = new PdfTrueTypeFont(fontStream, 14, PdfFontStyle.Bold);
+                ;
+                PdfTrueTypeFont bodyFont1 = new PdfTrueTypeFont(fontStream, 8);
+                PdfTrueTypeFont bodyTitleFont1 = new PdfTrueTypeFont(fontStream, 8, PdfFontStyle.Bold);
+                PdfTrueTypeFont footerFont1 = new PdfTrueTypeFont(fontStream, 8);
+                titleFont = titleFont1;
+                bodyFont = bodyFont1;
+                bodyTitleFont = bodyTitleFont1;
+                footerFont = footerFont1;
 
-            // Draw grid on the page
-            pdfGrid.Draw(page, new PointF(0, 50));
+                // Add a page
+                PdfPage page = document.Pages.Add();
+                RectangleF bounds = new RectangleF(0, 0, document.Pages[0].GetClientSize().Width, 50);
+                // Create header template
+                PdfPageTemplateElement header = new PdfPageTemplateElement(bounds);
+                header.Graphics.DrawString(reportTitle, titleFont, PdfBrushes.Black, new PointF(0, 10));
 
-            // Save to memory stream
-            using (MemoryStream stream = new MemoryStream())
-            {
-                document.Save(stream);
-                return stream.ToArray();
+                // Apply header to all pages
+                document.Template.Top = header;
+                PdfPageTemplateElement footer = new PdfPageTemplateElement(document.PageSettings.Width, 40);
+
+                string currentDate = $"Generated: {DateTime.Now:g}";
+                footer.Graphics.DrawString(currentDate, footerFont, PdfBrushes.Black, new PointF(0, 20));
+
+                // Draw pagination on the right
+                PdfPageNumberField pageNumber = new PdfPageNumberField
+                {
+                    Font = footerFont,
+                    Brush = PdfBrushes.Black
+                };
+                PdfPageCountField pageCount = new PdfPageCountField
+                {
+                    Font = footerFont,
+                    Brush = PdfBrushes.Black
+                };
+                PdfCompositeField pagination = new PdfCompositeField(footerFont, PdfBrushes.Black, "Page {0} of {1}",
+                    pageNumber, pageCount);
+               
+                SizeF pageSize = document.PageSettings.Size;
+                pagination.Draw(footer.Graphics, new PointF(pageSize.Width - 150, 20));
+
+                // Apply footer to all pages
+                document.Template.Bottom = footer;
+
+                PdfGraphics graphics = page.Graphics;
+
+
+                // Create PDF grid
+                PdfGrid pdfGrid = new PdfGrid();
+
+                // Create data source
+                List<object> data = new List<object>();
+                foreach (var item in items)
+                {
+                    data.Add(new
+                    {
+                        TransactionDate = item.TransDate.ToString("dd-MM-yyyy"),
+                        DocumentName = item.DocSeriesName,
+                        ReferenceNumber = item.RefCode,
+                        Debit = item.Debit.ToString("C"),
+                        Credit = item.Credit.ToString("C"),
+                        RunningTotal = item.RunningTotal.ToString("C")
+                    });
+                }
+
+                // Assign data source
+                pdfGrid.DataSource = data;
+                // Set custom column widths
+                pdfGrid.Columns[0].Width = 80;
+                pdfGrid.Columns[1].Width = 135;
+                pdfGrid.Columns[2].Width = 90; // ReferenceNumber (wider)
+                pdfGrid.Columns[3].Width = 70; // Debit (narrow)
+                pdfGrid.Columns[4].Width = 70; // Credit (narrow)
+                pdfGrid.Columns[5].Width = 70; // RunningTotal (narrow)
+                // Customize header text
+                PdfGridRow rowHeader = pdfGrid.Headers[0];
+                rowHeader.Cells[0].Value = "Ημ/νία";
+                rowHeader.Cells[1].Value = "Παραστατικό";
+                rowHeader.Cells[2].Value = "Αρ.Παρ.";
+                rowHeader.Cells[3].Value = "Χρέωση";
+                rowHeader.Cells[4].Value = "Πίστωση";
+                rowHeader.Cells[5].Value = "Υπόλοιπο";
+
+                // Apply header style
+                PdfGridCellStyle headerStyle = new PdfGridCellStyle
+                {
+                    BackgroundBrush = PdfBrushes.LightGray,
+                    Font = bodyTitleFont,
+                };
+                for (int i = 0; i < rowHeader.Cells.Count; i++)
+                {
+                    rowHeader.Cells[i].Style = headerStyle;
+                }
+
+                // Apply cell style with right alignment for Debit and Credit columns
+                PdfGridCellStyle numberCellStyle = new PdfGridCellStyle
+                {
+                    Font = bodyFont,
+                    StringFormat = new PdfStringFormat(PdfTextAlignment.Right)
+                };
+                foreach (PdfGridRow row in pdfGrid.Rows)
+                {
+                    row.Cells[3].Style = numberCellStyle; // Debit
+                    row.Cells[4].Style = numberCellStyle; // Credit
+                    row.Cells[5].Style = numberCellStyle; // Running Total
+                }
+
+                // Customize grid style
+                PdfGridStyle gridStyle = new PdfGridStyle
+                {
+                    CellPadding = new PdfPaddings(5, 5, 5, 5),
+                    BackgroundBrush = PdfBrushes.White,
+                    TextBrush = PdfBrushes.Black,
+                    Font = bodyFont,
+                };
+                pdfGrid.Style = gridStyle;
+
+                // Draw grid on the page
+                pdfGrid.Draw(page, new PointF(0, 50));
+
+                // Save to memory stream
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    document.Save(stream);
+                    return stream.ToArray();
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
+            throw new Exception("Error generating PDF", ex);
         }
     }
 }
