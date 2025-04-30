@@ -21,7 +21,7 @@ public class PdfExportService
             {
                 page.Size(PageSizes.A4);
                 page.Margin(30);
-                page.DefaultTextStyle(x => x.FontSize(10));
+                page.DefaultTextStyle(x => x.FontSize(8));
                 page.Header().Row(row =>
                 {
                     // Left: Logo
@@ -59,7 +59,7 @@ public class PdfExportService
                     foreach (var movement in movements)
                     {
                         table.Cell().Element(CellStyle).Text(movement.TransDate.ToShortDateString());
-                        table.Cell().Element(CellStyle).Text(movement.DocSeriesCode);
+                        table.Cell().Element(CellStyle).Text(movement.DocSeriesName);
                         table.Cell().Element(CellStyle).Text(movement.RefCode);
                         table.Cell().Element(CellStyle).AlignRight().Text($"{movement.Debit:C}");
                         table.Cell().Element(CellStyle).AlignRight().Text($"{movement.Credit:C}");
@@ -82,7 +82,7 @@ public class PdfExportService
                 });
             });
         });
-
+        //throw new Exception("Test error from pdf export");
         return document.GeneratePdf();
     }
 }

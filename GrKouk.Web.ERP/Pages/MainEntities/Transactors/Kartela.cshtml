@@ -5,7 +5,8 @@
     ViewData["Title"] = "Καρτέλα " + @Model.TransactorName;
 }
 @section MyCss
-    {
+{
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="~/css/custom-checkbox.css" />
     <link rel="stylesheet" href="~/css/searchbar.css" />
 }
@@ -61,7 +62,8 @@ true
 
 
 @section Scripts
-    {
+{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="~/js/moment.min.js"></script>
     <script src="~/js/definitions.js"></script>
     <script src="~/js/indexPageIIFE.lib.js"></script>
@@ -301,8 +303,25 @@ true
                     selector: '#ExportToPdf',
                     event: 'click',
                     handler: function (event) {
+                        event.preventDefault(); // Prevent default anchor behavior
 
-                        indPgLib.exportToPdfHandler();
+                        indPgLib.exportToPdfHandler()
+                            .then((pdfUrl) => {
+                                // Assuming the exportToPdfHandler returns a URL to the PDF file
+                                if (pdfUrl) {
+                                    // Open the PDF in a new browser window or tab
+                                    window.open(pdfUrl, '_blank');
+                                } else {
+                                    toastr.error('Failed to generate the PDF. No URL returned.');
+                                }
+                            })
+
+                            .catch((error)=>{
+                                // if (result) {
+                                toastr.error(error);
+                                // }
+                            })
+                                
                     }
                 }
             ];

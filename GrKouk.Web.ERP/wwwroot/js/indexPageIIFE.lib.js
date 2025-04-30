@@ -931,10 +931,6 @@ var indPgLib = (function () {
     ) {
         let uri = indexPageDefinition.pdfExportUri;
 
-        if (!uri) {
-            return Promise.reject("Export URI is not defined.");
-        }
-
         uri += `?pageIndex=${pgIndex}`;
         uri += `&pageSize=${pgSize}`;
         uri += `&companyFilter=${companyFlt}`;
@@ -956,6 +952,9 @@ var indPgLib = (function () {
 
         var timeout;
         return new Promise((resolve, reject) => {
+            if (!uri) {
+                reject("Export URI is not defined.");
+            }
             $.ajax({
                 type: "GET",
                 url: uri,
@@ -968,18 +967,22 @@ var indPgLib = (function () {
 
                     // Create a download link for the file
                     const blob = new Blob([data], { type: 'application/pdf' });
-                    const link = document.createElement('a');
-                    link.href = window.URL.createObjectURL(blob);
-                    link.download = filename;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
+                    // const link = document.createElement('a');
+                    // link.href = window.URL.createObjectURL(blob);
+                    // link.download = filename;
+                    // document.body.appendChild(link);
+                    // link.click();
+                    // document.body.removeChild(link);
+                    var pdfUrl = window.URL.createObjectURL(blob);
+                    resolve(pdfUrl);
+                },
+                // error: function (error) {
+                //     reject(error);
+                // },
+                error: function (xhr, status, error) {
+                    reject(new Error('Failed to export to PDF: ' + error));
+                },
 
-                    resolve(data);
-                },
-                error: function (error) {
-                    reject(error);
-                },
                 beforeSend: function () {
                     if (timeout) {
                         clearTimeout(timeout);
@@ -1180,25 +1183,28 @@ var indPgLib = (function () {
             })
             .catch((error) => {
                 console.log(error);
+                return error.toString();
             });
     };
     const exportToPdfHandler = () => {
-        setFilterValues();
-        callExportToPdfEndpoint(pageIndexElement, pageSizeElement, tableCurrentSortElement
-            , datePeriodFilterElement, companyFilterElement, searchTextElement
-            , currencyFilterElement, transactorTypeFilterElement
-            , productNatureFilterElement, transactorIdFilterElement
-            , warehouseItemIdFilterElement, diaryIdFilterElement
-            , cfaIdFilterElement, showCarryOnFilterElement,
-            showSummaryFilterElement,showDisplayLinesWithZeroesFilterElement,materialCategoriesFilterElement, sectionsFilterElement)
-            .then((data) => {
-                console.log("PDF download started!");
-
-            })
-            .catch((error) => {
-                console.error("Error downloading PDF:", error);
-
-            });
+        return new Promise((resolve, reject) => {
+            setFilterValues();
+            callExportToPdfEndpoint(pageIndexElement, pageSizeElement, tableCurrentSortElement
+                , datePeriodFilterElement, companyFilterElement, searchTextElement
+                , currencyFilterElement, transactorTypeFilterElement
+                , productNatureFilterElement, transactorIdFilterElement
+                , warehouseItemIdFilterElement, diaryIdFilterElement
+                , cfaIdFilterElement, showCarryOnFilterElement,
+                showSummaryFilterElement, showDisplayLinesWithZeroesFilterElement, materialCategoriesFilterElement, sectionsFilterElement)
+                .then((data) => {
+                    console.log("PDF download started!");
+                    resolve(data);
+                })
+                .catch((error) => {
+                    console.error("Error downloading PDF:", error);
+                    reject(error);
+                });
+        });
     };
     const addPagerElementEventListeners = () => {
         let pagerElements = document.getElementsByClassName("page-link");

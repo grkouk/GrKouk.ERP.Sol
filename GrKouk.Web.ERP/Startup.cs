@@ -18,6 +18,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using NToastNotify;
+using QuestPDF.Infrastructure;
 
 namespace GrKouk.Web.ERP
 {
@@ -141,6 +142,7 @@ namespace GrKouk.Web.ERP
             services.AddTransient<IDocumentTransactionService, DocumentTransactionService>();
             services.AddTransient<IDocumentSyncService, SyncBusinessDocService>();
             services.AddTransient<PdfExportService>();
+            //QuestPDF.Settings.License = LicenseType.Community; 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

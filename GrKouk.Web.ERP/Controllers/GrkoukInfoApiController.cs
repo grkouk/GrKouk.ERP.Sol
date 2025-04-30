@@ -38,6 +38,7 @@ using GrKouk.Erp.Dtos.CashFlowTransactions;
 using GrKouk.Erp.Dtos.FinancialMovements;
 using GrKouk.Erp.Dtos.Sync;
 using GrKouk.Web.ERP.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Syncfusion.EJ2.Linq;
 
@@ -6902,6 +6903,7 @@ namespace GrKouk.Web.ERP.Controllers
 
                 beforePeriod.TransDate = beforePeriodDate;
                 beforePeriod.DocSeriesCode = "Εκ.Μεταφ.";
+                beforePeriod.DocSeriesName = "Εκ.Μεταφoράς.";
                 beforePeriod.CreatorId = -1;
                 beforePeriod.TransactorName = "";
 
@@ -6934,6 +6936,7 @@ namespace GrKouk.Web.ERP.Controllers
                     Id = dbTransaction.Id,
                     TransDate = dbTransaction.TransDate,
                     DocSeriesCode = dbTransaction.TransTransactorDocSeriesCode,
+                    DocSeriesName = dbTransaction.TransTransactorDocSeriesName,
                     RefCode = dbTransaction.TransRefCode,
                     CompanyCode = dbTransaction.CompanyCode,
                     SectionCode = dbTransaction.SectionCode,
@@ -6987,7 +6990,11 @@ namespace GrKouk.Web.ERP.Controllers
             try
             {
                 var pdfBytes = _pdfService.GenerateFinancialPdf(listWithTotal ?? new(),reportTitle);
-                return File(pdfBytes, "application/pdf", "FinancialReport.pdf");
+                Response.Headers.Append("Content-Disposition", "inline; filename=FinancialReport.pdf");
+
+                return File(pdfBytes, "application/pdf");
+
+                //return File(pdfBytes, "application/pdf", "FinancialReport.pdf");
             }
             catch (Exception ex)
             {
