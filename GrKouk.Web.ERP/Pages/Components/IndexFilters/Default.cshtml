@@ -54,7 +54,7 @@
             @{
                 if (Model.FiltersToShow.ShowDateFlt)
                 {
-                    <div class="col-md-2 col-sm-6">
+                    <div class="col-md-2 col-sm-6 col-lg-2">
 
                         <div class="form-floating">
 
@@ -72,7 +72,7 @@
             @{
                 if (Model.FiltersToShow.ShowMaterialNatureFlt)
                 {
-                    <div class="col-md-2 col-sm-6">
+                    <div class="col-md-2 col-sm-6 col-lg-3">
                         <div class="form-floating">
                             <select id="WarehouseItemNatureFilter" class="form-select form-select-sm"
                                     asp-items="Model.MaterialNaturesFilterValues">
@@ -87,7 +87,7 @@
             @{
                 if (Model.FiltersToShow.ShowMaterialCategoriesFlt)
                 {
-                    <div class="col-md-2 col-sm-6">
+                    <div class="col-md-2 col-sm-6 col-lg-3">
                         <div class="form-floating">
                             <select id="MaterialCategoriesFilter" class="form-select form-select-sm"
                                     asp-items="Model.MaterialCategoriesFilterValues">
@@ -102,7 +102,7 @@
             @{
                 if (Model.FiltersToShow.ShowTransactorTypeFlt)
                 {
-                    <div class="col-md-2 col-sm-6">
+                    <div class="col-md-2 col-sm-6 col-lg-3">
                         <div class="form-floating">
                             <select id="TransactorTypeFilter" class="form-select form-select-sm"
                                     asp-items="Model.TransactorTypeFilterValues">
@@ -118,8 +118,8 @@
             @{
                 if (Model.FiltersToShow.ShowSectionsFlt)
                 {
-                    <div class="col-md-3 col-sm-6">
-                      <ejs-multiselect id="SectionsFilterElm" dataSource="@Model.SectionsFilterUiSelectItems" placeholder="Select sections" mode="CheckBox"
+                    <div class="col-md-3 col-sm-6 col-lg-3">
+                      <ejs-multiselect id="SectionsFilterElm" dataSource="@Model.SectionsFilterUiSelectItems" placeholder="Sections" mode="CheckBox"
                                          showDropDownIcon="true"
                                          floatLabelType="Auto"
                                          allowResize ="true"
@@ -133,7 +133,7 @@
             @{
                 if (Model.FiltersToShow.ShowCompaniesFlt)
                 {
-                    <div class="col-md-2 col-sm-6">
+                    <div class="col-md-2 col-sm-6 col-lg-2">
                         <div class="form-floating">
                             <select id="CompanyFilter" class="form-select form-select-sm" asp-items="Model.CompanyFilterValues">
                             </select>
@@ -147,7 +147,7 @@
             @{
                 if (Model.FiltersToShow.ShowPageSizeFlt)
                 {
-                    <div class="col-md-1 col-sm-6">
+                    <div class="col-md-2 col-sm-6 col col-lg-2">
                         <div class="form-floating">
 
                             <select id="PageSize" class="form-select form-select-sm" asp-items="Model.PageSizeFilterValues">
@@ -161,7 +161,7 @@
             @{
                 if (Model.FiltersToShow.ShowCurrencyFlt)
                 {
-                    <div class="col-md-1 col-sm-6">
+                    <div class="col-md-2 col-sm-6 col-lg-2">
                         <div class="form-floating">
 
                             <select id="CurrencySelector" class="form-select form-select-sm"
