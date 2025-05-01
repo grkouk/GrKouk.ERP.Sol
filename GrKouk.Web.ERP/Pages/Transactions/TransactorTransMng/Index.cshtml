@@ -13,10 +13,8 @@
     <link rel="stylesheet" href="~/css/searchbar.css"/>
     <link rel="stylesheet" href="~/css/spinner.css"/>
 }
-
-
-
-<h4>Transactor Transactions Index</h4>
+<input type="hidden" id="initialPageTitle" value="@ViewData["Title"]" />
+<h4 id="hElementTitle">@ViewData["Title"]</h4>
 
 <div class="container ">
     <ul class="nav small justify-content-end ">
@@ -600,4 +598,5 @@
 
             });
     </script>
+    @ScriptHelper.RenderScripts(HttpContext)
 }

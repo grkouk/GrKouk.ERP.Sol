@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="~/css/custom-checkbox.css" />
     <link rel="stylesheet" href="~/css/searchbar.css" />
 }
-<h4>Synchronization Suppliers</h4>
+<input type="hidden" id="initialPageTitle" value="@ViewData["Title"]" />
+<h4 id="hElementTitle">@ViewData["Title"]</h4>
 
 <div class="container ">
     <ul class="nav small justify-content-end ">
@@ -543,4 +544,5 @@
 
             });
     </script>
+    @ScriptHelper.RenderScripts(HttpContext)
 }

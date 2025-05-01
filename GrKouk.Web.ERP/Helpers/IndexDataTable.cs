@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GrKouk.Erp.Definitions;
 using Newtonsoft.Json;
 using Syncfusion.EJ2.Base;
@@ -32,6 +33,8 @@ namespace GrKouk.Web.ERP.Helpers
         public bool ShowCarryOnAmountsInTabs { get; set; }
         public bool ShowSummaryFilter { get; set; }
         public bool ShowDisplayLinesWithZeroes { get; set; }
+        public DateTime? FromCustomFilterDate { get; set; }
+        public DateTime? ToCustomFilterDate { get; set; }
     }
 
     public class IndexDataTableResponse<T>

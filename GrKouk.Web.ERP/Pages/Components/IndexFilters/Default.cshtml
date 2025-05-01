@@ -4,23 +4,62 @@
 @{
     var viewContext = (ViewContext)ViewData["ViewContext"];
     var script = @"
-                             <script>
-                                 document.getElementById('DatePeriodFilter').addEventListener('change', warn, true);
-                                 function warn(e) {
-                                     if (e.currentTarget.value === 'CUSTOM') {
-                                         e.preventDefault();
-                                         e.stopPropagation();
-                                         var myModal = new bootstrap.Modal(document.getElementById('customDateFilter'), {
-                                             keyboard: true, focus: true
-                                         });
-                                         myModal.show();
-                                     } else {
-                                         return;
-                                     }
-                                 }
-                             </script>
-                             ";
-   // ScriptHelper.AddScript(viewContext, "<script>console.log('Script from ViewComponent');</script>");
+        <script>
+        $(document).ready(function () {
+             document.getElementById('DatePeriodFilter').addEventListener('change', dateFilterValueChange, true);
+             function dateFilterValueChange(e) {
+                 if (e.currentTarget.value === 'CUSTOM') {
+                     e.preventDefault();
+                     e.stopPropagation();
+                     var myModal = new bootstrap.Modal(document.getElementById('customDateFilter'), {
+                         keyboard: true, focus: true
+                     });
+                     myModal.show();
+                 } else {
+                     const label = document.getElementById('datePeriodLabel');
+                      label.innerText = ""Period:"";  
+                    const elemInitPageTitle = document.getElementById(""initialPageTitle"");
+                      const initialPageTitle = elemInitPageTitle.value;
+                      const elemHTitle = document.getElementById(""hElementTitle"");
+                    const elemDatePeriod = document.getElementById('DatePeriodFilter');
+                    const periodText = elemDatePeriod.options[elemDatePeriod.selectedIndex].text; 
+                      const title = `${initialPageTitle} Περίοδος ${periodText}` ; 
+                      document.title = title;
+                      elemHTitle.innerText = title;
+                     return;
+                 }
+             }
+             let selectButtonEl = document.getElementById('customDatesSelected');
+             document.getElementById('customDatesSelected').addEventListener('click', dateFilterCustomDatesSelected, true);
+             function dateFilterCustomDatesSelected(e) {
+                      $('#customDateFilter').modal('hide');
+                      const elemInitPageTitle = document.getElementById(""initialPageTitle"");
+                      const initialPageTitle = elemInitPageTitle.value;
+                      const elemHTitle = document.getElementById(""hElementTitle"");
+                      const elemFrom = document.getElementById(""fromDateFilterEl"");
+                      const elemTo = document.getElementById(""toDateFilterEl"");
+                      const label = document.getElementById('datePeriodLabel');
+                      const elemDatePeriod = document.getElementById('DatePeriodFilter');
+                      const fromLb = commonLib.formatDateInputValue(elemFrom.value);
+                      const toLb =  commonLib.formatDateInputValue(elemTo.value);   
+                      label.innerText = `${fromLb} ${toLb}`;  
+                      const periodText = elemDatePeriod.options[elemDatePeriod.selectedIndex].text; 
+                      const title = `${initialPageTitle} από ${fromLb} έως ${toLb}` ; 
+                      document.title = title;
+                      elemHTitle.innerText = title;
+                      indPgLib.refreshData();
+             }
+            let toDateFilterValue=new Date();
+            let fromDateFilterValue = new Date(toDateFilterValue.getFullYear(),toDateFilterValue.getMonth()-1,1);
+            const elemFrom = document.getElementById(""fromDateFilterEl"");
+            const elemTo = document.getElementById(""toDateFilterEl"");
+            const fromDateString = fromDateFilterValue.toJSON().slice(0, 10);
+            elemFrom.value = fromDateString;
+            toDateString = toDateFilterValue.toJSON().slice(0, 10);
+            elemTo.value = toDateString;
+        });
+         </script>
+                 ";
     ScriptHelper.AddScript(viewContext, script);
 }
 @{
@@ -61,7 +100,7 @@
                             <select name="DatePeriodFilter" id="DatePeriodFilter" class="form-select form-select-sm"
                                     asp-items="Model.DateFilterValues">
                             </select>
-                            <label class="small">Period:</label>
+                            <label id="datePeriodLabel" class="small">Period:</label>
                         </div>
 
                     </div>
@@ -210,3 +249,27 @@
     </form>
 </div>
 
+<!-- Custom Date filter Modal -->
+<div class="modal fade" id="customDateFilter" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label for="fromDateFilterEl">From date:</label>
+                <input type="date" id="fromDateFilterEl"/>
+                <label for="toDateFilterEl">To date:</label>
+                <input type="date" id="toDateFilterEl"/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="customDatesSelected">Select Period</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -14,7 +14,8 @@
     <link rel="stylesheet" href="~/lib/bootstrap-select/css/bootstrap-select.min.css" />
 }
 
-<h4>Λίστα Παραστατικών Πώλησης</h4>
+<input type="hidden" id="initialPageTitle" value="@ViewData["Title"]" />
+<h4 id="hElementTitle">@ViewData["Title"]</h4>
 
 <div class="container ">
     <ul class="nav small justify-content-end ">
@@ -1240,4 +1241,5 @@
                 indPgLib.saveSettings('SellDocIndexView');
             });
     </script>
+    @ScriptHelper.RenderScripts(HttpContext)
 }

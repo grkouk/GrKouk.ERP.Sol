@@ -77,7 +77,8 @@ var indPgLib = (function () {
     let $materialCategoriesFilter = $('#MaterialCategoriesFilter');
     let $currencySelector = $("#CurrencySelector");
     let $diaryId = $("#DiaryId");
-   // let rfSectionsFilter = document.getElementById("SectionsFilterElm").ej2_instances[0];
+    let $fromCustomFilterDate = $("#fromDateFilterEl");
+    let $toCustomFilterDate = $("#toDateFilterEl");
     //-------------------------------------------------------
     let companyFilterElement;
     let datePeriodFilterElement;
@@ -97,6 +98,8 @@ var indPgLib = (function () {
     let showCarryOnFilterElement;
     let showSummaryFilterElement;
     let showDisplayLinesWithZeroesFilterElement;
+    let fromCustomFilterDateElement
+    let toCustomFilterDateElement
 
     let setFilterValues;
     const setSelectorFilterValues = () => {
@@ -120,8 +123,10 @@ var indPgLib = (function () {
         showCarryOnFilterElement = flt.showCarryOnFilterElement;
         showSummaryFilterElement = flt.showSummaryFilterElement;
         showDisplayLinesWithZeroesFilterElement = flt.showDisplayLinesWithZeroesFilterElement;
-        materialCategoriesFilterElement = flt.materialCategoriesFilterElement
-        sectionsFilterElement = flt.sectionsFilterElement
+        materialCategoriesFilterElement = flt.materialCategoriesFilterElement;
+        sectionsFilterElement = flt.sectionsFilterElement;
+        fromCustomFilterDateElement=flt.fromCustomFilterDate;
+        toCustomFilterDateElement=flt.toCustomFilterDate;
     };
     const setIndexPageFilterValues = () => {
         var pageIndexVal = parseInt($pageIndex.val());
@@ -133,34 +138,20 @@ var indPgLib = (function () {
 
         var pageSize =
             $pageSize.val() == null || $pageSize.val().length == 0 ? 10 : parseInt($pageSize.val());
-
         pageSizeElement = pageSize;
-
         var companyFlt = $companyFilter.val();
-
         companyFilterElement = companyFlt;
-
         var datePeriod = $datePeriodFilter.val();
-
         datePeriodFilterElement = datePeriod;
-
         var sortData = getTableCurrentSort();
-
         tableCurrentSortElement = sortData;
-
         var searchFlt = $(".search_input").val();
-
         searchTextElement = searchFlt;
-
         var $dcId = $currencySelector;
         var currencyFlt = $dcId.val() == null || $dcId.val().length == 0 ? 1 : parseInt($dcId.val());
-
         currencyFilterElement = currencyFlt;
-
         var transTypeFlt = '';
         var transactorId = 0;
-       
-       
         if (!($transactorTypeFilter.val() === undefined)) {
             transTypeFlt = $transactorTypeFilter.val();
             transactorTypeFilterElement = transTypeFlt;
@@ -223,28 +214,34 @@ var indPgLib = (function () {
         } else {
             diaryIdFilterElement = 0;
         }
-        var materialCategoryFlt = '';
+        let materialCategoryFlt = '';
         if (!($materialCategoriesFilter.val() === undefined)) {
             materialCategoryFlt = $materialCategoriesFilter.val();
             materialCategoriesFilterElement = materialCategoryFlt;
         } else {
             materialCategoriesFilterElement = "";
         }
-        var sectionsFlt = '';
+        let sectionsFlt = '';
         if (!($sectionsFilter.val() === undefined)) {
             sectionsFlt = $sectionsFilter.val();
             sectionsFilterElement = sectionsFlt;
         } else {
             sectionsFilterElement = "";
         }
-        //Not used yet
-        //Preparing for syncfusion controls
-        // let sectionsFltSF;
-        // if(!rfSectionsFilter.value === undefined){
-        //     sectionsFltSF = rfSectionsFilter.value;
-        //     //sectionsFilterElement = sectionsFltSF;
-        //    
-        // }
+        let fromCustomDateFlt = '';
+        if (!($fromCustomFilterDate.val() === undefined)) {
+            fromCustomDateFlt = $fromCustomFilterDate.val();
+            fromCustomFilterDateElement = fromCustomDateFlt;
+        } else {
+            fromCustomFilterDateElement = "";
+        }
+        let toCustomDateFlt = '';
+        if (!($toCustomFilterDate.val() === undefined)) {
+            toCustomDateFlt = $toCustomFilterDate.val();
+            toCustomFilterDateElement = toCustomDateFlt;
+        } else {
+            toCustomFilterDateElement = "";
+        }
     };
     const commonTableHandlers = [
         {
@@ -857,8 +854,9 @@ var indPgLib = (function () {
     const getTableData = function (pgIndex, pgSize, sortData, dateRange
                                    , companyFlt, searchFlt, currencyFlt
                                    , transTypeFlt, wrItmNatureFlt, transactorId
-        , warehouseItemId, diaryId, cfaId, showCarryOnFlt
-        , showSummaryFlt, showDisplayLinesWithZeroesFlt,materialCategoriesFlt,sectionsFlt) {
+                                     , warehouseItemId, diaryId, cfaId, showCarryOnFlt
+                                  , showSummaryFlt, showDisplayLinesWithZeroesFlt,materialCategoriesFlt,sectionsFlt
+                                   ,fromCustomFilterDate, toCustomFilterDate) {
         let uri = indexPageDefinition.uri;
         uri += `?pageIndex=${pgIndex}`;
         uri += `&pageSize=${pgSize}`;
@@ -878,6 +876,8 @@ var indPgLib = (function () {
         uri += `&sectionsFilter=${sectionsFlt}`;
         uri += `&diaryId=${diaryId}`;
         uri += `&displayCurrencyId=${currencyFlt}`;
+        uri += `&fromCustomFilterDate=${fromCustomFilterDate}`;
+        uri += `&toCustomFilterDate=${toCustomFilterDate}`;
         var timeout;
         return new Promise((resolve, reject) => {
             $.ajax({
@@ -927,7 +927,7 @@ var indPgLib = (function () {
         transTypeFlt, wrItmNatureFlt, transactorId,
         warehouseItemId, diaryId, cfaId, showCarryOnFlt,
         showSummaryFlt, showDisplayLinesWithZeroesFlt,
-        materialCategoriesFlt, sectionsFlt
+        materialCategoriesFlt, sectionsFlt,fromCustomFilterDate, toCustomFilterDate
     ) {
         let uri = indexPageDefinition.pdfExportUri;
 
@@ -949,7 +949,8 @@ var indPgLib = (function () {
         uri += `&sectionsFilter=${sectionsFlt}`;
         uri += `&diaryId=${diaryId}`;
         uri += `&displayCurrencyId=${currencyFlt}`;
-
+        uri += `&fromCustomFilterDate=${fromCustomFilterDate}`;
+        uri += `&toCustomFilterDate=${toCustomFilterDate}`;
         var timeout;
         return new Promise((resolve, reject) => {
             if (!uri) {
@@ -1177,7 +1178,9 @@ var indPgLib = (function () {
             , productNatureFilterElement, transactorIdFilterElement
             , warehouseItemIdFilterElement, diaryIdFilterElement
             , cfaIdFilterElement, showCarryOnFilterElement,
-                showSummaryFilterElement,showDisplayLinesWithZeroesFilterElement,materialCategoriesFilterElement, sectionsFilterElement)
+                showSummaryFilterElement,showDisplayLinesWithZeroesFilterElement
+            ,materialCategoriesFilterElement, sectionsFilterElement
+            ,fromCustomFilterDateElement, toCustomFilterDateElement)
             .then((data) => {
                 bindDataToTable(data, pageIndexElement);
             })

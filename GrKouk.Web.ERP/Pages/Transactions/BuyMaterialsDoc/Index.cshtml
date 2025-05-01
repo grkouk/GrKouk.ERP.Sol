@@ -2,17 +2,19 @@
 @using GrKouk.Web.ERP.Helpers
 @model IndexModel
 
-@{
-    ViewData["Title"] = "Παραστατικά Αγορών/Εξόδων";
-}
+
 @section MyCss
     {
     <link rel="stylesheet" href="~/css/custom-checkbox.css" />
     <link rel="stylesheet" href="~/css/searchbar.css" />
     <link rel="stylesheet" href="~/css/search-modal.css" />
     <link rel="stylesheet" href="~/lib/bootstrap-select/css/bootstrap-select.min.css" />
-}
-<h4>Λίστα Αγορών/Εξόδων</h4>
+    }
+    @{
+        ViewData["Title"] = "Παραστατικά Αγορών/Εξόδων";
+    }
+    <input type="hidden" id="initialPageTitle" value="@ViewData["Title"]" />
+<h4 id="hElementTitle">@ViewData["Title"]</h4>
 
 
 <div class="container ">
@@ -1295,6 +1297,6 @@
             function (e) {
                 indPgLib.saveSettings('BuyDocIndexView');
             });
-    </script>
+    </script>`
     @ScriptHelper.RenderScripts(HttpContext)
 }

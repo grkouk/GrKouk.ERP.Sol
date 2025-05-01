@@ -76,3 +76,29 @@ let grkoukTableColumns = {
     }
 };
 
+var commonLib = (function() {
+    const formatDateInputValue = (inputValue) => {
+
+        const dateValue = inputValue; // yyyy-mm-dd
+        if (!dateValue) {
+            console.warn('Input has no value');
+            return null;
+        }
+
+        const date = new Date(dateValue);
+        if (isNaN(date)) {
+            console.error('Invalid date value');
+            return null;
+        }
+
+        const day = date.getDate(); // 1-31
+        const month = date.getMonth() + 1; // 1-12
+        const year = date.getFullYear() % 100; // last two digits
+
+        return `${day}/${month}/${year}`;
+    };
+    
+    return {
+        formatDateInputValue:formatDateInputValue
+    };
+})();
