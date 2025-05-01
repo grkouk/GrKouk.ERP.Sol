@@ -16,16 +16,6 @@
                      });
                      myModal.show();
                  } else {
-                     const label = document.getElementById('datePeriodLabel');
-                      label.innerText = ""Period:"";  
-                    const elemInitPageTitle = document.getElementById(""initialPageTitle"");
-                      const initialPageTitle = elemInitPageTitle.value;
-                      const elemHTitle = document.getElementById(""hElementTitle"");
-                    const elemDatePeriod = document.getElementById('DatePeriodFilter');
-                    const periodText = elemDatePeriod.options[elemDatePeriod.selectedIndex].text; 
-                      const title = `${initialPageTitle} Περίοδος ${periodText}` ; 
-                      document.title = title;
-                      elemHTitle.innerText = title;
                      return;
                  }
              }
@@ -33,20 +23,6 @@
              document.getElementById('customDatesSelected').addEventListener('click', dateFilterCustomDatesSelected, true);
              function dateFilterCustomDatesSelected(e) {
                       $('#customDateFilter').modal('hide');
-                      const elemInitPageTitle = document.getElementById(""initialPageTitle"");
-                      const initialPageTitle = elemInitPageTitle.value;
-                      const elemHTitle = document.getElementById(""hElementTitle"");
-                      const elemFrom = document.getElementById(""fromDateFilterEl"");
-                      const elemTo = document.getElementById(""toDateFilterEl"");
-                      const label = document.getElementById('datePeriodLabel');
-                      const elemDatePeriod = document.getElementById('DatePeriodFilter');
-                      const fromLb = commonLib.formatDateInputValue(elemFrom.value);
-                      const toLb =  commonLib.formatDateInputValue(elemTo.value);   
-                      label.innerText = `${fromLb} ${toLb}`;  
-                      const periodText = elemDatePeriod.options[elemDatePeriod.selectedIndex].text; 
-                      const title = `${initialPageTitle} από ${fromLb} έως ${toLb}` ; 
-                      document.title = title;
-                      elemHTitle.innerText = title;
                       indPgLib.refreshData();
              }
             let toDateFilterValue=new Date();

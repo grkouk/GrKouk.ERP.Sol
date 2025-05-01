@@ -319,6 +319,7 @@ var indPgLib = (function () {
                 }
                 //indPgLib.refreshData();
                 refreshTableData();
+               
             },
         },
         {
@@ -1182,6 +1183,7 @@ var indPgLib = (function () {
             ,materialCategoriesFilterElement, sectionsFilterElement
             ,fromCustomFilterDateElement, toCustomFilterDateElement)
             .then((data) => {
+                setIndexViewTitlesBasedOnPeriod();
                 bindDataToTable(data, pageIndexElement);
             })
             .catch((error) => {
@@ -1250,6 +1252,45 @@ var indPgLib = (function () {
     const registerPageHandlers = () => {
         registerHandlers(pageHandlersToRegister);
     };
+    const setIndexViewTitlesBasedOnPeriod= ()=>{
+        let initialPageTitle;
+      
+        const elemInitPageTitle = document.getElementById('initialPageTitle');
+        if (elemInitPageTitle) {
+            initialPageTitle = elemInitPageTitle.value;
+        }
+        const elemHTitle = document.getElementById('hElementTitle');
+        if (elemHTitle) {
+            
+        }
+       
+        const label = document.getElementById('datePeriodLabel');
+        const elemDatePeriod = document.getElementById('DatePeriodFilter');
+        let periodText;
+        let periodCode;
+        if (elemDatePeriod) {
+            periodText = elemDatePeriod.options[elemDatePeriod.selectedIndex].text;
+            periodCode = elemDatePeriod.options[elemDatePeriod.selectedIndex].value;
+            if(periodCode==="CUSTOM"){
+                const elemFrom = document.getElementById('fromDateFilterEl');
+                const elemTo = document.getElementById('toDateFilterEl');
+                const fromLb = commonLib.formatDateInputValue(elemFrom.value);
+                const toLb =  commonLib.formatDateInputValue(elemTo.value);
+                label.innerText = `${fromLb} ${toLb}`;
+                const title = `${initialPageTitle} από ${fromLb} έως ${toLb}` ;
+                document.title = title;
+                elemHTitle.innerText = title;
+            } else {
+                const title = `${initialPageTitle} Περίοδος ${periodText}` ;
+                document.title = title;
+                elemHTitle.innerText = title;
+            }
+        }
+       
+        
+        
+       
+    };
     const loadSettings = (localStorageKey) => {
         var storageItemJs = localStorage.getItem(localStorageKey);
         if (storageItemJs === undefined || storageItemJs === null) {
@@ -1277,7 +1318,14 @@ var indPgLib = (function () {
             $("#rowSelectorsVisible").val(filtersValue);
 
             filtersValue = storageItem.find((x) => x.filterKey === "dateRangeFilter").filterValue;
-            $datePeriodFilter.val(filtersValue);
+            if(filtersValue === "CUSTOM"){
+                $datePeriodFilter.val('CURMONTH');
+                //$fromCustomFilterDate.val(storageItem.find((x) => x.filterKey === "fromCustomFilterDate").filterValue);
+                //$toCustomFilterDate.val(storageItem.find((x) => x.filterKey === "toCustomFilterDate").filterValue);
+            }else {
+                $datePeriodFilter.val(filtersValue);
+            }
+            
             filtersValue = storageItem.find((x) => x.filterKey === "currentSort").filterValue;
             $currentSort.val(filtersValue);
             filtersValue = storageItem.find((x) => x.filterKey === "companyFilter").filterValue;
@@ -1380,7 +1428,8 @@ var indPgLib = (function () {
         setCurrencyFormatter: setCurrencyFormatter,
         setNumberFormatter: setNumberFormatter,
         loadSettings: loadSettings,
-        saveSettings: saveSettings
+        saveSettings: saveSettings,
+        setIndexViewTitlesBasedOnPeriod:setIndexViewTitlesBasedOnPeriod
         
     };
 })();

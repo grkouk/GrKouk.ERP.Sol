@@ -3,14 +3,15 @@
 @model GrKouk.Web.Erp.Pages.MainEntities.Transactors.IndexModel
 
 @{
-    ViewData["Title"] = "Transactors List";
+    ViewData["Title"] = "Συναλλασόμενοι";
 }
 @section MyCss
 {
     <link rel="stylesheet" href="~/css/custom-checkbox.css" />
     <link rel="stylesheet" href="~/css/searchbar.css" />
 }
-<h4>Συναλλασόμενοι</h4>
+<input type="hidden" id="initialPageTitle" value="@ViewData["Title"]" />
+<h4 id="hElementTitle">@ViewData["Title"]</h4>
 <div class="container mb-2">
     <ul class="nav small justify-content-end ">
         <li class="nav-item">

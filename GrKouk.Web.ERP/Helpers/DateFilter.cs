@@ -20,7 +20,7 @@ namespace GrKouk.Web.ERP.Helpers
             int threeYearsAgo = thisYear - 3;
             List<SelectListItem> datePeriods = new List<SelectListItem>
             {
-                new SelectListItem() {Value="CUSTOM", Text = "Custom"},
+                new SelectListItem() {Value = "CUSTOM", Text = "Custom"},
                 new SelectListItem() {Value = "CURMONTH", Text = "Τρέχων Μήνας"},
                 new SelectListItem() {Value = "30DAYS", Text = "30 Ημέρες"},
                 new SelectListItem() {Value = "60DAYS", Text = "60 Ημέρες"},
