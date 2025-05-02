@@ -79,6 +79,7 @@ var indPgLib = (function () {
     let $diaryId = $("#DiaryId");
     let $fromCustomFilterDate = $("#fromDateFilterEl");
     let $toCustomFilterDate = $("#toDateFilterEl");
+    let $nameOfIsozigioEl= $("#nameOfIsozigio");
     //-------------------------------------------------------
     let companyFilterElement;
     let datePeriodFilterElement;
@@ -100,7 +101,7 @@ var indPgLib = (function () {
     let showDisplayLinesWithZeroesFilterElement;
     let fromCustomFilterDateElement
     let toCustomFilterDateElement
-
+    let addToTitleText;
     let setFilterValues;
     const setSelectorFilterValues = () => {
         let flt = indexPageDefinition.getFilterValues();
@@ -243,6 +244,14 @@ var indPgLib = (function () {
             toCustomFilterDateElement = "";
         }
     };
+    const bindTitleSuffixes=()=>{
+      if($nameOfIsozigioEl.length>0){
+          addToTitleText=$nameOfIsozigioEl.val();
+      } else {
+          addToTitleText='';
+      }  
+    };
+    
     const commonTableHandlers = [
         {
             selector: "input[name=checkAllRows]",
@@ -1014,6 +1023,7 @@ var indPgLib = (function () {
         });
     };
     const bindDataToTable = (result, pgIndex) => {
+       
         handlePagingUi(result.totalPages, result.totalRecords, pgIndex, result.hasPrevious, result.hasNext);
 
 
@@ -1183,6 +1193,13 @@ var indPgLib = (function () {
             ,materialCategoriesFilterElement, sectionsFilterElement
             ,fromCustomFilterDateElement, toCustomFilterDateElement)
             .then((data) => {
+                if(data.nameOfIsozigio){
+                    if($nameOfIsozigioEl.length){
+                        $nameOfIsozigioEl.val(data.nameOfIsozigio);
+                    }
+
+                }
+                bindTitleSuffixes();
                 setIndexViewTitlesBasedOnPeriod();
                 bindDataToTable(data, pageIndexElement);
             })
@@ -1259,6 +1276,8 @@ var indPgLib = (function () {
         if (elemInitPageTitle) {
             initialPageTitle = elemInitPageTitle.value;
         }
+        bindTitleSuffixes();
+        initialPageTitle += ` ${addToTitleText} `;
         const elemHTitle = document.getElementById('hElementTitle');
         const label = document.getElementById('datePeriodLabel');
         const elemDatePeriod = document.getElementById('DatePeriodFilter');
@@ -1286,6 +1305,9 @@ var indPgLib = (function () {
                 document.title = title;
                 if(elemHTitle){
                     elemHTitle.innerText = title;
+                }
+                if(label){
+                    label.innerText = `Period:`;
                 }
             }
         }

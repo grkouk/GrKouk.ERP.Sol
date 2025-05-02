@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="~/css/searchbar.css" />
 }
 <input type="hidden" id="initialPageTitle" value="@ViewData["Title"]" />
+<input type="hidden" id="nameOfIsozigio" value="" />
 <h4 id="hElementTitle">@ViewData["Title"]</h4>
 <div class="container ">
     <ul class="nav small justify-content-end ">
@@ -401,4 +402,5 @@
             indPgLib.rowSelectorsUi();
         });
     </script>
+    @ScriptHelper.RenderScripts(HttpContext)
 }

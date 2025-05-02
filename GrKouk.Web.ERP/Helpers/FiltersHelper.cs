@@ -218,7 +218,7 @@ namespace GrKouk.Web.ERP.Helpers
         public static async Task<List<SelectListItem>> GetTransactorTypeFilterListAsync(ApiDbContext context)
         {
 
-            var dbTransactorTypes = await context.TransactorTypes.OrderBy(p => p.Code)
+            var dbTransactorTypes = await context.TransactorTypes.OrderBy(p => p.Name)
                 .AsNoTracking()
                 .ToListAsync();
             List<SelectListItem> transactorTypes = new()
@@ -227,7 +227,7 @@ namespace GrKouk.Web.ERP.Helpers
             };
             foreach (var dbTransactorType in dbTransactorTypes)
             {
-                transactorTypes.Add(new SelectListItem() { Value = dbTransactorType.Id.ToString(), Text = dbTransactorType.Code });
+                transactorTypes.Add(new SelectListItem() { Value = dbTransactorType.Id.ToString(), Text = dbTransactorType.Name });
             }
 
             return transactorTypes;

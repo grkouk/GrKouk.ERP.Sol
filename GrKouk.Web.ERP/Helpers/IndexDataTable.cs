@@ -67,7 +67,9 @@ namespace GrKouk.Web.ERP.Helpers
         public decimal GrandSumExportValue { get; set; }
         public List<T> Data { get; set; }
         public List<SearchListItem> Diaries { get; set; }
-
+        public string NameOfIsozigio { get; set; }
+        public string NameOfKartela { get; set; }
+        
     }
 
     public class CodeToComputeDefinition

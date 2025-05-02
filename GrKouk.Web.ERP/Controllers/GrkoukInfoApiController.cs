@@ -2454,21 +2454,21 @@ namespace GrKouk.Web.ERP.Controllers
             var isozigioType = "FREE";
             var transactorType =
                 await _context.TransactorTypes.Where(c => c.Id == transactorTypeId).FirstOrDefaultAsync();
-            //var isozigioName = "";
+            var isozigioName = "";
             if (transactorType != null)
             {
                 switch (transactorType.Code)
                 {
                     case "SYS.DTRANSACTOR":
-                        //isozigioName = "Συναλλασόμενων Ημερολογίου";
+                        isozigioName = "Συν/νων Ημγίου";
                         isozigioType = "SUPPLIER";
                         break;
                     case "SYS.CUSTOMER":
-                        //isozigioName = "Πελατών";
+                        isozigioName = "Πελατών";
                         isozigioType = "CUSTOMER";
                         break;
                     case "SYS.SUPPLIER":
-                        //isozigioName = "Προμηθευτών";
+                        isozigioName = "Προμηθευτών";
                         isozigioType = "SUPPLIER";
                         break;
                 }
@@ -2569,6 +2569,7 @@ namespace GrKouk.Web.ERP.Controllers
                 GrandSumOfDebit = grandSumOfDebit,
                 GrandSumOfCredit = grandSumOfCredit,
                 GrandSumOfDifference = grandSumDifference,
+                NameOfIsozigio = isozigioName,
                 Data = listItems
             };
             return Ok(response);
@@ -2880,36 +2881,36 @@ namespace GrKouk.Web.ERP.Controllers
                 }
             }
             //var isozigioType = "FREE";
-            //var isozigioName = "";
+            var isozigioName = "";
 
 
             switch (warehouseItemNatureFilter)
             {
                 case WarehouseItemNatureEnum.WarehouseItemNatureUndefined:
-                    //isozigioName = "";
+                    isozigioName = "";
                     break;
                 case WarehouseItemNatureEnum.WarehouseItemNatureMaterial:
-                    //isozigioName = "Υλικών";
+                    isozigioName = "Υλικών";
                     //isozigioType = "SUPPLIER";
                     break;
                 case WarehouseItemNatureEnum.WarehouseItemNatureService:
-                    //isozigioName = "Υπηρεσιών";
+                    isozigioName = "Υπηρεσιών";
                     // isozigioType = "SUPPLIER";
                     break;
                 case WarehouseItemNatureEnum.WarehouseItemNatureExpense:
-                    //isozigioName = "Δαπάνων";
+                    isozigioName = "Δαπάνων";
                     //isozigioType = "SUPPLIER";
                     break;
                 case WarehouseItemNatureEnum.WarehouseItemNatureIncome:
-                    //isozigioName = "Εσόδων";
+                    isozigioName = "Εσόδων";
                     //isozigioType = "SUPPLIER";
                     break;
                 case WarehouseItemNatureEnum.WarehouseItemNatureFixedAsset:
-                    //isozigioName = "Παγίων";
+                    isozigioName = "Παγίων";
                     //isozigioType = "SUPPLIER";
                     break;
                 case WarehouseItemNatureEnum.WarehouseItemNatureRawMaterial:
-                    //isozigioName = "Πρώτων Υλών";
+                    isozigioName = "Πρώτων Υλών";
                     //isozigioType = "SUPPLIER";
                     break;
                 default:
@@ -3005,7 +3006,8 @@ namespace GrKouk.Web.ERP.Controllers
                 SumExportValue = sumExportsValue,
                 SumImportVolume = sumImportsVolume,
                 SumExportVolume = sumExportsVolume,
-                Data = listItems
+                Data = listItems,
+                NameOfIsozigio = isozigioName,
             };
             return Ok(response);
         }

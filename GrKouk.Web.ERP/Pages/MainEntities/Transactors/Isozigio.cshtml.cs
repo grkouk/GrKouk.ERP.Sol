@@ -34,22 +34,22 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors
         {
            
 
-            var dbTransactorTypes = _context.TransactorTypes.OrderBy(p => p.Code).AsNoTracking();
-            List<SelectListItem> transactorTypes = new List<SelectListItem>();
-            transactorTypes.Add(new SelectListItem() { Value = 0.ToString(), Text = "{All Types}" });
-            foreach (var dbTransactorType in dbTransactorTypes)
-            {
-                transactorTypes.Add(new SelectListItem() { Value = dbTransactorType.Id.ToString(), Text = dbTransactorType.Code });
-            }
-            ViewData["TransactorTypeId"] = new SelectList(transactorTypes, "Value", "Text");
+            // var dbTransactorTypes = _context.TransactorTypes.OrderBy(p => p.Code).AsNoTracking();
+            // List<SelectListItem> transactorTypes = new List<SelectListItem>();
+            // transactorTypes.Add(new SelectListItem() { Value = 0.ToString(), Text = "{All Types}" });
+            // foreach (var dbTransactorType in dbTransactorTypes)
+            // {
+            //     transactorTypes.Add(new SelectListItem() { Value = dbTransactorType.Id.ToString(), Text = dbTransactorType.Name });
+            // }
+            // ViewData["TransactorTypeId"] = new SelectList(transactorTypes, "Value", "Text");
                        
 
-            var pageFilterSize = PageFilter.GetPageSizeFiltersSelectList();
-            ViewData["PageFilterSize"] = new SelectList(pageFilterSize, "Value", "Text");
+            // var pageFilterSize = PageFilter.GetPageSizeFiltersSelectList();
+            // ViewData["PageFilterSize"] = new SelectList(pageFilterSize, "Value", "Text");
 
-            var companiesList = FiltersHelper.GetCompaniesFilterList(_context);
-            ViewData["CompanyFilter"] = new SelectList(companiesList, "Value", "Text");
-            ViewData["CurrencySelector"] = new SelectList(FiltersHelper.GetCurrenciesFilterList(_context), "Value", "Text");
+            // var companiesList = FiltersHelper.GetCompaniesFilterList(_context);
+            // ViewData["CompanyFilter"] = new SelectList(companiesList, "Value", "Text");
+            // ViewData["CurrencySelector"] = new SelectList(FiltersHelper.GetCurrenciesFilterList(_context), "Value", "Text");
             var currencyListJs = _context.Currencies.OrderBy(p => p.Id).AsNoTracking().ToList();
             ViewData["CurrencyListJs"] = currencyListJs;
         }

@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="~/css/searchbar.css" />
 }
 <input type="hidden" id="initialPageTitle" value="@ViewData["Title"]" />
+<input type="hidden" id="nameOfIsozigio" value="" />
 <h4 id="hElementTitle">@ViewData["Title"]</h4>
 <div class="container ">
     <ul class="nav small justify-content-end ">
@@ -122,8 +123,8 @@
               //#region Index page definition objects
               const colDefs = [
                   {
-                      key: 'transactorName',
-                      responseKey: 'transactorName',
+                      key: 'materialName',
+                      responseKey: 'materialName',
                       actualVal: '',
                       columnFormat: 't',
                       totalKey: '',
@@ -140,7 +141,7 @@
                       remoteReference: {
                           isRemoteReference: true,
                           valueKey: 'id',
-                          url: '@Url.Page("/mainentities/transactors/details")?id='
+                          url: '@Url.Page("/mainentities/materials/details")?id='
                       }
                   },
 
@@ -165,16 +166,16 @@
                   },
 
                   {
-                      key: 'debit',
-                      responseKey: 'debit',
+                      key: 'importVolume',
+                      responseKey: 'importVolume',
                       actualVal: '',
-                      columnFormat: 'c',
-                      totalKey: 'sumOfDebit',
+                      columnFormat: 'n',
+                      totalKey: 'sumImportsVolume',
                       grandTotalKey: 'grandSumOfDebit',
-                      totalFormatter: 'currency',
+                      totalFormatter: 'number',
                       sortKey: '',
                       sortType: '',
-                      header: 'Debit',
+                      header: 'Imp. Volume',
                       text: '',
                       headerClass: 'small text-center',
                       class: 'small text-end ',
@@ -184,16 +185,16 @@
                       }
                   },
                   {
-                      key: 'credit',
-                      responseKey: 'credit',
+                      key: 'exportVolume',
+                      responseKey: 'exportVolume',
                       actualVal: '',
-                      columnFormat: 'c',
-                      totalKey: 'sumOfCredit',
+                      columnFormat: 'n',
+                      totalKey: 'sumExportsVolume',
                       grandTotalKey: 'grandSumOfCredit',
-                      totalFormatter: 'currency',
+                      totalFormatter: 'number',
                       sortKey: '',
                       sortType: '',
-                      header: 'Credit',
+                      header: 'Exp. Volume',
                       text: '',
                       headerClass: 'small text-center',
                       class: 'small text-end ',
@@ -203,18 +204,75 @@
                       }
                   },
                   {
-                      key: 'runningTotal',
-                      responseKey: 'runningTotal',
+                      key: 'runningTotalVolume',
+                      responseKey: 'runningTotalVolume',
+                      actualVal: '',
+                      columnFormat: 'n',
+                      totalKey: '',
+                      grandTotalKey: '',
+                      totalFormatter: 'number',
+                      sortKey: '',
+                      sortType: '',
+                      header: 'Balance Vol.',
+                      text: '',
+                      headerClass: 'small text-center',
+                      class: 'small text-end d-none d-md-table-cell',
+                      classWhenCondition: '',
+                      classCondition: {},
+                      remoteReference: {
+                      }
+                  },
+                  {
+                      key: 'importValue',
+                      responseKey: 'importValue',
                       actualVal: '',
                       columnFormat: 'c',
-                      totalKey: 'sumOfDifference',
-                      grandTotalKey: 'grandSumOfDifference',
+                      totalKey: 'sumImportsValue',
+                      grandTotalKey: 'sumImportsValue',
                       totalFormatter: 'currency',
                       sortKey: '',
                       sortType: '',
-                      header: 'Balance',
+                      header: 'Imp. Value',
                       text: '',
                       headerClass: 'small text-center',
+                      class: 'small text-end ',
+                      classWhenCondition: '',
+                      classCondition: {},
+                      remoteReference: {
+                      }
+                  },
+                  {
+                      key: 'exportValue',
+                      responseKey: 'exportValue',
+                      actualVal: '',
+                      columnFormat: 'c',
+                      totalKey: 'sumExportsValue',
+                      grandTotalKey: 'sumExportsValue',
+                      totalFormatter: 'currency',
+                      sortKey: '',
+                      sortType: '',
+                      header: 'Exp. Value',
+                      text: '',
+                      headerClass: 'small text-center',
+                      class: 'small text-end ',
+                      classWhenCondition: '',
+                      classCondition: {},
+                      remoteReference: {
+                      }
+                  },
+                  {
+                      key: 'runningTotalValue',
+                      responseKey: 'runningTotalValue',
+                      actualVal: '',
+                      columnFormat: 'c',
+                      totalKey: '',
+                      grandTotalKey: '',
+                      totalFormatter: 'currency',
+                      sortKey: '',
+                      sortType: '',
+                      header: 'Bal. Value',
+                      text: '',
+                      headerClass: 'small text-end d-none d-md-table-cell',
                       class: 'small text-end ',
                       classWhenCondition: '',
                       classCondition: {},
@@ -335,10 +393,10 @@
                       }
                   },
                   {
-                      selector: '#TransactorTypeFilter',
+                      selector: '#MaterialNatureSelector',
                       event: 'change',
                       handler: function(event) {
-                          $('#pageIndex').val(1);
+                         // $('#pageIndex').val(1);
                           indPgLib.refreshData();
                       }
                   },
@@ -352,7 +410,7 @@
                   }
               ];
               const indexPageDef = {
-                  uri: '/api/GrKoukInfoApi/GetIndexTblDataTransactorsBalance',
+                  uri: '/api/GrKoukInfoApi/GetIndexTblDataWarehouseBalance',
                   currencyFormatter: formatterCurrency,
                   numberFormatter: formatterNumber,
                   colDefs: colDefs,
@@ -367,198 +425,7 @@
 
               indPgLib.setIndexPageDefinition(indexPageDef);    
         //#endregion   
-            var getTableData = (pageIndex, pageSize, sortData, dateRange, companyFilter,transactorTypeFilter,warehouseItemNatureFilter, searchFilter,displayCurrencyId) => {
-                //#region getTableData
-                var timeout;
-                var uri = '/api/GrKoukInfoApi/GetIndexTblDataWarehouseBalance';
-                uri += `?pageIndex=${pageIndex}`;
-                uri += `&pageSize=${pageSize}`;
-                uri += `&companyFilter=${companyFilter}`;
-                uri += `&dateRange=${dateRange}`;
-                uri += `&transactorTypeFilter=${transactorTypeFilter}`;
-                uri += `&warehouseItemNatureFilter=${warehouseItemNatureFilter}`;
-                uri += `&sortData=${sortData}`;
-                uri += `&searchFilter=${searchFilter}`;
-                uri += `&displayCurrencyId=${displayCurrencyId}`;
-                // uri += `&transactorId=${transactorId}`;
-                $.ajax({
-                    contentType: 'application/json; charset=utf-8',
-
-                    dataType: 'json',
-                    type: 'GET',
-
-                    url: uri,
-                    beforeSend: function() {
-                        if (timeout) {
-                            clearTimeout(timeout);
-                        }
-                        timeout = setTimeout(function() {
-
-                                $("#loadMe").modal({
-                                    backdrop: "static", //remove ability to close modal with click
-                                    keyboard: false, //remove option to close with keyboard
-                                    show: true //Display loader!
-                                });
-                            },
-                            1000);
-
-                    },
-                    success: function(result) {
-                        var totalRecords = result.totalRecords;
-                        var totalPages = result.totalPages;
-
-                        $totalPages.val(totalPages);
-                        $totalRecords.val(totalRecords);
-                        var pagingInfo =
-                            ` Page:${pageIndex} of ${totalPages} Total Items ${totalRecords}`;
-                        $('[name=PagingInfo]').text(pagingInfo);
-                        var hasPrevious = result.hasPrevious;
-                        var hasNext = result.hasNext;
-                        if (hasPrevious) {
-                            $('#GoToFirst, #GoToPrevious').parent().removeClass('disabled');
-                        } else {
-                            $('#GoToFirst, #GoToPrevious').parent().addClass('disabled');
-                        }
-                        if (hasNext) {
-                            $('#GoToLast, #GoToNext').parent().removeClass('disabled');
-                        } else {
-                            $('#GoToLast, #GoToNext').parent().addClass('disabled');
-                        }
-                        $('#myTable > tbody').empty();
-
-                        $.each(result.data,
-                            function (index, value) {
-                                let cols = [
-                                    {
-                                        text: value.materialName,
-                                        class: 'small'
-                                    },
-                                    {
-                                        text: value.companyCode,
-                                        class: 'small d-none d-md-table-cell'
-                                    },
-
-                                    {
-                                        text: formatterNumber.format( value.importVolume),
-                                        class: 'small text-right'
-                                    },
-                                    {
-                                        text: formatterNumber.format( value.exportVolume),
-                                        class: 'small text-right'
-                                    },
-                                    {
-                                        text: formatterNumber.format(value.runningTotalVolume),
-                                        class: 'small text-right d-none d-md-table-cell'
-                                    },
-                                    {
-                                        text: formatterCurrency.format(value.importValue),
-                                        class: 'small text-right'
-                                    },
-                                    {
-                                        text: formatterCurrency.format( value.exportValue),
-                                        class: 'small text-right'
-                                    },
-                                    {
-                                        text: formatterCurrency.format( value.runningTotalValue),
-                                        class: 'small text-right d-none d-md-table-cell'
-                                    }
-                                ];
-
-                                var itemId = value.id;
-                                var urlEdit = `@Url.Page("./Edit")?id=${itemId}`;
-                                var urlInfo = `@Url.Page("./Details")?id=${itemId}`;
-                                var urlDel = `@Url.Page("./Delete")?id=${itemId}`;
-                                var urlNewLikeThis = `@Url.Page("./Create")?copyFromId=${itemId}`;
-                                var actionsCol = '<td class="small text-center d-none d-md-table-cell">';
-                               // actionsCol += `<a href="${urlEdit}"><i class="fas fa-edit fa-lg" style="color:slategray"></i></a> |`;
-                                actionsCol += `<a href="${urlInfo}"><i class="fas fa-info-circle fa-lg" style="color:slategray"></i></a> | `;
-                                //actionsCol += `<a href="${urlDel}"><i class="fas fa-trash fa-lg" style="color:slategray"></i></a> | `;
-                                actionsCol += `<a href="${urlNewLikeThis}"><i class="fas fa-clone fa-lg" style="color:slategray"></i></a> `;
-                                actionsCol += '</td>';
-                                var actionColMobile =
-                                    '<td class="small text-center d-table-cell d-sm-table-cell d-md-none">';
-                                actionColMobile +=
-                                    '<a class=" dropdown-toggle" role="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" ';
-                                actionColMobile +=
-                                    'aria-expanded="false"><i class="fas fa-bars fa-lg" style="color:slategray"></i></a>';
-                                actionColMobile +=
-                                    '<div class="dropdown-menu small" aria-labelledby="dropdownMenuButton">';
-                                //actionColMobile += `<a class="dropdown-item" href="${urlEdit}"><i class="fas fa-edit fa-lg" style="color:slategray"></i>  Edit</a> `;
-                                actionColMobile += `<a class="dropdown-item" href="${urlInfo}"><i class="fas fa-info-circle fa-lg" style="color:slategray"></i> Details</a> `;
-                                //actionColMobile += `<a class="dropdown-item" href="${urlDel}"><i class="fas fa-trash fa-lg" style="color:slategray"></i> Delete</a> `;
-                                actionColMobile += `<a class="dropdown-item" href="${urlNewLikeThis}"><i class="fas fa-clone fa-lg" style="color:slategray"></i> Duplicate</a> `;
-                                actionColMobile += '</div></td>';
-                                var $tr = $('<tr>');
-
-                                var $td = $(
-                                    '<td name="selectRowColumn"> <label class="custom-control custom-checkbox">  ' +
-                                    ' <input type="checkbox" class="custom-control-input" name="checkTableRow" ' +
-                                    `data-itemId="${itemId}">` +
-                                    '<span class="custom-control-indicator"></span></label></td>');
-                                $tr.append($td);
-                                cols.forEach(function(item) {
-                                    var $tdCol = $('<td>').text(item.text).addClass(item.class);
-                                    $tr.append($tdCol);
-
-                                });
-                                $tr.append(actionsCol);
-                                $tr.append(actionColMobile);
-                                $tr.appendTo('#myTable > tbody');
-
-                            });
-                        $('input[name=checkTableRow]').on('change',
-                            function() {
-                                handleSelectedRowsUi();
-                            });
-                        //console.log();
-                        var sumImportsVolume = formatterNumber.format(result.sumImportVolume);
-                        var sumExportsVolume = formatterNumber.format(result.sumExportVolume);
-                        var sumImportsValue = formatterCurrency.format(result.sumImportValue);
-                        var sumExportsValue = formatterCurrency.format(result.sumExportValue);
-                       // var sumDifference = formatterCurrency.format(result.sumOfDifference);
-                        var $summaryRow = $('<tr class="table-info">').append(
-                            $('<td name="selectRowColumn"> </td>  '),
-                            $('<td>').text('Σύνολα Σελίδας').addClass('small font-weight-bold'),
-                            $('<td>').addClass('d-none d-md-table-cell'),
-
-                            $('<td>').text(sumImportsVolume).addClass('small text-right font-weight-bold'),
-                            $('<td>').text(sumExportsVolume).addClass('small text-right font-weight-bold'),
-                            $('<td>').addClass('d-none d-md-table-cell'),
-                            $('<td>').text(sumImportsValue).addClass('small text-right font-weight-bold'),
-                            $('<td>').text(sumExportsValue).addClass('small text-right font-weight-bold'),
-
-                            $('<td>').text('').addClass('small d-none d-md-table-cell'),
-                            $('<td>').addClass('d-none d-md-table-cell'),
-                            $('<td>').addClass('d-table-cell d-sm-table-cell d-md-none')
-                        ).appendTo('#myTable > tbody:last');
-                        rowSelectorsUi();
-                        handleSortUi();
-                    },
-                    complete: function() {
-                        if (timeout) {
-                            clearTimeout(timeout);
-                        }
-                        $("#loadMe").modal("hide");
-                        setTimeout(function() {
-                                console.log('Checking for open modals');
-                                var isOpen = $('#loadMe').hasClass('show');
-                                if (isOpen) {
-                                    console.log('There is an open Modal');
-                                    $("#loadMe").modal("hide");
-                                } else {
-                                    console.log('No open modal');
-                                }
-                            },
-                            2000);
-                    },
-                    error: function(e) {
-                        console.log(e);
-
-                    }
-                });
-                //#endregion
-            };
-
+         
               var currencyChanged = () => {
                   let curCurrencySelected = parseInt($('#CurrencySelector').val());
                   var currencyCode;
