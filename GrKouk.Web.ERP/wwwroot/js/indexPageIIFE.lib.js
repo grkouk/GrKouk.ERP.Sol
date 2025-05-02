@@ -1,7 +1,7 @@
 ﻿//Author: George Koukoudis
-//Version:  1.5.1
+//Version:  2.0.0
 //Date Created: 2022-01-17
-//Date Modified: 2025-01-11
+//Date Modified: 2025-05-2
 //Index pages javascript tools
 
 var indPgLib = (function () {
@@ -1365,6 +1365,7 @@ var indPgLib = (function () {
         var pageIndex = $pageIndex.val();
         var currentCurrency = $currencySelector.val();
         var sectionsFilter = $sectionsFilter.val();
+        let showCarryOnFilter = $showCarryOnFlt.is(':checked')
         var filtersArr = [];
         //#endregion
         filtersArr.push({
@@ -1408,7 +1409,200 @@ var indPgLib = (function () {
         localStorage.setItem(localStorageKey, sessionVal);
         //#endregion
     };
-    //register common handlers
+    /**
+     * Saves the current state of configured form elements to localStorage.
+     * @param {string} storageKey - The key to use in localStorage.
+     * @param {object} config - Configuration mapping element IDs to storage keys and properties.
+     */
+
+    const saveSettingsToStorageV1=(storageKey, config)=> {
+        const settingsToStore = []; // Array to hold { filterKey, filterValue } objects
+
+        // Gather current settings from elements
+        for (const elementId in config) {
+            if (Object.hasOwnProperty.call(config, elementId)) {
+                const {key, prop} = config[elementId]; // Get storage key and property name
+                const element = document.getElementById(elementId);
+
+                if (element) {
+                    try {
+                        // Read the value using the specified property ('value', 'checked', etc.)
+                        const currentValue = element[prop];
+                        settingsToStore.push({filterKey: key, filterValue: currentValue});
+                    } catch (e) {
+                        console.error(`Error reading property '${prop}' from element '#${elementId}'. Skipping this setting.`, e);
+                    }
+                } else {
+                    // Log if an expected element is missing
+                    console.warn(`Element with ID "${elementId}" not found in the DOM during save. Skipping this setting.`);
+                }
+            }
+
+        }
+    };
+    /**
+     * Applies settings from localStorage to form elements, using defaults if storage is missing or invalid.
+     * @param {string} storageKey - The key used in localStorage.
+     * @param {object} config - Configuration mapping element IDs to storage keys, defaults, and properties.
+     */
+    const applySettingsFromStorageV1=(storageKey, config)=>{
+        const storedString = localStorage.getItem(storageKey);
+        let loadedSettings = {}; // Will hold { filterKey: filterValue } pairs
+
+        if (storedString) {
+            try {
+                const storedArray = JSON.parse(storedString);
+                // Ensure it's an array and convert to an object for easier lookup
+                if (Array.isArray(storedArray)) {
+                    loadedSettings = storedArray.reduce((acc, item) => {
+                        if (item && typeof item.filterKey === 'string') {
+                            acc[item.filterKey] = item.filterValue;
+                        }
+                        return acc;
+                    }, {});
+                } else {
+                    console.warn(`localStorage item "${storageKey}" is not a valid array. Using defaults.`);
+                }
+            } catch (error) {
+                console.error(`Failed to parse localStorage item "${storageKey}". Using defaults.`, error);
+                // Keep loadedSettings empty, defaults will apply
+            }
+        } else {
+            console.log(`localStorage item "${storageKey}" not found. Using defaults.`);
+        }
+
+        // Apply settings or defaults to elements
+        for (const elementId in config) {
+            if (Object.hasOwnProperty.call(config, elementId)) {
+                const { key, default: defaultValue, prop } = config[elementId];
+                const element = document.getElementById(elementId);
+
+                if (element) {
+                    // Use loaded value if available, otherwise use the default
+                    const value = loadedSettings[key] !== undefined ? loadedSettings[key] : defaultValue;
+
+                    try {
+                        // Use 'checked' property for checkboxes/radios, 'value' for others
+                        if (prop === 'checked') {
+                            // Ensure boolean conversion for checked state
+                            element[prop] = Boolean(value);
+                        } else if (prop === 'value') {
+                            element[prop] = value;
+                        } else {
+                            // Potentially support other properties if needed
+                            element[prop] = value;
+                            console.warn(`Unsupported property '${prop}' for element '#${elementId}'. Attempting direct assignment.`);
+                        }
+                    } catch (e) {
+                        console.error(`Error setting property '${prop}' on element '#${elementId}' with value '${value}'.`, e);
+                    }
+                } else {
+                    // Log if an expected element is missing
+                    console.warn(`Element with ID "${elementId}" not found in the DOM.`);
+                }
+            }
+        }
+
+    };
+    const saveSettingsToStorage=(storageKey, config)=>{
+        const settingsToStore = [];
+
+        // Iterate through config and read settings using jQuery
+        for (const elementId in config) {
+            if (Object.hasOwnProperty.call(config, elementId)) {
+                const { key: settingKey, prop } = config[elementId];
+                const $element = $('#' + elementId); // Use jQuery selector
+
+                if ($element.length) { // Check if element exists
+                    try {
+                        let currentValue;
+                        if (prop === 'checked') {
+                            // Use .prop() to read boolean properties
+                            currentValue = $element.prop('checked');
+                        } else if (prop === 'value') {
+                            // Use .val() to read 'value'
+                            currentValue = $element.val();
+                        } else {
+                            // Fallback for potentially other properties
+                            currentValue = $element.prop(prop);
+                            console.warn(`Attempting to read non-standard property '${prop}' using .prop() from '#${elementId}'. Verify this is intended.`);
+                        }
+                        settingsToStore.push({ filterKey: settingKey, filterValue: currentValue });
+                    } catch (e) {
+                        console.error(`Error reading property/value from jQuery element '#${elementId}'. Skipping this setting.`, e);
+                    }
+                } else {
+                     console.warn(`Element with ID "${elementId}" not found in the DOM using jQuery during save. Skipping this setting.`);
+                }
+            }
+        }
+
+        // Save the array to localStorage (no change here)
+        try {
+            const jsonString = JSON.stringify(settingsToStore);
+            localStorage.setItem(storageKey, jsonString);
+             console.log(`Settings saved successfully to localStorage storageKey "${storageKey}".`);
+        } catch (error) {
+            console.error(`Failed to save settings to localStorage key "${storageKey}".`, error);
+        }
+
+
+    }
+    const applySettingsFromStorage=(storageKey, config)=>{
+        const storedString = localStorage.getItem(storageKey);
+        let loadedSettings = {};
+
+        if (storedString) {
+            try {
+                const storedArray = JSON.parse(storedString);
+                if (Array.isArray(storedArray)) {
+                    loadedSettings = storedArray.reduce((acc, item) => {
+                        if (item && typeof item.filterKey === 'string') {
+                            acc[item.filterKey] = item.filterValue;
+                        }
+                        return acc;
+                    }, {});
+                } else {
+                    console.warn(`localStorage item "${storageKey}" is not a valid array. Using defaults.`);
+                }
+            } catch (error) {
+                console.error(`Failed to parse localStorage item "${storageKey}". Using defaults.`, error);
+            }
+        } else {
+            console.log(`localStorage item "${storageKey}" not found. Using defaults.`);
+        }
+
+        // Iterate through config and apply settings using jQuery
+        for (const elementId in config) {
+            if (Object.hasOwnProperty.call(config, elementId)) {
+                const { key: settingKey, default: defaultValue, prop } = config[elementId];
+                const $element = $('#' + elementId); // Use jQuery selector
+
+                if ($element.length) { // Check if element exists using jQuery's length property
+                    const value = loadedSettings[settingKey] !== undefined ? loadedSettings[settingKey] : defaultValue;
+                    try {
+                        if (prop === 'checked') {
+                            // Use .prop() for boolean properties like 'checked'
+                            $element.prop('checked', Boolean(value));
+                        } else if (prop === 'value') {
+                            // Use .val() for 'value' property
+                            $element.val(value);
+                        } else {
+                            // Fallback for potentially other properties (less common with jQuery)
+                            $element.prop(prop, value);
+                            console.warn(`Attempting to set non-standard property '${prop}' using .prop() on '#${elementId}'. Verify this is intended.`);
+                        }
+                    } catch (e) {
+                        console.error(`Error setting property/value on jQuery element '#${elementId}' with value '${value}'.`, e);
+                    }
+                } else {
+                    // console.warn(`Element with ID "${elementId}" not found in the DOM using jQuery during apply.`);
+                }
+            }
+        }
+
+    }
+        //register common handlers
     setupCreateNewElement();
     registerHandlers(commonHandlers);
     return {
@@ -1429,7 +1623,9 @@ var indPgLib = (function () {
         setNumberFormatter: setNumberFormatter,
         loadSettings: loadSettings,
         saveSettings: saveSettings,
-        setIndexViewTitlesBasedOnPeriod:setIndexViewTitlesBasedOnPeriod
+        setIndexViewTitlesBasedOnPeriod:setIndexViewTitlesBasedOnPeriod,
+        saveSettingsToStorage:saveSettingsToStorage,
+        applySettingsFromStorage:applySettingsFromStorage
         
     };
 })();
