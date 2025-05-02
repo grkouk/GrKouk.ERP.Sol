@@ -167,25 +167,26 @@
                 //  'TransactorTypeFilter':      { key: 'transactorTypeFilter',      default: 1,           prop: 'value' },
                 //'WarehouseItemNatureFilter': { key: 'warehouseItemNatureFilter', default: 1,           prop: 'value' },
                 'currentSort':               { key: 'currentSort',               default: 'datesort:asc',prop: 'value' },
-                'CurrencySelector':          { key: 'currentCurrency',           default: '',          prop: 'value' },
-                // 'ShowCarryOnFlt':            { key: 'ShowCarryOnFlt',            default: true,        prop: 'checked'} // Reads the 'checked' property
+                'CurrencySelector':          { key: 'currentCurrency',           default: 1,          prop: 'value' },
+                // 'ShowCarryOnFlt':            { key: 'ShowCarryOnFlt',            default: true,        prop: 'checked'},
+                //'ShowSummaryFlt':            { key: 'ShowSummaryFlt',            default: true,        prop: 'checked'} // Reads the 'checked' property
             };
             // --- Page Hide Event Listener (Replaces unload) ---
-            window.addEventListener('pagehide', function(event) {
-                console.log('pagehide event triggered. Saving settings...'); // For debugging
-                indPgLib.saveSettingsToStorage(storageKey, elementSettingsConfig);
-                // Avoid complex logic or async operations here
-            });
-            document.addEventListener('visibilitychange', function() {
-                if (document.visibilityState === 'hidden') {
-                    console.log('visibilitychange to hidden triggered. Saving settings...'); // For debugging
-                    saveSettingsToStorage(storageKey, elementSettingsConfig);
-                }
-            });
+            // window.addEventListener('pagehide', function(event) {
+            //     console.log('pagehide event triggered. Saving settings...'); // For debugging
+            //     indPgLib.saveSettingsToStorage(storageKey, elementSettingsConfig);
+            //     // Avoid complex logic or async operations here
+            // });
+            // document.addEventListener('visibilitychange', function() {
+            //     if (document.visibilityState === 'hidden') {
+            //         console.log('visibilitychange to hidden triggered. Saving settings...'); // For debugging
+            //         indPgLib.saveSettingsToStorage(storageKey, elementSettingsConfig);
+            //     }
+            // });
 
             window.addEventListener('beforeunload', function(event) {
                 console.log('beforeunload event triggered. Saving settings...'); // For debugging
-                saveSettingsToStorage(storageKey, elementSettingsConfig);
+                indPgLib.saveSettingsToStorage(storageKey, elementSettingsConfig);
                 // DO NOT try to add confirmation dialogs or complex logic here.
             });
 
@@ -1313,9 +1314,7 @@
             indPgLib.addPagerElementEventListeners();
             indPgLib.registerPageHandlers();
             //Going to new setting management
-           
-
-            indPgLib.applySettingsFromStorage("BuyDocIndexViewNew",elementSettingsConfig);
+            indPgLib.applySettingsFromStorage(storageKey,elementSettingsConfig);
 
            // indPgLib.loadSettings('BuyDocIndexView');
             //----------------
@@ -1325,12 +1324,7 @@
             indPgLib.refreshData();
             indPgLib.rowSelectorsUi();
         });
-
-        // $(window).on('beforeunload',
-        //     function (e) {
-        //         //indPgLib.saveSettings('BuyDocIndexView');
-        //         //indPgLib.saveSettingsToStorage("",)
-        //     });
+        
     </script>`
     @ScriptHelper.RenderScripts(HttpContext)
 }

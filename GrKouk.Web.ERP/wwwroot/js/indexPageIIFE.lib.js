@@ -1421,7 +1421,9 @@ var indPgLib = (function () {
         // Gather current settings from elements
         for (const elementId in config) {
             if (Object.hasOwnProperty.call(config, elementId)) {
-                const {key, prop} = config[elementId]; // Get storage key and property name
+               // const {key, prop} = config[elementId]; // Get storage key and property name
+                const { key: settingKey, prop, dataType } = config[elementId]; // Get dataType
+
                 const element = document.getElementById(elementId);
 
                 if (element) {
@@ -1510,13 +1512,25 @@ var indPgLib = (function () {
         // Iterate through config and read settings using jQuery
         for (const elementId in config) {
             if (Object.hasOwnProperty.call(config, elementId)) {
-                const { key: settingKey, prop } = config[elementId];
+                //const { key: settingKey, prop } = config[elementId];
+                const { key: settingKey, prop, dataType } = config[elementId]; // Get dataType
+
                 const $element = $('#' + elementId); // Use jQuery selector
 
                 if ($element.length) { // Check if element exists
                     try {
                         let currentValue;
-                        if (prop === 'checked') {
+                        if (dataType === 'array') {
+                            currentValue = $element.val(); // .val() on multi-select returns array (usually of strings)
+                            // Ensure it's an array, default to empty array if not (e.g., null)
+                            // if (!Array.isArray(currentValue)) {
+                            //     console.warn(`Expected array from .val() on '#${elementId}' but received ${typeof currentValue}. Using empty array.`);
+                            //     currentValue = [];
+                            // }
+                            // Optional: Convert string array to integer array IF needed here
+                             //currentValue = currentValue.map(str => parseInt(str, 10)).filter(n => !isNaN(n));
+                        }
+                        else if (prop === 'checked') {
                             // Use .prop() to read boolean properties
                             currentValue = $element.prop('checked');
                         } else if (prop === 'value') {
@@ -1575,13 +1589,27 @@ var indPgLib = (function () {
         // Iterate through config and apply settings using jQuery
         for (const elementId in config) {
             if (Object.hasOwnProperty.call(config, elementId)) {
-                const { key: settingKey, default: defaultValue, prop } = config[elementId];
+                //const { key: settingKey, default: defaultValue, prop } = config[elementId];
+                const { key: settingKey, default: defaultValue, prop, dataType } = config[elementId];
+
                 const $element = $('#' + elementId); // Use jQuery selector
 
                 if ($element.length) { // Check if element exists using jQuery's length property
-                    const value = loadedSettings[settingKey] !== undefined ? loadedSettings[settingKey] : defaultValue;
+                    let value = loadedSettings[settingKey] !== undefined ? loadedSettings[settingKey] : defaultValue;
                     try {
-                        if (prop === 'checked') {
+                        // --- Special Handling for Array ---
+                        if (dataType === 'array') {
+                            // Ensure the value we are about to set is actually an array
+                            // if (!Array.isArray(value)) {
+                            //     console.warn(`Expected array for settingKey "${settingKey}" but received ${typeof value}. Using default:`, defaultValue);
+                            //     value = Array.isArray(defaultValue) ? defaultValue : []; // Fallback to default or empty array
+                            // }
+                            // Optional: Ensure array contains expected types (e.g., strings for .val()) if necessary
+                            // value = value.map(item => String(item)); // If .val() expects string array
+                            $element.val(value); // Set using .val()
+                        }
+
+                        else if (prop === 'checked') {
                             // Use .prop() for boolean properties like 'checked'
                             $element.prop('checked', Boolean(value));
                         } else if (prop === 'value') {
