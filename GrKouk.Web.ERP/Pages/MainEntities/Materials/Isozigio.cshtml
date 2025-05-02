@@ -1,4 +1,5 @@
 ﻿@page
+@using GrKouk.Web.ERP.Helpers
 @model IsozigioModel
 @{
     ViewData["Title"] = "Ισοζύγιο ";
@@ -8,7 +9,8 @@
     <link rel="stylesheet" href="~/css/custom-checkbox.css" />
     <link rel="stylesheet" href="~/css/searchbar.css" />
 }
-<h4>Ισοζύγιο  </h4>
+<input type="hidden" id="initialPageTitle" value="@ViewData["Title"]" />
+<h4 id="hElementTitle">@ViewData["Title"]</h4>
 <div class="container ">
     <ul class="nav small justify-content-end ">
 
@@ -37,160 +39,70 @@
         </li>
     </ul>
 </div>
-<div class="collapse show" id="filterCollapse">
-    <form class="form-inline" id="FiltersForm" method="get">
-        <input type="hidden" id="filtersVisible" />
-        <input type="hidden" id="rowSelectorsVisible" />
-        <input type="hidden" id="currentSort" />
-        <input type="hidden" id="currentFilter" />
-        <input type="hidden" id="totalPages" />
-        <input type="hidden" id="totalRecords" />
-        <input type="hidden" id="pageIndex" />
-        <div class="container">
-            <div class="form-row">
-                <div class="form-group col-md-auto">
-                    <div class="searchbar">
-                        <input class="search_input" type="text" name="" placeholder="Search...">
-                        <a href="#" class="search_icon"><i class="fas fa-search fa-xs"></i></a>
-                    </div>
-                </div>
+@await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow
+{
+    ShowCurrencyFlt = true,
+    ShowCompaniesFlt = true,
+    ShowPageSizeFlt = true,
+    ShowMaterialCategoriesFlt = true
+    ,ShowDateFlt=true
+    ,ShowDisplayLinesWithZeroAmountFlt=true
+})
 
-                <div class="form-group col-md-auto">
-                    <label class="small"> WarehouseItem Nature:</label>
-                    <select id="WarehouseItemNatureFilter" class="form-control form-control-sm small"
-                            asp-items="ViewBag.MaterialNatureValues"></select>
-
-                </div>
-                <div class="form-group col-md-auto">
-                    <label class="small">Company:</label>
-                    <select id="CompanyFilter" class="form-control form-control-sm small"
-                            asp-items="ViewBag.CompanyFilter"></select>
-                </div>
-                <div class="form-group col-md-auto">
-                    <label class="small"> Page Size:</label>
-                    <select id="PageSize" class="form-control form-control-sm small"
-                            asp-items="ViewBag.PageFilterSize"></select>
-                </div>
-                <div class="form-group col-md-auto">
-                    <small>
-                        <label name="PagingInfo"> </label>
-
-                    </small>
-                </div>
-                <div class="form-group col-md-auto">
-                    <label class="small"> Currency:</label>
-                    <select id="CurrencySelector" class="form-control form-control-sm small"
-                            asp-items="ViewBag.CurrencySelector"></select>
-                </div>
-            </div>
-        </div>
-    </form>
+<div class="row mt-1">
+    <partial name="_PagerPartial" />
 </div>
-
-<br />
-<table class="table table-bordered table-sm" id="myTable">
-    <thead class="thead-light">
-        <tr>
-            <th name="selectAllRowsColumn">
-                <label class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" name="checkAllRows">
-                    <span class="custom-control-indicator"></span>
-                </label>
-            </th>
-            <th class="small">
-                <a href="#" id="NameSortHeader">
-                    Item
-                </a>
-                <i class="fas fa-sort-alpha-down" id="NameSortHeaderIcon" name="SortIcon"></i>
-            </th>
-            <th class="small text-center d-none d-md-table-cell">
-                CompanyCode
-            </th>
-            <th class="small text-center">
-                ImportVolume
-            </th>
-            <th class="small text-center">
-                ExportVolume
-            </th>
-            <th class="small text-center d-none d-md-table-cell">
-                RunningTotalVolume
-            </th>
-            <th class="small text-center">
-                ImportValue
-            </th>
-            <th class="small text-center">
-                ExportValue
-            </th>
-            <th class="small text-center d-none d-md-table-cell">
-                RunningTotalValue
-            </th>
-            <th class="small text-center d-none d-md-table-cell"></th>
-            <th class="small text-center d-table-cell d-sm-table-cell d-md-none"></th>
-        </tr>
-    </thead>
-    <tbody>
-
-        <tr></tr>
-
-
-
-    </tbody>
-</table>
+<partial name="_DataTable" />
 <div class="row">
-    <div class="col-3">
-        <label class="small" name="PagingInfo"> </label>
-    </div>
-    <div class="col-9">
-        <nav aria-label="Page navigation example">
-            <ul class="pagination pagination-sm justify-content-end">
-                <li class="page-item ">
-                    <a href="#" id="GoToFirst"
-                       class="page-link" aria-label="First">
-                        First
-                    </a>
-                </li>
-                <li class="page-item ">
-                    <a href="#" id="GoToPrevious"
-                       class="page-link" aria-label="Previous">
-                        Previous
-                    </a>
-                </li>
-
-                <li class="page-item ">
-                    <a href="#" id="GoToNext"
-                       class="page-link" aria-label="Next">
-                        Next
-                    </a>
-                </li>
-                <li class="page-item  ">
-                    <a href="#" id="GoToLast"
-                       class="page-link" aria-label="Last">
-                        Last
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
+    <partial name="_PagerPartial" />
 </div>
-<!-- Modal -->
-<div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <div class="loader"></div>
-                <div>
-                    <p>Executing request. <br><br><small>Please wait...</small></p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<a asp-page="./Index" class="small"> Back to List</a>
+<br />
+<a asp-page="./Index" class="small">Back to List</a>
+<partial name="_LoadMePartial" />
 
 @section Scripts
 {
+    <script src="~/js/moment.min.js"></script>
+    <script src="~/js/definitions.js"></script>
+    <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
           $(document).ready(function() {
+              const storageKey = 'WarehouseBalanceIndexViewNew';
+              const elementSettingsConfig = {
+                  // Element ID: { key: storageKey, default: defaultValue, prop: propertyToSetOrRead }
+                  // 'pageIndex':                 { key: 'pageIndex',                 default: 1,           prop: 'value' },
+                  'PageSize':                  { key: 'pageSize',                  default: 10,          prop: 'value' },
+                  'filtersVisible':            { key: 'filtersVisible',            default: true,        prop: 'value' },
+                  'rowSelectorsVisible':       { key: 'rowSelectorsVisible',       default: false,       prop: 'value' },
+                  'DatePeriodFilter':          { key: 'dateRangeFilter',           default: 'CURYEAR',   prop: 'value' },
+                  'CompanyFilter':             { key: 'companyFilter',             default: 0,           prop: 'value' },
+                  'TransactorTypeFilter':      { key: 'transactorTypeFilter',      default: 1,           prop: 'value' },
+                  //'WarehouseItemNatureFilter': { key: 'warehouseItemNatureFilter', default: 1,           prop: 'value' },
+                  'currentSort':               { key: 'currentSort',               default: 'datesort:asc',prop: 'value' },
+                  'CurrencySelector':          { key: 'currentCurrency',           default: 1,          prop: 'value' },
+                  'fromDateFilterEl':          { key: 'fromDateFilter',           default: '',          prop: 'value' },
+                  'toDateFilterEl':          { key: 'toDateFilter',           default: '',          prop: 'value' },
+                  //'ShowCarryOnFlt':            { key: 'ShowCarryOnFlt',            default: true,        prop: 'checked'}, 
+                  //'ShowSummaryFlt':            { key: 'ShowSummaryFlt',            default: true,        prop: 'checked'}
+              };
+              // --- Page Hide Event Listener (Replaces unload) ---
+              // window.addEventListener('pagehide', function(event) {
+              //     console.log('pagehide event triggered. Saving settings...'); // For debugging
+              //     indPgLib.saveSettingsToStorage(storageKey, elementSettingsConfig);
+              //     // Avoid complex logic or async operations here
+              // });
+              // document.addEventListener('visibilitychange', function() {
+              //     if (document.visibilityState === 'hidden') {
+              //         console.log('visibilitychange to hidden triggered. Saving settings...'); // For debugging
+              //         indPgLib.saveSettingsToStorage(storageKey, elementSettingsConfig);
+              //     }
+              // });
+
+              window.addEventListener('beforeunload', function(event) {
+                  console.log('beforeunload event triggered. Saving settings...'); // For debugging
+                  indPgLib.saveSettingsToStorage(storageKey, elementSettingsConfig);
+                  // DO NOT try to add confirmation dialogs or complex logic here.
+              });  
             var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
            // currentCulture = 'el-GR';
             var formatterCurrency = new Intl.NumberFormat(currentCulture,
@@ -204,77 +116,257 @@
                     maximumFractionDigits: 3
 
                 });
-            //#region variables
-            var $filtersVisible = $('#filtersVisible');
-            var $filterCollapse = $('#filterCollapse');
-            var $checkAllRows = $('input[name=checkAllRows]');
-            var $filtersToggle = $('#filtersToggle');
-            var $rowSelectorsToggle = $('#rowSelectorsToggle');
-            var $rowSelectorsVisible = $('#rowSelectorsVisible');
-            var $selectAllSelector = $('th[name=selectAllRowsColumn]');
-            var $selectedRowsActionsMenu = $('#SelectedRowsActionsMenu');
-            var $selectedRowsActionsLink = $('#ddSelectedRowsActions');
-            var $deleteSelectedRowsLink = $('#deleteSelectedRows');
-            var $pageIndex = $('#pageIndex');
-            var $pageSize = $('#PageSize');
-            var $totalPages = $('#totalPages');
-              var $totalRecords = $('#totalRecords');
-            var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
-            //#endregion
-            var reallyIsNaN = function(x) {
-                return x !== x;
-            };
-            var handleSortUi = () => {
-                var curSort = $('#currentSort').val();
-                $('[name=SortIcon]').hide();
-                if (curSort === undefined || curSort === null || curSort.length === 0) {
-                    //hide all icons
-                    return;
-                }
-                var curSortAr = curSort.split(':');
-                switch (curSortAr[0]) {
-                    case 'companysort':
-                        if (curSortAr[1] === 'asc') {
-                            $('#CompanySortHeaderIcon').addClass('fas fa-sort-numeric-up').show();
-                        } else {
-                            $('#CompanySortHeaderIcon').addClass('fas fa-sort-numeric-down').show();
-                        }
-                        break;
-                    case 'categorysort':
-                        if (curSortAr[1] === 'asc') {
-                            $('#CategorySortHeaderIcon').addClass('fas fa-sort-numeric-up').show();
-                        } else {
-                            $('#CategorySortHeaderIcon').addClass('fas fa-sort-numeric-down').show();
-                        }
-                        break;
-                    case 'namesort':
-                        if (curSortAr[1] === 'asc') {
-                            $('#NameSortHeaderIcon').addClass('fas fa-sort-alpha-up').show();
-                        } else {
-                            $('#NameSortHeaderIcon').addClass('fas fa-sort-alpha-down').show();
-                        }
-                        break;
-                    default:
-                }
+        //#region index page definitions
+              var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
+              //#endregion
+              //#region Index page definition objects
+              const colDefs = [
+                  {
+                      key: 'transactorName',
+                      responseKey: 'transactorName',
+                      actualVal: '',
+                      columnFormat: 't',
+                      totalKey: '',
+                      grandTotalKey: '',
+                      totalFormatter: '',
+                      sortKey: 'NameSort',
+                      sortType: 'alpha',
+                      header: 'Transactor',
+                      text: '',
+                      headerClass: 'small text-center',
+                      class: 'small',
+                      classWhenCondition: '',
+                      classCondition: {},
+                      remoteReference: {
+                          isRemoteReference: true,
+                          valueKey: 'id',
+                          url: '@Url.Page("/mainentities/transactors/details")?id='
+                      }
+                  },
 
-            };
-            var handleSelectedRowsUi = () => {
-                var $rowSelectors = $('input[name=checkTableRow]');
-                var $selectedRowsActionsLink = $('#ddSelectedRowsActions');
-                var allRows = $rowSelectors.length;
-                var selectedRowsCount = $rowSelectors.filter(':checked').length;
-                if (selectedRowsCount > 0) {
-                    $selectedRowsActionsLink.removeClass('disabled');
-                    //$selectedRowsActionsLink.prop('disabled', 'false');
-                } else {
-                    $selectedRowsActionsLink.addClass('disabled');
-                }
-                if (selectedRowsCount == allRows) {
-                    $checkAllRows.prop('checked', true);
-                } else {
-                    $checkAllRows.prop('checked', false);
-                }
-            };
+                  {
+                      key: 'companyCode',
+                      responseKey: 'companyCode',
+                      actualVal: '',
+                      columnFormat: 't',
+                      totalKey: '',
+                      grandTotalKey: '',
+                      totalFormatter: '',
+                      sortKey: 'CompanyCodeSort',
+                      sortType: 'alpha',
+                      header: 'Company',
+                      text: '',
+                      headerClass: 'small text-center',
+                      class: 'small ',
+                      classWhenCondition: '',
+                      classCondition: {},
+                      remoteReference: {
+                      }
+                  },
+
+                  {
+                      key: 'debit',
+                      responseKey: 'debit',
+                      actualVal: '',
+                      columnFormat: 'c',
+                      totalKey: 'sumOfDebit',
+                      grandTotalKey: 'grandSumOfDebit',
+                      totalFormatter: 'currency',
+                      sortKey: '',
+                      sortType: '',
+                      header: 'Debit',
+                      text: '',
+                      headerClass: 'small text-center',
+                      class: 'small text-end ',
+                      classWhenCondition: '',
+                      classCondition: {},
+                      remoteReference: {
+                      }
+                  },
+                  {
+                      key: 'credit',
+                      responseKey: 'credit',
+                      actualVal: '',
+                      columnFormat: 'c',
+                      totalKey: 'sumOfCredit',
+                      grandTotalKey: 'grandSumOfCredit',
+                      totalFormatter: 'currency',
+                      sortKey: '',
+                      sortType: '',
+                      header: 'Credit',
+                      text: '',
+                      headerClass: 'small text-center',
+                      class: 'small text-end ',
+                      classWhenCondition: '',
+                      classCondition: {},
+                      remoteReference: {
+                      }
+                  },
+                  {
+                      key: 'runningTotal',
+                      responseKey: 'runningTotal',
+                      actualVal: '',
+                      columnFormat: 'c',
+                      totalKey: 'sumOfDifference',
+                      grandTotalKey: 'grandSumOfDifference',
+                      totalFormatter: 'currency',
+                      sortKey: '',
+                      sortType: '',
+                      header: 'Balance',
+                      text: '',
+                      headerClass: 'small text-center',
+                      class: 'small text-end ',
+                      classWhenCondition: '',
+                      classCondition: {},
+                      remoteReference: {
+                      }
+                  }
+              ];
+              const actionColDefs = [
+                  {
+                      actionType: 'defaultAction2',
+                      visibility: 'always',
+                      target: '_blank',
+                      condition: {},
+                      text: 'Edit Prototype',
+
+                      dataAttributes: [
+                          {
+                              key: 'docid',
+                              valueKey: 'docid'
+                          }
+                      ],
+                      icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
+                      uriType: 'funcHref', //funcUrl staticHref, staticUrl
+                      urlKeys: [
+                          { key: 'id', valueKey: 'id' }
+                      ],
+                      uriFunc: function (col, valueSource) {
+                          let retUri = '';
+                          if (valueSource.creatorSectionId > 0) {
+                              switch (valueSource.creatorSectionCode) {
+                                  case "SCNSELLCOMBINED":
+                                      retUri = `/transactions/sellmaterialdoc/edit?id=${valueSource["creatorId"]}`;
+                                      break;
+                                  case "SCNBUYMATTRANS":
+                                      retUri = `/transactions/buymaterialsdoc/Details?id=${valueSource["creatorId"]}`;
+                                      break;
+                                  case "SCNBUYEXPTRANS":
+                                      retUri = `/transactions/buymaterialsdoc/details?id=${valueSource["creatorId"]}`;
+                                      break;
+                                  case "SCNTRANSACTORTRANS":
+                                      var itemId = valueSource["id"];
+                                      retUri = `/transactions/transactortransmng/Details?id=${itemId}`;
+                                  default:
+                              }
+
+                          } else {
+
+                              var itemId = valueSource["id"];
+                              retUri = `/transactions/transactortransmng/Details?id=${itemId}`;
+                          }
+                          return retUri;
+                      },
+                      uri: ''
+                  }
+              ];
+              const actionColSubDefs = [
+
+              ];
+              const actionMobileColDefs = [
+                  {
+                      actionType: 'defaultAction2',
+                      visibility: 'always',
+                      target: '_blank',
+                      condition: {},
+                      text: 'Edit Prototype',
+
+                      dataAttributes: [
+                          {
+                              key: 'docid',
+                              valueKey: 'docid'
+                          }
+                      ],
+                      icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>',
+                      uriType: 'funcHref', //funcUrl staticHref, staticUrl
+                      urlKeys: [
+                          { key: 'id', valueKey: 'id' }
+                      ],
+                      uriFunc: function (col, valueSource) {
+                          let retUri = '';
+                          if (valueSource.creatorSectionId > 0) {
+                              switch (valueSource.creatorSectionCode) {
+                                  case "SCNSELLCOMBINED":
+                                      retUri = `/transactions/sellmaterialdoc/Edit?id=${valueSource["creatorId"]}`;
+                                      break;
+                                  case "SCNBUYMATTRANS":
+                                      retUri = `/transactions/buymaterialsdoc/Edit?id=${valueSource["creatorId"]}`;
+                                      break;
+                                  case "SCNBUYEXPTRANS":
+                                      retUri = `/transactions/buymaterialsdoc/Edit?id=${valueSource["creatorId"]}`;
+                                      break;
+                                  case "SCNTRANSACTORTRANS":
+                                      var itemId = valueSource["id"];
+                                      retUri = `/transactions/transactortransmng/Details?id=${itemId}`;
+                                  default:
+
+                              }
+
+                          } else {
+
+                              var itemId = valueSource["id"];
+                              retUri = `/transactions/transactortransmng/Edit?id=${itemId}`;
+                          }
+                          return retUri;
+                      },
+                      uri: ''
+                  }
+              ];
+              const tableHandlersToRegister = [
+
+              ];
+              const pageHandlersToRegister = [
+                  {
+                      selector: '#CurrencySelector',
+                      event: 'change',
+                      handler: function (event) {
+                          currencyChanged();
+                          indPgLib.refreshData();
+                      }
+                  },
+                  {
+                      selector: '#TransactorTypeFilter',
+                      event: 'change',
+                      handler: function(event) {
+                          $('#pageIndex').val(1);
+                          indPgLib.refreshData();
+                      }
+                  },
+                  {
+                      selector: '#ShowDisplayLinesWithZeroes',
+                      event: 'change',
+                      handler: function (event) {
+
+                          indPgLib.refreshData();
+                      }
+                  }
+              ];
+              const indexPageDef = {
+                  uri: '/api/GrKoukInfoApi/GetIndexTblDataTransactorsBalance',
+                  currencyFormatter: formatterCurrency,
+                  numberFormatter: formatterNumber,
+                  colDefs: colDefs,
+                  actionColDefs: actionColDefs,
+                  actionColSubDefs: actionColSubDefs,
+                  actionMobileColDefs: actionMobileColDefs,
+                  tableHandlersToRegister: tableHandlersToRegister,
+                  pageHandlersToRegister: pageHandlersToRegister,
+                  afterTableLoad: {
+                  }
+              };
+
+              indPgLib.setIndexPageDefinition(indexPageDef);    
+        //#endregion   
             var getTableData = (pageIndex, pageSize, sortData, dateRange, companyFilter,transactorTypeFilter,warehouseItemNatureFilter, searchFilter,displayCurrencyId) => {
                 //#region getTableData
                 var timeout;
@@ -467,489 +559,40 @@
                 //#endregion
             };
 
-            var rowSelectorsUi = () => {
-                var $selectSingleSelectors = $('td[name=selectRowColumn]');
-                var selectorsVisible = $rowSelectorsVisible.val();
-                var newSelectorsVisible =
-                    (selectorsVisible == 'True' || selectorsVisible == 'true' || selectorsVisible === true)
-                        ? 'True'
-                        : 'False';
-                if (newSelectorsVisible == 'True') {
-                    $selectAllSelector.removeAttr('hidden');
-                    $selectSingleSelectors.removeAttr('hidden');
-                    $selectAllSelector.show();
-                    $selectSingleSelectors.show();
-                    $rowSelectorsVisible.val(true);
-                    $rowSelectorsToggle.text('Hide Row Selectors');
-                    $selectedRowsActionsMenu.removeAttr('hidden');
-                    $selectedRowsActionsLink.addClass('disabled');
-                } else {
-                    $selectAllSelector.hide();
-                    $selectSingleSelectors.hide();
-                    $rowSelectorsVisible.val(false);
-                    $rowSelectorsToggle.text('Show Row Selectors');
-                    $selectedRowsActionsMenu.attr('hidden', 'true');
-                }
-            };
-            var refreshTableData = () => {
-                var pageIndexVal = parseInt($('#pageIndex').val());
-
-                var pageIndex = reallyIsNaN(pageIndexVal)
-                    ? 1
-                    : pageIndexVal;
-                $('#pageIndex').val(pageIndex);
-
-                var pageSize = $('#PageSize').val() == null || $('#PageSize').val().length == 0
-                    ? 10
-                    : parseInt($('#PageSize').val());
+              var currencyChanged = () => {
+                  let curCurrencySelected = parseInt($('#CurrencySelector').val());
+                  var currencyCode;
+                  try {
+                      let currentCurrency = currencyListJs.find(x => x.id === curCurrencySelected);
+                      currencyCode = currentCurrency.code;
+                      let locale = currentCurrency.displayLocale;
+                      formatterCurrency = new Intl.NumberFormat(locale,
+                          {
+                              style: 'currency',
+                              currency: currencyCode,
+                              minimumFractionDigits: 2
+                          });
+                      indPgLib.setCurrencyFormatter(formatterCurrency);
+                  } catch (e) {
+                      //not found keep old formater or maybe create a default one
+                      console.log('Not found currency code for this id');
+                  }
+              };
 
 
-                var companyFilter = $('#CompanyFilter').val();
+              indPgLib.addPagerElementEventListeners();
+              indPgLib.registerPageHandlers();
+              //Going to new setting management
+              indPgLib.applySettingsFromStorage(storageKey,elementSettingsConfig);
+              //indPgLib.loadSettings('TransactorTransIndexView');
+              //----------------
 
-               // var datePeriod = $('#DatePeriodFilter').val();
-                var sortData = $('#currentSort').val();
-                var searchVal = $('.search_input').val();
-              //  var transactorTypeFilter = $('#TransactorTypeFilter').val();
-                var warehouseItemNatureFilter = $('#WarehouseItemNatureFilter').val();
-                var $dcId = $('#CurrencySelector');
-                var displayCurrencyId =$dcId.val() == null || $dcId.val().length == 0
-                    ? 1
-                    : parseInt($dcId.val());
-                getTableData(pageIndex, pageSize, sortData, '', companyFilter, '',warehouseItemNatureFilter ,searchVal,displayCurrencyId);
-
-            };
-            var gotoFirstPage = () => {
-                var curPageIndex = 1;
-                $pageIndex.val(curPageIndex);
-                refreshTableData();
-            };
-            var gotoLastPage = () => {
-                var curPageIndex = parseInt($totalPages.val());
-
-                $pageIndex.val(curPageIndex);
-                refreshTableData();
-            };
-            var gotoNextPage = () => {
-                var curPageIndex = parseInt($pageIndex.val());
-                curPageIndex += 1;
-                $pageIndex.val(curPageIndex);
-                refreshTableData();
-
-            };
-            var gotoPreviousPage = () => {
-                var curPageIndex = parseInt($pageIndex.val());
-                curPageIndex -= 1;
-                $pageIndex.val(curPageIndex);
-                refreshTableData();
-
-            };
-            var deleteSelectedRows = () => {
-                var $rowSelectors = $('input[name=checkTableRow]');
-                var selectedRows = $rowSelectors.filter(':checked');
-                var idsToDelete = [];
-                $.each(selectedRows,
-                    function(key, value) {
-                        console.log(value);
-                        var id = parseInt(value.dataset.itemid);
-                        idsToDelete.push(id);
-                    });
-                if (idsToDelete.length > 0) {
-                    var idsJs = JSON.stringify({
-                        //ToDo: Change this
-                        section: 'SectionCode',
-                        ids: idsToDelete
-                    });
-                    var timeout;
-
-                    $.ajax({
-                        contentType: 'application/json; charset=utf-8',
-
-                        dataType: 'json',
-                        type: 'POST',
-                        data: idsJs,
-                        url: "/api/GrkoukInfoApi/DeletesellDocumentsList",
-                        beforeSend: function() {
-                            if (timeout) {
-                                clearTimeout(timeout);
-                            }
-                            timeout = setTimeout(function() {
-
-                                    $("#loadMe").modal({
-                                        backdrop: "static", //remove ability to close modal with click
-                                        keyboard: false, //remove option to close with keyboard
-                                        show: true //Display loader!
-                                    });
-                                },
-                                1000);
-
-                        },
-                        success: function(result) {
-                            console.log(result);
-                            toastr.success("Delete", result.message);
-                            refreshTableData();
-
-                        },
-                        complete: function() {
-                            if (timeout) {
-                                clearTimeout(timeout);
-                            }
-                            $("#loadMe").modal("hide");
-                            setTimeout(function() {
-                                    console.log('Checking for open modals');
-                                    var isOpen = $('#loadMe').hasClass('show');
-                                    if (isOpen) {
-                                        console.log('There is an open Modal');
-                                        $("#loadMe").modal("hide");
-                                    } else {
-                                        console.log('No open modal');
-                                    }
-                                },
-                                2000);
-                        },
-                        error: function(e) {
-                            console.log(e);
-                            toastr.error("Error", e.responseJSON.error);
-
-                        }
-                    });
-
-                }
-
-            };
-            var getSelectedRows = () => {
-                var $rowSelectors = $('input[name=checkTableRow]');
-                var selectedRows = $rowSelectors.filter(':checked');
-                console.log('Selected table rows=' + selectedRows);
-            };
-            var countSelectedRows = () => {
-                var $rowSelectors = $('input[name=checkTableRow]');
-                var selectedRows = $rowSelectors.filter(':checked');
-                return selectedRows.length;
-            };
-            var handleFiltersUi = () => {
-                var filterVisible = $filtersVisible.val();
-                if (filterVisible === 'True' || filterVisible === 'true') {
-                    $filterCollapse.collapse('show');
-                } else {
-                    $filterCollapse.collapse('hide');
-                }
-            };
-            var showFiltersUi = () => {
-
-            };
-            $deleteSelectedRowsLink.on('click',
-                () => {
-                    deleteSelectedRows();
-                });
-
-
-            $filterCollapse.on('hidden.bs.collapse',
-                function() {
-                    console.log('Filters Hidden');
-                    $filtersToggle.text('Show Filters');
-
-
-                    $filtersVisible.val(false);
-                });
-
-            $filterCollapse.on('shown.bs.collapse',
-                function() {
-                    console.log('Filters Shown');
-                    $filtersToggle.text('Hide Filters');
-                    // var alist = $('a[href*="&filtersVisible"]');
-
-                    $filtersVisible.val(true);
-                });
-            $checkAllRows.on('change',
-                function() {
-                    var th = $(this).index();
-                    var isChecked = $(this).prop('checked');
-                    $('input[name=checkTableRow]').prop('checked', isChecked);
-                    var selectedRowsCount = countSelectedRows();
-                    if (selectedRowsCount > 0) {
-                        $selectedRowsActionsLink.removeClass('disabled');
-                    } else {
-                        $selectedRowsActionsLink.addClass('disabled');
-                    }
-                });
-
-
-            var rosSelectorsToggleHandler = () => {
-                var $selectSingleSelectors = $('td[name=selectRowColumn]');
-                var selectorsVisible = $rowSelectorsVisible.val();
-                var newSelectorsVisible =
-                    (selectorsVisible == 'True' || selectorsVisible == 'true' || selectorsVisible === true)
-                        ? 'False'
-                        : 'True';
-                if (newSelectorsVisible == 'True') {
-                    $selectAllSelector.removeAttr('hidden');
-                    $selectSingleSelectors.removeAttr('hidden');
-                    $selectAllSelector.show();
-                    $selectSingleSelectors.show();
-                    $rowSelectorsVisible.val(true);
-                    $rowSelectorsToggle.text('Hide Row Selectors');
-                    $selectedRowsActionsMenu.removeAttr('hidden');
-                    $selectedRowsActionsLink.addClass('disabled');
-                } else {
-                    $selectAllSelector.hide();
-                    $selectSingleSelectors.hide();
-                    $rowSelectorsVisible.val(false);
-                    $rowSelectorsToggle.text('Show Row Selectors');
-                    $selectedRowsActionsMenu.attr('hidden', 'true');
-                }
-            };
-            var currencyChanged = () => {
-                let curCurrencySelected = parseInt($('#CurrencySelector').val());
-                var currencyCode;
-                try {
-                    let currentCurrency = currencyListJs.find(x => x.id === curCurrencySelected);
-                    currencyCode = currentCurrency.code;
-                    let locale = currentCurrency.displayLocale;
-                    formatterCurrency = new Intl.NumberFormat(locale,
-                        {
-                            style: 'currency',
-                            currency: currencyCode,
-                            minimumFractionDigits: 2
-                        });
-                } catch (e) {
-                    //not found keep old formater or maybe create a default one
-                    console.log('Not found currency code for this id');
-                }
-            };
-            $('#CurrencySelector').on('change',
-                function() {
-                    currencyChanged();
-                    refreshTableData();
-                });
-            $rowSelectorsToggle.on('click',
-                function() {
-                    rosSelectorsToggleHandler();
-                });
-
-
-            $('#DatePeriodFilter').on('change',
-                function() {
-                    $('#pageIndex').val(1);
-                    refreshTableData();
-                });
-
-            $('#CompanyFilter').on('change',
-                function() {
-                    $('#pageIndex').val(1);
-                    refreshTableData();
-                });
-            $('#TransactorTypeFilter').on('change',
-                function() {
-                    $('#pageIndex').val(1);
-                    refreshTableData();
-                });
-
-            $('#PageSize').on('change',
-                function() {
-                    $('#pageIndex').val(1);
-                    refreshTableData();
-                });
-            $('#GoToLast').on('click',
-                function() {
-                    gotoLastPage();
-                });
-            $('#GoToFirst').on('click',
-                function() {
-                    gotoFirstPage();
-                });
-            $('#GoToNext').on('click',
-                function() {
-                    gotoNextPage();
-                });
-            $('#GoToPrevious').on('click',
-                function() {
-                    gotoPreviousPage();
-                });
-            $('#TransDateHeader').on('click',
-                function() {
-                    var newSortVal = '';
-                    var curSort = $('#currentSort').val();
-                    if (curSort === undefined || curSort === null || curSort.length === 0) {
-                        curSort = 'transactiondate:desc';
-                    }
-                    var curSortAr = curSort.split(':');
-                    if (curSortAr[0] === 'transactiondate') {
-                        var newSort = curSortAr[1] === 'asc' ? 'desc' : 'asc';
-                        newSortVal = curSortAr[0] + ':' + newSort;
-                    } else {
-                        newSortVal = 'transactiondate:asc';
-                    }
-                    $('#currentSort').val(newSortVal);
-                    $('#pageIndex').val(1);
-                    refreshTableData();
-
-                });
-            $('#WarehouseItemNatureFilter').on('change',
-                function() {
-                    $('#pageIndex').val(1);
-                    refreshTableData();
-                });
-
-            $('#CreateNew').on('click',function() {
-                    var uri = '@Url.Page("Create")';
-                    window.location.href = uri;
-            });
-            $('#NameSortHeader').on('click',
-                function() {
-                    var newSortVal = '';
-                    var curSort = $('#currentSort').val();
-                    if (curSort === undefined || curSort === null || curSort.length === 0) {
-                        curSort = 'namesort:desc';
-                    }
-                    var curSortAr = curSort.split(':');
-                    if (curSortAr[0] === 'namesort') {
-                        var newSort = curSortAr[1] === 'asc' ? 'desc' : 'asc';
-                        newSortVal = curSortAr[0] + ':' + newSort;
-                    } else {
-                        newSortVal = 'namesort:asc';
-                    }
-                    $('#currentSort').val(newSortVal);
-                    $('#pageIndex').val(1);
-                    refreshTableData();
-                });
-            $('.search_icon').on('click',
-                function() {
-                    icon = $(this).find("svg");
-                    if (icon.hasClass('fa-search')) {
-                        icon.addClass("fa-times").removeClass("fa-search");
-                    } else {
-                        icon.addClass("fa-search").removeClass("fa-times");
-                        $('.search_input').val('');
-                    }
-
-                    refreshTableData();
-                });
-
-            $('#FiltersForm').on('submit',function(e) {
-                    e.preventDefault();
-                    var $icon = $('.search_icon').find("svg");
-                    if ($icon.hasClass('fa-search')) {
-                        $icon.addClass("fa-times").removeClass("fa-search");
-                    } else {
-                        $icon.addClass("fa-search").removeClass("fa-times");
-                    }
-                    refreshTableData();
-            });
-
-            var storageItemJs = localStorage.getItem('WarehouseBalanceIndexView');
-            if (storageItemJs === undefined || storageItemJs === null) {
-                $('#pageIndex').val(1);
-                $('#filtersVisible').val(true);
-                $('#rowSelectorsVisible').val(true);
-
-                //$('#DatePeriodFilter').val('CURMONTH');
-                $('#CompanyFilter').val(0);
-                $('#TransactorTypeFilter').val(1);
-                $('#WarehouseItemNatureFilter').val(1);
-                $('#currentSort').val('namesort:asc');
-            } else {
-                var storageItem = JSON.parse(storageItemJs);
-                var filtersValue = storageItem.find(x => x.filterKey === 'filtersVisible').filterValue;
-                if (filtersValue === true) {
-                    $filtersToggle.text('Hide Filters');
-                } else {
-                    $filtersToggle.text('Show Filters');
-                }
-                $('#filtersVisible').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'rowSelectorsVisible').filterValue;
-                $('#rowSelectorsVisible').val(filtersValue);
-                //filtersValue = storageItem.find(x => x.filterKey === 'dateRangeFilter').filterValue;
-                //$('#DatePeriodFilter').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'currentSort').filterValue;
-                $('#currentSort').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'companyFilter').filterValue;
-                $('#CompanyFilter').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'pageSize').filterValue;
-                $('#PageSize').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'pageIndex').filterValue;
-                $('#pageIndex').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'transactorTypeFilter').filterValue;
-                $('#TransactorTypeFilter').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'warehouseItemNatureFilter').filterValue;
-                $('#WarehouseItemNatureFilter').val(filtersValue);
-                try {
-                    filtersValue = storageItem.find(x => x.filterKey === 'currentCurrency').filterValue;
-                    $('#CurrencySelector').val(filtersValue);
-                } catch (e) {
-
-                }
-            }
-              handleFiltersUi();
-            currencyChanged();
-            refreshTableData();
-
-            rowSelectorsUi();
+              indPgLib.handleFiltersUi();
+              currencyChanged();
+              indPgLib.refreshData();
+              indPgLib.rowSelectorsUi();
         });
 
-        $(window).on('beforeunload',function(e) {
-                //#region CommentOut
-                //#region Variables
-                var filtersVisible = $('#filterCollapse').hasClass('show');
-                var $rowSelectorsColumn = $('th[name=selectAllRowsColumn]');
-
-                var rowSelectorsNotVisible = $rowSelectorsColumn.is(':hidden');
-                var rowSelectorsVisible = (rowSelectorsNotVisible) ? false : true;
-
-                var pageSize = $('#PageSize').val();
-                var dateRange = $('#DatePeriodFilter').val();
-                var currentSort = $('#currentSort').val();
-                var companyFilter = $('#CompanyFilter').val();
-                var pageIndex = $('#pageIndex').val();
-                var transactorTypeFilter = $('#TransactorTypeFilter').val();
-            var warehouseItemNatureFilter = $('#WarehouseItemNatureFilter').val();
-                var currentCurrency = $('#CurrencySelector').val();
-                var filtersArr = [];
-                //#endregion
-                filtersArr.push({
-                    filterKey: 'filtersVisible',
-                    filterValue: filtersVisible
-                });
-                filtersArr.push({
-                    filterKey: 'rowSelectorsVisible',
-                    filterValue: rowSelectorsVisible
-                });
-                filtersArr.push({
-                    filterKey: 'pageIndex',
-                    filterValue: pageIndex
-                });
-                filtersArr.push({
-                    filterKey: 'pageSize',
-                    filterValue: pageSize
-                });
-                filtersArr.push({
-                    filterKey: 'dateRangeFilter',
-                    filterValue: dateRange
-                });
-                filtersArr.push({
-                    filterKey: 'currentSort',
-                    filterValue: currentSort
-                });
-                filtersArr.push({
-                    filterKey: 'companyFilter',
-                    filterValue: companyFilter
-                });
-                filtersArr.push({
-                    filterKey: 'transactorTypeFilter',
-                    filterValue: transactorTypeFilter
-                });
-                filtersArr.push({
-                    filterKey: 'warehouseItemNatureFilter',
-                    filterValue: warehouseItemNatureFilter
-                });
-                filtersArr.push({
-                    filterKey: 'currentCurrency',
-                    filterValue: currentCurrency
-                });
-                var sessionVal = JSON.stringify(filtersArr);
-
-                localStorage.setItem('WarehouseBalanceIndexView', sessionVal);
-                //#endregion
-
-            });
+       
     </script>
 }
