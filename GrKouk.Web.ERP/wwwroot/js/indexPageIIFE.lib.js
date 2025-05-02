@@ -1260,10 +1260,6 @@ var indPgLib = (function () {
             initialPageTitle = elemInitPageTitle.value;
         }
         const elemHTitle = document.getElementById('hElementTitle');
-        if (elemHTitle) {
-            
-        }
-       
         const label = document.getElementById('datePeriodLabel');
         const elemDatePeriod = document.getElementById('DatePeriodFilter');
         let periodText;
@@ -1276,14 +1272,21 @@ var indPgLib = (function () {
                 const elemTo = document.getElementById('toDateFilterEl');
                 const fromLb = commonLib.formatDateInputValue(elemFrom.value);
                 const toLb =  commonLib.formatDateInputValue(elemTo.value);
-                label.innerText = `${fromLb} ${toLb}`;
+                if(label){
+                    label.innerText = `${fromLb} ${toLb}`;
+                }
+               
                 const title = `${initialPageTitle} από ${fromLb} έως ${toLb}` ;
                 document.title = title;
-                elemHTitle.innerText = title;
+                if (elemHTitle) {
+                    elemHTitle.innerText = title;
+                }
             } else {
                 const title = `${initialPageTitle} Περίοδος ${periodText}` ;
                 document.title = title;
-                elemHTitle.innerText = title;
+                if(elemHTitle){
+                    elemHTitle.innerText = title;
+                }
             }
         }
        
@@ -1521,14 +1524,7 @@ var indPgLib = (function () {
                     try {
                         let currentValue;
                         if (dataType === 'array') {
-                            currentValue = $element.val(); // .val() on multi-select returns array (usually of strings)
-                            // Ensure it's an array, default to empty array if not (e.g., null)
-                            // if (!Array.isArray(currentValue)) {
-                            //     console.warn(`Expected array from .val() on '#${elementId}' but received ${typeof currentValue}. Using empty array.`);
-                            //     currentValue = [];
-                            // }
-                            // Optional: Convert string array to integer array IF needed here
-                             //currentValue = currentValue.map(str => parseInt(str, 10)).filter(n => !isNaN(n));
+                            currentValue = $element.val(); 
                         }
                         else if (prop === 'checked') {
                             // Use .prop() to read boolean properties
@@ -1599,14 +1595,7 @@ var indPgLib = (function () {
                     try {
                         // --- Special Handling for Array ---
                         if (dataType === 'array') {
-                            // Ensure the value we are about to set is actually an array
-                            // if (!Array.isArray(value)) {
-                            //     console.warn(`Expected array for settingKey "${settingKey}" but received ${typeof value}. Using default:`, defaultValue);
-                            //     value = Array.isArray(defaultValue) ? defaultValue : []; // Fallback to default or empty array
-                            // }
-                            // Optional: Ensure array contains expected types (e.g., strings for .val()) if necessary
-                            // value = value.map(item => String(item)); // If .val() expects string array
-                            $element.val(value); // Set using .val()
+                             $element.val(value); // Set using .val()
                         }
 
                         else if (prop === 'checked') {

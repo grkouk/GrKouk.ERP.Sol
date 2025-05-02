@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="~/css/custom-checkbox.css" />
     <link rel="stylesheet" href="~/css/searchbar.css" />
 }
-<h4>Καρτέλα @Model.WarehouseItemName</h4>
+<input type="hidden" id="initialPageTitle" value="@ViewData["Title"]" />
+<h4 id="hElementTitle">@ViewData["Title"]</h4>
 <div class="container ">
     <ul class="nav small justify-content-end ">
 
@@ -49,7 +50,7 @@
 </div>
 <br />
 <a asp-page="./Index" class="small">Back to List</a>
-
+<partial name="_LoadMePartial" />
 @section Scripts
     {
     <script src="~/js/moment.min.js"></script>
@@ -57,6 +58,40 @@
     <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
         $(document).ready(function () {
+            const storageKey = 'WarehouseAccountTabNew';
+            const elementSettingsConfig = {
+                // Element ID: { key: storageKey, default: defaultValue, prop: propertyToSetOrRead }
+                // 'pageIndex':                 { key: 'pageIndex',                 default: 1,           prop: 'value' },
+                'PageSize':                  { key: 'pageSize',                  default: 10,          prop: 'value' },
+                'filtersVisible':            { key: 'filtersVisible',            default: true,        prop: 'value' },
+                'rowSelectorsVisible':       { key: 'rowSelectorsVisible',       default: false,       prop: 'value' },
+                'DatePeriodFilter':          { key: 'dateRangeFilter',           default: 'CURYEAR',   prop: 'value' },
+                'CompanyFilter':             { key: 'companyFilter',             default: 0,           prop: 'value' },
+                //  'TransactorTypeFilter':      { key: 'transactorTypeFilter',      default: 1,           prop: 'value' },
+                //'WarehouseItemNatureFilter': { key: 'warehouseItemNatureFilter', default: 1,           prop: 'value' },
+                'currentSort':               { key: 'currentSort',               default: 'datesort:asc',prop: 'value' },
+                'CurrencySelector':          { key: 'currentCurrency',           default: 1,          prop: 'value' },
+                'ShowCarryOnFlt':            { key: 'ShowCarryOnFlt',            default: true,        prop: 'checked'}, // Reads the 'checked' property
+                //'ShowSummaryFlt':            { key: 'ShowSummaryFlt',            default: true,        prop: 'checked'} // Reads the 'checked' property
+            };
+            // --- Page Hide Event Listener (Replaces unload) ---
+            // window.addEventListener('pagehide', function(event) {
+            //     console.log('pagehide event triggered. Saving settings...'); // For debugging
+            //     indPgLib.saveSettingsToStorage(storageKey, elementSettingsConfig);
+            //     // Avoid complex logic or async operations here
+            // });
+            // document.addEventListener('visibilitychange', function() {
+            //     if (document.visibilityState === 'hidden') {
+            //         console.log('visibilitychange to hidden triggered. Saving settings...'); // For debugging
+            //         indPgLib.saveSettingsToStorage(storageKey, elementSettingsConfig);
+            //     }
+            // });
+            //
+            window.addEventListener('beforeunload', function(event) {
+                console.log('beforeunload event triggered. Saving settings...'); // For debugging
+                indPgLib.saveSettingsToStorage(storageKey, elementSettingsConfig);
+                // DO NOT try to add confirmation dialogs or complex logic here.
+            });
             var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
             var formatterCurrency = new Intl.NumberFormat(currentCulture,
                 {
@@ -403,48 +438,11 @@
                 }
             };
 
-            var storageItemJs = localStorage.getItem('WarehouseAccountTab');
-            if (storageItemJs === undefined || storageItemJs === null) {
-                $('#pageIndex').val(1);
-                $('#PageSize').val(10);
-                $('#filtersVisible').val(true);
-                $('#rowSelectorsVisible').val(false);
-
-                $('#DatePeriodFilter').val('CURYEAR');
-                $('#CompanyFilter').val(0);
-                $('#TransactorTypeFilter').val(1);
-                $('#WarehouseItemNatureFilter').val(1);
-                $('#currentSort').val('datesort:asc');
-            } else {
-                var storageItem = JSON.parse(storageItemJs);
-                var filtersValue = storageItem.find(x => x.filterKey === 'filtersVisible').filterValue;
-
-                $('#filtersVisible').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'rowSelectorsVisible').filterValue;
-                $('#rowSelectorsVisible').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'dateRangeFilter').filterValue;
-                $('#DatePeriodFilter').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'currentSort').filterValue;
-                $('#currentSort').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'companyFilter').filterValue;
-                $('#CompanyFilter').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'pageSize').filterValue;
-                $('#PageSize').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'pageIndex').filterValue;
-                $('#pageIndex').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'transactorTypeFilter').filterValue;
-                $('#TransactorTypeFilter').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'warehouseItemNatureFilter').filterValue;
-                $('#WarehouseItemNatureFilter').val(filtersValue);
-                try {
-                    filtersValue = storageItem.find(x => x.filterKey === 'currentCurrency').filterValue;
-                    $('#CurrencySelector').val(filtersValue);
-                } catch (e) {
-
-                }
-            }
+           
             indPgLib.addPagerElementEventListeners();
             indPgLib.registerPageHandlers();
+            //Going to new setting management
+            indPgLib.applySettingsFromStorage(storageKey,elementSettingsConfig);
             //indPgLib.loadSettings('TransactorTransIndexView');
             //----------------
 
@@ -454,70 +452,6 @@
             indPgLib.rowSelectorsUi();
         });
 
-        $(window).on('beforeunload', function (e) {
-            //#region CommentOut
-            //#region Variables
-            var filtersVisible = $('#filterCollapse').hasClass('show');
-            var $rowSelectorsColumn = $('th[name=selectAllRowsColumn]');
-
-            var rowSelectorsNotVisible = $rowSelectorsColumn.is(':hidden');
-            var rowSelectorsVisible = (rowSelectorsNotVisible) ? false : true;
-
-            var pageSize = $('#PageSize').val();
-            var dateRange = $('#DatePeriodFilter').val();
-            var currentSort = $('#currentSort').val();
-            var companyFilter = $('#CompanyFilter').val();
-            var pageIndex = $('#pageIndex').val();
-            var transactorTypeFilter = $('#TransactorTypeFilter').val();
-            var warehouseItemNatureFilter = $('#WarehouseItemNatureFilter').val();
-            var currentCurrency = $('#CurrencySelector').val();
-            var filtersArr = [];
-            //#endregion
-            filtersArr.push({
-                filterKey: 'filtersVisible',
-                filterValue: filtersVisible
-            });
-            filtersArr.push({
-                filterKey: 'rowSelectorsVisible',
-                filterValue: rowSelectorsVisible
-            });
-            filtersArr.push({
-                filterKey: 'pageIndex',
-                filterValue: pageIndex
-            });
-            filtersArr.push({
-                filterKey: 'pageSize',
-                filterValue: pageSize
-            });
-            filtersArr.push({
-                filterKey: 'dateRangeFilter',
-                filterValue: dateRange
-            });
-            filtersArr.push({
-                filterKey: 'currentSort',
-                filterValue: currentSort
-            });
-            filtersArr.push({
-                filterKey: 'companyFilter',
-                filterValue: companyFilter
-            });
-            filtersArr.push({
-                filterKey: 'transactorTypeFilter',
-                filterValue: transactorTypeFilter
-            });
-            filtersArr.push({
-                filterKey: 'warehouseItemNatureFilter',
-                filterValue: warehouseItemNatureFilter
-            });
-            filtersArr.push({
-                filterKey: 'currentCurrency',
-                filterValue: currentCurrency
-            });
-            var sessionVal = JSON.stringify(filtersArr);
-
-            localStorage.setItem('WarehouseAccountTab', sessionVal);
-            //#endregion
-
-        });
+       
     </script>
 }
