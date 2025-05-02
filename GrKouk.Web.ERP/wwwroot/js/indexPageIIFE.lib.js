@@ -1217,7 +1217,8 @@ var indPgLib = (function () {
                 , productNatureFilterElement, transactorIdFilterElement
                 , warehouseItemIdFilterElement, diaryIdFilterElement
                 , cfaIdFilterElement, showCarryOnFilterElement,
-                showSummaryFilterElement, showDisplayLinesWithZeroesFilterElement, materialCategoriesFilterElement, sectionsFilterElement)
+                showSummaryFilterElement, showDisplayLinesWithZeroesFilterElement
+                , materialCategoriesFilterElement, sectionsFilterElement,fromCustomFilterDateElement, toCustomFilterDateElement)
                 .then((data) => {
                     console.log("PDF download started!");
                     resolve(data);

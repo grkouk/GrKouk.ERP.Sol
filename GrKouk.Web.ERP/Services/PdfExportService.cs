@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using GrKouk.Erp.Domain.DocDefinitions;
 using GrKouk.Web.ERP.Helpers;
@@ -171,6 +172,9 @@ public class PdfExportService
 
                 PdfGraphics graphics = page.Graphics;
 
+                // Calculate Totals
+                decimal totalDebit = items.Sum(item => item.Debit);
+                decimal totalCredit = items.Sum(item => item.Credit);
 
                 // Create PDF grid
                 PdfGrid pdfGrid = new PdfGrid();
@@ -218,6 +222,12 @@ public class PdfExportService
                 {
                     rowHeader.Cells[i].Style = headerStyle;
                 }
+                // Apply default style first
+                PdfGridCellStyle defaultCellStyle = new PdfGridCellStyle
+                {
+                    Font = bodyFont,
+                    StringFormat = new PdfStringFormat(PdfTextAlignment.Left) // Default alignment
+                };
 
                 // Apply cell style with right alignment for Debit and Credit columns
                 PdfGridCellStyle numberCellStyle = new PdfGridCellStyle
@@ -227,6 +237,10 @@ public class PdfExportService
                 };
                 foreach (PdfGridRow row in pdfGrid.Rows)
                 {
+                    for(int i=0; i< row.Cells.Count; i++) {
+                        row.Cells[i].Style = defaultCellStyle; // Apply default first
+                    }
+
                     row.Cells[3].Style = numberCellStyle; // Debit
                     row.Cells[4].Style = numberCellStyle; // Credit
                     row.Cells[5].Style = numberCellStyle; // Running Total
@@ -241,9 +255,63 @@ public class PdfExportService
                     Font = bodyFont,
                 };
                 pdfGrid.Style = gridStyle;
+                pdfGrid.RepeatHeader = true;
 
                 // Draw grid on the page
-                pdfGrid.Draw(page, new PointF(0, 50));
+               // pdfGrid.Draw(page, new PointF(0, 50));
+               // Draw the main grid on the page and get layout result
+                // Start drawing below the header area
+                PdfGridLayoutFormat layoutFormat = new PdfGridLayoutFormat()
+                    { Layout = PdfLayoutType.Paginate };
+                PdfLayoutResult result = pdfGrid.Draw(page, new PointF(0, 50), layoutFormat); // Use Y=50 to leave space for header
+
+                // *** START: Add Totals Grid ***
+                PdfGrid totalsGrid = new PdfGrid();
+                totalsGrid.Columns.Add(6); // Add 6 columns to match main grid
+
+                // Set column widths for totals grid to match main grid
+                totalsGrid.Columns[0].Width = pdfGrid.Columns[0].Width;
+                totalsGrid.Columns[1].Width = pdfGrid.Columns[1].Width;
+                totalsGrid.Columns[2].Width = pdfGrid.Columns[2].Width;
+                totalsGrid.Columns[3].Width = pdfGrid.Columns[3].Width;
+                totalsGrid.Columns[4].Width = pdfGrid.Columns[4].Width;
+                totalsGrid.Columns[5].Width = pdfGrid.Columns[5].Width;
+
+                // Add totals row
+                PdfGridRow totalsRow = totalsGrid.Rows.Add();
+
+                // Set cell values for totals row
+                totalsRow.Cells[0].Value = "";
+                totalsRow.Cells[1].Value = "";
+                totalsRow.Cells[2].Value = "Totals:";
+                totalsRow.Cells[3].Value = totalDebit.ToString("C");
+                totalsRow.Cells[4].Value = totalCredit.ToString("C");
+                totalsRow.Cells[5].Value = ""; // No total for running total column
+
+                // Style the totals row
+                PdfGridCellStyle totalsLabelStyle = new PdfGridCellStyle
+                {
+                    Font = bodyTitleFont, // Use bold font for label
+                    StringFormat = new PdfStringFormat(PdfTextAlignment.Right) // Align label right in its cell
+                };
+                 PdfGridCellStyle totalsNumberStyle = new PdfGridCellStyle
+                {
+                    Font = bodyTitleFont, // Use bold font for totals
+                    StringFormat = new PdfStringFormat(PdfTextAlignment.Right) // Align numbers right
+                };
+                 totalsRow.Cells[2].Style = totalsLabelStyle;
+                 totalsRow.Cells[3].Style = totalsNumberStyle;
+                 totalsRow.Cells[4].Style = totalsNumberStyle;
+
+                // Apply basic grid style (optional, for borders/padding)
+                totalsGrid.Style.CellPadding = gridStyle.CellPadding; // Use same padding
+                // totalsGrid.Style.BorderOverlapStyle = PdfBorderOverlapStyle.Overlap; // If you want borders
+
+                // Draw the totals grid below the main grid result
+                // Use the result.Page and result.Bounds.Bottom for positioning
+                 float totalsY = result.Bounds.Bottom + 10; // Add 10 points padding
+                 totalsGrid.Draw(result.Page, new PointF(0, totalsY));
+                // *** END: Add Totals Grid ***
 
                 // Save to memory stream
                 using (MemoryStream stream = new MemoryStream())
