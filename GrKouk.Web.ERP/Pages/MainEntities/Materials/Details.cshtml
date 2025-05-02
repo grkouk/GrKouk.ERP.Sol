@@ -11,7 +11,7 @@
     <div class="row">
         <main role="main" class="col-md-12 ms-sm-auto col-lg-12 px-4">
             <div class="row justify-content-end pt-2 pb-3 px-1">
-                <div class="col-5 gx-1">
+                <div class="col-4 gx-1">
 
                     <ejs-multiselect id="SelectedCompanies" dataSource="@ViewBag.CompaniesListJs"
                                      placeholder="Select Companies" mode="CheckBox"
@@ -20,6 +20,12 @@
                         <e-multiselect-fields text="Title" value="ValueInt"></e-multiselect-fields>
                     </ejs-multiselect>
 
+                </div>
+               
+                <div class="col-2 gx-1">
+                    <select id="PeriodSelector" class="form-select form-select-sm"
+                            asp-items="ViewBag.DatePeriodListJs">
+                    </select>
                 </div>
                 <div class="col-1 gx-1">
                     <select id="CurrencySelector" class="form-select form-select-sm"
@@ -105,11 +111,11 @@
                                 <table class="table-sm w-100">
 
                                     <tr>
-                                        <td>Ποσότητες(Εισ)</td>
+                                        <td>Ποσότητες(Εξα)</td>
                                         <td><span class="numeric-data" name="ExportVolume"> </span></td>
                                     </tr>
                                     <tr>
-                                        <td>Αξία(Εισ)</td>
+                                        <td>Αξία(Εξα)</td>
                                         <td><span class="currency-data" name="ExportValue"></span></td>
                                     </tr>
                                     <tr>
@@ -205,12 +211,14 @@
             <input type="hidden" id="companiesSelectionChanged" />
             <ejs-grid id="Grid"
                       allowPaging="true" allowResizing="true" allowSorting="true" enablePersistence="true">
-                @*<e-data-manager url="@Url.Action("", "FinancialData")" adaptor="UrlAdaptor"></e-data-manager> *@
+                @* <e-data-manager url="@Url.Action("GetCashFlowAccountTransactionsForDetail", "FinancialData")" *@
+                @*                 adaptor="UrlAdaptor"></e-data-manager> *@
                 <e-grid-aggregates>
                     <e-grid-aggregate>
                         <e-aggregate-columns>
-                            <e-aggregate-column field="debit" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
-                            <e-aggregate-column field="credit" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
+                            <e-aggregate-column field="quontity1" type="Sum" format="N2" footerTemplate="${Sum}"></e-aggregate-column>
+                            <e-aggregate-column field="amountFpa" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
+                            <e-aggregate-column field="amountNet" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
 
                         </e-aggregate-columns>
 
@@ -219,12 +227,13 @@
                 <e-grid-pagesettings pageSizes="true"></e-grid-pagesettings>
                 <e-grid-columns>
                     <e-grid-column field="transDate" headerText="Trans Date" textAlign="Right" width="50" type="date" format="dd/MM/yyyy"></e-grid-column>
-                    <e-grid-column field="docSeriesCode" headerText="Series Code" width="60"></e-grid-column>
-                    <e-grid-column field="refCode" headerText="Ref Code" width="60" textAlign="Right"></e-grid-column>
+                    <e-grid-column field="transWarehouseDocSeriesName" headerText="Series Code" width="60"></e-grid-column>
+                    <e-grid-column field="transRefCode" headerText="Ref Code" width="60" textAlign="Right"></e-grid-column>
                     <e-grid-column field="companyCode" headerText="Company Code" width="60"></e-grid-column>
-                    <e-grid-column field="debit" headerText="Debit" width="50" type="number" textAlign="Right" format="C2"></e-grid-column>
-                    <e-grid-column field="credit" headerText="Credit" width="50" type="number" textAlign="Right" format="C2"></e-grid-column>
-                    <e-grid-column field="runningTotal" headerText="Running Total" type="number" width="50" textAlign="Right" format="C2"></e-grid-column>
+                    <e-grid-column field="quontity1" headerText="Quantity 1" width="50" type="number" textAlign="Right" format="N2"></e-grid-column>
+                    <e-grid-column field="unitPrice" headerText="Unit Price" width="50" type="number" textAlign="Right" format="C2"></e-grid-column>
+                    <e-grid-column field="amountFpa" headerText="VAT Amount" type="number" width="50" textAlign="Right" format="C2"></e-grid-column>
+                    <e-grid-column field="amountNet" headerText="Net Amount" type="number" width="50" textAlign="Right" format="C2"></e-grid-column>
                 </e-grid-columns>
             </ejs-grid>
 
@@ -232,7 +241,7 @@
 
             <hr />
             <footer>
-                <p>&copy; 2018-2023 - George Koukoudis</p>
+                <p>&copy; 2018-2025 - George Koukoudis</p>
             </footer>
 
         </main>
@@ -298,14 +307,20 @@
              const currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
              const warehouseItemId = @Model.ItemVm.Id;
              const refreshView = () => {
-
+                 let selPeriodId = $periodSelector.val();
                  let selCurrencyId = $currencySelector.val();
                  let selCompanies = $('#SelectedCompanies').val();
+                
                   // const $selectedPeriod = $('.selected-period-text');
                  //	let selPeriodId = $selectedPeriod.data('periodid');
-                 getFinancialData(warehouseItemId, "", selCompanies,selCurrencyId, $spinnerEl)
-
-              };
+                 getFinancialData(warehouseItemId,  selPeriodId, selCompanies,selCurrencyId, $spinnerEl)
+                 let grd = document.getElementById("GridCFADetailPage").ej2_instances[0];
+                 grd.query = new ej.data.Query()
+                     .addParams('entityId', cashFlowAccountId)
+                     .addParams('dateRange', selPeriodId)
+                     .addParams('companyFilter', selCompanies)
+                     .addParams('displayCurrencyId', selCurrencyId);
+             };
             const formatNumericElements = () => {
                     let $currencyElements = $('.currency-data');
                     let $numElements = $('.numeric-data');
@@ -356,7 +371,12 @@
                         console.log('Not found currency code for this id');
                     }
                 };
-           
+            const periodChanged = () =>  {
+                refreshView();
+            };
+            $periodSelector.change((event) => {
+                periodChanged();
+            });
             const loadPreviousSession = (sessionKey, sessionObject) => {
                   let storageItemJs = localStorage.getItem(sessionKey);
                   if (storageItemJs === undefined || storageItemJs === null) {

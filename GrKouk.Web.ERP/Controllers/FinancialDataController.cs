@@ -1175,51 +1175,53 @@ namespace GrKouk.Web.ERP.Controllers
                 var allCompaniesEntity =
                     await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
 
-                //if (allCompaniesEntity != null)
-                //{
-                //    var allCompaniesId = allCompaniesEntity.Id;
-                //    firmIds.Add(allCompaniesId);
-                //}
+                if (allCompaniesEntity == null)
+                {
+                    return NotFound("All Companies entity not found");
+                }
 
-                fullListIq = fullListIq.Where(p => firmIds.Contains(p.CompanyId));
+                if (!firmIds.Contains(allCompaniesEntity.Id))
+                {
+                    fullListIq = fullListIq.Where(p => firmIds.Contains(p.CompanyId));
+                }
             }
 
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
                 .Take(10)
                 .ToListAsync();
-            var t = fullListIq.ProjectTo<WarehouseTransListDto>(_mapper.ConfigurationProvider);
-            var t1 = await t.Select(p => new WarehouseTransListDto
+            //var t = fullListIq.ProjectTo<WarehouseTransListDto>(_mapper.ConfigurationProvider);
+            var t1 = await fullListIq.Select(p => new WarehouseTransListDto
             {
+                TransDate = p.TransDate,
                 TransWarehouseDocSeriesId = p.TransWarehouseDocSeriesId,
-                TransWarehouseDocSeriesName = p.TransWarehouseDocSeriesName,
-                TransWarehouseDocSeriesCode = p.TransWarehouseDocSeriesCode,
-
+                TransWarehouseDocSeriesName = p.TransWarehouseDocSeries.Name,
+                TransWarehouseDocSeriesCode = p.TransWarehouseDocSeries.Code,
+                TransRefCode = p.TransRefCode,
                 InventoryAction = p.InventoryAction,
                 InventoryValueAction = p.InventoryValueAction,
                 InvoicedVolumeAction = p.InvoicedVolumeAction,
                 InvoicedValueAction = p.InvoicedValueAction,
                 Quontity1 = p.Quontity1,
                 Quontity2 = p.Quontity2,
-                UnitPrice = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.UnitPrice),
-                UnitExpenses = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                UnitPrice = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.UnitPrice),
+                UnitExpenses = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates,
                     p.UnitExpenses),
-                UnitPriceFinal = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
-                    p.UnitPriceFinal),
-                AmountFpa = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountFpa),
-                AmountNet = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountNet),
-                AmountDiscount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+               
+                AmountFpa = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountFpa),
+                AmountNet = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountNet),
+                AmountDiscount = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates,
                     p.AmountDiscount),
                 TransQ1 = p.TransQ1,
                 TransQ2 = p.TransQ2,
-                TransFpaAmount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                TransFpaAmount = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates,
                     p.TransFpaAmount),
-                TransNetAmount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                TransNetAmount = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates,
                     p.TransNetAmount),
-                TransDiscountAmount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                TransDiscountAmount = ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates,
                     p.TransDiscountAmount),
                 CompanyId = p.CompanyId,
-                CompanyCode = p.CompanyCode,
-                CompanyCurrencyId = p.CompanyCurrencyId
+                CompanyCode = p.Company.Code,
+                CompanyCurrencyId = p.Company.CurrencyId
             }).ToListAsync();
             decimal grandSumImportVolume = t1.Sum(p => p.ImportUnits);
             decimal grandSumImportValue = t1.Sum(p => p.ImportAmount);

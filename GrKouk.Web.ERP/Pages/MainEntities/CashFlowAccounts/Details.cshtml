@@ -21,14 +21,15 @@
                     </ejs-multiselect>
 
                 </div>
+               
+                <div class="col-2 gx-1">
+                    <select id="PeriodSelector" class="form-select form-select-sm"
+                            asp-items="ViewBag.DatePeriodListJs">
+                    </select>
+                </div>
                 <div class="col-1 gx-1">
                     <select id="CurrencySelector" class="form-select form-select-sm"
                             asp-items="ViewBag.CurrencyList">
-                    </select>
-                </div>
-                 <div class="col-2 gx-1">
-                    <select id="PeriodSelector" class="form-select form-select-sm"
-                            asp-items="ViewBag.DatePeriodListJs">
                     </select>
                 </div>
             </div>
@@ -172,7 +173,7 @@
 
             <hr />
             <footer>
-                <p>&copy; 2018-2023 - George Koukoudis</p>
+                <p>&copy; 2018-2025 - George Koukoudis</p>
             </footer>
 
         </main>
