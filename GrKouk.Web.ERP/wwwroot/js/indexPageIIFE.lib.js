@@ -1093,9 +1093,9 @@ var indPgLib = (function () {
         //====================
         let pageSummaryCount = 0;
         let totalSummaryCount = 0;
-        let $pageSummaryRow = $('<tr class="table-info">');
+        let $pageSummaryRow = $('<tr class="table-secondary">');
         $pageSummaryRow.append('<td name="selectRowColumn"> </td> ');
-        let $totalSummaryRow = $('<tr class="table-info">');
+        let $totalSummaryRow = $('<tr class="table-secondary">');
         if (indexPageType === definitionsLib.IndexPageTypeEnum.IndexPage) {
             $totalSummaryRow.append('<td name="selectRowColumn"> </td> ');
         }
