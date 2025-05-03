@@ -13,7 +13,8 @@
     <link rel="stylesheet" href="~/css/searchbar.css"/>
     <link rel="stylesheet" href="~/css/spinner.css"/>
 }
-<input type="hidden" id="initialPageTitle" value="@ViewData["Title"]" />
+
+<input type="hidden" id="initialPageTitle" value="@ViewData["Title"]"/>
 <h4 id="hElementTitle">@ViewData["Title"]</h4>
 
 <div class="container ">
@@ -68,7 +69,7 @@
 </div>
 
 <!-- Modal -->
-<partial name="_LoadMePartial" />
+<partial name="_LoadMePartial"/>
 
 @section Scripts
 {
@@ -83,18 +84,18 @@
             const elementSettingsConfig = {
                 // Element ID: { key: storageKey, default: defaultValue, prop: propertyToSetOrRead }
                 // 'pageIndex':                 { key: 'pageIndex',                 default: 1,           prop: 'value' },
-                'PageSize':                  { key: 'pageSize',                  default: 10,          prop: 'value' },
-                'filtersVisible':            { key: 'filtersVisible',            default: true,        prop: 'value' },
-                'rowSelectorsVisible':       { key: 'rowSelectorsVisible',       default: false,       prop: 'value' },
-                'DatePeriodFilter':          { key: 'dateRangeFilter',           default: 'CURYEAR',   prop: 'value' },
-                'CompanyFilter':             { key: 'companyFilter',             default: 0,           prop: 'value' },
+                'PageSize': {key: 'pageSize', default: 10, prop: 'value'},
+                'filtersVisible': {key: 'filtersVisible', default: true, prop: 'value'},
+                'rowSelectorsVisible': {key: 'rowSelectorsVisible', default: false, prop: 'value'},
+                'DatePeriodFilter': {key: 'dateRangeFilter', default: 'CURYEAR', prop: 'value'},
+                'CompanyFilter': {key: 'companyFilter', default: 0, prop: 'value'},
                 //  'TransactorTypeFilter':      { key: 'transactorTypeFilter',      default: 1,           prop: 'value' },
                 //'WarehouseItemNatureFilter': { key: 'warehouseItemNatureFilter', default: 1,           prop: 'value' },
-                'currentSort':               { key: 'currentSort',               default: 'datesort:asc',prop: 'value' },
-                'CurrencySelector':          { key: 'currentCurrency',           default: 1,          prop: 'value' },
-                'SectionsFilter':          { key: 'sectionsFilter',           default: '[0]',          prop: 'value', dataType: 'array'},
-                'fromDateFilterEl':          { key: 'fromDateFilter',           default: '',          prop: 'value' },
-                'toDateFilterEl':          { key: 'toDateFilter',           default: '',          prop: 'value' },
+                'currentSort': {key: 'currentSort', default: 'datesort:asc', prop: 'value'},
+                'CurrencySelector': {key: 'currentCurrency', default: 1, prop: 'value'},
+                'SectionsFilter': {key: 'sectionsFilter', default: '[0]', prop: 'value', dataType: 'array'},
+                'fromDateFilterEl': {key: 'fromDateFilter', default: '', prop: 'value'},
+                'toDateFilterEl': {key: 'toDateFilter', default: '', prop: 'value'},
                 // 'ShowCarryOnFlt':            { key: 'ShowCarryOnFlt',            default: true,        prop: 'checked'} // Reads the 'checked' property
             };
             // window.addEventListener('pagehide', function(event) {
@@ -108,7 +109,7 @@
             //         indPgLib.saveSettingsToStorage(storageKey, elementSettingsConfig);
             //     }
             // });
-            window.addEventListener('beforeunload', function(event) {
+            window.addEventListener('beforeunload', function (event) {
                 console.log('beforeunload event triggered. Saving settings...'); // For debugging
                 indPgLib.saveSettingsToStorage(storageKey, elementSettingsConfig);
                 // DO NOT try to add confirmation dialogs or complex logic here.
@@ -587,26 +588,71 @@
             indPgLib.addPagerElementEventListeners();
             indPgLib.registerPageHandlers();
             //Going to new setting management
-            indPgLib.applySettingsFromStorage(storageKey,elementSettingsConfig);
+            indPgLib.applySettingsFromStorage(storageKey, elementSettingsConfig);
             //----------------
 
             indPgLib.handleFiltersUi();
             const selectedSections = document.getElementById("SectionsFilterElm").ej2_instances[0];
             let sectionsFilterValue = $('#SectionsFilter').val();
             if (sectionsFilterValue != null && sectionsFilterValue.length > 0) {
-                selectedSections.value = JSON.parse( sectionsFilterValue);
+                selectedSections.value = JSON.parse(sectionsFilterValue);
             }
             selectedSections.changeOnBlur = false;
             selectedSections.addEventListener("change", (event) => {
-                if ((event.value==null|| event.value.length===0) && event.oldValue.includes(0)) {
-                    return
+                // Ensure we have arrays, even if null/undefined
+                const newValue = event.value || [];
+                const oldValue = event.oldValue || []; // Assumes your component provides oldValue
+
+                const zeroWasSelected = oldValue.includes(0);
+                const zeroIsSelected = newValue.includes(0);
+
+                let finalValue; // This will hold the calculated correct selection
+
+                // --- Rule 1: User just selected 0 ---
+                // Check if 0 is newly added in this change event
+                if (zeroIsSelected && !zeroWasSelected) {
+                    finalValue = [0]; // Force selection to be only 0
                 }
-                if (event.value.includes(0)) {
-                    event.value = [0];
-                    selectedSections.value = [0];
+                    // --- Rule 2: User selected something else while 0 was selected ---
+                // Check if 0 was selected before, AND a non-zero item was added
+                else if (zeroWasSelected) {
+                    // Find items present in newValue but not in oldValue
+                    const addedItems = newValue.filter(item => !oldValue.includes(item));
+                    // Check if any of those newly added items are not 0
+                    const addedNonZeroItem = addedItems.some(item => item !== 0);
+
+                    if (addedNonZeroItem) {
+                        // User added a non-zero item while 0 was selected. Remove 0.
+                        finalValue = newValue.filter(item => item !== 0);
+                    } else {
+                        // 0 was selected, but only other changes happened (like removing items, or removing 0 itself).
+                        // In this case, the component's newValue is likely correct as is (it might be just [0], or [] etc.)
+                        finalValue = newValue;
+                    }
                 }
-                var selected = JSON.stringify(event.value);
-                $('#SectionsFilter').val(selected);
+                // --- Default Case: No special 0-rule applies ---
+                else {
+                    // 0 wasn't selected before, and wasn't added now. Normal selection.
+                    finalValue = newValue;
+                }
+
+                // --- Update Component and Hidden Field ---
+
+                // Get the component's current visual value (might differ from finalValue if we intervened)
+                const currentComponentValue = selectedSections.value || [];
+
+                // Check if our calculated finalValue is different from the component's current value
+                // Simple array comparison for primitive values:
+                const valuesAreEqual = finalValue.length === currentComponentValue.length &&
+                    finalValue.every((val, index) => val === currentComponentValue[index]);
+
+                // Only update the component's value if it needs changing, prevents potential event loops
+                if (!valuesAreEqual) {
+                    selectedSections.value = finalValue;
+                }
+
+                // Always update the hidden input field with the final calculated value
+                $('#SectionsFilter').val(JSON.stringify(finalValue));
             });
             selectedSections.addEventListener("blur", (event) => {
                 const allSectionsId = 0;
@@ -626,7 +672,7 @@
 
 
         });
-        
+
     </script>
     @ScriptHelper.RenderScripts(HttpContext)
 }
