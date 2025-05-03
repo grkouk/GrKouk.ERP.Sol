@@ -31,16 +31,25 @@
         });
     }
 
-    document.querySelectorAll('.theme-option').forEach(option => {
-        option.addEventListener('click', (e) => {
-            e.preventDefault();
-            const selectedTheme = option.getAttribute('data-theme');
-            applyTheme(selectedTheme);
-            updateDropdownCheckmark(selectedTheme);
+   
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.querySelectorAll('.theme-option').forEach(option => {
+            const checkmark = option.querySelector('.checkmark');
+            if (option.dataset.theme === savedTheme) {
+                checkmark.classList.remove('d-none');
+            } else {
+                checkmark.classList.add('d-none');
+            }
+
+            option.addEventListener('click', () => {
+                localStorage.setItem('theme', option.dataset.theme);
+                document.documentElement.setAttribute('data-bs-theme', option.dataset.theme);
+                location.reload(); // Optional: to refresh and apply changes
+            });
         });
     });
-
     // On initial load
-    const initialTheme = localStorage.getItem('theme') || 'light';
-    updateDropdownCheckmark(initialTheme);
+   // const initialTheme = localStorage.getItem('theme') || 'light';
+   // updateDropdownCheckmark(initialTheme);
 </script>
