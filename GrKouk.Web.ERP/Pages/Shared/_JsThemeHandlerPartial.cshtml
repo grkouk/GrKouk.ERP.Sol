@@ -1,0 +1,46 @@
+
+<script>
+    const html = document.documentElement;
+    const syncfusionTheme = document.getElementById('cssSyncfusion');
+
+    function applyTheme(theme) {
+        html.setAttribute('data-bs-theme', theme);
+        localStorage.setItem('theme', theme);
+
+        const themeHref = theme === 'dark'
+            ? 'https://cdn.syncfusion.com/ej2/28.1.38/bootstrap5-dark.css'
+            : 'https://cdn.syncfusion.com/ej2/28.1.38/bootstrap5.css';
+
+        syncfusionTheme.setAttribute('href', themeHref);
+    }
+
+    function updateDropdownCheckmark(theme) {
+        document.querySelectorAll('.theme-option').forEach(option => {
+            const icon = option.querySelector('i');
+            if (option.getAttribute('data-theme') === theme) {
+                option.classList.add('active');
+                if (!icon) {
+                    const checkIcon = document.createElement('i');
+                    checkIcon.className = 'bi bi-check ms-2';
+                    option.appendChild(checkIcon);
+                }
+            } else {
+                option.classList.remove('active');
+                if (icon) icon.remove();
+            }
+        });
+    }
+
+    document.querySelectorAll('.theme-option').forEach(option => {
+        option.addEventListener('click', (e) => {
+            e.preventDefault();
+            const selectedTheme = option.getAttribute('data-theme');
+            applyTheme(selectedTheme);
+            updateDropdownCheckmark(selectedTheme);
+        });
+    });
+
+    // On initial load
+    const initialTheme = localStorage.getItem('theme') || 'light';
+    updateDropdownCheckmark(initialTheme);
+</script>

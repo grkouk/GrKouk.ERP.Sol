@@ -5,6 +5,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>@ViewData["Title"] - GrKouk Web ERP</title>
+    <partial name="_ThemeLoaderScriptPartial"/>
     <partial name="_CssBootstrapBlockPartial"/>
     @RenderSection("MyCss", required: false)
 </head>
@@ -154,6 +155,16 @@
                         </div>
                     </li>
                 }
+                <li class="nav-link dropdown mt-1">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="themeDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Theme
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="themeDropdown">
+                        <li><a class="dropdown-item theme-option" data-theme="light" href="#">Light</a></li>
+                        <li><a class="dropdown-item theme-option" data-theme="dark" href="#">Dark</a></li>
+                    </ul>
+
+                </li>
             </ul>
             <partial name="_LoginPartial"/>
         </div>
@@ -172,8 +183,8 @@
     </footer>
 </div>
 <partial name="_JsBlockPartial"/>
-
-@RenderSection("Scripts", required: false)
+<partial name="_JsThemeHandlerPartial"/>
+@await RenderSectionAsync("Scripts", required: false)
 @await Component.InvokeAsync("NToastNotify")
 </body>
 </html>

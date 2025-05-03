@@ -1,0 +1,14 @@
+<script>
+    (function () {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-bs-theme', savedTheme);
+
+        const link = document.createElement('link');
+        link.id = 'cssSyncfusion';
+        link.rel = 'stylesheet';
+        link.href = savedTheme === 'dark'
+            ? 'https://cdn.syncfusion.com/ej2/28.1.38/bootstrap5-dark.css'
+            : 'https://cdn.syncfusion.com/ej2/28.1.38/bootstrap5.css';
+        document.head.appendChild(link);
+    })();
+</script>
