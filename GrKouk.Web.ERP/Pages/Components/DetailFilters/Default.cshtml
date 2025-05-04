@@ -1,0 +1,66 @@
+@model GrKouk.Web.ERP.Helpers.DetailFilterResult
+
+@{
+    var viewContext = (ViewContext)ViewData["ViewContext"];
+}
+
+@{
+    Layout = null;
+}
+@* <form class="form-inline" id="FiltersForm" method="get"> *@
+<div class="row justify-content-end">
+
+    <input type="hidden" id="currentFilter" />
+    <input type="hidden" id="SectionsFilter" />
+        
+        
+    @{
+        if (Model.FiltersToShow.ShowDateFlt)
+        {
+            <div class="col-2">
+                <select name="DatePeriodFilter" id="DatePeriodFilter" class="form-select form-select-sm"
+                        asp-items="Model.DateFilterValues">
+                </select>
+            </div>
+        }
+    }
+    @{
+        if (Model.FiltersToShow.ShowCompaniesMultiFlt)
+        {
+            <div class="col-4">
+                <ejs-multiselect id="CompaniesFilterElm" dataSource="@Model.CompaniesFilterUiSelectItems" placeholder="Companies" mode="CheckBox"
+                                 showDropDownIcon="true"
+                                 floatLabelType="Auto"
+                                 allowResize ="true"
+                                 showSelectAll="false">
+                    <e-multiselect-fields text="Text" value="ValueInt"></e-multiselect-fields>
+                </ejs-multiselect>
+            </div>
+        }
+
+    }
+    @{
+        if (Model.FiltersToShow.ShowCompaniesFlt)
+        {
+            <div class="col-2">
+                <select id="CompanyFilter" class="form-select form-select-sm" asp-items="Model.CompanyFilterValues">
+                </select>
+            </div>
+        }
+    }
+    @{
+        if (Model.FiltersToShow.ShowCurrencyFlt)
+        {
+            <div class="col-2">
+                <select id="CurrencySelector" class="form-select form-select-sm"
+                        asp-items="Model.CurrencyFilterValues">
+                </select>
+            </div>
+        }
+    }
+           
+     
+
+</div>
+@* </form> *@
+<partial name="Shared/_CustomDateFilterPartial" />
