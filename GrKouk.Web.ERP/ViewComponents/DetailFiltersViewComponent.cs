@@ -1,7 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using GrKouk.Erp.Domain.Shared;
+using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GrKouk.Web.ERP.ViewComponents;
 
@@ -24,6 +30,7 @@ public class DetailFiltersViewComponent:ViewComponent
 
         if (filtersToShow.ShowCompaniesMultiFlt)
         {
+            
             detailFiltersResult.CompaniesFilterUiSelectItems = await FiltersHelper.GetCompaniesFilterUiListAsync(_context);
         }
         if (filtersToShow.ShowCurrencyFlt)
@@ -35,6 +42,7 @@ public class DetailFiltersViewComponent:ViewComponent
             detailFiltersResult.DateFilterValues = DateFilter.GetDateFiltersSelectList();
         }
         detailFiltersResult.FiltersToShow = filtersToShow;
+       
         ViewData["ViewContext"] = ViewContext; 
         return View(detailFiltersResult);
     }

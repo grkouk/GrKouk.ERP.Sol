@@ -185,13 +185,7 @@ namespace GrKouk.Web.ERP.Helpers
                     ValueInt = p.Id,
                     Value = p.Id.ToString()
                 }).ToListAsync();
-            companiesUiListJs.Insert(0, new UISelectTypeItem()
-            {
-                Title = "{All Companies}",
-                Text = "{All Companies}",
-                ValueInt = 0,
-                Value = 0.ToString()
-            });
+           
             return companiesUiListJs;
         }
         public static List<SelectListItem> GetSeekTypesList()

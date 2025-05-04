@@ -57,7 +57,7 @@
                 <div class="row align-items-center justify-content-between">
                     <div class="col-lg-4 col-sm-12">
                         <div class="card">
-                            <div class="card-header text-dark text-center">
+                            <div class="card-header text-center">
                                 <h5>Εισροές</h5>
                             </div>
                             <div class="card-body text-center">
@@ -77,7 +77,7 @@
                     </div>
                     <div class="col-lg-4 col-sm-12">
                         <div class="card">
-                            <div class="card-header text-dark text-center">
+                            <div class="card-header text-center">
                                 <h5>Εκροές</h5>
                             </div>
                             <div class="card-body text-center">
@@ -136,7 +136,7 @@
             </div>
 
 
-            <div id="transGrid"></div>
+            <div id="transGrid">
             <input type="hidden" asp-for="ItemVm.Id" id="CashFlowAccountId" />
             <input type="hidden" id="SelectedCompanies" />
             <input type="hidden" id="CurrencyId" />
@@ -169,7 +169,7 @@
                 </e-grid-columns>
             </ejs-grid>
 
-
+            </div>
 
             <hr />
             <footer>
@@ -296,16 +296,16 @@
                 }
             });
             const currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
-            const cashFlowAccountId = @Model.ItemVm.Id;
+            const mainEntityId = @Model.ItemVm.Id;
             const refreshView = () => {
                  let selPeriodId = $periodSelector.val();
                  let selCurrencyId = $currencySelector.val();
                  let selCompanies = $('#SelectedCompanies').val();
                 
-                 getFinancialData(cashFlowAccountId, selPeriodId, selCompanies,selCurrencyId, $spinnerEl)
+                 getFinancialData(mainEntityId, selPeriodId, selCompanies,selCurrencyId, $spinnerEl)
                  let grd = document.getElementById("GridCFADetailPage").ej2_instances[0];
                  grd.query = new ej.data.Query()
-                    .addParams('entityId', cashFlowAccountId)
+                    .addParams('entityId', mainEntityId)
                     .addParams('dateRange', selPeriodId)
                     .addParams('companyFilter', selCompanies)
                     .addParams('displayCurrencyId', selCurrencyId);  
@@ -335,7 +335,7 @@
 
                     });
                 };
-            var currencyChanged = () => {
+            const currencyChanged = () => {
                     let curCurrencySelected = parseInt($('#CurrencySelector').val());
                     var currencyCode;
                     try {

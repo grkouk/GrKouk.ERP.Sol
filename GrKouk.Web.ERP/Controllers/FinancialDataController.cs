@@ -329,13 +329,28 @@ namespace GrKouk.Web.ERP.Controllers
                 _context.TransactorTransactions.Where(p => p.TransactorId == request.TransactorId);
             if (!string.IsNullOrEmpty(request.CompanyFilter))
             {
-                if (int.TryParse(request.CompanyFilter, out var companyId))
+                List<int> firmIds = System.Text.Json.JsonSerializer.Deserialize<List<int>>(request.CompanyFilter);
+                var allCompCode =
+                    await _context.AppSettings.SingleOrDefaultAsync(
+                        p => p.Code == Constants.AllCompaniesCodeKey);
+                if (allCompCode == null)
                 {
-                    if (companyId > 0)
-                    {
-                        fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
-                    }
+                    return NotFound("All Companies Code Setting not found");
                 }
+
+                var allCompaniesEntity =
+                    await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+
+                if (allCompaniesEntity == null)
+                {
+                    return NotFound("All Companies entity not found");
+                }
+
+                if (!firmIds.Contains(allCompaniesEntity.Id))
+                {
+                    fullListIq = fullListIq.Where(p => firmIds.Contains(p.CompanyId));
+                }
+
             }
 
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
@@ -554,18 +569,32 @@ namespace GrKouk.Web.ERP.Controllers
                 transactionsList = transactionsList.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
                 transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
             }
-
             if (!string.IsNullOrEmpty(request.CompanyFilter))
             {
-                if (int.TryParse(request.CompanyFilter, out var companyId))
+                List<int> firmIds = System.Text.Json.JsonSerializer.Deserialize<List<int>>(request.CompanyFilter);
+                var allCompCode =
+                    await _context.AppSettings.SingleOrDefaultAsync(
+                        p => p.Code == Constants.AllCompaniesCodeKey);
+                if (allCompCode == null)
                 {
-                    if (companyId > 0)
-                    {
-                        transactionsList = transactionsList.Where(p => p.CompanyId == companyId);
-                        transListBeforePeriod = transListBeforePeriod.Where(p => p.CompanyId == companyId);
-                        transListAll = transListAll.Where(p => p.CompanyId == companyId);
-                    }
+                    return NotFound("All Companies Code Setting not found");
                 }
+
+                var allCompaniesEntity =
+                    await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+
+                if (allCompaniesEntity == null)
+                {
+                    return NotFound("All Companies entity not found");
+                }
+
+                if (!firmIds.Contains(allCompaniesEntity.Id))
+                {
+                    transactionsList = transactionsList.Where(p => firmIds.Contains(p.CompanyId));
+                    transListBeforePeriod = transListBeforePeriod.Where(p => firmIds.Contains(p.CompanyId));
+                    transListAll = transListAll.Where(p => firmIds.Contains(p.CompanyId));
+                }
+
             }
 
             var dbTrans = transactionsList.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);

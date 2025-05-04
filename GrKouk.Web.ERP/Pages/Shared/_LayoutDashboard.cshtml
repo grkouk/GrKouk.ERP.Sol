@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using GrKouk.Web.ERP.Helpers
+<!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="utf-8" />
@@ -6,8 +7,6 @@
     <title>@ViewData["Title"] - GrKouk Web ERP</title>
     <partial name="_ThemeLoaderScriptPartial"/>
     <partial name="_CssBootstrapBlockPartial"/>
-
-   @* <partial name="_CssSyncfusionBlockPartial"/> *@
 
     <style>
         .bd-placeholder-img {
@@ -41,6 +40,12 @@
     </nav>
 
     @RenderBody()
+    <hr/>
+    <footer>
+        <p>
+            &copy; @HelperFunctions.GetFooterCopyrightText()
+        </p>
+    </footer>
     <partial name="_JsBlockPartial" />
     <partial name="_JsSyncfusionBlockPartial"/>
 
