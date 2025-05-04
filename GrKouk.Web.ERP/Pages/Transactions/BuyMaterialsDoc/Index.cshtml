@@ -57,10 +57,7 @@
     </ul>
 </div>
 
-
 @await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowDateFlt = true })
-
-
 
 <div class="row mt-1">
     <partial name="_PagerPartial" />
@@ -69,7 +66,6 @@
 <div class="row">
     <partial name="_PagerPartial" />
 </div>
-@* <partial name="_CustomDateFilterPartial" /> *@
 <partial name="_LoadMePartial" />
 <partial name="_DeleteConfirmationPartial" />
 <!-- Modal Item selector for payments -->
