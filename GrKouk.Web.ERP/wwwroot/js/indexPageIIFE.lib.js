@@ -4,7 +4,7 @@
 //Date Modified: 2025-05-2
 //Index pages javascript tools
 
-var indPgLib = (function () {
+const indPgLib = (function () {
     let indexPageDefinition;
     let colDefs;
     let actionColDefs;
@@ -1435,104 +1435,105 @@ var indPgLib = (function () {
         localStorage.setItem(localStorageKey, sessionVal);
         //#endregion
     };
-    /**
-     * Saves the current state of configured form elements to localStorage.
-     * @param {string} storageKey - The key to use in localStorage.
-     * @param {object} config - Configuration mapping element IDs to storage keys and properties.
-     */
 
-    const saveSettingsToStorageV1=(storageKey, config)=> {
-        const settingsToStore = []; // Array to hold { filterKey, filterValue } objects
-
-        // Gather current settings from elements
-        for (const elementId in config) {
-            if (Object.hasOwnProperty.call(config, elementId)) {
-               // const {key, prop} = config[elementId]; // Get storage key and property name
-                const { key: settingKey, prop, dataType } = config[elementId]; // Get dataType
-
-                const element = document.getElementById(elementId);
-
-                if (element) {
-                    try {
-                        // Read the value using the specified property ('value', 'checked', etc.)
-                        const currentValue = element[prop];
-                        settingsToStore.push({filterKey: key, filterValue: currentValue});
-                    } catch (e) {
-                        console.error(`Error reading property '${prop}' from element '#${elementId}'. Skipping this setting.`, e);
-                    }
-                } else {
-                    // Log if an expected element is missing
-                    console.warn(`Element with ID "${elementId}" not found in the DOM during save. Skipping this setting.`);
-                }
+    const ensureFltManLibLoadedOld=(scriptPath, callback)=> {
+        // 1. Check if already loaded
+        if (typeof fltManLib !== 'undefined') {
+            console.log('fltManLib already loaded.');
+            if (typeof callback === 'function') {
+                callback(null); // Call callback immediately (null indicates no error)
             }
-
+            return;
         }
+
+        // 2. Check if a script tag with this source already exists (basic check)
+        // Note: This doesn't guarantee it *finished* loading or didn't error.
+        if (document.querySelector(`script[src="${scriptPath}"]`)) {
+            console.log('fltManLib script tag found, assuming loading or loaded.');
+            // Potential issue: If called again before the first load finishes,
+            // the callback might run too early. Promises handle this better.
+            // For simplicity here, we might still need to wait or use the library cautiously.
+            // A robust callback solution would need queueing, which adds complexity.
+            // Let's proceed with a simple load attempt if check 1 failed.
+        }
+
+
+        // 3. Attempt to load
+        console.log('fltManLib not found. Attempting to load...');
+        const script = document.createElement('script');
+        script.src = scriptPath;
+        script.type = 'text/javascript';
+        script.async = true;
+
+        script.onload = () => {
+            if (typeof fltManLib !== 'undefined') {
+                console.log(`fltManLib loaded successfully from ${scriptPath}`);
+                if (typeof callback === 'function') callback(null); // Success
+            } else {
+                console.error(`Script ${scriptPath} loaded, but 'fltManLib' is still undefined.`);
+                if (typeof callback === 'function') callback(new Error(`'fltManLib' not defined after loading ${scriptPath}`));
+            }
+        };
+
+        script.onerror = () => {
+            console.error(`Failed to load script: ${scriptPath}`);
+            if (typeof callback === 'function') {
+                callback(new Error(`Failed to load script: ${scriptPath}`)); // Pass error to callback
+            }
+        };
+
+        document.head.appendChild(script);
     };
+    function ensureFltManLibLoaded(scriptPath) {
+        if (window.fltManLib) return Promise.resolve(window.fltManLib);
+
+        // If not loaded, dynamically add the script:
+        const script = document.createElement('script');
+        // script.src = '/js/filterManagement.lib.js';
+        script.src = scriptPath;
+        document.body.appendChild(script);
+
+        // Must return a Promise that resolves when the script loads!
+        // (Otherwise, undefined is returned)
+        return new Promise((resolve, reject) => {
+            script.onload = () => resolve(window.fltManLib);
+            script.onerror = reject;
+        });
+    }
+
     /**
      * Applies settings from localStorage to form elements, using defaults if storage is missing or invalid.
      * @param {string} storageKey - The key used in localStorage.
      * @param {object} config - Configuration mapping element IDs to storage keys, defaults, and properties.
      */
-    const applySettingsFromStorageV1=(storageKey, config)=>{
-        const storedString = localStorage.getItem(storageKey);
-        let loadedSettings = {}; // Will hold { filterKey: filterValue } pairs
 
-        if (storedString) {
-            try {
-                const storedArray = JSON.parse(storedString);
-                // Ensure it's an array and convert to an object for easier lookup
-                if (Array.isArray(storedArray)) {
-                    loadedSettings = storedArray.reduce((acc, item) => {
-                        if (item && typeof item.filterKey === 'string') {
-                            acc[item.filterKey] = item.filterValue;
-                        }
-                        return acc;
-                    }, {});
-                } else {
-                    console.warn(`localStorage item "${storageKey}" is not a valid array. Using defaults.`);
-                }
-            } catch (error) {
-                console.error(`Failed to parse localStorage item "${storageKey}". Using defaults.`, error);
-                // Keep loadedSettings empty, defaults will apply
-            }
-        } else {
-            console.log(`localStorage item "${storageKey}" not found. Using defaults.`);
-        }
-
-        // Apply settings or defaults to elements
-        for (const elementId in config) {
-            if (Object.hasOwnProperty.call(config, elementId)) {
-                const { key, default: defaultValue, prop } = config[elementId];
-                const element = document.getElementById(elementId);
-
-                if (element) {
-                    // Use loaded value if available, otherwise use the default
-                    const value = loadedSettings[key] !== undefined ? loadedSettings[key] : defaultValue;
-
-                    try {
-                        // Use 'checked' property for checkboxes/radios, 'value' for others
-                        if (prop === 'checked') {
-                            // Ensure boolean conversion for checked state
-                            element[prop] = Boolean(value);
-                        } else if (prop === 'value') {
-                            element[prop] = value;
-                        } else {
-                            // Potentially support other properties if needed
-                            element[prop] = value;
-                            console.warn(`Unsupported property '${prop}' for element '#${elementId}'. Attempting direct assignment.`);
-                        }
-                    } catch (e) {
-                        console.error(`Error setting property '${prop}' on element '#${elementId}' with value '${value}'.`, e);
-                    }
-                } else {
-                    // Log if an expected element is missing
-                    console.warn(`Element with ID "${elementId}" not found in the DOM.`);
-                }
-            }
-        }
+    const saveSettingsToStorage=(storageKey, config)=>{
+        // const pathToFltManLib = '/js/filterManagement.lib.js';
+        //
+        // ensureFltManLibLoaded(pathToFltManLib)
+        //     .then(() => {
+        //         console.log('fltManLib is ready to use.');
+                fltManLib.saveSettingsToStorage(storageKey,config);
+            // })
+            // .catch(error => {
+            //     console.error('Failed to load or initialize fltManLib:', error);
+            // });
 
     };
-    const saveSettingsToStorage=(storageKey, config)=>{
+    const applySettingsFromStorage=(storageKey, config)=>{
+        // const pathToFltManLib = '/js/filterManagement.lib.js';
+        //
+        // ensureFltManLibLoaded(pathToFltManLib)
+        //     .then(() => {
+        //         console.log('fltManLib is ready to use.');
+                fltManLib.applySettingsFromStorage(storageKey,config);
+            // })
+            // .catch(error => {
+            //     console.error('Failed to load or initialize fltManLib:', error);
+            // });
+
+    };
+    const saveSettingsToStorageOld=(storageKey, config)=>{
         const settingsToStore = [];
 
         // Iterate through config and read settings using jQuery
@@ -1581,7 +1582,7 @@ var indPgLib = (function () {
 
 
     }
-    const applySettingsFromStorage=(storageKey, config)=>{
+    const applySettingsFromStorageOld=(storageKey, config)=>{
         const storedString = localStorage.getItem(storageKey);
         let loadedSettings = {};
 
