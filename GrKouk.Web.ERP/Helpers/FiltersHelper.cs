@@ -175,7 +175,25 @@ namespace GrKouk.Web.ERP.Helpers
 
             return dbCompanies;
         }
-
+        public static async Task<List<UISelectTypeItem>> GetCompaniesFilterUiListAsync(ApiDbContext context)
+        {
+            var companiesUiListJs = await context.Companies.OrderBy(p => p.Name)
+                .Select(p => new UISelectTypeItem()
+                {
+                    Title = p.Name,
+                    Text = p.Name,
+                    ValueInt = p.Id,
+                    Value = p.Id.ToString()
+                }).ToListAsync();
+            companiesUiListJs.Insert(0, new UISelectTypeItem()
+            {
+                Title = "{All Companies}",
+                Text = "{All Companies}",
+                ValueInt = 0,
+                Value = 0.ToString()
+            });
+            return companiesUiListJs;
+        }
         public static List<SelectListItem> GetSeekTypesList()
         {
             List<SelectListItem> seekTypes = new List<SelectListItem>
