@@ -112,16 +112,34 @@ namespace GrKouk.Web.ERP.Controllers
             {
                 IQueryable<BuyDocument> fullListIq = _context.BuyDocuments
                     .Include(p => p.Transactor);
+               
                 if (!string.IsNullOrEmpty(request.CompanyFilter))
                 {
-                    if (int.TryParse(request.CompanyFilter, out var companyId))
+                    List<int> firmIds = System.Text.Json.JsonSerializer.Deserialize<List<int>>(request.CompanyFilter);
+                    var allCompCode =
+                        await _context.AppSettings.SingleOrDefaultAsync(
+                            p => p.Code == Constants.AllCompaniesCodeKey);
+                    if (allCompCode == null)
                     {
-                        if (companyId > 0)
-                        {
-                            fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
-                        }
+                        return NotFound("All Companies Code Setting not found");
                     }
+
+                    var allCompaniesEntity =
+                        await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+
+                    if (allCompaniesEntity == null)
+                    {
+                        return NotFound("All Companies entity not found");
+                    }
+
+                    if (!firmIds.Contains(allCompaniesEntity.Id))
+                    {
+                        fullListIq = fullListIq.Where(p => firmIds.Contains(p.CompanyId));
+                    }
+
                 }
+                
+               
 
                 //DateTime beforePeriodDate = DateTime.Today;
                 if (!string.IsNullOrEmpty(request.DateRange))
@@ -182,10 +200,10 @@ namespace GrKouk.Web.ERP.Controllers
 
                     if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeAverage)
                     {
-                        r = t1.Sum(p => p.TransTotalAmount) / (numberOfDays > 0 ? numberOfDays : 1);
-                        // r = t1.GroupBy(p => p.TransDate.Date)
-                        //     .Select(g => g.Sum(x => x.TransTotalAmount))
-                        //     .Average();
+                        //r = t1.Sum(p => p.TransTotalAmount) / (numberOfDays > 0 ? numberOfDays : 1);
+                        r = t1.GroupBy(p => p.TransDate.Date)
+                            .Select(g => g.Sum(x => x.TransTotalAmount))
+                            .Average();
                     }
 
                     if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeCount)
@@ -215,13 +233,28 @@ namespace GrKouk.Web.ERP.Controllers
 
                 if (!string.IsNullOrEmpty(request.CompanyFilter))
                 {
-                    if (int.TryParse(request.CompanyFilter, out var companyId))
+                    List<int> firmIds = System.Text.Json.JsonSerializer.Deserialize<List<int>>(request.CompanyFilter);
+                    var allCompCode =
+                        await _context.AppSettings.SingleOrDefaultAsync(
+                            p => p.Code == Constants.AllCompaniesCodeKey);
+                    if (allCompCode == null)
                     {
-                        if (companyId > 0)
-                        {
-                            fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
-                        }
+                        return NotFound("All Companies Code Setting not found");
                     }
+
+                    var allCompaniesEntity =
+                        await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+
+                    if (allCompaniesEntity == null)
+                    {
+                        return NotFound("All Companies entity not found");
+                    }
+
+                    if (!firmIds.Contains(allCompaniesEntity.Id))
+                    {
+                        fullListIq = fullListIq.Where(p => firmIds.Contains(p.CompanyId));
+                    }
+
                 }
 
                 DateTime beforePeriodDate = DateTime.Today;
@@ -280,11 +313,11 @@ namespace GrKouk.Web.ERP.Controllers
 
                     if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeAverage)
                     {
-                        r = t1.Sum(p => p.TransTotalAmount) / (numberOfDays > 0 ? numberOfDays : 1);
+                        //r = t1.Sum(p => p.TransTotalAmount) / (numberOfDays > 0 ? numberOfDays : 1);
                         
-                        // r = t1.GroupBy(p => p.TransDate.Date)
-                        //     .Select(g => g.Sum(x => x.TransTotalAmount))
-                        //     .Average();
+                        r = t1.GroupBy(p => p.TransDate.Date)
+                            .Select(g => g.Sum(x => x.TransTotalAmount))
+                            .Average();
                     }
 
                     if (defObj.AggType == MainInfoAggregationTypeEnum.AggregationTypeCount)
