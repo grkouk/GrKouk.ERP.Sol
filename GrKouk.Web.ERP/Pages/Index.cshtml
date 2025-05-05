@@ -579,14 +579,7 @@
 			});
 			selectedCompanies.addEventListener("close", (event) => {
 				refreshView();
-				// let selectionChanged = $companiesSelectionChanged.val();
-				// if (selectionChanged) {
-				//     $companiesSelectionChanged.val(0);
-				//     let sComp = selectedCompanies.value;
-				//     var selected = JSON.stringify(selectedCompanies.value);
-				//     $('#SelectedCompanies').val(selected);
-				//     refreshView();
-				// }
+				
 			});
 
 			//-----------------
@@ -1057,10 +1050,11 @@
 				if (companiesFilterValue != null && companiesFilterValue.length > 0) {
 					selectedCompanies.value = JSON.parse(companiesFilterValue);
 				}
-				currencyChanged();
+				
 				setTimeout(function () {
 						console.log('Executing refreshView')
-						refreshView();
+						currencyChanged();
+						//refreshView();
 					},
 					5000);
 			}
