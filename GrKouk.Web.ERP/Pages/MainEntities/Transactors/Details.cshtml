@@ -321,6 +321,7 @@
                     refreshView();
                   
                 });
+              
                 const currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
                 const mainEntityId = @Model.Item.Id;
                 const refreshView = () => {
@@ -550,14 +551,8 @@
                 var selected = JSON.stringify(selectedCompanies.value);
                 
                 currencyChanged();
-               
-               // refreshView();
 
             });
-
-
         }());
-
-
     </script>
 }
