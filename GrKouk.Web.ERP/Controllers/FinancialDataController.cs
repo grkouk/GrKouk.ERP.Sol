@@ -385,7 +385,33 @@ namespace GrKouk.Web.ERP.Controllers
                 }
 
             }
+            DateTime beforePeriodDate = DateTime.Today;
+            if (!string.IsNullOrEmpty(request.DateRange))
+            {
+                DateFilterDates dfDates=new();
+                var datePeriodFilter = request.DateRange;
+                if (datePeriodFilter == "CUSTOM")
+                {
+                    if (request.FromCustomFilterDate.HasValue && request.ToCustomFilterDate.HasValue)
+                    {
+                        dfDates.FromDate = request.FromCustomFilterDate.Value;
+                        dfDates.ToDate = request.ToCustomFilterDate.Value;
+                    }
+                    else
+                    {
+                        return BadRequest("Custom Period filter dates are missing");
+                    }
+                }
+                else
+                {
+                    dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
+                }
+               
+                DateTime fromDate = dfDates.FromDate;
+                DateTime toDate = dfDates.ToDate;
 
+                fullListIq = fullListIq.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
+            }
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
                 .Take(10)
                 .ToListAsync();
@@ -494,7 +520,32 @@ namespace GrKouk.Web.ERP.Controllers
                 }
 
             }
+            if (!string.IsNullOrEmpty(request.DateRange))
+            {
+                DateFilterDates dfDates=new();
+                var datePeriodFilter = request.DateRange;
+                if (datePeriodFilter == "CUSTOM")
+                {
+                    if (request.FromCustomFilterDate.HasValue && request.ToCustomFilterDate.HasValue)
+                    {
+                        dfDates.FromDate = request.FromCustomFilterDate.Value;
+                        dfDates.ToDate = request.ToCustomFilterDate.Value;
+                    }
+                    else
+                    {
+                        return BadRequest("Custom Period filter dates are missing");
+                    }
+                }
+                else
+                {
+                    dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
+                }
+               
+                DateTime fromDate = dfDates.FromDate;
+                DateTime toDate = dfDates.ToDate;
 
+                fullListIq = fullListIq.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
+            }
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
                 .Take(10)
                 .ToListAsync();
@@ -1247,7 +1298,32 @@ namespace GrKouk.Web.ERP.Controllers
                     fullListIq = fullListIq.Where(p => firmIds.Contains(p.CompanyId));
                 }
             }
+            if (!string.IsNullOrEmpty(request.DateRange))
+            {
+                DateFilterDates dfDates=new();
+                var datePeriodFilter = request.DateRange;
+                if (datePeriodFilter == "CUSTOM")
+                {
+                    if (request.FromCustomFilterDate.HasValue && request.ToCustomFilterDate.HasValue)
+                    {
+                        dfDates.FromDate = request.FromCustomFilterDate.Value;
+                        dfDates.ToDate = request.ToCustomFilterDate.Value;
+                    }
+                    else
+                    {
+                        return BadRequest("Custom Period filter dates are missing");
+                    }
+                }
+                else
+                {
+                    dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
+                }
+               
+                DateTime fromDate = dfDates.FromDate;
+                DateTime toDate = dfDates.ToDate;
 
+                fullListIq = fullListIq.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
+            }
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
                 .Take(10)
                 .ToListAsync();
