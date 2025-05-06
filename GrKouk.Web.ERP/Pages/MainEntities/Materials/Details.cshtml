@@ -24,11 +24,13 @@
                 </div>
             </div>
 
-            <hr />
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-2 pb-2 mb-3 border-bottom">
+            <hr/>
+            <div
+                class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-2 pb-2 mb-3 border-bottom">
                 <div class="d-flex align-items-center">
                     <h5 class="me-2">Financial Summary</h5>
-                    <div class="spinner-border ml-auto text-primary" role="status" aria-hidden="true" id="FinancialLoader" style="display: none"></div>
+                    <div class="spinner-border ml-auto text-primary" role="status" aria-hidden="true"
+                         id="FinancialLoader" style="display: none"></div>
                 </div>
 
             </div>
@@ -158,7 +160,8 @@
                     </div>
                 </div>
             </div>
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <div
+                class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h5>Transactions</h5>
                 <div class="btn-toolbar mb-2 mb-md-0">
                     <div class="btn-group me-2">
@@ -166,11 +169,16 @@
                         <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
                     </div>
                     <div class="btn-group">
-                        <button type="button" class="btn  btn-sm btn-outline-secondary selected-period-text">Reference</button>
-                        <button type="button" class="btn  btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split" id="datePeriodMenuReference" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-reference="parent">
+                        <button type="button" class="btn  btn-sm btn-outline-secondary selected-period-text">Reference
+                        </button>
+                        <button type="button"
+                                class="btn  btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split"
+                                id="datePeriodMenuReference" data-bs-toggle="dropdown" aria-haspopup="true"
+                                aria-expanded="false" data-reference="parent">
                             <span class="sr-only">Toggle Dropdown</span>
                         </button>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="datePeriodMenuReference" name="PeriodSelector">
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="datePeriodMenuReference"
+                             name="PeriodSelector">
                             <button class="dropdown-item period-item" type="button">Action</button>
                             <button class="dropdown-item period-item" type="button">Another Action</button>
 
@@ -182,55 +190,60 @@
             </div>
 
 
-            <div id="transGrid"></div>
-            <input type="hidden" asp-for="ItemVm.Id" id="WarehouseItemId" />
-            <input type="hidden" id="SelectoedCompanies" />
-            <input type="hidden" id="CurrencyId" />
-            <input type="hidden" id="PeriodId" />
-            <input type="hidden" id="companiesSelectionChanged" />
-            <ejs-grid id="Grid"
-                      allowPaging="true" allowResizing="true" allowSorting="true" enablePersistence="true">
-                @* <e-data-manager url="@Url.Action("GetCashFlowAccountTransactionsForDetail", "FinancialData")" *@
-                @*                 adaptor="UrlAdaptor"></e-data-manager> *@
-                <e-grid-aggregates>
-                    <e-grid-aggregate>
-                        <e-aggregate-columns>
-                            <e-aggregate-column field="quontity1" type="Sum" format="N2" footerTemplate="${Sum}"></e-aggregate-column>
-                            <e-aggregate-column field="amountFpa" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
-                            <e-aggregate-column field="amountNet" type="Sum" format="C2" footerTemplate="${Sum}"></e-aggregate-column>
+            <div id="transGrid">
+                <input type="hidden" asp-for="ItemVm.Id" id="WarehouseItemId"/>
+                <input type="hidden" id="SelectoedCompanies"/>
+                <input type="hidden" id="CurrencyId"/>
+                <input type="hidden" id="PeriodId"/>
+                <input type="hidden" id="companiesSelectionChanged"/>
+                <ejs-grid id="Grid"
+                          allowPaging="true" allowResizing="true" allowSorting="true" enablePersistence="true">
+                    @* <e-data-manager url="@Url.Action("GetCashFlowAccountTransactionsForDetail", "FinancialData")" *@
+                    @*                 adaptor="UrlAdaptor"></e-data-manager> *@
+                    <e-grid-aggregates>
+                        <e-grid-aggregate>
+                            <e-aggregate-columns>
+                                <e-aggregate-column field="quontity1" type="Sum" format="N2"
+                                                    footerTemplate="${Sum}"></e-aggregate-column>
+                                <e-aggregate-column field="amountFpa" type="Sum" format="C2"
+                                                    footerTemplate="${Sum}"></e-aggregate-column>
+                                <e-aggregate-column field="amountNet" type="Sum" format="C2"
+                                                    footerTemplate="${Sum}"></e-aggregate-column>
 
-                        </e-aggregate-columns>
+                            </e-aggregate-columns>
 
-                    </e-grid-aggregate>
-                </e-grid-aggregates>
-                <e-grid-pagesettings pageSizes="true"></e-grid-pagesettings>
-                <e-grid-columns>
-                    <e-grid-column field="transDate" headerText="Trans Date" textAlign="Right" width="50" type="date" format="dd/MM/yyyy"></e-grid-column>
-                    <e-grid-column field="transWarehouseDocSeriesName" headerText="Series Code" width="60"></e-grid-column>
-                    <e-grid-column field="transRefCode" headerText="Ref Code" width="60" textAlign="Right"></e-grid-column>
-                    <e-grid-column field="companyCode" headerText="Company Code" width="60"></e-grid-column>
-                    <e-grid-column field="quontity1" headerText="Quantity 1" width="50" type="number" textAlign="Right" format="N2"></e-grid-column>
-                    <e-grid-column field="unitPrice" headerText="Unit Price" width="50" type="number" textAlign="Right" format="C2"></e-grid-column>
-                    <e-grid-column field="amountFpa" headerText="VAT Amount" type="number" width="50" textAlign="Right" format="C2"></e-grid-column>
-                    <e-grid-column field="amountNet" headerText="Net Amount" type="number" width="50" textAlign="Right" format="C2"></e-grid-column>
-                </e-grid-columns>
-            </ejs-grid>
-
-
-
-            <hr />
-            <footer>
-                <p>&copy; 2018-2025 - George Koukoudis</p>
-            </footer>
-
+                        </e-grid-aggregate>
+                    </e-grid-aggregates>
+                    <e-grid-pagesettings pageSizes="true"></e-grid-pagesettings>
+                    <e-grid-columns>
+                        <e-grid-column field="transDate" headerText="Trans Date" textAlign="Right" width="50"
+                                       type="date" format="dd/MM/yyyy"></e-grid-column>
+                        <e-grid-column field="transWarehouseDocSeriesName" headerText="Series Code"
+                                       width="60"></e-grid-column>
+                        <e-grid-column field="transRefCode" headerText="Ref Code" width="60"
+                                       textAlign="Right"></e-grid-column>
+                        <e-grid-column field="companyCode" headerText="Company Code" width="60"></e-grid-column>
+                        <e-grid-column field="quontity1" headerText="Quantity 1" width="50" type="number"
+                                       textAlign="Right" format="N2"></e-grid-column>
+                        <e-grid-column field="unitPrice" headerText="Unit Price" width="50" type="number"
+                                       textAlign="Right" format="C2"></e-grid-column>
+                        <e-grid-column field="amountFpa" headerText="VAT Amount" type="number" width="50"
+                                       textAlign="Right" format="C2"></e-grid-column>
+                        <e-grid-column field="amountNet" headerText="Net Amount" type="number" width="50"
+                                       textAlign="Right" format="C2"></e-grid-column>
+                    </e-grid-columns>
+                </ejs-grid>
+            </div>
+            @* <hr/> *@
         </main>
     </div>
 </div>
+
 @section Scripts
 {
     <script src="~/js/filterManagement.lib.js"></script>
-<script src="~/js/product.lib.js"></script>
-<script>
+    <script src="~/js/product.lib.js"></script>
+    <script>
         $(document).ready(function () {
             const storageKey = 'MaterialDetailsPageNew';
             const elementSettingsConfig = {
@@ -256,20 +269,20 @@
             //const sessionKey = 'MaterialDetailsPage';
             let currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
             let formatterCurrency = new Intl.NumberFormat(currentCulture,
-                    {
-                        style: 'currency',
-                        currency: 'EUR',
-                        minimumFractionDigits: 2
-                    });
+                {
+                    style: 'currency',
+                    currency: 'EUR',
+                    minimumFractionDigits: 2
+                });
             let formatterNumber = new Intl.NumberFormat(currentCulture,
-                    {
-                        maximumFractionDigits: 3
+                {
+                    maximumFractionDigits: 3
 
-                    });
+                });
             let sessionObj = {
-                 'currencyCode': '',
-                 'periodCode': '',
-                 'companyCode': ''
+                'currencyCode': '',
+                'periodCode': '',
+                'companyCode': ''
             };
             const loadCultureFiles = (name) => {
                 let files = ['ca-gregorian.json', 'numbers.json', 'timeZoneNames.json', 'currencies.json'];
@@ -362,50 +375,60 @@
                 refreshView();
 
             });
-           
-             const currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
-             const warehouseItemId = @Model.ItemVm.Id;
-             const refreshView = () => {
-                 let selPeriodId = $periodSelector.val();
-                 let selCurrencyId = $currencySelector.val();
-                 let selCompanies;
-                 let companiesFilterValue = $('#CompaniesFilter').val();
-                 if (companiesFilterValue != null && companiesFilterValue.length > 0) {
-                     selCompanies = companiesFilterValue;
-                 }
-                
-                 getFinancialData(warehouseItemId,  selPeriodId, selCompanies,selCurrencyId, $spinnerEl)
-                 // let grd = document.getElementById("GridCFADetailPage").ej2_instances[0];
-                 // grd.query = new ej.data.Query()
-                 //     .addParams('entityId', cashFlowAccountId)
-                 //     .addParams('dateRange', selPeriodId)
-                 //     .addParams('companyFilter', selCompanies)
-                 //     .addParams('displayCurrencyId', selCurrencyId);
-             };
+
+            const currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
+            const warehouseItemId = @Model.ItemVm.Id;
+            const refreshView = () => {
+                let selPeriodId = $periodSelector.val();
+                let selCurrencyId = $currencySelector.val();
+                let selCompanies;
+                let companiesFilterValue = $('#CompaniesFilter').val();
+                if (companiesFilterValue != null && companiesFilterValue.length > 0) {
+                    selCompanies = companiesFilterValue;
+                }
+                let fromCustomDate = '';
+                let toCustomDate = '';
+                let $toCustomFilterDate = $("#toDateFilterEl");
+                if ($toCustomFilterDate.val() != null && $toCustomFilterDate.val().length > 0) {
+                    toCustomDate = $toCustomFilterDate.val();
+                }
+                let $fromCustomFilterDate = $("#fromDateFilterEl");
+                if ($fromCustomFilterDate.val() != null && $fromCustomFilterDate.val().length > 0) {
+                    fromCustomDate = $fromCustomFilterDate.val();
+                }
+                getFinancialData(warehouseItemId, selPeriodId, selCompanies, selCurrencyId, fromCustomDate, toCustomDate, $spinnerEl)
+                // let grd = document.getElementById("GridCFADetailPage").ej2_instances[0];
+                // grd.query = new ej.data.Query()
+                //     .addParams('entityId', cashFlowAccountId)
+                //     .addParams('dateRange', selPeriodId)
+                //     .addParams('companyFilter', selCompanies)
+                //     .addParams('displayCurrencyId', selCurrencyId);
+            };
+            window.refreshData = refreshView
             const formatNumericElements = () => {
-                    let $currencyElements = $('.currency-data');
-                    let $numElements = $('.numeric-data');
-                    $currencyElements.each(function() {
-                        let $el = $(this);
-                        //let elValueStr = $el.attr('data-actualValue');
-                        let elValueStr = $el.text();
-                        let elValue = parseFloat(elValueStr);
-                        if (!isNaN(elValue)) {
-                            $el.text(formatterCurrency.format(elValue));
-                        }
+                let $currencyElements = $('.currency-data');
+                let $numElements = $('.numeric-data');
+                $currencyElements.each(function () {
+                    let $el = $(this);
+                    //let elValueStr = $el.attr('data-actualValue');
+                    let elValueStr = $el.text();
+                    let elValue = parseFloat(elValueStr);
+                    if (!isNaN(elValue)) {
+                        $el.text(formatterCurrency.format(elValue));
+                    }
 
-                    });
-                    $numElements.each(function() {
-                        let $el = $(this);
-                        //let elValueStr = $el.attr('data-actualValue');
-                        let elValueStr = $el.text();
-                        let elValue = parseFloat(elValueStr);
-                        if (!isNaN(elValue)) {
-                            $el.text(formatterNumber.format(elValue));
-                        }
+                });
+                $numElements.each(function () {
+                    let $el = $(this);
+                    //let elValueStr = $el.attr('data-actualValue');
+                    let elValueStr = $el.text();
+                    let elValue = parseFloat(elValueStr);
+                    if (!isNaN(elValue)) {
+                        $el.text(formatterNumber.format(elValue));
+                    }
 
-                    });
-                };
+                });
+            };
             const getSelectedCurrencyId = (selector, val) => {
                 // Check if the value is null or undefined
                 if (val == null) {
@@ -432,37 +455,39 @@
                 let val = selector.val(); // Get the current value
                 let curCurrencySelected = getSelectedCurrencyId(selector, val);
                 let currencyCode;
-                    try {
-                        let currentCurrency = currencyListJs.find(x => x.id === curCurrencySelected);
-                        currencyCode = currentCurrency.code;
-                        let locale = currentCurrency.displayLocale;
-                        formatterCurrency = new Intl.NumberFormat(locale,
-                            {
-                                style: 'currency',
-                                currency: currencyCode,
-                                minimumFractionDigits: 2
-                            });
-                            formatterNumber = new Intl.NumberFormat(locale,
-                            {
-                                maximumFractionDigits: 3
+                try {
+                    let currentCurrency = currencyListJs.find(x => x.id === curCurrencySelected);
+                    currencyCode = currentCurrency.code;
+                    let locale = currentCurrency.displayLocale;
+                    formatterCurrency = new Intl.NumberFormat(locale,
+                        {
+                            style: 'currency',
+                            currency: currencyCode,
+                            minimumFractionDigits: 2
+                        });
+                    formatterNumber = new Intl.NumberFormat(locale,
+                        {
+                            maximumFractionDigits: 3
 
-                                });
-                        refreshView();
+                        });
+                    refreshView();
                     //formatNumericElements();
-                        //indPgLib.setCurrencyFormatter(formatterCurrency);
-                    } catch (e) {
-                        //not found keep old formater or maybe create a default one
-                        console.log('Not found currency code for this id');
-                    }
-                };
-           
+                    //indPgLib.setCurrencyFormatter(formatterCurrency);
+                } catch (e) {
+                    //not found keep old formater or maybe create a default one
+                    console.log('Not found currency code for this id');
+                }
+            };
+            const periodChanged = () => {
+                refreshView();
+            };
             $periodSelector.change((event) => {
                 periodChanged();
             });
-           
-            const getFinancialData = (itemId, dateRange, selCompany, selCurrency, spinnerEl) => {
-                    productLib.getProductFinancialSummaryData(itemId,dateRange,selCompany,selCurrency,spinnerEl)
-                    .then((data)=>{
+
+            const getFinancialData = (itemId, dateRange, selCompany, selCurrency, fromCustomDate, toCustomDate, spinnerEl) => {
+                productLib.getProductFinancialSummaryData(itemId, dateRange, selCompany, selCurrency, fromCustomDate, toCustomDate, spinnerEl)
+                    .then((data) => {
                         console.log(data);
                         let $importVolume = $('[name=ImportVolume]');
                         let $importValue = $('[name=ImportValue]');
@@ -491,16 +516,14 @@
                         formatNumericElements();
                     })
                     .catch((error) => {
-                                console.log("Error getting summary data");
-                                console.log(error);
-                            });
+                        console.log("Error getting summary data");
+                        console.log(error);
+                    });
             };
             $currencySelector.change((event) => {
                 currencyChanged();
             });
-            const periodChanged = () => {
-                refreshView();
-            };
+          
             $periodSelector.change((event) => {
                 periodChanged();
             });
@@ -515,9 +538,10 @@
             currencyChanged();
 
             //refreshView();
-     });
-   
-</script>
+        });
+
+    </script>
+    @ScriptHelper.RenderScripts(HttpContext)
 }
 
 

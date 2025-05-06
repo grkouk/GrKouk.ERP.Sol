@@ -23,7 +23,7 @@
              document.getElementById('customDatesSelected').addEventListener('click', dateFilterCustomDatesSelected, true);
              function dateFilterCustomDatesSelected(e) {
                       $('#customDateFilter').modal('hide');
-                      indPgLib.refreshData();
+                      window.refreshData();
              }
             let toDateFilterValue=new Date();
             let fromDateFilterValue = new Date(toDateFilterValue.getFullYear(),toDateFilterValue.getMonth()-1,1);

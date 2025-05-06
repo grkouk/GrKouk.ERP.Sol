@@ -357,8 +357,17 @@
                 if (companiesFilterValue != null && companiesFilterValue.length > 0) {
                     selCompanies = companiesFilterValue;
                 }
-
-                getFinancialData(mainEntityId, selPeriodId, selCompanies, selCurrencyId, $spinnerEl)
+                let fromCustomDate='';
+                let toCustomDate='';
+                let $toCustomFilterDate = $("#toDateFilterEl");
+                if ($toCustomFilterDate.val() != null && $toCustomFilterDate.val().length > 0) {
+                    toCustomDate = $toCustomFilterDate.val();
+                }
+                let $fromCustomFilterDate = $("#fromDateFilterEl");
+                if ($fromCustomFilterDate.val() != null && $fromCustomFilterDate.val().length > 0) {
+                    fromCustomDate = $fromCustomFilterDate.val();
+                }
+                getFinancialData(mainEntityId, selPeriodId, selCompanies, selCurrencyId,fromCustomDate,toCustomDate, $spinnerEl)
                 let grd = document.getElementById("GridCFADetailPage").ej2_instances[0];
                 grd.query = new ej.data.Query()
                     .addParams('entityId', mainEntityId)
@@ -366,7 +375,7 @@
                     .addParams('companyFilter', selCompanies)
                     .addParams('displayCurrencyId', selCurrencyId);
             };
-
+            window.refreshData = refreshView;
             const formatNumericElements = () => {
                 let $currencyElements = $('.currency-data');
                 let $numElements = $('.numeric-data');
@@ -454,8 +463,8 @@
             };
 
           
-            const getFinancialData = (itemId, dateRange, selCompany, selCurrency, spinnerEl) => {
-                productLib.getCfaFinancialSummaryData(itemId, dateRange, selCompany, selCurrency, spinnerEl)
+            const getFinancialData = (itemId, dateRange, selCompany, selCurrency, fromCustomDate, toCustomDate, spinnerEl) => {
+                productLib.getCfaFinancialSummaryData(itemId, dateRange, selCompany, selCurrency, fromCustomDate, toCustomDate, spinnerEl)
                     .then((data) => {
                         console.log(data);
 
@@ -486,7 +495,6 @@
             $periodSelector.change((event) => {
                 periodChanged();
             });
-            // loadPreviousSession(sessionObj);
             fltManLib.applySettingsFromStorage(storageKey, elementSettingsConfig);
 
 
@@ -501,6 +509,7 @@
         });
        
     </script>
+    @ScriptHelper.RenderScripts(HttpContext)
 }
 
 

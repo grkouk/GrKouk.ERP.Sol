@@ -639,20 +639,35 @@ namespace GrKouk.Web.ERP.Controllers
                 .Where(p => p.TransactorId == request.TransactorId);
             IQueryable<TransactorTransaction> transListAll = _context.TransactorTransactions
                 .Where(p => p.TransactorId == request.TransactorId);
-
-
-            //DateTime beforePeriodDate = DateTime.Today;
+           
+            DateTime beforePeriodDate = DateTime.Today;
             if (!string.IsNullOrEmpty(request.DateRange))
             {
+                DateFilterDates dfDates = new();
                 var datePeriodFilter = request.DateRange;
-                DateFilterDates dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
-                DateTime fromDate = dfDates.FromDate;
-                //beforePeriodDate = fromDate.AddDays(-1);
-                DateTime toDate = dfDates.ToDate;
+                if (datePeriodFilter == "CUSTOM")
+                {
+                    if (request.FromCustomFilterDate.HasValue && request.ToCustomFilterDate.HasValue)
+                    {
+                        dfDates.FromDate = request.FromCustomFilterDate.Value;
+                        dfDates.ToDate = request.ToCustomFilterDate.Value;
+                    }
+                    else
+                    {
+                        return BadRequest("Custom Period filter dates are missing");
+                    }
+                }
+                else
+                {
+                    dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
+                }
 
+                DateTime fromDate = dfDates.FromDate;
+                DateTime toDate = dfDates.ToDate;
                 transactionsList = transactionsList.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
                 transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
             }
+
             if (!string.IsNullOrEmpty(request.CompanyFilter))
             {
                 List<int> firmIds = System.Text.Json.JsonSerializer.Deserialize<List<int>>(request.CompanyFilter);

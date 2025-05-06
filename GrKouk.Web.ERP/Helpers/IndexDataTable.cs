@@ -96,6 +96,10 @@ namespace GrKouk.Web.ERP.Helpers
         public string CompanyFilter { get; set; }
         [JsonProperty(PropertyName = "dateRange", Required = Required.Default)]
         public string DateRange { get; set; }
+        [JsonProperty(PropertyName = "fromCustomFilterDate", Required = Required.AllowNull)]
+        public DateTime? FromCustomFilterDate { get; set; }
+        [JsonProperty(PropertyName = "toCustomFilterDate", Required = Required.AllowNull)]
+        public DateTime? ToCustomFilterDate { get; set; }
     }
 
     public class AutoCompleteDataManagerRequest : DataManagerRequest

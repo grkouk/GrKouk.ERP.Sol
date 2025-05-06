@@ -12,13 +12,29 @@
         currencyFormatter = formatterCurrency;
     };
     const spinnerLoaderShow = ($spinnerElement) => {
-        $spinnerElement.show();
+        if ($spinnerElement && typeof $spinnerElement.show === "function") {
+
+            $spinnerElement.show();
+        }
+
     };
     const spinnerLoaderHide = ($spinnerElement) => {
-        $spinnerElement.hide();
+        if ($spinnerElement && typeof $spinnerElement.hide === "function") {
+
+            $spinnerElement.hide();
+        }
+
     };
     const spinnerLoaderIsVisible = ($spinnerElement) => {
-        return ($spinnerElement.is(':visible'));
+        if (
+            $spinnerElement &&
+            $spinnerElement instanceof jQuery &&
+            $spinnerElement.length > 0
+        ) {
+            return $spinnerElement.is(':visible');
+        }
+        return false;
+
     };
 
     const makeAjaxCall = (uri, $SpElement) => {
@@ -242,12 +258,14 @@
                 });
         });
     };
-    const getProductFinancialSummaryData = (itemId, dateRange, selCompany, selCurrency, spinnerElement) => {
+    const getProductFinancialSummaryData = (itemId, dateRange, selCompany, selCurrency, fromCustomDate, toCustomDate, spinnerElement) => {
         var uri = '/api/FinancialData/GetWarehouseItemFinancialSummaryData?';
         uri += `&warehouseItemId=${itemId}`;
         uri += `&companyFilter=${selCompany}`;
         uri += `&dateRange=${dateRange}`;
         uri += `&displayCurrencyId=${selCurrency}`;
+        uri += `&fromCustomFilterDate=${fromCustomDate}`;
+        uri += `&toCustomFilterDate=${toCustomDate}`;
         return new Promise((resolve, reject) => {
             makeAjaxCall(uri, spinnerElement)
                 .then((data) => {
@@ -259,12 +277,14 @@
         });
     };
     ///
-    const getCfaFinancialSummaryData = (itemId, dateRange, selCompany, selCurrency, spinnerElement) => {
+    const getCfaFinancialSummaryData = (itemId, dateRange, selCompany, selCurrency, fromCustomDate, toCustomDate, spinnerElement) => {
         var uri = '/api/FinancialData/GetCfaFinancialSummaryData?';
         uri += `&cashFlowAccountId=${itemId}`;
         uri += `&companyFilter=${selCompany}`;
         uri += `&dateRange=${dateRange}`;
         uri += `&displayCurrencyId=${selCurrency}`;
+        uri += `&fromCustomFilterDate=${fromCustomDate}`;
+        uri += `&toCustomFilterDate=${toCustomDate}`;
         return new Promise((resolve, reject) => {
             makeAjaxCall(uri, spinnerElement)
                 .then((data) => {

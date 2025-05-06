@@ -138,10 +138,7 @@
             </ejs-grid>
 
 
-            <hr/>
-            <footer>
-                <p>&copy; 2018-2025 - George Koukoudis</p>
-            </footer>
+           
 
         </main>
     </div>
@@ -332,14 +329,28 @@
                     if (companiesFilterValue != null && companiesFilterValue.length > 0) {
                         selCompanies = companiesFilterValue;
                     }
-                    getFinancialData(mainEntityId, selPeriodId, selCompanies, selCurrencyId, $spinnerEl)
+                    let fromCustomDate='';
+                    let toCustomDate='';
+                   
+                    let $fromCustomFilterDate = $("#fromDateFilterEl");
+                    if ($fromCustomFilterDate.val() != null && $fromCustomFilterDate.val().length > 0) {
+                        fromCustomDate = $fromCustomFilterDate.val();
+                    }
+                    let $toCustomFilterDate = $("#toDateFilterEl");
+                    if ($toCustomFilterDate.val() != null && $toCustomFilterDate.val().length > 0) {
+                        toCustomDate = $toCustomFilterDate.val();
+                    }
+                    getFinancialData(mainEntityId, selPeriodId, selCompanies, selCurrencyId,fromCustomDate,toCustomDate, $spinnerEl)
                     let grd = document.getElementById("GridTransactorDetailsPage").ej2_instances[0];
                     grd.query = new ej.data.Query()
                         .addParams('transactorId', mainEntityId)
                         .addParams('dateRange', selPeriodId)
                         .addParams('companyFilter', selCompanies)
-                        .addParams('displayCurrencyId', selCurrencyId);
+                        .addParams('displayCurrencyId', selCurrencyId)
+                        .addParams('fromCustomFilterDate', fromCustomDate)
+                        .addParams('toCustomFilterDate', toCustomDate);
                 };
+                window.refreshData = refreshView
                 const formatNumericElements = () => {
                     let $currencyElements = $('.currency-data');
                     let $numElements = $('.numeric-data');
@@ -429,13 +440,15 @@
                 };
                
                
-                const getFinancialData = (transactorId, dateRange, selCompany, selCurrency, spinnerEl) => {
+                const getFinancialData = (transactorId, dateRange, selCompany, selCurrency, fromCustomDate, toCustomDate,spinnerEl) => {
                     var timeout;
                     var uri = '/api/FinancialData/GetTransactorFinancialSummaryData?';
                     uri += `&transactorId=${transactorId}`;
                     uri += `&companyFilter=${selCompany}`;
                     uri += `&dateRange=${dateRange}`;
                     uri += `&displayCurrencyId=${selCurrency}`;
+                    uri += `&fromCustomFilterDate=${fromCustomDate}`;
+                    uri += `&toCustomFilterDate=${toCustomDate}`;
                     $.ajax({
                         contentType: 'application/json; charset=utf-8',
                         dataType: 'json',
@@ -539,7 +552,6 @@
                 $periodSelector.change((event) => {
                     periodChanged();
                 });
-               // loadPreviousSession(sessionObj);
                 fltManLib.applySettingsFromStorage(storageKey, elementSettingsConfig);
                
 
@@ -555,4 +567,5 @@
             });
         }());
     </script>
+    @ScriptHelper.RenderScripts(HttpContext)
 }
