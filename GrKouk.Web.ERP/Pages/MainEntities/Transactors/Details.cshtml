@@ -7,7 +7,7 @@
     // ViewData["Title"] = "Transactor Details";
 }
 
-<input type="hidden" id="initialPageTitle" value="@ViewData["Title"]"/>
+<input type="hidden" id="initialPageTitle" value="Financial Summary"/>
 @* <h4 id="hElementTitle">@ViewData["Title"]</h4> *@
 <div class="container-fluid">
     <div class="row">
@@ -29,7 +29,7 @@
             <div
                 class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-2 pb-2 mb-3 border-bottom">
                 <div class="d-flex align-items-center">
-                    <h5 class="mr-2">Financial Summary</h5>
+                    <h5 id="hElementTitle" class="mr-2">Financial Summary</h5>
                     <div class="spinner-border ml-auto text-primary" role="status" aria-hidden="true"
                          id="FinancialLoader" style="display: none"></div>
                 </div>
@@ -136,9 +136,6 @@
                                    textAlign="Right" format="C2"></e-grid-column>
                 </e-grid-columns>
             </ejs-grid>
-
-
-           
 
         </main>
     </div>
@@ -341,6 +338,7 @@
                         toCustomDate = $toCustomFilterDate.val();
                     }
                     getFinancialData(mainEntityId, selPeriodId, selCompanies, selCurrencyId,fromCustomDate,toCustomDate, $spinnerEl)
+                    fltManLib.setIndexViewTitlesBasedOnPeriod();
                     let grd = document.getElementById("GridTransactorDetailsPage").ej2_instances[0];
                     grd.query = new ej.data.Query()
                         .addParams('transactorId', mainEntityId)

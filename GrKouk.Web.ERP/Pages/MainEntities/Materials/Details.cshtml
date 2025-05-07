@@ -7,7 +7,7 @@
     //ViewData["Title"] = "Product Details";
 }
 
-<input type="hidden" id="initialPageTitle" value="@ViewData["Title"]"/>
+<input type="hidden" id="initialPageTitle" value="Financial Summary"/>
 <div class="container-fluid">
     <div class="row">
         <main role="main" class="col-md-12 ms-sm-auto col-lg-12 px-4">
@@ -28,7 +28,7 @@
             <div
                 class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-2 pb-2 mb-3 border-bottom">
                 <div class="d-flex align-items-center">
-                    <h5 class="me-2">Financial Summary</h5>
+                    <h5 id="hElementTitle" class="me-2">Financial Summary</h5>
                     <div class="spinner-border ml-auto text-primary" role="status" aria-hidden="true"
                          id="FinancialLoader" style="display: none"></div>
                 </div>
@@ -279,11 +279,7 @@
                     maximumFractionDigits: 3
 
                 });
-            let sessionObj = {
-                'currencyCode': '',
-                'periodCode': '',
-                'companyCode': ''
-            };
+           
             const loadCultureFiles = (name) => {
                 let files = ['ca-gregorian.json', 'numbers.json', 'timeZoneNames.json', 'currencies.json'];
                 if (name === 'ar') {
@@ -397,6 +393,7 @@
                     fromCustomDate = $fromCustomFilterDate.val();
                 }
                 getFinancialData(warehouseItemId, selPeriodId, selCompanies, selCurrencyId, fromCustomDate, toCustomDate, $spinnerEl)
+                fltManLib.setIndexViewTitlesBasedOnPeriod();
                 // let grd = document.getElementById("GridCFADetailPage").ej2_instances[0];
                 // grd.query = new ej.data.Query()
                 //     .addParams('entityId', cashFlowAccountId)

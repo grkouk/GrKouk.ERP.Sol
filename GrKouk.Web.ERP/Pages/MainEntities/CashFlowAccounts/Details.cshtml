@@ -7,7 +7,7 @@
     //ViewData["Title"] = "Product Details";
 }
 
-<input type="hidden" id="initialPageTitle" value="@ViewData["Title"]"/>
+<input type="hidden" id="initialPageTitle" value="Financial Summary"/>
 <div class="container-fluid">
     <div class="row">
         <main role="main" class="col-md-12 ms-sm-auto col-lg-12 px-4">
@@ -29,7 +29,7 @@
             <div
                 class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-2 pb-2 mb-3 border-bottom">
                 <div class="d-flex align-items-center">
-                    <h5 class="me-2">Financial Summary</h5>
+                    <h5 id="hElementTitle" class="me-2">Financial Summary</h5>
                     <div class="spinner-border ml-auto text-primary" role="status" aria-hidden="true"
                          id="FinancialLoader" style="display: none"></div>
                 </div>
@@ -274,11 +274,7 @@
                     loadCulture(prop);
                 }
             };
-            let sessionObj = {
-                'currencyCode': '',
-                'periodCode': '',
-                'companyCode': ''
-            };
+           
             const selectedCompanies = document.getElementById("CompaniesFilterElm").ej2_instances[0];
             let companiesFilterValue = $('#CompaniesFilter').val();
             if (companiesFilterValue != null && companiesFilterValue.length > 0) {
@@ -368,6 +364,7 @@
                     fromCustomDate = $fromCustomFilterDate.val();
                 }
                 getFinancialData(mainEntityId, selPeriodId, selCompanies, selCurrencyId,fromCustomDate,toCustomDate, $spinnerEl)
+                fltManLib.setIndexViewTitlesBasedOnPeriod();
                 let grd = document.getElementById("GridCFADetailPage").ej2_instances[0];
                 grd.query = new ej.data.Query()
                     .addParams('entityId', mainEntityId)

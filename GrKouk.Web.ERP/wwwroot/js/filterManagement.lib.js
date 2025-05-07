@@ -115,7 +115,45 @@ const fltManLib = (function () {
         }
 
     }
+
+    const setIndexViewTitlesBasedOnPeriod= ()=>{
+        let initialPageTitle;
+
+        const elemInitPageTitle = document.getElementById('initialPageTitle');
+        if (elemInitPageTitle) {
+            initialPageTitle = elemInitPageTitle.value;
+        }
+        const elemHTitle = document.getElementById('hElementTitle');
+       
+        const elemDatePeriod = document.getElementById('DatePeriodFilter');
+        let periodText;
+        let periodCode;
+        if (elemDatePeriod) {
+            periodText = elemDatePeriod.options[elemDatePeriod.selectedIndex].text;
+            periodCode = elemDatePeriod.options[elemDatePeriod.selectedIndex].value;
+            if(periodCode==="CUSTOM"){
+                const elemFrom = document.getElementById('fromDateFilterEl');
+                const elemTo = document.getElementById('toDateFilterEl');
+                const fromLb = commonLib.formatDateInputValue(elemFrom.value);
+                const toLb =  commonLib.formatDateInputValue(elemTo.value);
+               
+
+                const title = `${initialPageTitle} από ${fromLb} έως ${toLb}` ;
+                //document.title = title;
+                if (elemHTitle) {
+                    elemHTitle.innerText = title;
+                }
+            } else {
+                const title = `${initialPageTitle} Περίοδος ${periodText}` ;
+                //document.title = title;
+                if(elemHTitle){
+                    elemHTitle.innerText = title;
+                }
+            }
+        }
+    };
     return {
+        setIndexViewTitlesBasedOnPeriod: setIndexViewTitlesBasedOnPeriod,
         saveSettingsToStorage: saveSettingsToStorage,
         applySettingsFromStorage: applySettingsFromStorage
     };

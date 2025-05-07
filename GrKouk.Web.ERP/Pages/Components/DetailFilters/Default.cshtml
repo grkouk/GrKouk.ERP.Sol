@@ -5,35 +5,35 @@
     var viewContext = (ViewContext)ViewData["ViewContext"];
     var script = @"
         <script>
-        $(document).ready(function () {
-             document.getElementById('DatePeriodFilter').addEventListener('change', dateFilterValueChange, true);
-             function dateFilterValueChange(e) {
-                 if (e.currentTarget.value === 'CUSTOM') {
-                     e.preventDefault();
-                     e.stopPropagation();
-                     var myModal = new bootstrap.Modal(document.getElementById('customDateFilter'), {
-                         keyboard: true, focus: true
-                     });
-                     myModal.show();
-                 } else {
-                     return;
+            $(document).ready(function () {
+                 document.getElementById('DatePeriodFilter').addEventListener('change', dateFilterValueChange, true);
+                 function dateFilterValueChange(e) {
+                     if (e.currentTarget.value === 'CUSTOM') {
+                         e.preventDefault();
+                         e.stopPropagation();
+                         var myModal = new bootstrap.Modal(document.getElementById('customDateFilter'), {
+                             keyboard: true, focus: true
+                         });
+                         myModal.show();
+                     } else {
+                         return;
+                     }
                  }
-             }
-             let selectButtonEl = document.getElementById('customDatesSelected');
-             document.getElementById('customDatesSelected').addEventListener('click', dateFilterCustomDatesSelected, true);
-             function dateFilterCustomDatesSelected(e) {
-                      $('#customDateFilter').modal('hide');
-                      window.refreshData();
-             }
-            let toDateFilterValue=new Date();
-            let fromDateFilterValue = new Date(toDateFilterValue.getFullYear(),toDateFilterValue.getMonth()-1,1);
-            const elemFrom = document.getElementById(""fromDateFilterEl"");
-            const elemTo = document.getElementById(""toDateFilterEl"");
-            const fromDateString = fromDateFilterValue.toJSON().slice(0, 10);
-            elemFrom.value = fromDateString;
-            toDateString = toDateFilterValue.toJSON().slice(0, 10);
-            elemTo.value = toDateString;
-        });
+                 let selectButtonEl = document.getElementById('customDatesSelected');
+                 document.getElementById('customDatesSelected').addEventListener('click', dateFilterCustomDatesSelected, true);
+                 function dateFilterCustomDatesSelected(e) {
+                          $('#customDateFilter').modal('hide');
+                          window.refreshData();
+                 }
+                let toDateFilterValue=new Date();
+                let fromDateFilterValue = new Date(toDateFilterValue.getFullYear(),toDateFilterValue.getMonth()-1,1);
+                const elemFrom = document.getElementById(""fromDateFilterEl"");
+                const elemTo = document.getElementById(""toDateFilterEl"");
+                const fromDateString = fromDateFilterValue.toJSON().slice(0, 10);
+                elemFrom.value = fromDateString;
+                toDateString = toDateFilterValue.toJSON().slice(0, 10);
+                elemTo.value = toDateString;
+            });
          </script>
                  ";
     ScriptHelper.AddScript(viewContext, script);
