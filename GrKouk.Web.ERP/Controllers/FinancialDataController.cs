@@ -138,23 +138,32 @@ namespace GrKouk.Web.ERP.Controllers
                     }
 
                 }
-                
-               
-
-                //DateTime beforePeriodDate = DateTime.Today;
                 if (!string.IsNullOrEmpty(request.DateRange))
                 {
+                    DateFilterDates dfDates=new();
                     var datePeriodFilter = request.DateRange;
-                    DateFilterDates dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
+                    if (datePeriodFilter == "CUSTOM")
+                    {
+                        if (request.FromCustomFilterDate.HasValue && request.ToCustomFilterDate.HasValue)
+                        {
+                            dfDates.FromDate = request.FromCustomFilterDate.Value;
+                            dfDates.ToDate = request.ToCustomFilterDate.Value;
+                        }
+                        else
+                        {
+                            return BadRequest("Custom Period filter dates are missing");
+                        }
+                    }
+                    else
+                    {
+                        dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
+                    }
+               
                     DateTime fromDate = dfDates.FromDate;
-                    //beforePeriodDate = fromDate.AddDays(-1);
                     DateTime toDate = dfDates.ToDate;
-                    fullListIq = fullListIq.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
-                    numberOfDays = (int) (toDate - fromDate).TotalDays +1;
-                    //transactionsList = transactionsList.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
-                    //transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
-                }
 
+                    fullListIq = fullListIq.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
+                } 
                 if (defObj.TransTypes != null)
                 {
                     if (defObj.TransTypes.Length > 0)
@@ -257,17 +266,32 @@ namespace GrKouk.Web.ERP.Controllers
 
                 }
 
-                DateTime beforePeriodDate = DateTime.Today;
                 if (!string.IsNullOrEmpty(request.DateRange))
                 {
+                    DateFilterDates dfDates=new();
                     var datePeriodFilter = request.DateRange;
-                    DateFilterDates dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
+                    if (datePeriodFilter == "CUSTOM")
+                    {
+                        if (request.FromCustomFilterDate.HasValue && request.ToCustomFilterDate.HasValue)
+                        {
+                            dfDates.FromDate = request.FromCustomFilterDate.Value;
+                            dfDates.ToDate = request.ToCustomFilterDate.Value;
+                        }
+                        else
+                        {
+                            return BadRequest("Custom Period filter dates are missing");
+                        }
+                    }
+                    else
+                    {
+                        dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
+                    }
+               
                     DateTime fromDate = dfDates.FromDate;
-                    beforePeriodDate = fromDate.AddDays(-1);
                     DateTime toDate = dfDates.ToDate;
-                    numberOfDays = (int) (toDate - fromDate).TotalDays +1;
+
                     fullListIq = fullListIq.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
-                }
+                } 
 
                 if (defObj.TransTypes != null)
                 {

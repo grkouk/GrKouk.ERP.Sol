@@ -31,7 +31,7 @@
 	@if (User.IsInRole("Admin"))
 	{
 		<input type="hidden" id="logged" value="true"/>
-		<input type="hidden" id="initialPageTitle" value="@ViewData["Title"]"/>
+		<input type="hidden" id="initialPageTitle" value="Financial Summary"/>
 		<div class="container-fluid">
 			@* <div class="row pt-5 mt-5"></div> *@
 			<div class="row pt-5 mt-4">
@@ -43,7 +43,7 @@
 					<div
 						class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-2 pb-2 mb-3 border-bottom">
 						<div class="d-flex align-items-center">
-							<h5 class="mr-2">Financial Summary</h5>
+							<h5 id="hElementTitle" class="mr-2">Financial Summary</h5>
 							<div class="spinner-border ml-auto text-primary" role="status" aria-hidden="true"
 							     id="FinancialLoader" style="display: none"></div>
 						</div>
@@ -508,8 +508,7 @@
 
 				});
 			const currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
-			//const companyListJs = @Html.Raw(Json.Serialize(ViewBag.CompanyListJs));
-			//const datePeriodListJs = @Html.Raw(Json.Serialize(ViewBag.DatePeriodListJs));
+			
 			const computeLineSum = (dependentCodes) => {
 
 			};
@@ -584,13 +583,23 @@
 
 			//-----------------
 			const refreshView = () => {
-
 				let selPeriodId = $periodSelector.val();
 				let selCurrencyId = $currencySelector.val();
 				let selCompanies;
 				let companiesFilterValue = $('#CompaniesFilter').val();
 				if (companiesFilterValue != null && companiesFilterValue.length > 0) {
 					selCompanies = companiesFilterValue;
+				}
+				let fromCustomDate='';
+				let toCustomDate='';
+
+				let $fromCustomFilterDate = $("#fromDateFilterEl");
+				if ($fromCustomFilterDate.val() != null && $fromCustomFilterDate.val().length > 0) {
+					fromCustomDate = $fromCustomFilterDate.val();
+				}
+				let $toCustomFilterDate = $("#toDateFilterEl");
+				if ($toCustomFilterDate.val() != null && $toCustomFilterDate.val().length > 0) {
+					toCustomDate = $toCustomFilterDate.val();
 				}
 
 				let $expenseFieldsToCompute = $('[name=BuyCodeValue]');
@@ -600,10 +609,10 @@
 
 					let cd = $item.data('computecode');
 					let loader = $item.next();
-					getFinancialData(cd, selPeriodId, selCompanies, selCurrencyId, $item, loader);
+					getFinancialData(cd, selPeriodId, selCompanies, selCurrencyId,fromCustomDate,toCustomDate, $item, loader);
 
 				});
-
+				fltManLib.setIndexViewTitlesBasedOnPeriod();
 				let $incomeFieldsToCompute = $('[name=SellCodeValue]');
 				$incomeFieldsToCompute.each(function (index) {
 
@@ -611,7 +620,7 @@
 
 					let cd = $item.data('computecode');
 					let loader = $item.next();
-					getFinancialData(cd, selPeriodId, selCompanies, selCurrencyId, $item, loader);
+					getFinancialData(cd, selPeriodId, selCompanies, selCurrencyId,fromCustomDate,toCustomDate, $item, loader);
 
 				});
 
@@ -622,7 +631,7 @@
 
 					let cd = $item.data('computecode');
 					let loader = $item.next();
-					getFinancialData(cd, selPeriodId, selCompanies, selCurrencyId, $item, loader);
+					getFinancialData(cd, selPeriodId, selCompanies, selCurrencyId,fromCustomDate,toCustomDate, $item, loader);
 
 				});
 
@@ -633,12 +642,13 @@
 
 					let cd = $item.data('computecode');
 					let loader = $item.next();
-					getFinancialData(cd, selPeriodId, selCompanies, selCurrencyId, $item, loader);
+					getFinancialData(cd, selPeriodId, selCompanies, selCurrencyId,fromCustomDate,toCustomDate, $item, loader);
 
 				});
 				//updateBalanceGroup();
 
 			};
+			window.refreshData = refreshView
 			//-------------Autocomplete shortcuts modal--------------------
 			const refreshAutoCompleteData = (e) => {
 
@@ -682,7 +692,7 @@
 			
 			
 			//--------------------------------------------------------------------------
-			const getFinancialData = (codeToCompute, dateRange, selCompany, selCurrency, element, loader, selectionCallback) => {
+			const getFinancialData = (codeToCompute, dateRange, selCompany, selCurrency, fromCustomDate, toCustomDate, element, loader, selectionCallback) => {
 				//console.log('Inside getFinancialData')
 				var timeout;
 				var uri = '/api/FinancialData/GetMainDashboardInfo?';
@@ -690,6 +700,8 @@
 				uri += `&companyFilter=${selCompany}`;
 				uri += `&dateRange=${dateRange}`;
 				uri += `&displayCurrencyId=${selCurrency}`;
+				uri += `&fromCustomFilterDate=${fromCustomDate}`;
+				uri += `&toCustomFilterDate=${toCustomDate}`;
 				$.ajax({
 					contentType: 'application/json; charset=utf-8',
 					dataType: 'json',
