@@ -18,8 +18,10 @@ using GrKouk.Erp.Dtos.WarehouseTransactions;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using NToastNotify.Helpers;
 using Syncfusion.EJ2.Base;
@@ -33,11 +35,13 @@ namespace GrKouk.Web.ERP.Controllers
     {
         private readonly ApiDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IMemoryCache _cache;
 
-        public FinancialDataController(ApiDbContext context, IMapper mapper)
+        public FinancialDataController(ApiDbContext context, IMapper mapper, IMemoryCache cache)
         {
             _context = context;
             _mapper = mapper;
+            _cache = cache;
         }
 
         private static decimal ConvertAmount(int companyCurrencyId, int displayCurrencyId, IList<ExchangeRate> rates,
@@ -70,6 +74,28 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
             return retAmount;
+        }
+        private async Task<int?> GetAllCompaniesIdCachedAsync()
+        {
+            // Key can be any unique string
+            const string cacheKey = "AllCompaniesId";
+            if (_cache.TryGetValue(cacheKey, out int cachedValue))
+                return cachedValue;
+
+            // Not cached, fetch from DB
+            var allCompCode = await _context.AppSettings.SingleOrDefaultAsync(
+                p => p.Code == Constants.AllCompaniesCodeKey);
+
+            if (allCompCode == null)
+                return null;
+
+            var allCompaniesEntity = await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+
+            if (allCompaniesEntity == null)
+                return null;
+
+            _cache.Set(cacheKey, allCompaniesEntity.Id, TimeSpan.FromHours(1)); // or whatever expiry you like
+            return allCompaniesEntity.Id;
         }
 
         [HttpGet("GetMainDashboardInfo")]
@@ -374,7 +400,11 @@ namespace GrKouk.Web.ERP.Controllers
             return Ok(response);
         }
 
-        [HttpGet("GetTransactorFinancialSummaryData")]
+       /// <summary>
+       /// This is deprecated
+       /// </summary>
+       /// <param name="request"></param>
+       /// <returns></returns>
         public async Task<IActionResult> GetTransactorFinancialSummaryData([FromQuery] IndexDataTableRequest request)
         {
             if (request.TransactorId <= 0)
@@ -505,6 +535,112 @@ namespace GrKouk.Web.ERP.Controllers
             return Ok(response);
         }
 
+        [HttpGet("GetTransactorFinancialSummaryData")]
+        public async Task<IActionResult> GetTransactorFinancialSummaryDataV2([FromQuery] IndexDataTableRequest request)
+        {
+            if (request.TransactorId <= 0)
+            {
+                return BadRequest("Transactor Id is out of valid range");
+            }
+
+            IQueryable<TransactorTransaction> fullListIq =
+                _context.TransactorTransactions.Where(p => p.TransactorId == request.TransactorId);
+           
+            if (!string.IsNullOrEmpty(request.CompanyFilter))
+            {
+                List<int> firmIds = System.Text.Json.JsonSerializer.Deserialize<List<int>>(request.CompanyFilter);
+                int? allCompaniesId = await GetAllCompaniesIdCachedAsync();
+                if (allCompaniesId is null)
+                {
+                    return NotFound("All Companies entity not found");
+                }
+                fullListIq = FilterEval.ApplyCompanyListFilter(fullListIq, firmIds, (int)allCompaniesId, p => p.CompanyId);
+            }
+            DateTime beforePeriodDate = DateTime.Today;
+            if (!string.IsNullOrEmpty(request.DateRange))
+            {
+                var datePeriodFilter = request.DateRange;
+                try
+                {
+                    var (fromDate, toDate) = FilterEval.GetDateRange(datePeriodFilter, request.FromCustomFilterDate,
+                        request.ToCustomFilterDate);
+                    fullListIq = FilterEval.ApplyPeriodDateFilter(fullListIq, fromDate, toDate, t => t.TransDate);
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+
+            }
+            
+            var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
+                .Take(10)
+                .ToListAsync();
+            var t = fullListIq.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
+            var t1 = await t.Select(p => new TransactorTransListDto
+            {
+                TransTransactorDocSeriesId = p.TransTransactorDocSeriesId,
+                TransTransactorDocSeriesName = p.TransTransactorDocSeriesName,
+                TransTransactorDocSeriesCode = p.TransTransactorDocSeriesCode,
+                TransTransactorDocTypeId = p.TransTransactorDocTypeId,
+                FinancialAction = p.FinancialAction,
+                AmountFpa = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountFpa),
+                AmountNet = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountNet),
+                AmountDiscount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                    p.AmountDiscount),
+                TransFpaAmount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                    p.TransFpaAmount),
+                TransNetAmount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                    p.TransNetAmount),
+                TransDiscountAmount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                    p.TransDiscountAmount),
+                CompanyCode = p.CompanyCode,
+                CompanyCurrencyId = p.CompanyCurrencyId
+            }).ToListAsync();
+            var grandSumOfAmount = t1.Sum(p => p.TotalAmount);
+            var grandSumOfDebit = t1.Sum(p => p.DebitAmount);
+            var grandSumOfCredit = t1.Sum(p => p.CreditAmount);
+            var transactor = await _context.Transactors.Include(p => p.TransactorType)
+                .FirstOrDefaultAsync(p => p.Id == request.TransactorId);
+            if (transactor == null)
+            {
+                return BadRequest();
+            }
+
+            await _context.Entry(transactor).Reference(p => p.TransactorType).LoadAsync();
+            var transactorType = transactor.TransactorType;
+            if (transactorType == null)
+            {
+                return BadRequest();
+            }
+
+            decimal difference = 0;
+            switch (transactorType.Code)
+            {
+                case "SYS.CUSTOMER":
+                    difference = grandSumOfDebit - grandSumOfCredit;
+                    break;
+                case "SYS.SUPPLIER":
+                    difference = grandSumOfCredit - grandSumOfDebit;
+                    break;
+                case "SYS.DEPARTMENT":
+                    difference = grandSumOfDebit - grandSumOfCredit;
+                    break;
+                case "SYS.DTRANSACTOR":
+                    difference = grandSumOfCredit - grandSumOfDebit;
+                    break;
+                default:
+                    break;
+            }
+
+            var response = new TransactorFinancialDataResponse()
+            {
+                SumOfDebit = grandSumOfDebit,
+                SumOfCredit = grandSumOfCredit,
+                SumOfDifference = difference
+            };
+            return Ok(response);
+        }
         [HttpGet("GetCfaFinancialSummaryData")]
         public async Task<IActionResult> GetCfaFinancialSummaryData([FromQuery] IndexDataTableRequest request)
         {
@@ -825,11 +961,6 @@ namespace GrKouk.Web.ERP.Controllers
                     Error = "No valid date range specified"
                 });
             }
-
-
-
-
-
             IQueryable<CashFlowAccountTransaction> transactionsList = _context.CashFlowAccountTransactions
                 .Include(p => p.Company)
                 .Include(p => p.DocumentSeries)

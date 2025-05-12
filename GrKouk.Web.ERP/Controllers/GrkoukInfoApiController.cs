@@ -40,6 +40,7 @@ using GrKouk.Erp.Dtos.Sync;
 using GrKouk.Web.ERP.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Caching.Memory;
 using Syncfusion.EJ2.Linq;
 
 //using Remotion.Linq.Parsing.Structure.IntermediateModel;
@@ -74,14 +75,16 @@ namespace GrKouk.Web.ERP.Controllers
         private readonly IMapper _mapper;
         private readonly IDocumentTransactionService _docTransSrv;
         private readonly PdfExportService _pdfService;
+        private readonly IMemoryCache _cache;
 
         public GrkoukInfoApiController(ApiDbContext context, IMapper mapper, IDocumentTransactionService docTransSrv
-            , PdfExportService pdfService)
+            , PdfExportService pdfService, IMemoryCache cache)
         {
             _context = context;
             _mapper = mapper;
             _docTransSrv = docTransSrv;
             _pdfService = pdfService;
+            _cache = cache;
         }
 
         [HttpGet("UnlinkProductImages")]
@@ -498,49 +501,32 @@ namespace GrKouk.Web.ERP.Controllers
                         break;
                 }
             }
-
             if (!string.IsNullOrEmpty(request.DateRange))
             {
-                DateFilterDates dfDates=new();
                 var datePeriodFilter = request.DateRange;
-                if (datePeriodFilter == "CUSTOM")
+                try
                 {
-                    if (request.FromCustomFilterDate.HasValue && request.ToCustomFilterDate.HasValue)
-                    {
-                        dfDates.FromDate = request.FromCustomFilterDate.Value;
-                        dfDates.ToDate = request.ToCustomFilterDate.Value;
-                    }
-                    else
-                    {
-                        return BadRequest("Custom Period filter dates are missing");
-                    }
+                    var (fromDate, toDate) = FilterEval.GetDateRange(datePeriodFilter, request.FromCustomFilterDate,
+                        request.ToCustomFilterDate);
+                    fullListIq = FilterEval.ApplyPeriodDateFilter(fullListIq, fromDate, toDate, t => t.TransDate);
                 }
-                else
+                catch (Exception ex)
                 {
-                    dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
+                    return BadRequest(ex.Message);
                 }
-               
-                DateTime fromDate = dfDates.FromDate;
-                DateTime toDate = dfDates.ToDate;
-
-                fullListIq = fullListIq.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
             }
-
             if (!string.IsNullOrEmpty(request.CompanyFilter))
             {
-                if (int.TryParse(request.CompanyFilter, out var companyId))
-                {
-                    if (companyId > 0)
-                    {
-                        fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
-                    }
-                }
+                fullListIq = FilterEval.ApplyCompanyFilter(fullListIq, request.CompanyFilter, t => t.CompanyId);
             }
 
             if (!string.IsNullOrEmpty(request.SearchFilter))
             {
-                fullListIq = fullListIq.Where(p => p.TransactorName.Contains(request.SearchFilter)
-                                                   || p.TransRefCode.Contains(request.SearchFilter));
+                fullListIq = FilterEval.ApplySearchFilter(fullListIq, request.SearchFilter,
+                    t => t.TransactorName,
+                    t => t.TransRefCode);
+                // fullListIq = fullListIq.Where(p => p.TransactorName.Contains(request.SearchFilter)
+                                                   // || p.TransRefCode.Contains(request.SearchFilter));
             }
 
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
