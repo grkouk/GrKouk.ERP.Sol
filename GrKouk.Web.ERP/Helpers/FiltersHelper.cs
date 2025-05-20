@@ -37,7 +37,8 @@ namespace GrKouk.Web.ERP.Helpers
                 new SelectListItem() {Value = "10", Text = "10"},
                 new SelectListItem() {Value = "20", Text = "20"},
                 new SelectListItem() {Value = "50", Text = "50"},
-                new SelectListItem() {Value = "100", Text = "100"}
+                new SelectListItem() {Value = "100", Text = "100"},
+                new SelectListItem() {Value = "5000", Text = "{All}"}
 
             };
             return filtersSelectList;
