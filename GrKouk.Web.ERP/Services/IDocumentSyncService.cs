@@ -129,7 +129,7 @@ public class SyncBusinessDocService : IDocumentSyncService
        
         #region "Find Synced Supplier"
 
-        (syncSupplierId, syncSupplierName) = await FindSyncedErpSupplierId(request.SupplierId);
+        (syncSupplierId, syncSupplierName) = await FindSyncedErpSupplierId(request.SupplierId, request.CompanyCode);
         if (syncSupplierId < 0)
         {
             return ServiceResult.Error("Sync Supplier not found", "BADREQUEST");
@@ -366,9 +366,9 @@ public class SyncBusinessDocService : IDocumentSyncService
         return item.Id;
     }
 
-    private async Task<(int supplierId, string supplierName)> FindSyncedErpSupplierId(int businessSupplierId)
+    private async Task<(int supplierId, string supplierName)> FindSyncedErpSupplierId(int businessSupplierId, string companyCode)
     {
-        var syncSupplier = await _context.SyncSuppliers.SingleOrDefaultAsync(p => p.BusId == businessSupplierId);
+        var syncSupplier = await _context.SyncSuppliers.SingleOrDefaultAsync(p => p.BusId == businessSupplierId && p.CompanyCode == companyCode);;
         if (syncSupplier == null)
         {
             return (-1, string.Empty);
