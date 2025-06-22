@@ -8406,9 +8406,15 @@ namespace GrKouk.Web.ERP.Controllers
                 switch (request.SortData.ToLower())
                 {
                     case "datesort:asc":
-                        fullListIq = fullListIq.OrderBy(p => p.SyncedAt);
+                        fullListIq = fullListIq.OrderBy(p => p.TransDate);
                         break;
                     case "datesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.TransDate);
+                        break;
+                    case "synceddatesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.SyncedAt);
+                        break;
+                    case "synceddatesort:desc":
                         fullListIq = fullListIq.OrderByDescending(p => p.SyncedAt);
                         break;
                     case "namesort:asc":
