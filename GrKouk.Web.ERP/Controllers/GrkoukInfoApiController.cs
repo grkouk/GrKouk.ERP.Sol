@@ -1617,6 +1617,12 @@ namespace GrKouk.Web.ERP.Controllers
                     case "sectioncodesort:desc":
                         fullListIq = fullListIq.OrderByDescending(p => p.Section.Code);
                         break;
+                    case "refnumbersort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.RefCode);
+                        break;
+                    case "refnumbersort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.RefCode);
+                        break;
                 }
             }
 
@@ -8435,6 +8441,12 @@ namespace GrKouk.Web.ERP.Controllers
                         break;
                     case "companycodesort:desc":
                         fullListIq = fullListIq.OrderByDescending(p => p.CompanyCode);
+                        break;
+                    case "refnumbersort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.RefNumber);
+                        break;
+                    case "refnumbersort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.RefNumber);
                         break;
                     // case "sectioncodesort:asc":
                     //     fullListIq = fullListIq.OrderBy(p => p.Section.Code);
