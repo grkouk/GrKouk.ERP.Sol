@@ -891,98 +891,151 @@ public class DocumentTransactionService : IDocumentTransactionService
                 }
 
 
-                int warehouseSeriesId = 0;
-                int warehouseTypeId = 0;
+               
+            }
+            int warehouseSeriesId = 0;
+            int warehouseTypeId = 0;
 
-                if (transWarehouseDef.DefaultDocSeriesId > 0)
+            if (transWarehouseDef.DefaultDocSeriesId > 0)
+            {
+                var transWarehouseDefaultSeries =
+                    await _context.TransWarehouseDocSeriesDefs.FirstOrDefaultAsync(p =>
+                        p.Id == transWarehouseDef.DefaultDocSeriesId);
+                if (transWarehouseDefaultSeries == null)
                 {
-                    var transWarehouseDefaultSeries =
-                        await _context.TransWarehouseDocSeriesDefs.FirstOrDefaultAsync(p =>
-                            p.Id == transWarehouseDef.DefaultDocSeriesId);
-                    if (transWarehouseDefaultSeries == null)
+                    if (ownsTransaction) await transaction.RollbackAsync();
+                    return new NotFoundObjectResult(new
                     {
-                        if (ownsTransaction) await transaction.RollbackAsync();
-                        return new NotFoundObjectResult(new
-                        {
-                            error = "Default series for warehouse transaction not found"
-                        });
-                    }
-
-                    noWarehouseTrans = false;
-                    warehouseSeriesId = transWarehouseDef.DefaultDocSeriesId;
-                    warehouseTypeId = transWarehouseDefaultSeries.TransWarehouseDocTypeDefId;
-                }
-                else
-                {
-                    noWarehouseTrans = true;
+                        error = "Default series for warehouse transaction not found"
+                    });
                 }
 
-                foreach (var dataBuyDocLine in docTrans.BuyDocLines)
+                noWarehouseTrans = false;
+                warehouseSeriesId = transWarehouseDef.DefaultDocSeriesId;
+                warehouseTypeId = transWarehouseDefaultSeries.TransWarehouseDocTypeDefId;
+            }
+            else
+            {
+                noWarehouseTrans = true;
+            }
+
+            foreach (var dataBuyDocLine in docTrans.BuyDocLines)
+            {
+                var warehouseItemId = dataBuyDocLine.WarehouseItemId;
+                var material = await _context.WarehouseItems.SingleOrDefaultAsync(p => p.Id == warehouseItemId);
+                if (material is null)
                 {
-                    var warehouseItemId = dataBuyDocLine.WarehouseItemId;
-                    var material = await _context.WarehouseItems.SingleOrDefaultAsync(p => p.Id == warehouseItemId);
-                    if (material is null)
+                    //Handle error
+                    if (ownsTransaction) await transaction.RollbackAsync();
+                    return new NotFoundObjectResult(new
                     {
-                        //Handle error
-                        if (ownsTransaction) await transaction.RollbackAsync();
-                        return new NotFoundObjectResult(new
-                        {
-                            error = "Could not locate material in Doc Line "
-                        });
-                    }
+                        error = "Could not locate material in Doc Line "
+                    });
+                }
 
-                    #region MaterialLine
+                #region MaterialLine
 
-                    var transUnitId = dataBuyDocLine.TransactionUnitId;
-                    var transUnitFactor = dataBuyDocLine.TransactionUnitFactor;
-                    decimal transPrice = dataBuyDocLine.TransUnitPrice;
-                    double transUnits = dataBuyDocLine.TransactionQuantity;
-                    decimal units = (decimal)dataBuyDocLine.Q1;
-                    decimal unitPrice = dataBuyDocLine.Price;
-                    decimal fpaRate = (decimal)dataBuyDocLine.FpaRate;
-                    decimal discountRate = (decimal)dataBuyDocLine.DiscountRate;
-                    decimal lineNetAmount = unitPrice * units;
-                    decimal lineDiscountAmount = lineNetAmount * discountRate;
-                    decimal lineFpaAmount = (lineNetAmount - lineDiscountAmount) * fpaRate;
-                    var lineAmounts = new DocLineFinancialActionAmounts
+                var transUnitId = dataBuyDocLine.TransactionUnitId;
+                var transUnitFactor = dataBuyDocLine.TransactionUnitFactor;
+                decimal transPrice = dataBuyDocLine.TransUnitPrice;
+                double transUnits = dataBuyDocLine.TransactionQuantity;
+                decimal units = (decimal)dataBuyDocLine.Q1;
+                decimal unitPrice = dataBuyDocLine.Price;
+                decimal fpaRate = (decimal)dataBuyDocLine.FpaRate;
+                decimal discountRate = (decimal)dataBuyDocLine.DiscountRate;
+                decimal lineNetAmount = unitPrice * units;
+                decimal lineDiscountAmount = lineNetAmount * discountRate;
+                decimal lineFpaAmount = (lineNetAmount - lineDiscountAmount) * fpaRate;
+                var lineAmounts = new DocLineFinancialActionAmounts
+                {
+                    AmountNet = lineNetAmount,
+                    AmountFpa = lineFpaAmount,
+                    AmountDiscount = lineDiscountAmount,
+                    AmountExpenses = 0
+                };
+                ActionHandlers.DocLineFinAction(transTransactorDef.FinancialTransAction, lineAmounts);
+                var warehouseItemLine = new BuyDocLine
+                {
+                    UnitPrice = unitPrice,
+                    AmountFpa = lineFpaAmount,
+                    AmountNet = lineNetAmount,
+                    AmountDiscount = lineDiscountAmount,
+                    DiscountRate = discountRate,
+                    FpaRate = fpaRate,
+                    WarehouseItemId = dataBuyDocLine.WarehouseItemId,
+                    Quontity1 = dataBuyDocLine.Q1,
+                    Quontity2 = dataBuyDocLine.Q2,
+                    PrimaryUnitId = dataBuyDocLine.MainUnitId,
+                    SecondaryUnitId = dataBuyDocLine.SecUnitId,
+                    Factor = dataBuyDocLine.Factor,
+                    BuyDocumentId = docId,
+                    Etiology = transToAttach.Etiology,
+                    TransactionUnitId = transUnitId,
+                    TransactionQuantity = transUnits,
+                    TransUnitPrice = transPrice,
+                    TransactionUnitFactor = transUnitFactor,
+                    TransNetAmount = lineAmounts.TransNetAmount,
+                    TransFpaAmount = lineAmounts.TransFpaAmount,
+                    TransDiscountAmount = lineAmounts.TransDiscountAmount,
+                    TransExpensesAmount = lineAmounts.TransExpensesAmount
+                };
+
+                //_context.Entry(transToAttach).Entity
+
+                try
+                {
+                    transToAttach.BuyDocLines.Add(warehouseItemLine);
+                }
+                catch (Exception e)
+                {
+                    if (ownsTransaction) await transaction.RollbackAsync();
+                    string msg = e.InnerException?.Message;
+                    return new BadRequestObjectResult(new
                     {
-                        AmountNet = lineNetAmount,
-                        AmountFpa = lineFpaAmount,
-                        AmountDiscount = lineDiscountAmount,
-                        AmountExpenses = 0
-                    };
-                    ActionHandlers.DocLineFinAction(transTransactorDef.FinancialTransAction, lineAmounts);
-                    var warehouseItemLine = new BuyDocLine
+                        error = e.Message + " " + msg
+                    });
+                }
+
+                #endregion
+
+                if (!noWarehouseTrans)
+                {
+                    #region Warehouse transaction
+
+                    var warehouseTrans = new WarehouseTransaction
                     {
-                        UnitPrice = unitPrice,
-                        AmountFpa = lineFpaAmount,
-                        AmountNet = lineNetAmount,
-                        AmountDiscount = lineDiscountAmount,
-                        DiscountRate = discountRate,
                         FpaRate = fpaRate,
-                        WarehouseItemId = dataBuyDocLine.WarehouseItemId,
-                        Quontity1 = dataBuyDocLine.Q1,
-                        Quontity2 = dataBuyDocLine.Q2,
+                        DiscountRate = discountRate,
+                        UnitPrice = unitPrice,
+                        AmountDiscount = lineDiscountAmount,
+                        AmountNet = lineNetAmount,
+                        AmountFpa = lineFpaAmount,
+                        CompanyId = transToAttach.CompanyId,
+                        Etiology = transToAttach.Etiology,
+                        FiscalPeriodId = transToAttach.FiscalPeriodId,
+                        WarehouseItemId = warehouseItemId,
                         PrimaryUnitId = dataBuyDocLine.MainUnitId,
                         SecondaryUnitId = dataBuyDocLine.SecUnitId,
-                        Factor = dataBuyDocLine.Factor,
-                        BuyDocumentId = docId,
-                        Etiology = transToAttach.Etiology,
-                        TransactionUnitId = transUnitId,
-                        TransactionQuantity = transUnits,
-                        TransUnitPrice = transPrice,
-                        TransactionUnitFactor = transUnitFactor,
-                        TransNetAmount = lineAmounts.TransNetAmount,
-                        TransFpaAmount = lineAmounts.TransFpaAmount,
-                        TransDiscountAmount = lineAmounts.TransDiscountAmount,
-                        TransExpensesAmount = lineAmounts.TransExpensesAmount
+                        SectionId = sectionId,
+                        CreatorId = transToAttach.Id,
+                        TransDate = transToAttach.TransDate,
+                        TransRefCode = transToAttach.TransRefCode,
+                        UnitFactor = (decimal)dataBuyDocLine.Factor,
+                        TransWarehouseDocSeriesId = warehouseSeriesId,
+                        TransWarehouseDocTypeId = warehouseTypeId
                     };
 
-                    //_context.Entry(transToAttach).Entity
+                    ActionHandlers.ItemNatureHandler(material.WarehouseItemNature, warehouseTrans,
+                        transWarehouseDef);
+                    ActionHandlers.ItemInventoryActionHandler(warehouseTrans.InventoryAction, dataBuyDocLine.Q1,
+                        dataBuyDocLine.Q2,
+                        warehouseTrans);
+                    ActionHandlers.ItemInventoryValueActionHandler(warehouseTrans.InventoryValueAction,
+                        warehouseTrans);
 
                     try
                     {
-                        transToAttach.BuyDocLines.Add(warehouseItemLine);
+                        await _context.WarehouseTransactions.AddAsync(warehouseTrans);
                     }
                     catch (Exception e)
                     {
@@ -995,75 +1048,23 @@ public class DocumentTransactionService : IDocumentTransactionService
                     }
 
                     #endregion
-
-                    if (!noWarehouseTrans)
-                    {
-                        #region Warehouse transaction
-
-                        var warehouseTrans = new WarehouseTransaction
-                        {
-                            FpaRate = fpaRate,
-                            DiscountRate = discountRate,
-                            UnitPrice = unitPrice,
-                            AmountDiscount = lineDiscountAmount,
-                            AmountNet = lineNetAmount,
-                            AmountFpa = lineFpaAmount,
-                            CompanyId = transToAttach.CompanyId,
-                            Etiology = transToAttach.Etiology,
-                            FiscalPeriodId = transToAttach.FiscalPeriodId,
-                            WarehouseItemId = warehouseItemId,
-                            PrimaryUnitId = dataBuyDocLine.MainUnitId,
-                            SecondaryUnitId = dataBuyDocLine.SecUnitId,
-                            SectionId = sectionId,
-                            CreatorId = transToAttach.Id,
-                            TransDate = transToAttach.TransDate,
-                            TransRefCode = transToAttach.TransRefCode,
-                            UnitFactor = (decimal)dataBuyDocLine.Factor,
-                            TransWarehouseDocSeriesId = warehouseSeriesId,
-                            TransWarehouseDocTypeId = warehouseTypeId
-                        };
-
-                        ActionHandlers.ItemNatureHandler(material.WarehouseItemNature, warehouseTrans,
-                            transWarehouseDef);
-                        ActionHandlers.ItemInventoryActionHandler(warehouseTrans.InventoryAction, dataBuyDocLine.Q1,
-                            dataBuyDocLine.Q2,
-                            warehouseTrans);
-                        ActionHandlers.ItemInventoryValueActionHandler(warehouseTrans.InventoryValueAction,
-                            warehouseTrans);
-
-                        try
-                        {
-                            await _context.WarehouseTransactions.AddAsync(warehouseTrans);
-                        }
-                        catch (Exception e)
-                        {
-                            if (ownsTransaction) await transaction.RollbackAsync();
-                            string msg = e.InnerException?.Message;
-                            return new BadRequestObjectResult(new
-                            {
-                                error = e.Message + " " + msg
-                            });
-                        }
-
-                        #endregion
-                    }
                 }
+            }
 
 
-                try
+            try
+            {
+                await _context.SaveChangesAsync();
+                if (ownsTransaction) await transaction.CommitAsync();
+            }
+            catch (Exception e)
+            {
+                if (ownsTransaction) await transaction.RollbackAsync();
+                string msg = e.InnerException?.Message;
+                return new BadRequestObjectResult(new
                 {
-                    await _context.SaveChangesAsync();
-                    if (ownsTransaction) await transaction.CommitAsync();
-                }
-                catch (Exception e)
-                {
-                    if (ownsTransaction) await transaction.RollbackAsync();
-                    string msg = e.InnerException?.Message;
-                    return new BadRequestObjectResult(new
-                    {
-                        error = e.Message + " " + msg
-                    });
-                }
+                    error = e.Message + " " + msg
+                });
             }
         }
         finally
