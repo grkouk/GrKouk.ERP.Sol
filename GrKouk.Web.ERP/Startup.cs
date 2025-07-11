@@ -1,6 +1,7 @@
 using System;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -68,6 +69,27 @@ namespace GrKouk.Web.ERP
                 options.SlidingExpiration = true;
 
                 options.LoginPath = "/Identity/Account/Login";
+                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+                // Ensure correct redirect for normal browser requests
+                options.Events = new CookieAuthenticationEvents
+                {
+                    OnRedirectToLogin = context =>
+                    {
+                        // For API or AJAX, return 401 so JS can handle it
+                        if (context.Request.Path.StartsWithSegments("/api") ||
+                            context.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                        {
+                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                            return Task.CompletedTask;
+                        }
+
+                        // For normal requests, redirect always
+                        context.Response.Redirect(context.RedirectUri);
+                        return Task.CompletedTask;
+                    }
+                };
+
+
             })
 
                 .AddJwtBearer(options =>
