@@ -262,8 +262,8 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
                 // });
             }
 
-            ViewData["CompanyId"] =
-                new SelectList(_context.Companies.OrderBy(c => c.Code).AsNoTracking(), "Id", "Code");
+            ViewData["CompanyId"] = FiltersHelper.GetSolidCompaniesFilterList(_context);
+                //new SelectList(_context.Companies.OrderBy(c => c.Code).AsNoTracking(), "Id", "Code");
             ViewData["FiscalPeriodId"] =
                 new SelectList(_context.FiscalPeriods.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
             ViewData["TransactorId"] = new SelectList(transactorsList, "Value", "Text");
