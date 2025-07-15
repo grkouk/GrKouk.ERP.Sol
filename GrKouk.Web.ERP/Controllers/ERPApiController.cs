@@ -470,8 +470,8 @@ namespace GrKouk.Web.ERP.Controllers
             #region Boiler Plate Code
 
             string mainEntityName = SyncEntityNames.SyncBuyDocument;
-            string syncEntityName = SyncEntityNames.SyncBuyDocument;
-            ;
+            //string syncEntityName = SyncEntityNames.SyncBuyDocument;
+            
             _logger.LogInformation("SyncBuyDocuments");
             int addedCount = 0;
             int failedToAddCount = 0;
@@ -686,7 +686,7 @@ namespace GrKouk.Web.ERP.Controllers
             #region BoilerPlate Code
 
             string mainEntityName = "SyncSupplier";
-            string syncEntityName = "SyncSupplier";
+            //string syncEntityName = "SyncSupplier";
             _logger.LogInformation("SyncMatchedBusinessSuppliers");
             int addedCount = 0;
             int failedToAddCount = 0;
