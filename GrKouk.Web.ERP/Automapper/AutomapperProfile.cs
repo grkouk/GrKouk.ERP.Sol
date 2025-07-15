@@ -4,6 +4,7 @@ using GrKouk.Erp.Domain.DocDefinitions;
 using GrKouk.Erp.Domain.MediaEntities;
 using GrKouk.Erp.Domain.RecurringTransactions;
 using GrKouk.Erp.Domain.Shared;
+using GrKouk.Erp.Domain.Warehouses;
 using GrKouk.Erp.Dtos.BuyDocuments;
 using GrKouk.Erp.Dtos.CashFlowAccounts;
 using GrKouk.Erp.Dtos.CashFlowTransactions;
@@ -17,6 +18,7 @@ using GrKouk.Erp.Dtos.SellDocuments;
 using GrKouk.Erp.Dtos.Transactors;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Erp.Dtos.WarehouseItems;
+using GrKouk.Erp.Dtos.Warehouses;
 using GrKouk.Erp.Dtos.WarehouseTransactions;
 using GrKouk.Web.ERP.Helpers;
 
@@ -300,7 +302,8 @@ namespace GrKouk.Web.ERP.Automapper {
                    .ForMember(dest => dest.WarehouseItemNature,
                     opt => opt.MapFrom(src => src.WarehouseItem.WarehouseItemNature))
                .ForMember(dest => dest.Url, opt => opt.Ignore());
-
+            CreateMap<Warehouse, WarehouseCreateDto>().ReverseMap();
+            CreateMap<Warehouse, WarehouseModifyDto>().ReverseMap();
         }
     }
 }
