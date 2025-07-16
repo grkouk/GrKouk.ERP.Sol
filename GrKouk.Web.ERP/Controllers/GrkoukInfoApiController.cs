@@ -37,6 +37,7 @@ using GrKouk.Erp.Domain.Sync;
 using GrKouk.Erp.Dtos.CashFlowTransactions;
 using GrKouk.Erp.Dtos.FinancialMovements;
 using GrKouk.Erp.Dtos.Sync;
+using GrKouk.Erp.Dtos.Warehouses;
 using GrKouk.Web.ERP.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -8521,6 +8522,115 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
+      
+         [HttpGet("GetIndexTblDataWarehouses")]
+        public async Task<IActionResult> GetIndexTblDataWarehouses([FromQuery] IndexDataTableRequest request)
+        {
+            var fullListIq = _context.WarehouseCompanyMappings
+                .Select(t => new WarehouseBigClass()
+                {
+                    Id = t.Warehouse.Id,
+                    Code = t.Warehouse.Code,
+                    Name = t.Warehouse.Name,
+                    CompanyId = t.Company.Id,
+                    CompanyCode = t.Company.Code
+                });
+
+
+            if (!string.IsNullOrEmpty(request.SortData))
+            {
+                switch (request.SortData.ToLower())
+                {
+                    case "codesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.Code);
+                        break;
+                    case "codesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.Code);
+                        break;
+                    case "namesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.Name);
+                        break;
+                    case "namesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.Name);
+                        break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.CompanyFilter))
+            {
+                if (int.TryParse(request.CompanyFilter, out var companyId))
+                {
+                    if (companyId > 0)
+                    {
+                        var allCompCode =
+                            await _context.AppSettings.SingleOrDefaultAsync(
+                                p => p.Code == Constants.AllCompaniesCodeKey);
+                        if (allCompCode == null)
+                        {
+                            return NotFound("All Companies Code Setting not found");
+                        }
+
+                        var allCompaniesEntity =
+                            await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+                        if (allCompaniesEntity != null)
+                        {
+                            var allCompaniesId = allCompaniesEntity.Id;
+                            fullListIq =
+                                fullListIq.Where(t => t.CompanyId == companyId || t.CompanyId == allCompaniesId);
+                        }
+                        else
+                        {
+                            fullListIq = fullListIq.Where(t => t.CompanyId == companyId);
+                        }
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.SearchFilter))
+            {
+                fullListIq = fullListIq.Where(p => p.Name.Contains(request.SearchFilter)
+                                                   || p.Code.Contains(request.SearchFilter)
+                );
+            }
+
+            var testList = fullListIq.ToList();
+            var projectedList = testList.GroupBy(g => new
+                {
+                    g.Id,
+                    g.Name,
+                    g.Code
+                })
+                .Select(f => new WarehouseListDto()
+                {
+                    Id = f.Key.Id,
+                    Name = f.Key.Name,
+                    Code = f.Key.Code,
+
+                    CompanyCodes = string.Join(",", f.Select(n => n.CompanyCode))
+                });
+            var pageIndex = request.PageIndex;
+
+            var pageSize = request.PageSize;
+            var listItems = PagedList<WarehouseListDto>.Create(projectedList.AsQueryable(), pageIndex, pageSize);
+            //var relevantDiarys = new List<SearchListItem>();
+            //var dList = await _context.DiaryDefs.Where(p => p.DiaryType == DiaryTypeEnum.DiaryTypeEnumTransactors)
+            //    .ToListAsync();
+
+
+            var response = new IndexDataTableResponse<WarehouseListDto>
+            {
+                TotalRecords = listItems.TotalCount,
+                TotalPages = listItems.TotalPages,
+                HasPrevious = listItems.HasPrevious,
+                HasNext = listItems.HasNext,
+                // Diaries = relevantDiarys,
+                Data = listItems
+            };
+            return Ok(response);
+        }
+        
+        
+        
         [HttpGet("GetIndexTblDataMediaEntryItems")]
         public async Task<IActionResult> GetIndexTblDataMediaEntryItems([FromQuery] IndexDataTableRequest request)
         {
