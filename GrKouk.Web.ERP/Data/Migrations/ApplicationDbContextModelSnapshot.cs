@@ -2987,6 +2987,53 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.ToTable("SynchronizationLogs");
                 });
 
+            modelBuilder.Entity("GrKouk.Erp.Domain.Warehouses.Warehouse", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("Warehouses");
+                });
+
+            modelBuilder.Entity("GrKouk.Erp.Domain.Warehouses.WarehouseCompanyMapping", b =>
+                {
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CompanyId", "WarehouseId");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.ToTable("WarehouseCompanyMappings");
+                });
+
             modelBuilder.Entity("GrKouk.Web.ERP.Helpers.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
@@ -4215,6 +4262,25 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.Navigation("WarehouseItem");
                 });
 
+            modelBuilder.Entity("GrKouk.Erp.Domain.Warehouses.WarehouseCompanyMapping", b =>
+                {
+                    b.HasOne("GrKouk.Erp.Domain.Shared.Company", "Company")
+                        .WithMany("WarehouseCompanyMappings")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("GrKouk.Erp.Domain.Warehouses.Warehouse", "Warehouse")
+                        .WithMany("CompanyMappings")
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+
+                    b.Navigation("Warehouse");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -4289,6 +4355,8 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.Navigation("TransactorCompanyMappings");
 
+                    b.Navigation("WarehouseCompanyMappings");
+
                     b.Navigation("WarehouseItemCompanyMappings");
                 });
 
@@ -4326,6 +4394,11 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.Navigation("CompanyMappings");
 
                     b.Navigation("WarehouseItemCodes");
+                });
+
+            modelBuilder.Entity("GrKouk.Erp.Domain.Warehouses.Warehouse", b =>
+                {
+                    b.Navigation("CompanyMappings");
                 });
 #pragma warning restore 612, 618
         }
