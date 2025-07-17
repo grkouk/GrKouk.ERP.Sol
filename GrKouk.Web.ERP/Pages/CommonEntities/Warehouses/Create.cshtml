@@ -31,14 +31,14 @@
                 <span asp-validation-for="ItemVm.Name" class="text-danger small"></span>
             </div>
             <div class="col-md-3">
-                <div class="form-floating">
+                
                     <ejs-multiselect id="SelectedCompanies" dataSource="@ViewBag.CompaniesListJs" placeholder="Select Companies" mode="CheckBox"
-                                     showDropDownIcon="true"
+                                     showDropDownIcon="true" floatLabelType="Always"
                                      showSelectAll="false" selectAllText="Select All" unSelectAllText="unSelect All">
                         <e-multiselect-fields text="Title" value="Value"></e-multiselect-fields>
                     </ejs-multiselect>
-                    <label class="form-label small">New Selected Comp</label>
-                </div>
+                    
+                
             </div>
           
         </div>
