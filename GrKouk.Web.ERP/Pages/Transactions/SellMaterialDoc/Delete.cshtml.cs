@@ -3,21 +3,27 @@ using System.Linq;
 using System.Threading.Tasks;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using NToastNotify;
 
 namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Operator")]
     public class DeleteModel : PageModel
     {
         private readonly ApiDbContext _context;
+        private readonly IDocumentTransactionService _docTransSrv;
+        private readonly IToastNotification _toastNotification;
 
-        public DeleteModel(ApiDbContext context)
+        public DeleteModel(ApiDbContext context, IDocumentTransactionService docTransSrv,IToastNotification toastNotification)
         {
             _context = context;
+            _docTransSrv = docTransSrv;
+            _toastNotification = toastNotification;
         }
 
         [BindProperty]
@@ -53,33 +59,14 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
                 return NotFound();
             }
            
-            SaleDocument = await _context.SellDocuments.FindAsync(id);
-
-            if (SaleDocument != null)
+            var srvResult = await _docTransSrv.DeleteBuyDocument((int)id);
+            if (!srvResult.Success)
             {
-                await using var transaction = await _context.Database.BeginTransactionAsync();
-                try
-                {
-                    _context.SellDocLines.RemoveRange(_context.SellDocLines.Where(p => p.SellDocumentId == id));
-                    _context.TransactorTransactions.RemoveRange(_context.TransactorTransactions.Where(p => p.CreatorSectionId == SaleDocument.SectionId && p.CreatorId == id));
-                    _context.CashFlowAccountTransactions.RemoveRange(_context.CashFlowAccountTransactions.Where(p => p.CreatorSectionId == SaleDocument.SectionId && p.CreatorId == id));
-                    _context.WarehouseTransactions.RemoveRange(_context.WarehouseTransactions.Where(p => p.SectionId == SaleDocument.SectionId && p.CreatorId == id));
-                    _context.SellDocTransPaymentMappings.RemoveRange(_context.SellDocTransPaymentMappings.Where(p=>p.SellDocumentId==id));
-                    _context.SellDocuments.Remove(SaleDocument);
-
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-                }
-                catch (Exception ex)
-                {
-                    await transaction.RollbackAsync();
-                    string msg = $"Error  {ex.Message} inner exception->{ex.InnerException?.Message}";
-                    ModelState.AddModelError(string.Empty, msg);
-                    //LoadCombos();
-                    return Page();
-                }
-               
+                ModelState.AddModelError("", srvResult.ErrorMessage);
+                _toastNotification.AddErrorToastMessage(srvResult.ErrorMessage);
+                return Page();
             }
+            _toastNotification.AddSuccessToastMessage("Delete operation was successfull");
 
             return RedirectToPage("./Index");
         }
