@@ -3059,6 +3059,24 @@ namespace GrKouk.Web.ERP.Controllers
 
 
         [HttpPost("SalesDoc")]
+        public async Task<IActionResult> PostSalesDocV2([FromBody] SellDocCreateAjaxDto data)
+        {
+            if (data == null)
+            {
+                return BadRequest(new
+                {
+                    error = "Empty request data"
+                });
+            }
+            return await _docTransSrv.AddSalesDoc(data);
+
+           
+        } 
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public async Task<IActionResult> PostSalesDoc([FromBody] SellDocCreateAjaxDto data)
         {
             const string sectionCode = "SYS-SELL-COMBINED-SCN";
@@ -3577,6 +3595,24 @@ namespace GrKouk.Web.ERP.Controllers
         }
 
         [HttpPost("SalesDocUpdate")]
+        public async Task<IActionResult> PutSalesDocV2([FromBody] SellDocModifyAjaxDto data)
+        {
+            if (data == null)
+            {
+                return BadRequest(new
+                {
+                    error = "Empty request data"
+                });
+            }
+            return await _docTransSrv.ModifySalesDoc(data);
+
+           
+        } 
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public async Task<IActionResult> PutSalesDoc([FromBody] SellDocModifyAjaxDto data)
         {
             const string sectionCode = "SYS-SELL-COMBINED-SCN";
