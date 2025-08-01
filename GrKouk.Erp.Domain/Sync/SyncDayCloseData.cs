@@ -4,11 +4,14 @@ using System.ComponentModel.DataAnnotations;
 namespace GrKouk.Erp.Domain.Sync;
 //TODO: Maybe I dont need this
 
-public class DayCloseData
+public class SyncDayCloseData
 {
     public Guid Id { get; set; }
     [Required]
     public DateTime TransDate { get; set; }
+    [Required]
+    public int ErpId { get; set; }
+
     [Range(0, int.MaxValue, ErrorMessage = "ZNumber must be a non-negative value")]
     public int ZNumber { get; set; }
     

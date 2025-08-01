@@ -1303,6 +1303,53 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(res);
         }
-        
+
+        [HttpPost("SyncAddBusinessDayCloseData")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public async Task<IActionResult> SyncAddBusinessDayCloseData([FromBody] DayClosePayload request)
+        {
+            #region Error Checking
+
+            if (request == null)
+            {
+                return BadRequest(new
+                {
+                    error = "Empty request data"
+                });
+            }
+           
+            #endregion
+
+            try
+            {
+                var syncServiceResult = await _docSyncSrv.SyncAddDayCloseData(request, null);;
+                if (syncServiceResult is null)
+                {
+                    return BadRequest(new
+                    {
+                        error = "Empty response from sync service"
+                    });
+                }
+                if (!syncServiceResult.Success)
+                {
+                    return BadRequest(new
+                    {
+                        error = syncServiceResult.ErrorMessage
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                _logger.LogError("An error occurred during document sync: {Error}", ex.Message);
+                
+            }
+            var res = new DayCloseResponse()
+            {
+                Message = "Το κλείσιμο ημέρας ενημερώθηκε με επιτυχία.",
+                IsSuccess = true
+            };
+            return Ok(res);
+        }
     }
 }

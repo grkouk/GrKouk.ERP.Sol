@@ -2207,21 +2207,21 @@ public class DocumentTransactionService : IDocumentTransactionService
             _context.SellDocuments.Remove(saleDocument);
 
             await _context.SaveChangesAsync();
-            var syncDoc = await _context.SyncSaleDocuments.SingleOrDefaultAsync(p => p.ErpId == saleDocument.Id);
-            if (syncDoc is not null)
-            {
-                var syncLog = await _context.SynchronizationLogs.SingleOrDefaultAsync(p => p.EntityId == syncDoc.Id);
-                if (syncLog is not null)
-                {
-                    _context.SynchronizationLogs.Remove(syncLog);
-                }
+            // var syncDoc = await _context.SyncSaleDocuments.SingleOrDefaultAsync(p => p.ErpId == saleDocument.Id);
+            // if (syncDoc is not null)
+            // {
+            //     var syncLog = await _context.SynchronizationLogs.SingleOrDefaultAsync(p => p.EntityId == syncDoc.Id);
+            //     if (syncLog is not null)
+            //     {
+            //         _context.SynchronizationLogs.Remove(syncLog);
+            //     }
+            //
+            //     _context.SyncSaleDocuments.Remove(syncDoc);
+            // }
 
-                _context.SyncBuyDocuments.Remove(syncDoc);
-            }
+            //_context.SellDocuments.Remove(saleDocument);
 
-            _context.SellDocuments.Remove(saleDocument);
-
-            await _context.SaveChangesAsync();
+           // await _context.SaveChangesAsync();
             // if (generateTestError)
             // {
             //     throw new Exception("Test Error");

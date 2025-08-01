@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.Sync;
 using GrKouk.Erp.Dtos.BuyDocuments;
+using GrKouk.Erp.Dtos.SellDocuments;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,8 @@ namespace GrKouk.Web.ERP.Services;
 
 public interface IDocumentSyncService
 {
-    Task<ServiceResult> SyncAddBusinessBuyDocument(SyncBusinessBuyDocumentRequest request,Guid? syncSessionId=null);
+    Task<ServiceResult> SyncAddBusinessBuyDocument(SyncBusinessBuyDocumentRequest request, Guid? syncSessionId = null);
+    Task<ServiceResult> SyncAddDayCloseData(DayClosePayload request, Guid? syncSessionId = null);
 }
 
 public class SyncBusinessDocService : IDocumentSyncService
@@ -24,14 +26,16 @@ public class SyncBusinessDocService : IDocumentSyncService
     private readonly ILogger<SyncBusinessDocService> _logger;
     private readonly IDocumentTransactionService _docTransSrv;
 
-    public SyncBusinessDocService(ApiDbContext context, ILogger<SyncBusinessDocService> logger,IDocumentTransactionService docTransSrv)
+    public SyncBusinessDocService(ApiDbContext context, ILogger<SyncBusinessDocService> logger,
+        IDocumentTransactionService docTransSrv)
     {
         _context = context;
         _logger = logger;
         _docTransSrv = docTransSrv;
     }
 
-    public async Task<ServiceResult> SyncAddBusinessBuyDocument(SyncBusinessBuyDocumentRequest request, Guid? syncSessionId=null )
+    public async Task<ServiceResult> SyncAddBusinessBuyDocument(SyncBusinessBuyDocumentRequest request,
+        Guid? syncSessionId = null)
     {
         #region Boiler Plate Code
 
@@ -47,19 +51,11 @@ public class SyncBusinessDocService : IDocumentSyncService
         if (request == null)
         {
             return ServiceResult.Error("Empty request data", "BADREQUEST");
-            // return BadRequest(new
-            // {
-            //     error = "Empty request data"
-            // });
         }
 
         if (string.IsNullOrEmpty(request.CompanyCode))
         {
             return ServiceResult.Error("No Company Code", "BADREQUEST");
-            // return BadRequest(new
-            // {
-            //     error = "No Company Code"
-            // });
         }
 
         var companyId = await FindCompanyIdByCode(request.CompanyCode);
@@ -67,15 +63,12 @@ public class SyncBusinessDocService : IDocumentSyncService
         if (companyId < 0)
         {
             return ServiceResult.Error("No Company Code", "BADREQUEST");
-            // return BadRequest(new
-            // {
-            //     error = "No Company for this company code"
-            // });
         }
 
         var syncId = syncSessionId ?? Guid.NewGuid();
         var syncSource = "MAUI Client"; // Source of the sync operation
-        string syncMerchItemCode = string.Empty;;
+        string syncMerchItemCode = string.Empty;
+        ;
         int syncMerchitemId = 0;
         string paymentMethodCashCode = "Μετρητοίς";
         int paymentMethodCashId = 0;
@@ -88,9 +81,11 @@ public class SyncBusinessDocService : IDocumentSyncService
         int paymentMethodId = 0;
 
         #endregion
+
         #region Find Doc series id
 
-        (docSeriesId,syncMerchItemCode) = await FindDocSeriesIdForBusDocIdAndCompanyCode(request.BuyDocDefId, request.CompanyCode);
+        (docSeriesId, syncMerchItemCode) =
+            await FindDocSeriesIdForBusDocIdAndCompanyCode(request.BuyDocDefId, request.CompanyCode);
         switch (docSeriesId)
         {
             case -1:
@@ -101,6 +96,7 @@ public class SyncBusinessDocService : IDocumentSyncService
         }
 
         #endregion
+
         #region Get default Merch item id
 
         syncMerchitemId = await FindWarehouseItemIdByCode(syncMerchItemCode);
@@ -126,7 +122,7 @@ public class SyncBusinessDocService : IDocumentSyncService
         }
 
         #endregion
-       
+
         #region "Find Synced Supplier"
 
         (syncSupplierId, syncSupplierName) = await FindSyncedErpSupplierId(request.SupplierId, request.CompanyCode);
@@ -194,7 +190,8 @@ public class SyncBusinessDocService : IDocumentSyncService
             if (result is BadRequestObjectResult badRequestResult)
             {
                 if (ownsTransaction) await transaction.RollbackAsync();
-                return ServiceResult.Error(badRequestResult.Value.ToString(), "BADREQUEST");;
+                return ServiceResult.Error(badRequestResult.Value.ToString(), "BADREQUEST");
+                
             }
 
             int newDocId = 0;
@@ -243,8 +240,9 @@ public class SyncBusinessDocService : IDocumentSyncService
             });
 
             try
-            {
-                if (ownsTransaction) await _context.SaveChangesAsync();
+            { 
+                await _context.SaveChangesAsync();
+                if (ownsTransaction) await transaction.CommitAsync();
                 // throw new Exception("Test");
                 addedCount++;
             }
@@ -257,8 +255,8 @@ public class SyncBusinessDocService : IDocumentSyncService
             }
 
 
-            await _context.SaveChangesAsync();
-            if (ownsTransaction) await transaction.CommitAsync();
+            //await _context.SaveChangesAsync();
+            //if (ownsTransaction) await transaction.CommitAsync();
         }
         catch (Exception ex)
         {
@@ -290,8 +288,289 @@ public class SyncBusinessDocService : IDocumentSyncService
         };
         return ServiceResult.Ok(res);
     }
-#region Helper Methods
-    private async Task<(int docId,string merchCode)> FindDocSeriesIdForBusDocIdAndCompanyCode(int busBuyDocDefId, string companyCode)
+
+    public async Task<ServiceResult> SyncAddDayCloseData(DayClosePayload request, Guid? syncSessionId = null)
+    {
+        string mainEntityName = SyncEntityNames.SyncDayCloseDate;
+        const string docSeriesLianiniCode = "ΑΠΛΠ";
+        const string docSeriesLianiniStarCode = "ΑΠΛΠSTAR";
+        _logger.LogInformation("SyncDayCloseData");
+
+        #region Check parameters
+
+        if (request == null)
+        {
+            return ServiceResult.Error("Empty request data", "BADREQUEST");
+        }
+
+        if (string.IsNullOrEmpty(request.CompanyCode))
+        {
+            return ServiceResult.Error("No Company Code", "BADREQUEST");
+        }
+
+        var companyId = await FindCompanyIdByCode(request.CompanyCode);
+        ;
+        if (companyId < 0)
+        {
+            return ServiceResult.Error("No Company Code", "BADREQUEST");
+        }
+
+        #endregion
+
+        #region Varialble Declarations
+
+        var syncId = syncSessionId ?? Guid.NewGuid();
+        var syncSource = "MAUI Client"; // Source of the sync operation
+        string syncMerchItemCode = "SYNCMERCH";
+        
+        int syncMerchitemId = 0;
+        string paymentMethodCashCode = "Μετρητοίς";
+        int paymentMethodCashId = 0;
+        string paymentMethodCardsCode = "NBG POS";
+        int paymentMethodCardsId = 0;
+
+        int docSeriesId = 0;
+        string syncCustomerCode = "ΠΕΛΛΙΑΝ";
+        int syncCustomerId = 0;
+        string syncSupplierName;
+        int paymentMethodId = 0;
+
+        #endregion
+
+        #region Find Doc series id
+
+        var docSeriesLianiki =
+            await _context.SellDocSeriesDefs.SingleOrDefaultAsync(p => p.Code == docSeriesLianiniCode);
+        if (docSeriesLianiki == null)
+        {
+            return ServiceResult.Error("Default Doc Series not found", "BADREQUEST");
+        }
+
+        var docSeriesLianikiId = docSeriesLianiki.Id;
+        var docSeriesLianikiStar =
+            await _context.SellDocSeriesDefs.SingleOrDefaultAsync(p => p.Code == docSeriesLianiniStarCode);
+        if (docSeriesLianikiStar == null)
+        {
+            return ServiceResult.Error("Default Start Doc Series not found", "BADREQUEST");
+        }
+
+        var docSeriesLianikiStarId = docSeriesLianikiStar.Id;
+
+        #endregion
+
+        #region Get default Merch item id
+
+        syncMerchitemId = await FindWarehouseItemIdByCode(syncMerchItemCode);
+        if (syncMerchitemId < 0)
+        {
+            return ServiceResult.Error("Default Merch item not found", "BADREQUEST");
+        }
+
+        #endregion
+        #region Payment Methods
+
+        paymentMethodCashId = await FindPaymentMethodIdByName(paymentMethodCashCode);
+        if (paymentMethodCashId < 0)
+        {
+            return ServiceResult.Error("Default Cash Payment not found", "BADREQUEST");
+        }
+
+        paymentMethodCardsId = await FindPaymentMethodIdByName(paymentMethodCardsCode);
+        if (paymentMethodCardsId < 0)
+        {
+            return ServiceResult.Error("Default Card Payment not found", "BADREQUEST");
+        }
+
+        #endregion
+
+        #region "Find Synced Customer"
+
+       var customer=await _context.Transactors
+           .Include(p=>p.TransactorType)
+           .SingleOrDefaultAsync(p=>p.Code==syncCustomerCode && p.TransactorType.Code=="SYS.CUSTOMER");
+        if (customer is null)
+        {
+            return ServiceResult.Error("Sync Customer not found", "BADREQUEST");
+        }
+        syncCustomerId = customer.Id;
+        string etiologyMessage =
+            $"Synced Day Close for Z {request.ZNumber}  Transaction date {request.TransDate:dddd dd/MM/yyyy}";
+
+        #endregion
+        
+        // Check if a transaction is already active
+        bool ownsTransaction = _context.Database.CurrentTransaction == null;
+        var transaction = ownsTransaction
+            ? await _context.Database.BeginTransactionAsync()
+            : _context.Database.CurrentTransaction;
+        try
+        {
+            SellDocLineAjaxDto docLine = new SellDocLineAjaxDto
+            {
+                WarehouseItemId = syncMerchitemId,
+                TransactionUnitId = 1,
+                TransactionQuantity = 1,
+                TransactionUnitFactor = 1,
+                TransUnitPrice = request.TotalCash,
+                Q1 = 1,
+                Q2 = 1,
+                Price = request.TotalCash,
+                Amount = 0,
+                AmountDiscount = 0,
+                AmountExpenses = 0,
+                DiscountRate = 0,
+                MainUnitId = 1,
+                SecUnitId = 1,
+                Factor = 1,
+                FpaRate = 0,
+            };
+
+            var docTrans = new SellDocCreateAjaxDto
+            {
+                TransDate = request.TransDate,
+                TransactorId = syncCustomerId,
+                SellDocSeriesId = docSeriesLianikiId,
+                TransRefCode = request.ZNumber.ToString(),
+                AmountDiscount = 0,
+                Etiology = etiologyMessage + " cash payment",
+                PaymentMethodId = paymentMethodCashId,
+                CompanyId = companyId,
+                SalesChannelId = 1,
+                SellDocLines = new List<SellDocLineAjaxDto> { docLine },
+                AmountFpa = 0,
+                AmountNet = request.TotalCash,
+            };
+            
+            var result = await _docTransSrv.AddSalesDoc(docTrans);
+            if (result is BadRequestObjectResult badRequestResult)
+            {
+                if (ownsTransaction) await transaction.RollbackAsync();
+                return ServiceResult.Error(badRequestResult.Value.ToString(), "BADREQUEST");
+                
+            }
+            SellDocLineAjaxDto docLineCards = new SellDocLineAjaxDto
+            {
+                WarehouseItemId = syncMerchitemId,
+                TransactionUnitId = 1,
+                TransactionQuantity = 1,
+                TransactionUnitFactor = 1,
+                TransUnitPrice = request.TotalCards,
+                Q1 = 1,
+                Q2 = 1,
+                Price = request.TotalCards,
+                Amount = 0,
+                AmountDiscount = 0,
+                AmountExpenses = 0,
+                DiscountRate = 0,
+                MainUnitId = 1,
+                SecUnitId = 1,
+                Factor = 1,
+                FpaRate = 0,
+            };
+            var docTransCards = new SellDocCreateAjaxDto
+            {
+                TransDate = request.TransDate,
+                TransactorId = syncCustomerId,
+                SellDocSeriesId = docSeriesLianikiId,
+                TransRefCode = request.ZNumber.ToString(),
+                AmountDiscount = 0,
+                Etiology = etiologyMessage + " card payment",
+                PaymentMethodId = paymentMethodCardsId,
+                CompanyId = companyId,
+                SalesChannelId = 1,
+                SellDocLines = new List<SellDocLineAjaxDto> { docLineCards },
+                AmountFpa = 0,
+                AmountNet = request.TotalCards,
+            };
+            
+            var resultCards = await _docTransSrv.AddSalesDoc(docTransCards);
+            if (resultCards is BadRequestObjectResult badCardsRequestResult)
+            {
+                if (ownsTransaction) await transaction.RollbackAsync();
+                return ServiceResult.Error(badCardsRequestResult.Value.ToString(), "BADREQUEST");
+                
+            }
+            SellDocLineAjaxDto docLineStar = new SellDocLineAjaxDto
+            {
+                WarehouseItemId = syncMerchitemId,
+                TransactionUnitId = 1,
+                TransactionQuantity = 1,
+                TransactionUnitFactor = 1,
+                TransUnitPrice = request.TotalStar,
+                Q1 = 1,
+                Q2 = 1,
+                Price = request.TotalStar,
+                Amount = 0,
+                AmountDiscount = 0,
+                AmountExpenses = 0,
+                DiscountRate = 0,
+                MainUnitId = 1,
+                SecUnitId = 1,
+                Factor = 1,
+                FpaRate = 0,
+            };
+            var docTransStar = new SellDocCreateAjaxDto
+            {
+                TransDate = request.TransDate,
+                TransactorId = syncCustomerId,
+                SellDocSeriesId = docSeriesLianikiStarId,
+                TransRefCode = request.ZNumber.ToString(),
+                AmountDiscount = 0,
+                Etiology = etiologyMessage,
+                PaymentMethodId = paymentMethodCashId,
+                CompanyId = companyId,
+                SalesChannelId = 1,
+                SellDocLines = new List<SellDocLineAjaxDto> { docLineStar },
+                AmountFpa = 0,
+                AmountNet = request.TotalStar,
+            };
+            
+            var resultStar = await _docTransSrv.AddSalesDoc(docTransStar);
+            if (resultStar is BadRequestObjectResult badStarRequestResult)
+            {
+                if (ownsTransaction) await transaction.RollbackAsync();
+                return ServiceResult.Error(badStarRequestResult.Value.ToString(), "BADREQUEST");
+            }
+            try
+            { 
+                await _context.SaveChangesAsync();
+                if (ownsTransaction) await transaction.CommitAsync();
+                // throw new Exception("Test");
+            }
+            catch (Exception ex)
+            {
+                if (ownsTransaction) await transaction.RollbackAsync();
+                _logger.LogError("An error occurred during synchronization: {Error}", ex.Message);
+                return ServiceResult.Error($"Error:{ex.Message}");
+            }
+        }
+        catch (Exception ex)
+        {
+            if (ownsTransaction) await transaction.RollbackAsync();
+            _logger.LogError("An error occurred during synchronization: {Error}", ex.Message);
+            return ServiceResult.Error($"Error:{ex.Message}");
+        }
+        finally
+        {
+            // Dispose the transaction only if we created it
+            if (ownsTransaction && transaction != null)
+            {
+                await transaction.DisposeAsync();
+            }
+        }
+
+        var res = new DayCloseResponse()
+        {
+            IsSuccess = true,
+            Message = "Κλείσιμο ημέρας ενημερώθηκε με επιτυχία"
+        };
+        return ServiceResult.Ok(res);
+    }
+
+    #region Helper Methods
+
+    private async Task<(int docId, string merchCode)> FindDocSeriesIdForBusDocIdAndCompanyCode(int busBuyDocDefId,
+        string companyCode)
     {
         //To use for ilika in timologio agoron
         const string syncMerchItemCode = "SYNCMERCH";
@@ -329,7 +608,7 @@ public class SyncBusinessDocService : IDocumentSyncService
             return (-1, string.Empty);
         }
 
-        return (docSeries.Id, merchItemCode) ;
+        return (docSeries.Id, merchItemCode);
     }
 
     private async Task<int> FindCompanyIdByCode(string companyCode)
@@ -366,9 +645,13 @@ public class SyncBusinessDocService : IDocumentSyncService
         return item.Id;
     }
 
-    private async Task<(int supplierId, string supplierName)> FindSyncedErpSupplierId(int businessSupplierId, string companyCode)
+    private async Task<(int supplierId, string supplierName)> FindSyncedErpSupplierId(int businessSupplierId,
+        string companyCode)
     {
-        var syncSupplier = await _context.SyncSuppliers.SingleOrDefaultAsync(p => p.BusId == businessSupplierId && p.CompanyCode == companyCode);;
+        var syncSupplier =
+            await _context.SyncSuppliers.SingleOrDefaultAsync(p =>
+                p.BusId == businessSupplierId && p.CompanyCode == companyCode);
+        ;
         if (syncSupplier == null)
         {
             return (-1, string.Empty);
@@ -376,5 +659,6 @@ public class SyncBusinessDocService : IDocumentSyncService
 
         return (syncSupplier.ErpId, syncSupplier.Name);
     }
+
     #endregion
 }
