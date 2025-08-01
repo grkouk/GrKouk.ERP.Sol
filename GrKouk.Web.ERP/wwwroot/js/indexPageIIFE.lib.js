@@ -641,7 +641,7 @@ const indPgLib = (function () {
                         $tdCol.text(value[col.responseKey]);
                         break;
                     case "d":
-                        $tdCol.text(moment(value[col.responseKey]).format("DD/MM/YYYY"));
+                        $tdCol.text(moment(value[col.responseKey]).locale('el').format("ddd DD/MM/YYYY"));
                         break;
                     case "c":
                         $tdCol.text(currencyFormatter.format(value[col.responseKey]));
