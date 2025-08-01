@@ -87,7 +87,7 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<SynchronizationLog> SynchronizationLogs { get; set; }
         public DbSet<SyncUnitOfMeasurement> SyncUnitOfMeasurements { get; set; }
         public DbSet<SyncBuyDocument> SyncBuyDocuments { get; set; }
-        public DbSet<SyncBuyDocument> SyncSaleDocuments { get; set; }
+        public DbSet<SyncSaleDocument> SyncSaleDocuments { get; set; }
         public DbSet<SyncSupplier> SyncSuppliers { get; set; }
 
         public DbSet<Warehouse> Warehouses { get; set; }
