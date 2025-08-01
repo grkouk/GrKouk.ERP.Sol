@@ -59,7 +59,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
                 return NotFound();
             }
            
-            var srvResult = await _docTransSrv.DeleteBuyDocument((int)id);
+            var srvResult = await _docTransSrv.DeleteSaleDocument((int)id);
             if (!srvResult.Success)
             {
                 ModelState.AddModelError("", srvResult.ErrorMessage);
