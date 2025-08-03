@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.CodeAnalysis.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using NToastNotify;
@@ -56,6 +57,19 @@ namespace GrKouk.Web.ERP
                 .AddDefaultUI()
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApiDbContext>();
+           
+                services.AddHealthChecks()
+                    .AddCheck("self", () => HealthCheckResult.Healthy())
+                    .AddSqlServer(
+                        Configuration.GetConnectionString("DefaultConnection"),
+                        name: "database",
+                        tags: new[] { "database" }
+                    );
+
+
+                // You can add more checks here
+                ;
+
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -213,6 +227,8 @@ namespace GrKouk.Web.ERP
             {
                 endpoints.MapRazorPages();
                 endpoints.MapDefaultControllerRoute();
+                endpoints.MapHealthChecks("/health");
+
             });
             //Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("");
         
