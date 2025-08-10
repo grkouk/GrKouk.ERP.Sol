@@ -6,7 +6,7 @@
     var script = @"
         <script>
             $(document).ready(function () {
-                 document.getElementById('DatePeriodFilter').addEventListener('change', dateFilterValueChange, true);
+                 document.getElementById('DatePeriodFilter').addEventListener('click', dateFilterValueChange, true);
                  function dateFilterValueChange(e) {
                      if (e.currentTarget.value === 'CUSTOM') {
                          e.preventDefault();

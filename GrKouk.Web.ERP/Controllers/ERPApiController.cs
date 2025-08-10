@@ -1342,7 +1342,12 @@ namespace GrKouk.Web.ERP.Controllers
             {
                 Debug.WriteLine(ex.Message);
                 _logger.LogError("An error occurred during document sync: {Error}", ex.Message);
-                
+                var dayCloseResult = new DayCloseResponse()
+                {
+                    Message = "Το κλείσιμο ημέρας ενημερώθηκε με επιτυχία." + ex.Message,
+                    IsSuccess = true
+                };
+                return BadRequest(dayCloseResult);
             }
             var res = new DayCloseResponse()
             {

@@ -177,6 +177,7 @@ namespace GrKouk.Web.ERP
 
             services.AddTransient<IDocumentTransactionService, DocumentTransactionService>();
             services.AddTransient<IDocumentSyncService, SyncBusinessDocService>();
+            services.AddTransient<ITransactorTransactionService, TransactorTransactionService>();
             services.AddTransient<PdfExportService>();
             //QuestPDF.Settings.License = LicenseType.Community; 
         }
