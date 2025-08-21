@@ -1573,6 +1573,124 @@ namespace GrKouk.Web.ERP.Controllers
             return Ok(response);
         }
 
+        [HttpGet("GetIndexTblDataTransactorTransV3")]
+        public async Task<IActionResult> GetIndexTblDataTransactorTransV3([FromQuery] IndexDataTableRequest request)
+        {
+            IQueryable<TransactorTransaction> fullListIq = _context.TransactorTransactions
+                .Include(p => p.Company)
+                .Include(p => p.Section)
+                .Include(p => p.Transactor)
+                .Include(p => p.TransTransactorDocSeries)
+                .Include(p => p.TransTransactorDocType);
+
+            // Sorting
+            fullListIq = FilterEval.ApplyTransactorTransSorting(fullListIq, request.SortData);
+
+            // Date filter
+            var (fromDate, toDate) = FilterEval.GetDateRange(request.DateRange, request.FromCustomFilterDate, request.ToCustomFilterDate);
+            fullListIq = FilterEval.ApplyPeriodDateFilter(fullListIq, fromDate, toDate, p => p.TransDate);
+
+            // Company filter
+            if (!string.IsNullOrEmpty(request.CompanyFilter))
+            {
+                fullListIq = FilterEval.ApplyCompanyFilter(fullListIq, request.CompanyFilter, p => p.CompanyId);
+            }
+
+            // Sections filter (JSON list, 0 means All)
+            if (!string.IsNullOrEmpty(request.SectionsFilter))
+            {
+                fullListIq = FilterEval.ApplyIntListFilterFromJson(fullListIq, request.SectionsFilter, 0, p => p.SectionId);
+            }
+
+            // Search filter
+            if (!string.IsNullOrEmpty(request.SearchFilter))
+            {
+                fullListIq = FilterEval.ApplySearchFilter(fullListIq, request.SearchFilter,
+                    p => p.Transactor.Name,
+                    p => p.TransRefCode);
+            }
+
+            // Currency rates
+            var currencyRates = await _context.ExchangeRates
+                .OrderByDescending(p => p.ClosingDate)
+                .Take(10)
+                .ToListAsync();
+
+            var t = fullListIq.Select(p => new TransactorTransListDto
+            {
+                Id = p.Id,
+                TransDate = p.TransDate,
+                TransTransactorDocSeriesId = p.TransTransactorDocSeriesId,
+                TransTransactorDocSeriesName = p.TransTransactorDocSeries.Name,
+                TransTransactorDocSeriesCode = p.TransTransactorDocSeries.Code,
+                TransTransactorDocTypeId = p.TransTransactorDocTypeId,
+                TransRefCode = p.TransRefCode,
+                TransactorId = p.TransactorId,
+                TransactorName = p.Transactor.Name,
+                SectionId = p.SectionId,
+                SectionCode = p.Section.Code,
+                CreatorId = p.CreatorId,
+                CreatorSectionId = p.CreatorSectionId,
+                CreatorSectionCode = "",
+                FiscalPeriodId = p.FiscalPeriodId,
+                FinancialAction = p.FinancialAction,
+                FpaRate = p.FpaRate,
+                DiscountRate = p.DiscountRate,
+                AmountFpa = CurrencyConverter.ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountFpa),
+                AmountNet = CurrencyConverter.ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountNet),
+                AmountDiscount = CurrencyConverter.ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountDiscount),
+                TransFpaAmount = CurrencyConverter.ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.TransFpaAmount),
+                TransNetAmount = CurrencyConverter.ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.TransNetAmount),
+                TransDiscountAmount = CurrencyConverter.ConvertAmount(p.Company.CurrencyId, request.DisplayCurrencyId, currencyRates, p.TransDiscountAmount),
+                CompanyCode = p.Company.Code,
+                CompanyCurrencyId = p.Company.CurrencyId,
+                CompanyId = p.CompanyId,
+                CfAccountId = p.CfAccountId
+            });
+
+            var t1 = await t.ToListAsync();
+            var grandSumOfAmount = t1.Sum(p => p.TotalAmount);
+            var grandSumOfDebit = t1.Sum(p => p.DebitAmount);
+            var grandSumOfCredit = t1.Sum(p => p.CreditAmount);
+
+            var pageIndex = request.PageIndex;
+            var pageSize = request.PageSize;
+
+            var listItems = await PagedList<TransactorTransListDto>.CreateAsync(t, pageIndex, pageSize);
+
+            foreach (var listItem in listItems)
+            {
+                if (listItem.CreatorSectionId >= 0)
+                {
+                    var creatorSection = await _context.Sections.FindAsync(listItem.CreatorSectionId);
+                    if (creatorSection != null)
+                    {
+                        listItem.CreatorSectionCode = creatorSection.Code;
+                    }
+                }
+            }
+
+            decimal sumAmountTotal = listItems.Sum(p => p.TotalAmount);
+            decimal sumDebit = listItems.Sum(p => p.DebitAmount);
+            decimal sumCredit = listItems.Sum(p => p.CreditAmount);
+
+            var response = new IndexDataTableResponse<TransactorTransListDto>
+            {
+                TotalRecords = listItems.TotalCount,
+                TotalPages = listItems.TotalPages,
+                HasPrevious = listItems.HasPrevious,
+                HasNext = listItems.HasNext,
+                SumOfAmount = sumAmountTotal,
+                SumOfDebit = sumDebit,
+                SumOfCredit = sumCredit,
+                GrandSumOfAmount = grandSumOfAmount,
+                GrandSumOfDebit = grandSumOfDebit,
+                GrandSumOfCredit = grandSumOfCredit,
+                Data = listItems
+            };
+            return Ok(response);
+        }
+
         [HttpGet("GetIndexTblDataCfaTrans")]
         public async Task<IActionResult> GetIndexTblDataCfaTrans([FromQuery] IndexDataTableRequest request)
         {
