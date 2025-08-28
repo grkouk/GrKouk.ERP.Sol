@@ -1,0 +1,217 @@
+@page
+@using GrKouk.Web.ERP.Helpers
+@model GrKouk.Web.Erp.Pages.Configuration.BuyDocSeriesDefinitions.IndexNewModel
+
+@{
+    ViewData["Title"] = "Buy Doc Series Definitions";
+}
+@section MyCss
+{
+    <link rel="stylesheet" href="~/css/custom-checkbox.css" />
+    <link rel="stylesheet" href="~/css/searchbar.css" />
+}
+<input type="hidden" id="initialPageTitle" value="@ViewData["Title"]" />
+<h4 id="hElementTitle">@ViewData["Title"]</h4>
+<div class="container mb-2">
+    <ul class="nav small justify-content-end ">
+        <li class="nav-item">
+            <a href="#" role="button" class="btn btn-sm btn-outline-secondary " id="CreateNew">Create New</a>
+        </li>
+        <li class="nav-item">
+            <a class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#filterCollapse" href="#filterCollapse" role="button" id="filtersToggle"
+               aria-expanded="false" aria-controls="filterCollapse">
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="btn btn-sm btn-outline-secondary" data-toggle="collapse" href="#" id="rowSelectorsToggle" role="button">
+            </a>
+        </li>
+        <li class="nav-item dropdown " id="SelectedRowsActionsMenu">
+            <a class="btn btn-sm btn-outline-secondary dropdown-toggle disabled" role="button" id="ddSelectedRowsActions" data-bs-toggle="dropdown"
+               aria-haspopup="true" aria-expanded="false">Actions</a>
+            <div class="dropdown-menu small">
+                <a class="dropdown-item" href="#">Another action</a>
+                <a class="dropdown-item" href="#">Something else here</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">Separated link</a>
+            </div>
+        </li>
+    </ul>
+</div>
+
+@await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowDateFlt = false, ShowCurrencyFlt = false })
+
+<div class="row mt-1">
+    <partial name="_PagerPartial" />
+</div>
+<partial name="_DataTable"/>
+
+<div class="row">
+    <partial name="_PagerPartial" />
+</div>
+
+<!-- Modal -->
+<partial name="_LoadMePartial" />
+
+@section Scripts {
+    <script src="~/js/definitions.js"></script>
+    <script src="~/js/filterManagement.lib.js"></script>
+    <script src="~/js/indexPageIIFE.lib.js"></script>
+    <script>
+        $(document).ready(function () {
+            const storageKey = 'BuyDocSeriesDefIndexViewNew';
+            const elementSettingsConfig = {
+                'PageSize': { key: 'pageSize', default: 10, prop: 'value' },
+                'filtersVisible': { key: 'filtersVisible', default: true, prop: 'value' },
+                'rowSelectorsVisible': { key: 'rowSelectorsVisible', default: false, prop: 'value' },
+                'CompanyFilter': { key: 'companyFilter', default: 0, prop: 'value' },
+                'currentSort': { key: 'currentSort', default: 'codesort:asc', prop: 'value' }
+            };
+
+            const colDefs = [
+                {
+                    key: 'code',
+                    responseKey: 'code',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: 'CodeSort',
+                    sortType: 'alpha',
+                    header: 'Code',
+                    text: '',
+                    headerClass: 'small text-center d-none d-md-table-cell',
+                    class: 'small d-none d-md-table-cell ',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {}
+                },
+                {
+                    key: 'abbr',
+                    responseKey: 'abbr',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: 'AbbrSort',
+                    sortType: 'alpha',
+                    header: 'Abbr',
+                    text: '',
+                    headerClass: 'small text-center d-none d-md-table-cell',
+                    class: 'small d-none d-md-table-cell ',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {}
+                },
+                {
+                    key: 'name',
+                    responseKey: 'name',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: 'NameSort',
+                    sortType: 'alpha',
+                    header: 'Name',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {}
+                },
+                {
+                    key: 'active',
+                    responseKey: 'active',
+                    actualVal: '',
+                    columnFormat: 'b',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: 'ActiveSort',
+                    sortType: 'alpha',
+                    header: 'Active',
+                    text: '',
+                    headerClass: 'small text-center d-none d-md-table-cell',
+                    class: 'small d-none d-md-table-cell ',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {}
+                },
+                {
+                    key: 'buyDocTypeDefCode',
+                    responseKey: 'buyDocTypeDefCode',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: 'BuyDocTypeDefCodeSort',
+                    sortType: 'alpha',
+                    header: 'Doc Type',
+                    text: '',
+                    headerClass: 'small text-center d-none d-md-table-cell',
+                    class: 'small d-none d-md-table-cell ',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {}
+                },
+                {
+                    key: 'companyCode',
+                    responseKey: 'companyCode',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: 'CompanyCodeSort',
+                    sortType: 'alpha',
+                    header: 'Company',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small ',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {}
+                }
+            ];
+
+            const actionColDefs = [
+                { actionType: 'defaultAction', valueKey: 'id', icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>', url: '@Url.Page("./Edit")?id=' },
+                { actionType: 'defaultAction', valueKey: 'id', icon: '<i class="fas fa-info-circle fa-lg" style="color:slategray"></i>', url: '@Url.Page("./Details")?id=' },
+                { actionType: 'defaultAction', valueKey: 'id', icon: '<i class="fas fa-trash fa-lg" style="color:slategray"></i>', url: '@Url.Page("./Delete")?id=' },
+                { actionType: 'defaultAction', valueKey: 'id', icon: '<i class="fas fa-clone fa-lg" style="color:slategray"></i>', url: '@Url.Page("./Create")?copyFromId=' }
+            ];
+
+            const actionColSubDefs = [];
+
+            const actionMobileColDefs = [
+                { actionType: 'defaultAction', visibility: 'always', elementName: '', condition: {}, text: 'Edit', valueKey: 'id', icon: '<i class="fas fa-edit fa-lg" style="color:slategray"></i>', url: '@Url.Page("./Edit")?id=' },
+                { actionType: 'defaultAction', visibility: 'always', elementName: '', condition: {}, text: 'Details', valueKey: 'id', icon: '<i class="fas fa-info-circle fa-lg" style="color:slategray"></i>', url: '@Url.Page("./Details")?id=' },
+                { actionType: 'defaultAction', visibility: 'always', elementName: '', condition: {}, text: 'Delete', valueKey: 'id', icon: '<i class="fas fa-trash fa-lg" style="color:slategray"></i>', url: '@Url.Page("./Delete")?id=' },
+                { actionType: 'defaultAction', visibility: 'always', elementName: '', condition: {}, text: 'Duplicate', valueKey: 'id', icon: '<i class="fas fa-clone fa-lg" style="color:slategray"></i>', url: '@Url.Page("./Create")?copyFromId=' }
+            ];
+
+            const tableHandlersToRegister = [];
+            const pageHandlersToRegister = [];
+
+            const indexPageDef = {
+                uri: '/api/GrKoukInfoApi/GetIndexTblDataBuyDocSeriesDefs',
+                currencyFormatter: formatterCurrency,
+                numberFormatter: formatterNumber,
+                colDefs: colDefs,
+                actionColDefs: actionColDefs,
+                actionColSubDefs: actionColSubDefs,
+                actionMobileColDefs: actionMobileColDefs,
+                tableHandlersToRegister: tableHandlersToRegister,
+                pageHandlersToRegister: pageHandlersToRegister,
+                afterTableLoad: {}
+            };
+
+            indPgLib.setIndexPageDefinition(indexPageDef);
+        });
+    </script>
+}
