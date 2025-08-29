@@ -190,19 +190,22 @@ public class PdfExportService
                         ReferenceNumber = item.RefCode,
                         Debit = item.Debit.ToString("C"),
                         Credit = item.Credit.ToString("C"),
-                        RunningTotal = item.RunningTotal.ToString("C")
+                        RunningTotal = item.RunningTotal.ToString("C"),
+                        CompanyCode = item.CompanyCode,
                     });
                 }
 
                 // Assign data source
                 pdfGrid.DataSource = data;
                 // Set custom column widths
-                pdfGrid.Columns[0].Width = 80;
-                pdfGrid.Columns[1].Width = 135;
-                pdfGrid.Columns[2].Width = 90; // ReferenceNumber (wider)
+                pdfGrid.Columns[0].Width = 60;
+                pdfGrid.Columns[1].Width = 110;
+                pdfGrid.Columns[2].Width = 70; // ReferenceNumber (wider)
                 pdfGrid.Columns[3].Width = 70; // Debit (narrow)
                 pdfGrid.Columns[4].Width = 70; // Credit (narrow)
                 pdfGrid.Columns[5].Width = 70; // RunningTotal (narrow)
+                pdfGrid.Columns[6].Width = 65; // Company (narrow)
+                
                 // Customize header text
                 PdfGridRow rowHeader = pdfGrid.Headers[0];
                 rowHeader.Cells[0].Value = "Ημ/νία";
@@ -211,6 +214,7 @@ public class PdfExportService
                 rowHeader.Cells[3].Value = "Χρέωση";
                 rowHeader.Cells[4].Value = "Πίστωση";
                 rowHeader.Cells[5].Value = "Υπόλοιπο";
+                rowHeader.Cells[6].Value = "Εταιρεία";
 
                 // Apply header style
                 PdfGridCellStyle headerStyle = new PdfGridCellStyle
@@ -267,7 +271,7 @@ public class PdfExportService
 
                 // *** START: Add Totals Grid ***
                 PdfGrid totalsGrid = new PdfGrid();
-                totalsGrid.Columns.Add(6); // Add 6 columns to match main grid
+                totalsGrid.Columns.Add(7); // Add 6 columns to match main grid
 
                 // Set column widths for totals grid to match main grid
                 totalsGrid.Columns[0].Width = pdfGrid.Columns[0].Width;
@@ -276,6 +280,7 @@ public class PdfExportService
                 totalsGrid.Columns[3].Width = pdfGrid.Columns[3].Width;
                 totalsGrid.Columns[4].Width = pdfGrid.Columns[4].Width;
                 totalsGrid.Columns[5].Width = pdfGrid.Columns[5].Width;
+                totalsGrid.Columns[6].Width = pdfGrid.Columns[6].Width;
 
                 // Add totals row
                 PdfGridRow totalsRow = totalsGrid.Rows.Add();
@@ -287,6 +292,7 @@ public class PdfExportService
                 totalsRow.Cells[3].Value = totalDebit.ToString("C");
                 totalsRow.Cells[4].Value = totalCredit.ToString("C");
                 totalsRow.Cells[5].Value = ""; // No total for running total column
+                totalsRow.Cells[6].Value = ""; // No total for company column
 
                 // Style the totals row
                 PdfGridCellStyle totalsLabelStyle = new PdfGridCellStyle
