@@ -142,6 +142,21 @@
 
             }
             @{
+                if (Model.FiltersToShow.ShowCompaniesMultiFlt)
+                {
+                    <div class="col-md-3 col-sm-6 col-lg-3">
+                        <ejs-multiselect id="CompaniesFilterElm" dataSource="@Model.CompaniesFilterUiSelectItems" placeholder="Companies" mode="CheckBox"
+                                         showDropDownIcon="true"
+                                         floatLabelType="Auto"
+                                         allowResize ="true"
+                                         showSelectAll="false">
+                            <e-multiselect-fields text="Text" value="ValueInt"></e-multiselect-fields>
+                        </ejs-multiselect>
+                    </div>
+                }
+
+            }
+            @{
                 if (Model.FiltersToShow.ShowCompaniesFlt)
                 {
                     <div class="col-md-2 col-sm-6 col-lg-2">

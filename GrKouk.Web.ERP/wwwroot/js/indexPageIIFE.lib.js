@@ -1,7 +1,7 @@
 ﻿//Author: George Koukoudis
 //Version:  2.0.0
 //Date Created: 2022-01-17
-//Date Modified: 2025-05-2
+//Date Modified: 2025-08-29
 //Index pages javascript tools
 
 const indPgLib = (function () {
@@ -74,6 +74,7 @@ const indPgLib = (function () {
     let $warehouseItemId = $('#WarehouseItemId');
     let $warehouseItemNatureFilter = $('#WarehouseItemNatureFilter');
     let $sectionsFilter = $('#SectionsFilter');
+    let $companiesFilter = $('#CompaniesFilter');
     let $materialCategoriesFilter = $('#MaterialCategoriesFilter');
     let $currencySelector = $("#CurrencySelector");
     let $diaryId = $("#DiaryId");
@@ -93,6 +94,7 @@ const indPgLib = (function () {
     let warehouseItemIdFilterElement;
     let materialCategoriesFilterElement;
     let sectionsFilterElement;
+    let companiesFilterElement;
     let productNatureFilterElement;
     let tableCurrentSortElement;
     let diaryIdFilterElement;
@@ -126,6 +128,7 @@ const indPgLib = (function () {
         showDisplayLinesWithZeroesFilterElement = flt.showDisplayLinesWithZeroesFilterElement;
         materialCategoriesFilterElement = flt.materialCategoriesFilterElement;
         sectionsFilterElement = flt.sectionsFilterElement;
+        companiesFilterElement=flt.companiesFilterElement;
         fromCustomFilterDateElement=flt.fromCustomFilterDate;
         toCustomFilterDateElement=flt.toCustomFilterDate;
     };
@@ -228,6 +231,13 @@ const indPgLib = (function () {
             sectionsFilterElement = sectionsFlt;
         } else {
             sectionsFilterElement = "";
+        }
+        let companiesFlt = '';
+        if (!($companiesFilter.val() === undefined)) {
+            companiesFlt = $companiesFilter.val();
+            companiesFilterElement = companiesFlt;
+        } else {
+            companiesFilterElement = "";
         }
         let fromCustomDateFlt = '';
         if (!($fromCustomFilterDate.val() === undefined)) {
@@ -866,7 +876,7 @@ const indPgLib = (function () {
                                    , transTypeFlt, wrItmNatureFlt, transactorId
                                      , warehouseItemId, diaryId, cfaId, showCarryOnFlt
                                   , showSummaryFlt, showDisplayLinesWithZeroesFlt,materialCategoriesFlt,sectionsFlt
-                                   ,fromCustomFilterDate, toCustomFilterDate) {
+                                   ,fromCustomFilterDate, toCustomFilterDate, companiesFlt) {
         let uri = indexPageDefinition.uri;
         uri += `?pageIndex=${pgIndex}`;
         uri += `&pageSize=${pgSize}`;
@@ -884,6 +894,7 @@ const indPgLib = (function () {
         uri += `&warehouseItemId=${warehouseItemId}`;
         uri += `&materialCategoriesFilter=${materialCategoriesFlt}`;
         uri += `&sectionsFilter=${sectionsFlt}`;
+        uri += `&companiesFilter=${companiesFlt}`;
         uri += `&diaryId=${diaryId}`;
         uri += `&displayCurrencyId=${currencyFlt}`;
         uri += `&fromCustomFilterDate=${fromCustomFilterDate}`;
@@ -937,7 +948,7 @@ const indPgLib = (function () {
         transTypeFlt, wrItmNatureFlt, transactorId,
         warehouseItemId, diaryId, cfaId, showCarryOnFlt,
         showSummaryFlt, showDisplayLinesWithZeroesFlt,
-        materialCategoriesFlt, sectionsFlt,fromCustomFilterDate, toCustomFilterDate
+        materialCategoriesFlt, sectionsFlt,fromCustomFilterDate, toCustomFilterDate,companiesFlt
     ) {
         let uri = indexPageDefinition.pdfExportUri;
 
@@ -957,6 +968,7 @@ const indPgLib = (function () {
         uri += `&warehouseItemId=${warehouseItemId}`;
         uri += `&materialCategoriesFilter=${materialCategoriesFlt}`;
         uri += `&sectionsFilter=${sectionsFlt}`;
+        uri += `&companiesFilter=${companiesFlt}`;
         uri += `&diaryId=${diaryId}`;
         uri += `&displayCurrencyId=${currencyFlt}`;
         uri += `&fromCustomFilterDate=${fromCustomFilterDate}`;
@@ -1191,7 +1203,7 @@ const indPgLib = (function () {
             , cfaIdFilterElement, showCarryOnFilterElement,
                 showSummaryFilterElement,showDisplayLinesWithZeroesFilterElement
             ,materialCategoriesFilterElement, sectionsFilterElement
-            ,fromCustomFilterDateElement, toCustomFilterDateElement)
+            ,fromCustomFilterDateElement, toCustomFilterDateElement, companiesFilterElement)
             .then((data) => {
                 if(data.nameOfIsozigio){
                     if($nameOfIsozigioEl.length){
@@ -1218,7 +1230,8 @@ const indPgLib = (function () {
                 , warehouseItemIdFilterElement, diaryIdFilterElement
                 , cfaIdFilterElement, showCarryOnFilterElement,
                 showSummaryFilterElement, showDisplayLinesWithZeroesFilterElement
-                , materialCategoriesFilterElement, sectionsFilterElement,fromCustomFilterDateElement, toCustomFilterDateElement)
+                , materialCategoriesFilterElement, sectionsFilterElement
+                ,fromCustomFilterDateElement, toCustomFilterDateElement,companiesFilterElement)
                 .then((data) => {
                     console.log("PDF download started!");
                     resolve(data);

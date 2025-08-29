@@ -31,7 +31,7 @@ public class DetailFiltersViewComponent:ViewComponent
         if (filtersToShow.ShowCompaniesMultiFlt)
         {
             
-            detailFiltersResult.CompaniesFilterUiSelectItems = await FiltersHelper.GetCompaniesFilterUiListAsync(_context);
+            detailFiltersResult.CompaniesFilterUiSelectItems = await FiltersHelper.GetSolidCompaniesFilterUiListAsync(_context);
         }
         if (filtersToShow.ShowCurrencyFlt)
         {
