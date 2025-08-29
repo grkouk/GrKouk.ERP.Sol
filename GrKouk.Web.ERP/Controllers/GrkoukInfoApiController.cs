@@ -7413,6 +7413,7 @@ namespace GrKouk.Web.ERP.Controllers
             }
             catch (Exception ex)
             {
+                var message = ex.Message + " " + ex.InnerException?.Message;
                 return BadRequest(ex.Message);
             }
 

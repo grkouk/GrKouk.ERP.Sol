@@ -220,6 +220,7 @@ public class PdfExportService
                 PdfGridCellStyle headerStyle = new PdfGridCellStyle
                 {
                     BackgroundBrush = PdfBrushes.LightGray,
+                    StringFormat = new PdfStringFormat(PdfTextAlignment.Center),
                     Font = bodyTitleFont,
                 };
                 for (int i = 0; i < rowHeader.Cells.Count; i++)
