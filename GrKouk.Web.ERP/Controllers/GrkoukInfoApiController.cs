@@ -6689,18 +6689,23 @@ namespace GrKouk.Web.ERP.Controllers
                     transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
                 }
             }
-
-            if (!string.IsNullOrEmpty(request.CompanyFilter))
+            if (!string.IsNullOrEmpty(request.CompaniesFilter))
             {
-                if (int.TryParse(request.CompanyFilter, out var companyId))
-                {
-                    if (companyId > 0)
-                    {
-                        transactionsList = transactionsList.Where(p => p.CompanyId == companyId);
-                        transListAll = transListAll.Where(p => p.CompanyId == companyId);
-                    }
-                }
+                transactionsList = FilterEval.ApplyIntListFilterFromJson(transactionsList, request.CompaniesFilter, 0, p => p.CompanyId);
+                transListAll = FilterEval.ApplyIntListFilterFromJson(transListAll, request.CompaniesFilter, 0, p => p.CompanyId);
             }
+            // if (!string.IsNullOrEmpty(request.CompanyFilter))
+            // {
+            //     
+            //     if (int.TryParse(request.CompanyFilter, out var companyId))
+            //     {
+            //         if (companyId > 0)
+            //         {
+            //             transactionsList = transactionsList.Where(p => p.CompanyId == companyId);
+            //             transListAll = transListAll.Where(p => p.CompanyId == companyId);
+            //         }
+            //     }
+            // }
 
             if (!string.IsNullOrEmpty(request.SearchFilter))
             {
@@ -7095,18 +7100,22 @@ namespace GrKouk.Web.ERP.Controllers
                     transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
                 }
             }
-
-            if (!string.IsNullOrEmpty(request.CompanyFilter))
+            if (!string.IsNullOrEmpty(request.CompaniesFilter))
             {
-                if (int.TryParse(request.CompanyFilter, out var companyId))
-                {
-                    if (companyId > 0)
-                    {
-                        transactionsList = transactionsList.Where(p => p.CompanyId == companyId);
-                        transListAll = transListAll.Where(p => p.CompanyId == companyId);
-                    }
-                }
+                transactionsList = FilterEval.ApplyIntListFilterFromJson(transactionsList, request.CompaniesFilter, 0, p => p.CompanyId);
+                transListAll = FilterEval.ApplyIntListFilterFromJson(transListAll, request.CompaniesFilter, 0, p => p.CompanyId);
             }
+            // if (!string.IsNullOrEmpty(request.CompanyFilter))
+            // {
+            //     if (int.TryParse(request.CompanyFilter, out var companyId))
+            //     {
+            //         if (companyId > 0)
+            //         {
+            //             transactionsList = transactionsList.Where(p => p.CompanyId == companyId);
+            //             transListAll = transListAll.Where(p => p.CompanyId == companyId);
+            //         }
+            //     }
+            // }
 
             if (!string.IsNullOrEmpty(request.SearchFilter))
             {

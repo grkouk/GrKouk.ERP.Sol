@@ -45,7 +45,7 @@
 </div>
 <input type="hidden" asp-for="TransactorId" />
 @await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowDateFlt = true ,ShowDisplayCarryOnLineFlt =
-true
+true, ShowCompaniesMultiFlt = true, ShowCompaniesFlt = false
 })
 
 
@@ -64,6 +64,8 @@ true
 
 @section Scripts
 {
+    <script src="https://cdn.syncfusion.com/ej2/28.1.37/dist/ej2.min.js"></script>
+    <ejs-scripts></ejs-scripts>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     @* <script src="~/js/moment.min.js"></script> *@
     <script src="~/js/moment-with-locales.min.js"></script>
@@ -80,7 +82,8 @@ true
                 'filtersVisible':            { key: 'filtersVisible',            default: true,        prop: 'value' },
                 'rowSelectorsVisible':       { key: 'rowSelectorsVisible',       default: false,       prop: 'value' },
                 'DatePeriodFilter':          { key: 'dateRangeFilter',           default: 'CURYEAR',   prop: 'value' },
-                'CompanyFilter':             { key: 'companyFilter',             default: 0,           prop: 'value' },
+                //'CompanyFilter':             { key: 'companyFilter',             default: 0,           prop: 'value' },
+                'CompaniesFilter': {key: 'companiesFilter', default: '[0]', prop: 'value', dataType: 'array'},
                 //  'TransactorTypeFilter':      { key: 'transactorTypeFilter',      default: 1,           prop: 'value' },
                 //'WarehouseItemNatureFilter': { key: 'warehouseItemNatureFilter', default: 1,           prop: 'value' },
                 'currentSort':               { key: 'currentSort',               default: 'datesort:asc',prop: 'value' },
@@ -408,6 +411,81 @@ true
             //----------------
 
             indPgLib.handleFiltersUi();
+            //--------------------------Companies filter handling
+            const selectedCompanies = document.getElementById("CompaniesFilterElm").ej2_instances[0];
+            let companiesFilterValue = $('#CompaniesFilter').val();
+            if (companiesFilterValue != null && companiesFilterValue.length > 0) {
+                selectedCompanies.value = JSON.parse(companiesFilterValue);
+            }
+            selectedCompanies.changeOnBlur = false;
+            selectedCompanies.addEventListener("change", (event) => {
+                // Ensure we have arrays, even if null/undefined
+                const newValue = event.value || [];
+                const oldValue = event.oldValue || []; // Assumes your component provides oldValue
+
+                const zeroWasSelected = oldValue.includes(0);
+                const zeroIsSelected = newValue.includes(0);
+
+                let finalValue; // This will hold the calculated correct selection
+
+                // --- Rule 1: User just selected 0 ---
+                // Check if 0 is newly added in this change event
+                if (zeroIsSelected && !zeroWasSelected) {
+                    finalValue = [0]; // Force selection to be only 0
+                }
+                    // --- Rule 2: User selected something else while 0 was selected ---
+                // Check if 0 was selected before, AND a non-zero item was added
+                else if (zeroWasSelected) {
+                    // Find items present in newValue but not in oldValue
+                    const addedItems = newValue.filter(item => !oldValue.includes(item));
+                    // Check if any of those newly added items are not 0
+                    const addedNonZeroItem = addedItems.some(item => item !== 0);
+
+                    if (addedNonZeroItem) {
+                        // User added a non-zero item while 0 was selected. Remove 0.
+                        finalValue = newValue.filter(item => item !== 0);
+                    } else {
+                        // 0 was selected, but only other changes happened (like removing items, or removing 0 itself).
+                        // In this case, the component's newValue is likely correct as is (it might be just [0], or [] etc.)
+                        finalValue = newValue;
+                    }
+                }
+                // --- Default Case: No special 0-rule applies ---
+                else {
+                    // 0 wasn't selected before, and wasn't added now. Normal selection.
+                    finalValue = newValue;
+                }
+
+                // --- Update Component and Hidden Field ---
+
+                // Get the component's current visual value (might differ from finalValue if we intervened)
+                const currentComponentValue = selectedCompanies.value || [];
+
+                // Check if our calculated finalValue is different from the component's current value
+                // Simple array comparison for primitive values:
+                const valuesAreEqual = finalValue.length === currentComponentValue.length &&
+                    finalValue.every((val, index) => val === currentComponentValue[index]);
+
+                // Only update the component's value if it needs changing, prevents potential event loops
+                if (!valuesAreEqual) {
+                    selectedCompanies.value = finalValue;
+                }
+
+                // Always update the hidden input field with the final calculated value
+                $('#CompaniesFilter').val(JSON.stringify(finalValue));
+            });
+            selectedCompanies.addEventListener("blur", (event) => {
+                const allCompaniesId = 0;
+                if (selectedCompanies.value == null || selectedCompanies.value.length === 0) {
+                    selectedCompanies.value = [allCompaniesId];
+                }
+
+                indPgLib.refreshData();
+            });
+            selectedCompanies.addEventListener("close", (event) => {
+                indPgLib.refreshData();
+            });
+            //---------------------------------------------------
             currencyChanged();
             indPgLib.refreshData();
             indPgLib.rowSelectorsUi();
