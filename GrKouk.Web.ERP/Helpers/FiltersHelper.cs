@@ -191,7 +191,8 @@ namespace GrKouk.Web.ERP.Helpers
         }
         public static async Task<List<UISelectTypeItem>> GetCompaniesFilterUiListAsync(ApiDbContext context)
         {
-            var companiesUiListJs = await context.Companies.OrderBy(p => p.Name)
+            var companiesUiListJs = await context.Companies.Where(p=>p.Id!=1)
+                .OrderBy(p => p.Name)
                 .Select(p => new UISelectTypeItem()
                 {
                     Title = p.Name,
@@ -201,8 +202,8 @@ namespace GrKouk.Web.ERP.Helpers
                 }).ToListAsync();
             companiesUiListJs.Insert(0, new UISelectTypeItem()
             {
-                Title = "{All Companies}",
-                Text = "{All Companies}",
+                Title = "{Ολες}",
+                Text = "{Ολες}",
                 ValueInt = 0,
                 Value = 0.ToString()
             });
