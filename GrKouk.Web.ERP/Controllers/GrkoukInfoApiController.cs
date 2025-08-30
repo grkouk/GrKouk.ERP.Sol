@@ -1184,7 +1184,207 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(response);
         }
+ [HttpGet("GetIndexTblDataSellDocumentsDaily")]
+        public async Task<IActionResult> GetIndexTblDataSellDocumentsDaily([FromQuery] IndexDataTableRequest request)
+        {
+            IQueryable<SellDocList2Dto> fullListIq = _context.SellDocuments
+                .Include(p => p.SellDocSeries)
+                .Include(p => p.SellDocType)
+                .Include(p => p.Company)
+                .Include(p => p.Section)
+                .Include(p => p.Transactor)
+                .Select(p => new SellDocList2Dto()
+                {
+                   // Id = p.Id,
+                    TransDate = p.TransDate,
+                    AmountDiscount = p.AmountDiscount,
+                    AmountFpa = p.AmountFpa,
+                    AmountNet = p.AmountNet,
+                    SellDocSeriesCode = p.SellDocSeries.Code,
+                   // SellDocSeriesId = p.SellDocSeriesId,
+                   // SellDocSeriesName = p.SellDocSeries.Name,
+                    CompanyCode = p.Company.Code,
+                    CompanyId = p.CompanyId,
+                    CompanyCurrencyId = p.Company.CurrencyId,
+                    //SectionCode = p.Section.Code,
+                    //SectionId = p.SectionId,
+                    //TransactorId = p.TransactorId,
+                    TransactorName = p.Transactor.Name,
+                    //TransRefCode = p.TransRefCode,
+                    //PayedOfAmount = p.PaymentMappings.Sum(t => t.AmountUsed)
+                });
 
+            if (!string.IsNullOrEmpty(request.SortData))
+            {
+                switch (request.SortData.ToLower())
+                {
+                    case "transactiondatesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.TransDate);
+                        break;
+                    case "transactiondatesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.TransDate);
+                        break;
+                    case "transactornamesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.TransactorName);
+                        break;
+                    case "transactornamesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.TransactorName);
+                        break;
+
+                    case "seriescodesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.SellDocSeriesCode);
+                        break;
+                    case "seriescodesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.SellDocSeriesCode);
+                        break;
+                    case "companycodesort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.CompanyCode);
+                        break;
+                    case "companycodesort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.CompanyCode);
+                        break;
+                    case "refnumbersort:asc":
+                        fullListIq = fullListIq.OrderBy(p => p.TransRefCode);
+                        break;
+                    case "refnumbersort:desc":
+                        fullListIq = fullListIq.OrderByDescending(p => p.TransRefCode);
+                        break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.DateRange))
+            {
+                DateFilterDates dfDates=new();
+                var datePeriodFilter = request.DateRange;
+                if (datePeriodFilter == "CUSTOM")
+                {
+                    if (request.FromCustomFilterDate.HasValue && request.ToCustomFilterDate.HasValue)
+                    {
+                        dfDates.FromDate = request.FromCustomFilterDate.Value;
+                        dfDates.ToDate = request.ToCustomFilterDate.Value;
+                    }
+                    else
+                    {
+                        return BadRequest("Custom Period filter dates are missing");
+                    }
+                }
+                else
+                {
+                    dfDates = DateFilter.GetDateFilterDates(datePeriodFilter);
+                }
+                DateTime fromDate = dfDates.FromDate;
+                DateTime toDate = dfDates.ToDate;
+
+                fullListIq = fullListIq.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
+            }
+
+            if (!string.IsNullOrEmpty(request.CompanyFilter))
+            {
+                if (int.TryParse(request.CompanyFilter, out var companyId))
+                {
+                    if (companyId > 0)
+                    {
+                        fullListIq = fullListIq.Where(p => p.CompanyId == companyId);
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(request.SearchFilter))
+            {
+                fullListIq = fullListIq.Where(p => p.TransactorName.Contains(request.SearchFilter));
+
+            }
+
+           
+
+            var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
+                .Take(10)
+                .ToListAsync();
+
+            var t = fullListIq.Select(p => new SellDocList2Dto
+            {
+                // Intentionally exclude Id and TransRefCode in the final projection as per requirement
+                TransDate = p.TransDate,
+              
+                TransactorId = p.TransactorId,
+                TransactorName = p.TransactorName,
+             
+                SellDocSeriesCode = p.SellDocSeriesCode,
+              
+                AmountFpa = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountFpa),
+                AmountNet = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates, p.AmountNet),
+                AmountDiscount = ConvertAmount(p.CompanyCurrencyId, request.DisplayCurrencyId, currencyRates,
+                    p.AmountDiscount),
+                CompanyId = p.CompanyId,
+                CompanyCode = p.CompanyCode,
+               
+                CompanyCurrencyId = p.CompanyCurrencyId
+            });
+            var t1 = await t.ToListAsync();
+            var grandSumOfAmountNew = t1.Sum(p => p.TotalAmount);
+            var gransSumOfNetAmountNew = t1.Sum(p => p.TotalNetAmount);
+            //var grandSumOfPayedAmount = t1.Sum((p => p.PayedOfAmount));
+            // Apply grouping by TransDate and aggregate amounts; keep other fields except Id and TransRefCode
+            var groupedList = t1
+                .GroupBy(p =>new
+                {
+                    p.TransDate.Date
+                    ,p.TransactorId
+                    ,p.TransactorName
+                  
+                    ,p.CompanyId
+                    ,p.CompanyCode
+                    ,p.CompanyCurrencyId
+                })
+                .Select(g => new SellDocList2Dto
+                {
+                    // Exclude Id and TransRefCode
+                    TransDate = g.Key.Date,
+                    AmountDiscount = g.Sum(x => x.AmountDiscount),
+                    AmountFpa = g.Sum(x => x.AmountFpa),
+                    AmountNet = g.Sum(x => x.AmountNet),
+                    SellDocSeriesCode = "#ΑΠΛΙΑΝ",
+                  
+                    CompanyCode = g.Key.CompanyCode,
+                    CompanyId = g.Key.CompanyId,
+                    CompanyCurrencyId = g.Key.CompanyCurrencyId,
+                  
+                    TransactorId = g.Key.TransactorId,
+                    TransactorName = g.Key.TransactorName,
+                 
+                });
+            var relevantDiarys = await _context.DiaryDefs.Where(p => p.DiaryType == DiaryTypeEnum.DiaryTypeEnumSales)
+                .Select(item => new SearchListItem()
+                {
+                    Value = item.Id,
+                    Text = item.Name
+                })
+                .ToListAsync();
+            var pageIndex = request.PageIndex;
+            var pageSize = request.PageSize;
+            var listItems =  PagedList<SellDocList2Dto>.Create(groupedList.AsQueryable(), pageIndex, pageSize);
+
+
+            decimal sumAmountTotal = listItems.Sum(p => p.TotalAmount);
+            decimal sumAmountTotalNet = listItems.Sum(p => p.TotalNetAmount);
+            decimal sumAmountTotalPayed = listItems.Sum(p => p.PayedOfAmount);
+            var response = new IndexDataTableResponse<SellDocList2Dto>
+            {
+                TotalRecords = listItems.TotalCount,
+                TotalPages = listItems.TotalPages,
+                HasPrevious = listItems.HasPrevious,
+                HasNext = listItems.HasNext,
+                SumOfAmount = sumAmountTotal,
+                SumOfNetAmount = sumAmountTotalNet,
+                SumOfPayedAmount = sumAmountTotalPayed,
+                GrandSumOfAmount = grandSumOfAmountNew,
+                GrandSumOfNetAmount = gransSumOfNetAmountNew,
+                GrandSumOfPayedAmount = 0,
+                Diaries = relevantDiarys,
+                Data = listItems
+            };
+            return Ok(response);
+        }
         [HttpGet("GetIndexTblDataSellDocumentsV1")]
         public async Task<IActionResult> GetIndexTblDataSellDocumentsV1([FromQuery] IndexDataTableRequest request)
         {
