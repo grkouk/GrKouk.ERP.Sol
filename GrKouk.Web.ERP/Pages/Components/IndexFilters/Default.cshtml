@@ -4,33 +4,44 @@
 @{
     var viewContext = (ViewContext)ViewData["ViewContext"];
     var script = @"
-                             <script>
-                                 document.getElementById('DatePeriodFilter').addEventListener('change', warn, true);
-                                 function warn(e) {
-                                     if (e.currentTarget.value === 'CUSTOM') {
-                                         e.preventDefault();
-                                         e.stopPropagation();
-                                         var myModal = new bootstrap.Modal(document.getElementById('customDateFilter'), {
-                                             keyboard: true, focus: true
-                                         });
-                                         myModal.show();
-                                     } else {
-                                         return;
-                                     }
-                                 }
-                             </script>
-                             ";
-   // ScriptHelper.AddScript(viewContext, "<script>console.log('Script from ViewComponent');</script>");
+        <script>
+        $(document).ready(function () {
+             document.getElementById('DatePeriodFilter').addEventListener('change', dateFilterValueChange, true);
+             function dateFilterValueChange(e) {
+                 if (e.currentTarget.value === 'CUSTOM') {
+                     e.preventDefault();
+                     e.stopPropagation();
+                     var myModal = new bootstrap.Modal(document.getElementById('customDateFilter'), {
+                         keyboard: true, focus: true
+                     });
+                     myModal.show();
+                 } else {
+                     return;
+                 }
+             }
+             let selectButtonEl = document.getElementById('customDatesSelected');
+             document.getElementById('customDatesSelected').addEventListener('click', dateFilterCustomDatesSelected, true);
+             function dateFilterCustomDatesSelected(e) {
+                      $('#customDateFilter').modal('hide');
+                      indPgLib.refreshData();
+             }
+            let toDateFilterValue=new Date();
+            let fromDateFilterValue = new Date(toDateFilterValue.getFullYear(),toDateFilterValue.getMonth()-1,1);
+            const elemFrom = document.getElementById(""fromDateFilterEl"");
+            const elemTo = document.getElementById(""toDateFilterEl"");
+            const fromDateString = fromDateFilterValue.toJSON().slice(0, 10);
+            elemFrom.value = fromDateString;
+            toDateString = toDateFilterValue.toJSON().slice(0, 10);
+            elemTo.value = toDateString;
+        });
+         </script>
+                 ";
     ScriptHelper.AddScript(viewContext, script);
 }
 @{
     Layout = null;
 }
 
-
-<style>
-  
-</style>
 <div class="collapse show" id="filterCollapse">
     <form class="form-inline" id="FiltersForm" method="get">
         <input type="hidden" id="filtersVisible" />
@@ -41,6 +52,7 @@
         <input type="hidden" id="totalRecords" />
         <input type="hidden" id="pageIndex" />
         <input type="hidden" id="SectionsFilter" />
+        <input type="hidden" id="CompaniesFilter" />
         
         <div class="row align-items-center">
             <div class="col-md-auto">
@@ -54,14 +66,14 @@
             @{
                 if (Model.FiltersToShow.ShowDateFlt)
                 {
-                    <div class="col-md-2 col-sm-6">
+                    <div class="col-md-2 col-sm-6 col-lg-2">
 
                         <div class="form-floating">
 
                             <select name="DatePeriodFilter" id="DatePeriodFilter" class="form-select form-select-sm"
                                     asp-items="Model.DateFilterValues">
                             </select>
-                            <label class="small">Period:</label>
+                            <label id="datePeriodLabel" class="small">Period:</label>
                         </div>
 
                     </div>
@@ -72,7 +84,7 @@
             @{
                 if (Model.FiltersToShow.ShowMaterialNatureFlt)
                 {
-                    <div class="col-md-2 col-sm-6">
+                    <div class="col-md-2 col-sm-6 col-lg-2">
                         <div class="form-floating">
                             <select id="WarehouseItemNatureFilter" class="form-select form-select-sm"
                                     asp-items="Model.MaterialNaturesFilterValues">
@@ -87,7 +99,7 @@
             @{
                 if (Model.FiltersToShow.ShowMaterialCategoriesFlt)
                 {
-                    <div class="col-md-2 col-sm-6">
+                    <div class="col-md-2 col-sm-6 col-lg-2">
                         <div class="form-floating">
                             <select id="MaterialCategoriesFilter" class="form-select form-select-sm"
                                     asp-items="Model.MaterialCategoriesFilterValues">
@@ -102,7 +114,7 @@
             @{
                 if (Model.FiltersToShow.ShowTransactorTypeFlt)
                 {
-                    <div class="col-md-2 col-sm-6">
+                    <div class="col-md-2 col-sm-6 col-lg-2">
                         <div class="form-floating">
                             <select id="TransactorTypeFilter" class="form-select form-select-sm"
                                     asp-items="Model.TransactorTypeFilterValues">
@@ -118,8 +130,8 @@
             @{
                 if (Model.FiltersToShow.ShowSectionsFlt)
                 {
-                    <div class="col-md-3 col-sm-6">
-                      <ejs-multiselect id="SectionsFilterElm" dataSource="@Model.SectionsFilterUiSelectItems" placeholder="Select sections" mode="CheckBox"
+                    <div class="col-md-3 col-sm-6 col-lg-3">
+                      <ejs-multiselect id="SectionsFilterElm" dataSource="@Model.SectionsFilterUiSelectItems" placeholder="Sections" mode="CheckBox"
                                          showDropDownIcon="true"
                                          floatLabelType="Auto"
                                          allowResize ="true"
@@ -131,9 +143,24 @@
 
             }
             @{
+                if (Model.FiltersToShow.ShowCompaniesMultiFlt)
+                {
+                    <div class="col-md-3 col-sm-6 col-lg-3">
+                        <ejs-multiselect id="CompaniesFilterElm" dataSource="@Model.CompaniesFilterUiSelectItems" placeholder="Companies" mode="CheckBox"
+                                         showDropDownIcon="true"
+                                         floatLabelType="Auto"
+                                         allowResize ="true"
+                                         showSelectAll="false">
+                            <e-multiselect-fields text="Text" value="ValueInt"></e-multiselect-fields>
+                        </ejs-multiselect>
+                    </div>
+                }
+
+            }
+            @{
                 if (Model.FiltersToShow.ShowCompaniesFlt)
                 {
-                    <div class="col-md-2 col-sm-6">
+                    <div class="col-md-2 col-sm-6 col-lg-2">
                         <div class="form-floating">
                             <select id="CompanyFilter" class="form-select form-select-sm" asp-items="Model.CompanyFilterValues">
                             </select>
@@ -147,7 +174,7 @@
             @{
                 if (Model.FiltersToShow.ShowPageSizeFlt)
                 {
-                    <div class="col-md-1 col-sm-6">
+                    <div class="col-md-2 col-sm-6 col col-lg-2">
                         <div class="form-floating">
 
                             <select id="PageSize" class="form-select form-select-sm" asp-items="Model.PageSizeFilterValues">
@@ -161,7 +188,7 @@
             @{
                 if (Model.FiltersToShow.ShowCurrencyFlt)
                 {
-                    <div class="col-md-1 col-sm-6">
+                    <div class="col-md-2 col-sm-6 col-lg-2">
                         <div class="form-floating">
 
                             <select id="CurrencySelector" class="form-select form-select-sm"
@@ -209,4 +236,4 @@
 
     </form>
 </div>
-
+<partial name="Shared/_CustomDateFilterPartial" />

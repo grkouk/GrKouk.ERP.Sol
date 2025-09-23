@@ -1,0 +1,77 @@
+﻿@page
+@model EditModel
+@section MyCss
+{
+    @* <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/bootstrap5.css" /> *@
+    @* <partial name="Shared/_CssSyncfusionBlockPartial"/> *@
+}
+@{
+    ViewData["Title"] = "Warehouse Edit";
+}
+
+<h4>Edit Warehouse</h4>
+<hr />
+
+<div class="container">
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="ItemVm.Id" />
+       
+        <input type="hidden" asp-for="ItemVm.SelectedCompanies" />
+        <div class="row mb-3">
+            <div class="col-md-2">
+                <label asp-for="ItemVm.Code" class="form-label small"></label>
+                <input asp-for="ItemVm.Code" class="form-control form-control-sm small" />
+                <span asp-validation-for="ItemVm.Code" class="text-danger small"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="ItemVm.Name" class="form-label small"></label>
+                <input asp-for="ItemVm.Name" class="form-control form-control-sm small" />
+                <span asp-validation-for="ItemVm.Name" class="text-danger small"></span>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label class="form-label small">Companies</label>
+                <ejs-multiselect id="SelectedCompanies" dataSource="@ViewBag.CompaniesListJs" placeholder="Select Companies" mode="CheckBox"
+                                 showDropDownIcon="true"
+                                 showSelectAll="false" selectAllText="Select All" unSelectAllText="unSelect All">
+                    <e-multiselect-fields text="Title" value="Value"></e-multiselect-fields>
+                </ejs-multiselect>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div>
+                <input type="submit" value="Update" class="btn btn-primary btn-sm" />
+            </div>
+        </div>
+    </form>
+</div>
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+   
+    <partial name="Shared/_JsSyncfusionBlockPartial"/>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function() {
+            const selectedCompanies = document.getElementById("SelectedCompanies").ej2_instances[0];
+           
+            var oldSel = $('#ItemVm_SelectedCompanies').val();
+            if (oldSel.length>0) {
+                selectedCompanies.value=JSON.parse(oldSel);    
+            }
+            
+            selectedCompanies.changeOnBlur=false;
+            selectedCompanies.addEventListener("change",(event)=>{
+                console.log("Inside selected companies change event handler");
+                console.log(event);
+                var selected = JSON.stringify(event.value);
+                $('#ItemVm_SelectedCompanies').val(selected);
+            });
+        });
+    </script>
+}

@@ -6,6 +6,7 @@ using AutoMapper;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
+using GrKouk.Web.ERP.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -17,10 +18,12 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
     public class DeleteModel : PageModel {
         private readonly ApiDbContext _context;
         private readonly IMapper _mapper;
+        private readonly ITransactorTransactionService _transService;
         public bool NotUpdatable;
-        public DeleteModel(ApiDbContext context, IMapper mapper) {
+        public DeleteModel(ApiDbContext context, IMapper mapper, ITransactorTransactionService transService) {
             _context = context;
             _mapper = mapper;
+            _transService = transService;
         }
 
         [BindProperty]
@@ -54,34 +57,32 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
                 return NotFound();
             }
 
-            var itemToDelete = await _context.TransactorTransactions.FindAsync(id);
-
-            if (itemToDelete != null)
+            try
             {
-                await using var transaction = await _context.Database.BeginTransactionAsync();
-                try
+                var serviceResult = await _transService.DeleteTransactorTransaction(id.Value);
+                if (serviceResult == null)
                 {
-                    _context.BuyDocTransPaymentMappings.RemoveRange(
-                        _context.BuyDocTransPaymentMappings
-                            .Where(p => p.TransactorTransactionId == itemToDelete.Id));
-                    _context.SellDocTransPaymentMappings.RemoveRange(
-                        _context.SellDocTransPaymentMappings
-                            .Where(p => p.TransactorTransactionId == itemToDelete.Id));
-                    _context.CashFlowAccountTransactions.RemoveRange(
-                        _context.CashFlowAccountTransactions.Where(p =>
-                            p.CreatorSectionId == itemToDelete.SectionId && p.CreatorId == itemToDelete.Id));
-                    _context.TransactorTransactions.Remove(itemToDelete);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+                    ModelState.AddModelError(string.Empty, "Empty response from transactor service");
+                    LoadCombos();
+                    return Page();
                 }
-                catch (Exception ex)
+
+                if (!serviceResult.Success)
                 {
-                    await transaction.RollbackAsync();
-                    string msg = $"Error  {ex.Message} inner exception->{ex.InnerException?.Message}";
+                    var msg = string.IsNullOrWhiteSpace(serviceResult.ErrorMessage)
+                        ? "Error from transactor service"
+                        : serviceResult.ErrorMessage;
                     ModelState.AddModelError(string.Empty, msg);
                     LoadCombos();
                     return Page();
                 }
+            }
+            catch (Exception ex)
+            {
+                string msg = $"Error  {ex.Message} inner exception->{ex.InnerException?.Message}";
+                ModelState.AddModelError(string.Empty, msg);
+                LoadCombos();
+                return Page();
             }
 
             return RedirectToPage("./Index");

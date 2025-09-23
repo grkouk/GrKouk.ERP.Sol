@@ -470,8 +470,8 @@ namespace GrKouk.Web.ERP.Controllers
             #region Boiler Plate Code
 
             string mainEntityName = SyncEntityNames.SyncBuyDocument;
-            string syncEntityName = SyncEntityNames.SyncBuyDocument;
-            ;
+            //string syncEntityName = SyncEntityNames.SyncBuyDocument;
+            
             _logger.LogInformation("SyncBuyDocuments");
             int addedCount = 0;
             int failedToAddCount = 0;
@@ -686,7 +686,7 @@ namespace GrKouk.Web.ERP.Controllers
             #region BoilerPlate Code
 
             string mainEntityName = "SyncSupplier";
-            string syncEntityName = "SyncSupplier";
+            //string syncEntityName = "SyncSupplier";
             _logger.LogInformation("SyncMatchedBusinessSuppliers");
             int addedCount = 0;
             int failedToAddCount = 0;
@@ -1303,6 +1303,58 @@ namespace GrKouk.Web.ERP.Controllers
             };
             return Ok(res);
         }
-        
+
+        [HttpPost("SyncAddBusinessDayCloseData")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public async Task<IActionResult> SyncAddBusinessDayCloseData([FromBody] DayClosePayload request)
+        {
+            #region Error Checking
+
+            if (request == null)
+            {
+                return BadRequest(new
+                {
+                    error = "Empty request data"
+                });
+            }
+           
+            #endregion
+
+            try
+            {
+                var syncServiceResult = await _docSyncSrv.SyncAddDayCloseData(request, null);;
+                if (syncServiceResult is null)
+                {
+                    return BadRequest(new
+                    {
+                        error = "Empty response from sync service"
+                    });
+                }
+                if (!syncServiceResult.Success)
+                {
+                    return BadRequest(new
+                    {
+                        error = syncServiceResult.ErrorMessage
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                _logger.LogError("An error occurred during document sync: {Error}", ex.Message);
+                var dayCloseResult = new DayCloseResponse()
+                {
+                    Message = "Το κλείσιμο ημέρας ενημερώθηκε με επιτυχία." + ex.Message,
+                    IsSuccess = true
+                };
+                return BadRequest(dayCloseResult);
+            }
+            var res = new DayCloseResponse()
+            {
+                Message = "Το κλείσιμο ημέρας ενημερώθηκε με επιτυχία.",
+                IsSuccess = true
+            };
+            return Ok(res);
+        }
     }
 }

@@ -54,6 +54,10 @@ namespace GrKouk.Web.ERP.ViewComponents
                  indexFiltersResult.SectionsFilterValues = await FiltersHelper.GetSectionsFilterListAsync(_context);
                  indexFiltersResult.SectionsFilterUiSelectItems =  await FiltersHelper.GetSectionsFilterUiListAsync(_context);
             }
+            if (filtersToShow.ShowCompaniesMultiFlt)
+            {
+                indexFiltersResult.CompaniesFilterUiSelectItems =  await FiltersHelper.GetCompaniesFilterUiListAsync(_context);
+            }
             indexFiltersResult.FiltersToShow = filtersToShow;
             ViewData["ViewContext"] = ViewContext; 
             return View(indexFiltersResult);

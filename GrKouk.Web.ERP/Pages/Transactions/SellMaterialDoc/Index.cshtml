@@ -14,7 +14,8 @@
     <link rel="stylesheet" href="~/lib/bootstrap-select/css/bootstrap-select.min.css" />
 }
 
-<h4>Λίστα Παραστατικών Πώλησης</h4>
+<input type="hidden" id="initialPageTitle" value="@ViewData["Title"]" />
+<h4 id="hElementTitle">@ViewData["Title"]</h4>
 
 <div class="container ">
     <ul class="nav small justify-content-end ">
@@ -148,11 +149,36 @@
 @section Scripts
 {
     <script src="~/lib/bootstrap-select/js/bootstrap-select.min.js"></script>
-    <script src="~/js/moment.min.js"></script>
+    @* <script src="~/js/moment.min.js"></script> *@
+    <script src="~/js/moment-with-locales.min.js"></script>
     <script src="~/js/definitions.js"></script>
+    <script src="~/js/filterManagement.lib.js"></script>
     <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
         $(document).ready(function () {
+            const storageKey = 'SellDocIndexViewNew';
+            const elementSettingsConfig = {
+                // Element ID: { key: storageKey, default: defaultValue, prop: propertyToSetOrRead }
+                // 'pageIndex':                 { key: 'pageIndex',                 default: 1,           prop: 'value' },
+                'PageSize':                  { key: 'pageSize',                  default: 10,          prop: 'value' },
+                'filtersVisible':            { key: 'filtersVisible',            default: true,        prop: 'value' },
+                'rowSelectorsVisible':       { key: 'rowSelectorsVisible',       default: false,       prop: 'value' },
+                'DatePeriodFilter':          { key: 'dateRangeFilter',           default: 'CURYEAR',   prop: 'value' },
+                'CompanyFilter':             { key: 'companyFilter',             default: 0,           prop: 'value' },
+                //  'TransactorTypeFilter':      { key: 'transactorTypeFilter',      default: 1,           prop: 'value' },
+                //'WarehouseItemNatureFilter': { key: 'warehouseItemNatureFilter', default: 1,           prop: 'value' },
+                'currentSort':               { key: 'currentSort',               default: 'datesort:asc',prop: 'value' },
+                'CurrencySelector':          { key: 'currentCurrency',           default: 1,          prop: 'value' },
+                'fromDateFilterEl':          { key: 'fromDateFilter',           default: '',          prop: 'value' },
+                'toDateFilterEl':          { key: 'toDateFilter',           default: '',          prop: 'value' },
+                // 'ShowCarryOnFlt':            { key: 'ShowCarryOnFlt',            default: true,        prop: 'checked'} // Reads the 'checked' property
+            };
+            window.addEventListener('beforeunload', function(event) {
+                console.log('beforeunload event triggered. Saving settings...'); // For debugging
+                indPgLib.saveSettingsToStorage(storageKey, elementSettingsConfig);
+                // DO NOT try to add confirmation dialogs or complex logic here.
+            });
+
             var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
             let baseCulture = '@System.Globalization.CultureInfo.CurrentCulture.';
 
@@ -1228,16 +1254,16 @@
 
             indPgLib.addPagerElementEventListeners();
             indPgLib.registerPageHandlers();
-            indPgLib.loadSettings('SellDocIndexView');
+            //Going to new setting management
+            indPgLib.applySettingsFromStorage(storageKey,elementSettingsConfig);
+            
             indPgLib.handleFiltersUi();
             currencyChanged();
             indPgLib.refreshData();
             indPgLib.rowSelectorsUi();
         });
 
-        $(window).on('beforeunload',
-            function(e) {
-                indPgLib.saveSettings('SellDocIndexView');
-            });
+      
     </script>
+    @ScriptHelper.RenderScripts(HttpContext)
 }

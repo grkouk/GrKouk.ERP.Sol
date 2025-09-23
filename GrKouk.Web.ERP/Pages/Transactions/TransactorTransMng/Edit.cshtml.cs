@@ -10,6 +10,7 @@ using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
+using GrKouk.Web.ERP.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -26,15 +27,17 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
         private readonly ApiDbContext _context;
         private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
+                private readonly ITransactorTransactionService _transService;
         public bool NotUpdatable;
         public bool InitialLoad = true;
         public int EntityInTransactionId { get; set; }
 
-        public EditModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public EditModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification, ITransactorTransactionService transService)
         {
             _context = context;
             _mapper = mapper;
             _toastNotification = toastNotification;
+            _transService = transService;
         }
 
         [BindProperty] public TransactorTransModifyDto ItemVm { get; set; }
@@ -83,152 +86,35 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
                 return Page();
             }
 
-            var spTransactionToAttach = _mapper.Map<TransactorTransaction>(ItemVm);
-
-            #region Fiscal Period
-
-            var fiscalPeriod = await HelperFunctions.GetFiscalPeriod(_context, ItemVm.TransDate);
-            if (fiscalPeriod == null)
+            try
             {
-                ModelState.AddModelError(string.Empty, "No Fiscal Period covers Transaction Date");
-                return Page();
-            }
-
-            #endregion
-
-            var docSeries =
-                _context.TransTransactorDocSeriesDefs.SingleOrDefault(m =>
-                    m.Id == spTransactionToAttach.TransTransactorDocSeriesId);
-
-            if (docSeries is null)
-            {
-                ModelState.AddModelError(string.Empty, "Δεν βρέθηκε η σειρά παραστατικού");
-                LoadCombos();
-                return Page();
-            }
-
-            _context.Entry(docSeries).Reference(t => t.TransTransactorDocTypeDef).Load();
-
-            var docTypeDef = docSeries.TransTransactorDocTypeDef;
-            _context.Entry(docTypeDef)
-                .Reference(t => t.TransTransactorDef)
-                .Load();
-            var transTransactorDef = docTypeDef.TransTransactorDef;
-
-            #region Section Management
-
-            int sectionId = 0;
-            if (docTypeDef.SectionId == 0)
-            {
-                var sectn = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == _sectionCode);
-                if (sectn == null)
+                var serviceResult = await _transService.ModifyTransactorTransaction(ItemVm);
+                if (serviceResult == null)
                 {
-                    ModelState.AddModelError(string.Empty, "Δεν υπάρχει το Section");
+                    ModelState.AddModelError(string.Empty, "Empty response from transactor service");
                     LoadCombos();
                     return Page();
                 }
 
-                sectionId = sectn.Id;
-            }
-            else
-            {
-                sectionId = docTypeDef.SectionId;
-            }
-
-            #endregion
-
-            var spOldTrans = await _context.TransactorTransactions
-                .Where(p => p.Id == ItemVm.Id)
-                .AsNoTracking()
-                .SingleOrDefaultAsync();
-            int oldTransSectionId = spOldTrans?.SectionId ?? sectionId;
-            await using (var transaction = await _context.Database.BeginTransactionAsync())
-            {
-                spTransactionToAttach.SectionId = sectionId;
-                spTransactionToAttach.FiscalPeriodId = fiscalPeriod.Id;
-                spTransactionToAttach.TransTransactorDocTypeId = docSeries.TransTransactorDocTypeDefId;
-                spTransactionToAttach.FinancialAction = transTransactorDef.FinancialTransAction;
-                ActionHandlers.TransactorFinAction(transTransactorDef.FinancialTransAction, spTransactionToAttach);
-                try
+                if (!serviceResult.Success)
                 {
-                    _context.Attach(spTransactionToAttach).State = EntityState.Modified;
-                    var docId = spTransactionToAttach.Id;
-                    _context.BuyDocTransPaymentMappings.RemoveRange(
-                        _context.BuyDocTransPaymentMappings
-                            .Where(p => p.TransactorTransactionId == docId));
-                    _context.SellDocTransPaymentMappings.RemoveRange(
-                        _context.SellDocTransPaymentMappings
-                            .Where(p => p.TransactorTransactionId == docId));
-                    _context.CashFlowAccountTransactions.RemoveRange(
-                        _context.CashFlowAccountTransactions.Where(p =>
-                            p.CreatorSectionId == oldTransSectionId && p.CreatorId == docId));
-                    if (ItemVm.CfAccountId > 0)
-                    {
-                        var cfaSeriesId = docSeries.DefaultCfaTransSeriesId;
-                        if (cfaSeriesId > 0)
-                        {
-                            var cfaSeries = await _context.CashFlowDocSeriesDefs.FindAsync(cfaSeriesId);
-                            if (cfaSeries != null)
-                            {
-                                await _context.Entry(cfaSeries)
-                                    .Reference(t => t.CashFlowDocTypeDefinition)
-                                    .LoadAsync();
-
-                                var cfaType = cfaSeries.CashFlowDocTypeDefinition;
-                                if (cfaType != null)
-                                {
-                                    await _context.Entry(cfaType)
-                                        .Reference(t => t.CashFlowTransactionDefinition)
-                                        .LoadAsync();
-                                    var transactor = await _context.Transactors
-                                        .Where(p => p.Id == ItemVm.TransactorId)
-                                        .AsNoTracking()
-                                        .SingleOrDefaultAsync();
-                                    var etiology =
-                                        $"{cfaSeries.Name} created from {docSeries.Name} for {transactor.Name} with {ItemVm.Etiology} ";
-                                    var cfaTransDef = cfaType.CashFlowTransactionDefinition;
-                                    var cfaTrans = new CashFlowAccountTransaction
-                                    {
-                                        TransDate = ItemVm.TransDate,
-                                        CashFlowAccountId = ItemVm.CfAccountId,
-                                        CompanyId = ItemVm.CompanyId,
-                                        DocumentSeriesId = cfaSeries.Id,
-                                        DocumentTypeId = cfaType.Id,
-                                        Etiology = ItemVm.Etiology,
-                                        FiscalPeriodId = spTransactionToAttach.FiscalPeriodId,
-                                        CreatorSectionId = sectionId,
-                                        CreatorId = spTransactionToAttach.Id,
-                                        RefCode = spTransactionToAttach.TransRefCode,
-                                        Amount = ItemVm.AmountSum,
-                                        SectionId = cfaType.SectionId > 0 ? cfaType.SectionId : sectionId
-                                    };
-                                    ActionHandlers.CashFlowFinAction(cfaTransDef.CfaAction, cfaTrans);
-                                    await _context.CashFlowAccountTransactions.AddAsync(cfaTrans);
-                                }
-                            }
-                        }
-                    }
-
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    await transaction.RollbackAsync();
-                    ModelState.AddModelError(string.Empty, "Concurrency error");
-                    LoadCombos();
-                    return Page();
-                }
-                catch (Exception ex)
-                {
-                    await transaction.RollbackAsync();
-                    string msg = $"Error  {ex.Message} inner exception->{ex.InnerException?.Message}";
+                    var msg = string.IsNullOrWhiteSpace(serviceResult.ErrorMessage)
+                        ? "Error from transactor service"
+                        : serviceResult.ErrorMessage;
                     ModelState.AddModelError(string.Empty, msg);
                     LoadCombos();
                     return Page();
                 }
+                _toastNotification.AddSuccessToastMessage("Transaction saved");
             }
-
+            catch (Exception e)
+            {
+                var msg = $"Error {e.Message} {e.InnerException?.Message}";
+                _toastNotification.AddErrorToastMessage(msg);
+                ModelState.AddModelError(string.Empty, msg);
+                LoadCombos();
+                return Page();
+            }
 
             return RedirectToPage("./Index");
         }
@@ -262,8 +148,8 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
                 // });
             }
 
-            ViewData["CompanyId"] =
-                new SelectList(_context.Companies.OrderBy(c => c.Code).AsNoTracking(), "Id", "Code");
+            ViewData["CompanyId"] = FiltersHelper.GetSolidCompaniesFilterList(_context);
+                //new SelectList(_context.Companies.OrderBy(c => c.Code).AsNoTracking(), "Id", "Code");
             ViewData["FiscalPeriodId"] =
                 new SelectList(_context.FiscalPeriods.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
             ViewData["TransactorId"] = new SelectList(transactorsList, "Value", "Text");

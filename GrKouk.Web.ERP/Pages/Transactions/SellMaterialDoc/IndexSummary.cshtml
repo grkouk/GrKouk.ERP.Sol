@@ -1,0 +1,1073 @@
+﻿@page
+@using GrKouk.Web.ERP.Helpers
+@model IndexSummaryModel
+
+@{
+    ViewData["Title"] = "Ημερήσια Παραστατικά Πώλησης";
+}
+
+@section MyCss
+{
+    <link rel="stylesheet" href="~/css/custom-checkbox.css" />
+    <link rel="stylesheet" href="~/css/searchbar.css" />
+    <link rel="stylesheet" href="~/css/search-modal.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-select/css/bootstrap-select.min.css" />
+}
+
+<input type="hidden" id="initialPageTitle" value="@ViewData["Title"]" />
+<h4 id="hElementTitle">@ViewData["Title"]</h4>
+
+<div class="container ">
+    <ul class="nav small justify-content-end ">
+       
+        <li class="nav-item dropdown ">
+            <a class="btn btn-sm btn-outline-secondary dropdown-toggle" role="button" id="ddDiarys" data-bs-toggle="dropdown"
+               aria-haspopup="true" aria-expanded="false">Ημερολόγια</a>
+
+            <div class="dropdown-menu small " name="diaryDropDownMenu">
+                <h6 class="dropdown-header">Σχετικά Ημερολόγια</h6>
+                <a class="dropdown-item small diaryLink">
+                </a>
+            </div>
+        </li>
+       
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="collapse" data-bs-target="#filterCollapse" role="button" id="filtersToggle"
+               aria-expanded="false" aria-controls="filterCollapse">
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="collapse" href="#" id="rowSelectorsToggle" role="button">
+
+            </a>
+            @*<a class="nav-link disabled" href="#" tabindex="-1" >Selectors</a>*@
+        </li>
+        <li class="nav-item dropdown " id="SelectedRowsActionsMenu">
+            <a class="nav-link dropdown-toggle disabled" role="button" id="ddSelectedRowsActions" data-bs-toggle="dropdown"
+               aria-haspopup="true" aria-expanded="false">
+                Actions
+            </a>
+            <div class="dropdown-menu small">
+               
+              
+                <a class="dropdown-item" href="#">Something else here</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">Separated link</a>
+
+            </div>
+        </li>
+    </ul>
+</div>
+
+
+@await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { })
+
+
+<div class="row mt-1">
+    <partial name="_PagerPartial" />
+</div>
+<partial name="_DataTable" />
+
+<div class="row">
+    <partial name="_PagerPartial" />
+</div>
+
+<!-- Modal -->
+<partial name="_LoadMePartial" />
+
+<!-- Modal Item selector for payments -->
+<div class="modal fade" id="itemSelector" tabindex="-1" role="dialog" aria-labelledby="itemsModalLabel" aria-hidden="true" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-lg" style="overflow-y: scroll; max-height:75%;  margin-top: 50px; margin-bottom:50px;" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="container-fluid">
+                    <div class="row mb-1">
+                        <div class="col-6">
+                            <p class="modal-title font-weight-bold" id="itemsModalLabel">Selector</p>
+                        </div>
+                        <div class="col-6 text-end">
+
+                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            <h3 id="docAmount">0</h3>
+                            <span class="text-muted">Doc Amount</span>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <h3 id="tocover">0</h3>
+                            <span class="text-muted">To Cover</span>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <h3 id="covered">0</h3>
+                            <span class="text-muted">Covered</span>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <h3 id="remaining">0</h3>
+                            <span class="text-muted">Remaining</span>
+                        </div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-11">
+                            <input class="form-control form-control-sm" name="itemsSearchText" placeholder="Search text" type="text" />
+
+                        </div>
+                        <div class="col-1">
+                            <span class="spinner-border spinner-border-sm text-primary" id="SpinnerLoader" style="display: none"></span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body ">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <table class="table table-bordered table-sm" id="selectorItemsList">
+                                <thead class="thead-light">
+
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="SaveItemSelector">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/lib/bootstrap-select/js/bootstrap-select.min.js"></script>
+    @* <script src="~/js/moment.min.js"></script> *@
+    <script src="~/js/moment-with-locales.min.js"></script>
+    <script src="~/js/definitions.js"></script>
+    <script src="~/js/filterManagement.lib.js"></script>
+    <script src="~/js/indexPageIIFE.lib.js"></script>
+    <script>
+        $(document).ready(function () {
+            const storageKey = 'SellDocIndexViewNew';
+            const elementSettingsConfig = {
+                // Element ID: { key: storageKey, default: defaultValue, prop: propertyToSetOrRead }
+                // 'pageIndex':                 { key: 'pageIndex',                 default: 1,           prop: 'value' },
+                'PageSize':                  { key: 'pageSize',                  default: 10,          prop: 'value' },
+                'filtersVisible':            { key: 'filtersVisible',            default: true,        prop: 'value' },
+                'rowSelectorsVisible':       { key: 'rowSelectorsVisible',       default: false,       prop: 'value' },
+                'DatePeriodFilter':          { key: 'dateRangeFilter',           default: 'CURYEAR',   prop: 'value' },
+                'CompanyFilter':             { key: 'companyFilter',             default: 0,           prop: 'value' },
+                //  'TransactorTypeFilter':      { key: 'transactorTypeFilter',      default: 1,           prop: 'value' },
+                //'WarehouseItemNatureFilter': { key: 'warehouseItemNatureFilter', default: 1,           prop: 'value' },
+                'currentSort':               { key: 'currentSort',               default: 'datesort:asc',prop: 'value' },
+                'CurrencySelector':          { key: 'currentCurrency',           default: 1,          prop: 'value' },
+                'fromDateFilterEl':          { key: 'fromDateFilter',           default: '',          prop: 'value' },
+                'toDateFilterEl':          { key: 'toDateFilter',           default: '',          prop: 'value' },
+                // 'ShowCarryOnFlt':            { key: 'ShowCarryOnFlt',            default: true,        prop: 'checked'} // Reads the 'checked' property
+            };
+            window.addEventListener('beforeunload', function(event) {
+                console.log('beforeunload event triggered. Saving settings...'); // For debugging
+                indPgLib.saveSettingsToStorage(storageKey, elementSettingsConfig);
+                // DO NOT try to add confirmation dialogs or complex logic here.
+            });
+
+            var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
+            let baseCulture = '@System.Globalization.CultureInfo.CurrentCulture.';
+
+            var formatterCurrency = new Intl.NumberFormat(currentCulture,
+                {
+                    style: 'currency',
+                    currency: 'EUR',
+                    minimumFractionDigits: 2
+                });
+            var formatterNumber = new Intl.NumberFormat(currentCulture,
+                {
+                    maximumFractionDigits: 3
+
+                });
+            //#region variables
+
+            var $deleteSelectedRowsLink = $('#deleteSelectedRows');
+            var currencyListJs = @Html.Raw(Json.Serialize(ViewBag.CurrencyListJs));
+            //#endregion
+              //#region Index page definition objects
+            const colDefs = [
+                {
+                    key: 'transDate',
+                    responseKey: 'transDate',
+                    actualVal: '',
+                    columnFormat: 'd',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: 'TransactionDateSort',
+                    sortType: 'numeric',
+                    header: 'Date',
+                    text: '',
+                    headerClass: 'small text-center ',
+                    class: 'small',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {}
+                },
+                {
+                    key: 'transactorName',
+                    responseKey: 'transactorName',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: 'label',
+                    grandTotalKey: 'label',
+                    totalFormatter: '',
+                    sortKey: 'TransactorNameSort',
+                    sortType: 'alpha',
+                    header: 'Transactor',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {
+                        isRemoteReference: true,
+                        valueKey: 'transactorId',
+                        url: '@Url.Page("/mainentities/transactors/details")?id='
+                    }
+                },
+                {
+                    key: 'sellDocSeriesCode',
+                    responseKey: 'sellDocSeriesCode',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: 'SeriesCodeSort',
+                    sortType: 'alpha',
+                    header: 'Series',
+                    text: '',
+                    headerClass: 'small text-center d-none d-md-table-cell',
+                    class: 'small d-none d-md-table-cell ',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {}
+                },
+               
+                {
+                    key: 'companyCode',
+                    responseKey: 'companyCode',
+                    actualVal: '',
+                    columnFormat: 't',
+                    totalKey: '',
+                    grandTotalKey: '',
+                    totalFormatter: '',
+                    sortKey: 'CompanyCodeSort',
+                    sortType: 'alpha',
+                    header: 'Company',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small ',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {}
+                },
+                {
+                    key: 'totalNetAmount',
+                    responseKey: 'totalNetAmount',
+                    actualVal: '',
+                    columnFormat: 'c',
+                    totalKey: 'sumOfNetAmount',
+                    grandTotalKey: 'grandSumOfNetAmount',
+                    totalFormatter: 'currency',
+                    sortKey: '',
+                    sortType: '',
+                    header: 'Net Amount',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small text-end',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {}
+                },
+                {
+                    key: 'totalAmount',
+                    responseKey: 'totalAmount',
+                    actualVal: '',
+                    columnFormat: 'c',
+                    totalKey: 'sumOfAmount',
+                    grandTotalKey: 'grandSumOfAmount',
+                    totalFormatter: 'currency',
+                    sortKey: '',
+                    sortType: '',
+                    header: 'Amount',
+                    text: '',
+                    headerClass: 'small text-center',
+                    class: 'small text-end',
+                    classWhenCondition: '',
+                    classCondition: {},
+                    remoteReference: {}
+                }
+            ];
+            const actionColDefs = [
+                
+            ];
+            const actionColSubDefs = [
+               
+            ];
+            const actionMobileColDefs = [
+              
+            ];
+            const tableHandlersToRegister = [
+               
+
+
+            ];
+            const pageHandlersToRegister = [
+                {
+                    selector:'#CurrencySelector',
+                    event:'change',
+                    handler: function(event) {
+                        currencyChanged();
+                        indPgLib.refreshData();
+                    }
+                }
+
+
+            ];
+            const indexPageDef = {
+                uri: '/api/GrKoukInfoApi/GetIndexTblDataSellDocumentsDaily',
+                currencyFormatter: formatterCurrency,
+                numberFormatter: formatterNumber,
+                colDefs: colDefs,
+                actionColDefs: actionColDefs,
+                actionColSubDefs: actionColSubDefs,
+                actionMobileColDefs: actionMobileColDefs,
+                tableHandlersToRegister:tableHandlersToRegister,
+                pageHandlersToRegister:pageHandlersToRegister,
+                afterTableLoad: {
+                    callback: function (valueSource) {
+                        loadDiaries(valueSource.diaries);
+                    }
+                }
+            };
+
+            indPgLib.setIndexPageDefinition(indexPageDef);
+            //#endregion
+
+            //#region items selectors modals
+            $.fn.selectpicker.Constructor.BootstrapVersion = '4';
+            var selectedCompanies = "";
+            var selectedNatures = "";
+            var selectedTransTypes = "";
+            var curSelectorType = "";
+            let selectedDocumentId = 0;
+
+            const setPaymentsFromCustomersSelectorCurrentSort = (currentSort) => {
+                var filtersArr = [];
+                filtersArr.push({
+                    filterKey: 'currentSort',
+                    filterValue: currentSort
+                });
+                let sessionVal = JSON.stringify(filtersArr);
+
+                localStorage.setItem('PaymentFromCustomersSelectorStore', sessionVal);
+            };
+            const getPaymentsFromCustomersSelectorCurrentSort = () => {
+                var storageItemJs = localStorage.getItem('PaymentFromCustomersSelectorStore');
+                if (storageItemJs === undefined || storageItemJs === null) {
+                    return "";
+                } else {
+
+                    var storageItem = JSON.parse(storageItemJs);
+                    try {
+                        let filtersValue = storageItem.find(x => x.filterKey === 'currentSort').filterValue;
+                        return filtersValue;
+                    } catch (e) {
+                        return "";
+                    }
+                }
+            };
+
+            var getPaymentsFromCustomersList = (docId, selCompanies, searchFilter, sortData, pageSize, displayCurrencyId, selectionCallback) => {
+                var timeout;
+                let pageIndex = 1;
+                let uri = '/api/GrKoukInfoApi/GetSelectorPaymentsFromCustomersItems';
+                uri += `?`;
+                uri += `pageIndex=${pageIndex}`;
+                uri += `&pageSize=${pageSize}`;
+                uri += `&companyFilter=${selCompanies}`;
+                uri += `&sortData=${sortData}`;
+                uri += `&documentId=${docId}`;
+                uri += `&searchFilter=${searchFilter}`;
+                uri += `&displayCurrencyId=${displayCurrencyId}`;
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'GET',
+                    url: uri,
+                    beforeSend: function () {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        timeout = setTimeout(function () {
+                            $('#SpinnerLoader').show();
+
+                        },
+                            1000);
+                    },
+                    success: function (result) {
+                        $('#selectorItemsList > tbody').empty();
+                        $('#selectorItemsList > thead').empty();
+                        let colDefs = [
+                            {
+                                key: 'transDate',
+                                responseKey: 'transDate',
+                                sortKey: 'TransDateSort',
+                                sortType: 'numeric',
+                                header: 'Date',
+                                text: '',
+                                actualVal: '',
+                                columnFormat: 'd',
+                                headerClass: 'small text-center d-none d-md-table-cell',
+                                class: 'small d-none d-md-table-cell'
+                            },
+                            {
+                                key: 'docSeriesCode',
+                                responseKey: 'docSeriesCode',
+                                sortKey: 'DocSeriesCodeSort',
+                                sortType: 'alpha',
+                                header: 'Doc Series',
+                                text: '',
+                                actualVal: '',
+                                columnFormat: 't',
+                                headerClass: 'small text-center',
+                                class: 'small'
+                            },
+                            {
+                                key: 'totalAmount',
+                                responseKey: 'totalAmount',
+                                sortKey: '',
+                                sortType: 'numeric',
+                                header: 'Amount',
+                                text: '',
+                                actualVal: '',
+                                columnFormat: 'c',
+                                headerClass: 'small text-center',
+                                class: 'small text-right '
+                            },
+                            {
+                                key: 'amountUsedInPayments',
+                                responseKey: 'amountUsedInPayments',
+                                sortKey: '',
+                                sortType: 'numeric',
+                                header: 'Already Used Amount',
+                                text: '',
+                                actualVal: '',
+                                columnFormat: 'c',
+                                headerClass: 'small text-center',
+                                class: 'small text-right '
+                            },
+                            {
+                                key: 'companyCode',
+                                responseKey: 'companyCode',
+                                sortKey: 'CompanyCodeSort',
+                                sortType: 'alpha',
+                                header: 'Company',
+                                text: '',
+                                actualVal: '',
+                                columnFormat: 't',
+                                headerClass: 'small text-center',
+                                class: 'small'
+                            },
+                            {
+                                key: 'amountReserved',
+                                responseKey: '',
+                                sortKey: '',
+                                sortType: 'numeric',
+                                header: 'Reserved Amount',
+                                text: '',
+                                actualVal: '',
+                                columnFormat: 'c',
+                                headerClass: 'small text-center',
+                                class: 'small text-right text-primary'
+                            }
+                        ];
+                        let curSortUndefined = false;
+                        let curSortAr = [];
+                        var curSort = getPaymentsFromCustomersSelectorCurrentSort();
+                        if (curSort === undefined || curSort === null || curSort.length === 0) {
+                            curSortUndefined = true;
+                        } else {
+                            curSortAr = curSort.split(':');
+                        }
+                        var $trHead = $('<tr>');
+                        colDefs.forEach(function (item) {
+                            //var $tdColHead = $('<th>').text(item.header).addClass(item.class);
+                            var tdColHead = '';
+                            if (item.sortKey.length !== 0) {
+                                let colHtml = "";
+                                colHtml = `<th class="${item.headerClass}"> `;
+                                colHtml += `<a href="#" role="button" name="SelectorSortHeader" tabindex="-1" `;
+                                colHtml += `data-sortkey="${item.sortKey}" data-sorttype="${item.sortType}">  `;
+                                colHtml += `${item.header}  `;
+                                colHtml += `</a>  `;
+                                if (curSortUndefined) {
+                                    colHtml += `<i class="" name="SortIcon"></i>  `;
+                                } else {
+                                    if (curSortAr[0] === item.sortKey) {
+
+                                        var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
+                                        var iconSortType = "fas fa-sort-" + item.sortType + newSortIconType;
+                                        colHtml += `<i class="${iconSortType}" name="SortIcon"></i>  `;
+                                    } else {
+                                        colHtml += `<i class="" name="SortIcon"></i>  `;
+                                    }
+                                }
+
+                                colHtml += `</a>  `;
+                                tdColHead = colHtml;
+                            } else {
+                                tdColHead = $('<th>').text(item.header).addClass(item.headerClass);
+                            }
+                            $trHead.append($(tdColHead));
+                        });
+                        $trHead.append($('<th>'));
+                        $trHead.appendTo('#selectorItemsList > thead');
+
+                        let docAmount = formatterCurrency.format(result.sumOfAmount);
+                        let docAmountVal = parseFloat(result.sumOfAmount);
+                        let $docAmount = $('#docAmount');
+                        $docAmount.text(docAmount);
+                        $docAmount.attr('data-actualValue', docAmountVal);
+
+                        let covered = formatterCurrency.format(0);
+
+                        let $covered = $('#covered');
+                        $covered.text(covered);
+                        $covered.attr('data-actualValue', 0);
+
+                        let coveredVal = parseFloat(result.sumOfPayedAmount);
+                        let toCoverVal = docAmountVal - coveredVal;
+                        let toCover = formatterCurrency.format(toCoverVal);
+                        let $toCover = $('#tocover');
+                        $toCover.text(toCover);
+                        $toCover.attr('data-actualValue', toCoverVal);
+
+                        let remainingVal = docAmountVal - coveredVal;
+                        let remaining = formatterCurrency.format(remainingVal);
+                        let $remaining = $('#remaining');
+                        $remaining.text(remaining);
+                        $remaining.attr('data-actualValue', remainingVal);
+
+                        $.each(result.data,
+                            function (index, value) {
+                                var itemId = value.id;
+                                var $tr = $('<tr>');
+                                colDefs.forEach(function (col) {
+
+                                    let $tdCol = $('<td>');
+                                    if (col.responseKey) {
+                                        switch (col.columnFormat) {
+                                            case 't':
+                                                $tdCol.text(value[col.responseKey]);
+                                                break;
+                                            case 'd':
+                                                $tdCol.text(moment(value[col.responseKey]).format('DD/MM/YYYY'));
+                                                break;
+                                            case 'c':
+                                                $tdCol.text(formatterCurrency.format(value[col.responseKey]));
+                                                $tdCol.attr('data-actualValue', value[col.responseKey]);
+                                                break;
+                                            default:
+                                        }
+                                    } else {
+                                        switch (col.columnFormat) {
+                                            case 't':
+                                                break;
+                                            case 'd':
+                                                break;
+                                            case 'c':
+                                                $tdCol.attr('data-actualValue', 0);
+                                                break;
+                                            default:
+                                        }
+                                    }
+                                    $tdCol.addClass(col.class);
+                                    $tr.append($tdCol);
+
+                                });
+                                var actionsCol = '<td class="small text-center">';
+                                actionsCol += '<input type="checkbox"  ';
+                                actionsCol += `data-itemId="${itemId}"`;
+                                actionsCol += 'name="selectItem"/>';
+                                //actionsCol +='<span><i class="far fa-check-square fa-lg" style="color:slategray"></i></span>';
+                                actionsCol += '</td>';
+
+                                $tr.append(actionsCol);
+                                $tr.appendTo('#selectorItemsList > tbody');
+
+                            });
+
+                        $('[name=selectItem]').on('click',
+                            function (event) {
+                                var checkInput = $(event.delegateTarget);
+                                var itemId = checkInput.data('itemid');
+                                let isChecked = checkInput.prop('checked');
+                                var amount = checkInput.parents('tr').find('td:eq(2)').attr('data-actualValue');
+                                var amountVal = parseFloat(amount);
+                                var usedAmount = checkInput.parents('tr').find('td:eq(3)').attr('data-actualValue');
+                                var usedAmountVal = parseFloat(usedAmount);
+                                var $reservedAmount = checkInput.parents('tr').find('td:eq(5)');
+                                var reservedAmount = $reservedAmount.attr('data-actualValue');
+                                var reservedAmountVal = parseFloat(reservedAmount);
+                                let availableAmount = amountVal - usedAmountVal - reservedAmountVal;
+                                let $docAmount = $('#docAmount');
+                                let docAmountVal = parseFloat($docAmount.attr('data-actualValue'));
+
+                                let $toCover = $('#tocover');
+                                let toCoverVal = parseFloat($toCover.attr('data-actualValue'));
+
+                                let $covered = $('#covered');
+                                let coveredVal = parseFloat($covered.attr('data-actualValue'));
+                                //let coveredVal = parseFloat('0');
+                                let $remaining = $('#remaining');
+                                //toCoverVal = docAmountVal - coveredVal;
+                                let remainingVal = parseFloat($remaining.attr('data-actualValue'));
+                                if (remainingVal <= 0 && isChecked) {
+                                    event.preventDefault();
+                                    return;
+                                }
+                                if (availableAmount > toCoverVal && isChecked) {
+                                    availableAmount = toCoverVal;
+                                }
+
+                                if (isChecked) {
+                                    //var tcv = toCoverVal;
+                                    //toCoverVal = toCoverVal - availableAmount;
+                                    coveredVal = coveredVal + availableAmount;
+                                    remainingVal = toCoverVal - coveredVal;
+                                    reservedAmountVal = availableAmount;
+
+
+                                } else {
+                                    // var tcv1 = toCoverVal;
+                                    //toCoverVal = toCoverVal + reservedAmountVal;
+                                    coveredVal = coveredVal - reservedAmountVal;
+                                    remainingVal = remainingVal + reservedAmountVal;
+                                    reservedAmountVal = 0;
+                                }
+                                $toCover.attr('data-actualValue', toCoverVal);
+                                $covered.attr('data-actualValue', coveredVal);
+                                $remaining.attr('data-actualValue', remainingVal);
+                                $reservedAmount.attr('data-actualValue', reservedAmountVal);
+                                $reservedAmount.text(formatterCurrency.format(reservedAmountVal));
+
+                                let toCover = formatterCurrency.format(toCoverVal);
+                                $toCover.text(toCover);
+                                let covered = formatterCurrency.format(coveredVal);
+                                $covered.text(covered);
+                                let remaining = formatterCurrency.format(remainingVal);
+                                $remaining.text(remaining);
+                                console.log('Inside click event handler for selectItem');
+
+                                //selectionCallback(productId);
+                                //$('#itemSelector').modal('hide');
+
+                            });
+                        $('[name=SelectorSortHeader]').on('click',
+                            function (event) {
+                                var button = $(event.delegateTarget);
+                                var reqSort = button.data('sortkey');
+                                let reqSortType = button.data('sorttype');
+                                let iconSortType = '';
+                                var newSortVal = '';
+                                var curSort = getPaymentsFromCustomersSelectorCurrentSort();
+                                if (curSort === undefined || curSort === null || curSort.length === 0) {
+                                    curSort = reqSort + ':desc';
+                                }
+                                var curSortAr = curSort.split(':');
+                                if (curSortAr[0] === reqSort) {
+                                    var newSort = curSortAr[1] === 'asc' ? 'desc' : 'asc';
+                                    var newSortIconType = curSortAr[1] === 'asc' ? '-down' : '-up';
+                                    newSortVal = curSortAr[0] + ':' + newSort;
+                                    iconSortType = "fas fa-sort-" + reqSortType + newSortIconType;
+                                } else {
+                                    newSortVal = reqSort + ':asc';
+                                    iconSortType = "fas fa-sort-" + reqSortType + "-up";
+                                }
+                                let $btParent = button.parent();
+                                let $icon = $btParent.find('i:eq(0)');
+                                if ($icon !== null) {
+                                    $icon.removeClass();
+                                    $icon.addClass(iconSortType);
+                                }
+
+                                setPaymentsFromCustomersSelectorCurrentSort(newSortVal);
+                                //$('#pageIndex').val(1);
+                                var $dcId = $('#CurrencySelector');
+
+                                var displayCurrencyId = $dcId.val() == null || $dcId.val().length == 0
+                                    ? 1
+                                    : parseInt($dcId.val());
+                                getPaymentsFromCustomersList(selectedDocumentId, '', '', newSortVal, 100, displayCurrencyId, '');
+
+
+                            });
+                    },
+                    complete:
+                        function () {
+                            if (timeout) {
+                                clearTimeout(timeout);
+                            }
+                            $("#loadMe").modal("hide");
+                            setTimeout(function () {
+                                console.log('Checking for open modals');
+                                //var isOpen = $('#loadMe').hasClass('show');
+                                var isOpen = $('#SpinnerLoader').is(':visible');
+                                if (isOpen) {
+                                    console.log('Spinner is showing');
+
+                                    $('#SpinnerLoader').hide();
+                                } else {
+                                    console.log('No open modal');
+                                }
+                            },
+                                2000);
+                        },
+                    error: function (e) {
+                        console.log(e);
+
+                    }
+                });
+            };
+
+            $('#itemSelector').on('show.bs.modal',
+                function (event) {
+                    var button = $(event.relatedTarget);
+                    var selectorType = button.data('selectortype');
+                    selectedDocumentId = button.data('docid');
+                    var modal = $(this);
+                    var $dcId = $('#CurrencySelector');
+
+                    var displayCurrencyId = $dcId.val() == null || $dcId.val().length == 0
+                        ? 1
+                        : parseInt($dcId.val());
+                    switch (selectorType) {
+                        case "SalePaymentsSelector":
+                            modal.find('.modal-title').text("Ευρετήριο Εισπράξεων από Πελάτες");
+
+                            curSelectorType = "SalePaymentsSelector";
+                            getPaymentsFromCustomersList(selectedDocumentId, '', '', '', 100, displayCurrencyId, '');
+                            break;
+
+
+                        default:
+                    }
+
+                });
+
+
+            var timeKey;
+            $('[name=itemsSearchText]').on('keyup',
+                function (event) {
+                    //var button = $(event.relatedTarget);
+
+                    var $this = $(this);
+                    console.log("Inside keyUp event");
+                    //var searchText = $('[name=itemsSearchText]').val();
+                    var searchText = $this.val();
+                    if (searchText.length === 0) {
+                        console.log("search text lenght 0 returning");
+                        return;
+                    }
+                    if (timeKey) {
+                        console.log("Clear timeKey");
+                        clearTimeout(timeKey);
+                    }
+                    timeKey = setTimeout(function () {
+                        console.log("Will execute get request in 1 sec!");
+
+                        switch (curSelectorType) {
+                            case "ProductsSelector":
+
+                                break;
+                            case "SuppliersSelector":
+                                break;
+                            default:
+                        }
+
+                        $('#itemSelector').modal('handleUpdate');
+                    },
+                        1000);
+                });
+            const saveMappings = (data) => {
+                return $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'POST',
+                    url: "/api/Materials/AddSalePaymentMappingList",
+                    data: data,
+
+                    success: function (result) {
+                        toastr.success("Saved Mappings", "Saved Mappings");
+                    },
+                    error: function (e) {
+                        console.log('Error saving ');
+                        console.log(e);
+                        var r = e.responseJSON.error;
+                        toastr.error(r, "saveData");
+                    }
+                });
+            };
+            $('#SaveItemSelector').on('click',
+                function (e) {
+                    console.log('Modal save button clicked');
+
+                    var linesArr = [];
+                    linesArr.length = 0;
+
+                    $.each($("#selectorItemsList tbody tr"),
+                        function () {
+                            var checkbox = $(this).find('td:eq(6)').children('input')[0];
+                            var itemId = $(checkbox).attr('data-itemId');
+                            let isChecked = checkbox.checked;
+                            if (isChecked) {
+                                linesArr.push({
+                                    receiptId: itemId,
+                                    amountUsed: $(this).find('td:eq(5)').attr('data-actualValue')
+                                });
+                            }
+
+                        });
+                    var $curSelector = $('#CurrencySelector');
+
+                    var displayCurrencyId = $curSelector.val() == null || $curSelector.val().length == 0
+                        ? 1
+                        : parseInt($curSelector.val());
+                    var data = JSON.stringify({
+                        docId: selectedDocumentId,
+                        displayCurrencyId: displayCurrencyId,
+                        paymentMappingLines: linesArr
+
+                    });
+                    $.when(saveMappings(data))
+                        .then(function (response) {
+                            console.log(response);
+                            $('#itemSelector').modal('hide');
+                            indPgLib.refreshData();
+                        })
+                        .fail(function (err) {
+                            console.log(err);
+                            //toastr.error(e.toString(), "when SaveData");
+                        });
+
+
+                });
+
+            const transactorSelected = (transactorId) => {
+
+            };
+            const productSelected = (productId) => {
+
+            };
+            //#endregion
+            const loadDiaries = (availableDiarys) => {
+                var $diaryDd = $('[name=diaryDropDownMenu]');
+                $('.diaryLink').remove();
+                if (availableDiarys === undefined || availableDiarys === null) {
+                    return;
+                }
+                var d = availableDiarys;
+
+                d.forEach(function (item) {
+                    var $aLink = $('<a>').addClass('dropdown-item small diaryLink');
+                    $aLink.text(item.text);
+                    var diaryHRef = '/transactions/sellmaterialdoc/salesDiary';
+                    diaryHRef += `?diaryId=${item.value}`;
+                    $aLink.attr('href', diaryHRef);
+                    $aLink.attr('target', '_blank');
+                    $diaryDd.append($aLink);
+                });
+
+            };
+            const payOfDocument = (docId) => {
+                var timeout;
+                let idsToHandle = [];
+                let id = parseInt(docId);
+                idsToHandle.push(id);
+                var dataJs = JSON.stringify({
+                    ids: idsToHandle
+                });
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'POST',
+                    data: dataJs,
+                    url: "/api/materials/AddSalePaymentMapping",
+                    beforeSend: function () {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        timeout = setTimeout(function () {
+
+                            $("#loadMe").modal({
+                                backdrop: "static", //remove ability to close modal with click
+                                keyboard: false, //remove option to close with keyboard
+                                show: true //Display loader!
+                            });
+                        },
+                            1000);
+
+                    },
+                    success: function (result) {
+                        console.log(result);
+                        toastr.success(result.message);
+                        indPgLib.refreshData();
+
+                    },
+                    complete: function () {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                        }
+                        $("#loadMe").modal("hide");
+                        setTimeout(function () {
+                            console.log('Checking for open modals');
+                            var isOpen = $('#loadMe').hasClass('show');
+                            if (isOpen) {
+                                console.log('There is an open Modal');
+                                $("#loadMe").modal("hide");
+                            } else {
+                                console.log('No open modal');
+                            }
+                        },
+                            2000);
+                    },
+                    error: function (e) {
+                        console.log(e);
+                        let message = e.responseJSON.errorMessage;
+                        toastr.error("Error", message);
+
+                    }
+                });
+            };
+
+
+            var deleteSelectedRows = () => {
+                var $rowSelectors = $('input[name=checkTableRow]');
+                var selectedRows = $rowSelectors.filter(':checked');
+                var idsToDelete = [];
+                $.each(selectedRows,
+                    function(key, value) {
+                        console.log(value);
+                        var id = parseInt(value.dataset.itemid);
+                        idsToDelete.push(id);
+                    });
+                if (idsToDelete.length > 0) {
+                    var idsJs = JSON.stringify({
+                        //ToDo: Change this
+                        section: 'SectionCode',
+                        ids: idsToDelete
+                    });
+                    var timeout;
+
+                    $.ajax({
+                        contentType: 'application/json; charset=utf-8',
+
+                        dataType: 'json',
+                        type: 'POST',
+                        data: idsJs,
+                        url: "/api/GrkoukInfoApi/DeletesellDocumentsList",
+                        beforeSend: function() {
+                            if (timeout) {
+                                clearTimeout(timeout);
+                            }
+                            timeout = setTimeout(function() {
+
+                                    $("#loadMe").modal({
+                                        backdrop: "static", //remove ability to close modal with click
+                                        keyboard: false, //remove option to close with keyboard
+                                        show: true //Display loader!
+                                    });
+                                },
+                                1000);
+
+                        },
+                        success: function(result) {
+                            console.log(result);
+                            toastr.success("Delete", result.message);
+                            indPgLib.refreshData();
+
+                        },
+                        complete: function() {
+                            if (timeout) {
+                                clearTimeout(timeout);
+                            }
+                            $("#loadMe").modal("hide");
+                            setTimeout(function() {
+                                    console.log('Checking for open modals');
+                                    var isOpen = $('#loadMe').hasClass('show');
+                                    if (isOpen) {
+                                        console.log('There is an open Modal');
+                                        $("#loadMe").modal("hide");
+                                    } else {
+                                        console.log('No open modal');
+                                    }
+                                },
+                                2000);
+                        },
+                        error: function (e) {
+                            console.log(e);
+                            toastr.error("Error", e.responseJSON.error);
+
+                        }
+                    });
+
+                }
+
+            };
+
+            $deleteSelectedRowsLink.on('click',
+                () => {
+                   //deleteSelectedRows();
+                });
+
+
+            var currencyChanged = () => {
+                let curCurrencySelected = parseInt($('#CurrencySelector').val());
+                var currencyCode;
+                try {
+                    let currentCurrency = currencyListJs.find(x => x.id === curCurrencySelected);
+                    currencyCode = currentCurrency.code;
+                    let locale = currentCurrency.displayLocale;
+                    formatterCurrency = new Intl.NumberFormat(locale,
+                        {
+                            style: 'currency',
+                            currency: currencyCode,
+                            minimumFractionDigits: 2
+                        });
+                     indPgLib.setCurrencyFormatter(formatterCurrency);
+                } catch (e) {
+                    //not found keep old formater or maybe create a default one
+                    console.log('Not found currency code for this id');
+                }
+            };
+
+            indPgLib.addPagerElementEventListeners();
+            indPgLib.registerPageHandlers();
+            //Going to new setting management
+            indPgLib.applySettingsFromStorage(storageKey,elementSettingsConfig);
+            
+            indPgLib.handleFiltersUi();
+            currencyChanged();
+            indPgLib.refreshData();
+            indPgLib.rowSelectorsUi();
+        });
+
+      
+    </script>
+    @ScriptHelper.RenderScripts(HttpContext)
+}

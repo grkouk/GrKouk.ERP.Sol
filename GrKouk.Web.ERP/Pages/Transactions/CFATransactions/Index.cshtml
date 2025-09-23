@@ -3,14 +3,15 @@
 @model IndexModel
 
 @{
-    ViewData["Title"] = "CFA Transactions";
+    ViewData["Title"] = "Κινήσεις Χρηματικών Λογαριασμών";
 }
 @section MyCss
     {
     <link rel="stylesheet" href="~/css/custom-checkbox.css" />
     <link rel="stylesheet" href="~/css/searchbar.css" />
 }
-<h4>CFA Transactions Index</h4>
+<input type="hidden" id="initialPageTitle" value="@ViewData["Title"]" />
+<h4 id="hElementTitle">@ViewData["Title"]</h4>
 
 <div class="container ">
     <ul class="nav small justify-content-end ">
@@ -58,11 +59,39 @@
 
 @section Scripts
 {
-    <script src="~/js/moment.min.js"></script>
+    @* <script src="~/js/moment.min.js"></script> *@
+    <script src="~/js/moment-with-locales.min.js"></script>
     <script src="~/js/definitions.js"></script>
+    <script src="~/js/filterManagement.lib.js"></script>
     <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
         $(document).ready(function() {
+            const storageKey = 'CfaTransIndexViewNew';
+            const elementSettingsConfig = {
+                // Element ID: { key: storageKey, default: defaultValue, prop: propertyToSetOrRead }
+                // 'pageIndex':                 { key: 'pageIndex',                 default: 1,           prop: 'value' },
+                'PageSize':                  { key: 'pageSize',                  default: 10,          prop: 'value' },
+                'filtersVisible':            { key: 'filtersVisible',            default: true,        prop: 'value' },
+                'rowSelectorsVisible':       { key: 'rowSelectorsVisible',       default: false,       prop: 'value' },
+                'DatePeriodFilter':          { key: 'dateRangeFilter',           default: 'CURYEAR',   prop: 'value' },
+                'CompanyFilter':             { key: 'companyFilter',             default: 0,           prop: 'value' },
+                //  'TransactorTypeFilter':      { key: 'transactorTypeFilter',      default: 1,           prop: 'value' },
+                //'WarehouseItemNatureFilter': { key: 'warehouseItemNatureFilter', default: 1,           prop: 'value' },
+                'currentSort':               { key: 'currentSort',               default: 'datesort:asc',prop: 'value' },
+                'CurrencySelector':          { key: 'currentCurrency',           default: 1,          prop: 'value' },
+                'fromDateFilterEl':          { key: 'fromDateFilter',           default: '',          prop: 'value' },
+                'toDateFilterEl':          { key: 'toDateFilter',           default: '',          prop: 'value' },
+                // 'ShowCarryOnFlt':            { key: 'ShowCarryOnFlt',            default: true,        prop: 'checked'} 
+            };
+            // --- Page Hide Event Listener (Replaces unload) ---
+
+            window.addEventListener('beforeunload', function(event) {
+                console.log('beforeunload event triggered. Saving settings...'); // For debugging
+                indPgLib.saveSettingsToStorage(storageKey, elementSettingsConfig);
+                // DO NOT try to add confirmation dialogs or complex logic here.
+            });
+
+
             var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
             let baseCulture = '@System.Globalization.CultureInfo.CurrentCulture.';
             var formatterCurrency = new Intl.NumberFormat(currentCulture,
@@ -151,7 +180,7 @@
                     totalKey: '',
                     grandTotalKey: '',
                     totalFormatter: '',
-                    sortKey: '',
+                    sortKey: 'RefNumberSort',
                     sortType: '',
                     header: 'Ref Number',
                     text: '',
@@ -542,21 +571,16 @@
             };
             indPgLib.addPagerElementEventListeners();
             indPgLib.registerPageHandlers();
-            indPgLib.loadSettings('CfaTransIndexView');
+            //Going to new setting management
+            indPgLib.applySettingsFromStorage(storageKey,elementSettingsConfig);
             //----------------
 
             indPgLib.handleFiltersUi();
             currencyChanged();
             indPgLib.refreshData();
             indPgLib.rowSelectorsUi();
-
-
         });
 
-        $(window).on('beforeunload',
-            function(e) {
-                indPgLib.saveSettings('CfaTransIndexView');
-
-            });
     </script>
+    @ScriptHelper.RenderScripts(HttpContext)
 }

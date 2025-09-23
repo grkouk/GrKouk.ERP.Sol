@@ -1,6 +1,7 @@
 using System;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -15,9 +16,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.CodeAnalysis.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using NToastNotify;
+using QuestPDF.Infrastructure;
 
 namespace GrKouk.Web.ERP
 {
@@ -54,6 +57,19 @@ namespace GrKouk.Web.ERP
                 .AddDefaultUI()
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApiDbContext>();
+           
+                services.AddHealthChecks()
+                    .AddCheck("self", () => HealthCheckResult.Healthy())
+                    .AddSqlServer(
+                        Configuration.GetConnectionString("DefaultConnection"),
+                        name: "database",
+                        tags: new[] { "database" }
+                    );
+
+
+                // You can add more checks here
+                ;
+
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -67,6 +83,27 @@ namespace GrKouk.Web.ERP
                 options.SlidingExpiration = true;
 
                 options.LoginPath = "/Identity/Account/Login";
+                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+                // Ensure correct redirect for normal browser requests
+                options.Events = new CookieAuthenticationEvents
+                {
+                    OnRedirectToLogin = context =>
+                    {
+                        // For API or AJAX, return 401 so JS can handle it
+                        if (context.Request.Path.StartsWithSegments("/api") ||
+                            context.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                        {
+                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                            return Task.CompletedTask;
+                        }
+
+                        // For normal requests, redirect always
+                        context.Response.Redirect(context.RedirectUri);
+                        return Task.CompletedTask;
+                    }
+                };
+
+
             })
 
                 .AddJwtBearer(options =>
@@ -99,7 +136,7 @@ namespace GrKouk.Web.ERP
                     policy.RequireRole("Admin");      // The user must have the Admin role
                 });
 
-
+               
                 // Default (Web Cookie Authentication): No need to add schemes, relies on cookie
             });
 
@@ -140,6 +177,9 @@ namespace GrKouk.Web.ERP
 
             services.AddTransient<IDocumentTransactionService, DocumentTransactionService>();
             services.AddTransient<IDocumentSyncService, SyncBusinessDocService>();
+            services.AddTransient<ITransactorTransactionService, TransactorTransactionService>();
+            services.AddTransient<PdfExportService>();
+            //QuestPDF.Settings.License = LicenseType.Community; 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -188,6 +228,8 @@ namespace GrKouk.Web.ERP
             {
                 endpoints.MapRazorPages();
                 endpoints.MapDefaultControllerRoute();
+                endpoints.MapHealthChecks("/health");
+
             });
             //Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("");
         

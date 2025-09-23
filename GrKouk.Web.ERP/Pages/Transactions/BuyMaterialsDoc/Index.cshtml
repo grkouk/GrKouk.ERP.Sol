@@ -2,17 +2,19 @@
 @using GrKouk.Web.ERP.Helpers
 @model IndexModel
 
-@{
-    ViewData["Title"] = "Παραστατικά Αγορών/Εξόδων";
-}
+
 @section MyCss
     {
     <link rel="stylesheet" href="~/css/custom-checkbox.css" />
     <link rel="stylesheet" href="~/css/searchbar.css" />
     <link rel="stylesheet" href="~/css/search-modal.css" />
     <link rel="stylesheet" href="~/lib/bootstrap-select/css/bootstrap-select.min.css" />
-}
-<h4>Λίστα Αγορών/Εξόδων</h4>
+    }
+    @{
+        ViewData["Title"] = "Παραστατικά Αγορών/Εξόδων";
+    }
+    <input type="hidden" id="initialPageTitle" value="@ViewData["Title"]" />
+<h4 id="hElementTitle">@ViewData["Title"]</h4>
 
 
 <div class="container ">
@@ -55,10 +57,7 @@
     </ul>
 </div>
 
-
 @await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowDateFlt = true })
-
-
 
 <div class="row mt-1">
     <partial name="_PagerPartial" />
@@ -67,7 +66,6 @@
 <div class="row">
     <partial name="_PagerPartial" />
 </div>
-@* <partial name="_CustomDateFilterPartial" /> *@
 <partial name="_LoadMePartial" />
 <partial name="_DeleteConfirmationPartial" />
 <!-- Modal Item selector for payments -->
@@ -148,11 +146,51 @@
 @section Scripts
 {
     <script src="~/lib/bootstrap-select/js/bootstrap-select.min.js"></script>
-    <script src="~/js/moment.min.js"></script>
+    @* <script src="~/js/moment.min.js"></script> *@
+    <script src="~/js/moment-with-locales.min.js"></script>
     <script src="~/js/definitions.js"></script>
+    <script src="~/js/filterManagement.lib.js"></script>
     <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
         $(document).ready(function () {
+            const storageKey = 'BuyDocIndexViewNew';
+            const elementSettingsConfig = {
+                // Element ID: { key: storageKey, default: defaultValue, prop: propertyToSetOrRead }
+                // 'pageIndex':                 { key: 'pageIndex',                 default: 1,           prop: 'value' },
+                'PageSize':                  { key: 'pageSize',                  default: 10,          prop: 'value' },
+                'filtersVisible':            { key: 'filtersVisible',            default: true,        prop: 'value' },
+                'rowSelectorsVisible':       { key: 'rowSelectorsVisible',       default: false,       prop: 'value' },
+                'DatePeriodFilter':          { key: 'dateRangeFilter',           default: 'CURYEAR',   prop: 'value' },
+                'CompanyFilter':             { key: 'companyFilter',             default: 0,           prop: 'value' },
+                //  'TransactorTypeFilter':      { key: 'transactorTypeFilter',      default: 1,           prop: 'value' },
+                //'WarehouseItemNatureFilter': { key: 'warehouseItemNatureFilter', default: 1,           prop: 'value' },
+                'currentSort':               { key: 'currentSort',               default: 'datesort:asc',prop: 'value' },
+                'CurrencySelector':          { key: 'currentCurrency',           default: 1,          prop: 'value' },
+                'fromDateFilterEl':          { key: 'fromDateFilter',           default: '',          prop: 'value' },
+                'toDateFilterEl':          { key: 'toDateFilter',           default: '',          prop: 'value' },
+                // 'ShowCarryOnFlt':            { key: 'ShowCarryOnFlt',            default: true,        prop: 'checked'},
+                //'ShowSummaryFlt':            { key: 'ShowSummaryFlt',            default: true,        prop: 'checked'} // Reads the 'checked' property
+            };
+            // --- Page Hide Event Listener (Replaces unload) ---
+            // window.addEventListener('pagehide', function(event) {
+            //     console.log('pagehide event triggered. Saving settings...'); // For debugging
+            //     indPgLib.saveSettingsToStorage(storageKey, elementSettingsConfig);
+            //     // Avoid complex logic or async operations here
+            // });
+            // document.addEventListener('visibilitychange', function() {
+            //     if (document.visibilityState === 'hidden') {
+            //         console.log('visibilitychange to hidden triggered. Saving settings...'); // For debugging
+            //         indPgLib.saveSettingsToStorage(storageKey, elementSettingsConfig);
+            //     }
+            // });
+
+            window.addEventListener('beforeunload', function(event) {
+                console.log('beforeunload event triggered. Saving settings...'); // For debugging
+                indPgLib.saveSettingsToStorage(storageKey, elementSettingsConfig);
+                // DO NOT try to add confirmation dialogs or complex logic here.
+            });
+
+
             var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
             let baseCulture = '@System.Globalization.CultureInfo.CurrentCulture.';
             currentCulture = 'el-GR';
@@ -1087,13 +1125,6 @@
 
 
                 });
-
-            const transactorSelected = (transactorId) => {
-
-            };
-            const productSelected = (productId) => {
-
-            };
             //#endregion
             const loadDiaries = (availableDiarys) => {
                 var $diaryDd = $('[name=diaryDropDownMenu]');
@@ -1282,7 +1313,10 @@
 
             indPgLib.addPagerElementEventListeners();
             indPgLib.registerPageHandlers();
-            indPgLib.loadSettings('BuyDocIndexView');
+            //Going to new setting management
+            indPgLib.applySettingsFromStorage(storageKey,elementSettingsConfig);
+
+           // indPgLib.loadSettings('BuyDocIndexView');
             //----------------
 
             indPgLib.handleFiltersUi();
@@ -1290,11 +1324,7 @@
             indPgLib.refreshData();
             indPgLib.rowSelectorsUi();
         });
-
-        $(window).on('beforeunload',
-            function (e) {
-                indPgLib.saveSettings('BuyDocIndexView');
-            });
-    </script>
+        
+    </script>`
     @ScriptHelper.RenderScripts(HttpContext)
 }

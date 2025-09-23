@@ -15,6 +15,7 @@ namespace GrKouk.Web.ERP.Helpers
         public List<SelectListItem> MaterialCategoriesFilterValues { get; set; }
         public List<SelectListItem> SectionsFilterValues { get; set; }
         public List<UISelectTypeItem> SectionsFilterUiSelectItems { get; set; }
+        public List<UISelectTypeItem> CompaniesFilterUiSelectItems { get; set; }
         public IndexFiltersToShow FiltersToShow { get; set; }
        
     }
@@ -26,7 +27,8 @@ namespace GrKouk.Web.ERP.Helpers
         public bool ShowMaterialNatureFlt { get; set; } = false;
 
         public bool ShowTransactorTypeFlt { get; set; } = false;
-        public bool ShowCompaniesFlt { get; set; } = true;
+        public bool ShowCompaniesFlt { get; set; } = true; 
+        public bool ShowCompaniesMultiFlt { get; set; } = false;
         public bool ShowPageSizeFlt { get; set; } = true;
         public bool ShowDisplayCarryOnLineFlt { get; set; } = false;
         public bool ShowDisplaySummaryFlt { get; set; } = false;

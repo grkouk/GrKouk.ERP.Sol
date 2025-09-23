@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using GrKouk.Erp.Domain.CashFlow;
+using GrKouk.Erp.Domain.Warehouses;
 
 namespace GrKouk.Erp.Domain.Shared
 {
@@ -40,6 +41,13 @@ namespace GrKouk.Erp.Domain.Shared
         {
             get => _cashFlowAccountCompanyMappings ??= new List<CashFlowAccountCompanyMapping>();
             set => _cashFlowAccountCompanyMappings = value;
+        }
+        private ICollection<WarehouseCompanyMapping> _warehouseCompanyMappings;
+
+        public ICollection<WarehouseCompanyMapping> WarehouseCompanyMappings
+        {
+            get => _warehouseCompanyMappings ??= new List<WarehouseCompanyMapping>();
+            set => _warehouseCompanyMappings = value;
         }
     }
 }

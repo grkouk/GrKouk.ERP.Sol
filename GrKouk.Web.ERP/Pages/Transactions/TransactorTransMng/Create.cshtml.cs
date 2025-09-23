@@ -10,6 +10,7 @@ using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
+using GrKouk.Web.ERP.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -27,16 +28,18 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
         private readonly ApiDbContext _context;
         private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
+        private readonly ITransactorTransactionService _transService;
         public bool NotUpdatable;
         public bool InitialLoad = true;
         public int CopyFromId { get; set; }
         public int CopyFromTransactorId { get; set; } = 0;
 
-        public CreateModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public CreateModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification, ITransactorTransactionService transService)
         {
             _context = context;
             _mapper = mapper;
             _toastNotification = toastNotification;
+            _transService = transService;
         }
 
         public IActionResult OnGet(int? copyFromId)
@@ -70,6 +73,42 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
         [BindProperty] public TransactorTransCreateDto ItemVm { get; set; }
 
         public async Task<IActionResult> OnPostAsync()
+        {
+            if (!ModelState.IsValid)
+            {
+                LoadCombos();
+                return Page();
+            }
+
+            try
+            {
+                var serviceResult = await _transService.AddTransactorTransaction(ItemVm,_sectionCode);
+                if (serviceResult == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Empty response from transactor service");
+                    LoadCombos();
+                    return Page();
+                }
+
+                if (!serviceResult.Success)
+                {
+                    ModelState.AddModelError(string.Empty, "Error from transactor service" + serviceResult);
+                    LoadCombos();
+                    return Page();
+                }
+                _toastNotification.AddSuccessToastMessage("Transaction saved");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                string msg = e.Message;
+                msg += e.InnerException?.Message;
+
+                _toastNotification.AddErrorToastMessage(msg);
+            }
+            return RedirectToPage("./Index");
+        }
+        private async Task<IActionResult> OnPostAsyncOld()
         {
             if (!ModelState.IsValid)
             {
@@ -234,8 +273,8 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
                 // });
             }
 
-            ViewData["CompanyId"] =
-                new SelectList(_context.Companies.OrderBy(c => c.Code).AsNoTracking(), "Id", "Code");
+            ViewData["CompanyId"] = FiltersHelper.GetSolidCompaniesFilterList(_context);
+              // new SelectList(_context.Companies.OrderBy(c => c.Code).AsNoTracking(), "Id", "Code");
             ViewData["FiscalPeriodId"] =
                 new SelectList(_context.FiscalPeriods.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
             ViewData["TransactorId"] = new SelectList(transactorsList, "Value", "Text");

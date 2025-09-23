@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using GrKouk.Erp.Definitions;
 using Newtonsoft.Json;
 using Syncfusion.EJ2.Base;
@@ -19,6 +20,7 @@ namespace GrKouk.Web.ERP.Helpers
         public string MaterialCategoriesFilter { get; set; }
         public string TransactorTypeFilter { get; set; }
         public string SectionsFilter { get; set; }
+        public string CompaniesFilter { get; set; }
         public string SearchFilter { get; set; }
         public int DiaryId { get; set; }
         public int TransactorId { get; set; }
@@ -32,6 +34,8 @@ namespace GrKouk.Web.ERP.Helpers
         public bool ShowCarryOnAmountsInTabs { get; set; }
         public bool ShowSummaryFilter { get; set; }
         public bool ShowDisplayLinesWithZeroes { get; set; }
+        public DateTime? FromCustomFilterDate { get; set; }
+        public DateTime? ToCustomFilterDate { get; set; }
     }
 
     public class IndexDataTableResponse<T>
@@ -64,7 +68,9 @@ namespace GrKouk.Web.ERP.Helpers
         public decimal GrandSumExportValue { get; set; }
         public List<T> Data { get; set; }
         public List<SearchListItem> Diaries { get; set; }
-
+        public string NameOfIsozigio { get; set; }
+        public string NameOfKartela { get; set; }
+        
     }
 
     public class CodeToComputeDefinition
@@ -91,6 +97,10 @@ namespace GrKouk.Web.ERP.Helpers
         public string CompanyFilter { get; set; }
         [JsonProperty(PropertyName = "dateRange", Required = Required.Default)]
         public string DateRange { get; set; }
+        [JsonProperty(PropertyName = "fromCustomFilterDate", Required = Required.AllowNull)]
+        public DateTime? FromCustomFilterDate { get; set; }
+        [JsonProperty(PropertyName = "toCustomFilterDate", Required = Required.AllowNull)]
+        public DateTime? ToCustomFilterDate { get; set; }
     }
 
     public class AutoCompleteDataManagerRequest : DataManagerRequest

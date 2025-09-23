@@ -53,5 +53,13 @@ namespace GrKouk.Web.ERP.Helpers
              }   
              return (natureCode: int.Parse(natureItem.Value), natureName: natureItem.Text);
         }
+
+        public static string GetFooterCopyrightText()
+        {
+            string copyRight = "2018-2025 - George Koukoudis Version ";
+            var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            copyRight += version.ToString();
+            return copyRight;
+        }
     }
 }

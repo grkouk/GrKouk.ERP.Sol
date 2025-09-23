@@ -1,14 +1,21 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
+using GrKouk.Erp.Domain.DocDefinitions;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
+using GrKouk.Web.ERP.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using NToastNotify;
+
 
 namespace GrKouk.Web.ERP.Pages.MainEntities.Transactors
 {
@@ -43,6 +50,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Transactors
             LoadFilters();
             return Page();
         }
+       
         private void LoadFilters()
         {
 

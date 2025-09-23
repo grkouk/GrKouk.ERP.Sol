@@ -10,13 +10,12 @@
     <link rel="stylesheet" href="~/css/custom-checkbox.css" />
     <link rel="stylesheet" href="~/css/searchbar.css" />
 }
-<h4>Synchronization Buy Docs</h4>
+<input type="hidden" id="initialPageTitle" value="@ViewData["Title"]" />
+<h4 id="hElementTitle">@ViewData["Title"]</h4>
 
 <div class="container ">
     <ul class="nav small justify-content-end ">
-        <li class="nav-item">
-            <a href="#" role="button" class="nav-link" id="CreateNew">Create New</a>
-        </li>
+       
         <li class="nav-item">
             <a class="nav-link" data-bs-toggle="collapse" data-bs-target="#filterCollapse" href="#filterCollapse" role="button" id="filtersToggle"
                aria-expanded="false" aria-controls="filterCollapse">
@@ -27,9 +26,7 @@
 
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="@Url.Page("./addcrossentry")">Αντιλογισμός</a>
-        </li>
+       
         <li class="nav-item dropdown " id="SelectedRowsActionsMenu">
             <a class="nav-link dropdown-toggle disabled" role="button" id="ddSelectedRowsActions" data-toggle="dropdown"
                aria-haspopup="true" aria-expanded="false">Actions</a>
@@ -60,6 +57,7 @@
 {
     <script src="~/js/moment.min.js"></script>
     <script src="~/js/definitions.js"></script>
+    <script src="~/js/filterManagement.lib.js"></script>
     <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
         $(document).ready(function() {
@@ -95,8 +93,8 @@
                     sortType: 'alpha',
                     header: 'Id',
                     text: '',
-                    headerClass: 'small text-center',
-                    class: 'small',
+                    headerClass: 'small text-center d-none d-xl-table-cell ',
+                    class: 'small d-none d-xl-table-cell ',
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
@@ -170,7 +168,7 @@
                     totalKey: 'label',
                     grandTotalKey: 'label',
                     totalFormatter: '',
-                    sortKey: '',
+                    sortKey: 'RefNumberSort',
                     sortType: 'alpha',
                     header: 'Reference Number',
                     text: '',
@@ -230,9 +228,9 @@
                     totalKey: '',
                     grandTotalKey: '',
                     totalFormatter: '',
-                    sortKey: 'DateSort',
+                    sortKey: 'SyncedDateSort',
                     sortType: 'numeric',
-                    header: 'Date',
+                    header: 'Synced At',
                     text: '',
                     headerClass: 'small text-center ',
                     class: 'small',
@@ -254,8 +252,8 @@
                     sortType: 'alpha',
                     header: 'Operation',
                     text: '',
-                    headerClass: 'small text-center',
-                    class: 'small',
+                    headerClass: 'small text-center small text-center d-none d-xl-table-cell',
+                    class: 'small small text-center d-none d-xl-table-cell',
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
@@ -274,8 +272,8 @@
                     sortType: 'alpha',
                     header: 'Source',
                     text: '',
-                    headerClass: 'small text-center',
-                    class: 'small',
+                    headerClass: 'small text-center small text-center d-none d-xl-table-cell',
+                    class: 'small small text-center d-none d-xl-table-cell',
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
@@ -294,8 +292,8 @@
                     sortType: 'alpha',
                     header: 'Sync Log Id',
                     text: '',
-                    headerClass: 'small text-center d-none d-md-table-cell',
-                    class: 'small d-none d-md-table-cell ',
+                    headerClass: 'small text-center d-none d-xxl-table-cell',
+                    class: 'small d-none d-xxl-table-cell ',
                     classWhenCondition: '',
                     classCondition: {},
                     remoteReference: {
@@ -641,4 +639,5 @@
 
             });
     </script>
+    @ScriptHelper.RenderScripts(HttpContext)
 }

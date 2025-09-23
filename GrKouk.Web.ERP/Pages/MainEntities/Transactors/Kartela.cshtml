@@ -2,20 +2,26 @@
 @using GrKouk.Web.ERP.Helpers
 @model GrKouk.Web.ERP.Pages.MainEntities.Transactors.KartelaModel
 @{
-    ViewData["Title"] = "Καρτέλα" + @Model.TransactorName;
+    ViewData["Title"] = "Καρτέλα " + @Model.TransactorName;
 }
 @section MyCss
-    {
+{
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="~/css/custom-checkbox.css" />
     <link rel="stylesheet" href="~/css/searchbar.css" />
 }
-<h4>Καρτέλα @Model.TransactorName</h4>
+<input type="hidden" id="initialPageTitle" value="@ViewData["Title"]" />
+<h4 id="hElementTitle">@ViewData["Title"]</h4>
 <div class="container ">
     <ul class="nav small justify-content-end ">
+        <li class="nav-item">
+            <a href="#" role="button" class="btn btn-sm btn-outline-secondary " id="ExportToPdf">Export To Pdf</a>
 
+        </li>
+       
         <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#filterCollapse" role="button" id="filtersToggle"
-                aria-expanded="false" aria-controls="filterCollapse">
+               aria-expanded="false" aria-controls="filterCollapse">
             </a>
         </li>
         <li class="nav-item">
@@ -25,7 +31,7 @@
         </li>
         <li class="nav-item dropdown " id="SelectedRowsActionsMenu">
             <a class="nav-link dropdown-toggle disabled" role="button" id="ddSelectedRowsActions" data-toggle="dropdown"
-                aria-haspopup="true" aria-expanded="false">Actions</a>
+               aria-haspopup="true" aria-expanded="false">Actions</a>
             <div class="dropdown-menu small">
 
                 <a class="dropdown-item" href="#">Another action</a>
@@ -39,7 +45,7 @@
 </div>
 <input type="hidden" asp-for="TransactorId" />
 @await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowDateFlt = true ,ShowDisplayCarryOnLineFlt =
-true
+true, ShowCompaniesMultiFlt = true, ShowCompaniesFlt = false
 })
 
 
@@ -57,12 +63,54 @@ true
 
 
 @section Scripts
-    {
-    <script src="~/js/moment.min.js"></script>
+{
+    <script src="https://cdn.syncfusion.com/ej2/28.1.37/dist/ej2.min.js"></script>
+    <ejs-scripts></ejs-scripts>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    @* <script src="~/js/moment.min.js"></script> *@
+    <script src="~/js/moment-with-locales.min.js"></script>
     <script src="~/js/definitions.js"></script>
+    <script src="~/js/filterManagement.lib.js"></script>
     <script src="~/js/indexPageIIFE.lib.js"></script>
     <script>
         $(document).ready(function () {
+            const storageKey = 'TransactorAccountTabNew';
+            const elementSettingsConfig = {
+                // Element ID: { key: storageKey, default: defaultValue, prop: propertyToSetOrRead }
+                // 'pageIndex':                 { key: 'pageIndex',                 default: 1,           prop: 'value' },
+                'PageSize':                  { key: 'pageSize',                  default: 10,          prop: 'value' },
+                'filtersVisible':            { key: 'filtersVisible',            default: true,        prop: 'value' },
+                'rowSelectorsVisible':       { key: 'rowSelectorsVisible',       default: false,       prop: 'value' },
+                'DatePeriodFilter':          { key: 'dateRangeFilter',           default: 'CURYEAR',   prop: 'value' },
+                //'CompanyFilter':             { key: 'companyFilter',             default: 0,           prop: 'value' },
+                'CompaniesFilter': {key: 'companiesFilter', default: '[0]', prop: 'value', dataType: 'array'},
+                //  'TransactorTypeFilter':      { key: 'transactorTypeFilter',      default: 1,           prop: 'value' },
+                //'WarehouseItemNatureFilter': { key: 'warehouseItemNatureFilter', default: 1,           prop: 'value' },
+                'currentSort':               { key: 'currentSort',               default: 'datesort:asc',prop: 'value' },
+                'CurrencySelector':          { key: 'currentCurrency',           default: 1,          prop: 'value' },
+                'ShowCarryOnFlt':            { key: 'ShowCarryOnFlt',            default: true,        prop: 'checked'},
+                'fromDateFilterEl':          { key: 'fromDateFilter',           default: '',          prop: 'value' },
+                'toDateFilterEl':          { key: 'toDateFilter',           default: '',          prop: 'value' },
+                //'ShowSummaryFlt':            { key: 'ShowSummaryFlt',            default: true,        prop: 'checked'} 
+            };
+            // --- Page Hide Event Listener (Replaces unload) ---
+            // window.addEventListener('pagehide', function(event) {
+            //     console.log('pagehide event triggered. Saving settings...'); // For debugging
+            //     indPgLib.saveSettingsToStorage(storageKey, elementSettingsConfig);
+            //     // Avoid complex logic or async operations here
+            // });
+            // document.addEventListener('visibilitychange', function() {
+            //     if (document.visibilityState === 'hidden') {
+            //         console.log('visibilitychange to hidden triggered. Saving settings...'); // For debugging
+            //         indPgLib.saveSettingsToStorage(storageKey, elementSettingsConfig);
+            //     }
+            // });
+            //
+            window.addEventListener('beforeunload', function(event) {
+                console.log('beforeunload event triggered. Saving settings...'); // For debugging
+                indPgLib.saveSettingsToStorage(storageKey, elementSettingsConfig);
+                // DO NOT try to add confirmation dialogs or complex logic here.
+            });
             var currentCulture = '@System.Globalization.CultureInfo.CurrentCulture';
             var formatterCurrency = new Intl.NumberFormat(currentCulture,
                 {
@@ -292,10 +340,36 @@ true
 
                         indPgLib.refreshData();
                     }
+                },
+                {
+                    selector: '#ExportToPdf',
+                    event: 'click',
+                    handler: function (event) {
+                        event.preventDefault(); // Prevent default anchor behavior
+
+                        indPgLib.exportToPdfHandler()
+                            .then((pdfUrl) => {
+                                // Assuming the exportToPdfHandler returns a URL to the PDF file
+                                if (pdfUrl) {
+                                    // Open the PDF in a new browser window or tab
+                                    window.open(pdfUrl, '_blank');
+                                } else {
+                                    toastr.error('Failed to generate the PDF. No URL returned.');
+                                }
+                            })
+
+                            .catch((error)=>{
+                                // if (result) {
+                                toastr.error(error);
+                                // }
+                            })
+                                
+                    }
                 }
             ];
             const indexPageDef = {
                 uri: '/api/GrKoukInfoApi/GetIndexTblDataTransactorAccountTab',
+                pdfExportUri: '/api/GrKoukInfoApi/GetIndexTblDataTransactorExportAccountTab',
                 currencyFormatter: formatterCurrency,
                 numberFormatter: formatterNumber,
                 colDefs: colDefs,
@@ -329,136 +403,94 @@ true
                     console.log('Not found currency code for this id');
                 }
             };
-
-
-
-            var storageItemJs = localStorage.getItem('TransactorAccountTab');
-            if (storageItemJs === undefined || storageItemJs === null) {
-                $('#pageIndex').val(1);
-                $('#PageSize').val(10);
-                $('#filtersVisible').val(true);
-                $('#rowSelectorsVisible').val(false);
-
-                $('#DatePeriodFilter').val('CURYEAR');
-                $('#CompanyFilter').val(0);
-                $('#TransactorTypeFilter').val(1);
-                $('#WarehouseItemNatureFilter').val(1);
-                $('#currentSort').val('datesort:asc');
-                $('#ShowCarryOnFlt').val(true);
-            } else {
-                var storageItem = JSON.parse(storageItemJs);
-                var filtersValue = storageItem.find(x => x.filterKey === 'filtersVisible').filterValue;
-
-                $('#filtersVisible').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'rowSelectorsVisible').filterValue;
-                $('#rowSelectorsVisible').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'dateRangeFilter').filterValue;
-                $('#DatePeriodFilter').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'currentSort').filterValue;
-                $('#currentSort').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'companyFilter').filterValue;
-                $('#CompanyFilter').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'pageSize').filterValue;
-                $('#PageSize').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'pageIndex').filterValue;
-                $('#pageIndex').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'transactorTypeFilter').filterValue;
-                $('#TransactorTypeFilter').val(filtersValue);
-                filtersValue = storageItem.find(x => x.filterKey === 'warehouseItemNatureFilter').filterValue;
-                $('#WarehouseItemNatureFilter').val(filtersValue);
-                try {
-                    filtersValue = storageItem.find(x => x.filterKey === 'currentCurrency').filterValue;
-                    $('#CurrencySelector').val(filtersValue);
-                } catch (e) {
-
-                }
-                try {
-                    filtersValue = storageItem.find(x => x.filterKey === 'ShowCarryOnFlt').filterValue;
-                    $('#ShowCarryOnFlt').prop('checked', filtersValue);
-                } catch (e) {
-                    $('#ShowCarryOnFlt').prop('checked', true);
-                }
-            }
+            
             indPgLib.addPagerElementEventListeners();
             indPgLib.registerPageHandlers();
-            //indPgLib.loadSettings('TransactorTransIndexView');
+            //Going to new setting management
+            indPgLib.applySettingsFromStorage(storageKey,elementSettingsConfig);
             //----------------
 
             indPgLib.handleFiltersUi();
+            //--------------------------Companies filter handling
+            const selectedCompanies = document.getElementById("CompaniesFilterElm").ej2_instances[0];
+            let companiesFilterValue = $('#CompaniesFilter').val();
+            if (companiesFilterValue != null && companiesFilterValue.length > 0) {
+                selectedCompanies.value = JSON.parse(companiesFilterValue);
+            }
+            selectedCompanies.changeOnBlur = false;
+            selectedCompanies.addEventListener("change", (event) => {
+                // Ensure we have arrays, even if null/undefined
+                const newValue = event.value || [];
+                const oldValue = event.oldValue || []; // Assumes your component provides oldValue
+
+                const zeroWasSelected = oldValue.includes(0);
+                const zeroIsSelected = newValue.includes(0);
+
+                let finalValue; // This will hold the calculated correct selection
+
+                // --- Rule 1: User just selected 0 ---
+                // Check if 0 is newly added in this change event
+                if (zeroIsSelected && !zeroWasSelected) {
+                    finalValue = [0]; // Force selection to be only 0
+                }
+                    // --- Rule 2: User selected something else while 0 was selected ---
+                // Check if 0 was selected before, AND a non-zero item was added
+                else if (zeroWasSelected) {
+                    // Find items present in newValue but not in oldValue
+                    const addedItems = newValue.filter(item => !oldValue.includes(item));
+                    // Check if any of those newly added items are not 0
+                    const addedNonZeroItem = addedItems.some(item => item !== 0);
+
+                    if (addedNonZeroItem) {
+                        // User added a non-zero item while 0 was selected. Remove 0.
+                        finalValue = newValue.filter(item => item !== 0);
+                    } else {
+                        // 0 was selected, but only other changes happened (like removing items, or removing 0 itself).
+                        // In this case, the component's newValue is likely correct as is (it might be just [0], or [] etc.)
+                        finalValue = newValue;
+                    }
+                }
+                // --- Default Case: No special 0-rule applies ---
+                else {
+                    // 0 wasn't selected before, and wasn't added now. Normal selection.
+                    finalValue = newValue;
+                }
+
+                // --- Update Component and Hidden Field ---
+
+                // Get the component's current visual value (might differ from finalValue if we intervened)
+                const currentComponentValue = selectedCompanies.value || [];
+
+                // Check if our calculated finalValue is different from the component's current value
+                // Simple array comparison for primitive values:
+                const valuesAreEqual = finalValue.length === currentComponentValue.length &&
+                    finalValue.every((val, index) => val === currentComponentValue[index]);
+
+                // Only update the component's value if it needs changing, prevents potential event loops
+                if (!valuesAreEqual) {
+                    selectedCompanies.value = finalValue;
+                }
+
+                // Always update the hidden input field with the final calculated value
+                $('#CompaniesFilter').val(JSON.stringify(finalValue));
+            });
+            selectedCompanies.addEventListener("blur", (event) => {
+                const allCompaniesId = 0;
+                if (selectedCompanies.value == null || selectedCompanies.value.length === 0) {
+                    selectedCompanies.value = [allCompaniesId];
+                }
+
+                indPgLib.refreshData();
+            });
+            selectedCompanies.addEventListener("close", (event) => {
+                indPgLib.refreshData();
+            });
+            //---------------------------------------------------
             currencyChanged();
             indPgLib.refreshData();
             indPgLib.rowSelectorsUi();
         });
-
-        $(window).on('beforeunload', function (e) {
-            //#region CommentOut
-            //#region Variables
-            var filtersVisible = $('#filterCollapse').hasClass('show');
-            var $rowSelectorsColumn = $('th[name=selectAllRowsColumn]');
-
-            var rowSelectorsNotVisible = $rowSelectorsColumn.is(':hidden');
-            var rowSelectorsVisible = (rowSelectorsNotVisible) ? false : true;
-
-            var pageSize = $('#PageSize').val();
-            var dateRange = $('#DatePeriodFilter').val();
-            var currentSort = $('#currentSort').val();
-            var companyFilter = $('#CompanyFilter').val();
-            var pageIndex = $('#pageIndex').val();
-            var transactorTypeFilter = $('#TransactorTypeFilter').val();
-            var warehouseItemNatureFilter = $('#WarehouseItemNatureFilter').val();
-            var currentCurrency = $('#CurrencySelector').val();
-            var showCarryOnFlt = $('#ShowCarryOnFlt').is(':checked')
-            var filtersArr = [];
-            //#endregion
-            filtersArr.push({
-                filterKey: 'filtersVisible',
-                filterValue: filtersVisible
-            });
-            filtersArr.push({
-                filterKey: 'rowSelectorsVisible',
-                filterValue: rowSelectorsVisible
-            });
-            filtersArr.push({
-                filterKey: 'pageIndex',
-                filterValue: pageIndex
-            });
-            filtersArr.push({
-                filterKey: 'pageSize',
-                filterValue: pageSize
-            });
-            filtersArr.push({
-                filterKey: 'dateRangeFilter',
-                filterValue: dateRange
-            });
-            filtersArr.push({
-                filterKey: 'currentSort',
-                filterValue: currentSort
-            });
-            filtersArr.push({
-                filterKey: 'companyFilter',
-                filterValue: companyFilter
-            });
-            filtersArr.push({
-                filterKey: 'transactorTypeFilter',
-                filterValue: transactorTypeFilter
-            });
-            filtersArr.push({
-                filterKey: 'warehouseItemNatureFilter',
-                filterValue: warehouseItemNatureFilter
-            });
-            filtersArr.push({
-                filterKey: 'currentCurrency',
-                filterValue: currentCurrency
-            });
-            filtersArr.push({
-                filterKey: 'ShowCarryOnFlt',
-                filterValue: showCarryOnFlt
-            });
-            var sessionVal = JSON.stringify(filtersArr);
-
-            localStorage.setItem('TransactorAccountTab', sessionVal);
-            //#endregion
-
-        });
+        
     </script>
+    @ScriptHelper.RenderScripts(HttpContext)
 }

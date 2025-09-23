@@ -11,7 +11,7 @@
 
 @section MyCss
 {
-    <partial name="Shared/_CssSyncfusionBlockPartial"/>
+    @* <partial name="Shared/_CssSyncfusionBlockPartial"/> *@
     <link rel="stylesheet" href="~/css/search-modal.css"/>
     <link rel="stylesheet" href="~/lib/bootstrap-select/css/bootstrap-select.min.css"/>
 }
@@ -288,6 +288,7 @@
 <partial name="_ItemSelector"/>
 
 @section Scripts {
+    <partial name="Shared/_JsThemeHandlerPartial"/>
     @{ await Html.RenderPartialAsync("_ValidationScriptsStrippedPartial"); }
     <script src="~/lib/bootstrap-select/js/bootstrap-select.min.js"></script>
     <script src="~/lib/jqueryui/jquery-ui.min.js"></script>

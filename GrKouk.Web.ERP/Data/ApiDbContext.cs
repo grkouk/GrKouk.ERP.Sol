@@ -4,6 +4,7 @@ using GrKouk.Erp.Domain.MediaEntities;
 using GrKouk.Erp.Domain.RecurringTransactions;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Domain.Sync;
+using GrKouk.Erp.Domain.Warehouses;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -86,8 +87,13 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<SynchronizationLog> SynchronizationLogs { get; set; }
         public DbSet<SyncUnitOfMeasurement> SyncUnitOfMeasurements { get; set; }
         public DbSet<SyncBuyDocument> SyncBuyDocuments { get; set; }
-        public DbSet<SyncBuyDocument> SyncSaleDocuments { get; set; }
+        public DbSet<SyncSaleDocument> SyncSaleDocuments { get; set; }
         public DbSet<SyncSupplier> SyncSuppliers { get; set; }
+
+        public DbSet<Warehouse> Warehouses { get; set; }
+
+        public DbSet<WarehouseCompanyMapping> WarehouseCompanyMappings { get; set; }
+        
        // public DbSet<SyncItem> SyncItems { get; set; }
         
 
@@ -753,6 +759,30 @@ namespace GrKouk.Web.ERP.Data
                 entity.HasIndex(p => p.BusId);
                 entity.HasIndex(p => p.CompanyCode);
                 entity.HasIndex(p => p.BusCode);
+            });
+            modelBuilder.Entity<Warehouse>(entity =>
+            {
+                entity.HasIndex(c => c.Code).IsUnique();
+                entity.HasMany(p => p.CompanyMappings)
+                    .WithOne(p => p.Warehouse)
+                    .HasForeignKey(p => p.WarehouseId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+            modelBuilder.Entity<WarehouseCompanyMapping>(entity =>
+            {
+                entity.HasKey(p => new
+                {
+                    p.CompanyId,
+                    p.WarehouseId
+                });
+                entity.HasOne(p => p.Company)
+                    .WithMany(p => p.WarehouseCompanyMappings)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasForeignKey(p => p.CompanyId);
+                entity.HasOne(p => p.Warehouse)
+                    .WithMany(p => p.CompanyMappings)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasForeignKey(p => p.WarehouseId);
             });
         }
         

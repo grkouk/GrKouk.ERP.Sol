@@ -37,7 +37,8 @@ namespace GrKouk.Web.ERP.Helpers
                 new SelectListItem() {Value = "10", Text = "10"},
                 new SelectListItem() {Value = "20", Text = "20"},
                 new SelectListItem() {Value = "50", Text = "50"},
-                new SelectListItem() {Value = "100", Text = "100"}
+                new SelectListItem() {Value = "100", Text = "100"},
+                new SelectListItem() {Value = "5000", Text = "{All}"}
 
             };
             return filtersSelectList;
@@ -175,7 +176,39 @@ namespace GrKouk.Web.ERP.Helpers
 
             return dbCompanies;
         }
-
+        public static async Task<List<UISelectTypeItem>> GetSolidCompaniesFilterUiListAsync(ApiDbContext context)
+        {
+            var companiesUiListJs = await context.Companies.OrderBy(p => p.Name)
+                .Select(p => new UISelectTypeItem()
+                {
+                    Title = p.Name,
+                    Text = p.Name,
+                    ValueInt = p.Id,
+                    Value = p.Id.ToString()
+                }).ToListAsync();
+           
+            return companiesUiListJs;
+        }
+        public static async Task<List<UISelectTypeItem>> GetCompaniesFilterUiListAsync(ApiDbContext context)
+        {
+            var companiesUiListJs = await context.Companies.Where(p=>p.Id!=1)
+                .OrderBy(p => p.Name)
+                .Select(p => new UISelectTypeItem()
+                {
+                    Title = p.Name,
+                    Text = p.Name,
+                    ValueInt = p.Id,
+                    Value = p.Id.ToString()
+                }).ToListAsync();
+            companiesUiListJs.Insert(0, new UISelectTypeItem()
+            {
+                Title = "{Ολες}",
+                Text = "{Ολες}",
+                ValueInt = 0,
+                Value = 0.ToString()
+            });
+            return companiesUiListJs;
+        }
         public static List<SelectListItem> GetSeekTypesList()
         {
             List<SelectListItem> seekTypes = new List<SelectListItem>
@@ -218,7 +251,7 @@ namespace GrKouk.Web.ERP.Helpers
         public static async Task<List<SelectListItem>> GetTransactorTypeFilterListAsync(ApiDbContext context)
         {
 
-            var dbTransactorTypes = await context.TransactorTypes.OrderBy(p => p.Code)
+            var dbTransactorTypes = await context.TransactorTypes.OrderBy(p => p.Name)
                 .AsNoTracking()
                 .ToListAsync();
             List<SelectListItem> transactorTypes = new()
@@ -227,7 +260,7 @@ namespace GrKouk.Web.ERP.Helpers
             };
             foreach (var dbTransactorType in dbTransactorTypes)
             {
-                transactorTypes.Add(new SelectListItem() { Value = dbTransactorType.Id.ToString(), Text = dbTransactorType.Code });
+                transactorTypes.Add(new SelectListItem() { Value = dbTransactorType.Id.ToString(), Text = dbTransactorType.Name });
             }
 
             return transactorTypes;

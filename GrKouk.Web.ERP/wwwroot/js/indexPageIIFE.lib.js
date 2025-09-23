@@ -1,10 +1,10 @@
 ﻿//Author: George Koukoudis
-//Version:  1.5.1
+//Version:  2.0.0
 //Date Created: 2022-01-17
-//Date Modified: 2025-01-11
+//Date Modified: 2025-08-29
 //Index pages javascript tools
 
-var indPgLib = (function () {
+const indPgLib = (function () {
     let indexPageDefinition;
     let colDefs;
     let actionColDefs;
@@ -74,10 +74,13 @@ var indPgLib = (function () {
     let $warehouseItemId = $('#WarehouseItemId');
     let $warehouseItemNatureFilter = $('#WarehouseItemNatureFilter');
     let $sectionsFilter = $('#SectionsFilter');
+    let $companiesFilter = $('#CompaniesFilter');
     let $materialCategoriesFilter = $('#MaterialCategoriesFilter');
     let $currencySelector = $("#CurrencySelector");
     let $diaryId = $("#DiaryId");
-   // let rfSectionsFilter = document.getElementById("SectionsFilterElm").ej2_instances[0];
+    let $fromCustomFilterDate = $("#fromDateFilterEl");
+    let $toCustomFilterDate = $("#toDateFilterEl");
+    let $nameOfIsozigioEl= $("#nameOfIsozigio");
     //-------------------------------------------------------
     let companyFilterElement;
     let datePeriodFilterElement;
@@ -91,13 +94,16 @@ var indPgLib = (function () {
     let warehouseItemIdFilterElement;
     let materialCategoriesFilterElement;
     let sectionsFilterElement;
+    let companiesFilterElement;
     let productNatureFilterElement;
     let tableCurrentSortElement;
     let diaryIdFilterElement;
     let showCarryOnFilterElement;
     let showSummaryFilterElement;
     let showDisplayLinesWithZeroesFilterElement;
-
+    let fromCustomFilterDateElement
+    let toCustomFilterDateElement
+    let addToTitleText;
     let setFilterValues;
     const setSelectorFilterValues = () => {
         let flt = indexPageDefinition.getFilterValues();
@@ -120,8 +126,11 @@ var indPgLib = (function () {
         showCarryOnFilterElement = flt.showCarryOnFilterElement;
         showSummaryFilterElement = flt.showSummaryFilterElement;
         showDisplayLinesWithZeroesFilterElement = flt.showDisplayLinesWithZeroesFilterElement;
-        materialCategoriesFilterElement = flt.materialCategoriesFilterElement
-        sectionsFilterElement = flt.sectionsFilterElement
+        materialCategoriesFilterElement = flt.materialCategoriesFilterElement;
+        sectionsFilterElement = flt.sectionsFilterElement;
+        companiesFilterElement=flt.companiesFilterElement;
+        fromCustomFilterDateElement=flt.fromCustomFilterDate;
+        toCustomFilterDateElement=flt.toCustomFilterDate;
     };
     const setIndexPageFilterValues = () => {
         var pageIndexVal = parseInt($pageIndex.val());
@@ -133,34 +142,20 @@ var indPgLib = (function () {
 
         var pageSize =
             $pageSize.val() == null || $pageSize.val().length == 0 ? 10 : parseInt($pageSize.val());
-
         pageSizeElement = pageSize;
-
         var companyFlt = $companyFilter.val();
-
         companyFilterElement = companyFlt;
-
         var datePeriod = $datePeriodFilter.val();
-
         datePeriodFilterElement = datePeriod;
-
         var sortData = getTableCurrentSort();
-
         tableCurrentSortElement = sortData;
-
         var searchFlt = $(".search_input").val();
-
         searchTextElement = searchFlt;
-
         var $dcId = $currencySelector;
         var currencyFlt = $dcId.val() == null || $dcId.val().length == 0 ? 1 : parseInt($dcId.val());
-
         currencyFilterElement = currencyFlt;
-
         var transTypeFlt = '';
         var transactorId = 0;
-       
-       
         if (!($transactorTypeFilter.val() === undefined)) {
             transTypeFlt = $transactorTypeFilter.val();
             transactorTypeFilterElement = transTypeFlt;
@@ -223,29 +218,50 @@ var indPgLib = (function () {
         } else {
             diaryIdFilterElement = 0;
         }
-        var materialCategoryFlt = '';
+        let materialCategoryFlt = '';
         if (!($materialCategoriesFilter.val() === undefined)) {
             materialCategoryFlt = $materialCategoriesFilter.val();
             materialCategoriesFilterElement = materialCategoryFlt;
         } else {
             materialCategoriesFilterElement = "";
         }
-        var sectionsFlt = '';
+        let sectionsFlt = '';
         if (!($sectionsFilter.val() === undefined)) {
             sectionsFlt = $sectionsFilter.val();
             sectionsFilterElement = sectionsFlt;
         } else {
             sectionsFilterElement = "";
         }
-        //Not used yet
-        //Preparing for syncfusion controls
-        // let sectionsFltSF;
-        // if(!rfSectionsFilter.value === undefined){
-        //     sectionsFltSF = rfSectionsFilter.value;
-        //     //sectionsFilterElement = sectionsFltSF;
-        //    
-        // }
+        let companiesFlt = '';
+        if (!($companiesFilter.val() === undefined)) {
+            companiesFlt = $companiesFilter.val();
+            companiesFilterElement = companiesFlt;
+        } else {
+            companiesFilterElement = "";
+        }
+        let fromCustomDateFlt = '';
+        if (!($fromCustomFilterDate.val() === undefined)) {
+            fromCustomDateFlt = $fromCustomFilterDate.val();
+            fromCustomFilterDateElement = fromCustomDateFlt;
+        } else {
+            fromCustomFilterDateElement = "";
+        }
+        let toCustomDateFlt = '';
+        if (!($toCustomFilterDate.val() === undefined)) {
+            toCustomDateFlt = $toCustomFilterDate.val();
+            toCustomFilterDateElement = toCustomDateFlt;
+        } else {
+            toCustomFilterDateElement = "";
+        }
     };
+    const bindTitleSuffixes=()=>{
+      if($nameOfIsozigioEl.length>0){
+          addToTitleText=$nameOfIsozigioEl.val();
+      } else {
+          addToTitleText='';
+      }  
+    };
+    
     const commonTableHandlers = [
         {
             selector: "input[name=checkAllRows]",
@@ -322,6 +338,7 @@ var indPgLib = (function () {
                 }
                 //indPgLib.refreshData();
                 refreshTableData();
+               
             },
         },
         {
@@ -634,7 +651,7 @@ var indPgLib = (function () {
                         $tdCol.text(value[col.responseKey]);
                         break;
                     case "d":
-                        $tdCol.text(moment(value[col.responseKey]).format("DD/MM/YYYY"));
+                        $tdCol.text(moment(value[col.responseKey]).locale('el').format("ddd DD/MM/YYYY"));
                         break;
                     case "c":
                         $tdCol.text(currencyFormatter.format(value[col.responseKey]));
@@ -857,8 +874,9 @@ var indPgLib = (function () {
     const getTableData = function (pgIndex, pgSize, sortData, dateRange
                                    , companyFlt, searchFlt, currencyFlt
                                    , transTypeFlt, wrItmNatureFlt, transactorId
-        , warehouseItemId, diaryId, cfaId, showCarryOnFlt
-        , showSummaryFlt, showDisplayLinesWithZeroesFlt,materialCategoriesFlt,sectionsFlt) {
+                                     , warehouseItemId, diaryId, cfaId, showCarryOnFlt
+                                  , showSummaryFlt, showDisplayLinesWithZeroesFlt,materialCategoriesFlt,sectionsFlt
+                                   ,fromCustomFilterDate, toCustomFilterDate, companiesFlt) {
         let uri = indexPageDefinition.uri;
         uri += `?pageIndex=${pgIndex}`;
         uri += `&pageSize=${pgSize}`;
@@ -876,8 +894,11 @@ var indPgLib = (function () {
         uri += `&warehouseItemId=${warehouseItemId}`;
         uri += `&materialCategoriesFilter=${materialCategoriesFlt}`;
         uri += `&sectionsFilter=${sectionsFlt}`;
+        uri += `&companiesFilter=${companiesFlt}`;
         uri += `&diaryId=${diaryId}`;
         uri += `&displayCurrencyId=${currencyFlt}`;
+        uri += `&fromCustomFilterDate=${fromCustomFilterDate}`;
+        uri += `&toCustomFilterDate=${toCustomFilterDate}`;
         var timeout;
         return new Promise((resolve, reject) => {
             $.ajax({
@@ -921,7 +942,100 @@ var indPgLib = (function () {
             });
         });
     };
+    const callExportToPdfEndpoint = function (
+        pgIndex, pgSize, sortData, dateRange,
+        companyFlt, searchFlt, currencyFlt,
+        transTypeFlt, wrItmNatureFlt, transactorId,
+        warehouseItemId, diaryId, cfaId, showCarryOnFlt,
+        showSummaryFlt, showDisplayLinesWithZeroesFlt,
+        materialCategoriesFlt, sectionsFlt,fromCustomFilterDate, toCustomFilterDate,companiesFlt
+    ) {
+        let uri = indexPageDefinition.pdfExportUri;
+
+        uri += `?pageIndex=${pgIndex}`;
+        uri += `&pageSize=${pgSize}`;
+        uri += `&companyFilter=${companyFlt}`;
+        uri += `&dateRange=${dateRange}`;
+        uri += `&sortData=${sortData}`;
+        uri += `&searchFilter=${searchFlt}`;
+        uri += `&transactorTypeFilter=${transTypeFlt}`;
+        uri += `&warehouseItemNatureFilter=${wrItmNatureFlt}`;
+        uri += `&transactorId=${transactorId}`;
+        uri += `&cashFlowAccountId=${cfaId}`;
+        uri += `&showCarryOnAmountsInTabs=${showCarryOnFlt}`;
+        uri += `&showSummaryFilter=${showSummaryFlt}`;
+        uri += `&showDisplayLinesWithZeroes=${showDisplayLinesWithZeroesFlt}`;
+        uri += `&warehouseItemId=${warehouseItemId}`;
+        uri += `&materialCategoriesFilter=${materialCategoriesFlt}`;
+        uri += `&sectionsFilter=${sectionsFlt}`;
+        uri += `&companiesFilter=${companiesFlt}`;
+        uri += `&diaryId=${diaryId}`;
+        uri += `&displayCurrencyId=${currencyFlt}`;
+        uri += `&fromCustomFilterDate=${fromCustomFilterDate}`;
+        uri += `&toCustomFilterDate=${toCustomFilterDate}`;
+        var timeout;
+        return new Promise((resolve, reject) => {
+            if (!uri) {
+                reject("Export URI is not defined.");
+            }
+            $.ajax({
+                type: "GET",
+                url: uri,
+                xhrFields: {
+                    responseType: 'blob' // Tell jQuery to expect a binary file
+                },
+                success: function (data) {
+                    // Use predefined filename directly
+                    const filename = "FinancialReport.pdf";
+
+                    // Create a download link for the file
+                    const blob = new Blob([data], { type: 'application/pdf' });
+                    // const link = document.createElement('a');
+                    // link.href = window.URL.createObjectURL(blob);
+                    // link.download = filename;
+                    // document.body.appendChild(link);
+                    // link.click();
+                    // document.body.removeChild(link);
+                    var pdfUrl = window.URL.createObjectURL(blob);
+                    resolve(pdfUrl);
+                },
+                // error: function (error) {
+                //     reject(error);
+                // },
+                error: function (xhr, status, error) {
+                    reject(new Error('Failed to export to PDF: ' + error));
+                },
+
+                beforeSend: function () {
+                    if (timeout) {
+                        clearTimeout(timeout);
+                    }
+                    timeout = setTimeout(function () {
+                        spinnerLoaderShow();
+                        indexPageSpinnerShow();
+                    }, 1000);
+                },
+                complete: function () {
+                    if (timeout) {
+                        clearTimeout(timeout);
+                    }
+
+                    setTimeout(function () {
+                        var isOpen = spinnerLoaderIsVisible();
+                        if (isOpen) {
+                            spinnerLoaderHide();
+                        }
+                        isOpen = indexPageSpinnerIsVisible();
+                        if (isOpen) {
+                            indexPageSpinnerHide();
+                        }
+                    }, 2000);
+                },
+            });
+        });
+    };
     const bindDataToTable = (result, pgIndex) => {
+       
         handlePagingUi(result.totalPages, result.totalRecords, pgIndex, result.hasPrevious, result.hasNext);
 
 
@@ -991,9 +1105,9 @@ var indPgLib = (function () {
         //====================
         let pageSummaryCount = 0;
         let totalSummaryCount = 0;
-        let $pageSummaryRow = $('<tr class="table-info">');
+        let $pageSummaryRow = $('<tr class="table-secondary">');
         $pageSummaryRow.append('<td name="selectRowColumn"> </td> ');
-        let $totalSummaryRow = $('<tr class="table-info">');
+        let $totalSummaryRow = $('<tr class="table-secondary">');
         if (indexPageType === definitionsLib.IndexPageTypeEnum.IndexPage) {
             $totalSummaryRow.append('<td name="selectRowColumn"> </td> ');
         }
@@ -1087,15 +1201,47 @@ var indPgLib = (function () {
             , productNatureFilterElement, transactorIdFilterElement
             , warehouseItemIdFilterElement, diaryIdFilterElement
             , cfaIdFilterElement, showCarryOnFilterElement,
-                showSummaryFilterElement,showDisplayLinesWithZeroesFilterElement,materialCategoriesFilterElement, sectionsFilterElement)
+                showSummaryFilterElement,showDisplayLinesWithZeroesFilterElement
+            ,materialCategoriesFilterElement, sectionsFilterElement
+            ,fromCustomFilterDateElement, toCustomFilterDateElement, companiesFilterElement)
             .then((data) => {
+                if(data.nameOfIsozigio){
+                    if($nameOfIsozigioEl.length){
+                        $nameOfIsozigioEl.val(data.nameOfIsozigio);
+                    }
+
+                }
+                bindTitleSuffixes();
+                setIndexViewTitlesBasedOnPeriod();
                 bindDataToTable(data, pageIndexElement);
             })
             .catch((error) => {
                 console.log(error);
+                return error.toString();
             });
     };
-
+    const exportToPdfHandler = () => {
+        return new Promise((resolve, reject) => {
+            setFilterValues();
+            callExportToPdfEndpoint(pageIndexElement, pageSizeElement, tableCurrentSortElement
+                , datePeriodFilterElement, companyFilterElement, searchTextElement
+                , currencyFilterElement, transactorTypeFilterElement
+                , productNatureFilterElement, transactorIdFilterElement
+                , warehouseItemIdFilterElement, diaryIdFilterElement
+                , cfaIdFilterElement, showCarryOnFilterElement,
+                showSummaryFilterElement, showDisplayLinesWithZeroesFilterElement
+                , materialCategoriesFilterElement, sectionsFilterElement
+                ,fromCustomFilterDateElement, toCustomFilterDateElement,companiesFilterElement)
+                .then((data) => {
+                    console.log("PDF download started!");
+                    resolve(data);
+                })
+                .catch((error) => {
+                    console.error("Error downloading PDF:", error);
+                    reject(error);
+                });
+        });
+    };
     const addPagerElementEventListeners = () => {
         let pagerElements = document.getElementsByClassName("page-link");
         Array.from(pagerElements).forEach((item) => {
@@ -1137,6 +1283,53 @@ var indPgLib = (function () {
     const registerPageHandlers = () => {
         registerHandlers(pageHandlersToRegister);
     };
+    const setIndexViewTitlesBasedOnPeriod= ()=>{
+        let initialPageTitle;
+      
+        const elemInitPageTitle = document.getElementById('initialPageTitle');
+        if (elemInitPageTitle) {
+            initialPageTitle = elemInitPageTitle.value;
+        }
+        bindTitleSuffixes();
+        initialPageTitle += ` ${addToTitleText} `;
+        const elemHTitle = document.getElementById('hElementTitle');
+        const label = document.getElementById('datePeriodLabel');
+        const elemDatePeriod = document.getElementById('DatePeriodFilter');
+        let periodText;
+        let periodCode;
+        if (elemDatePeriod) {
+            periodText = elemDatePeriod.options[elemDatePeriod.selectedIndex].text;
+            periodCode = elemDatePeriod.options[elemDatePeriod.selectedIndex].value;
+            if(periodCode==="CUSTOM"){
+                const elemFrom = document.getElementById('fromDateFilterEl');
+                const elemTo = document.getElementById('toDateFilterEl');
+                const fromLb = commonLib.formatDateInputValue(elemFrom.value);
+                const toLb =  commonLib.formatDateInputValue(elemTo.value);
+                if(label){
+                    label.innerText = `${fromLb} ${toLb}`;
+                }
+               
+                const title = `${initialPageTitle} από ${fromLb} έως ${toLb}` ;
+                document.title = title;
+                if (elemHTitle) {
+                    elemHTitle.innerText = title;
+                }
+            } else {
+                const title = `${initialPageTitle} Περίοδος ${periodText}` ;
+                document.title = title;
+                if(elemHTitle){
+                    elemHTitle.innerText = title;
+                }
+                if(label){
+                    label.innerText = `Period:`;
+                }
+            }
+        }
+       
+        
+        
+       
+    };
     const loadSettings = (localStorageKey) => {
         var storageItemJs = localStorage.getItem(localStorageKey);
         if (storageItemJs === undefined || storageItemJs === null) {
@@ -1164,7 +1357,14 @@ var indPgLib = (function () {
             $("#rowSelectorsVisible").val(filtersValue);
 
             filtersValue = storageItem.find((x) => x.filterKey === "dateRangeFilter").filterValue;
-            $datePeriodFilter.val(filtersValue);
+            if(filtersValue === "CUSTOM"){
+                $datePeriodFilter.val('CURMONTH');
+                //$fromCustomFilterDate.val(storageItem.find((x) => x.filterKey === "fromCustomFilterDate").filterValue);
+                //$toCustomFilterDate.val(storageItem.find((x) => x.filterKey === "toCustomFilterDate").filterValue);
+            }else {
+                $datePeriodFilter.val(filtersValue);
+            }
+            
             filtersValue = storageItem.find((x) => x.filterKey === "currentSort").filterValue;
             $currentSort.val(filtersValue);
             filtersValue = storageItem.find((x) => x.filterKey === "companyFilter").filterValue;
@@ -1204,6 +1404,7 @@ var indPgLib = (function () {
         var pageIndex = $pageIndex.val();
         var currentCurrency = $currencySelector.val();
         var sectionsFilter = $sectionsFilter.val();
+        let showCarryOnFilter = $showCarryOnFlt.is(':checked')
         var filtersArr = [];
         //#endregion
         filtersArr.push({
@@ -1247,13 +1448,222 @@ var indPgLib = (function () {
         localStorage.setItem(localStorageKey, sessionVal);
         //#endregion
     };
-    //register common handlers
+
+    const ensureFltManLibLoadedOld=(scriptPath, callback)=> {
+        // 1. Check if already loaded
+        if (typeof fltManLib !== 'undefined') {
+            console.log('fltManLib already loaded.');
+            if (typeof callback === 'function') {
+                callback(null); // Call callback immediately (null indicates no error)
+            }
+            return;
+        }
+
+        // 2. Check if a script tag with this source already exists (basic check)
+        // Note: This doesn't guarantee it *finished* loading or didn't error.
+        if (document.querySelector(`script[src="${scriptPath}"]`)) {
+            console.log('fltManLib script tag found, assuming loading or loaded.');
+            // Potential issue: If called again before the first load finishes,
+            // the callback might run too early. Promises handle this better.
+            // For simplicity here, we might still need to wait or use the library cautiously.
+            // A robust callback solution would need queueing, which adds complexity.
+            // Let's proceed with a simple load attempt if check 1 failed.
+        }
+
+
+        // 3. Attempt to load
+        console.log('fltManLib not found. Attempting to load...');
+        const script = document.createElement('script');
+        script.src = scriptPath;
+        script.type = 'text/javascript';
+        script.async = true;
+
+        script.onload = () => {
+            if (typeof fltManLib !== 'undefined') {
+                console.log(`fltManLib loaded successfully from ${scriptPath}`);
+                if (typeof callback === 'function') callback(null); // Success
+            } else {
+                console.error(`Script ${scriptPath} loaded, but 'fltManLib' is still undefined.`);
+                if (typeof callback === 'function') callback(new Error(`'fltManLib' not defined after loading ${scriptPath}`));
+            }
+        };
+
+        script.onerror = () => {
+            console.error(`Failed to load script: ${scriptPath}`);
+            if (typeof callback === 'function') {
+                callback(new Error(`Failed to load script: ${scriptPath}`)); // Pass error to callback
+            }
+        };
+
+        document.head.appendChild(script);
+    };
+    function ensureFltManLibLoaded(scriptPath) {
+        if (window.fltManLib) return Promise.resolve(window.fltManLib);
+
+        // If not loaded, dynamically add the script:
+        const script = document.createElement('script');
+        // script.src = '/js/filterManagement.lib.js';
+        script.src = scriptPath;
+        document.body.appendChild(script);
+
+        // Must return a Promise that resolves when the script loads!
+        // (Otherwise, undefined is returned)
+        return new Promise((resolve, reject) => {
+            script.onload = () => resolve(window.fltManLib);
+            script.onerror = reject;
+        });
+    }
+
+    /**
+     * Applies settings from localStorage to form elements, using defaults if storage is missing or invalid.
+     * @param {string} storageKey - The key used in localStorage.
+     * @param {object} config - Configuration mapping element IDs to storage keys, defaults, and properties.
+     */
+
+    const saveSettingsToStorage=(storageKey, config)=>{
+        // const pathToFltManLib = '/js/filterManagement.lib.js';
+        //
+        // ensureFltManLibLoaded(pathToFltManLib)
+        //     .then(() => {
+        //         console.log('fltManLib is ready to use.');
+                fltManLib.saveSettingsToStorage(storageKey,config);
+            // })
+            // .catch(error => {
+            //     console.error('Failed to load or initialize fltManLib:', error);
+            // });
+
+    };
+    const applySettingsFromStorage=(storageKey, config)=>{
+        // const pathToFltManLib = '/js/filterManagement.lib.js';
+        //
+        // ensureFltManLibLoaded(pathToFltManLib)
+        //     .then(() => {
+        //         console.log('fltManLib is ready to use.');
+                fltManLib.applySettingsFromStorage(storageKey,config);
+            // })
+            // .catch(error => {
+            //     console.error('Failed to load or initialize fltManLib:', error);
+            // });
+
+    };
+    const saveSettingsToStorageOld=(storageKey, config)=>{
+        const settingsToStore = [];
+
+        // Iterate through config and read settings using jQuery
+        for (const elementId in config) {
+            if (Object.hasOwnProperty.call(config, elementId)) {
+                //const { key: settingKey, prop } = config[elementId];
+                const { key: settingKey, prop, dataType } = config[elementId]; // Get dataType
+
+                const $element = $('#' + elementId); // Use jQuery selector
+
+                if ($element.length) { // Check if element exists
+                    try {
+                        let currentValue;
+                        if (dataType === 'array') {
+                            currentValue = $element.val(); 
+                        }
+                        else if (prop === 'checked') {
+                            // Use .prop() to read boolean properties
+                            currentValue = $element.prop('checked');
+                        } else if (prop === 'value') {
+                            // Use .val() to read 'value'
+                            currentValue = $element.val();
+                        } else {
+                            // Fallback for potentially other properties
+                            currentValue = $element.prop(prop);
+                            console.warn(`Attempting to read non-standard property '${prop}' using .prop() from '#${elementId}'. Verify this is intended.`);
+                        }
+                        settingsToStore.push({ filterKey: settingKey, filterValue: currentValue });
+                    } catch (e) {
+                        console.error(`Error reading property/value from jQuery element '#${elementId}'. Skipping this setting.`, e);
+                    }
+                } else {
+                     console.warn(`Element with ID "${elementId}" not found in the DOM using jQuery during save. Skipping this setting.`);
+                }
+            }
+        }
+
+        // Save the array to localStorage (no change here)
+        try {
+            const jsonString = JSON.stringify(settingsToStore);
+            localStorage.setItem(storageKey, jsonString);
+             console.log(`Settings saved successfully to localStorage storageKey "${storageKey}".`);
+        } catch (error) {
+            console.error(`Failed to save settings to localStorage key "${storageKey}".`, error);
+        }
+
+
+    }
+    const applySettingsFromStorageOld=(storageKey, config)=>{
+        const storedString = localStorage.getItem(storageKey);
+        let loadedSettings = {};
+
+        if (storedString) {
+            try {
+                const storedArray = JSON.parse(storedString);
+                if (Array.isArray(storedArray)) {
+                    loadedSettings = storedArray.reduce((acc, item) => {
+                        if (item && typeof item.filterKey === 'string') {
+                            acc[item.filterKey] = item.filterValue;
+                        }
+                        return acc;
+                    }, {});
+                } else {
+                    console.warn(`localStorage item "${storageKey}" is not a valid array. Using defaults.`);
+                }
+            } catch (error) {
+                console.error(`Failed to parse localStorage item "${storageKey}". Using defaults.`, error);
+            }
+        } else {
+            console.log(`localStorage item "${storageKey}" not found. Using defaults.`);
+        }
+
+        // Iterate through config and apply settings using jQuery
+        for (const elementId in config) {
+            if (Object.hasOwnProperty.call(config, elementId)) {
+                //const { key: settingKey, default: defaultValue, prop } = config[elementId];
+                const { key: settingKey, default: defaultValue, prop, dataType } = config[elementId];
+
+                const $element = $('#' + elementId); // Use jQuery selector
+
+                if ($element.length) { // Check if element exists using jQuery's length property
+                    let value = loadedSettings[settingKey] !== undefined ? loadedSettings[settingKey] : defaultValue;
+                    try {
+                        // --- Special Handling for Array ---
+                        if (dataType === 'array') {
+                             $element.val(value); // Set using .val()
+                        }
+
+                        else if (prop === 'checked') {
+                            // Use .prop() for boolean properties like 'checked'
+                            $element.prop('checked', Boolean(value));
+                        } else if (prop === 'value') {
+                            // Use .val() for 'value' property
+                            $element.val(value);
+                        } else {
+                            // Fallback for potentially other properties (less common with jQuery)
+                            $element.prop(prop, value);
+                            console.warn(`Attempting to set non-standard property '${prop}' using .prop() on '#${elementId}'. Verify this is intended.`);
+                        }
+                    } catch (e) {
+                        console.error(`Error setting property/value on jQuery element '#${elementId}' with value '${value}'.`, e);
+                    }
+                } else {
+                    // console.warn(`Element with ID "${elementId}" not found in the DOM using jQuery during apply.`);
+                }
+            }
+        }
+
+    }
+        //register common handlers
     setupCreateNewElement();
     registerHandlers(commonHandlers);
     return {
         getIndexPageDefinition: getIndexPageDefinition,
         setIndexPageDefinition: setIndexPageDefinition,
         refreshData: refreshTableData,
+        exportToPdfHandler: exportToPdfHandler,
         addPagerElementEventListeners: addPagerElementEventListeners,
         getTableCurrentSort: getTableCurrentSort,
         setTableCurrentSort: setTableCurrentSort,
@@ -1266,7 +1676,10 @@ var indPgLib = (function () {
         setCurrencyFormatter: setCurrencyFormatter,
         setNumberFormatter: setNumberFormatter,
         loadSettings: loadSettings,
-        saveSettings: saveSettings
+        saveSettings: saveSettings,
+        setIndexViewTitlesBasedOnPeriod:setIndexViewTitlesBasedOnPeriod,
+        saveSettingsToStorage:saveSettingsToStorage,
+        applySettingsFromStorage:applySettingsFromStorage
         
     };
 })();

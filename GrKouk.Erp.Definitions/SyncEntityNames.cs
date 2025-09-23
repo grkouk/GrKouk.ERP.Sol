@@ -8,6 +8,8 @@ public static class SyncEntityNames
     public const string SyncSaleDocument= "SyncSaleDocument";
     // ReSharper disable once InconsistentNaming
     public const string SyncSupplier= "SyncSupplier";
+    // ReSharper disable once InconsistentNaming
+    public const string SyncDayCloseDate= "SyncDayCloseData";
        
         
 }
