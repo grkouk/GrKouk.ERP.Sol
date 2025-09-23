@@ -1,16 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <Authors>George Koukoudis</Authors>
     <Company>GrKouk</Company>
     <Copyright>George Koukoudis</Copyright>
-    <PackageVersion>2.0.0.0</PackageVersion>
+    <PackageVersion>3.0.0.0</PackageVersion>
     <Title>GrKouk.Erp.Definitions</Title>
     <Description>GrKouk.Erp.Definitions </Description>
-    <AssemblyVersion>2.0.0.0</AssemblyVersion>
-    <FileVersion>2.0.0.0</FileVersion>
-    <Version>2.0.0.0</Version>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <FileVersion>3.0.0.0</FileVersion>
+    <Version>3.0.0.0</Version>
   </PropertyGroup>
 
 </Project>
