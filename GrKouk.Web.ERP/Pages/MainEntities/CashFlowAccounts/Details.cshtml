@@ -370,7 +370,9 @@
                     .addParams('entityId', mainEntityId)
                     .addParams('dateRange', selPeriodId)
                     .addParams('companyFilter', selCompanies)
-                    .addParams('displayCurrencyId', selCurrencyId);
+                    .addParams('displayCurrencyId', selCurrencyId)
+                    .addParams('fromCustomFilterDate', fromCustomDate)
+                    .addParams('toCustomFilterDate', toCustomDate);
             };
             window.refreshData = refreshView;
             const formatNumericElements = () => {
