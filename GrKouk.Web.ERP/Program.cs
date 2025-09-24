@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using NToastNotify;
 
@@ -79,6 +80,7 @@ namespace GrKouk.Web.ERP
                                 context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                                 return Task.CompletedTask;
                             }
+
                             context.Response.Redirect(context.RedirectUri);
                             return Task.CompletedTask;
                         }
@@ -111,7 +113,8 @@ namespace GrKouk.Web.ERP
                 });
                 options.AddPolicy("ApiPolicy2", policy =>
                 {
-                    policy.AddAuthenticationSchemes(CookieAuthenticationDefaults.AuthenticationScheme, JwtBearerDefaults.AuthenticationScheme);
+                    policy.AddAuthenticationSchemes(CookieAuthenticationDefaults.AuthenticationScheme,
+                        JwtBearerDefaults.AuthenticationScheme);
                     policy.RequireAuthenticatedUser();
                     policy.RequireRole("Admin");
                 });
@@ -149,6 +152,43 @@ namespace GrKouk.Web.ERP
 
             var app = builder.Build();
 
+            // Database connectivity check (startup gate)
+            // I have disabled this check for now, because it is not showing a good error message.
+
+            #region Database connectivity check
+
+            // try
+            // {
+            //     using var scope = app.Services.CreateScope();
+            //     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+            //     var db = scope.ServiceProvider.GetRequiredService<ApiDbContext>();
+            //
+            //     // Option A: quick connectivity check
+            //     if (!db.Database.CanConnect())
+            //     {
+            //         logger.LogCritical(
+            //             "Cannot connect to the database using connection string 'DefaultConnection'. Aborting startup.");
+            //         // Fail fast so containers/orchestrators can restart
+            //         Environment.ExitCode = -1;
+            //         return; // prevent app.Run()
+            //     }
+            //
+            //     // Option B: ensure/migrate if that’s desired (comment out if not)
+            //     // db.Database.Migrate();
+            //
+            //     logger.LogInformation("Database connectivity check passed.");
+            // }
+            // catch (Exception ex)
+            // {
+            //     // Any exception trying to resolve the context or connect
+            //     var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
+            //     var logger = loggerFactory.CreateLogger<Program>();
+            //     logger.LogCritical(ex, "Database connectivity check failed during startup.");
+            //     Environment.ExitCode = -1;
+            //     return; // prevent app.Run()
+            // }
+            #endregion
+            // ... the rest of your middleware and endpoints
             if (app.Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -178,7 +218,8 @@ namespace GrKouk.Web.ERP
                 endpoints.MapHealthChecks("/health");
             });
 
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JFaF5cXGRCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXZcc3VQRGNeVEdyXURWYEg=");
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(
+                "Ngo9BigBOggjHTQxAR8/V1JFaF5cXGRCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXZcc3VQRGNeVEdyXURWYEg=");
             // Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Mgo+DSMBMAY9C3t2XVhhQlJHfV5AQmBIYVp/TGpJfl96cVxMZVVBJAtUQF1hTH5Sd0RiXn9ccHFXTmNZ");
 
             app.Run();
