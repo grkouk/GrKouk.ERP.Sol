@@ -39,7 +39,8 @@
     </ul>
 </div>
 <input type="hidden" asp-for="CfaId" />
-@await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowDateFlt = true })
+@await Component.InvokeAsync("IndexFilters", new IndexFiltersToShow { ShowDateFlt = true ,ShowDisplayCarryOnLineFlt =
+    true,})
 
 
 <div class="row mt-1">
@@ -347,6 +348,15 @@
                         currencyChanged();
                         indPgLib.refreshData();
                     }
+                },
+                {
+                    selector: '#ShowCarryOnFlt',
+                    event: 'change',
+                    handler: function (event) {
+
+                        indPgLib.refreshData();
+                    }
+                
                 }
             ];
             const indexPageDef = {
