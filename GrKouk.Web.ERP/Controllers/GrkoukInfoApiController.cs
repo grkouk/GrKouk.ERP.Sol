@@ -6561,30 +6561,31 @@ namespace GrKouk.Web.ERP.Controllers
                 DateTime toDate = dfDates.ToDate;
 
                 transactionsList = transactionsList.Where(p => p.TransDate >= fromDate && p.TransDate <= toDate);
-                transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
-            }
-
-            if (!string.IsNullOrEmpty(request.CompanyFilter))
-            {
-                if (int.TryParse(request.CompanyFilter, out var companyId))
+                if (request.ShowCarryOnAmountsInTabs)
                 {
-                    if (companyId > 0)
-                    {
-                        transactionsList = transactionsList.Where(p => p.CompanyId == companyId);
-                        transListBeforePeriod = transListBeforePeriod.Where(p => p.CompanyId == companyId);
-                        transListAll = transListAll.Where(p => p.CompanyId == companyId);
-                    }
+                    transListBeforePeriod = transListBeforePeriod.Where(p => p.TransDate < fromDate);
                 }
             }
+            if (!string.IsNullOrEmpty(request.CompaniesFilter))
+            {
+                transactionsList = FilterEval.ApplyIntListFilterFromJson(transactionsList, request.CompaniesFilter, 0, p => p.CompanyId);
+                transListAll = FilterEval.ApplyIntListFilterFromJson(transListAll, request.CompaniesFilter, 0, p => p.CompanyId);
+            }
+            // if (!string.IsNullOrEmpty(request.CompanyFilter))
+            // {
+            //     if (int.TryParse(request.CompanyFilter, out var companyId))
+            //     {
+            //         if (companyId > 0)
+            //         {
+            //             transactionsList = transactionsList.Where(p => p.CompanyId == companyId);
+            //             transListAll = transListAll.Where(p => p.CompanyId == companyId);
+            //         }
+            //     }
+            // }
 
             if (!string.IsNullOrEmpty(request.SearchFilter))
             {
                 transactionsList = transactionsList.Where(p =>
-                    p.DocumentSeries.Name.Contains(request.SearchFilter)
-                    || p.DocumentSeries.Code.Contains(request.SearchFilter)
-                    || p.RefCode.Contains(request.SearchFilter)
-                );
-                transListBeforePeriod = transListBeforePeriod.Where(p =>
                     p.DocumentSeries.Name.Contains(request.SearchFilter)
                     || p.DocumentSeries.Code.Contains(request.SearchFilter)
                     || p.RefCode.Contains(request.SearchFilter)
@@ -6669,73 +6670,97 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
             //-----------------------------------------------
-            var dbTransBeforePeriod =
-                transListBeforePeriod.ProjectTo<CfaTransactionListDto>(_mapper.ConfigurationProvider);
-            var transBeforePeriodList = await dbTransBeforePeriod.ToListAsync();
-            foreach (var item in transBeforePeriodList)
+            var listWithTotal = new List<CfaKartelaLine>();
+            decimal runningTotal = 0;
+            if (request.ShowCarryOnAmountsInTabs)
             {
-                if (item.CompanyCurrencyId != 1)
+                if (!string.IsNullOrEmpty(request.CompaniesFilter))
                 {
-                    var r = currencyRates.Where(p => p.CurrencyId == item.CompanyCurrencyId)
-                        .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
-                    if (r != null)
-                    {
-                        item.Amount /= r.Rate;
-                        item.TransAmount /= r.Rate;
-                    }
+                    transListBeforePeriod = FilterEval.ApplyIntListFilterFromJson(transListBeforePeriod, request.CompaniesFilter, 0, p => p.CompanyId);
                 }
+                 // if (!string.IsNullOrEmpty(request.CompanyFilter))
+                 // {
+                 //     if (int.TryParse(request.CompanyFilter, out var companyId))
+                 //     {
+                 //         if (companyId > 0)
+                 //         {
+                 //            
+                 //                 transListBeforePeriod = transListBeforePeriod.Where(p => p.CompanyId == companyId);
+                 //            
+                 //         }
+                 //     }
+                 // }
 
-                if (request.DisplayCurrencyId != 1)
-                {
-                    var r = currencyRates.Where(p => p.CurrencyId == request.DisplayCurrencyId)
-                        .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
-                    if (r != null)
-                    {
-                        item.Amount *= r.Rate;
-                        item.TransAmount *= r.Rate;
-                    }
-                }
+                 if (!string.IsNullOrEmpty(request.SearchFilter))
+                 {
+                     transListBeforePeriod = transListBeforePeriod.Where(p =>
+                         p.DocumentSeries.Name.Contains(request.SearchFilter)
+                         || p.DocumentSeries.Code.Contains(request.SearchFilter)
+                         || p.RefCode.Contains(request.SearchFilter));
+                 }
+
+                 var dbTransBeforePeriod =
+                     transListBeforePeriod.ProjectTo<CfaTransactionListDto>(_mapper.ConfigurationProvider);
+                 var transBeforePeriodList = await dbTransBeforePeriod.ToListAsync();
+                 foreach (var item in transBeforePeriodList)
+                 {
+                     if (item.CompanyCurrencyId != 1)
+                     {
+                         var r = currencyRates.Where(p => p.CurrencyId == item.CompanyCurrencyId)
+                             .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
+                         if (r != null)
+                         {
+                             item.Amount /= r.Rate;
+                             item.TransAmount /= r.Rate;
+                         }
+                     }
+
+                     if (request.DisplayCurrencyId != 1)
+                     {
+                         var r = currencyRates.Where(p => p.CurrencyId == request.DisplayCurrencyId)
+                             .OrderByDescending(p => p.ClosingDate).FirstOrDefault();
+                         if (r != null)
+                         {
+                             item.Amount *= r.Rate;
+                             item.TransAmount *= r.Rate;
+                         }
+                     }
+                 }
+
+                 //Create before period line
+                 var bl1 = new
+                 {
+                     Deposit = transBeforePeriodList.Sum(x => x.DepositAmount),
+                     Withdraw = transBeforePeriodList.Sum(x => x.WithdrawAmount),
+                         
+                 };
+
+                 var beforePeriod = new CfaKartelaLine();
+                 if (bl1.Withdraw >= bl1.Deposit)
+                 {
+                     var amnt = bl1.Withdraw - bl1.Deposit;
+                     beforePeriod.Withdraw = amnt;
+                     beforePeriod.Deposit = 0;
+                 }
+                 else
+                 {
+                     var amnt = bl1.Deposit - bl1.Withdraw;
+                     beforePeriod.Withdraw = 0;
+                     beforePeriod.Deposit = amnt;
+                 }
+
+                 beforePeriod.RunningTotal = bl1.Deposit - bl1.Withdraw;
+
+                 beforePeriod.TransDate = beforePeriodDate;
+                 beforePeriod.DocSeriesCode = "Εκ.Μεταφ.";
+                 beforePeriod.DocSeriesName = "Εκ.Μεταφoράς.";
+                 beforePeriod.CreatorId = -1;
+                 beforePeriod.CashFlowAccountName = "";
+
+                 listWithTotal.Add(beforePeriod);
+                 runningTotal = beforePeriod.RunningTotal;
             }
-
-            //Create before period line
-            var bl1 = new
-            {
-                Deposit = transBeforePeriodList.Sum(x => x.DepositAmount),
-                Withdraw = transBeforePeriodList.Sum(x => x.WithdrawAmount),
-            };
-
-            var beforePeriod = new CfaKartelaLine();
-            if (bl1.Withdraw >= bl1.Deposit)
-            {
-                var amnt = bl1.Withdraw - bl1.Deposit;
-                beforePeriod.Withdraw = amnt;
-                beforePeriod.Deposit = 0;
-            }
-            else
-            {
-                var amnt = bl1.Deposit - bl1.Withdraw;
-                beforePeriod.Withdraw = 0;
-                beforePeriod.Deposit = amnt;
-            }
-
-            beforePeriod.RunningTotal = bl1.Deposit - bl1.Withdraw;
-
-
-            beforePeriod.TransDate = beforePeriodDate;
-            beforePeriod.DocSeriesCode = "Εκ.Μεταφ.";
-            beforePeriod.DocSeriesName = "Εκ.Μεταφ.";
-            beforePeriod.CreatorId = -1;
-            beforePeriod.CashFlowAccountName = "";
-
-            var listWithTotal = new List<CfaKartelaLine>
-            {
-                beforePeriod
-            };
-
             //----------------------------------------------------
-
-
-            decimal runningTotal = beforePeriod.RunningTotal;
 
             foreach (var dbTransaction in dbTransactions)
             {
@@ -7011,19 +7036,23 @@ namespace GrKouk.Web.ERP.Controllers
             //Handle before period carry on row
             if (request.ShowCarryOnAmountsInTabs)
             {
-                if (!string.IsNullOrEmpty(request.CompanyFilter))
+                if (!string.IsNullOrEmpty(request.CompaniesFilter))
                 {
-                    if (int.TryParse(request.CompanyFilter, out var companyId))
-                    {
-                        if (companyId > 0)
-                        {
-                            if (request.ShowCarryOnAmountsInTabs)
-                            {
-                                transListBeforePeriod = transListBeforePeriod.Where(p => p.CompanyId == companyId);
-                            }
-                        }
-                    }
+                    transListBeforePeriod = FilterEval.ApplyIntListFilterFromJson(transListBeforePeriod, request.CompaniesFilter, 0, p => p.CompanyId);
                 }
+                // if (!string.IsNullOrEmpty(request.CompanyFilter))
+                // {
+                //     if (int.TryParse(request.CompanyFilter, out var companyId))
+                //     {
+                //         if (companyId > 0)
+                //         {
+                //             if (request.ShowCarryOnAmountsInTabs)
+                //             {
+                //                 transListBeforePeriod = transListBeforePeriod.Where(p => p.CompanyId == companyId);
+                //             }
+                //         }
+                //     }
+                // }
 
                 if (!string.IsNullOrEmpty(request.SearchFilter))
                 {
@@ -7305,17 +7334,7 @@ namespace GrKouk.Web.ERP.Controllers
                 transactionsList = FilterEval.ApplyIntListFilterFromJson(transactionsList, request.CompaniesFilter, 0, p => p.CompanyId);
                 transListAll = FilterEval.ApplyIntListFilterFromJson(transListAll, request.CompaniesFilter, 0, p => p.CompanyId);
             }
-            // if (!string.IsNullOrEmpty(request.CompanyFilter))
-            // {
-            //     if (int.TryParse(request.CompanyFilter, out var companyId))
-            //     {
-            //         if (companyId > 0)
-            //         {
-            //             transactionsList = transactionsList.Where(p => p.CompanyId == companyId);
-            //             transListAll = transListAll.Where(p => p.CompanyId == companyId);
-            //         }
-            //     }
-            // }
+            
 
             if (!string.IsNullOrEmpty(request.SearchFilter))
             {
@@ -7421,19 +7440,23 @@ namespace GrKouk.Web.ERP.Controllers
             //Handle before period carry on row
             if (request.ShowCarryOnAmountsInTabs)
             {
-                if (!string.IsNullOrEmpty(request.CompanyFilter))
+                if (!string.IsNullOrEmpty(request.CompaniesFilter))
                 {
-                    if (int.TryParse(request.CompanyFilter, out var companyId))
-                    {
-                        if (companyId > 0)
-                        {
-                            if (request.ShowCarryOnAmountsInTabs)
-                            {
-                                transListBeforePeriod = transListBeforePeriod.Where(p => p.CompanyId == companyId);
-                            }
-                        }
-                    }
+                    transListBeforePeriod = FilterEval.ApplyIntListFilterFromJson(transListBeforePeriod, request.CompaniesFilter, 0, p => p.CompanyId);
                 }
+                // if (!string.IsNullOrEmpty(request.CompanyFilter))
+                // {
+                //     if (int.TryParse(request.CompanyFilter, out var companyId))
+                //     {
+                //         if (companyId > 0)
+                //         {
+                //             if (request.ShowCarryOnAmountsInTabs)
+                //             {
+                //                 transListBeforePeriod = transListBeforePeriod.Where(p => p.CompanyId == companyId);
+                //             }
+                //         }
+                //     }
+                // }
 
                 if (!string.IsNullOrEmpty(request.SearchFilter))
                 {

@@ -1,0 +1,216 @@
+﻿@page
+@model DetailsModel
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+    Layout = "_LayoutEntryFormTransaction";
+    ViewData["Title"] = "Προβολή κίνησης Χρηματικού Λογαριασμού";
+}
+<hr />
+<div class="container-xxl">
+    <form method="post">
+        <fieldset id="thisForm" disabled>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="@Model.InitialLoad" id="IsInitialLoad"/>
+            <input type="hidden" asp-for="@Model.CopyFromId" id="CopyFromId"/>
+            <input type="hidden" asp-for="@Model.CopyFromTransactorId" id="CopyFromTransactorId"/>
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <div class="form-floating">
+                        <input asp-for="ItemVm.TransDate" class="form-control form-control-sm" autofocus/>
+                        <label asp-for="ItemVm.TransDate" class="form-label small"></label>
+                        <span asp-validation-for="ItemVm.TransDate" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="form-floating">
+                        <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm" asp-items="ViewBag.CompanyId"></select>
+                        <label asp-for="ItemVm.CompanyId" class="form-label small"></label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-floating">
+                        <input asp-for="ItemVm.TransRefCode" class="form-control form-control-sm" placeholder="Ref Code"/>
+                        <label asp-for="ItemVm.TransRefCode" class="form-label small"></label>
+                        <span asp-validation-for="ItemVm.TransRefCode" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3 align-items-center">
+
+
+                <div class="col-md-5">
+                    <div class="form-floating">
+                        <select asp-for="ItemVm.CashFlowAccountId" class="form-select form-select-sm"></select>
+                        <label asp-for="ItemVm.CashFlowAccountId" class="form-label small"></label>
+                        <span asp-validation-for="ItemVm.CashFlowAccountId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-auto ms-0 ps-0" id="SpinnerLoaderCompanies" style="display: none">
+                    <span class="spinner-border spinner-border-sm text-primary"></span>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <select asp-for="ItemVm.DocSeriesId" class="form-select form-select-sm" asp-items="ViewBag.DocSeriesId"></select>
+                        <label asp-for="ItemVm.DocSeriesId" class="form-label small"></label>
+                    </div>
+                </div>
+            </div>
+            @{
+                var vl = Model.ItemVm?.Amount;
+                var vl1 = FormattableString.Invariant($"{vl}");
+
+            }
+            <div class="row mb-3 justify-content-end">
+                <div class="col-md-3">
+                    <div class="form-floating">
+                        <input asp-for="ItemVm.Amount" class="form-control form-control-sm text-end currency-input" placeholder="Amount" 
+                               data-actualValue="@vl1"/>
+                        <label asp-for="ItemVm.Amount" class="form-label small"></label>
+                        <div class="invalid-feedback">
+                            <span asp-validation-for="ItemVm.Amount" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <div class="form-floating">
+                        <textarea asp-for="ItemVm.Etiology" class="form-control form-control-sm" placeholder="Αιτιολογία Κίνησης"> </textarea>
+                        <label asp-for="ItemVm.Etiology" class="form-label small"></label>
+                    </div>
+                    <div class="invalid-feedback">
+                        <span asp-validation-for="ItemVm.Etiology" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            @* <div class="row mb-3"> *@
+            @*     <div class="col"> *@
+            @*         <input type="submit" value="Create" class="btn btn-primary btn-sm" id="saveForm"/> *@
+            @*     </div> *@
+            @* </div> *@
+        </fieldset>
+    </form>
+    <a asp-page="./Edit" asp-route-id="@Model.ItemVm.Id">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsStrippedPartial");}
+    <script src="~/js/product.lib.js"></script>
+     <script>
+        $(document).ready(function () {
+            let formatterCurrency;
+            let formatterNumber;
+            let parseNumber;
+            let formatCurrency;
+            let formatNumber;
+            var $initialLoad = $('#IsInitialLoad');
+            const $spinnerElement = $('#SpinnerLoaderCompanies');
+            //if (!$initialLoad.val()) return;
+            const $transDate = $('#ItemVm_TransDate');
+            const $cfaId = $('#cfaId');
+            const $amount = $('#ItemVm_Amount');
+            const $companyId = $('#ItemVm_CompanyId');
+            const $docCurrency = $('[name=docCurrency]');
+            const $cashFlowAccountId = $('#ItemVm_CashFlowAccountId');
+
+            const formatCurrencyLineValueElements = () => {
+                let $elementsToUpdateVal = $('.currency-input');
+                $elementsToUpdateVal.each(function() {
+                    let $el = $(this);
+                    let parse = Globalize.numberParser();
+                    let elValue = parse($el.val());
+                    if (!isNaN(elValue)) {
+                        $el.val(formatterCurrency.format(elValue));
+                    }
+
+                });
+            };
+            const updateCurrencyFormat = () => {
+                formatCurrencyLineValueElements();
+            };
+            const prepCurrencyInputs = () => {
+                productLib.prepCurrencyInputs();
+                
+            };
+            const prepCurrencyInputsForPost = () => {
+                productLib.prepCurrencyInputsForPost();
+                
+            };
+
+            const loadCompanyCfAccounts = (lst) => {
+                $cashFlowAccountId.empty();
+                $.each(lst, function(index, item) {
+                    $cashFlowAccountId.append($('<option></option>').attr('value', item.value).text(item.text));
+                });
+            };
+
+            const companyChanged = () => {
+                let companyId = parseInt($companyId.val());
+
+                if (isNaN(companyId)) {
+                    companyId = 0;
+                }
+                if (companyId > 0) {
+
+                    productLib.getCompanyCashFlowAccounts(companyId, $spinnerElement)
+                        .then((data) => {
+                            loadCompanyCfAccounts(data.accounts);
+                            let cfaId = $cfaId.val();
+                            $cashFlowAccountId.val(cfaId);
+                            let currencyCode = data.currencyCode;
+                            let locale = data.currencyLocale.substring(0,2);
+                            productLib.setGlobalizeLocale(locale)
+                                .then(() => {
+                                    formatterCurrency = new Intl.NumberFormat(locale,
+                                        {
+                                            style: 'currency',
+                                            currency: currencyCode,
+                                            minimumFractionDigits: 2
+                                        });
+                                    formatterNumber = new Intl.NumberFormat(locale,
+                                        {
+                                            maximumFractionDigits: 3
+
+                                        });
+                                    parseNumber = Globalize.numberParser();
+                                    formatNumber = Globalize.numberFormatter();
+                                    formatCurrency = Globalize.currencyFormatter(currencyCode);
+                                    productLib.setParsers(parseNumber);
+                                    productLib.setFormatters(formatNumber, formatCurrency);
+                                    $docCurrency.text(currencyCode);
+                                    updateCurrencyFormat();
+                                });
+                            
+                           
+                        })
+                        .catch((error) => {
+                            console.log("Error getting company base currency");
+                            console.log(error);
+                        });
+                } else {
+                    $cashFlowAccountId.empty();
+                }
+            };
+
+
+            $companyId.change(() => {
+                companyChanged();
+            });
+            $('#saveForm').click(function (e) {
+                prepCurrencyInputsForPost();
+            });
+           
+
+
+
+            companyChanged();
+            prepCurrencyInputs();
+           
+        });
+
+
+    </script>
+}
