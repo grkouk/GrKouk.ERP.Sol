@@ -92,7 +92,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
 
                 if (!serviceResult.Success)
                 {
-                    ModelState.AddModelError(string.Empty, "Error from transactor service" + serviceResult);
+                    ModelState.AddModelError(string.Empty, "Error from transactor service " + serviceResult.ErrorMessage);
                     LoadCombos();
                     return Page();
                 }
