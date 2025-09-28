@@ -82,7 +82,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
 
             try
             {
-                var serviceResult = await _transService.AddTransactorTransaction(ItemVm,_sectionCode);
+                var serviceResult = await _transService.AddTransactorTransaction(ItemVm);
                 if (serviceResult == null)
                 {
                     ModelState.AddModelError(string.Empty, "Empty response from transactor service");
