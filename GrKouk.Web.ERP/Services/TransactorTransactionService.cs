@@ -23,7 +23,7 @@ public class TransactorTransactionService : ITransactorTransactionService
     }
 
 
-    public async Task<ServiceResult> AddTransactorTransaction(TransactorTransCreateDto itemVm,string  callerSectionCode)
+    public async Task<ServiceResult> AddTransactorTransaction(TransactorTransCreateDto itemVm,string  callerSectionCode=null)
     {
         #region Fiscal Period
 
@@ -169,7 +169,7 @@ public class TransactorTransactionService : ITransactorTransactionService
         return ServiceResult.Ok();
     }
 
-    public async Task<ServiceResult> ModifyTransactorTransaction(TransactorTransModifyDto itemVm)
+    public async Task<ServiceResult> ModifyTransactorTransaction(TransactorTransModifyDto itemVm, string  callerSectionCode=null)
     {
         #region Fiscal Period
 

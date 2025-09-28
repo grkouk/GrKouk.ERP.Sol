@@ -14,9 +14,9 @@ namespace GrKouk.Web.ERP.Services;
 public class TransactorTransactionServiceV2 : ITransactorTransactionService
 {
     private readonly ApiDbContext _context;
-    private readonly ILogger<TransactorTransactionService> _logger;
-
-    public TransactorTransactionServiceV2(ApiDbContext context, ILogger<TransactorTransactionService> logger)
+    private readonly ILogger<TransactorTransactionServiceV2> _logger;
+    private const string _defaultSectionCode = GrKouk.Erp.Definitions.Constants.SectionTransactorTransactions;
+    public TransactorTransactionServiceV2(ApiDbContext context, ILogger<TransactorTransactionServiceV2> logger)
     {
         _context = context;
         _logger = logger;
@@ -75,20 +75,19 @@ public class TransactorTransactionServiceV2 : ITransactorTransactionService
         int sectionId ;
         if (String.IsNullOrEmpty(callerSectionCode))
         {
-            if (itemVm.SectionId == 0)
+            if (docTypeDef.SectionId == 0)
             {
-                if (docTypeDef.SectionId == 0)
+                var sectn = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == _defaultSectionCode);
+                if (sectn == null)
                 {
-                    return ServiceResult.Error("Δεν μπορεί να προσδιοριστεί το Section", "BADREQUEST");
+                    return ServiceResult.Error("Δεν υπάρχει το Section", "BADREQUEST");
                 }
-
-                sectionId = docTypeDef.SectionId;
+                sectionId = sectn.Id;
             }
             else
             {
-                sectionId = itemVm.SectionId;
+                sectionId = docTypeDef.SectionId;
             }
-                
         }
         else
         {
@@ -183,7 +182,7 @@ public class TransactorTransactionServiceV2 : ITransactorTransactionService
         return ServiceResult.Ok(spTransaction);
     }
 
-    public async Task<ServiceResult> ModifyTransactorTransaction(TransactorTransModifyDto itemVm)
+    public async Task<ServiceResult> ModifyTransactorTransaction(TransactorTransModifyDto itemVm, string callerSectionCode = null)
     {
         #region Fiscal Period
 
@@ -209,24 +208,34 @@ public class TransactorTransactionServiceV2 : ITransactorTransactionService
 
         #region Section Management
 
-        int sectionId;
-        if (docTypeDef.SectionId == 0)
+        int sectionId ;
+        if (String.IsNullOrEmpty(callerSectionCode))
         {
-            var sectn = await _context.Sections
-                .SingleOrDefaultAsync(s => s.SystemName == GrKouk.Erp.Definitions.Constants.SectionTransactorTransactions);
+            if (docTypeDef.SectionId == 0)
+            {
+                var sectn = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == _defaultSectionCode);
+                if (sectn == null)
+                {
+                    return ServiceResult.Error("Δεν υπάρχει το Section", "BADREQUEST");
+                }
+                sectionId = sectn.Id;
+            }
+            else
+            {
+                sectionId = docTypeDef.SectionId;
+            }
+        }
+        else
+        {
+            var sectn = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == callerSectionCode);
             if (sectn == null)
             {
                 return ServiceResult.Error("Δεν υπάρχει το Section", "BADREQUEST");
             }
             sectionId = sectn.Id;
         }
-        else
-        {
-            sectionId = docTypeDef.SectionId;
-        }
-
+        
         #endregion
-
         // Get old transaction (for old section id) and the entity to update
         var spOldTrans = await _context.TransactorTransactions
             .AsNoTracking()
