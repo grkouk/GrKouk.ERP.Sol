@@ -23,7 +23,7 @@ public class TransactorTransactionServiceV2 : ITransactorTransactionService
     }
 
 
-    public async Task<ServiceResult> AddTransactorTransaction(TransactorTransCreateDto itemVm,string  callerSectionCode)
+    public async Task<ServiceResult> AddTransactorTransaction(TransactorTransCreateDto itemVm,string  callerSectionCode=null)
     {
         #region Fiscal Period
 
@@ -59,7 +59,7 @@ public class TransactorTransactionServiceV2 : ITransactorTransactionService
 
         if (docSeries is null)
         {
-            return ServiceResult.Error("Δεν βρέθηκε η σειρά παραστατικο", "BADREQUEST");
+            return ServiceResult.Error("Δεν βρέθηκε η σειρά του παραστατικού", "BADREQUEST");
         }
         await _context.Entry(docSeries).Reference(t => t.TransTransactorDocTypeDef).LoadAsync();
 
@@ -73,7 +73,24 @@ public class TransactorTransactionServiceV2 : ITransactorTransactionService
         #region Section Management
 
         int sectionId ;
-        if (docTypeDef.SectionId == 0)
+        if (String.IsNullOrEmpty(callerSectionCode))
+        {
+            if (itemVm.SectionId == 0)
+            {
+                if (docTypeDef.SectionId == 0)
+                {
+                    return ServiceResult.Error("Δεν μπορεί να προσδιοριστεί το Section", "BADREQUEST");
+                }
+
+                sectionId = docTypeDef.SectionId;
+            }
+            else
+            {
+                sectionId = itemVm.SectionId;
+            }
+                
+        }
+        else
         {
             var sectn = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == callerSectionCode);
             if (sectn == null)
@@ -82,12 +99,9 @@ public class TransactorTransactionServiceV2 : ITransactorTransactionService
             }
             sectionId = sectn.Id;
         }
-        else
-        {
-            sectionId = docTypeDef.SectionId;
-        }
-        #endregion
         
+        #endregion
+
         // Check if a transaction is already active
         bool ownsTransaction = _context.Database.CurrentTransaction == null;
         var transaction = ownsTransaction
