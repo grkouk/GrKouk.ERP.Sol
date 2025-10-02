@@ -73,32 +73,20 @@ public class TransactorTransactionServiceV2 : ITransactorTransactionService
         #region Section Management
 
         int sectionId ;
-        if (String.IsNullOrEmpty(callerSectionCode))
+      
+        if (docTypeDef.SectionId == 0)
         {
-            if (docTypeDef.SectionId == 0)
-            {
-                var sectn = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == _defaultSectionCode);
-                if (sectn == null)
-                {
-                    return ServiceResult.Error("Δεν υπάρχει το Section", "BADREQUEST");
-                }
-                sectionId = sectn.Id;
-            }
-            else
-            {
-                sectionId = docTypeDef.SectionId;
-            }
-        }
-        else
-        {
-            var sectn = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == callerSectionCode);
+            var sectn = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == _defaultSectionCode);
             if (sectn == null)
             {
                 return ServiceResult.Error("Δεν υπάρχει το Section", "BADREQUEST");
             }
             sectionId = sectn.Id;
         }
-        
+        else
+        {
+            sectionId = docTypeDef.SectionId;
+        }
         #endregion
 
         // Check if a transaction is already active
@@ -115,6 +103,8 @@ public class TransactorTransactionServiceV2 : ITransactorTransactionService
             ActionHandlers.TransactorFinAction(transTransactorDef.FinancialTransAction, spTransaction);
             await _context.TransactorTransactions.AddAsync(spTransaction);
             await _context.SaveChangesAsync();
+            //Retrieve new id of the transaction
+            var NewDocId = _context.Entry(spTransaction).Entity.Id;
             if (itemVm.CfAccountId>0)
             {
                 var cfaSeriesId = docSeries.DefaultCfaTransSeriesId;
@@ -149,12 +139,19 @@ public class TransactorTransactionServiceV2 : ITransactorTransactionService
                                 DocumentTypeId = cfaType.Id,
                                 Etiology = etiology,
                                 FiscalPeriodId = spTransaction.FiscalPeriodId,
-                                CreatorSectionId = sectionId,
-                                CreatorId = spTransaction.Id,
+                                CreatorSectionId = itemVm.CreatorSectionId,
+                                CreatorId = itemVm.CreatorId,
                                 RefCode = spTransaction.TransRefCode,
                                 Amount = itemVm.AmountSum,
                                 SectionId = cfaType.SectionId > 0 ? cfaType.SectionId : sectionId
                             };
+                            //If itemvn.creatorid is 0 then it is a transaction from transactor transactions directly
+                            //so pass the creator id and section id from the transaction 
+                            if (itemVm.CreatorId == 0)
+                            {
+                                cfaTrans.CreatorSectionId = sectionId;
+                                cfaTrans.CreatorId = spTransaction.Id;
+                            }
                             ActionHandlers.CashFlowFinAction(cfaTransDef.CfaAction, cfaTrans);
                             await _context.CashFlowAccountTransactions.AddAsync(cfaTrans);
                             await _context.SaveChangesAsync();
@@ -209,32 +206,20 @@ public class TransactorTransactionServiceV2 : ITransactorTransactionService
         #region Section Management
 
         int sectionId ;
-        if (String.IsNullOrEmpty(callerSectionCode))
+      
+        if (docTypeDef.SectionId == 0)
         {
-            if (docTypeDef.SectionId == 0)
-            {
-                var sectn = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == _defaultSectionCode);
-                if (sectn == null)
-                {
-                    return ServiceResult.Error("Δεν υπάρχει το Section", "BADREQUEST");
-                }
-                sectionId = sectn.Id;
-            }
-            else
-            {
-                sectionId = docTypeDef.SectionId;
-            }
-        }
-        else
-        {
-            var sectn = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == callerSectionCode);
+            var sectn = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == _defaultSectionCode);
             if (sectn == null)
             {
                 return ServiceResult.Error("Δεν υπάρχει το Section", "BADREQUEST");
             }
             sectionId = sectn.Id;
         }
-        
+        else
+        {
+            sectionId = docTypeDef.SectionId;
+        }
         #endregion
         // Get old transaction (for old section id) and the entity to update
         var spOldTrans = await _context.TransactorTransactions
@@ -276,6 +261,8 @@ public class TransactorTransactionServiceV2 : ITransactorTransactionService
             spTransaction.FpaRate = itemVm.FpaRate;
             spTransaction.DiscountRate = itemVm.DiscountRate;
             spTransaction.SectionId = sectionId;
+            spTransaction.CreatorId = itemVm.CreatorId;
+            spTransaction.CreatorSectionId = itemVm.CreatorSectionId;
             spTransaction.FiscalPeriodId = fiscalPeriod.Id;
             spTransaction.FinancialAction = transTransactorDef.FinancialTransAction;
 
@@ -323,12 +310,18 @@ public class TransactorTransactionServiceV2 : ITransactorTransactionService
                                 DocumentTypeId = cfaType.Id,
                                 Etiology = itemVm.Etiology,
                                 FiscalPeriodId = spTransaction.FiscalPeriodId,
-                                CreatorSectionId = sectionId,
-                                CreatorId = spTransaction.Id,
+                               
                                 RefCode = spTransaction.TransRefCode,
                                 Amount = itemVm.AmountSum,
                                 SectionId = cfaType.SectionId > 0 ? cfaType.SectionId : sectionId
                             };
+                            //If itemvn.creatorid is 0 then it is a transaction from tranactor transactions directly
+                            //so pass the creator id and section id from the transaction 
+                            if (itemVm.CreatorId == 0)
+                            {
+                                cfaTrans.CreatorSectionId = sectionId;
+                                cfaTrans.CreatorId = spTransaction.Id;
+                            }
                             ActionHandlers.CashFlowFinAction(cfaTransDef.CfaAction, cfaTrans);
                             await _context.CashFlowAccountTransactions.AddAsync(cfaTrans);
                         }
@@ -359,6 +352,10 @@ public class TransactorTransactionServiceV2 : ITransactorTransactionService
 
     public async Task<ServiceResult> DeleteTransactorTransaction(int id)
     {
+        if (id <= 0)
+        {
+            return ServiceResult.Error("No Document Id", "ARGUMENT_ERROR");
+        }
         // Get the transaction (no tracking) to determine section for related deletions
         var spTrans = await _context.TransactorTransactions
             .AsNoTracking()

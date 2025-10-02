@@ -24,6 +24,7 @@ namespace GrKouk.Erp.Dtos.CashFlowTransactions
         [Display(Name = "Sector")]
         public int SectionId { get; set; }
         public int CreatorId { get; set; }
+        public int CreatorSectionId { get; set; }
         [Display(Name = "Fiscal Period")]
         public int FiscalPeriodId { get; set; }
         public CashFlowAccountActionsEnum CfaAction { get; set; }
