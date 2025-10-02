@@ -84,8 +84,10 @@ public class SyncBusinessDocService : IDocumentSyncService
 
         #region Find Doc series id
 
+        // (docSeriesId, syncMerchItemCode) =
+        //     await FindDocSeriesIdForBusDocIdAndCompanyCode(request.BuyDocDefId, request.CompanyCode); 
         (docSeriesId, syncMerchItemCode) =
-            await FindDocSeriesIdForBusDocIdAndCompanyCode(request.BuyDocDefId, request.CompanyCode);
+            await FindDocSeriesIdForBusDocCodeAndCompanyCode(request.BuyDocDefCode, request.CompanyCode);
         switch (docSeriesId)
         {
             case -1:
@@ -568,7 +570,47 @@ public class SyncBusinessDocService : IDocumentSyncService
     }
 
     #region Helper Methods
+    private async Task<(int docId, string merchCode)> FindDocSeriesIdForBusDocCodeAndCompanyCode(string busBuyDocDefCode,
+        string companyCode)
+    {
+        //To use for ilika in timologio agoron
+        const string syncMerchItemCode = "SYNCMERCH";
+        //To use for ipiresia in timologio paroxis
+        const string syncMerchYpiresiaItemCode = "ΥΠΕΙΚ";
+        string merchItemCode = string.Empty;
+        const string busDocTypeTimologioAgId = "ΤΔΑ";
+        const string busDocTypePistorikoEpId = "ΠΙΣΔΑ";
+        const string busDocTypeTimParYpiresionAgId = "ΤΠΥ";
+        const string docSeriesTimAgCode = "TIMDAAGSYNC";
+        const string docSeriesPistotikoEpAgCode = "PISTIMAGSYNC";
+        const string docSeriesTimParYpiresionikoAgCode = "ΤΜΠΑΡΑΓΣΥΓΧ";
+        string docSeriesCode;
+        switch (busBuyDocDefCode)
+        {
+            case busDocTypeTimologioAgId:
+                docSeriesCode = docSeriesTimAgCode;
+                merchItemCode = syncMerchItemCode;
+                break;
+            case busDocTypePistorikoEpId:
+                docSeriesCode = docSeriesPistotikoEpAgCode;
+                merchItemCode = syncMerchItemCode;
+                break;
+            case busDocTypeTimParYpiresionAgId:
+                docSeriesCode = docSeriesTimParYpiresionikoAgCode;
+                merchItemCode = syncMerchYpiresiaItemCode;
+                break;
+            default:
+                return (-2, string.Empty);
+        }
 
+        var docSeries = await _context.BuyDocSeriesDefs.SingleOrDefaultAsync(p => p.Code == docSeriesCode);
+        if (docSeries == null)
+        {
+            return (-1, string.Empty);
+        }
+
+        return (docSeries.Id, merchItemCode);
+    }
     private async Task<(int docId, string merchCode)> FindDocSeriesIdForBusDocIdAndCompanyCode(int busBuyDocDefId,
         string companyCode)
     {
