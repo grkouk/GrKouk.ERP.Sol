@@ -15,6 +15,8 @@ public class SyncBusinessBuyDocumentRequest
     public int BuyDocDefId { get; set; }
     [JsonPropertyName("buyDocDefName")]
     public string? BuyDocDefName { get; set; }
+    [JsonPropertyName("buyDocDefCode")]
+    public string? BuyDocDefCode { get; set; }
     [JsonPropertyName("netAmount")]
     public decimal NetAmount { get; set; }
     [JsonPropertyName("vatAmount")]
