@@ -132,9 +132,19 @@ namespace GrKouk.Web.ERP.Data
 
 
 
-            modelBuilder.Entity<FpaDef>()
-                .HasIndex(c => c.Code)
-                .IsUnique();
+            modelBuilder.Entity<FpaDef>(entity =>
+            {
+                entity.HasIndex(c => c.Code)
+                    .IsUnique();
+                entity.Property(e => e.CompanyId).HasDefaultValue(1);
+                entity.Property(e => e.CreatedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+        
+                entity.Property(e => e.ModifiedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+            });
+                
+            
 
             modelBuilder.Entity<FinancialMovement>()
                 .HasIndex(c => c.Code)
@@ -178,6 +188,12 @@ namespace GrKouk.Web.ERP.Data
             modelBuilder.Entity<MeasureUnit>(entity =>
             {
                 entity.HasIndex(p => p.Code).IsUnique();
+                entity.Property(e => e.CompanyId).HasDefaultValue(1);
+                entity.Property(e => e.CreatedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+        
+                entity.Property(e => e.ModifiedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
             });
 
             modelBuilder.Entity<WarehouseItem>(entity =>
