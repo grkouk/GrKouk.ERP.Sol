@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -9,6 +10,7 @@ using GrKouk.Erp.Dtos.CashFlowTransactions;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
+using GrKouk.Web.ERP.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -25,16 +27,18 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
         private readonly ApiDbContext _context;
         private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
+        private readonly ICFATransactionService _cfaTransSrv;
         public bool NotUpdatable;
         public bool InitialLoad = true;
         public int CopyFromId { get; set; }
         public int CopyFromTransactorId { get; set; } = 0;
 
-        public CreateModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public CreateModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification, ICFATransactionService cfaTransSrv)
         {
             _context = context;
             _mapper = mapper;
             _toastNotification = toastNotification;
+            _cfaTransSrv = cfaTransSrv;
         }
 
         public IActionResult OnGet(int? copyFromId)
@@ -72,6 +76,41 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
         {
             if (!ModelState.IsValid)
             {
+                LoadCombos();
+                return Page();
+            }
+
+            try
+            {
+                var serviceResult = await _cfaTransSrv.AddCFATransaction(ItemVm);
+                if (serviceResult == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Empty response from transaction service");
+                    LoadCombos();
+                    return Page();
+                }
+
+                if (!serviceResult.Success)
+                {
+                    ModelState.AddModelError(string.Empty, "Error from transactor service " + serviceResult.ErrorMessage);
+                    LoadCombos();
+                    return Page();
+                }
+                _toastNotification.AddSuccessToastMessage("Transaction saved");
+            }
+            catch (Exception e)
+            {
+                string msg = e.Message;
+                msg += e.InnerException?.Message;
+
+                _toastNotification.AddErrorToastMessage(msg);
+            }
+            return RedirectToPage("./Index");
+        }
+        public async Task<IActionResult> OnPostAsyncOld()
+        {
+            if (!ModelState.IsValid)
+            {
                 return Page();
             }
 
@@ -101,41 +140,41 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
             await _context.Entry(docSeries).Reference(t => t.CashFlowDocTypeDefinition).LoadAsync();
 
             var docTypeDef = docSeries.CashFlowDocTypeDefinition;
-            await _context.Entry(docTypeDef)
-                .Reference(t => t.CashFlowTransactionDefinition)
-                .LoadAsync();
+             await _context.Entry(docTypeDef)
+                 .Reference(t => t.CashFlowTransactionDefinition)
+                 .LoadAsync();
 
             var cfaTransactionDef = docTypeDef.CashFlowTransactionDefinition;
 
-            #region Section Management
+             #region Section Management
+            
+             int sectionId = 0;
+             if (docTypeDef.SectionId == 0)
+             {
+                 var sectn = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == _sectionCode);
+                 if (sectn == null)
+                 {
+                     ModelState.AddModelError(string.Empty, "Δεν υπάρχει το Section");
+                     LoadCombos();
+                     return Page();
+                 }
+            
+                 sectionId = sectn.Id;
+             }
+             else
+             {
+                 sectionId = docTypeDef.SectionId;
+             }
+             #endregion
 
-            int sectionId = 0;
-            if (docTypeDef.SectionId == 0)
-            {
-                var sectn = await _context.Sections.SingleOrDefaultAsync(s => s.SystemName == _sectionCode);
-                if (sectn == null)
-                {
-                    ModelState.AddModelError(string.Empty, "Δεν υπάρχει το Section");
-                    LoadCombos();
-                    return Page();
-                }
-
-                sectionId = sectn.Id;
-            }
-            else
-            {
-                sectionId = docTypeDef.SectionId;
-            }
-            #endregion
-
-            cfaTransaction.SectionId = sectionId;
-            cfaTransaction.DocumentTypeId = docSeries.CashFlowDocTypeDefId;
-            cfaTransaction.FiscalPeriodId = fiscalPeriod.Id;
-            cfaTransaction.CfaAction = cfaTransactionDef.CfaAction;
-            ActionHandlers.CashFlowFinAction(cfaTransactionDef.CfaAction, cfaTransaction);
-
-            await _context.CashFlowAccountTransactions.AddAsync(cfaTransaction);
-            await _context.SaveChangesAsync();
+             cfaTransaction.SectionId = sectionId;
+             cfaTransaction.DocumentTypeId = docSeries.CashFlowDocTypeDefId;
+             cfaTransaction.FiscalPeriodId = fiscalPeriod.Id;
+             cfaTransaction.CfaAction = cfaTransactionDef.CfaAction;
+             ActionHandlers.CashFlowFinAction(cfaTransactionDef.CfaAction, cfaTransaction);
+            
+             await _context.CashFlowAccountTransactions.AddAsync(cfaTransaction);
+             await _context.SaveChangesAsync();
             _toastNotification.AddSuccessToastMessage("Saved");
 
             return RedirectToPage("./Index");

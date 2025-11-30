@@ -30,14 +30,26 @@ public class CFATransactionService : ICFATransactionService
     }
     public async Task<ServiceResult> AddCFATransaction(CfaTransactionCreateDto itemVm, string callerSectionCode = null)
     {
+        int fiscalPeriodId;
         #region Fiscal Period
 
-        var fiscalPeriod = await HelperFunctions.GetFiscalPeriod(_context, itemVm.TransDate);
-        if (fiscalPeriod == null)
+        // Check if we already have a fiscal period for this date
+        // This should be true if this is called from another higher update service
+        // Example from the Document Update Service
+        if (!(itemVm.FiscalPeriodId > 0))
         {
-            return ServiceResult.Error("No Fiscal Period covers Transaction Date", "BADREQUEST");
-            
+            var fiscalPeriod = await HelperFunctions.GetFiscalPeriod(_context, itemVm.TransDate);
+            if (fiscalPeriod == null)
+            {
+                return ServiceResult.Error("No Fiscal Period covers Transaction Date", "BADREQUEST");
+            }
+            fiscalPeriodId = fiscalPeriod.Id;    
         }
+        else
+        {
+            fiscalPeriodId = itemVm.FiscalPeriodId;
+        }
+
 
         #endregion
 
@@ -45,14 +57,13 @@ public class CFATransactionService : ICFATransactionService
         {
             TransDate = itemVm.TransDate,
             DocumentSeriesId = itemVm.DocSeriesId,
-           
             CashFlowAccountId = itemVm.CashFlowAccountId,
             RefCode = itemVm.TransRefCode,
             CompanyId = itemVm.CompanyId,
-            
             Amount = itemVm.Amount,
             Etiology = itemVm.Etiology,
-           
+            CreatorSectionId = itemVm.CreatorSectionId,
+            CreatorId = itemVm.CreatorId
 
         };
         var docSeries = await
@@ -98,7 +109,7 @@ public class CFATransactionService : ICFATransactionService
         {
             spTransaction.SectionId = sectionId;
             spTransaction.DocumentTypeId = docSeries.CashFlowDocTypeDefId;
-            spTransaction.FiscalPeriodId = fiscalPeriod.Id;
+            spTransaction.FiscalPeriodId = fiscalPeriodId;
             spTransaction.CfaAction = transTransactorDef.CfaAction;
             ActionHandlers.CashFlowFinAction(transTransactorDef.CfaAction, spTransaction);
             await _context.CashFlowAccountTransactions.AddAsync(spTransaction);
@@ -126,13 +137,26 @@ public class CFATransactionService : ICFATransactionService
 
     public async Task<ServiceResult> ModifyCFATransaction(CfaTransactionModifyDto itemVm, string callerSectionCode = null)
     {
-         #region Fiscal Period
+        int fiscalPeriodId;
+        #region Fiscal Period
 
-        var fiscalPeriod = await HelperFunctions.GetFiscalPeriod(_context, itemVm.TransDate);
-        if (fiscalPeriod == null)
+        // Check if we already have a fiscal period for this date
+        // This should be true if this is called from another higher update service
+        // Example from the Document Update Service
+        if (!(itemVm.FiscalPeriodId > 0))
         {
-            return ServiceResult.Error("No Fiscal Period covers Transaction Date", "BADREQUEST");
+            var fiscalPeriod = await HelperFunctions.GetFiscalPeriod(_context, itemVm.TransDate);
+            if (fiscalPeriod == null)
+            {
+                return ServiceResult.Error("No Fiscal Period covers Transaction Date", "BADREQUEST");
+            }
+            fiscalPeriodId = fiscalPeriod.Id;    
         }
+        else
+        {
+            fiscalPeriodId = itemVm.FiscalPeriodId;
+        }
+
 
         #endregion
 
@@ -199,7 +223,7 @@ public class CFATransactionService : ICFATransactionService
             spTransaction.Amount = itemVm.Amount;
             spTransaction.Etiology = itemVm.Etiology;
             spTransaction.SectionId = sectionId;
-            spTransaction.FiscalPeriodId = fiscalPeriod.Id;
+            spTransaction.FiscalPeriodId = fiscalPeriodId;
             spTransaction.CfaAction = transTransactorDef.CfaAction;
 
             // Apply financial action to derived amounts
@@ -223,7 +247,7 @@ public class CFATransactionService : ICFATransactionService
             }
         }
 
-        return ServiceResult.Ok();
+        return ServiceResult.Ok(spTransaction);
     }
 
     public async Task<ServiceResult> DeleteCFATransaction(int id)

@@ -1094,6 +1094,38 @@ namespace GrKouk.Web.ERP.Controllers
             return Ok(listItems);
         }
 
+        [HttpGet("GetErpMeasureUnits")]
+        // [Authorize(Policy = "ApiPolicy2")]
+        public async Task<IActionResult> GetErpMeasureUnits(string companyCode)
+        {
+            // Company code not used because measureunit has no company id
+            //---------------------------------------------------------------
+            // int allCompaniesId = 0;
+            // var allCompCode =
+            //     await _context.AppSettings.SingleOrDefaultAsync(p => p.Code == Constants.AllCompaniesCodeKey);
+            // if (allCompCode == null)
+            // {
+            //     return NotFound("All Companies Code Setting not found");
+            // }
+            //
+            // var allCompaniesEntity =
+            //     await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+            //
+            // if (allCompaniesEntity != null)
+            // {
+            //     allCompaniesId = allCompaniesEntity.Id;
+            // }
+            // var company = await _context.Companies.SingleOrDefaultAsync(p => p.Code == companyCode);
+            // if (company == null)
+            // {
+            //     return BadRequest("No Company for this company code");
+            // }
+            // var companyId = company.Id;
+            var items = await _context.MeasureUnits.Where(p =>
+                p.Active
+            ).ToListAsync();
+            return Ok(items);
+        }
         [HttpPost("SyncCheckBusinessBuyDocument")]
         [Authorize(Policy = "ApiPolicy2")]
         public async Task<IActionResult> SyncCheckBusinessBuyDocument([FromBody] SyncBusinessBuyDocumentRequest request)

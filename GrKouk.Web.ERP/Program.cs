@@ -145,9 +145,10 @@ namespace GrKouk.Web.ERP
             builder.Services.AddControllers().AddNewtonsoftJson();
 
             // App services
-            builder.Services.AddTransient<IDocumentTransactionService, DocumentTransactionService>();
+            builder.Services.AddTransient<IDocumentTransactionService, DocumentTransactionServiceV2>();
             builder.Services.AddTransient<IDocumentSyncService, SyncBusinessDocService>();
-            builder.Services.AddTransient<ITransactorTransactionService, TransactorTransactionService>();
+            builder.Services.AddTransient<ITransactorTransactionService, TransactorTransactionServiceV2>();
+            builder.Services.AddTransient<ICFATransactionService, CFATransactionService>();
             builder.Services.AddTransient<PdfExportService>();
 
             var app = builder.Build();

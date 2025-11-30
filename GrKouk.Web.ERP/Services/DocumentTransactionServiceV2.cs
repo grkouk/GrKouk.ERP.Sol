@@ -185,6 +185,7 @@ public class DocumentTransactionServiceV2 : IDocumentTransactionService
                     CfAccountId = 0,
                     CreatorId = newDocumentId,
                     CreatorSectionId = sectionId,
+                    FiscalPeriodId = fiscalPeriod.Id,
                     AmountNet = docTrans.AmountNet,
                     AmountDiscount = docTrans.AmountDiscount,
                     AmountFpa = docTrans.AmountFpa,
@@ -197,15 +198,27 @@ public class DocumentTransactionServiceV2 : IDocumentTransactionService
                     if (ownsTransaction) await transaction.RollbackAsync();
                     return new BadRequestObjectResult(new { error = serviceResult.ErrorMessage });
                 }
-
+                // ServiceResult contains a copy of the created transaction object 
+                // We can use it to update the document transaction amounts 
                 // Update document transaction amounts based on the financial action
-                var tmpTrans = new TransactorTransaction
+                // var tmpTrans = new TransactorTransaction
+                // {
+                //     AmountNet = spTransactorCreateDto.AmountNet,
+                //     AmountFpa = spTransactorCreateDto.AmountFpa,
+                //     AmountDiscount = spTransactorCreateDto.AmountDiscount
+                // };
+                //ActionHandlers.TransactorFinAction(transTransactorDef.FinancialTransAction, tmpTrans);
+                
+                var tmpTrans = serviceResult.Data as TransactorTransaction;
+                if (tmpTrans == null)
                 {
-                    AmountNet = spTransactorCreateDto.AmountNet,
-                    AmountFpa = spTransactorCreateDto.AmountFpa,
-                    AmountDiscount = spTransactorCreateDto.AmountDiscount
-                };
-                ActionHandlers.TransactorFinAction(transTransactorDef.FinancialTransAction, tmpTrans);
+                    if (ownsTransaction) await transaction.RollbackAsync();
+                    return new BadRequestObjectResult(new
+                    {
+                        error = "Could not retrieve created transactor transaction"
+                    });
+                }
+                
                 transToAttach.TransNetAmount = tmpTrans.TransNetAmount;
                 transToAttach.TransFpaAmount = tmpTrans.TransFpaAmount;
                 transToAttach.TransDiscountAmount = tmpTrans.TransDiscountAmount;
@@ -245,6 +258,14 @@ public class DocumentTransactionServiceV2 : IDocumentTransactionService
                     var transactor = await _context.Transactors
                         .Where(p => p.Id == docTrans.TransactorId)
                         .SingleOrDefaultAsync();
+                    if (transactor is null)
+                    {
+                        if (ownsTransaction) await transaction.RollbackAsync();
+                        return new NotFoundObjectResult(new
+                        {
+                            error = "Transactor not found"
+                        });
+                    }
                     var transTransactorEtiology =
                         $"{transTransactorPayOffSeries.Name} created from {docSeries.Name} for {transactor.Name} with {docTrans.Etiology} ";
 
@@ -256,6 +277,7 @@ public class DocumentTransactionServiceV2 : IDocumentTransactionService
                         TransactorId = docTrans.TransactorId,
                         TransRefCode = docTrans.TransRefCode,
                         CompanyId = docTrans.CompanyId,
+                        FiscalPeriodId = fiscalPeriod.Id,
                         CreatorId = newDocumentId,
                         CreatorSectionId = sectionId,
                         CfAccountId = paymentCfAccountId,
@@ -272,38 +294,23 @@ public class DocumentTransactionServiceV2 : IDocumentTransactionService
                         return new BadRequestObjectResult(new { error = payoffResult.ErrorMessage });
                     }
 
-
-
-                    try
-                    {
-                        var createdPayoffTrans = await _context.TransactorTransactions
-                            .Where(p => p.TransactorId == docTrans.TransactorId
-                                        && p.TransTransactorDocSeriesId == transTransactorPayOffSeries.Id
-                                        && p.TransDate == docTrans.TransDate
-                                        && p.TransRefCode == docTrans.TransRefCode)
-                            .OrderByDescending(p => p.Id)
-                            .FirstOrDefaultAsync();
-
-                        if (createdPayoffTrans != null)
-                        {
-                            var payOffMapping = new BuyDocTransPaymentMapping()
-                            {
-                                BuyDocumentId = docId,
-                                TransactorTransactionId = createdPayoffTrans.Id,
-                                AmountUsed = docTrans.AmountNet + docTrans.AmountFpa - docTrans.AmountDiscount
-                            };
-                            await _context.BuyDocTransPaymentMappings.AddAsync(payOffMapping);
-                        }
-                    }
-                    catch (Exception e)
+                    var createdPayoffTrans = payoffResult.Data as TransactorTransaction;
+                    if (createdPayoffTrans == null)
                     {
                         if (ownsTransaction) await transaction.RollbackAsync();
-                        string msg = e.InnerException?.Message;
                         return new BadRequestObjectResult(new
                         {
-                            error = e.Message + " " + msg
+                            error = "Could not retrieve created payoff transaction"
                         });
                     }
+                    var payOffMapping = new BuyDocTransPaymentMapping()
+                    {
+                        BuyDocumentId = docId,
+                        TransactorTransactionId = createdPayoffTrans.Id,
+                        AmountUsed = docTrans.AmountNet + docTrans.AmountFpa - docTrans.AmountDiscount
+                    };
+                    await _context.BuyDocTransPaymentMappings.AddAsync(payOffMapping);
+
                 }
             }
 
