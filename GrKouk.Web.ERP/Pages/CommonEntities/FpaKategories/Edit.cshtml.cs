@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using GrKouk.Erp.Domain.DocDefinitions;
 using GrKouk.Web.ERP.Data;
@@ -45,6 +46,7 @@ namespace GrKouk.Web.Erp.Pages.CommonEntities.FpaKategories
                 return Page();
             }
 
+            FpaDef.ModifiedAt = DateTime.UtcNow;
             _context.Attach(FpaDef).State = EntityState.Modified;
 
             try

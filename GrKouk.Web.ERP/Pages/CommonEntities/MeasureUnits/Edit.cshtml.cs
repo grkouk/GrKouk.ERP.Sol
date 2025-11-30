@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using GrKouk.Erp.Domain.Shared;
 using Microsoft.AspNetCore.Mvc;
@@ -45,6 +46,7 @@ namespace GrKouk.Web.Erp.Pages.CommonEntities.MeasureUnits
                 return Page();
             }
 
+            MeasureUnit.ModifiedAt = DateTime.UtcNow;
             _context.Attach(MeasureUnit).State = EntityState.Modified;
 
             try

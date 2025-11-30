@@ -12,6 +12,8 @@ namespace GrKouk.Erp.Domain.DocDefinitions
         [MaxLength(200)] [Required] public string Name { get; set; }
 
         public Single Rate { get; set; }
-
+        public DateTime CreatedAt { get; set; }
+        public DateTime ModifiedAt { get; set; } 
+        public int CompanyId { get; set; }  
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace GrKouk.Erp.Domain.Shared
 {
@@ -18,5 +19,10 @@ namespace GrKouk.Erp.Domain.Shared
         public bool Active { get; set; }
         [Display(Name = "Decimals")]
         public int? DecimalPlaces { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime ModifiedAt { get; set; } 
+        public int CompanyId { get; set; }  
+        
+        
     }
 }
