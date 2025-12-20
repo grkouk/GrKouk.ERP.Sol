@@ -143,9 +143,14 @@ namespace GrKouk.Web.ERP.Data
                 entity.Property(e => e.ModifiedAt)
                     .HasDefaultValueSql("GETUTCDATE()");
             });
-                
-            
 
+
+            modelBuilder.Entity<PaymentMethod>(entity =>
+            {
+                entity.HasIndex(p => p.Code).IsUnique();
+                entity.Property(p => p.DateCreated).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(p => p.DateLastModified).HasDefaultValueSql("GETUTCDATE()");
+            });
             modelBuilder.Entity<FinancialMovement>()
                 .HasIndex(c => c.Code)
                 .IsUnique();
@@ -705,6 +710,11 @@ namespace GrKouk.Web.ERP.Data
                 entity.HasOne(p => p.Company)
                     .WithMany()
                     .OnDelete(DeleteBehavior.Restrict);
+                entity.Property(e => e.CreatedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+        
+                entity.Property(e => e.ModifiedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
             });
             modelBuilder.Entity<ProfitCentre>(entity =>
             {

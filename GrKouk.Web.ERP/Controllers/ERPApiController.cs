@@ -1095,35 +1095,108 @@ namespace GrKouk.Web.ERP.Controllers
         }
 
         [HttpGet("GetErpMeasureUnits")]
-        // [Authorize(Policy = "ApiPolicy2")]
+        [Authorize(Policy = "ApiPolicy2")]
+        // [AllowAnonymous]
         public async Task<IActionResult> GetErpMeasureUnits(string companyCode)
         {
-            // Company code not used because measureunit has no company id
-            //---------------------------------------------------------------
-            // int allCompaniesId = 0;
-            // var allCompCode =
-            //     await _context.AppSettings.SingleOrDefaultAsync(p => p.Code == Constants.AllCompaniesCodeKey);
-            // if (allCompCode == null)
-            // {
-            //     return NotFound("All Companies Code Setting not found");
-            // }
-            //
-            // var allCompaniesEntity =
-            //     await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
-            //
-            // if (allCompaniesEntity != null)
-            // {
-            //     allCompaniesId = allCompaniesEntity.Id;
-            // }
-            // var company = await _context.Companies.SingleOrDefaultAsync(p => p.Code == companyCode);
-            // if (company == null)
-            // {
-            //     return BadRequest("No Company for this company code");
-            // }
-            // var companyId = company.Id;
+            
+             int allCompaniesId = 0;
+             var allCompCode =
+                 await _context.AppSettings.SingleOrDefaultAsync(p => p.Code == Constants.AllCompaniesCodeKey);
+             if (allCompCode == null)
+             {
+                 return NotFound("All Companies Code Setting not found");
+             }
+            
+             var allCompaniesEntity =
+                 await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+            
+             if (allCompaniesEntity != null)
+             {
+                 allCompaniesId = allCompaniesEntity.Id;
+             }
+             var company = await _context.Companies.SingleOrDefaultAsync(p => p.Code == companyCode);
+             if (company == null)
+             {
+                 return BadRequest("No Company for this company code");
+             }
+             var companyId = company.Id;
             var items = await _context.MeasureUnits.Where(p =>
                 p.Active
             ).ToListAsync();
+            return Ok(items);
+        }
+        [HttpGet("GetErpVatClasses")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public async Task<IActionResult> GetErpVatClasses(string companyCode)
+        {
+            int allCompaniesId = 0;
+            var allCompCode =
+                await _context.AppSettings.SingleOrDefaultAsync(p => p.Code == Constants.AllCompaniesCodeKey);
+            if (allCompCode == null)
+            {
+                return NotFound("All Companies Code Setting not found");
+            }
+            
+            var allCompaniesEntity =
+                await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+            
+            if (allCompaniesEntity != null)
+            {
+                allCompaniesId = allCompaniesEntity.Id;
+            }
+            var company = await _context.Companies.SingleOrDefaultAsync(p => p.Code == companyCode);
+            if (company == null)
+            {
+                return BadRequest("No Company for this company code");
+            }
+            var companyId = company.Id;
+            var items = await _context.FpaKategories.ToListAsync();
+            return Ok(items);
+        }
+        /// <summary>
+        /// To be synced with Item Family in Business App
+        /// </summary>
+        /// <param name="companyCode"></param>
+        /// <returns></returns>
+        [HttpGet("GetErpItemCategories")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public async Task<IActionResult> GetErpWarehouseItemCategories(string companyCode)
+        {
+            var query = _context.MaterialCategories.AsQueryable();
+
+            // Return all categories if companyCode is null, empty, or "ALL"
+            if (string.IsNullOrEmpty(companyCode) || companyCode.Equals("ALL", StringComparison.OrdinalIgnoreCase))
+            {
+                var allItems = await query.ToListAsync();
+                return Ok(allItems);
+            }
+
+            int allCompaniesId = 0;
+            var allCompCode =
+                await _context.AppSettings.SingleOrDefaultAsync(p => p.Code == Constants.AllCompaniesCodeKey);
+            if (allCompCode == null)
+            {
+                return NotFound(new { error = "All Companies Code Setting not found" });
+            }
+            
+            var allCompaniesEntity =
+                await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+            
+            if (allCompaniesEntity != null)
+            {
+                allCompaniesId = allCompaniesEntity.Id;
+            }
+            // Filter by specific company
+            var company = await _context.Companies.SingleOrDefaultAsync(p => p.Code == companyCode);
+            if (company == null)
+            {
+                return NotFound(new { ErrorMessage = "No Company found for this company code" });
+            }
+
+            query = query.Where(p => p.CompanyId == company.Id || p.CompanyId == allCompaniesId);
+            var items = await query.ToListAsync();
+
             return Ok(items);
         }
         [HttpPost("SyncCheckBusinessBuyDocument")]

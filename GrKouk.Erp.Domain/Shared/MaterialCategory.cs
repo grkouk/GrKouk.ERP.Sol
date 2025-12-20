@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace GrKouk.Erp.Domain.Shared
 {
@@ -16,6 +17,7 @@ namespace GrKouk.Erp.Domain.Shared
 
         public int CompanyId { get; set; } = 1;
         public virtual Company Company { get; set; }
-        
+        public DateTime CreatedAt { get; set; }
+        public DateTime ModifiedAt { get; set; } 
     }
 }
