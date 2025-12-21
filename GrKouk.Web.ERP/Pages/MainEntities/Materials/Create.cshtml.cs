@@ -10,6 +10,7 @@ using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Erp.Dtos.WarehouseItems;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
+using GrKouk.Web.ERP.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -24,12 +25,14 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
     {
         private readonly ApiDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IWarehouseManagementSrv _warehouseManagementSrv;
         private readonly IToastNotification _toastNotification;
         public int CopyFromId { get; set; }
-        public CreateModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public CreateModel(ApiDbContext context, IMapper mapper, IWarehouseManagementSrv warehouseManagementSrv,IToastNotification toastNotification)
         {
             _context = context;
             _mapper = mapper;
+            _warehouseManagementSrv = warehouseManagementSrv;
             _toastNotification = toastNotification;
         }
 
@@ -101,6 +104,43 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
         public WarehouseItemCreateDto WarehouseItemVm { get; set; }
 
         public async Task<IActionResult> OnPostAsync()
+        {
+            if (!ModelState.IsValid)
+            {
+                LoadCombos();
+                return Page();
+            }
+            // var materialToAttach = _mapper.Map<WarehouseItem>(WarehouseItemVm);
+        
+            try
+            {
+                var serviceResult = await _warehouseManagementSrv.AddWarehouseItemAsync(WarehouseItemVm);
+                if (serviceResult == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Empty response from management service");
+                    LoadCombos();
+                    return Page();
+                }
+
+                if (!serviceResult.Success)
+                {
+                    ModelState.AddModelError(string.Empty, "Error from management service " + serviceResult.ErrorMessage);
+                    LoadCombos();
+                    return Page();
+                }
+                _toastNotification.AddSuccessToastMessage("Warehouse Item saved");
+                return RedirectToPage("./Index");
+            }
+            catch (Exception e)
+            {
+                ModelState.AddModelError("",e.Message);
+                _toastNotification.AddErrorToastMessage(e.Message);
+                LoadCombos();
+                return Page();
+            }
+        }
+        
+        public async Task<IActionResult> OnPostAsyncOld()
         {
             if (!ModelState.IsValid)
             {

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -16,10 +17,12 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
     public class DeleteModel : PageModel
     {
         private readonly ApiDbContext _context;
+        private readonly IWarehouseManagementSrv _warehouseManagementSrv;
         private readonly IToastNotification _toastNotification;
-        public DeleteModel(ApiDbContext context, IToastNotification toastNotification)
+        public DeleteModel(ApiDbContext context, IWarehouseManagementSrv warehouseManagementSrv, IToastNotification toastNotification)
         {
             _context = context;
+            _warehouseManagementSrv = warehouseManagementSrv;
             _toastNotification = toastNotification;
         }
 
@@ -48,7 +51,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(int? id)
+        public async Task<IActionResult> OnPostAsyncOld(int? id)
         {
             if (id == null)
             {
@@ -95,6 +98,27 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
                     
                 }
             }
+
+            return RedirectToPage("./Index");
+        }
+        
+        public async Task<IActionResult> OnPostAsync(int? id)
+        {
+            // const string sectionCode = "SYS-BUY-MATERIALS-SCN";
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var srvResult = await _warehouseManagementSrv.DeleteWarehouseItemAsync((int)id);
+            if (!srvResult.Success)
+            {
+                ModelState.AddModelError("", srvResult.ErrorMessage);
+                _toastNotification.AddErrorToastMessage(srvResult.ErrorMessage);
+                return Page();
+            }
+            _toastNotification.AddSuccessToastMessage("Delete operation was successfull");
+           
 
             return RedirectToPage("./Index");
         }
