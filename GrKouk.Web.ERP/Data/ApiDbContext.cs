@@ -148,8 +148,13 @@ namespace GrKouk.Web.ERP.Data
             modelBuilder.Entity<PaymentMethod>(entity =>
             {
                 entity.HasIndex(p => p.Code).IsUnique();
-                entity.Property(p => p.DateCreated).HasDefaultValueSql("GETUTCDATE()");
-                entity.Property(p => p.DateLastModified).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.CompanyId).HasDefaultValue(1);
+                entity.Property(e => e.CreatedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+        
+                entity.Property(e => e.ModifiedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+                
             });
             modelBuilder.Entity<FinancialMovement>()
                 .HasIndex(c => c.Code)

@@ -17,11 +17,9 @@ namespace GrKouk.Erp.Domain.DocDefinitions
         public SeriesAutoPayoffEnum AutoPayoffWay { get; set; }
         public int? PayoffSeriesId { get; set; }
         public int CfAccountId { get; set; }
-        [DataType(DataType.Date)]
-        public DateTime DateCreated { get; set; }
-
-        [DataType(DataType.Date)]
-        public DateTime DateLastModified { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime ModifiedAt { get; set; } 
+        public int CompanyId { get; set; }  
     }
 
     //public class FinancialAccount

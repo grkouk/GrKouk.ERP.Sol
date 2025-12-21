@@ -1199,6 +1199,48 @@ namespace GrKouk.Web.ERP.Controllers
 
             return Ok(items);
         }
+        
+        [HttpGet("GetErpPaymentMethods")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public async Task<IActionResult> GetErpPaymentMethods(string companyCode)
+        {
+            var query = _context.PaymentMethods.AsQueryable();
+
+            // Return all categories if companyCode is null, empty, or "ALL"
+            if (string.IsNullOrEmpty(companyCode) || companyCode.Equals("ALL", StringComparison.OrdinalIgnoreCase))
+            {
+                var allItems = await query.ToListAsync();
+                return Ok(allItems);
+            }
+
+            int allCompaniesId = 0;
+            var allCompCode =
+                await _context.AppSettings.SingleOrDefaultAsync(p => p.Code == Constants.AllCompaniesCodeKey);
+            if (allCompCode == null)
+            {
+                return NotFound(new { error = "All Companies Code Setting not found" });
+            }
+            
+            var allCompaniesEntity =
+                await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+            
+            if (allCompaniesEntity != null)
+            {
+                allCompaniesId = allCompaniesEntity.Id;
+            }
+            // Filter by specific company
+            var company = await _context.Companies.SingleOrDefaultAsync(p => p.Code == companyCode);
+            if (company == null)
+            {
+                return NotFound(new { ErrorMessage = "No Company found for this company code" });
+            }
+
+            query = query.Where(p => p.CompanyId == company.Id || p.CompanyId == allCompaniesId);
+            var items = await query.ToListAsync();
+
+            return Ok(items);
+        }
+
         [HttpPost("SyncCheckBusinessBuyDocument")]
         [Authorize(Policy = "ApiPolicy2")]
         public async Task<IActionResult> SyncCheckBusinessBuyDocument([FromBody] SyncBusinessBuyDocumentRequest request)
