@@ -10,6 +10,7 @@ using GrKouk.Erp.Domain.Sync;
 using GrKouk.Erp.Dtos.BuyDocuments;
 using GrKouk.Erp.Dtos.Sync;
 using GrKouk.Erp.Dtos.Transactors;
+using GrKouk.Erp.Dtos.WarehouseItems;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
 using GrKouk.Web.ERP.Services;
@@ -29,14 +30,16 @@ namespace GrKouk.Web.ERP.Controllers
         private readonly ILogger<ErpApiController> _logger;
         private readonly IDocumentTransactionService _docTransSrv;
         private readonly IDocumentSyncService _docSyncSrv;
+        private readonly IWarehouseManagementSrv _warehouseManagementSrv;
 
         public ErpApiController(ApiDbContext context, ILogger<ErpApiController> logger,
-            IDocumentTransactionService docTransSrv, IDocumentSyncService docSyncSrv)
+            IDocumentTransactionService docTransSrv, IDocumentSyncService docSyncSrv,IWarehouseManagementSrv warehouseManagementSrv)
         {
             _context = context;
             _logger = logger;
             _docTransSrv = docTransSrv;
             _docSyncSrv = docSyncSrv;
+            _warehouseManagementSrv = warehouseManagementSrv;
         }
 
         [HttpPost("SyncBusinessItemFamilies")]
@@ -1240,7 +1243,110 @@ namespace GrKouk.Web.ERP.Controllers
 
             return Ok(items);
         }
+        [HttpGet("GetErpItemsForCashier")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public async Task<IActionResult> GetErpItemsForCashier(string companyCode)
+        {
+            var query = _context.CompanyWarehouseItemMappings
+                .Include(p => p.WarehouseItem)
+                
+                .AsQueryable();
 
+            // Return all categories if companyCode is null, empty, or "ALL"
+            if (string.IsNullOrEmpty(companyCode) || companyCode.Equals("ALL", StringComparison.OrdinalIgnoreCase))
+            {
+                var allItems = await query.ToListAsync();
+                return Ok(allItems);
+            }
+            
+            // Filter by specific company
+            var company = await _context.Companies.SingleOrDefaultAsync(p => p.Code == companyCode);
+            if (company == null)
+            {
+                return NotFound(new { ErrorMessage = "No Company found for this company code" });
+            }
+
+            query = query.Where(p => p.CompanyId == company.Id );
+            var items = await query
+                .Select(i=> new ErpItemDto()
+                {
+                    Id = i.WarehouseItem.Id,
+                    Name = i.WarehouseItem.Name,
+                    Code = i.WarehouseItem.Code,
+                    Active = i.WarehouseItem.Active,
+                    MainMeasureUnitId = i.WarehouseItem.MainMeasureUnitId,
+                    SecondaryMeasureUnitId = i.WarehouseItem.SecondaryMeasureUnitId,
+                    BuyMeasureUnitId = i.WarehouseItem.BuyMeasureUnitId,
+                    SecondaryUnitToMainRate = i.WarehouseItem.SecondaryUnitToMainRate,
+                    BuyUnitToMainRate = i.WarehouseItem.BuyUnitToMainRate,
+                    FpaDefId = i.WarehouseItem.FpaDefId,
+                    MaterialCategoryId = i.WarehouseItem.MaterialCategoryId,
+                    MaterialType = (int)i.WarehouseItem.MaterialType,
+                    WarehouseItemNature = (int)i.WarehouseItem.WarehouseItemNature,
+                    PriceNetto = i.WarehouseItem.PriceNetto,
+                    PriceBrutto = i.WarehouseItem.PriceBrutto,  
+                    ManufacturerCode = i.WarehouseItem.ManufacturerCode,
+                    ModifiedAt = i.WarehouseItem.DateLastModified
+                    
+                })
+                .ToListAsync();
+
+            return Ok(items);
+        }
+        [HttpPost("AddCashierWarehouseItem")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public async Task<IActionResult> AddCashierWarehouseItem([FromBody] CashierItemCreateRequest request)
+        {
+            if (request == null)
+            {
+                return BadRequest(new
+                {
+                    error = "Empty request data"
+                });
+            }
+
+            try
+            {
+                var warehouseItemToInsert = new WarehouseItemCreateDto()
+                {
+                    Active = request.Item.Active,
+                    MainMeasureUnitId = request.Item.MainMeasureUnitId,
+                    SecondaryMeasureUnitId = request.Item.SecondaryMeasureUnitId,
+                    BuyMeasureUnitId = request.Item.BuyMeasureUnitId,
+                    SecondaryUnitToMainRate = request.Item.SecondaryUnitToMainRate,
+                    BuyUnitToMainRate = request.Item.BuyUnitToMainRate,
+                    ManufacturerCode = request.Item.ManufacturerCode,
+                    Code = request.Item.Code,
+                    Name = request.Item.Name,
+                    ShortDescription = request.Item.Name,
+                    Description = request.Item.Name,
+                    MaterialType = (MaterialTypeEnum)request.Item.MaterialType,
+                    MaterialCategoryId = request.Item.MaterialCategoryId,
+                    WarehouseItemNature = (WarehouseItemNatureEnum) request.Item.WarehouseItemNature,
+                    
+                };
+                var syncServiceResult = await _warehouseManagementSrv.AddWarehouseItemAsync(warehouseItemToInsert);
+                if (syncServiceResult is null)
+                {
+                    return StatusCode(500, new
+                    {
+                        error = "Internal server error occurred during business buy document synchronization"
+                    });
+                }
+
+                if (!syncServiceResult.Success)
+                {
+                    return BadRequest(new { error = syncServiceResult.ErrorMessage });
+                }
+
+                var res = syncServiceResult.Data;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.ToString() });
+            }
+        }
         [HttpPost("SyncCheckBusinessBuyDocument")]
         [Authorize(Policy = "ApiPolicy2")]
         public async Task<IActionResult> SyncCheckBusinessBuyDocument([FromBody] SyncBusinessBuyDocumentRequest request)
