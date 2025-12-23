@@ -16,6 +16,7 @@ public interface IWarehouseManagementSrv
     Task<ServiceResult> AddWarehouseItemAsync(WarehouseItemCreateDto item);
     Task<ServiceResult> ModifyWarehouseItemAsync(WarehouseItemModifyDto item);
     Task<ServiceResult> DeleteWarehouseItemAsync(int itemId);
+    Task<ServiceResult> AddCompanyMappingToWarehouseItemAsync(int warehouseItemId, int companyId);
 }
 
 public class WarehouseManagementSrv : IWarehouseManagementSrv
@@ -100,6 +101,13 @@ public class WarehouseManagementSrv : IWarehouseManagementSrv
         {
             if (ownsTransaction) await transaction.RollbackAsync();
             _logger.LogError(ex, "An error occurred while adding warehouse item");
+            if (ex.GetBaseException() is Microsoft.Data.SqlClient.SqlException sqlEx)
+            {
+                if (sqlEx.Number == 2601 || sqlEx.Number == 2627)
+                {
+                    return ServiceResult.Error("Το είδος με αυτόν τον κωδικό υπάρχει ήδη", "DUPLICATE_VALUE");
+                }
+            }
             return ServiceResult.Error($"Error: {ex.Message}", "INTERNAL_ERROR");
         }
         finally
@@ -203,6 +211,13 @@ public class WarehouseManagementSrv : IWarehouseManagementSrv
         {
             if (ownsTransaction) await transaction.RollbackAsync();
             _logger.LogError(ex, "An error occurred while modifying warehouse item");
+            if (ex.GetBaseException() is Microsoft.Data.SqlClient.SqlException sqlEx)
+            {
+                if (sqlEx.Number == 2601 || sqlEx.Number == 2627)
+                {
+                    return ServiceResult.Error("Το είδος με αυτόν τον κωδικό υπάρχει ήδη", "DUPLICATE_VALUE");
+                }
+            }
             return ServiceResult.Error($"Error: {ex.Message}", "INTERNAL_ERROR");
         }
         finally
@@ -238,6 +253,46 @@ public class WarehouseManagementSrv : IWarehouseManagementSrv
             _context.CompanyWarehouseItemMappings.RemoveRange(
                 _context.CompanyWarehouseItemMappings.Where(p => p.WarehouseItemId == itemId));
             _context.WarehouseItems.Remove(item);
+            await _context.SaveChangesAsync();
+            if (ownsTransaction) await transaction.CommitAsync();
+
+            return ServiceResult.Ok();
+        }
+        catch (Exception ex)
+        {
+            if (ownsTransaction) await transaction.RollbackAsync();
+            _logger.LogError(ex, "An error occurred while deleting warehouse item");
+            return ServiceResult.Error($"Error: {ex.Message}", "INTERNAL_ERROR");
+        }
+        finally
+        {
+            if (ownsTransaction && transaction != null)
+            {
+                await transaction.DisposeAsync();
+            }
+        }
+    }
+
+    public async Task<ServiceResult> AddCompanyMappingToWarehouseItemAsync(int warehouseItemId, int companyId)
+    {
+        _logger.LogInformation("AddCompanyMappingToWarehouseItemAsync: {warehouseItemId}, {companyId}", warehouseItemId, companyId);
+        if (warehouseItemId <= 0 || companyId <= 0)
+        {
+            return ServiceResult.Error("Invalid warehouse item or company", "BADREQUEST");
+        }
+        bool ownsTransaction = _context.Database.CurrentTransaction == null;
+        var transaction = ownsTransaction
+            ? await _context.Database.BeginTransactionAsync()
+            : _context.Database.CurrentTransaction;
+        try
+        {
+            var mapping = new CompanyWarehouseItemMapping
+            {
+                CompanyId = companyId,
+                WarehouseItemId = warehouseItemId
+            };
+            await _context.CompanyWarehouseItemMappings.AddAsync(mapping);
+               
             await _context.SaveChangesAsync();
             if (ownsTransaction) await transaction.CommitAsync();
 

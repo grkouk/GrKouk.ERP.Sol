@@ -1307,6 +1307,46 @@ namespace GrKouk.Web.ERP.Controllers
 
             try
             {
+                //get companyId for companyCode
+                var company = await _context.Companies.SingleOrDefaultAsync(p => p.Code == request.CompanyCode);
+                if (company == null)
+                {
+                    return NotFound(new
+                    {
+                        error = "Company code not found"
+                    });
+                }
+                var companyId = company.Id;
+                //Chack if Warehouseitem exists
+                var WrItem = await _context.WarehouseItems.SingleOrDefaultAsync(p=>p.Code == request.Item.Code);
+                if (WrItem != null)
+                {
+                    //WarehouseItem already exists
+                    //Chech Company Mappings if already mapped to company
+                    var companyMapping = await _context.CompanyWarehouseItemMappings.SingleOrDefaultAsync(p => p.CompanyId == companyId && p.WarehouseItemId == WrItem.Id);
+                    if (companyMapping != null)
+                    {
+                        return BadRequest(new
+                        {
+                            error = "Warehouse Item exists and already mapped to company"
+                        });
+                    }
+                    var syncSrvResult = await _warehouseManagementSrv.AddCompanyMappingToWarehouseItemAsync(WrItem.Id, companyId);
+                    if (syncSrvResult is null)
+                    {
+                        return StatusCode(500, new
+                        {
+                            error = "Internal server error empty service result in Add new company mapping to warehouse item"
+                        });
+                    }
+
+                    if (!syncSrvResult.Success)
+                    {
+                        return BadRequest(new { error = syncSrvResult.ErrorMessage });
+                    }
+                    var rsc = _context.WarehouseItems.Entry(WrItem).Entity;
+                    return Ok(rsc);
+                }
                 var warehouseItemToInsert = new WarehouseItemCreateDto()
                 {
                     Active = request.Item.Active,
@@ -1318,11 +1358,14 @@ namespace GrKouk.Web.ERP.Controllers
                     ManufacturerCode = request.Item.ManufacturerCode,
                     Code = request.Item.Code,
                     Name = request.Item.Name,
+                    FpaDefId = request.Item.FpaDefId,
                     ShortDescription = request.Item.Name,
                     Description = request.Item.Name,
                     MaterialType = (MaterialTypeEnum)request.Item.MaterialType,
                     MaterialCategoryId = request.Item.MaterialCategoryId,
                     WarehouseItemNature = (WarehouseItemNatureEnum) request.Item.WarehouseItemNature,
+                    //CompanyId is deprecated but there is a FK constraint so i put a value 
+                    CompanyId = 1
                     
                 };
                 var syncServiceResult = await _warehouseManagementSrv.AddWarehouseItemAsync(warehouseItemToInsert);
@@ -1608,6 +1651,55 @@ namespace GrKouk.Web.ERP.Controllers
                 IsSuccess = true
             };
             return Ok(res);
+        }
+        
+         [HttpPost("AddCashierWarehouseItemCategory")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public async Task<IActionResult> AddCashierWarehouseItemCategory([FromBody] CashierItemCategoryCreateRequest request)
+        {
+            if (request == null)
+            {
+                return BadRequest(new
+                {
+                    error = "Empty request data"
+                });
+            }
+
+            try
+            {
+                //get companyId for companyCode
+                var company = await _context.Companies.SingleOrDefaultAsync(p => p.Code == request.CompanyCode);
+                if (company == null)
+                {
+                    return NotFound(new
+                    {
+                        error = "Company code not found"
+                    });
+                }
+                var companyId = company.Id;
+              
+                var category = new MaterialCategory()
+                {
+                   
+                    Code = request.Item.Code,
+                    Name = request.Item.Name, 
+                    ModifiedAt = DateTime.Now,
+                    CompanyId = companyId
+                    
+                };
+                await _context.MaterialCategories.AddAsync(category);
+                await _context.SaveChangesAsync();
+                var res=_context.MaterialCategories.Entry(category).Entity;
+                return Ok(res);
+                
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    error = "Internal server error-> " + ex.Message
+                });
+            }
         }
     }
 }
