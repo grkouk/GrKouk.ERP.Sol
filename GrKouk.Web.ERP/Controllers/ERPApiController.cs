@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using GrKouk.Erp.Definitions;
+using GrKouk.Erp.Domain.DocDefinitions;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Domain.Sync;
 using GrKouk.Erp.Dtos.BuyDocuments;
@@ -1203,7 +1204,7 @@ namespace GrKouk.Web.ERP.Controllers
             return Ok(items);
         }
         
-        [HttpGet("GetErpPaymentMethods")]
+        [HttpGet("ç")]
         [Authorize(Policy = "ApiPolicy2")]
         public async Task<IActionResult> GetErpPaymentMethods(string companyCode)
         {
@@ -1242,6 +1243,55 @@ namespace GrKouk.Web.ERP.Controllers
             var items = await query.ToListAsync();
 
             return Ok(items);
+        }
+        
+        [HttpPost("AddCashierPaymentMethod")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public async Task<IActionResult> AddCashierPaymentMethod([FromBody] CashierPaymentMethodCreateRequest request)
+        {
+            if (request == null)
+            {
+                return BadRequest(new
+                {
+                    error = "Empty request data"
+                });
+            }
+
+            try
+            {
+                //get companyId for companyCode
+                var company = await _context.Companies.SingleOrDefaultAsync(p => p.Code == request.CompanyCode);
+                if (company == null)
+                {
+                    return NotFound(new
+                    {
+                        error = "Company code not found"
+                    });
+                }
+                var companyId = company.Id;
+              
+                var paymentMethod = new PaymentMethod()
+                {
+                   
+                    Code = request.Item.Code,
+                    Name = request.Item.Name, 
+                    ModifiedAt = DateTime.Now,
+                    CompanyId = companyId
+                    
+                };
+                await _context.PaymentMethods.AddAsync(paymentMethod);
+                await _context.SaveChangesAsync();
+                var res=_context.PaymentMethods.Entry(paymentMethod).Entity;
+                return Ok(res);
+                
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    error = "Internal server error-> " + ex.Message
+                });
+            }    
         }
         [HttpGet("GetErpItemsForCashier")]
         [Authorize(Policy = "ApiPolicy2")]
