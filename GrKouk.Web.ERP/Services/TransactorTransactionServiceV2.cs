@@ -59,6 +59,8 @@ public class TransactorTransactionServiceV2 : ITransactorTransactionService
             TransactorId = itemVm.TransactorId,
             TransRefCode = itemVm.TransRefCode,
             CompanyId = itemVm.CompanyId,
+            CreatorSectionId = itemVm.CreatorSectionId,
+            CreatorId = itemVm.CreatorId,
             CfAccountId = itemVm.CfAccountId,
             AmountNet = itemVm.AmountNet,
             AmountDiscount = itemVm.AmountDiscount,
