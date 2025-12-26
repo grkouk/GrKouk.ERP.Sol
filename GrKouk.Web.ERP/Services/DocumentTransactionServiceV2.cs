@@ -701,6 +701,8 @@ public class DocumentTransactionServiceV2 : IDocumentTransactionService
                         TransTransactorDocTypeId = transTransactorPayOffSeries.TransTransactorDocTypeDefId,
                         TransactorId = docTrans.TransactorId,
                         TransRefCode = docTrans.TransRefCode,
+                        CreatorId = docTrans.Id,
+                        CreatorSectionId = sectionId,
                         CompanyId = docTrans.CompanyId,
                         CfAccountId = paymentCfAccountId,
                         AmountNet = docTrans.AmountNet,
@@ -721,15 +723,14 @@ public class DocumentTransactionServiceV2 : IDocumentTransactionService
                     //End Cash Flow Account Transaction 
                     try
                     {
-                        var createdPayoffTrans = await _context.TransactorTransactions
-                            .Where(p => p.TransactorId == docTrans.TransactorId
-                                        && p.TransTransactorDocSeriesId == transTransactorPayOffSeries.Id
-                                        && p.TransDate == docTrans.TransDate
-                                        && p.TransRefCode == docTrans.TransRefCode)
-                            .OrderByDescending(p => p.Id)
-                            .FirstOrDefaultAsync();
-
-                        if (createdPayoffTrans != null)
+                        // var createdPayoffTrans = await _context.TransactorTransactions
+                        //     .Where(p => p.TransactorId == docTrans.TransactorId
+                        //                 && p.TransTransactorDocSeriesId == transTransactorPayOffSeries.Id
+                        //                 && p.TransDate == docTrans.TransDate
+                        //                 && p.TransRefCode == docTrans.TransRefCode)
+                        //     .OrderByDescending(p => p.Id)
+                        //     .FirstOrDefaultAsync();
+                        if (payoffResult.Data is TransactorTransaction createdPayoffTrans)
                         {
                             var payOffMapping = new BuyDocTransPaymentMapping()
                             {
