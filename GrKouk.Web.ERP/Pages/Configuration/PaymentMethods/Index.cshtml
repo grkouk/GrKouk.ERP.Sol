@@ -12,39 +12,45 @@
 </p>
 <table class="table table-bordered table-sm">
     <thead class="thead-light">
-        <tr>
-            <th class="small">
-                @Html.DisplayNameFor(model => model.PaymentMethod[0].Name)
-            </th>
-            <th class="small">
-                @Html.DisplayNameFor(model => model.PaymentMethod[0].DaysOverdue)
-            </th>
-            <th class="small">
-                @Html.DisplayNameFor(model => model.PaymentMethod[0].AutoPayoffWay)
-            </th>
-          
-            <th></th>
-        </tr>
+    <tr>
+        <th class="small">
+            @Html.DisplayNameFor(model => model.PaymentMethod[0].Code)
+        </th>
+        <th class="small">
+            @Html.DisplayNameFor(model => model.PaymentMethod[0].Name)
+        </th>
+        <th class="small">
+            @Html.DisplayNameFor(model => model.PaymentMethod[0].DaysOverdue)
+        </th>
+        <th class="small">
+            @Html.DisplayNameFor(model => model.PaymentMethod[0].AutoPayoffWay)
+        </th>
+
+        <th></th>
+    </tr>
     </thead>
     <tbody>
 @foreach (var item in Model.PaymentMethod) {
-        <tr>
-            <td class="small">
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td class="small">
-                @Html.DisplayFor(modelItem => item.DaysOverdue)
-            </td>
-            <td class="small">
-                @Html.DisplayFor(modelItem => item.AutoPayoffWay)
-            </td>
-           
-            <td class="small">
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+    <tr>
+        <td class="small">
+            @Html.DisplayFor(modelItem => item.Code)
+        </td>
+        <td class="small">
+            @Html.DisplayFor(modelItem => item.Name)
+        </td>
+        <td class="small">
+            @Html.DisplayFor(modelItem => item.DaysOverdue)
+        </td>
+        <td class="small">
+            @Html.DisplayFor(modelItem => item.AutoPayoffWay)
+        </td>
+
+        <td class="small">
+            <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+            <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+            <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+        </td>
+    </tr>
 }
     </tbody>
 </table>

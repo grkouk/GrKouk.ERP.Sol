@@ -1204,7 +1204,7 @@ namespace GrKouk.Web.ERP.Controllers
             return Ok(items);
         }
         
-        [HttpGet("ç")]
+        [HttpGet("GetErpPaymentMethods")]
         [Authorize(Policy = "ApiPolicy2")]
         public async Task<IActionResult> GetErpPaymentMethods(string companyCode)
         {
@@ -1282,7 +1282,15 @@ namespace GrKouk.Web.ERP.Controllers
                 await _context.PaymentMethods.AddAsync(paymentMethod);
                 await _context.SaveChangesAsync();
                 var res=_context.PaymentMethods.Entry(paymentMethod).Entity;
-                return Ok(res);
+                var ret = new ErpPaymentMethodDto()
+                {
+                    Id = res.Id,
+                    Code = res.Code,
+                    Name = res.Name,
+                    DaysOverdue = res.DaysOverdue,
+                    ModifiedAt = res.ModifiedAt
+                };
+                return Ok(ret);
                 
             }
             catch (Exception ex)
@@ -1293,6 +1301,68 @@ namespace GrKouk.Web.ERP.Controllers
                 });
             }    
         }
+        [HttpPost("ModifyCashierPaymentMethod")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public async Task<IActionResult> ModifyCashierPaymentMethod([FromBody] CashierPaymentMethodModifyRequest request)
+        {
+            if (request == null)
+            {
+                return BadRequest(new
+                {
+                    error = "Empty request data"
+                });
+            }
+
+            try
+            {
+                //get companyId for companyCode
+                var company = await _context.Companies.SingleOrDefaultAsync(p => p.Code == request.CompanyCode);
+                if (company == null)
+                {
+                    return NotFound(new
+                    {
+                        error = "Company code not found"
+                    });
+                }
+                var companyId = company.Id;
+                var entityToModify = await _context.PaymentMethods.SingleOrDefaultAsync(p => p.Id == request.Item.Id);
+                if (entityToModify == null)
+                {
+                    return NotFound(new
+                    {
+                        error = "Payment method not found"
+                    });
+                }
+                entityToModify.Code = request.Item.Code;
+                entityToModify.Name = request.Item.Name;
+                entityToModify.ModifiedAt = DateTime.Now;
+                entityToModify.DaysOverdue = request.Item.DaysOverdue;
+                
+               
+                _context.PaymentMethods.Entry(entityToModify).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+                var res=_context.PaymentMethods.Entry(entityToModify).Entity;
+                var ret = new ErpPaymentMethodDto()
+                {
+                    Id = res.Id,
+                    Code = res.Code,
+                    Name = res.Name,
+                    DaysOverdue = res.DaysOverdue,
+                    ModifiedAt = res.ModifiedAt
+                };
+                return Ok(ret);
+                
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    error = "Internal server error-> " + ex.Message
+                });
+            }    
+        }
+        
+        
         [HttpGet("GetErpItemsForCashier")]
         [Authorize(Policy = "ApiPolicy2")]
         public async Task<IActionResult> GetErpItemsForCashier(string companyCode)

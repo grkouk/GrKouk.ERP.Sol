@@ -12,6 +12,12 @@
     <hr />
     <dl class="dl-horizontal">
         <dt>
+            @Html.DisplayNameFor(model => model.PaymentMethod.Code)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PaymentMethod.Code)
+        </dd>
+        <dt>
             @Html.DisplayNameFor(model => model.PaymentMethod.Name)
         </dt>
         <dd>
@@ -29,7 +35,7 @@
         <dd>
             @Html.DisplayFor(model => model.PaymentMethod.AutoPayoffWay)
         </dd>
-       
+
     </dl>
 </div>
 <div>
