@@ -1821,5 +1821,65 @@ namespace GrKouk.Web.ERP.Controllers
                 });
             }
         }
+         [HttpPost("ModifyCashierWarehouseItemCategoryMethod")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public async Task<IActionResult> ModifyCashierWarehouseItemCategoryMethod([FromBody] CashierItemCategoryModifyRequest request)
+        {
+            if (request == null)
+            {
+                return BadRequest(new
+                {
+                    error = "Empty request data"
+                });
+            }
+
+            try
+            {
+                //get companyId for companyCode
+                var company = await _context.Companies.SingleOrDefaultAsync(p => p.Code == request.CompanyCode);
+                if (company == null)
+                {
+                    return NotFound(new
+                    {
+                        error = "Company code not found"
+                    });
+                }
+                var companyId = company.Id;
+                var entityToModify = await _context.MaterialCategories.SingleOrDefaultAsync(p => p.Id == request.Item.Id);
+                if (entityToModify == null)
+                {
+                    return NotFound(new
+                    {
+                        error = "Category not found"
+                    });
+                }
+                entityToModify.Code = request.Item.Code;
+                entityToModify.Name = request.Item.Name;
+                entityToModify.ModifiedAt = DateTime.Now;
+               
+                
+               
+                _context.MaterialCategories.Entry(entityToModify).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+                var res=_context.MaterialCategories.Entry(entityToModify).Entity;
+                var ret = new ErpPaymentMethodDto()
+                {
+                    Id = res.Id,
+                    Code = res.Code,
+                    Name = res.Name,
+                   
+                    ModifiedAt = res.ModifiedAt
+                };
+                return Ok(ret);
+                
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    error = "Internal server error-> " + ex.Message
+                });
+            }    
+        }
     }
 }

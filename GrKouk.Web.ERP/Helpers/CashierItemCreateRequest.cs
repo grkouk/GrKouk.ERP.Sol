@@ -30,7 +30,23 @@ public class CashierItemCategoryCreateDto
     public int DaysOverdue { get; set; }
     public DateTime ModifiedAt { get; set; }
 }
-
+public class CashierItemCategoryModifyRequest
+{
+    [JsonPropertyName("companyCode")]
+    public string CompanyCode { get; set; }
+    [JsonPropertyName("item")]
+    public CashierItemCategoryModifyDto Item { get; set; }
+}
+public class CashierItemCategoryModifyDto
+{
+    public int Id { get; set; }
+      
+    public string Code { get; set; }
+       
+    public string Name { get; set; }
+    public int DaysOverdue { get; set; }
+    public DateTime ModifiedAt { get; set; }
+}
 public class CashierPaymentMethodCreateRequest
 {
     [JsonPropertyName("companyCode")]
