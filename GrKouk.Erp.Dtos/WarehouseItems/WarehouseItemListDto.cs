@@ -190,7 +190,7 @@ namespace GrKouk.Erp.Dtos.WarehouseItems
                         ret = "Απροσδιόριστο";
                         break;
                     case WarehouseItemNatureEnum.WarehouseItemNatureMaterial:
-                        ret = "Υλικό";
+                        ret = "Εμπόρευμα";
                         break;
                     case WarehouseItemNatureEnum.WarehouseItemNatureService:
                         ret = "Υπηρεσία";

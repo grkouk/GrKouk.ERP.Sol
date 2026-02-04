@@ -29,7 +29,7 @@ namespace GrKouk.Erp.Definitions
     {
         [Description("Χωρίς Προσδιορισμό")]
         WarehouseItemNatureUndefined = 0,
-        [Description("Υλικό")]
+        [Description("Εμπόρευμα")]
         WarehouseItemNatureMaterial = 1,
         [Description("Υπηρεσία")]
         WarehouseItemNatureService = 2,

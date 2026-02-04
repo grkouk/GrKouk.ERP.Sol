@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.DocDefinitions;
@@ -1467,6 +1468,9 @@ namespace GrKouk.Web.ERP.Controllers
                     var rsc = _context.WarehouseItems.Entry(WrItem).Entity;
                     return Ok(rsc);
                 }
+                var selectedCompanies=new List<string>();
+                selectedCompanies.Add(companyId.ToString());
+                
                 var warehouseItemToInsert = new WarehouseItemCreateDto()
                 {
                     Active = request.Item.Active,
@@ -1484,6 +1488,7 @@ namespace GrKouk.Web.ERP.Controllers
                     MaterialType = (MaterialTypeEnum)request.Item.MaterialType,
                     MaterialCategoryId = request.Item.MaterialCategoryId,
                     WarehouseItemNature = (WarehouseItemNatureEnum) request.Item.WarehouseItemNature,
+                    SelectedCompanies = JsonSerializer.Serialize(selectedCompanies),
                     //CompanyId is deprecated but there is a FK constraint so i put a value 
                     CompanyId = 1
                     
@@ -1510,6 +1515,91 @@ namespace GrKouk.Web.ERP.Controllers
                 return BadRequest(new { error = ex.ToString() });
             }
         }
+
+        [HttpPost("ModifyCashierWarehouseItem")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public async Task<IActionResult> ModifyCashierWarehouseItem([FromBody] CashierItemModifyRequest request)
+        {
+            if (request == null)
+            {
+                return BadRequest(new
+                {
+                    error = "Empty request data"
+                });
+            } 
+            try
+            {
+                //get companyId for companyCode
+                var company = await _context.Companies.SingleOrDefaultAsync(p => p.Code == request.CompanyCode);
+                if (company == null)
+                {
+                    return NotFound(new
+                    {
+                        error = "Company code not found"
+                    });
+                }
+                var companyId = company.Id;
+                //Chack if Warehouseitem exists
+                var WrItem = await _context.WarehouseItems.SingleOrDefaultAsync(p=>p.Code == request.Item.Code);
+                if (WrItem != null)
+                {
+                    //WarehouseItem already exists
+                    //Warehouseitem must be mapped to selected Company
+                    var companyMapping = await _context.CompanyWarehouseItemMappings.SingleOrDefaultAsync(p => p.CompanyId == companyId && p.WarehouseItemId == WrItem.Id);
+                    if (companyMapping == null)
+                    {
+                        return BadRequest(new
+                        {
+                            error = "Warehouse Item is not mapped to company"
+                        });
+                    }
+                   
+                }
+                var itemToModify = new WarehouseItemModifyDto()
+                {
+                    Active = request.Item.Active,
+                    MainMeasureUnitId = request.Item.MainMeasureUnitId,
+                    SecondaryMeasureUnitId = request.Item.SecondaryMeasureUnitId,
+                    BuyMeasureUnitId = request.Item.BuyMeasureUnitId,
+                    SecondaryUnitToMainRate = request.Item.SecondaryUnitToMainRate,
+                    BuyUnitToMainRate = request.Item.BuyUnitToMainRate,
+                    ManufacturerCode = request.Item.ManufacturerCode,
+                    Code = request.Item.Code,
+                    Name = request.Item.Name,
+                    FpaDefId = request.Item.FpaDefId,
+                    ShortDescription = request.Item.Name,
+                    Description = request.Item.Name,
+                    MaterialType = (MaterialTypeEnum)request.Item.MaterialType,
+                    MaterialCategoryId = request.Item.MaterialCategoryId,
+                    WarehouseItemNature = (WarehouseItemNatureEnum) request.Item.WarehouseItemNature,
+                    SelectedCompanies = string.Empty,
+                    //CompanyId is deprecated but there is a FK constraint so i put a value 
+                    CompanyId = 1
+                    
+                };
+                var syncServiceResult = await _warehouseManagementSrv.ModifyWarehouseItemAsync(itemToModify);
+                if (syncServiceResult is null)
+                {
+                    return StatusCode(500, new
+                    {
+                        error = "Synchronization Error for warehouseitem modification."
+                    });
+                }
+
+                if (!syncServiceResult.Success)
+                {
+                    return BadRequest(new { error = syncServiceResult.ErrorMessage });
+                }
+
+                var res = syncServiceResult.Data;
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.ToString() });
+            }
+        }
+        
         [HttpPost("SyncCheckBusinessBuyDocument")]
         [Authorize(Policy = "ApiPolicy2")]
         public async Task<IActionResult> SyncCheckBusinessBuyDocument([FromBody] SyncBusinessBuyDocumentRequest request)
@@ -1639,6 +1729,7 @@ namespace GrKouk.Web.ERP.Controllers
                 return BadRequest(new { error = ex.ToString() });
             }
         }
+
 
         [HttpPost("SyncAddBusinessBuyDocuments")]
         [Authorize(Policy = "ApiPolicy2")]

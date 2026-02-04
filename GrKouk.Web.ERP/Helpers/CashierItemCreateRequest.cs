@@ -11,7 +11,14 @@ public class CashierItemCreateRequest
     public CashierItemCreateDto Item { get; set; }
  
 }
-
+public class CashierItemModifyRequest 
+{
+    [JsonPropertyName("companyCode")]
+    public string CompanyCode { get; set; }
+    [JsonPropertyName("item")]
+    public CashierItemModifyDto Item { get; set; }
+ 
+}
 public class CashierItemCategoryCreateRequest
 {
     [JsonPropertyName("companyCode")]
