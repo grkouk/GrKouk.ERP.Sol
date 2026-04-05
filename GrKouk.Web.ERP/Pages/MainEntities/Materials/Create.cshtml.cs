@@ -25,14 +25,14 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
     {
         private readonly ApiDbContext _context;
         private readonly IMapper _mapper;
-        private readonly IWarehouseManagementSrv _warehouseManagementSrv;
+        private readonly IWarehouseItemsManagementSrv _warehouseItemsManagementSrv;
         private readonly IToastNotification _toastNotification;
         public int CopyFromId { get; set; }
-        public CreateModel(ApiDbContext context, IMapper mapper, IWarehouseManagementSrv warehouseManagementSrv,IToastNotification toastNotification)
+        public CreateModel(ApiDbContext context, IMapper mapper, IWarehouseItemsManagementSrv warehouseItemsManagementSrv,IToastNotification toastNotification)
         {
             _context = context;
             _mapper = mapper;
-            _warehouseManagementSrv = warehouseManagementSrv;
+            _warehouseItemsManagementSrv = warehouseItemsManagementSrv;
             _toastNotification = toastNotification;
         }
 
@@ -114,7 +114,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
         
             try
             {
-                var serviceResult = await _warehouseManagementSrv.AddWarehouseItemAsync(WarehouseItemVm);
+                var serviceResult = await _warehouseItemsManagementSrv.AddWarehouseItemAsync(WarehouseItemVm);
                 if (serviceResult == null)
                 {
                     ModelState.AddModelError(string.Empty, "Empty response from management service");

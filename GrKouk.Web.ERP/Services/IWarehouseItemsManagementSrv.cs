@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GrKouk.Web.ERP.Services;
 
-public interface IWarehouseManagementSrv
+public interface IWarehouseItemsManagementSrv
 {
     Task<ServiceResult> AddWarehouseItemAsync(WarehouseItemCreateDto item);
     Task<ServiceResult> ModifyWarehouseItemAsync(WarehouseItemModifyDto item);
@@ -19,12 +19,13 @@ public interface IWarehouseManagementSrv
     Task<ServiceResult> AddCompanyMappingToWarehouseItemAsync(int warehouseItemId, int companyId);
 }
 
-public class WarehouseManagementSrv : IWarehouseManagementSrv
+
+public class WarehouseItemsManagementSrv : IWarehouseItemsManagementSrv
 {
     private readonly ApiDbContext _context;
-    private readonly ILogger<WarehouseManagementSrv> _logger;
+    private readonly ILogger<WarehouseItemsManagementSrv> _logger;
 
-    public WarehouseManagementSrv(ApiDbContext context, ILogger<WarehouseManagementSrv> logger)
+    public WarehouseItemsManagementSrv(ApiDbContext context, ILogger<WarehouseItemsManagementSrv> logger)
     {
         _context = context;
         _logger = logger;

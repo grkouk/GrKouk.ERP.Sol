@@ -47,6 +47,13 @@ public class CashierApiController : ControllerBase
             .ToListAsync();
         return Ok(items);
     }
+    /// <summary>
+    /// This is for the client management view for working with the search text 
+    /// </summary>
+    /// <param name="companyCode"></param>
+    /// <param name="searchText"></param>
+    /// <param name="datePeriod"></param>
+    /// <returns></returns>
     [HttpGet("GetErpSupplierPayments")]
     [Authorize(Policy = "ApiPolicy2")]
     public async Task<ActionResult> GetErpSupplierPayments(string companyCode, string searchText, string datePeriod="All")

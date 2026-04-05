@@ -17,12 +17,12 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
     public class DeleteModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IWarehouseManagementSrv _warehouseManagementSrv;
+        private readonly IWarehouseItemsManagementSrv _warehouseItemsManagementSrv;
         private readonly IToastNotification _toastNotification;
-        public DeleteModel(ApiDbContext context, IWarehouseManagementSrv warehouseManagementSrv, IToastNotification toastNotification)
+        public DeleteModel(ApiDbContext context, IWarehouseItemsManagementSrv warehouseItemsManagementSrv, IToastNotification toastNotification)
         {
             _context = context;
-            _warehouseManagementSrv = warehouseManagementSrv;
+            _warehouseItemsManagementSrv = warehouseItemsManagementSrv;
             _toastNotification = toastNotification;
         }
 
@@ -110,7 +110,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
                 return NotFound();
             }
 
-            var srvResult = await _warehouseManagementSrv.DeleteWarehouseItemAsync((int)id);
+            var srvResult = await _warehouseItemsManagementSrv.DeleteWarehouseItemAsync((int)id);
             if (!srvResult.Success)
             {
                 ModelState.AddModelError("", srvResult.ErrorMessage);
