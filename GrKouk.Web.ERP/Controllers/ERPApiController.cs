@@ -32,16 +32,16 @@ namespace GrKouk.Web.ERP.Controllers
         private readonly ILogger<ErpApiController> _logger;
         private readonly IDocumentTransactionService _docTransSrv;
         private readonly IDocumentSyncService _docSyncSrv;
-        private readonly IWarehouseManagementSrv _warehouseManagementSrv;
+        private readonly IWarehouseItemsManagementSrv _warehouseItemsManagementSrv;
 
         public ErpApiController(ApiDbContext context, ILogger<ErpApiController> logger,
-            IDocumentTransactionService docTransSrv, IDocumentSyncService docSyncSrv,IWarehouseManagementSrv warehouseManagementSrv)
+            IDocumentTransactionService docTransSrv, IDocumentSyncService docSyncSrv,IWarehouseItemsManagementSrv warehouseItemsManagementSrv)
         {
             _context = context;
             _logger = logger;
             _docTransSrv = docTransSrv;
             _docSyncSrv = docSyncSrv;
-            _warehouseManagementSrv = warehouseManagementSrv;
+            _warehouseItemsManagementSrv = warehouseItemsManagementSrv;
         }
 
         [HttpPost("SyncBusinessItemFamilies")]
@@ -804,212 +804,7 @@ namespace GrKouk.Web.ERP.Controllers
         public async Task<IActionResult> SyncBusinessSuppliers(
             [FromBody] SyncBusinessEntityRequest<SyncBusinessSupplierDto> request)
         {
-            // #region BoilerPlate Code
-            //
-            // string mainEntityName = "SyncSupplier";
-            // string syncEntityName = "SyncSupplier";
-            // _logger.LogInformation("SyncBusinessSuppliers");
-            // int addedCount = 0;
-            // int failedToAddCount = 0;
-            // int updatedCount = 0;
-            // int failedToUpdateCount = 0;
-            // int deletedCount = 0;
-            // int failedToDeleteCount = 0;
-            // if (request == null)
-            // {
-            //     return BadRequest(new
-            //     {
-            //         error = "Empty request data"
-            //     });
-            // }
-            //
-            // if (request.Items == null)
-            // {
-            //     return BadRequest(new
-            //     {
-            //         error = "No Items"
-            //     });
-            // }
-            //
-            // if (request.CompanyCode == null)
-            // {
-            //     return BadRequest(new
-            //     {
-            //         error = "No Company Code"
-            //     });
-            // }
-            //
-            // string businessCompanyCode = request.CompanyCode;
-            // var company = await _context.Companies.SingleOrDefaultAsync(p => p.Code == businessCompanyCode);
-            // if (company == null)
-            // {
-            //     return BadRequest(new
-            //     {
-            //         error = "No Company for this company code"
-            //     });
-            // }
-            //
-            // int companyId = company.Id;
-            //
-            // #endregion
-            //
-            // var sourceList = new List<SyncSupplier>();
-            //
-            //
-            // foreach (var item in request.Items)
-            // {
-            //     var sourceItem = new SyncSupplier
-            //     {
-            //         BusId = item.Id,
-            //         Name = item.Name,
-            //         TaxNumber = item.TaxNumber,
-            //         BusCode = item.Code,
-            //         SourceChecksum = ChecksumHelper.CalculateChecksum(item.Id.ToString()
-            //             , item.Name
-            //             , item.Code
-            //             , item.TaxNumber)
-            //     };
-            //     sourceList.Add(sourceItem);
-            // }
-            //
-            // #region Dictionaries
-            //
-            // var sourceDict = sourceList.ToDictionary(x => x.BusId);
-            // var destinationItems = _context.SyncSuppliers.ToList();
-            // var destinationDict = destinationItems.ToDictionary(x => x.BusId);
-            //
-            // var toInsert = sourceDict
-            //     .Where(src => !destinationDict.ContainsKey(src.Key))
-            //     .Select(pair => pair.Value)
-            //     .ToList();
-            //
-            // var toUpdate = sourceDict
-            //     .Where(src =>
-            //         destinationDict.ContainsKey(src.Key) &&
-            //         destinationDict[src.Key].SourceChecksum != src.Value.SourceChecksum)
-            //     .Select(pair => pair.Value)
-            //     .ToList();
-            //
-            // var toDelete = destinationDict
-            //     .Where(dest => !sourceDict.ContainsKey(dest.Key))
-            //     .Select(pair => pair.Value)
-            //     .ToList();
-            //
-            // #endregion
-            //
-            // var syncSessionId = Guid.NewGuid(); // Unique session ID for this sync operation
-            // var syncSource = "MAUI Client"; // Source of the sync operation
-            //
-            // await using var transaction = await _context.Database.BeginTransactionAsync();
-            // try
-            // {
-            //     foreach (var item in toInsert)
-            //     {
-            //        //Create a new buy document create Dto
-            //        //Must find erp supplier transactor id based on business supplier id
-            //         var newMainItem = _context.MeasureUnits.Add(new MeasureUnit()
-            //         {
-            //             Code = item.BusId.ToString(),
-            //             // Name = item.Name,
-            //             //CompanyId = companyId
-            //         });
-            //         try
-            //         {
-            //             await _context.SaveChangesAsync();
-            //         }
-            //         catch (Exception ex)
-            //         {
-            //             await transaction.RollbackAsync();
-            //             _logger.LogError("An error occurred during synchronization: {Error}", ex.Message);
-            //             failedToAddCount++;
-            //             return BadRequest(new
-            //             {
-            //                 error = "SyncBuyDocuments error " + ex.Message
-            //             });
-            //         }
-            //
-            //         _context.SynchronizationLogs.Add(new SynchronizationLog
-            //         {
-            //             SyncSessionId = syncSessionId,
-            //             EntityName = mainEntityName,
-            //             EntityId = newMainItem.Entity.Id,
-            //             OperationType = "INSERT",
-            //             Source = syncSource,
-            //         });
-            //         addedCount++;
-            //         //await _context.SaveChangesAsync();
-            //     }
-            //
-            //     foreach (var item in toUpdate)
-            //     {
-            //         // _context.SyncUnitOfMeasurements.Update(item);
-            //         _context.SynchronizationLogs.Add(new SynchronizationLog
-            //         {
-            //             SyncSessionId = syncSessionId,
-            //             EntityName = syncEntityName,
-            //             EntityId = item.BusId,
-            //             OperationType = "UPDATE",
-            //             Source = syncSource,
-            //         });
-            //         var mainEntityId = item.ErpId;
-            //         var mainEntityToUpdate =
-            //             await _context.MeasureUnits.FirstOrDefaultAsync(p => p.Id == mainEntityId);
-            //         if (mainEntityToUpdate == null)
-            //         {
-            //             _logger.LogError("Main entity with id {Id} not found", mainEntityId);
-            //             continue;
-            //         }
-            //
-            //         // mainEntityToUpdate.Name = item.Name;
-            //         mainEntityToUpdate.Code = item.BusId.ToString();
-            //         _context.MeasureUnits.Update(mainEntityToUpdate);
-            //
-            //
-            //         _context.SynchronizationLogs.Add(new SynchronizationLog
-            //         {
-            //             SyncSessionId = syncSessionId,
-            //             EntityName = mainEntityName,
-            //             EntityId = mainEntityToUpdate.Id,
-            //             OperationType = "UPDATE",
-            //             Source = syncSource,
-            //         });
-            //         updatedCount++;
-            //     }
-            //
-            //     foreach (var item in toDelete)
-            //     {
-            //         // _context.SyncUnitOfMeasurements.Remove(item);
-            //         deletedCount++;
-            //     }
-            //
-            //     await _context.SaveChangesAsync();
-            //     await transaction.CommitAsync();
-            // }
-            // catch (Exception ex)
-            // {
-            //     await transaction.RollbackAsync();
-            //     _logger.LogError("An error occurred during synchronization: {Error}", ex.Message);
-            //     return BadRequest(new
-            //     {
-            //         error = "SyncBuyDocuments error " + ex.Message
-            //     });
-            // }
-            //
-            //
-            // var res = new ErpSynchronizationResponse<SyncBuyDocument>
-            // {
-            //     Message = "SyncBuyDocuments",
-            //     AddedCount = addedCount,
-            //     FailedToAddCount = failedToAddCount,
-            //     UpdatedCount = updatedCount,
-            //     FailedToUpdateCount = failedToUpdateCount,
-            //     DeletedCount = deletedCount,
-            //     FailedToDeleteCount = failedToDeleteCount,
-            //     SyncSessionId = syncSessionId,
-            //     SyncSource = syncSource,
-            //     //SyncItems = toInsert.Concat(toUpdate).Concat(toDelete).ToList()
-            // };
-            // return Ok(res);
+            
             return Ok();
         }
 
@@ -1209,7 +1004,7 @@ namespace GrKouk.Web.ERP.Controllers
         [Authorize(Policy = "ApiPolicy2")]
         public async Task<IActionResult> GetErpPaymentMethods(string companyCode)
         {
-            var query = _context.PaymentMethods.AsQueryable();
+            var query = _context.PaymentMethods.OrderBy(p=>p.Name).AsQueryable();
 
             // Return all categories if companyCode is null, empty, or "ALL"
             if (string.IsNullOrEmpty(companyCode) || companyCode.Equals("ALL", StringComparison.OrdinalIgnoreCase))
@@ -1447,12 +1242,13 @@ namespace GrKouk.Web.ERP.Controllers
                     var companyMapping = await _context.CompanyWarehouseItemMappings.SingleOrDefaultAsync(p => p.CompanyId == companyId && p.WarehouseItemId == WrItem.Id);
                     if (companyMapping != null)
                     {
-                        return BadRequest(new
+                        return Conflict(new
                         {
-                            error = "Warehouse Item exists and already mapped to company"
+                            itemId=WrItem.Id,
+                            message = "Warehouse Item exists and already mapped to company"
                         });
                     }
-                    var syncSrvResult = await _warehouseManagementSrv.AddCompanyMappingToWarehouseItemAsync(WrItem.Id, companyId);
+                    var syncSrvResult = await _warehouseItemsManagementSrv.AddCompanyMappingToWarehouseItemAsync(WrItem.Id, companyId);
                     if (syncSrvResult is null)
                     {
                         return StatusCode(500, new
@@ -1493,7 +1289,7 @@ namespace GrKouk.Web.ERP.Controllers
                     CompanyId = 1
                     
                 };
-                var syncServiceResult = await _warehouseManagementSrv.AddWarehouseItemAsync(warehouseItemToInsert);
+                var syncServiceResult = await _warehouseItemsManagementSrv.AddWarehouseItemAsync(warehouseItemToInsert);
                 if (syncServiceResult is null)
                 {
                     return StatusCode(500, new
@@ -1577,7 +1373,7 @@ namespace GrKouk.Web.ERP.Controllers
                     CompanyId = 1
                     
                 };
-                var syncServiceResult = await _warehouseManagementSrv.ModifyWarehouseItemAsync(itemToModify);
+                var syncServiceResult = await _warehouseItemsManagementSrv.ModifyWarehouseItemAsync(itemToModify);
                 if (syncServiceResult is null)
                 {
                     return StatusCode(500, new
