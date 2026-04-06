@@ -429,7 +429,7 @@ public class SyncBusinessDocService : IDocumentSyncService
 
             var docTrans = new SellDocCreateAjaxDto
             {
-                TransDate = request.TransDate,
+                TransDate = request.TransDate.Date,
                 TransactorId = syncCustomerId,
                 SellDocSeriesId = docSeriesLianikiId,
                 TransRefCode = request.ZNumber.ToString() + "-CH",
@@ -471,7 +471,7 @@ public class SyncBusinessDocService : IDocumentSyncService
             };
             var docTransCards = new SellDocCreateAjaxDto
             {
-                TransDate = request.TransDate,
+                TransDate = request.TransDate.Date,
                 TransactorId = syncCustomerId,
                 SellDocSeriesId = docSeriesLianikiId,
                 TransRefCode = request.ZNumber.ToString() + "-CD",
@@ -513,7 +513,7 @@ public class SyncBusinessDocService : IDocumentSyncService
             };
             var docTransStar = new SellDocCreateAjaxDto
             {
-                TransDate = request.TransDate,
+                TransDate = request.TransDate.Date,
                 TransactorId = syncCustomerId,
                 SellDocSeriesId = docSeriesLianikiStarId,
                 TransRefCode = request.ZNumber.ToString()+"-ST",
