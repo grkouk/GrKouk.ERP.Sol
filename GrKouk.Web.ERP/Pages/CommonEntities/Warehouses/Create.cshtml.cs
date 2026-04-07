@@ -56,6 +56,14 @@ namespace GrKouk.Web.ERP.Pages.CommonEntities.Warehouses
                 return Page();
             }
             var itemToAttach = _mapper.Map<Warehouse>(ItemVm);
+            // var itemToAttach2 = new Warehouse()
+            // {
+            //     Name = ItemVm.Name,
+            //     Code = ItemVm.Code,
+            //     CompanyMappings = new System.Collections.Generic.HashSet<WarehouseCompanyMapping>(),
+            //     DateCreated = DateTime.Today,
+            //     DateLastModified = DateTime.Today,
+            // };
             await using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
