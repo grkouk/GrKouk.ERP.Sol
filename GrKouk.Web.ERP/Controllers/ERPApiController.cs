@@ -863,6 +863,13 @@ namespace GrKouk.Web.ERP.Controllers
                     Code = t.Transactor.Code,
                     Name = t.Transactor.Name,
                     TaxNumber = t.Transactor.TaxNumber,
+                    Address = t.Transactor.Address,
+                    City = t.Transactor.City,
+                    Zip = t.Transactor.Zip,
+                    PhoneWork = t.Transactor.PhoneWork,
+                    PhoneMobile = t.Transactor.PhoneMobile,
+                    EMail = t.Transactor.EMail,
+                    DateLastModified = t.Transactor.DateLastModified,
                     TransactorTypeId = t.Transactor.TransactorTypeId,
                     TransactorTypeCode = t.Transactor.TransactorType.Code,
                     TransactorTypeName = t.Transactor.TransactorType.Name,
@@ -875,19 +882,24 @@ namespace GrKouk.Web.ERP.Controllers
                 t.TransactorTypeCode == supplierTypeCode);
 
             var testList = fullListIq.ToList();
-            var projectedList = testList.GroupBy(g => new
+            var projectedList = testList.GroupBy(g => g.Id)
+                .Select(f =>
                 {
-                    g.Id,
-                    g.Name,
-                    g.Code,
-                    g.TaxNumber
-                })
-                .Select(f => new ErpSupplierDto()
-                {
-                    Id = f.Key.Id,
-                    Name = f.Key.Name,
-                    Code = f.Key.Code,
-                    Afm = f.Key.TaxNumber
+                    var first = f.First();
+                    return new ErpSupplierDto
+                    {
+                        Id = first.Id,
+                        Code = first.Code,
+                        Name = first.Name,
+                        TaxNumber = first.TaxNumber,
+                        Address = first.Address,
+                        City = first.City,
+                        PostalCode = first.Zip?.ToString(),
+                        PhoneWork = first.PhoneWork,
+                        PhoneMobile = first.PhoneMobile,
+                        Email = first.EMail,
+                        ModifiedAt = first.DateLastModified
+                    };
                 });
             var listItems = projectedList.OrderBy(p => p.Name).ToList();
 
@@ -922,6 +934,72 @@ namespace GrKouk.Web.ERP.Controllers
              }
              var companyId = company.Id;
             var items = await _context.MeasureUnits.Where(p =>
+                p.Active
+            ).ToListAsync();
+            return Ok(items);
+        }
+        [HttpGet("GetErpBuyDocTypeSeries")]
+        [Authorize(Policy = "ApiPolicy2")]
+        // [AllowAnonymous]
+        public async Task<IActionResult> GetErpBuyDocTypeSeries(string companyCode)
+        {
+            
+            int allCompaniesId = 0;
+            var allCompCode =
+                await _context.AppSettings.SingleOrDefaultAsync(p => p.Code == Constants.AllCompaniesCodeKey);
+            if (allCompCode == null)
+            {
+                return NotFound("All Companies Code Setting not found");
+            }
+            
+            var allCompaniesEntity =
+                await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+            
+            if (allCompaniesEntity != null)
+            {
+                allCompaniesId = allCompaniesEntity.Id;
+            }
+            var company = await _context.Companies.SingleOrDefaultAsync(p => p.Code == companyCode);
+            if (company == null)
+            {
+                return BadRequest("No Company for this company code");
+            }
+            var companyId = company.Id;
+            var items = await _context.BuyDocTypeDefs.Where(p =>
+                p.CompanyId==companyId || p.CompanyId==allCompaniesId &&
+                p.Active
+            ).ToListAsync();
+            return Ok(items);
+        }
+        [HttpGet("GetErpSellDocTypeSeries")]
+        [Authorize(Policy = "ApiPolicy2")]
+        // [AllowAnonymous]
+        public async Task<IActionResult> GetErpSellDocTypeSeries(string companyCode)
+        {
+            
+            int allCompaniesId = 0;
+            var allCompCode =
+                await _context.AppSettings.SingleOrDefaultAsync(p => p.Code == Constants.AllCompaniesCodeKey);
+            if (allCompCode == null)
+            {
+                return NotFound("All Companies Code Setting not found");
+            }
+            
+            var allCompaniesEntity =
+                await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+            
+            if (allCompaniesEntity != null)
+            {
+                allCompaniesId = allCompaniesEntity.Id;
+            }
+            var company = await _context.Companies.SingleOrDefaultAsync(p => p.Code == companyCode);
+            if (company == null)
+            {
+                return BadRequest("No Company for this company code");
+            }
+            var companyId = company.Id;
+            var items = await _context.SellDocTypeDefs.Where(p =>
+                p.CompanyId==companyId || p.CompanyId==allCompaniesId &&
                 p.Active
             ).ToListAsync();
             return Ok(items);
@@ -1040,7 +1118,38 @@ namespace GrKouk.Web.ERP.Controllers
 
             return Ok(items);
         }
-        
+
+        [HttpGet("GetErpItemNatures")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public IActionResult GetErpItemNatures()
+        {
+            var items = Enum.GetValues(typeof(WarehouseItemNatureEnum))
+                .Cast<WarehouseItemNatureEnum>()
+                .Select(e => new
+                {
+                    Value = (int)e,
+                    Description = e.GetDescription()
+                })
+                .ToList();
+
+            return Ok(items);
+        }
+        [HttpGet("GetErpItemTypes")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public IActionResult GetErpItemTypes()
+        {
+            var items = Enum.GetValues(typeof(MaterialTypeEnum))
+                .Cast<MaterialTypeEnum>()
+                .Select(e => new
+                {
+                    Value = (int)e,
+                    Description = e.GetDescription()
+                })
+                .ToList();
+
+            return Ok(items);
+        }
+
         [HttpPost("AddCashierPaymentMethod")]
         [Authorize(Policy = "ApiPolicy2")]
         public async Task<IActionResult> AddCashierPaymentMethod([FromBody] CashierPaymentMethodCreateRequest request)
@@ -1708,7 +1817,7 @@ namespace GrKouk.Web.ERP.Controllers
                 });
             }
         }
-         [HttpPost("ModifyCashierWarehouseItemCategoryMethod")]
+        [HttpPost("ModifyCashierWarehouseItemCategoryMethod")]
         [Authorize(Policy = "ApiPolicy2")]
         public async Task<IActionResult> ModifyCashierWarehouseItemCategoryMethod([FromBody] CashierItemCategoryModifyRequest request)
         {

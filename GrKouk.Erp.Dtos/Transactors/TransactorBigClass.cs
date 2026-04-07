@@ -1,4 +1,6 @@
-﻿namespace GrKouk.Erp.Dtos.Transactors
+﻿using System;
+
+namespace GrKouk.Erp.Dtos.Transactors
 {
     public class TransactorBigClass
     {
@@ -20,6 +22,8 @@
         public int TransactorTypeId { get; set; }
         public string TransactorTypeName { get; set; }
         public string TransactorTypeCode { get; set; }
+        public DateTime DateLastModified { get; set; }
+
         public int CompanyId { get; set; }
         public string CompanyCode { get; set; }
     }
