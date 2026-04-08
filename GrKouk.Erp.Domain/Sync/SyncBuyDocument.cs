@@ -32,3 +32,4 @@ public class SyncBuyDocument
     [MaxLength(32)]
     public string SourceChecksum { get; set; }
 }
+

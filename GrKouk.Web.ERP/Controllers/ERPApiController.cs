@@ -1277,7 +1277,7 @@ namespace GrKouk.Web.ERP.Controllers
                 
                 .AsQueryable();
 
-            // Return all categories if companyCode is null, empty, or "ALL"
+            // Return all if companyCode is null, empty, or "ALL"
             if (string.IsNullOrEmpty(companyCode) || companyCode.Equals("ALL", StringComparison.OrdinalIgnoreCase))
             {
                 var allItems = await query.ToListAsync();
