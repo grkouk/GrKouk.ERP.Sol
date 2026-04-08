@@ -1,0 +1,93 @@
+using System;
+using System.Collections.Generic;
+
+namespace GrKouk.Erp.Dtos.Sync;
+
+// ─── Individual entity DTOs ─────────────────────────────────────────
+
+public class SharedItemDto
+{
+    public Guid Id { get; set; }
+    public string Code { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public bool Active { get; set; }
+    public Guid ItemCategoryId { get; set; }
+    public Guid VatClassId { get; set; }
+    public Guid MainUnitId { get; set; }
+    public int ItemNature { get; set; }
+    public int ItemType { get; set; }
+    public string? ManufacturerCode { get; set; }
+    public string? UpcCode { get; set; }
+    public string? EanCode { get; set; }
+    public DateTime ModifiedAt { get; set; }
+    public string ModifiedByShopId { get; set; } = string.Empty;
+    public int Version { get; set; }
+}
+
+public class SharedItemCategoryDto
+{
+    public Guid Id { get; set; }
+    public string Code { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public DateTime ModifiedAt { get; set; }
+}
+
+public class SharedVatClassDto
+{
+    public Guid Id { get; set; }
+    public string Code { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public decimal Rate { get; set; }
+    public DateTime ModifiedAt { get; set; }
+}
+
+public class SharedMeasureUnitDto
+{
+    public Guid Id { get; set; }
+    public string Code { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public DateTime ModifiedAt { get; set; }
+}
+
+public class SharedItemCodeDto
+{
+    public Guid Id { get; set; }
+    public Guid ItemId { get; set; }
+    public int CodeType { get; set; }
+    public string Code { get; set; } = string.Empty;
+    public Guid MeasureUnitId { get; set; }
+    public decimal Quantity { get; set; } = 1;
+}
+
+// ─── Request / Response DTOs ────────────────────────────────────────
+
+public class SharedSyncPushRequest
+{
+    public string ShopId { get; set; } = string.Empty;
+    public List<SharedItemDto> Items { get; set; } = new();
+    public List<SharedItemCategoryDto> Categories { get; set; } = new();
+    public List<SharedVatClassDto> VatClasses { get; set; } = new();
+    public List<SharedMeasureUnitDto> MeasureUnits { get; set; } = new();
+    public List<SharedItemCodeDto> ItemCodes { get; set; } = new();
+}
+
+public class SharedSyncPushResponse
+{
+    public bool Success { get; set; }
+    public int ItemsUpserted { get; set; }
+    public int CategoriesUpserted { get; set; }
+    public int VatClassesUpserted { get; set; }
+    public int MeasureUnitsUpserted { get; set; }
+    public int ItemCodesUpserted { get; set; }
+    public List<string> Errors { get; set; } = new();
+}
+
+public class SharedSyncPullResponse
+{
+    public List<SharedItemDto> Items { get; set; } = new();
+    public List<SharedItemCategoryDto> Categories { get; set; } = new();
+    public List<SharedVatClassDto> VatClasses { get; set; } = new();
+    public List<SharedMeasureUnitDto> MeasureUnits { get; set; } = new();
+    public List<SharedItemCodeDto> ItemCodes { get; set; } = new();
+    public DateTime ServerTimestamp { get; set; }
+}

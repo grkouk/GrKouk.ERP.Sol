@@ -93,6 +93,13 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<Warehouse> Warehouses { get; set; }
 
         public DbSet<WarehouseCompanyMapping> WarehouseCompanyMappings { get; set; }
+
+        // Shared item registry (cross-shop sync)
+        public DbSet<SharedItem> SharedItems { get; set; }
+        public DbSet<SharedItemCategory> SharedItemCategories { get; set; }
+        public DbSet<SharedVatClass> SharedVatClasses { get; set; }
+        public DbSet<SharedMeasureUnit> SharedMeasureUnits { get; set; }
+        public DbSet<SharedItemCode> SharedItemCodes { get; set; }
         
        // public DbSet<SyncItem> SyncItems { get; set; }
         
@@ -814,6 +821,42 @@ namespace GrKouk.Web.ERP.Data
                     .WithMany(p => p.CompanyMappings)
                     .OnDelete(DeleteBehavior.Restrict)
                     .HasForeignKey(p => p.WarehouseId);
+            });
+
+            // ─── Shared item registry (cross-shop sync) ────────────────
+            modelBuilder.Entity<SharedItem>(entity =>
+            {
+                entity.HasIndex(p => p.Code);
+                entity.HasIndex(p => p.ModifiedAt);
+                entity.HasIndex(p => p.ModifiedByShopId);
+                entity.Property(p => p.ModifiedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+            });
+            modelBuilder.Entity<SharedItemCategory>(entity =>
+            {
+                entity.HasIndex(p => p.Code);
+                entity.HasIndex(p => p.ModifiedAt);
+                entity.Property(p => p.ModifiedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+            });
+            modelBuilder.Entity<SharedVatClass>(entity =>
+            {
+                entity.HasIndex(p => p.Code);
+                entity.HasIndex(p => p.ModifiedAt);
+                entity.Property(p => p.ModifiedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+            });
+            modelBuilder.Entity<SharedMeasureUnit>(entity =>
+            {
+                entity.HasIndex(p => p.Code);
+                entity.HasIndex(p => p.ModifiedAt);
+                entity.Property(p => p.ModifiedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+            });
+            modelBuilder.Entity<SharedItemCode>(entity =>
+            {
+                entity.HasIndex(p => p.ItemId);
+                entity.HasIndex(p => p.Code);
             });
         }
         
