@@ -1285,13 +1285,29 @@ namespace GrKouk.Web.ERP.Controllers
             }
             
             // Filter by specific company
+            int allCompaniesId = 0;
+            var allCompCode =
+                await _context.AppSettings.SingleOrDefaultAsync(p => p.Code == Constants.AllCompaniesCodeKey);
+            if (allCompCode == null)
+            {
+                return NotFound(new { error = "All Companies Code Setting not found" });
+            }
+            
+            var allCompaniesEntity =
+                await _context.Companies.SingleOrDefaultAsync(s => s.Code == allCompCode.Value);
+            
+            if (allCompaniesEntity != null)
+            {
+                allCompaniesId = allCompaniesEntity.Id;
+            }
+            // Filter by
             var company = await _context.Companies.SingleOrDefaultAsync(p => p.Code == companyCode);
             if (company == null)
             {
                 return NotFound(new { ErrorMessage = "No Company found for this company code" });
             }
 
-            query = query.Where(p => p.CompanyId == company.Id );
+            query = query.Where(p => p.CompanyId == company.Id || p.CompanyId == allCompaniesId );
             var items = await query
                 .Select(i=> new ErpItemDto()
                 {
