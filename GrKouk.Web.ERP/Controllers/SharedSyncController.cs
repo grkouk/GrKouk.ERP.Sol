@@ -15,7 +15,7 @@ namespace GrKouk.Web.ERP.Controllers;
 /// <summary>
 /// Handles cross-shop item synchronization via a shared registry.
 /// Both shops share the same GUIDs (shop 2 was cloned from shop 1).
-/// Prices and stock are excluded — they are shop-specific.
+/// Syncs items, reference data, and inter-shop price level prices.
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
@@ -115,9 +115,28 @@ public class SharedSyncController : ControllerBase
             })
             .ToListAsync();
 
+        var itemPrices = await _context.SharedItemPrices
+            .Where(p => p.ModifiedAt > since && p.ModifiedByShopId != shopId)
+            .Select(p => new SharedItemPriceDto
+            {
+                Id = p.Id,
+                ItemId = p.ItemId,
+                PriceLevelId = p.PriceLevelId,
+                NetPrice = p.NetPrice,
+                BrutPrice = p.BrutPrice,
+                Markup = p.Markup,
+                IsOverridden = p.IsOverridden,
+                ValidFrom = p.ValidFrom,
+                ValidTo = p.ValidTo,
+                IsActive = p.IsActive,
+                ModifiedAt = p.ModifiedAt,
+                ModifiedByShopId = p.ModifiedByShopId
+            })
+            .ToListAsync();
+
         _logger.LogInformation(
-            "SharedSync Pull for shop {ShopId} since {Since}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {ItemCodes} item codes",
-            shopId, since, items.Count, categories.Count, vatClasses.Count, measureUnits.Count, itemCodes.Count);
+            "SharedSync Pull for shop {ShopId} since {Since}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {ItemCodes} item codes, {ItemPrices} item prices",
+            shopId, since, items.Count, categories.Count, vatClasses.Count, measureUnits.Count, itemCodes.Count, itemPrices.Count);
 
         return Ok(new SharedSyncPullResponse
         {
@@ -126,6 +145,7 @@ public class SharedSyncController : ControllerBase
             VatClasses = vatClasses,
             MeasureUnits = measureUnits,
             ItemCodes = itemCodes,
+            ItemPrices = itemPrices,
             ServerTimestamp = serverTimestamp
         });
     }
@@ -150,6 +170,7 @@ public class SharedSyncController : ControllerBase
         int measureUnitsUpserted = 0;
         int itemsUpserted = 0;
         int itemCodesUpserted = 0;
+        int itemPricesUpserted = 0;
 
         try
         {
@@ -295,11 +316,49 @@ public class SharedSyncController : ControllerBase
                 }
             }
 
+            // 4. Item prices — upsert with last-write-wins
+            foreach (var price in request.ItemPrices)
+            {
+                var existing = await _context.SharedItemPrices.FindAsync(price.Id);
+                if (existing == null)
+                {
+                    _context.SharedItemPrices.Add(new SharedItemPrice
+                    {
+                        Id = price.Id,
+                        ItemId = price.ItemId,
+                        PriceLevelId = price.PriceLevelId,
+                        NetPrice = price.NetPrice,
+                        BrutPrice = price.BrutPrice,
+                        Markup = price.Markup,
+                        IsOverridden = price.IsOverridden,
+                        ValidFrom = price.ValidFrom,
+                        ValidTo = price.ValidTo,
+                        IsActive = price.IsActive,
+                        ModifiedAt = price.ModifiedAt,
+                        ModifiedByShopId = request.ShopId
+                    });
+                    itemPricesUpserted++;
+                }
+                else if (price.ModifiedAt > existing.ModifiedAt)
+                {
+                    existing.NetPrice = price.NetPrice;
+                    existing.BrutPrice = price.BrutPrice;
+                    existing.Markup = price.Markup;
+                    existing.IsOverridden = price.IsOverridden;
+                    existing.ValidFrom = price.ValidFrom;
+                    existing.ValidTo = price.ValidTo;
+                    existing.IsActive = price.IsActive;
+                    existing.ModifiedAt = price.ModifiedAt;
+                    existing.ModifiedByShopId = request.ShopId;
+                    itemPricesUpserted++;
+                }
+            }
+
             await _context.SaveChangesAsync();
 
             _logger.LogInformation(
-                "SharedSync Push from shop {ShopId}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {ItemCodes} item codes",
-                request.ShopId, itemsUpserted, categoriesUpserted, vatClassesUpserted, measureUnitsUpserted, itemCodesUpserted);
+                "SharedSync Push from shop {ShopId}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {ItemCodes} item codes, {ItemPrices} item prices",
+                request.ShopId, itemsUpserted, categoriesUpserted, vatClassesUpserted, measureUnitsUpserted, itemCodesUpserted, itemPricesUpserted);
         }
         catch (Exception ex)
         {
@@ -315,6 +374,7 @@ public class SharedSyncController : ControllerBase
             VatClassesUpserted = vatClassesUpserted,
             MeasureUnitsUpserted = measureUnitsUpserted,
             ItemCodesUpserted = itemCodesUpserted,
+            ItemPricesUpserted = itemPricesUpserted,
             Errors = errors
         });
     }
@@ -393,6 +453,24 @@ public class SharedSyncController : ControllerBase
             })
             .ToListAsync();
 
+        var itemPrices = await _context.SharedItemPrices
+            .Select(p => new SharedItemPriceDto
+            {
+                Id = p.Id,
+                ItemId = p.ItemId,
+                PriceLevelId = p.PriceLevelId,
+                NetPrice = p.NetPrice,
+                BrutPrice = p.BrutPrice,
+                Markup = p.Markup,
+                IsOverridden = p.IsOverridden,
+                ValidFrom = p.ValidFrom,
+                ValidTo = p.ValidTo,
+                IsActive = p.IsActive,
+                ModifiedAt = p.ModifiedAt,
+                ModifiedByShopId = p.ModifiedByShopId
+            })
+            .ToListAsync();
+
         return Ok(new SharedSyncPullResponse
         {
             Items = items,
@@ -400,6 +478,7 @@ public class SharedSyncController : ControllerBase
             VatClasses = vatClasses,
             MeasureUnits = measureUnits,
             ItemCodes = itemCodes,
+            ItemPrices = itemPrices,
             ServerTimestamp = serverTimestamp
         });
     }

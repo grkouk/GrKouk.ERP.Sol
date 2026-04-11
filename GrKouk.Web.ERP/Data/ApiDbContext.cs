@@ -100,6 +100,7 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<SharedVatClass> SharedVatClasses { get; set; }
         public DbSet<SharedMeasureUnit> SharedMeasureUnits { get; set; }
         public DbSet<SharedItemCode> SharedItemCodes { get; set; }
+        public DbSet<SharedItemPrice> SharedItemPrices { get; set; }
         
        // public DbSet<SyncItem> SyncItems { get; set; }
         
@@ -857,6 +858,18 @@ namespace GrKouk.Web.ERP.Data
             {
                 entity.HasIndex(p => p.ItemId);
                 entity.HasIndex(p => p.Code);
+            });
+            modelBuilder.Entity<SharedItemPrice>(entity =>
+            {
+                entity.HasIndex(p => p.ItemId);
+                entity.HasIndex(p => p.PriceLevelId);
+                entity.HasIndex(p => p.ModifiedAt);
+                entity.HasIndex(p => p.ModifiedByShopId);
+                entity.Property(p => p.ModifiedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(p => p.NetPrice).HasColumnType("decimal(18,4)");
+                entity.Property(p => p.BrutPrice).HasColumnType("decimal(18,4)");
+                entity.Property(p => p.Markup).HasColumnType("decimal(18,4)");
             });
         }
         

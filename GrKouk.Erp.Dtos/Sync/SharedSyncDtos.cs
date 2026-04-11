@@ -59,6 +59,22 @@ public class SharedItemCodeDto
     public decimal Quantity { get; set; } = 1;
 }
 
+public class SharedItemPriceDto
+{
+    public Guid Id { get; set; }
+    public Guid ItemId { get; set; }
+    public Guid PriceLevelId { get; set; }
+    public decimal NetPrice { get; set; }
+    public decimal BrutPrice { get; set; }
+    public decimal Markup { get; set; }
+    public bool IsOverridden { get; set; }
+    public DateTime? ValidFrom { get; set; }
+    public DateTime? ValidTo { get; set; }
+    public bool IsActive { get; set; }
+    public DateTime ModifiedAt { get; set; }
+    public string ModifiedByShopId { get; set; } = string.Empty;
+}
+
 // ─── Request / Response DTOs ────────────────────────────────────────
 
 public class SharedSyncPushRequest
@@ -69,6 +85,7 @@ public class SharedSyncPushRequest
     public List<SharedVatClassDto> VatClasses { get; set; } = new();
     public List<SharedMeasureUnitDto> MeasureUnits { get; set; } = new();
     public List<SharedItemCodeDto> ItemCodes { get; set; } = new();
+    public List<SharedItemPriceDto> ItemPrices { get; set; } = new();
 }
 
 public class SharedSyncPushResponse
@@ -79,6 +96,7 @@ public class SharedSyncPushResponse
     public int VatClassesUpserted { get; set; }
     public int MeasureUnitsUpserted { get; set; }
     public int ItemCodesUpserted { get; set; }
+    public int ItemPricesUpserted { get; set; }
     public List<string> Errors { get; set; } = new();
 }
 
@@ -89,5 +107,6 @@ public class SharedSyncPullResponse
     public List<SharedVatClassDto> VatClasses { get; set; } = new();
     public List<SharedMeasureUnitDto> MeasureUnits { get; set; } = new();
     public List<SharedItemCodeDto> ItemCodes { get; set; } = new();
+    public List<SharedItemPriceDto> ItemPrices { get; set; } = new();
     public DateTime ServerTimestamp { get; set; }
 }
