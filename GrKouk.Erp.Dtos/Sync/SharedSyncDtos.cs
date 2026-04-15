@@ -75,6 +75,26 @@ public class SharedItemPriceDto
     public string ModifiedByShopId { get; set; } = string.Empty;
 }
 
+public class SharedItemErpMappingDto
+{
+    public Guid Id { get; set; }
+    public Guid LocalItemId { get; set; }
+    public int ErpId { get; set; }
+    public DateTime LastSyncedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime ModifiedAt { get; set; }
+    public string ModifiedByShopId { get; set; } = string.Empty;
+}
+
+public class SharedItemErpMappingDeletionDto
+{
+    public Guid Id { get; set; }
+    public Guid LocalItemId { get; set; }
+    public DateTime DeletedAt { get; set; }
+    public DateTime ModifiedAt { get; set; }
+    public string ModifiedByShopId { get; set; } = string.Empty;
+}
+
 // ─── Request / Response DTOs ────────────────────────────────────────
 
 public class SharedSyncPushRequest
@@ -86,6 +106,8 @@ public class SharedSyncPushRequest
     public List<SharedMeasureUnitDto> MeasureUnits { get; set; } = new();
     public List<SharedItemCodeDto> ItemCodes { get; set; } = new();
     public List<SharedItemPriceDto> ItemPrices { get; set; } = new();
+    public List<SharedItemErpMappingDto> ItemErpMappings { get; set; } = new();
+    public List<SharedItemErpMappingDeletionDto> ItemErpMappingDeletions { get; set; } = new();
 }
 
 public class SharedSyncPushResponse
@@ -97,6 +119,8 @@ public class SharedSyncPushResponse
     public int MeasureUnitsUpserted { get; set; }
     public int ItemCodesUpserted { get; set; }
     public int ItemPricesUpserted { get; set; }
+    public int ItemErpMappingsUpserted { get; set; }
+    public int ItemErpMappingDeletionsApplied { get; set; }
     public List<string> Errors { get; set; } = new();
 }
 
@@ -108,5 +132,7 @@ public class SharedSyncPullResponse
     public List<SharedMeasureUnitDto> MeasureUnits { get; set; } = new();
     public List<SharedItemCodeDto> ItemCodes { get; set; } = new();
     public List<SharedItemPriceDto> ItemPrices { get; set; } = new();
+    public List<SharedItemErpMappingDto> ItemErpMappings { get; set; } = new();
+    public List<SharedItemErpMappingDeletionDto> ItemErpMappingDeletions { get; set; } = new();
     public DateTime ServerTimestamp { get; set; }
 }

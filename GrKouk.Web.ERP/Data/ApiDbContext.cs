@@ -30,6 +30,7 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<FinancialMovement> FinancialMovements { get; set; }
 
         public DbSet<FpaDef> FpaKategories { get; set; }
+        public DbSet<ErpFinancialAggregateDef> ErpFinancialAggregateDefs { get; set; }
         public DbSet<TransWarehouseDef> TransWarehouseDefs { get; set; }
         public DbSet<TransWarehouseDocTypeDef> TransWarehouseDocTypeDefs { get; set; }
         public DbSet<TransWarehouseDocSeriesDef> TransWarehouseDocSeriesDefs { get; set; }
@@ -89,6 +90,7 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<SyncBuyDocument> SyncBuyDocuments { get; set; }
         public DbSet<SyncSaleDocument> SyncSaleDocuments { get; set; }
         public DbSet<SyncSupplier> SyncSuppliers { get; set; }
+        public DbSet<UploadedBuyDocument> UploadedBuyDocuments { get; set; }
 
         public DbSet<Warehouse> Warehouses { get; set; }
 
@@ -101,6 +103,8 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<SharedMeasureUnit> SharedMeasureUnits { get; set; }
         public DbSet<SharedItemCode> SharedItemCodes { get; set; }
         public DbSet<SharedItemPrice> SharedItemPrices { get; set; }
+        public DbSet<SharedItemErpMapping> SharedItemErpMappings { get; set; }
+        public DbSet<SharedItemErpMappingDeletion> SharedItemErpMappingDeletions { get; set; }
         
        // public DbSet<SyncItem> SyncItems { get; set; }
         
@@ -147,8 +151,26 @@ namespace GrKouk.Web.ERP.Data
                 entity.Property(e => e.CompanyId).HasDefaultValue(1);
                 entity.Property(e => e.CreatedAt)
                     .HasDefaultValueSql("GETUTCDATE()");
-        
+
                 entity.Property(e => e.ModifiedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+            });
+
+            modelBuilder.Entity<ErpFinancialAggregateDef>(entity =>
+            {
+                entity.HasIndex(e => new { e.WarehouseItemNature, e.FpaDefId })
+                    .IsUnique();
+                entity.HasOne(e => e.FpaDef)
+                    .WithMany()
+                    .HasForeignKey(e => e.FpaDefId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.WarehouseItem)
+                    .WithMany()
+                    .HasForeignKey(e => e.WarehouseItemId)
+                    .OnDelete(DeleteBehavior.Restrict);
+                entity.Property(e => e.DateCreated)
+                    .HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.DateLastModified)
                     .HasDefaultValueSql("GETUTCDATE()");
             });
 
@@ -771,14 +793,22 @@ namespace GrKouk.Web.ERP.Data
             });
             modelBuilder.Entity<SyncBuyDocument>(entity =>
             {
-               
+
                 entity.HasIndex(p => p.ErpId);
                 entity.HasIndex(p => p.BusId);
                 entity.HasIndex(p => p.CompanyCode);
                 entity.HasIndex(p => p.TransDate);
                 entity.HasIndex(p => p.SupplierId);
                 entity.HasIndex(p => p.RefNumber);
-                
+
+            });
+            modelBuilder.Entity<UploadedBuyDocument>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.HasIndex(p => p.LocalBuyDocumentId).IsUnique();
+                entity.HasIndex(p => p.ErpBuyDocId);
+                entity.HasIndex(p => p.CompanyCode);
+                entity.Property(p => p.UploadedAt).HasDefaultValueSql("GETUTCDATE()");
             });
             modelBuilder.Entity<SyncSaleDocument>(entity =>
             {
@@ -870,6 +900,22 @@ namespace GrKouk.Web.ERP.Data
                 entity.Property(p => p.NetPrice).HasColumnType("decimal(18,4)");
                 entity.Property(p => p.BrutPrice).HasColumnType("decimal(18,4)");
                 entity.Property(p => p.Markup).HasColumnType("decimal(18,4)");
+            });
+            modelBuilder.Entity<SharedItemErpMapping>(entity =>
+            {
+                entity.HasIndex(p => p.LocalItemId).IsUnique();
+                entity.HasIndex(p => p.ModifiedAt);
+                entity.HasIndex(p => p.ModifiedByShopId);
+                entity.Property(p => p.ModifiedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+            });
+            modelBuilder.Entity<SharedItemErpMappingDeletion>(entity =>
+            {
+                entity.HasIndex(p => p.LocalItemId);
+                entity.HasIndex(p => p.ModifiedAt);
+                entity.HasIndex(p => p.ModifiedByShopId);
+                entity.Property(p => p.ModifiedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
             });
         }
         

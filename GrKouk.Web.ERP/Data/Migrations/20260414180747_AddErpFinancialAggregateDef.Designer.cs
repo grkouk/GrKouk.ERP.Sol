@@ -4,6 +4,7 @@ using GrKouk.Web.ERP.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GrKouk.Web.ERP.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260414180747_AddErpFinancialAggregateDef")]
+    partial class AddErpFinancialAggregateDef
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3422,40 +3425,6 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasIndex("EntityName", "EntityId");
 
                     b.ToTable("SynchronizationLogs");
-                });
-
-            modelBuilder.Entity("GrKouk.Erp.Domain.Sync.UploadedBuyDocument", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CompanyCode")
-                        .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<int>("ErpBuyDocId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("LocalBuyDocumentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("UploadedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompanyCode");
-
-                    b.HasIndex("ErpBuyDocId");
-
-                    b.HasIndex("LocalBuyDocumentId")
-                        .IsUnique();
-
-                    b.ToTable("UploadedBuyDocuments");
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Warehouses.Warehouse", b =>

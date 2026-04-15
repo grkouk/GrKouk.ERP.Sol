@@ -323,7 +323,7 @@ public class SyncBusinessDocService : IDocumentSyncService
 
         var syncId = syncSessionId ?? Guid.NewGuid();
         var syncSource = "MAUI Client"; // Source of the sync operation
-        string syncMerchItemCode = "SYNCMERCH";
+        string syncMerchItemCode = "SYNCMERCH00";
         
         int syncMerchitemId = 0;
         string paymentMethodCashCode = "Μετρητοίς";

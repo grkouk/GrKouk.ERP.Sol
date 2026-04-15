@@ -6,20 +6,14 @@
     <Authors>George Koukoudis</Authors>
     <Company>GrKoukOrg</Company>
     <Copyright>GrKoukOrg</Copyright>
-    <Version>2.0.0.1</Version>
+    <Version>2.1.0.0</Version>
     <PackageVersion>$(Version)</PackageVersion>
     <AssemblyVersion>$(Version)</AssemblyVersion>
     <FileVersion>$(Version)</FileVersion>
     <Title>GrKoukOrg Erp</Title>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Data\Migrations\20200531135638_trans.cs" />
-    <Compile Remove="Data\Migrations\20200531135638_trans.Designer.cs" />
-    <Compile Remove="Data\Migrations\20201105105344_CashFlowSectionEntities.cs" />
-    <Compile Remove="Data\Migrations\20201105105344_CashFlowSectionEntities.Designer.cs" />
-  </ItemGroup>
-
+ 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />

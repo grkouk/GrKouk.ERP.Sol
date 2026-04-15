@@ -251,6 +251,16 @@ public class WarehouseItemsManagementSrv : IWarehouseItemsManagementSrv
                 return ServiceResult.Error("Το είδος δεν βρέθηκε", "NOTFOUND");
             }
 
+            var aggregateRefs = await _context.ErpFinancialAggregateDefs
+                .Where(d => d.WarehouseItemId == itemId)
+                .CountAsync();
+            if (aggregateRefs > 0)
+            {
+                return ServiceResult.Error(
+                    "Το είδος χρησιμοποιείται ως αθροιστικό σε ορισμό Αθροιστικών Οικονομικών και δεν μπορεί να διαγραφεί. Αφαιρέστε πρώτα τον ορισμό.",
+                    "CONSTRAINT");
+            }
+
             _context.CompanyWarehouseItemMappings.RemoveRange(
                 _context.CompanyWarehouseItemMappings.Where(p => p.WarehouseItemId == itemId));
             _context.WarehouseItems.Remove(item);

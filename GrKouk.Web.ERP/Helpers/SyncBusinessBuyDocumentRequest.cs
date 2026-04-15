@@ -30,6 +30,6 @@ public class SyncBusinessBuyDocumentRequest
     [JsonPropertyName("totalAmount")]
     public decimal TotalAmount { get; set; }
     [JsonPropertyName("payedAmount")]
-    public decimal PayedAmount { get; set; } 
-   
+    public decimal PayedAmount { get; set; }
+
 }

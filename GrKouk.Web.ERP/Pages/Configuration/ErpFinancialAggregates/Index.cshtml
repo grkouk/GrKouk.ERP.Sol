@@ -1,0 +1,87 @@
+@page
+@using GrKouk.Erp.Definitions
+@using GrKouk.Web.ERP.Helpers
+@model GrKouk.Web.Erp.Pages.Configuration.ErpFinancialAggregates.IndexModel
+
+@{
+    ViewData["Title"] = "Ορισμοί Αθροιστικών Οικονομικών";
+}
+
+<h4>Ορισμοί Αθροιστικών Οικονομικών</h4>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger small">@TempData["Error"]</div>
+}
+
+<p>
+    <a class="small" asp-page="Create">Νέος Ορισμός</a>
+    &nbsp;|&nbsp;
+    <a class="small" asp-page="Index" asp-route-coverage="true">Έλεγχος Κάλυψης</a>
+</p>
+
+@if (Model.ShowCoverage)
+{
+    <h6>Κενά Κάλυψης — συνδυασμοί (Φύση, ΦΠΑ) σε χρήση χωρίς ενεργό ορισμό</h6>
+    @if (Model.Gaps.Count == 0)
+    {
+        <div class="alert alert-success small">Καμία έλλειψη. Κάθε συνδυασμός σε χρήση έχει ενεργό ορισμό αθροιστικού.</div>
+    }
+    else
+    {
+        <table class="table table-bordered table-sm">
+            <thead class="thead-light">
+            <tr>
+                <th class="small">Φύση Είδους</th>
+                <th class="small">ΦΠΑ</th>
+                <th class="small">Πλήθος Ειδών</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var g in Model.Gaps)
+            {
+                <tr>
+                    <td class="small">@g.Nature.GetDescription()</td>
+                    <td class="small">@g.FpaDefName</td>
+                    <td class="small">@g.ItemCount</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+    <hr/>
+}
+
+<table class="table table-bordered table-sm">
+    <thead class="thead-light">
+    <tr>
+        <th class="small">Φύση Είδους</th>
+        <th class="small">ΦΠΑ</th>
+        <th class="small">Αθροιστικό Είδος</th>
+        <th class="small">Κωδικός</th>
+        <th class="small">Ενεργό</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.Defs)
+    {
+        <tr class="@(item.Active ? "" : "text-muted")">
+            <td class="small">@item.WarehouseItemNature.GetDescription()</td>
+            <td class="small">@item.FpaDef?.Name</td>
+            <td class="small">@item.WarehouseItem?.Name</td>
+            <td class="small">@item.WarehouseItem?.Code</td>
+            <td class="small">@(item.Active ? "Ναι" : "Όχι")</td>
+            <td class="small">
+                <a asp-page="./Edit" asp-route-id="@item.Id">Επεξεργασία</a>
+                &nbsp;|&nbsp;
+                <form method="post" asp-page-handler="Toggle" asp-route-id="@item.Id" style="display:inline">
+                    <button type="submit" class="btn btn-link btn-sm p-0 small">
+                        @(item.Active ? "Απενεργοποίηση" : "Ενεργοποίηση")
+                    </button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

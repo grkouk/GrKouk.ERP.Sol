@@ -4,6 +4,7 @@ using GrKouk.Web.ERP.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GrKouk.Web.ERP.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260414173238_AddSharedItemErpMapping")]
+    partial class AddSharedItemErpMapping
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -376,52 +379,6 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasIndex("TransWarehouseDefId");
 
                     b.ToTable("BuyDocTypeDefs");
-                });
-
-            modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.ErpFinancialAggregateDef", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("DateCreated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<DateTime>("DateLastModified")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<int>("FpaDefId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("WarehouseItemId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("WarehouseItemNature")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FpaDefId");
-
-                    b.HasIndex("WarehouseItemId");
-
-                    b.HasIndex("WarehouseItemNature", "FpaDefId")
-                        .IsUnique();
-
-                    b.ToTable("ErpFinancialAggregateDefs");
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.FinancialMovement", b =>
@@ -3424,40 +3381,6 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.ToTable("SynchronizationLogs");
                 });
 
-            modelBuilder.Entity("GrKouk.Erp.Domain.Sync.UploadedBuyDocument", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CompanyCode")
-                        .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<int>("ErpBuyDocId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("LocalBuyDocumentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("UploadedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompanyCode");
-
-                    b.HasIndex("ErpBuyDocId");
-
-                    b.HasIndex("LocalBuyDocumentId")
-                        .IsUnique();
-
-                    b.ToTable("UploadedBuyDocuments");
-                });
-
             modelBuilder.Entity("GrKouk.Erp.Domain.Warehouses.Warehouse", b =>
                 {
                     b.Property<int>("Id")
@@ -3898,25 +3821,6 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.Navigation("TransTransactorDef");
 
                     b.Navigation("TransWarehouseDef");
-                });
-
-            modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.ErpFinancialAggregateDef", b =>
-                {
-                    b.HasOne("GrKouk.Erp.Domain.DocDefinitions.FpaDef", "FpaDef")
-                        .WithMany()
-                        .HasForeignKey("FpaDefId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("GrKouk.Erp.Domain.Shared.WarehouseItem", "WarehouseItem")
-                        .WithMany()
-                        .HasForeignKey("WarehouseItemId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("FpaDef");
-
-                    b.Navigation("WarehouseItem");
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.DocDefinitions.GlobalSettings", b =>

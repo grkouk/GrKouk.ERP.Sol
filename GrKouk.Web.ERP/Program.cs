@@ -147,6 +147,7 @@ namespace GrKouk.Web.ERP
             // App services
             builder.Services.AddTransient<IDocumentTransactionService, DocumentTransactionServiceV2>();
             builder.Services.AddTransient<IDocumentSyncService, SyncBusinessDocService>();
+            builder.Services.AddTransient<IBuyDocumentUploadService, BuyDocumentUploadService>();
             builder.Services.AddTransient<ITransactorTransactionService, TransactorTransactionServiceV2>();
             builder.Services.AddTransient<ICFATransactionService, CFATransactionService>();
             builder.Services.AddTransient<IWarehouseItemsManagementSrv, WarehouseItemsManagementSrv>();

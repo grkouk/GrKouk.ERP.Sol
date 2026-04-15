@@ -32,15 +32,19 @@ namespace GrKouk.Web.ERP.Controllers
         private readonly ILogger<ErpApiController> _logger;
         private readonly IDocumentTransactionService _docTransSrv;
         private readonly IDocumentSyncService _docSyncSrv;
+        private readonly IBuyDocumentUploadService _buyDocUploadSrv;
         private readonly IWarehouseItemsManagementSrv _warehouseItemsManagementSrv;
 
         public ErpApiController(ApiDbContext context, ILogger<ErpApiController> logger,
-            IDocumentTransactionService docTransSrv, IDocumentSyncService docSyncSrv,IWarehouseItemsManagementSrv warehouseItemsManagementSrv)
+            IDocumentTransactionService docTransSrv, IDocumentSyncService docSyncSrv,
+            IBuyDocumentUploadService buyDocUploadSrv,
+            IWarehouseItemsManagementSrv warehouseItemsManagementSrv)
         {
             _context = context;
             _logger = logger;
             _docTransSrv = docTransSrv;
             _docSyncSrv = docSyncSrv;
+            _buyDocUploadSrv = buyDocUploadSrv;
             _warehouseItemsManagementSrv = warehouseItemsManagementSrv;
         }
 
@@ -1334,6 +1338,45 @@ namespace GrKouk.Web.ERP.Controllers
 
             return Ok(items);
         }
+
+        /// <summary>
+        /// Returns one ErpItemDto per active ErpFinancialAggregateDef row. These are
+        /// the admin-curated aggregates for Material/Service/FixedAsset natures,
+        /// globally scoped (no company filter). The companyCode parameter is kept
+        /// for API stability but is not used for filtering.
+        /// </summary>
+        [HttpGet("GetErpFinancialAggregates")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public async Task<IActionResult> GetErpFinancialAggregates(string companyCode)
+        {
+            var aggregates = await _context.ErpFinancialAggregateDefs
+                .Where(d => d.Active)
+                .Include(d => d.WarehouseItem)
+                .Select(d => new ErpItemDto
+                {
+                    Id = d.WarehouseItem.Id,
+                    Name = d.WarehouseItem.Name,
+                    Code = d.WarehouseItem.Code,
+                    Active = d.WarehouseItem.Active,
+                    MainMeasureUnitId = d.WarehouseItem.MainMeasureUnitId,
+                    SecondaryMeasureUnitId = d.WarehouseItem.SecondaryMeasureUnitId,
+                    BuyMeasureUnitId = d.WarehouseItem.BuyMeasureUnitId,
+                    SecondaryUnitToMainRate = d.WarehouseItem.SecondaryUnitToMainRate,
+                    BuyUnitToMainRate = d.WarehouseItem.BuyUnitToMainRate,
+                    FpaDefId = d.WarehouseItem.FpaDefId,
+                    MaterialCategoryId = d.WarehouseItem.MaterialCategoryId,
+                    MaterialType = (int)d.WarehouseItem.MaterialType,
+                    WarehouseItemNature = (int)d.WarehouseItem.WarehouseItemNature,
+                    PriceNetto = d.WarehouseItem.PriceNetto,
+                    PriceBrutto = d.WarehouseItem.PriceBrutto,
+                    ManufacturerCode = d.WarehouseItem.ManufacturerCode,
+                    ModifiedAt = d.WarehouseItem.DateLastModified
+                })
+                .ToListAsync();
+
+            return Ok(aggregates);
+        }
+
         [HttpPost("AddCashierWarehouseItem")]
         [Authorize(Policy = "ApiPolicy2")]
         public async Task<IActionResult> AddCashierWarehouseItem([FromBody] CashierItemCreateRequest request)
@@ -1644,6 +1687,58 @@ namespace GrKouk.Web.ERP.Controllers
 
                 var res = syncServiceResult.Data;
                 return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.ToString() });
+            }
+        }
+
+
+        [HttpPost("SyncUploadBuyDocument")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public async Task<IActionResult> SyncUploadBuyDocument([FromBody] BuyDocumentUploadRequest request)
+        {
+            if (request == null)
+                return BadRequest(new { error = "Empty request data" });
+
+            try
+            {
+                var result = await _buyDocUploadSrv.UploadAsync(request);
+                if (result == null)
+                    return StatusCode(500, new { error = "Internal server error during BuyDocument upload" });
+                if (!result.Success)
+                    return BadRequest(new { error = result.ErrorMessage, code = result.ErrorCode });
+                return Ok(new { erpBuyDocId = result.Data });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.ToString() });
+            }
+        }
+
+        public class BuyDocumentDeleteRequest
+        {
+            public Guid LocalBuyDocumentId { get; set; }
+            public int ErpBuyDocId { get; set; }
+            public string CompanyCode { get; set; }
+        }
+
+        [HttpPost("SyncDeleteBuyDocument")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public async Task<IActionResult> SyncDeleteBuyDocument([FromBody] BuyDocumentDeleteRequest request)
+        {
+            if (request == null)
+                return BadRequest(new { error = "Empty request data" });
+
+            try
+            {
+                var result = await _buyDocUploadSrv.DeleteAsync(request.LocalBuyDocumentId, request.ErpBuyDocId, request.CompanyCode);
+                if (result == null)
+                    return StatusCode(500, new { error = "Internal server error during BuyDocument delete" });
+                if (!result.Success)
+                    return BadRequest(new { error = result.ErrorMessage, code = result.ErrorCode });
+                return Ok();
             }
             catch (Exception ex)
             {

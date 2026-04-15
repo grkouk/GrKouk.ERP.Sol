@@ -1,0 +1,88 @@
+@page "{id:int}"
+@model GrKouk.Web.Erp.Pages.Configuration.ErpFinancialAggregates.EditModel
+
+@{
+    ViewData["Title"] = "Επεξεργασία Ορισμού";
+}
+
+<h4>Επεξεργασία Ορισμού Αθροιστικού</h4>
+<hr/>
+
+<div class="container">
+    <form method="post">
+        <input type="hidden" asp-for="ItemVm.Id"/>
+        <div asp-validation-summary="All" class="text-danger small"></div>
+        <div class="row mb-3">
+            <div class="form-group col-md-4">
+                <label asp-for="ItemVm.WarehouseItemNature" class="form-label small"></label>
+                <select id="Nature" asp-for="ItemVm.WarehouseItemNature"
+                        class="form-select form-select-sm"
+                        asp-items="ViewBag.NatureList"></select>
+                <span asp-validation-for="ItemVm.WarehouseItemNature" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-4">
+                <label asp-for="ItemVm.FpaDefId" class="form-label small"></label>
+                <select id="FpaDef" asp-for="ItemVm.FpaDefId"
+                        class="form-select form-select-sm"
+                        asp-items="ViewBag.FpaDefList"></select>
+                <span asp-validation-for="ItemVm.FpaDefId" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-4">
+                <label asp-for="ItemVm.WarehouseItemId" class="form-label small"></label>
+                <select id="WarehouseItem" asp-for="ItemVm.WarehouseItemId"
+                        class="form-select form-select-sm"
+                        asp-items="ViewBag.WarehouseItemList"></select>
+                <span asp-validation-for="ItemVm.WarehouseItemId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="form-group col-md-6">
+                <label asp-for="ItemVm.Notes" class="form-label small"></label>
+                <input asp-for="ItemVm.Notes" class="form-control form-control-sm"/>
+            </div>
+            <div class="form-group col-md-2 form-check mt-4">
+                <input asp-for="ItemVm.Active" class="form-check-input"/>
+                <label asp-for="ItemVm.Active" class="form-check-label small"></label>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="form-group">
+                <input type="submit" value="Αποθήκευση" class="btn btn-secondary btn-sm"/>
+                &nbsp;
+                <a class="small" asp-page="Index">Πίσω</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script>
+        (function () {
+            const nature = document.getElementById('Nature');
+            const fpa = document.getElementById('FpaDef');
+            const item = document.getElementById('WarehouseItem');
+            const currentId = item.value;
+
+            async function reloadItems(keepCurrent) {
+                const n = nature.value, f = fpa.value;
+                if (!n || !f) {
+                    item.innerHTML = '<option value="">-- Επιλέξτε πρώτα Φύση και ΦΠΑ --</option>';
+                    return;
+                }
+                const res = await fetch(`?handler=WarehouseItems&nature=${n}&fpaDefId=${f}`);
+                if (!res.ok) return;
+                const data = await res.json();
+                if (data.length === 0) {
+                    item.innerHTML = '<option value="">(Κανένα είδος)</option>';
+                    return;
+                }
+                item.innerHTML = '<option value="">-- Επιλογή --</option>' +
+                    data.map(x => `<option value="${x.id}" ${keepCurrent && String(x.id) === currentId ? 'selected' : ''}>${x.text}</option>`).join('');
+            }
+
+            nature.addEventListener('change', () => reloadItems(false));
+            fpa.addEventListener('change', () => reloadItems(false));
+        })();
+    </script>
+}

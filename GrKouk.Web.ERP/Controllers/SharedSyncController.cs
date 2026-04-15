@@ -134,9 +134,35 @@ public class SharedSyncController : ControllerBase
             })
             .ToListAsync();
 
+        var itemErpMappings = await _context.SharedItemErpMappings
+            .Where(m => m.ModifiedAt > since && m.ModifiedByShopId != shopId)
+            .Select(m => new SharedItemErpMappingDto
+            {
+                Id = m.Id,
+                LocalItemId = m.LocalItemId,
+                ErpId = m.ErpId,
+                LastSyncedAt = m.LastSyncedAt,
+                CreatedAt = m.CreatedAt,
+                ModifiedAt = m.ModifiedAt,
+                ModifiedByShopId = m.ModifiedByShopId
+            })
+            .ToListAsync();
+
+        var itemErpMappingDeletions = await _context.SharedItemErpMappingDeletions
+            .Where(d => d.ModifiedAt > since && d.ModifiedByShopId != shopId)
+            .Select(d => new SharedItemErpMappingDeletionDto
+            {
+                Id = d.Id,
+                LocalItemId = d.LocalItemId,
+                DeletedAt = d.DeletedAt,
+                ModifiedAt = d.ModifiedAt,
+                ModifiedByShopId = d.ModifiedByShopId
+            })
+            .ToListAsync();
+
         _logger.LogInformation(
-            "SharedSync Pull for shop {ShopId} since {Since}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {ItemCodes} item codes, {ItemPrices} item prices",
-            shopId, since, items.Count, categories.Count, vatClasses.Count, measureUnits.Count, itemCodes.Count, itemPrices.Count);
+            "SharedSync Pull for shop {ShopId} since {Since}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {ItemCodes} item codes, {ItemPrices} item prices, {Mappings} mappings, {MapDeletions} mapping deletions",
+            shopId, since, items.Count, categories.Count, vatClasses.Count, measureUnits.Count, itemCodes.Count, itemPrices.Count, itemErpMappings.Count, itemErpMappingDeletions.Count);
 
         return Ok(new SharedSyncPullResponse
         {
@@ -146,6 +172,8 @@ public class SharedSyncController : ControllerBase
             MeasureUnits = measureUnits,
             ItemCodes = itemCodes,
             ItemPrices = itemPrices,
+            ItemErpMappings = itemErpMappings,
+            ItemErpMappingDeletions = itemErpMappingDeletions,
             ServerTimestamp = serverTimestamp
         });
     }
@@ -171,6 +199,8 @@ public class SharedSyncController : ControllerBase
         int itemsUpserted = 0;
         int itemCodesUpserted = 0;
         int itemPricesUpserted = 0;
+        int itemErpMappingsUpserted = 0;
+        int itemErpMappingDeletionsApplied = 0;
 
         try
         {
@@ -354,11 +384,69 @@ public class SharedSyncController : ControllerBase
                 }
             }
 
+            // 5. ItemErpMapping deletions — apply tombstones first so a same-batch
+            // re-map (delete old, create new for same LocalItemId) resolves correctly.
+            foreach (var del in request.ItemErpMappingDeletions)
+            {
+                var existingDel = await _context.SharedItemErpMappingDeletions.FindAsync(del.Id);
+                if (existingDel == null)
+                {
+                    _context.SharedItemErpMappingDeletions.Add(new SharedItemErpMappingDeletion
+                    {
+                        Id = del.Id,
+                        LocalItemId = del.LocalItemId,
+                        DeletedAt = del.DeletedAt,
+                        ModifiedAt = del.ModifiedAt,
+                        ModifiedByShopId = request.ShopId
+                    });
+                    itemErpMappingDeletionsApplied++;
+                }
+
+                // Remove the alive mapping for this LocalItemId if its ModifiedAt is
+                // older than the deletion — otherwise another shop has already
+                // re-mapped past this tombstone and we leave it alone.
+                var aliveMapping = await _context.SharedItemErpMappings
+                    .FirstOrDefaultAsync(m => m.LocalItemId == del.LocalItemId);
+                if (aliveMapping != null && aliveMapping.ModifiedAt < del.ModifiedAt)
+                {
+                    _context.SharedItemErpMappings.Remove(aliveMapping);
+                }
+            }
+
+            // 6. ItemErpMapping upserts — keyed by LocalItemId (unique), LWW by ModifiedAt.
+            foreach (var map in request.ItemErpMappings)
+            {
+                var existing = await _context.SharedItemErpMappings
+                    .FirstOrDefaultAsync(m => m.LocalItemId == map.LocalItemId);
+                if (existing == null)
+                {
+                    _context.SharedItemErpMappings.Add(new SharedItemErpMapping
+                    {
+                        Id = map.Id,
+                        LocalItemId = map.LocalItemId,
+                        ErpId = map.ErpId,
+                        LastSyncedAt = map.LastSyncedAt,
+                        CreatedAt = map.CreatedAt,
+                        ModifiedAt = map.ModifiedAt,
+                        ModifiedByShopId = request.ShopId
+                    });
+                    itemErpMappingsUpserted++;
+                }
+                else if (map.ModifiedAt > existing.ModifiedAt)
+                {
+                    existing.ErpId = map.ErpId;
+                    existing.LastSyncedAt = map.LastSyncedAt;
+                    existing.ModifiedAt = map.ModifiedAt;
+                    existing.ModifiedByShopId = request.ShopId;
+                    itemErpMappingsUpserted++;
+                }
+            }
+
             await _context.SaveChangesAsync();
 
             _logger.LogInformation(
-                "SharedSync Push from shop {ShopId}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {ItemCodes} item codes, {ItemPrices} item prices",
-                request.ShopId, itemsUpserted, categoriesUpserted, vatClassesUpserted, measureUnitsUpserted, itemCodesUpserted, itemPricesUpserted);
+                "SharedSync Push from shop {ShopId}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {ItemCodes} item codes, {ItemPrices} item prices, {Mappings} mappings, {MapDeletions} mapping deletions",
+                request.ShopId, itemsUpserted, categoriesUpserted, vatClassesUpserted, measureUnitsUpserted, itemCodesUpserted, itemPricesUpserted, itemErpMappingsUpserted, itemErpMappingDeletionsApplied);
         }
         catch (Exception ex)
         {
@@ -375,6 +463,8 @@ public class SharedSyncController : ControllerBase
             MeasureUnitsUpserted = measureUnitsUpserted,
             ItemCodesUpserted = itemCodesUpserted,
             ItemPricesUpserted = itemPricesUpserted,
+            ItemErpMappingsUpserted = itemErpMappingsUpserted,
+            ItemErpMappingDeletionsApplied = itemErpMappingDeletionsApplied,
             Errors = errors
         });
     }
@@ -471,6 +561,30 @@ public class SharedSyncController : ControllerBase
             })
             .ToListAsync();
 
+        var itemErpMappings = await _context.SharedItemErpMappings
+            .Select(m => new SharedItemErpMappingDto
+            {
+                Id = m.Id,
+                LocalItemId = m.LocalItemId,
+                ErpId = m.ErpId,
+                LastSyncedAt = m.LastSyncedAt,
+                CreatedAt = m.CreatedAt,
+                ModifiedAt = m.ModifiedAt,
+                ModifiedByShopId = m.ModifiedByShopId
+            })
+            .ToListAsync();
+
+        var itemErpMappingDeletions = await _context.SharedItemErpMappingDeletions
+            .Select(d => new SharedItemErpMappingDeletionDto
+            {
+                Id = d.Id,
+                LocalItemId = d.LocalItemId,
+                DeletedAt = d.DeletedAt,
+                ModifiedAt = d.ModifiedAt,
+                ModifiedByShopId = d.ModifiedByShopId
+            })
+            .ToListAsync();
+
         return Ok(new SharedSyncPullResponse
         {
             Items = items,
@@ -479,6 +593,8 @@ public class SharedSyncController : ControllerBase
             MeasureUnits = measureUnits,
             ItemCodes = itemCodes,
             ItemPrices = itemPrices,
+            ItemErpMappings = itemErpMappings,
+            ItemErpMappingDeletions = itemErpMappingDeletions,
             ServerTimestamp = serverTimestamp
         });
     }
