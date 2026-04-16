@@ -80,11 +80,6 @@ public class BuyDocumentUploadService : IBuyDocumentUploadService
                         $"Failed to delete existing ERP BuyDoc {request.ExistingErpBuyDocId.Value}: {delResult.ErrorMessage}",
                         delResult.ErrorCode ?? "DELETE_FAILED");
                 }
-
-                var prior = await _context.UploadedBuyDocuments
-                    .FirstOrDefaultAsync(p => p.ErpBuyDocId == request.ExistingErpBuyDocId.Value);
-                if (prior != null)
-                    _context.UploadedBuyDocuments.Remove(prior);
             }
 
             var docTrans = new BuyDocCreateAjaxDto
@@ -136,7 +131,7 @@ public class BuyDocumentUploadService : IBuyDocumentUploadService
             }
 
             var tracking = existing != null
-                ? await _context.UploadedBuyDocuments.FirstAsync(p => p.Id == existing.Id)
+                ? await _context.UploadedBuyDocuments.FirstOrDefaultAsync(p => p.Id == existing.Id)
                 : null;
             if (tracking != null)
             {
