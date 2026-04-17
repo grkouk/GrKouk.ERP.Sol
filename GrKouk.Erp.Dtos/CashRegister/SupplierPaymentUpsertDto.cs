@@ -7,6 +7,7 @@ public class SupplierPaymentUpsertDto
     public int? Id { get; set; }
     public string CompanyCode { get; set; }
     public int TransactorId { get; set; }
+    public int CfAccountId { get; set; }
     public DateTime TransDate { get; set; }
     public string TransRefCode { get; set; }
     public decimal AmountNet { get; set; }

@@ -204,6 +204,7 @@ public class CashierApiController : ControllerBase
             Id = entity.Id,
             CompanyCode = entity.Company?.Code ?? string.Empty,
             TransactorId = entity.TransactorId,
+            CfAccountId = entity.CfAccountId,
             TransDate = entity.TransDate,
             TransRefCode = entity.TransRefCode,
             AmountNet = entity.AmountNet,
@@ -215,6 +216,40 @@ public class CashierApiController : ControllerBase
             Timestamp = entity.Timestamp
         };
         return Ok(dto);
+    }
+
+    /// <summary>
+    /// Returns cash-flow accounts available to the caller's company (plus those mapped to the
+    /// system-wide ALL companies entry). Used by the cashier supplier-payment edit view.
+    /// </summary>
+    [HttpGet("cfaccounts")]
+    [Authorize(Policy = "ApiPolicy2")]
+    public async Task<ActionResult> GetCfAccounts(string companyCode)
+    {
+        if (string.IsNullOrEmpty(companyCode))
+            return BadRequest(new { error = "Company code is required" });
+
+        var company = await _context.Companies.SingleOrDefaultAsync(p => p.Code == companyCode);
+        if (company == null)
+            return BadRequest(new { error = $"Company with code '{companyCode}' not found" });
+
+        var allCompaniesId = await FiltersHelper.GetAllCompaniesIdAsync(_context);
+
+        var accounts = await _context.CashFlowAccountCompanyMappings
+            .AsNoTracking()
+            .Include(p => p.CashFlowAccount)
+            .Where(p => p.CompanyId == company.Id || p.CompanyId == allCompaniesId)
+            .Select(p => new CfAccountLookupDto
+            {
+                Id = p.CashFlowAccount.Id,
+                Code = p.CashFlowAccount.Code,
+                Name = p.CashFlowAccount.Name
+            })
+            .Distinct()
+            .OrderBy(x => x.Name)
+            .ToListAsync();
+
+        return Ok(accounts);
     }
 
     /// <summary>
@@ -248,6 +283,7 @@ public class CashierApiController : ControllerBase
             TransDate = dto.TransDate,
             TransTransactorDocSeriesId = docSeriesId,
             TransactorId = dto.TransactorId,
+            CfAccountId = dto.CfAccountId,
             TransRefCode = dto.TransRefCode,
             CompanyId = company.Id,
             AmountNet = dto.AmountNet,
@@ -304,6 +340,7 @@ public class CashierApiController : ControllerBase
             TransDate = dto.TransDate,
             TransTransactorDocSeriesId = docSeriesId,
             TransactorId = dto.TransactorId,
+            CfAccountId = dto.CfAccountId,
             TransRefCode = dto.TransRefCode,
             CompanyId = company.Id,
             AmountNet = dto.AmountNet,
