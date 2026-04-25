@@ -27,6 +27,7 @@ public class SharedItem
     public Guid ItemCategoryId { get; set; }
     public Guid VatClassId { get; set; }
     public Guid MainUnitId { get; set; }
+    public Guid? CashierDepartmentId { get; set; }
 
     // Classification (stored as int for flexibility)
     public int ItemNature { get; set; }
@@ -39,6 +40,9 @@ public class SharedItem
     public string UpcCode { get; set; }
     [MaxLength(50)]
     public string EanCode { get; set; }
+
+    // Costing
+    public bool UseBatchTracking { get; set; }
 
     // Tracking
     public DateTime ModifiedAt { get; set; }

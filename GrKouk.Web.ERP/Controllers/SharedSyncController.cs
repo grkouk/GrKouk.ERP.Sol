@@ -55,11 +55,13 @@ public class SharedSyncController : ControllerBase
                 ItemCategoryId = i.ItemCategoryId,
                 VatClassId = i.VatClassId,
                 MainUnitId = i.MainUnitId,
+                CashierDepartmentId = i.CashierDepartmentId,
                 ItemNature = i.ItemNature,
                 ItemType = i.ItemType,
                 ManufacturerCode = i.ManufacturerCode,
                 UpcCode = i.UpcCode,
                 EanCode = i.EanCode,
+                UseBatchTracking = i.UseBatchTracking,
                 ModifiedAt = i.ModifiedAt,
                 ModifiedByShopId = i.ModifiedByShopId,
                 Version = i.Version
@@ -97,6 +99,19 @@ public class SharedSyncController : ControllerBase
                 Code = m.Code,
                 Name = m.Name,
                 ModifiedAt = m.ModifiedAt
+            })
+            .ToListAsync();
+
+        var cashierDepartments = await _context.SharedCashierDepartments
+            .Where(d => d.ModifiedAt > since && d.ModifiedByShopId != shopId)
+            .Select(d => new SharedCashierDepartmentDto
+            {
+                Id = d.Id,
+                Code = d.Code,
+                Name = d.Name,
+                VatClassId = d.VatClassId,
+                ModifiedAt = d.ModifiedAt,
+                ModifiedByShopId = d.ModifiedByShopId
             })
             .ToListAsync();
 
@@ -240,6 +255,30 @@ public class SharedSyncController : ControllerBase
             measureUnits.AddRange(extraMeasureUnits);
         }
 
+        var includedDeptIds = cashierDepartments.Select(d => d.Id).ToHashSet();
+        var referencedDeptIds = items
+            .Where(i => i.CashierDepartmentId.HasValue)
+            .Select(i => i.CashierDepartmentId!.Value)
+            .Where(id => !includedDeptIds.Contains(id))
+            .Distinct()
+            .ToList();
+        if (referencedDeptIds.Count > 0)
+        {
+            var extraDepts = await _context.SharedCashierDepartments
+                .Where(d => referencedDeptIds.Contains(d.Id))
+                .Select(d => new SharedCashierDepartmentDto
+                {
+                    Id = d.Id,
+                    Code = d.Code,
+                    Name = d.Name,
+                    VatClassId = d.VatClassId,
+                    ModifiedAt = d.ModifiedAt,
+                    ModifiedByShopId = d.ModifiedByShopId
+                })
+                .ToListAsync();
+            cashierDepartments.AddRange(extraDepts);
+        }
+
         // For item codes, return codes belonging to items in the (now FK-complete) batch
         var allItemIds = items.Select(i => i.Id).ToHashSet();
         var itemCodes = await _context.SharedItemCodes
@@ -268,8 +307,8 @@ public class SharedSyncController : ControllerBase
             .ToListAsync();
 
         _logger.LogInformation(
-            "SharedSync Pull for shop {ShopId} since {Since}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {ItemCodes} item codes, {ItemPrices} item prices, {Mappings} mappings, {MapDeletions} mapping deletions",
-            shopId, since, items.Count, categories.Count, vatClasses.Count, measureUnits.Count, itemCodes.Count, itemPrices.Count, itemErpMappings.Count, itemErpMappingDeletions.Count);
+            "SharedSync Pull for shop {ShopId} since {Since}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {Depts} cashier depts, {ItemCodes} item codes, {ItemPrices} item prices, {Mappings} mappings, {MapDeletions} mapping deletions",
+            shopId, since, items.Count, categories.Count, vatClasses.Count, measureUnits.Count, cashierDepartments.Count, itemCodes.Count, itemPrices.Count, itemErpMappings.Count, itemErpMappingDeletions.Count);
 
         return Ok(new SharedSyncPullResponse
         {
@@ -277,6 +316,7 @@ public class SharedSyncController : ControllerBase
             Categories = categories,
             VatClasses = vatClasses,
             MeasureUnits = measureUnits,
+            CashierDepartments = cashierDepartments,
             ItemCodes = itemCodes,
             ItemPrices = itemPrices,
             ItemErpMappings = itemErpMappings,
@@ -303,6 +343,7 @@ public class SharedSyncController : ControllerBase
         int categoriesUpserted = 0;
         int vatClassesUpserted = 0;
         int measureUnitsUpserted = 0;
+        int cashierDepartmentsUpserted = 0;
         int itemsUpserted = 0;
         int itemCodesUpserted = 0;
         int itemPricesUpserted = 0;
@@ -383,6 +424,36 @@ public class SharedSyncController : ControllerBase
                 }
             }
 
+            // 1d. Cashier departments — DepartmentNumber is intentionally not in the
+            // wire format; the registry never stores it. Each shop owns its own
+            // button-to-department mapping locally.
+            foreach (var cd in request.CashierDepartments)
+            {
+                var existing = await _context.SharedCashierDepartments.FindAsync(cd.Id);
+                if (existing == null)
+                {
+                    _context.SharedCashierDepartments.Add(new SharedCashierDepartment
+                    {
+                        Id = cd.Id,
+                        Code = cd.Code,
+                        Name = cd.Name,
+                        VatClassId = cd.VatClassId,
+                        ModifiedAt = cd.ModifiedAt,
+                        ModifiedByShopId = request.ShopId
+                    });
+                    cashierDepartmentsUpserted++;
+                }
+                else if (cd.ModifiedAt > existing.ModifiedAt)
+                {
+                    existing.Code = cd.Code;
+                    existing.Name = cd.Name;
+                    existing.VatClassId = cd.VatClassId;
+                    existing.ModifiedAt = cd.ModifiedAt;
+                    existing.ModifiedByShopId = request.ShopId;
+                    cashierDepartmentsUpserted++;
+                }
+            }
+
             // 2. Items
             foreach (var item in request.Items)
             {
@@ -398,11 +469,13 @@ public class SharedSyncController : ControllerBase
                         ItemCategoryId = item.ItemCategoryId,
                         VatClassId = item.VatClassId,
                         MainUnitId = item.MainUnitId,
+                        CashierDepartmentId = item.CashierDepartmentId,
                         ItemNature = item.ItemNature,
                         ItemType = item.ItemType,
                         ManufacturerCode = item.ManufacturerCode,
                         UpcCode = item.UpcCode,
                         EanCode = item.EanCode,
+                        UseBatchTracking = item.UseBatchTracking,
                         ModifiedAt = item.ModifiedAt,
                         ModifiedByShopId = request.ShopId,
                         Version = 1
@@ -417,11 +490,13 @@ public class SharedSyncController : ControllerBase
                     existing.ItemCategoryId = item.ItemCategoryId;
                     existing.VatClassId = item.VatClassId;
                     existing.MainUnitId = item.MainUnitId;
+                    existing.CashierDepartmentId = item.CashierDepartmentId;
                     existing.ItemNature = item.ItemNature;
                     existing.ItemType = item.ItemType;
                     existing.ManufacturerCode = item.ManufacturerCode;
                     existing.UpcCode = item.UpcCode;
                     existing.EanCode = item.EanCode;
+                    existing.UseBatchTracking = item.UseBatchTracking;
                     existing.ModifiedAt = item.ModifiedAt;
                     existing.ModifiedByShopId = request.ShopId;
                     existing.Version++;
@@ -552,8 +627,8 @@ public class SharedSyncController : ControllerBase
             await _context.SaveChangesAsync();
 
             _logger.LogInformation(
-                "SharedSync Push from shop {ShopId}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {ItemCodes} item codes, {ItemPrices} item prices, {Mappings} mappings, {MapDeletions} mapping deletions",
-                request.ShopId, itemsUpserted, categoriesUpserted, vatClassesUpserted, measureUnitsUpserted, itemCodesUpserted, itemPricesUpserted, itemErpMappingsUpserted, itemErpMappingDeletionsApplied);
+                "SharedSync Push from shop {ShopId}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {Depts} cashier depts, {ItemCodes} item codes, {ItemPrices} item prices, {Mappings} mappings, {MapDeletions} mapping deletions",
+                request.ShopId, itemsUpserted, categoriesUpserted, vatClassesUpserted, measureUnitsUpserted, cashierDepartmentsUpserted, itemCodesUpserted, itemPricesUpserted, itemErpMappingsUpserted, itemErpMappingDeletionsApplied);
         }
         catch (Exception ex)
         {
@@ -568,6 +643,7 @@ public class SharedSyncController : ControllerBase
             CategoriesUpserted = categoriesUpserted,
             VatClassesUpserted = vatClassesUpserted,
             MeasureUnitsUpserted = measureUnitsUpserted,
+            CashierDepartmentsUpserted = cashierDepartmentsUpserted,
             ItemCodesUpserted = itemCodesUpserted,
             ItemPricesUpserted = itemPricesUpserted,
             ItemErpMappingsUpserted = itemErpMappingsUpserted,
@@ -596,11 +672,13 @@ public class SharedSyncController : ControllerBase
                 ItemCategoryId = i.ItemCategoryId,
                 VatClassId = i.VatClassId,
                 MainUnitId = i.MainUnitId,
+                CashierDepartmentId = i.CashierDepartmentId,
                 ItemNature = i.ItemNature,
                 ItemType = i.ItemType,
                 ManufacturerCode = i.ManufacturerCode,
                 UpcCode = i.UpcCode,
                 EanCode = i.EanCode,
+                UseBatchTracking = i.UseBatchTracking,
                 ModifiedAt = i.ModifiedAt,
                 ModifiedByShopId = i.ModifiedByShopId,
                 Version = i.Version
@@ -635,6 +713,18 @@ public class SharedSyncController : ControllerBase
                 Code = m.Code,
                 Name = m.Name,
                 ModifiedAt = m.ModifiedAt
+            })
+            .ToListAsync();
+
+        var cashierDepartments = await _context.SharedCashierDepartments
+            .Select(d => new SharedCashierDepartmentDto
+            {
+                Id = d.Id,
+                Code = d.Code,
+                Name = d.Name,
+                VatClassId = d.VatClassId,
+                ModifiedAt = d.ModifiedAt,
+                ModifiedByShopId = d.ModifiedByShopId
             })
             .ToListAsync();
 
@@ -698,6 +788,7 @@ public class SharedSyncController : ControllerBase
             Categories = categories,
             VatClasses = vatClasses,
             MeasureUnits = measureUnits,
+            CashierDepartments = cashierDepartments,
             ItemCodes = itemCodes,
             ItemPrices = itemPrices,
             ItemErpMappings = itemErpMappings,

@@ -101,6 +101,7 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<SharedItemCategory> SharedItemCategories { get; set; }
         public DbSet<SharedVatClass> SharedVatClasses { get; set; }
         public DbSet<SharedMeasureUnit> SharedMeasureUnits { get; set; }
+        public DbSet<SharedCashierDepartment> SharedCashierDepartments { get; set; }
         public DbSet<SharedItemCode> SharedItemCodes { get; set; }
         public DbSet<SharedItemPrice> SharedItemPrices { get; set; }
         public DbSet<SharedItemErpMapping> SharedItemErpMappings { get; set; }
@@ -881,6 +882,14 @@ namespace GrKouk.Web.ERP.Data
             {
                 entity.HasIndex(p => p.Code);
                 entity.HasIndex(p => p.ModifiedAt);
+                entity.Property(p => p.ModifiedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+            });
+            modelBuilder.Entity<SharedCashierDepartment>(entity =>
+            {
+                entity.HasIndex(p => p.Code);
+                entity.HasIndex(p => p.ModifiedAt);
+                entity.HasIndex(p => p.ModifiedByShopId);
                 entity.Property(p => p.ModifiedAt)
                     .HasDefaultValueSql("GETUTCDATE()");
             });
