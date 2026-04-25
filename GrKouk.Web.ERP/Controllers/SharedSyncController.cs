@@ -100,21 +100,6 @@ public class SharedSyncController : ControllerBase
             })
             .ToListAsync();
 
-        // For item codes, return codes belonging to items that changed
-        var changedItemIds = items.Select(i => i.Id).ToHashSet();
-        var itemCodes = await _context.SharedItemCodes
-            .Where(ic => changedItemIds.Contains(ic.ItemId))
-            .Select(ic => new SharedItemCodeDto
-            {
-                Id = ic.Id,
-                ItemId = ic.ItemId,
-                CodeType = ic.CodeType,
-                Code = ic.Code,
-                MeasureUnitId = ic.MeasureUnitId,
-                Quantity = ic.Quantity
-            })
-            .ToListAsync();
-
         var itemPrices = await _context.SharedItemPrices
             .Where(p => p.ModifiedAt > since && p.ModifiedByShopId != shopId)
             .Select(p => new SharedItemPriceDto
@@ -145,6 +130,128 @@ public class SharedSyncController : ControllerBase
                 CreatedAt = m.CreatedAt,
                 ModifiedAt = m.ModifiedAt,
                 ModifiedByShopId = m.ModifiedByShopId
+            })
+            .ToListAsync();
+
+        // Mappings/prices can be tagged ModifiedByShopId=B while their parent Item is
+        // tagged ModifiedByShopId=A (different push events). The echo filter on items
+        // (ModifiedByShopId != shopId) then drops the parent for shop A's pull, leaving
+        // the receiver with FK_ItemErpMappings_Items_LocalItemId. Pull in any missing
+        // FK parents now, bypassing the echo filter — they're for FK satisfaction, not
+        // change notification. The receiver's LWW guard skips redundant updates.
+        var includedItemIds = items.Select(i => i.Id).ToHashSet();
+        var referencedItemIds = itemErpMappings.Select(m => m.LocalItemId)
+            .Concat(itemPrices.Select(p => p.ItemId))
+            .Where(id => !includedItemIds.Contains(id))
+            .Distinct()
+            .ToList();
+        if (referencedItemIds.Count > 0)
+        {
+            var extraItems = await _context.SharedItems
+                .Where(i => referencedItemIds.Contains(i.Id))
+                .Select(i => new SharedItemDto
+                {
+                    Id = i.Id,
+                    Code = i.Code,
+                    Name = i.Name,
+                    Active = i.Active,
+                    ItemCategoryId = i.ItemCategoryId,
+                    VatClassId = i.VatClassId,
+                    MainUnitId = i.MainUnitId,
+                    ItemNature = i.ItemNature,
+                    ItemType = i.ItemType,
+                    ManufacturerCode = i.ManufacturerCode,
+                    UpcCode = i.UpcCode,
+                    EanCode = i.EanCode,
+                    ModifiedAt = i.ModifiedAt,
+                    ModifiedByShopId = i.ModifiedByShopId,
+                    Version = i.Version
+                })
+                .ToListAsync();
+            items.AddRange(extraItems);
+            _logger.LogInformation(
+                "SharedSync Pull for shop {ShopId}: pulled in {Found}/{Requested} FK parent items bypassing echo filter",
+                shopId, extraItems.Count, referencedItemIds.Count);
+        }
+
+        // Items have FKs to ItemCategories, VatClasses, MeasureUnits. The ref-data queries
+        // above filter by ModifiedAt > since, so an item that pulls in a FK-parent ref row
+        // would FK-fail on the receiver if that ref row was created pre-`since`. Fill in
+        // the missing ref rows now, bypassing the time filter (FK satisfaction, not change
+        // notification).
+        var includedCategoryIds = categories.Select(c => c.Id).ToHashSet();
+        var referencedCategoryIds = items.Select(i => i.ItemCategoryId)
+            .Where(id => !includedCategoryIds.Contains(id))
+            .Distinct()
+            .ToList();
+        if (referencedCategoryIds.Count > 0)
+        {
+            var extraCategories = await _context.SharedItemCategories
+                .Where(c => referencedCategoryIds.Contains(c.Id))
+                .Select(c => new SharedItemCategoryDto
+                {
+                    Id = c.Id,
+                    Code = c.Code,
+                    Name = c.Name,
+                    ModifiedAt = c.ModifiedAt
+                })
+                .ToListAsync();
+            categories.AddRange(extraCategories);
+        }
+
+        var includedVatClassIds = vatClasses.Select(v => v.Id).ToHashSet();
+        var referencedVatClassIds = items.Select(i => i.VatClassId)
+            .Where(id => !includedVatClassIds.Contains(id))
+            .Distinct()
+            .ToList();
+        if (referencedVatClassIds.Count > 0)
+        {
+            var extraVatClasses = await _context.SharedVatClasses
+                .Where(v => referencedVatClassIds.Contains(v.Id))
+                .Select(v => new SharedVatClassDto
+                {
+                    Id = v.Id,
+                    Code = v.Code,
+                    Name = v.Name,
+                    Rate = v.Rate,
+                    ModifiedAt = v.ModifiedAt
+                })
+                .ToListAsync();
+            vatClasses.AddRange(extraVatClasses);
+        }
+
+        var includedMeasureUnitIds = measureUnits.Select(m => m.Id).ToHashSet();
+        var referencedMeasureUnitIds = items.Select(i => i.MainUnitId)
+            .Where(id => !includedMeasureUnitIds.Contains(id))
+            .Distinct()
+            .ToList();
+        if (referencedMeasureUnitIds.Count > 0)
+        {
+            var extraMeasureUnits = await _context.SharedMeasureUnits
+                .Where(m => referencedMeasureUnitIds.Contains(m.Id))
+                .Select(m => new SharedMeasureUnitDto
+                {
+                    Id = m.Id,
+                    Code = m.Code,
+                    Name = m.Name,
+                    ModifiedAt = m.ModifiedAt
+                })
+                .ToListAsync();
+            measureUnits.AddRange(extraMeasureUnits);
+        }
+
+        // For item codes, return codes belonging to items in the (now FK-complete) batch
+        var allItemIds = items.Select(i => i.Id).ToHashSet();
+        var itemCodes = await _context.SharedItemCodes
+            .Where(ic => allItemIds.Contains(ic.ItemId))
+            .Select(ic => new SharedItemCodeDto
+            {
+                Id = ic.Id,
+                ItemId = ic.ItemId,
+                CodeType = ic.CodeType,
+                Code = ic.Code,
+                MeasureUnitId = ic.MeasureUnitId,
+                Quantity = ic.Quantity
             })
             .ToListAsync();
 
