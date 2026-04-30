@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.DocDefinitions;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.CashRegister;
@@ -378,6 +380,130 @@ public class CashierApiController : ControllerBase
             return BadRequest(new { error = result.ErrorMessage });
         }
         return NoContent();
+    }
+
+    /// <summary>
+    /// Supplier ledger ("kartela") for the cashier app. Returns the opening balance over the
+    /// pre-period and the in-period transactions (Debit/Credit raw — no running total). The
+    /// client computes the running total so it can be re-evaluated on grid sort. EUR-only:
+    /// no exchange-rate conversion is applied (cashier-side amounts are already in base
+    /// currency).
+    /// </summary>
+    [HttpGet("GetErpSupplierLedger")]
+    [Authorize(Policy = "ApiPolicy2")]
+    public async Task<ActionResult<SupplierLedgerResponseDto>> GetErpSupplierLedger(
+        string companyCode, int transactorId, DateTime dateFrom, DateTime dateTo)
+    {
+        if (string.IsNullOrEmpty(companyCode))
+        {
+            return BadRequest(new { error = "Company code is required" });
+        }
+        if (transactorId <= 0)
+        {
+            return BadRequest(new { error = "Transactor id is required" });
+        }
+
+        var company = await _context.Companies.SingleOrDefaultAsync(p => p.Code == companyCode);
+        if (company == null)
+        {
+            return BadRequest(new { error = $"Company with code '{companyCode}' not found" });
+        }
+
+        var companyId = company.Id;
+        var fromDate = dateFrom.Date;
+        var toDate = dateTo.Date;
+
+        // Pre-period rows (for the opening balance). Pull the small raw projection and
+        // derive Debit/Credit from FinancialAction in memory — keeps the SQL trivial.
+        var beforeRaw = await _context.TransactorTransactions
+            .Where(t => t.TransactorId == transactorId
+                        && t.CompanyId == companyId
+                        && t.TransDate < fromDate)
+            .Select(t => new
+            {
+                t.FinancialAction,
+                t.TransNetAmount,
+                t.TransFpaAmount,
+                t.TransDiscountAmount
+            })
+            .ToListAsync();
+
+        decimal openingDebit = 0m;
+        decimal openingCredit = 0m;
+        foreach (var r in beforeRaw)
+        {
+            var total = r.TransNetAmount + r.TransFpaAmount - r.TransDiscountAmount;
+            if (r.FinancialAction == FinActionsEnum.FinActionsEnumDebit ||
+                r.FinancialAction == FinActionsEnum.FinActionsEnumNegativeDebit)
+            {
+                openingDebit += total;
+            }
+            else if (r.FinancialAction == FinActionsEnum.FinActionsEnumCredit ||
+                     r.FinancialAction == FinActionsEnum.FinActionsEnumNegativeCredit)
+            {
+                openingCredit += total;
+            }
+        }
+
+        // Supplier convention: positive balance means we owe the supplier.
+        var openingBalance = openingCredit - openingDebit;
+
+        // In-period rows
+        var inPeriodRaw = await _context.TransactorTransactions
+            .Where(t => t.TransactorId == transactorId
+                        && t.CompanyId == companyId
+                        && t.TransDate >= fromDate
+                        && t.TransDate <= toDate)
+            .OrderBy(t => t.TransDate)
+            .ThenBy(t => t.Id)
+            .Select(t => new
+            {
+                t.Id,
+                t.TransDate,
+                DocSeriesName = t.TransTransactorDocSeries.Name,
+                t.TransRefCode,
+                t.FinancialAction,
+                t.TransNetAmount,
+                t.TransFpaAmount,
+                t.TransDiscountAmount
+            })
+            .ToListAsync();
+
+        var rows = new List<SupplierLedgerRowDto>(inPeriodRaw.Count);
+        foreach (var r in inPeriodRaw)
+        {
+            var total = r.TransNetAmount + r.TransFpaAmount - r.TransDiscountAmount;
+            decimal debit = 0m;
+            decimal credit = 0m;
+            if (r.FinancialAction == FinActionsEnum.FinActionsEnumDebit ||
+                r.FinancialAction == FinActionsEnum.FinActionsEnumNegativeDebit)
+            {
+                debit = total;
+            }
+            else if (r.FinancialAction == FinActionsEnum.FinActionsEnumCredit ||
+                     r.FinancialAction == FinActionsEnum.FinActionsEnumNegativeCredit)
+            {
+                credit = total;
+            }
+
+            rows.Add(new SupplierLedgerRowDto
+            {
+                Id = r.Id,
+                TransDate = r.TransDate,
+                DocSeriesName = r.DocSeriesName,
+                TransRefCode = r.TransRefCode,
+                Debit = debit,
+                Credit = credit
+            });
+        }
+
+        var response = new SupplierLedgerResponseDto
+        {
+            OpeningBalance = openingBalance,
+            OpeningBalanceDate = fromDate.AddDays(-1),
+            Rows = rows
+        };
+        return Ok(response);
     }
 
     private async Task<int> ResolvePaymentDocSeriesIdAsync(int companyId)
