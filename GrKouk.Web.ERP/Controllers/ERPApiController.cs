@@ -33,11 +33,13 @@ namespace GrKouk.Web.ERP.Controllers
         private readonly IDocumentTransactionService _docTransSrv;
         private readonly IDocumentSyncService _docSyncSrv;
         private readonly IBuyDocumentUploadService _buyDocUploadSrv;
+        private readonly IDayCloseUploadService _dayCloseUploadSrv;
         private readonly IWarehouseItemsManagementSrv _warehouseItemsManagementSrv;
 
         public ErpApiController(ApiDbContext context, ILogger<ErpApiController> logger,
             IDocumentTransactionService docTransSrv, IDocumentSyncService docSyncSrv,
             IBuyDocumentUploadService buyDocUploadSrv,
+            IDayCloseUploadService dayCloseUploadSrv,
             IWarehouseItemsManagementSrv warehouseItemsManagementSrv)
         {
             _context = context;
@@ -45,6 +47,7 @@ namespace GrKouk.Web.ERP.Controllers
             _docTransSrv = docTransSrv;
             _docSyncSrv = docSyncSrv;
             _buyDocUploadSrv = buyDocUploadSrv;
+            _dayCloseUploadSrv = dayCloseUploadSrv;
             _warehouseItemsManagementSrv = warehouseItemsManagementSrv;
         }
 
@@ -1713,6 +1716,29 @@ namespace GrKouk.Web.ERP.Controllers
             }
             catch (Exception ex)
             {
+                return BadRequest(new { error = ex.ToString() });
+            }
+        }
+
+        [HttpPost("SyncUploadDayCloseV2")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public async Task<IActionResult> SyncUploadDayCloseV2([FromBody] DayCloseUploadRequest request)
+        {
+            if (request == null)
+                return BadRequest(new { error = "Empty request data" });
+
+            try
+            {
+                var result = await _dayCloseUploadSrv.UploadAsync(request);
+                if (result == null)
+                    return StatusCode(500, new { error = "Internal server error during DayClose upload" });
+                if (!result.Success)
+                    return BadRequest(new { error = result.ErrorMessage, code = result.ErrorCode });
+                return Ok(result.Data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "SyncUploadDayCloseV2 failed");
                 return BadRequest(new { error = ex.ToString() });
             }
         }
