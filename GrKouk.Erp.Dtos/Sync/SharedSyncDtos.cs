@@ -21,6 +21,8 @@ public class SharedItemDto
     public string? UpcCode { get; set; }
     public string? EanCode { get; set; }
     public bool UseBatchTracking { get; set; }
+    public Guid? DepositItemId { get; set; }
+    public bool IsDepositItem { get; set; }
     public DateTime ModifiedAt { get; set; }
     public string ModifiedByShopId { get; set; } = string.Empty;
     public int Version { get; set; }

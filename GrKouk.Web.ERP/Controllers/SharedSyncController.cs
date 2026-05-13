@@ -62,6 +62,8 @@ public class SharedSyncController : ControllerBase
                 UpcCode = i.UpcCode,
                 EanCode = i.EanCode,
                 UseBatchTracking = i.UseBatchTracking,
+                DepositItemId = i.DepositItemId,
+                IsDepositItem = i.IsDepositItem,
                 ModifiedAt = i.ModifiedAt,
                 ModifiedByShopId = i.ModifiedByShopId,
                 Version = i.Version
@@ -178,6 +180,8 @@ public class SharedSyncController : ControllerBase
                     ManufacturerCode = i.ManufacturerCode,
                     UpcCode = i.UpcCode,
                     EanCode = i.EanCode,
+                    DepositItemId = i.DepositItemId,
+                    IsDepositItem = i.IsDepositItem,
                     ModifiedAt = i.ModifiedAt,
                     ModifiedByShopId = i.ModifiedByShopId,
                     Version = i.Version
@@ -476,6 +480,8 @@ public class SharedSyncController : ControllerBase
                         UpcCode = item.UpcCode,
                         EanCode = item.EanCode,
                         UseBatchTracking = item.UseBatchTracking,
+                        DepositItemId = item.DepositItemId,
+                        IsDepositItem = item.IsDepositItem,
                         ModifiedAt = item.ModifiedAt,
                         ModifiedByShopId = request.ShopId,
                         Version = 1
@@ -497,6 +503,8 @@ public class SharedSyncController : ControllerBase
                     existing.UpcCode = item.UpcCode;
                     existing.EanCode = item.EanCode;
                     existing.UseBatchTracking = item.UseBatchTracking;
+                    existing.DepositItemId = item.DepositItemId;
+                    existing.IsDepositItem = item.IsDepositItem;
                     existing.ModifiedAt = item.ModifiedAt;
                     existing.ModifiedByShopId = request.ShopId;
                     existing.Version++;
@@ -679,6 +687,8 @@ public class SharedSyncController : ControllerBase
                 UpcCode = i.UpcCode,
                 EanCode = i.EanCode,
                 UseBatchTracking = i.UseBatchTracking,
+                DepositItemId = i.DepositItemId,
+                IsDepositItem = i.IsDepositItem,
                 ModifiedAt = i.ModifiedAt,
                 ModifiedByShopId = i.ModifiedByShopId,
                 Version = i.Version

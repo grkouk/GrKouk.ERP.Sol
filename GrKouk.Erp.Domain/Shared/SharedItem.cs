@@ -44,6 +44,13 @@ public class SharedItem
     // Costing
     public bool UseBatchTracking { get; set; }
 
+    // Bottle deposit (Εγγύηση Συσκευασίας). DepositItemId points at another
+    // SharedItem that represents the packaging deposit charged with this item.
+    // No FK constraint here — registry table convention (raw Guid? like
+    // CashierDepartmentId); enforcement lives in the cash-register DB.
+    public Guid? DepositItemId { get; set; }
+    public bool IsDepositItem { get; set; }
+
     // Tracking
     public DateTime ModifiedAt { get; set; }
 
