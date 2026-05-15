@@ -113,6 +113,35 @@ public class SharedItemErpMappingDeletionDto
     public string ModifiedByShopId { get; set; } = string.Empty;
 }
 
+/// <summary>
+/// Tombstone for a deleted ItemCode. Propagates a barcode/supplier-code
+/// removal from one shop to the other via the registry. The receiver hard-
+/// deletes its matching local row by Id BEFORE its upsert section runs,
+/// freeing the (CodeType, Code) unique-index slot for any incoming new row.
+/// </summary>
+public class SharedItemCodeDeletionDto
+{
+    public Guid Id { get; set; }
+    public Guid DeletedItemCodeId { get; set; }
+    public DateTime DeletedAt { get; set; }
+    public DateTime ModifiedAt { get; set; }
+    public string ModifiedByShopId { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// Tombstone for a deleted ItemPriceLevelMapping. Propagates a price-row
+/// removal; receiver hard-deletes its matching local row by Id BEFORE the
+/// upsert section, freeing the (ItemId, PriceLevelId) unique-index slot.
+/// </summary>
+public class SharedItemPriceLevelMappingDeletionDto
+{
+    public Guid Id { get; set; }
+    public Guid DeletedMappingId { get; set; }
+    public DateTime DeletedAt { get; set; }
+    public DateTime ModifiedAt { get; set; }
+    public string ModifiedByShopId { get; set; } = string.Empty;
+}
+
 // ─── Request / Response DTOs ────────────────────────────────────────
 
 public class SharedSyncPushRequest
@@ -127,6 +156,8 @@ public class SharedSyncPushRequest
     public List<SharedItemPriceDto> ItemPrices { get; set; } = new();
     public List<SharedItemErpMappingDto> ItemErpMappings { get; set; } = new();
     public List<SharedItemErpMappingDeletionDto> ItemErpMappingDeletions { get; set; } = new();
+    public List<SharedItemCodeDeletionDto> ItemCodeDeletions { get; set; } = new();
+    public List<SharedItemPriceLevelMappingDeletionDto> ItemPriceLevelMappingDeletions { get; set; } = new();
 }
 
 public class SharedSyncPushResponse
@@ -141,6 +172,8 @@ public class SharedSyncPushResponse
     public int ItemPricesUpserted { get; set; }
     public int ItemErpMappingsUpserted { get; set; }
     public int ItemErpMappingDeletionsApplied { get; set; }
+    public int ItemCodeDeletionsApplied { get; set; }
+    public int ItemPriceLevelMappingDeletionsApplied { get; set; }
     public List<string> Errors { get; set; } = new();
 }
 
@@ -155,5 +188,7 @@ public class SharedSyncPullResponse
     public List<SharedItemPriceDto> ItemPrices { get; set; } = new();
     public List<SharedItemErpMappingDto> ItemErpMappings { get; set; } = new();
     public List<SharedItemErpMappingDeletionDto> ItemErpMappingDeletions { get; set; } = new();
+    public List<SharedItemCodeDeletionDto> ItemCodeDeletions { get; set; } = new();
+    public List<SharedItemPriceLevelMappingDeletionDto> ItemPriceLevelMappingDeletions { get; set; } = new();
     public DateTime ServerTimestamp { get; set; }
 }

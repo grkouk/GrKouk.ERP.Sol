@@ -107,6 +107,8 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<SharedItemPrice> SharedItemPrices { get; set; }
         public DbSet<SharedItemErpMapping> SharedItemErpMappings { get; set; }
         public DbSet<SharedItemErpMappingDeletion> SharedItemErpMappingDeletions { get; set; }
+        public DbSet<SharedItemCodeDeletion> SharedItemCodeDeletions { get; set; }
+        public DbSet<SharedItemPriceLevelMappingDeletion> SharedItemPriceLevelMappingDeletions { get; set; }
         
        // public DbSet<SyncItem> SyncItems { get; set; }
         
@@ -930,6 +932,22 @@ namespace GrKouk.Web.ERP.Data
             modelBuilder.Entity<SharedItemErpMappingDeletion>(entity =>
             {
                 entity.HasIndex(p => p.LocalItemId);
+                entity.HasIndex(p => p.ModifiedAt);
+                entity.HasIndex(p => p.ModifiedByShopId);
+                entity.Property(p => p.ModifiedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+            });
+            modelBuilder.Entity<SharedItemCodeDeletion>(entity =>
+            {
+                entity.HasIndex(p => p.DeletedItemCodeId);
+                entity.HasIndex(p => p.ModifiedAt);
+                entity.HasIndex(p => p.ModifiedByShopId);
+                entity.Property(p => p.ModifiedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+            });
+            modelBuilder.Entity<SharedItemPriceLevelMappingDeletion>(entity =>
+            {
+                entity.HasIndex(p => p.DeletedMappingId);
                 entity.HasIndex(p => p.ModifiedAt);
                 entity.HasIndex(p => p.ModifiedByShopId);
                 entity.Property(p => p.ModifiedAt)
