@@ -175,7 +175,8 @@ public class AuthController : ControllerBase
         }
 
         var creds = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
-        var token = new JwtSecurityToken(issuer, audience, claims, expires: DateTime.UtcNow.AddMinutes(60), signingCredentials: creds);
+        var expirationMinutes = int.TryParse(jwtSettings["ExpirationMinutes"], out var configMinutes) ? configMinutes : 60;
+        var token = new JwtSecurityToken(issuer, audience, claims, expires: DateTime.UtcNow.AddMinutes(expirationMinutes), signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
