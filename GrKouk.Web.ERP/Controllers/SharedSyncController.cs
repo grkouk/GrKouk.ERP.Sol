@@ -381,9 +381,31 @@ public class SharedSyncController : ControllerBase
         int itemErpMappingDeletionsApplied = 0;
         int itemCodeDeletionsApplied = 0;
         int itemPriceLevelMappingDeletionsApplied = 0;
+        int tombstoneAcksRecorded = 0;
+        int tombstonesPurged = 0;
 
         try
         {
+            // 0. Auto-register / heartbeat the calling shop in KnownShops. This is the
+            // anchor used by the tombstone-purge pass (a tombstone is purgeable once
+            // every active KnownShop has acked it). Bumping LastSeenAt on every push
+            // lets an admin spot stale shops via SELECT * FROM KnownShops ORDER BY LastSeenAt.
+            var knownShop = await _context.KnownShops.FindAsync(request.ShopId);
+            if (knownShop == null)
+            {
+                _context.KnownShops.Add(new KnownShop
+                {
+                    ShopId = request.ShopId,
+                    FirstSeenAt = DateTime.UtcNow,
+                    LastSeenAt = DateTime.UtcNow,
+                    IsActive = true
+                });
+            }
+            else
+            {
+                knownShop.LastSeenAt = DateTime.UtcNow;
+            }
+
             // 1. Reference data first (items depend on these)
             foreach (var cat in request.Categories)
             {
@@ -568,6 +590,19 @@ public class SharedSyncController : ControllerBase
                         ModifiedByShopId = request.ShopId
                     });
                     itemCodeDeletionsApplied++;
+
+                    // Auto-ack the originating shop. They created and pushed this tombstone,
+                    // which means they have already applied it locally. Saves us from touching
+                    // every cashier-side local-delete site to push pending-ack rows.
+                    _context.SharedTombstoneAcks.Add(new SharedTombstoneAck
+                    {
+                        Id = Guid.NewGuid(),
+                        TombstoneId = del.Id,
+                        TombstoneType = TombstoneTypes.ItemCode,
+                        ShopId = request.ShopId,
+                        AckedAt = DateTime.UtcNow
+                    });
+                    tombstoneAcksRecorded++;
                 }
 
                 // Drop the live registry row this tombstone targets — by Id, since
@@ -580,19 +615,21 @@ public class SharedSyncController : ControllerBase
                 }
             }
 
-            // 3. Item codes — replace all codes for pushed items.
-            // Note: ItemCode tombstones above already removed dropped rows from the
-            // registry; this section adds/replaces the codes that the pushed items
-            // currently own.
-            var pushedItemIds = request.Items.Select(i => i.Id).ToHashSet();
-            if (pushedItemIds.Count > 0 && request.ItemCodes.Count > 0)
+            // 3. Item codes — per-row upsert by Id. Deletions go through tombstones (see 2b).
+            //
+            // Was replace-all (RemoveRange + re-add) until 2026-05-19. That implicitly
+            // deleted any server-side row a client didn't include in its push payload,
+            // which silently wiped barcodes whenever the client's local view of an
+            // item's ItemCodes was incomplete (e.g. one barcode skipped on apply due to
+            // natural-key collision, then echoed back as part of the same SyncAsync's
+            // push). See project_sync_phase3_and_item_deletion.
+            //
+            // The tombstone handler at 2b above already removes rows the client
+            // explicitly tombstoned. Anything else stays.
+            foreach (var ic in request.ItemCodes)
             {
-                var existingCodes = await _context.SharedItemCodes
-                    .Where(ic => pushedItemIds.Contains(ic.ItemId))
-                    .ToListAsync();
-                _context.SharedItemCodes.RemoveRange(existingCodes);
-
-                foreach (var ic in request.ItemCodes)
+                var existing = await _context.SharedItemCodes.FindAsync(ic.Id);
+                if (existing == null)
                 {
                     _context.SharedItemCodes.Add(new SharedItemCode
                     {
@@ -603,8 +640,16 @@ public class SharedSyncController : ControllerBase
                         MeasureUnitId = ic.MeasureUnitId,
                         Quantity = ic.Quantity
                     });
-                    itemCodesUpserted++;
                 }
+                else
+                {
+                    existing.ItemId = ic.ItemId;
+                    existing.CodeType = ic.CodeType;
+                    existing.Code = ic.Code;
+                    existing.MeasureUnitId = ic.MeasureUnitId;
+                    existing.Quantity = ic.Quantity;
+                }
+                itemCodesUpserted++;
             }
 
             // 3b. ItemPriceLevelMapping tombstones — same shape as ItemCode tombstones.
@@ -624,6 +669,16 @@ public class SharedSyncController : ControllerBase
                         ModifiedByShopId = request.ShopId
                     });
                     itemPriceLevelMappingDeletionsApplied++;
+
+                    _context.SharedTombstoneAcks.Add(new SharedTombstoneAck
+                    {
+                        Id = Guid.NewGuid(),
+                        TombstoneId = del.Id,
+                        TombstoneType = TombstoneTypes.ItemPriceLevelMapping,
+                        ShopId = request.ShopId,
+                        AckedAt = DateTime.UtcNow
+                    });
+                    tombstoneAcksRecorded++;
                 }
 
                 var livePrice = await _context.SharedItemPrices
@@ -698,6 +753,16 @@ public class SharedSyncController : ControllerBase
                         ModifiedByShopId = request.ShopId
                     });
                     itemErpMappingDeletionsApplied++;
+
+                    _context.SharedTombstoneAcks.Add(new SharedTombstoneAck
+                    {
+                        Id = Guid.NewGuid(),
+                        TombstoneId = del.Id,
+                        TombstoneType = TombstoneTypes.ItemErpMapping,
+                        ShopId = request.ShopId,
+                        AckedAt = DateTime.UtcNow
+                    });
+                    tombstoneAcksRecorded++;
                 }
 
                 // Remove the alive mapping for this LocalItemId if it was modified
@@ -742,11 +807,57 @@ public class SharedSyncController : ControllerBase
                 }
             }
 
+            // 7. Tombstone acks from the calling shop. Each entry says "shop X has applied
+            // tombstone Y of type T locally." UNIQUE INDEX (TombstoneId, TombstoneType,
+            // ShopId) makes re-pushes idempotent. The shop's own acks for tombstones it
+            // originated are written above (auto-ack on tombstone insert) — these are for
+            // tombstones it received via pull and applied.
+            foreach (var ack in request.TombstoneAcks)
+            {
+                if (string.IsNullOrWhiteSpace(ack.TombstoneType)) continue;
+                var alreadyAcked = await _context.SharedTombstoneAcks
+                    .AnyAsync(a => a.TombstoneId == ack.TombstoneId
+                                && a.TombstoneType == ack.TombstoneType
+                                && a.ShopId == request.ShopId);
+                if (!alreadyAcked)
+                {
+                    _context.SharedTombstoneAcks.Add(new SharedTombstoneAck
+                    {
+                        Id = Guid.NewGuid(),
+                        TombstoneId = ack.TombstoneId,
+                        TombstoneType = ack.TombstoneType,
+                        ShopId = request.ShopId,
+                        AckedAt = DateTime.UtcNow
+                    });
+                    tombstoneAcksRecorded++;
+                }
+            }
+
             await _context.SaveChangesAsync();
 
+            // 8. Purge pass — delete tombstones every active KnownShop has acked.
+            // Runs only when we recorded new acks this push (no acks = no purge progress
+            // could possibly happen). Separate SaveChanges so a purge failure doesn't
+            // roll back the data work above.
+            if (tombstoneAcksRecorded > 0)
+            {
+                var activeShopCount = await _context.KnownShops.CountAsync(s => s.IsActive);
+                if (activeShopCount > 0)
+                {
+                    tombstonesPurged += await PurgeTombstonesByTypeAsync(TombstoneTypes.ItemCode, activeShopCount);
+                    tombstonesPurged += await PurgeTombstonesByTypeAsync(TombstoneTypes.ItemPriceLevelMapping, activeShopCount);
+                    tombstonesPurged += await PurgeTombstonesByTypeAsync(TombstoneTypes.ItemErpMapping, activeShopCount);
+                    // TombstoneTypes.Item is added by Workstream B.
+                    if (tombstonesPurged > 0)
+                    {
+                        await _context.SaveChangesAsync();
+                    }
+                }
+            }
+
             _logger.LogInformation(
-                "SharedSync Push from shop {ShopId}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {Depts} cashier depts, {ItemCodes} item codes ({IcDel} deletes), {ItemPrices} item prices ({IpDel} deletes), {Mappings} mappings, {MapDeletions} mapping deletions",
-                request.ShopId, itemsUpserted, categoriesUpserted, vatClassesUpserted, measureUnitsUpserted, cashierDepartmentsUpserted, itemCodesUpserted, itemCodeDeletionsApplied, itemPricesUpserted, itemPriceLevelMappingDeletionsApplied, itemErpMappingsUpserted, itemErpMappingDeletionsApplied);
+                "SharedSync Push from shop {ShopId}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {Depts} cashier depts, {ItemCodes} item codes ({IcDel} deletes), {ItemPrices} item prices ({IpDel} deletes), {Mappings} mappings, {MapDeletions} mapping deletions, {Acks} acks, {Purged} purged",
+                request.ShopId, itemsUpserted, categoriesUpserted, vatClassesUpserted, measureUnitsUpserted, cashierDepartmentsUpserted, itemCodesUpserted, itemCodeDeletionsApplied, itemPricesUpserted, itemPriceLevelMappingDeletionsApplied, itemErpMappingsUpserted, itemErpMappingDeletionsApplied, tombstoneAcksRecorded, tombstonesPurged);
         }
         catch (Exception ex)
         {
@@ -768,8 +879,64 @@ public class SharedSyncController : ControllerBase
             ItemErpMappingDeletionsApplied = itemErpMappingDeletionsApplied,
             ItemCodeDeletionsApplied = itemCodeDeletionsApplied,
             ItemPriceLevelMappingDeletionsApplied = itemPriceLevelMappingDeletionsApplied,
+            TombstoneAcksRecorded = tombstoneAcksRecorded,
+            TombstonesPurged = tombstonesPurged,
             Errors = errors
         });
+    }
+
+    /// <summary>
+    /// Hard-deletes tombstones of a given type that every active KnownShop has acked.
+    /// Also removes the matching SharedTombstoneAck rows. Returns the count of
+    /// tombstones (not acks) deleted. Caller is responsible for SaveChangesAsync.
+    /// </summary>
+    private async Task<int> PurgeTombstonesByTypeAsync(string tombstoneType, int activeShopCount)
+    {
+        // Group acks by TombstoneId, count distinct acks from currently-active shops.
+        // A tombstone is purgeable when that count >= activeShopCount.
+        var purgeableIds = await _context.SharedTombstoneAcks
+            .Where(a => a.TombstoneType == tombstoneType
+                     && _context.KnownShops.Any(s => s.ShopId == a.ShopId && s.IsActive))
+            .GroupBy(a => a.TombstoneId)
+            .Where(g => g.Count() >= activeShopCount)
+            .Select(g => g.Key)
+            .ToListAsync();
+
+        if (purgeableIds.Count == 0) return 0;
+
+        // Remove the matching acks (including any from inactive shops, since the tombstone
+        // is gone anyway). Use IN-set delete for batch efficiency.
+        var acksToRemove = await _context.SharedTombstoneAcks
+            .Where(a => a.TombstoneType == tombstoneType && purgeableIds.Contains(a.TombstoneId))
+            .ToListAsync();
+        _context.SharedTombstoneAcks.RemoveRange(acksToRemove);
+
+        // Delete from the actual tombstone table for this type.
+        if (tombstoneType == TombstoneTypes.ItemCode)
+        {
+            var tombs = await _context.SharedItemCodeDeletions
+                .Where(d => purgeableIds.Contains(d.Id))
+                .ToListAsync();
+            _context.SharedItemCodeDeletions.RemoveRange(tombs);
+            return tombs.Count;
+        }
+        if (tombstoneType == TombstoneTypes.ItemPriceLevelMapping)
+        {
+            var tombs = await _context.SharedItemPriceLevelMappingDeletions
+                .Where(d => purgeableIds.Contains(d.Id))
+                .ToListAsync();
+            _context.SharedItemPriceLevelMappingDeletions.RemoveRange(tombs);
+            return tombs.Count;
+        }
+        if (tombstoneType == TombstoneTypes.ItemErpMapping)
+        {
+            var tombs = await _context.SharedItemErpMappingDeletions
+                .Where(d => purgeableIds.Contains(d.Id))
+                .ToListAsync();
+            _context.SharedItemErpMappingDeletions.RemoveRange(tombs);
+            return tombs.Count;
+        }
+        return 0;
     }
 
     /// <summary>

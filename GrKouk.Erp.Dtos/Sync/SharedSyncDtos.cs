@@ -144,6 +144,12 @@ public class SharedItemPriceLevelMappingDeletionDto
 
 // ─── Request / Response DTOs ────────────────────────────────────────
 
+public class TombstoneAckDto
+{
+    public Guid TombstoneId { get; set; }
+    public string TombstoneType { get; set; } = string.Empty;
+}
+
 public class SharedSyncPushRequest
 {
     public string ShopId { get; set; } = string.Empty;
@@ -158,6 +164,12 @@ public class SharedSyncPushRequest
     public List<SharedItemErpMappingDeletionDto> ItemErpMappingDeletions { get; set; } = new();
     public List<SharedItemCodeDeletionDto> ItemCodeDeletions { get; set; } = new();
     public List<SharedItemPriceLevelMappingDeletionDto> ItemPriceLevelMappingDeletions { get; set; } = new();
+    // Phase 3 — Workstream E. Each entry tells the server "shop ShopId has applied this
+    // tombstone." Server inserts into SharedTombstoneAcks (UNIQUE-idempotent), then
+    // runs a purge pass that hard-deletes tombstones every active KnownShop has acked.
+    // Optional field — old cashier builds without this code path send no acks; server
+    // treats absent as empty list (backward-compatible).
+    public List<TombstoneAckDto> TombstoneAcks { get; set; } = new();
 }
 
 public class SharedSyncPushResponse
@@ -174,6 +186,8 @@ public class SharedSyncPushResponse
     public int ItemErpMappingDeletionsApplied { get; set; }
     public int ItemCodeDeletionsApplied { get; set; }
     public int ItemPriceLevelMappingDeletionsApplied { get; set; }
+    public int TombstoneAcksRecorded { get; set; }
+    public int TombstonesPurged { get; set; }
     public List<string> Errors { get; set; } = new();
 }
 
