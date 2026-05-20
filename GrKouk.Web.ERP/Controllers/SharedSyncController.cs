@@ -64,6 +64,9 @@ public class SharedSyncController : ControllerBase
                 UseBatchTracking = i.UseBatchTracking,
                 DepositItemId = i.DepositItemId,
                 IsDepositItem = i.IsDepositItem,
+                DeleteRequested = i.DeleteRequested,
+                DeleteRequestedByShopId = i.DeleteRequestedByShopId,
+                DeleteRequestedAt = i.DeleteRequestedAt,
                 ModifiedAt = i.ModifiedAt,
                 ModifiedByShopId = i.ModifiedByShopId,
                 Version = i.Version
@@ -180,8 +183,13 @@ public class SharedSyncController : ControllerBase
                     ManufacturerCode = i.ManufacturerCode,
                     UpcCode = i.UpcCode,
                     EanCode = i.EanCode,
+                    CashierDepartmentId = i.CashierDepartmentId,
+                    UseBatchTracking = i.UseBatchTracking,
                     DepositItemId = i.DepositItemId,
                     IsDepositItem = i.IsDepositItem,
+                    DeleteRequested = i.DeleteRequested,
+                    DeleteRequestedByShopId = i.DeleteRequestedByShopId,
+                    DeleteRequestedAt = i.DeleteRequestedAt,
                     ModifiedAt = i.ModifiedAt,
                     ModifiedByShopId = i.ModifiedByShopId,
                     Version = i.Version
@@ -334,6 +342,18 @@ public class SharedSyncController : ControllerBase
             })
             .ToListAsync();
 
+        var itemDeletions = await _context.SharedItemDeletions
+            .Where(d => d.ModifiedAt > since && d.ModifiedByShopId != shopId)
+            .Select(d => new SharedItemDeletionDto
+            {
+                Id = d.Id,
+                DeletedItemId = d.DeletedItemId,
+                DeletedAt = d.DeletedAt,
+                ModifiedAt = d.ModifiedAt,
+                ModifiedByShopId = d.ModifiedByShopId
+            })
+            .ToListAsync();
+
         _logger.LogInformation(
             "SharedSync Pull for shop {ShopId} since {Since}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {Depts} cashier depts, {ItemCodes} item codes ({IcDel} deletes), {ItemPrices} item prices ({IpDel} deletes), {Mappings} mappings, {MapDeletions} mapping deletions",
             shopId, since, items.Count, categories.Count, vatClasses.Count, measureUnits.Count, cashierDepartments.Count, itemCodes.Count, itemCodeDeletions.Count, itemPrices.Count, itemPriceLevelMappingDeletions.Count, itemErpMappings.Count, itemErpMappingDeletions.Count);
@@ -351,6 +371,7 @@ public class SharedSyncController : ControllerBase
             ItemErpMappingDeletions = itemErpMappingDeletions,
             ItemCodeDeletions = itemCodeDeletions,
             ItemPriceLevelMappingDeletions = itemPriceLevelMappingDeletions,
+            ItemDeletions = itemDeletions,
             ServerTimestamp = serverTimestamp
         });
     }
@@ -381,6 +402,7 @@ public class SharedSyncController : ControllerBase
         int itemErpMappingDeletionsApplied = 0;
         int itemCodeDeletionsApplied = 0;
         int itemPriceLevelMappingDeletionsApplied = 0;
+        int itemDeletionsApplied = 0;
         int tombstoneAcksRecorded = 0;
         int tombstonesPurged = 0;
 
@@ -532,6 +554,9 @@ public class SharedSyncController : ControllerBase
                         UseBatchTracking = item.UseBatchTracking,
                         DepositItemId = item.DepositItemId,
                         IsDepositItem = item.IsDepositItem,
+                        DeleteRequested = item.DeleteRequested,
+                        DeleteRequestedByShopId = item.DeleteRequestedByShopId,
+                        DeleteRequestedAt = item.DeleteRequestedAt,
                         ModifiedAt = item.ModifiedAt,
                         ModifiedByShopId = request.ShopId,
                         Version = 1
@@ -555,6 +580,9 @@ public class SharedSyncController : ControllerBase
                     existing.UseBatchTracking = item.UseBatchTracking;
                     existing.DepositItemId = item.DepositItemId;
                     existing.IsDepositItem = item.IsDepositItem;
+                    existing.DeleteRequested = item.DeleteRequested;
+                    existing.DeleteRequestedByShopId = item.DeleteRequestedByShopId;
+                    existing.DeleteRequestedAt = item.DeleteRequestedAt;
                     existing.ModifiedAt = item.ModifiedAt;
                     existing.ModifiedByShopId = request.ShopId;
                     existing.Version++;
@@ -807,6 +835,63 @@ public class SharedSyncController : ControllerBase
                 }
             }
 
+            // 6b. Item deletion tombstones (Workstream B, two-phase delete). Each
+            // tombstone hard-deletes the SharedItem and cascades to its child rows.
+            // Mirrors the ItemCode tombstone handling (section 2b): record idempotently
+            // by Id, auto-ack the originating shop, then remove the live registry data.
+            foreach (var del in request.ItemDeletions)
+            {
+                var existingDel = await _context.SharedItemDeletions.FindAsync(del.Id);
+                if (existingDel == null)
+                {
+                    _context.SharedItemDeletions.Add(new SharedItemDeletion
+                    {
+                        Id = del.Id,
+                        DeletedItemId = del.DeletedItemId,
+                        DeletedAt = del.DeletedAt,
+                        // Server-clock ModifiedAt so the pull-time filter works
+                        // regardless of client wall-clock — same as section 2b.
+                        ModifiedAt = DateTime.UtcNow,
+                        ModifiedByShopId = request.ShopId
+                    });
+                    itemDeletionsApplied++;
+
+                    // Auto-ack the originating shop — it created and applied this
+                    // tombstone locally. Saves pushing a separate ack row.
+                    _context.SharedTombstoneAcks.Add(new SharedTombstoneAck
+                    {
+                        Id = Guid.NewGuid(),
+                        TombstoneId = del.Id,
+                        TombstoneType = TombstoneTypes.Item,
+                        ShopId = request.ShopId,
+                        AckedAt = DateTime.UtcNow
+                    });
+                    tombstoneAcksRecorded++;
+                }
+
+                // Cascade-delete every registry row for this item by Id. Registry
+                // tables carry no FK constraints (cash-register convention), so order
+                // is not strictly required, but children-before-parent reads cleaner.
+                var liveCodes = await _context.SharedItemCodes
+                    .Where(ic => ic.ItemId == del.DeletedItemId).ToListAsync();
+                if (liveCodes.Count > 0) _context.SharedItemCodes.RemoveRange(liveCodes);
+
+                var livePrices = await _context.SharedItemPrices
+                    .Where(p => p.ItemId == del.DeletedItemId).ToListAsync();
+                if (livePrices.Count > 0) _context.SharedItemPrices.RemoveRange(livePrices);
+
+                var liveMappings = await _context.SharedItemErpMappings
+                    .Where(m => m.LocalItemId == del.DeletedItemId).ToListAsync();
+                if (liveMappings.Count > 0) _context.SharedItemErpMappings.RemoveRange(liveMappings);
+
+                var liveReadiness = await _context.SharedItemDeleteReadinesses
+                    .Where(r => r.ItemId == del.DeletedItemId).ToListAsync();
+                if (liveReadiness.Count > 0) _context.SharedItemDeleteReadinesses.RemoveRange(liveReadiness);
+
+                var liveItem = await _context.SharedItems.FindAsync(del.DeletedItemId);
+                if (liveItem != null) _context.SharedItems.Remove(liveItem);
+            }
+
             // 7. Tombstone acks from the calling shop. Each entry says "shop X has applied
             // tombstone Y of type T locally." UNIQUE INDEX (TombstoneId, TombstoneType,
             // ShopId) makes re-pushes idempotent. The shop's own acks for tombstones it
@@ -847,7 +932,7 @@ public class SharedSyncController : ControllerBase
                     tombstonesPurged += await PurgeTombstonesByTypeAsync(TombstoneTypes.ItemCode, activeShopCount);
                     tombstonesPurged += await PurgeTombstonesByTypeAsync(TombstoneTypes.ItemPriceLevelMapping, activeShopCount);
                     tombstonesPurged += await PurgeTombstonesByTypeAsync(TombstoneTypes.ItemErpMapping, activeShopCount);
-                    // TombstoneTypes.Item is added by Workstream B.
+                    tombstonesPurged += await PurgeTombstonesByTypeAsync(TombstoneTypes.Item, activeShopCount);
                     if (tombstonesPurged > 0)
                     {
                         await _context.SaveChangesAsync();
@@ -856,8 +941,8 @@ public class SharedSyncController : ControllerBase
             }
 
             _logger.LogInformation(
-                "SharedSync Push from shop {ShopId}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {Depts} cashier depts, {ItemCodes} item codes ({IcDel} deletes), {ItemPrices} item prices ({IpDel} deletes), {Mappings} mappings, {MapDeletions} mapping deletions, {Acks} acks, {Purged} purged",
-                request.ShopId, itemsUpserted, categoriesUpserted, vatClassesUpserted, measureUnitsUpserted, cashierDepartmentsUpserted, itemCodesUpserted, itemCodeDeletionsApplied, itemPricesUpserted, itemPriceLevelMappingDeletionsApplied, itemErpMappingsUpserted, itemErpMappingDeletionsApplied, tombstoneAcksRecorded, tombstonesPurged);
+                "SharedSync Push from shop {ShopId}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {Depts} cashier depts, {ItemCodes} item codes ({IcDel} deletes), {ItemPrices} item prices ({IpDel} deletes), {Mappings} mappings, {MapDeletions} mapping deletions, {ItemDels} item deletions, {Acks} acks, {Purged} purged",
+                request.ShopId, itemsUpserted, categoriesUpserted, vatClassesUpserted, measureUnitsUpserted, cashierDepartmentsUpserted, itemCodesUpserted, itemCodeDeletionsApplied, itemPricesUpserted, itemPriceLevelMappingDeletionsApplied, itemErpMappingsUpserted, itemErpMappingDeletionsApplied, itemDeletionsApplied, tombstoneAcksRecorded, tombstonesPurged);
         }
         catch (Exception ex)
         {
@@ -879,6 +964,7 @@ public class SharedSyncController : ControllerBase
             ItemErpMappingDeletionsApplied = itemErpMappingDeletionsApplied,
             ItemCodeDeletionsApplied = itemCodeDeletionsApplied,
             ItemPriceLevelMappingDeletionsApplied = itemPriceLevelMappingDeletionsApplied,
+            ItemDeletionsApplied = itemDeletionsApplied,
             TombstoneAcksRecorded = tombstoneAcksRecorded,
             TombstonesPurged = tombstonesPurged,
             Errors = errors
@@ -936,6 +1022,14 @@ public class SharedSyncController : ControllerBase
             _context.SharedItemErpMappingDeletions.RemoveRange(tombs);
             return tombs.Count;
         }
+        if (tombstoneType == TombstoneTypes.Item)
+        {
+            var tombs = await _context.SharedItemDeletions
+                .Where(d => purgeableIds.Contains(d.Id))
+                .ToListAsync();
+            _context.SharedItemDeletions.RemoveRange(tombs);
+            return tombs.Count;
+        }
         return 0;
     }
 
@@ -968,6 +1062,9 @@ public class SharedSyncController : ControllerBase
                 UseBatchTracking = i.UseBatchTracking,
                 DepositItemId = i.DepositItemId,
                 IsDepositItem = i.IsDepositItem,
+                DeleteRequested = i.DeleteRequested,
+                DeleteRequestedByShopId = i.DeleteRequestedByShopId,
+                DeleteRequestedAt = i.DeleteRequestedAt,
                 ModifiedAt = i.ModifiedAt,
                 ModifiedByShopId = i.ModifiedByShopId,
                 Version = i.Version
@@ -1093,6 +1190,17 @@ public class SharedSyncController : ControllerBase
             })
             .ToListAsync();
 
+        var itemDeletions = await _context.SharedItemDeletions
+            .Select(d => new SharedItemDeletionDto
+            {
+                Id = d.Id,
+                DeletedItemId = d.DeletedItemId,
+                DeletedAt = d.DeletedAt,
+                ModifiedAt = d.ModifiedAt,
+                ModifiedByShopId = d.ModifiedByShopId
+            })
+            .ToListAsync();
+
         return Ok(new SharedSyncPullResponse
         {
             Items = items,
@@ -1106,6 +1214,7 @@ public class SharedSyncController : ControllerBase
             ItemErpMappingDeletions = itemErpMappingDeletions,
             ItemCodeDeletions = itemCodeDeletions,
             ItemPriceLevelMappingDeletions = itemPriceLevelMappingDeletions,
+            ItemDeletions = itemDeletions,
             ServerTimestamp = serverTimestamp
         });
     }

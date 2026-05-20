@@ -51,6 +51,17 @@ public class SharedItem
     public Guid? DepositItemId { get; set; }
     public bool IsDepositItem { get; set; }
 
+    // Two-phase delete (Workstream B). DeleteRequested is a transient, cross-shop
+    // negotiation state: the item is hidden from new transactions on every shop
+    // while true, but existing transactions stay intact and the request can be
+    // cancelled. These flow through the normal Items push/pull LWW path.
+    public bool DeleteRequested { get; set; }
+
+    [MaxLength(50)]
+    public string? DeleteRequestedByShopId { get; set; }
+
+    public DateTime? DeleteRequestedAt { get; set; }
+
     // Tracking
     public DateTime ModifiedAt { get; set; }
 

@@ -111,6 +111,8 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<SharedItemPriceLevelMappingDeletion> SharedItemPriceLevelMappingDeletions { get; set; }
         public DbSet<KnownShop> KnownShops { get; set; }
         public DbSet<SharedTombstoneAck> SharedTombstoneAcks { get; set; }
+        public DbSet<SharedItemDeleteReadiness> SharedItemDeleteReadinesses { get; set; }
+        public DbSet<SharedItemDeletion> SharedItemDeletions { get; set; }
         
        // public DbSet<SyncItem> SyncItems { get; set; }
         
@@ -967,6 +969,21 @@ namespace GrKouk.Web.ERP.Data
                 entity.HasIndex(a => new { a.TombstoneId, a.TombstoneType, a.ShopId }).IsUnique();
                 entity.HasIndex(a => new { a.TombstoneType, a.TombstoneId });
                 entity.HasIndex(a => a.ShopId);
+            });
+
+            modelBuilder.Entity<SharedItemDeleteReadiness>(entity =>
+            {
+                entity.HasKey(r => new { r.ItemId, r.ShopId });
+                entity.HasIndex(r => r.ItemId);
+            });
+
+            modelBuilder.Entity<SharedItemDeletion>(entity =>
+            {
+                entity.HasIndex(d => d.DeletedItemId);
+                entity.HasIndex(d => d.ModifiedAt);
+                entity.HasIndex(d => d.ModifiedByShopId);
+                entity.Property(d => d.ModifiedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
             });
         }
         

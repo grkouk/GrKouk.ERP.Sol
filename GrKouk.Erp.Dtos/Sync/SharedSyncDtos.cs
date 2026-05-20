@@ -23,6 +23,11 @@ public class SharedItemDto
     public bool UseBatchTracking { get; set; }
     public Guid? DepositItemId { get; set; }
     public bool IsDepositItem { get; set; }
+    // Two-phase delete (Workstream B). Transient cross-shop negotiation state;
+    // flows through the normal Items push/pull LWW path like any other field.
+    public bool DeleteRequested { get; set; }
+    public string? DeleteRequestedByShopId { get; set; }
+    public DateTime? DeleteRequestedAt { get; set; }
     public DateTime ModifiedAt { get; set; }
     public string ModifiedByShopId { get; set; } = string.Empty;
     public int Version { get; set; }
@@ -142,6 +147,22 @@ public class SharedItemPriceLevelMappingDeletionDto
     public string ModifiedByShopId { get; set; } = string.Empty;
 }
 
+/// <summary>
+/// Tombstone for a hard-deleted Item (Workstream B, two-phase delete). Created
+/// by the requesting shop at finalize time, after the cross-shop readiness
+/// negotiation confirms zero transaction references everywhere. Receiver
+/// cascade-deletes the item and its child rows; participates in the tombstone-
+/// ack purge mechanism with TombstoneType "Item".
+/// </summary>
+public class SharedItemDeletionDto
+{
+    public Guid Id { get; set; }
+    public Guid DeletedItemId { get; set; }
+    public DateTime DeletedAt { get; set; }
+    public DateTime ModifiedAt { get; set; }
+    public string ModifiedByShopId { get; set; } = string.Empty;
+}
+
 // ─── Request / Response DTOs ────────────────────────────────────────
 
 public class TombstoneAckDto
@@ -164,6 +185,9 @@ public class SharedSyncPushRequest
     public List<SharedItemErpMappingDeletionDto> ItemErpMappingDeletions { get; set; } = new();
     public List<SharedItemCodeDeletionDto> ItemCodeDeletions { get; set; } = new();
     public List<SharedItemPriceLevelMappingDeletionDto> ItemPriceLevelMappingDeletions { get; set; } = new();
+    // Workstream B — Item deletion tombstones. Hard-delete propagation for the
+    // two-phase delete flow. Optional field; old builds send none.
+    public List<SharedItemDeletionDto> ItemDeletions { get; set; } = new();
     // Phase 3 — Workstream E. Each entry tells the server "shop ShopId has applied this
     // tombstone." Server inserts into SharedTombstoneAcks (UNIQUE-idempotent), then
     // runs a purge pass that hard-deletes tombstones every active KnownShop has acked.
@@ -186,6 +210,7 @@ public class SharedSyncPushResponse
     public int ItemErpMappingDeletionsApplied { get; set; }
     public int ItemCodeDeletionsApplied { get; set; }
     public int ItemPriceLevelMappingDeletionsApplied { get; set; }
+    public int ItemDeletionsApplied { get; set; }
     public int TombstoneAcksRecorded { get; set; }
     public int TombstonesPurged { get; set; }
     public List<string> Errors { get; set; } = new();
@@ -204,5 +229,6 @@ public class SharedSyncPullResponse
     public List<SharedItemErpMappingDeletionDto> ItemErpMappingDeletions { get; set; } = new();
     public List<SharedItemCodeDeletionDto> ItemCodeDeletions { get; set; } = new();
     public List<SharedItemPriceLevelMappingDeletionDto> ItemPriceLevelMappingDeletions { get; set; } = new();
+    public List<SharedItemDeletionDto> ItemDeletions { get; set; } = new();
     public DateTime ServerTimestamp { get; set; }
 }
