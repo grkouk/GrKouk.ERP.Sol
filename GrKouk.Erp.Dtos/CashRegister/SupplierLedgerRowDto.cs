@@ -10,5 +10,7 @@ namespace GrKouk.Erp.Dtos.CashRegister
         public string TransRefCode { get; set; }
         public decimal Debit { get; set; }
         public decimal Credit { get; set; }
+        public string CompanyCode { get; set; }
+        public string CompanyName { get; set; }
     }
 }

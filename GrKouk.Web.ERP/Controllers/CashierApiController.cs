@@ -392,9 +392,9 @@ public class CashierApiController : ControllerBase
     [HttpGet("GetErpSupplierLedger")]
     [Authorize(Policy = "ApiPolicy2")]
     public async Task<ActionResult<SupplierLedgerResponseDto>> GetErpSupplierLedger(
-        string companyCode, int transactorId, DateTime dateFrom, DateTime dateTo)
+        string companyCodes, int transactorId, DateTime dateFrom, DateTime dateTo)
     {
-        if (string.IsNullOrEmpty(companyCode))
+        if (string.IsNullOrEmpty(companyCodes))
         {
             return BadRequest(new { error = "Company code is required" });
         }
@@ -403,13 +403,31 @@ public class CashierApiController : ControllerBase
             return BadRequest(new { error = "Transactor id is required" });
         }
 
-        var company = await _context.Companies.SingleOrDefaultAsync(p => p.Code == companyCode);
-        if (company == null)
+        // Companies are branches of one business; the supplier sees a single account.
+        // Pool all selected branches and present them as one ledger, tagging each row
+        // with its branch for the Company column.
+        var codes = companyCodes.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(c => c.Trim())
+            .Where(c => c.Length > 0)
+            .Distinct()
+            .ToList();
+        if (codes.Count == 0)
         {
-            return BadRequest(new { error = $"Company with code '{companyCode}' not found" });
+            return BadRequest(new { error = "Company code is required" });
         }
 
-        var companyId = company.Id;
+        var companies = await _context.Companies
+            .Where(c => codes.Contains(c.Code))
+            .Select(c => new { c.Id, c.Code, c.Name })
+            .ToListAsync();
+        var missing = codes.Where(c => companies.All(co => co.Code != c)).ToList();
+        if (missing.Count > 0)
+        {
+            return BadRequest(new { error = $"Company with code '{string.Join(", ", missing)}' not found" });
+        }
+
+        var companyIds = companies.Select(c => c.Id).ToList();
+        var companyById = companies.ToDictionary(c => c.Id, c => c);
         var fromDate = dateFrom.Date;
         var toDate = dateTo.Date;
 
@@ -417,7 +435,7 @@ public class CashierApiController : ControllerBase
         // derive Debit/Credit from FinancialAction in memory — keeps the SQL trivial.
         var beforeRaw = await _context.TransactorTransactions
             .Where(t => t.TransactorId == transactorId
-                        && t.CompanyId == companyId
+                        && companyIds.Contains(t.CompanyId)
                         && t.TransDate < fromDate)
             .Select(t => new
             {
@@ -451,7 +469,7 @@ public class CashierApiController : ControllerBase
         // In-period rows
         var inPeriodRaw = await _context.TransactorTransactions
             .Where(t => t.TransactorId == transactorId
-                        && t.CompanyId == companyId
+                        && companyIds.Contains(t.CompanyId)
                         && t.TransDate >= fromDate
                         && t.TransDate <= toDate)
             .OrderBy(t => t.TransDate)
@@ -465,7 +483,8 @@ public class CashierApiController : ControllerBase
                 t.FinancialAction,
                 t.TransNetAmount,
                 t.TransFpaAmount,
-                t.TransDiscountAmount
+                t.TransDiscountAmount,
+                t.CompanyId
             })
             .ToListAsync();
 
@@ -486,6 +505,7 @@ public class CashierApiController : ControllerBase
                 credit = total;
             }
 
+            companyById.TryGetValue(r.CompanyId, out var co);
             rows.Add(new SupplierLedgerRowDto
             {
                 Id = r.Id,
@@ -493,7 +513,9 @@ public class CashierApiController : ControllerBase
                 DocSeriesName = r.DocSeriesName,
                 TransRefCode = r.TransRefCode,
                 Debit = debit,
-                Credit = credit
+                Credit = credit,
+                CompanyCode = co?.Code ?? string.Empty,
+                CompanyName = co?.Name ?? string.Empty
             });
         }
 
@@ -504,6 +526,202 @@ public class CashierApiController : ControllerBase
             Rows = rows
         };
         return Ok(response);
+    }
+
+    /// <summary>
+    /// Open-item payables ("what we owe and when") for a supplier, pooled across the
+    /// selected branches and treated as ONE account (the supplier sees one customer that
+    /// merely ships to several branches). Per payable invoice (BuyDocument) the due date
+    /// is the invoice date plus the payment-method credit term (DaysOverdue). Because
+    /// cash-register supplier payments are recorded on-account (not matched to a specific
+    /// invoice), the open amount per invoice is inferred by FIFO: oldest invoice first,
+    /// applying the pooled reductions (payments / credit notes). Current = due on/before
+    /// asOf; Future = not yet due. Residual reconciles to the true combined ledger
+    /// balance (opening balances / manual credits not tied to a BuyDocument). EUR-only.
+    /// </summary>
+    [HttpGet("GetErpSupplierOpenItems")]
+    [Authorize(Policy = "ApiPolicy2")]
+    public async Task<ActionResult<SupplierOpenItemsResponseDto>> GetErpSupplierOpenItems(
+        string companyCodes, int transactorId, DateTime? asOf = null)
+    {
+        if (string.IsNullOrEmpty(companyCodes))
+        {
+            return BadRequest(new { error = "Company code is required" });
+        }
+        if (transactorId <= 0)
+        {
+            return BadRequest(new { error = "Transactor id is required" });
+        }
+
+        var codes = companyCodes.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(c => c.Trim())
+            .Where(c => c.Length > 0)
+            .Distinct()
+            .ToList();
+        if (codes.Count == 0)
+        {
+            return BadRequest(new { error = "Company code is required" });
+        }
+
+        var companies = await _context.Companies
+            .Where(c => codes.Contains(c.Code))
+            .Select(c => new { c.Id, c.Code, c.Name })
+            .ToListAsync();
+        var missing = codes.Where(c => companies.All(co => co.Code != c)).ToList();
+        if (missing.Count > 0)
+        {
+            return BadRequest(new { error = $"Company with code '{string.Join(", ", missing)}' not found" });
+        }
+
+        var companyIds = companies.Select(c => c.Id).ToList();
+        var companyById = companies.ToDictionary(c => c.Id, c => c);
+        var asOfDate = (asOf ?? DateTime.Today).Date;
+
+        // Payable invoices = BuyDocuments whose doc type posts a CREDIT to the transactor
+        // (increases payable). PaymentMethod is left-joined: DaysOverdue may be null when
+        // the doc has no payment method, in which case the term falls back to 0 (due on
+        // the invoice date) and the result is flagged Approximate.
+        var invoicesRaw = await _context.BuyDocuments
+            .Where(b => b.TransactorId == transactorId
+                        && companyIds.Contains(b.CompanyId)
+                        && b.TransDate <= asOfDate
+                        && b.BuyDocType.TransTransactorDef != null
+                        && (b.BuyDocType.TransTransactorDef.FinancialTransAction == FinActionsEnum.FinActionsEnumCredit
+                            || b.BuyDocType.TransTransactorDef.FinancialTransAction == FinActionsEnum.FinActionsEnumNegativeCredit))
+            .Select(b => new
+            {
+                b.Id,
+                b.CompanyId,
+                b.TransDate,
+                b.TransRefCode,
+                DocSeriesName = b.BuyDocSeries.Name,
+                b.TransNetAmount,
+                b.TransFpaAmount,
+                b.TransDiscountAmount,
+                DaysOverdue = (int?)b.PaymentMethod.DaysOverdue
+            })
+            .ToListAsync();
+
+        // Pooled transactions (all branches, up to asOf) for the combined true balance and
+        // the FIFO reduction pool. Derive Debit/Credit exactly like the ledger so the
+        // numbers reconcile.
+        var transRaw = await _context.TransactorTransactions
+            .Where(t => t.TransactorId == transactorId
+                        && companyIds.Contains(t.CompanyId)
+                        && t.TransDate <= asOfDate)
+            .Select(t => new
+            {
+                t.FinancialAction,
+                t.TransNetAmount,
+                t.TransFpaAmount,
+                t.TransDiscountAmount
+            })
+            .ToListAsync();
+
+        decimal totalDebit = 0m;
+        decimal totalCredit = 0m;
+        foreach (var t in transRaw)
+        {
+            var total = t.TransNetAmount + t.TransFpaAmount - t.TransDiscountAmount;
+            if (t.FinancialAction == FinActionsEnum.FinActionsEnumDebit ||
+                t.FinancialAction == FinActionsEnum.FinActionsEnumNegativeDebit)
+            {
+                totalDebit += total;
+            }
+            else if (t.FinancialAction == FinActionsEnum.FinActionsEnumCredit ||
+                     t.FinancialAction == FinActionsEnum.FinActionsEnumNegativeCredit)
+            {
+                totalCredit += total;
+            }
+        }
+
+        // Supplier convention: positive balance means we owe the supplier.
+        var combinedBalance = totalCredit - totalDebit;
+
+        var invoices = invoicesRaw
+            .Select(b => new
+            {
+                b.Id,
+                b.CompanyId,
+                b.TransDate,
+                b.TransRefCode,
+                b.DocSeriesName,
+                Gross = b.TransNetAmount + b.TransFpaAmount - b.TransDiscountAmount,
+                DueDate = b.TransDate.Date.AddDays(b.DaysOverdue ?? 0),
+                HasTerm = b.DaysOverdue.HasValue
+            })
+            .OrderBy(b => b.TransDate)
+            .ThenBy(b => b.Id)
+            .ToList();
+
+        // FIFO-apply pooled reductions (payments + credit notes) to the oldest invoices.
+        var pool = totalDebit;
+        var approximate = false;
+        var openItems = new List<SupplierOpenItemDto>();
+        foreach (var inv in invoices)
+        {
+            if (!inv.HasTerm)
+            {
+                approximate = true;
+            }
+
+            var open = inv.Gross;
+            if (pool > 0m)
+            {
+                var applied = Math.Min(pool, open);
+                open -= applied;
+                pool -= applied;
+            }
+
+            if (open <= 0.0001m)
+            {
+                continue;
+            }
+
+            companyById.TryGetValue(inv.CompanyId, out var co);
+            openItems.Add(new SupplierOpenItemDto
+            {
+                BuyDocumentId = inv.Id,
+                CompanyCode = co?.Code ?? string.Empty,
+                CompanyName = co?.Name ?? string.Empty,
+                DocDate = inv.TransDate,
+                DueDate = inv.DueDate,
+                DocSeriesName = inv.DocSeriesName,
+                DocRef = inv.TransRefCode,
+                OriginalAmount = inv.Gross,
+                OpenAmount = open,
+                DaysPastDue = (int)(asOfDate - inv.DueDate.Date).TotalDays
+            });
+        }
+
+        var openSum = openItems.Sum(o => o.OpenAmount);
+        var residual = combinedBalance - openSum;
+        if (Math.Abs(residual) > 0.0001m)
+        {
+            approximate = true;
+        }
+
+        var current = openItems
+            .Where(o => o.DueDate.Date <= asOfDate)
+            .OrderBy(o => o.DueDate)
+            .ThenBy(o => o.BuyDocumentId)
+            .ToList();
+        var future = openItems
+            .Where(o => o.DueDate.Date > asOfDate)
+            .OrderBy(o => o.DueDate)
+            .ThenBy(o => o.BuyDocumentId)
+            .ToList();
+
+        return Ok(new SupplierOpenItemsResponseDto
+        {
+            Current = current,
+            Future = future,
+            CurrentTotal = current.Sum(o => o.OpenAmount),
+            FutureTotal = future.Sum(o => o.OpenAmount),
+            Residual = residual,
+            CombinedBalance = combinedBalance,
+            Approximate = approximate
+        });
     }
 
     private async Task<int> ResolvePaymentDocSeriesIdAsync(int companyId)
