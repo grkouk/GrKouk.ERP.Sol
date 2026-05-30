@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.DocDefinitions;
@@ -392,7 +393,7 @@ public class CashierApiController : ControllerBase
     [HttpGet("GetErpSupplierLedger")]
     [Authorize(Policy = "ApiPolicy2")]
     public async Task<ActionResult<SupplierLedgerResponseDto>> GetErpSupplierLedger(
-        string companyCodes, int transactorId, DateTime dateFrom, DateTime dateTo)
+        string companyCodes, int transactorId, DateTime dateFrom, DateTime dateTo, CancellationToken ct = default)
     {
         if (string.IsNullOrEmpty(companyCodes))
         {
@@ -419,7 +420,7 @@ public class CashierApiController : ControllerBase
         var companies = await _context.Companies
             .Where(c => codes.Contains(c.Code))
             .Select(c => new { c.Id, c.Code, c.Name })
-            .ToListAsync();
+            .ToListAsync(ct);
         var missing = codes.Where(c => companies.All(co => co.Code != c)).ToList();
         if (missing.Count > 0)
         {
@@ -444,7 +445,7 @@ public class CashierApiController : ControllerBase
                 t.TransFpaAmount,
                 t.TransDiscountAmount
             })
-            .ToListAsync();
+            .ToListAsync(ct);
 
         decimal openingDebit = 0m;
         decimal openingCredit = 0m;
@@ -486,7 +487,7 @@ public class CashierApiController : ControllerBase
                 t.TransDiscountAmount,
                 t.CompanyId
             })
-            .ToListAsync();
+            .ToListAsync(ct);
 
         var rows = new List<SupplierLedgerRowDto>(inPeriodRaw.Count);
         foreach (var r in inPeriodRaw)
@@ -542,7 +543,7 @@ public class CashierApiController : ControllerBase
     [HttpGet("GetErpSupplierOpenItems")]
     [Authorize(Policy = "ApiPolicy2")]
     public async Task<ActionResult<SupplierOpenItemsResponseDto>> GetErpSupplierOpenItems(
-        string companyCodes, int transactorId, DateTime? asOf = null)
+        string companyCodes, int transactorId, DateTime? asOf = null, CancellationToken ct = default)
     {
         if (string.IsNullOrEmpty(companyCodes))
         {
@@ -566,7 +567,7 @@ public class CashierApiController : ControllerBase
         var companies = await _context.Companies
             .Where(c => codes.Contains(c.Code))
             .Select(c => new { c.Id, c.Code, c.Name })
-            .ToListAsync();
+            .ToListAsync(ct);
         var missing = codes.Where(c => companies.All(co => co.Code != c)).ToList();
         if (missing.Count > 0)
         {
@@ -600,7 +601,7 @@ public class CashierApiController : ControllerBase
                 b.TransDiscountAmount,
                 DaysOverdue = (int?)b.PaymentMethod.DaysOverdue
             })
-            .ToListAsync();
+            .ToListAsync(ct);
 
         // Pooled transactions (all branches, up to asOf) for the combined true balance and
         // the FIFO reduction pool. Derive Debit/Credit exactly like the ledger so the
@@ -616,7 +617,7 @@ public class CashierApiController : ControllerBase
                 t.TransFpaAmount,
                 t.TransDiscountAmount
             })
-            .ToListAsync();
+            .ToListAsync(ct);
 
         decimal totalDebit = 0m;
         decimal totalCredit = 0m;
