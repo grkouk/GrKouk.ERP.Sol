@@ -432,6 +432,14 @@ public class CashierApiController : ControllerBase
         var fromDate = dateFrom.Date;
         var toDate = dateTo.Date;
 
+        // Rows posted in the payment section are editable supplier payments; their transaction id
+        // is the id used by the supplier-payments edit/delete endpoints. Resolve the section once
+        // so we can flag those rows. A missing section just means no row is flagged as a payment.
+        var paymentSectionId = await _context.Sections
+            .Where(s => s.Code == PaymentSectionCode)
+            .Select(s => (int?)s.Id)
+            .FirstOrDefaultAsync(ct);
+
         // Pre-period rows (for the opening balance). Pull the small raw projection and
         // derive Debit/Credit from FinancialAction in memory — keeps the SQL trivial.
         var beforeRaw = await _context.TransactorTransactions
@@ -485,7 +493,8 @@ public class CashierApiController : ControllerBase
                 t.TransNetAmount,
                 t.TransFpaAmount,
                 t.TransDiscountAmount,
-                t.CompanyId
+                t.CompanyId,
+                t.SectionId
             })
             .ToListAsync(ct);
 
@@ -516,7 +525,8 @@ public class CashierApiController : ControllerBase
                 Debit = debit,
                 Credit = credit,
                 CompanyCode = co?.Code ?? string.Empty,
-                CompanyName = co?.Name ?? string.Empty
+                CompanyName = co?.Name ?? string.Empty,
+                IsPayment = paymentSectionId.HasValue && r.SectionId == paymentSectionId.Value
             });
         }
 
