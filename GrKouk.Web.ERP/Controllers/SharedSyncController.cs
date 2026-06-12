@@ -405,6 +405,7 @@ public class SharedSyncController : ControllerBase
         int itemDeletionsApplied = 0;
         int tombstoneAcksRecorded = 0;
         int tombstonesPurged = 0;
+        int itemCostsUpserted = 0;
 
         try
         {
@@ -918,6 +919,36 @@ public class SharedSyncController : ControllerBase
                 }
             }
 
+            // 7b. Inter-shop item costs. Per-shop AverageCost for items the calling
+            // shop actually purchased. Keyed by (ShopId, ItemId); the ShopId in the
+            // row is always the caller's (never trust a foreign ShopId in the payload).
+            // LWW by UpdatedAt so a stale re-push can't clobber a fresher value. These
+            // rows feed the on-demand GET /itemcost lookup for the OTHER shop only.
+            foreach (var cost in request.ItemCosts)
+            {
+                var existing = await _context.SharedItemCosts
+                    .FindAsync(request.ShopId, cost.ItemId);
+                if (existing == null)
+                {
+                    _context.SharedItemCosts.Add(new SharedItemCost
+                    {
+                        ShopId = request.ShopId,
+                        ItemId = cost.ItemId,
+                        AverageCost = cost.AverageCost,
+                        LastPurchasePrice = cost.LastPurchasePrice,
+                        UpdatedAt = cost.UpdatedAt
+                    });
+                    itemCostsUpserted++;
+                }
+                else if (cost.UpdatedAt > existing.UpdatedAt)
+                {
+                    existing.AverageCost = cost.AverageCost;
+                    existing.LastPurchasePrice = cost.LastPurchasePrice;
+                    existing.UpdatedAt = cost.UpdatedAt;
+                    itemCostsUpserted++;
+                }
+            }
+
             await _context.SaveChangesAsync();
 
             // 8. Purge pass — delete tombstones every active KnownShop has acked.
@@ -941,8 +972,8 @@ public class SharedSyncController : ControllerBase
             }
 
             _logger.LogInformation(
-                "SharedSync Push from shop {ShopId}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {Depts} cashier depts, {ItemCodes} item codes ({IcDel} deletes), {ItemPrices} item prices ({IpDel} deletes), {Mappings} mappings, {MapDeletions} mapping deletions, {ItemDels} item deletions, {Acks} acks, {Purged} purged",
-                request.ShopId, itemsUpserted, categoriesUpserted, vatClassesUpserted, measureUnitsUpserted, cashierDepartmentsUpserted, itemCodesUpserted, itemCodeDeletionsApplied, itemPricesUpserted, itemPriceLevelMappingDeletionsApplied, itemErpMappingsUpserted, itemErpMappingDeletionsApplied, itemDeletionsApplied, tombstoneAcksRecorded, tombstonesPurged);
+                "SharedSync Push from shop {ShopId}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {Depts} cashier depts, {ItemCodes} item codes ({IcDel} deletes), {ItemPrices} item prices ({IpDel} deletes), {Mappings} mappings, {MapDeletions} mapping deletions, {ItemDels} item deletions, {Acks} acks, {Purged} purged, {ItemCosts} item costs",
+                request.ShopId, itemsUpserted, categoriesUpserted, vatClassesUpserted, measureUnitsUpserted, cashierDepartmentsUpserted, itemCodesUpserted, itemCodeDeletionsApplied, itemPricesUpserted, itemPriceLevelMappingDeletionsApplied, itemErpMappingsUpserted, itemErpMappingDeletionsApplied, itemDeletionsApplied, tombstoneAcksRecorded, tombstonesPurged, itemCostsUpserted);
         }
         catch (Exception ex)
         {
@@ -967,8 +998,42 @@ public class SharedSyncController : ControllerBase
             ItemDeletionsApplied = itemDeletionsApplied,
             TombstoneAcksRecorded = tombstoneAcksRecorded,
             TombstonesPurged = tombstonesPurged,
+            ItemCostsUpserted = itemCostsUpserted,
             Errors = errors
         });
+    }
+
+    /// <summary>
+    /// On-demand cross-shop cost lookup. Returns the most recently-updated cost
+    /// published by a shop OTHER than the requester for the given item, or 404 when
+    /// none exists. Used by the sale summary diary "borrow estimated cost" action for
+    /// items a shop sells but never purchased. requestingShopId is excluded so a shop
+    /// never borrows its own (absent) cost back.
+    /// </summary>
+    [HttpGet("itemcost/{itemId}")]
+    [Authorize(Policy = "ApiPolicy2")]
+    public async Task<IActionResult> GetItemCost(Guid itemId, [FromQuery] string requestingShopId)
+    {
+        if (string.IsNullOrWhiteSpace(requestingShopId))
+            return BadRequest(new { error = "requestingShopId is required" });
+
+        var cost = await _context.SharedItemCosts
+            .Where(c => c.ItemId == itemId && c.ShopId != requestingShopId)
+            .OrderByDescending(c => c.UpdatedAt)
+            .Select(c => new SharedItemCostDto
+            {
+                ItemId = c.ItemId,
+                AverageCost = c.AverageCost,
+                LastPurchasePrice = c.LastPurchasePrice,
+                UpdatedAt = c.UpdatedAt,
+                ShopId = c.ShopId
+            })
+            .FirstOrDefaultAsync();
+
+        if (cost == null)
+            return NotFound();
+
+        return Ok(cost);
     }
 
     /// <summary>

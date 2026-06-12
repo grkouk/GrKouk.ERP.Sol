@@ -163,6 +163,25 @@ public class SharedItemDeletionDto
     public string ModifiedByShopId { get; set; } = string.Empty;
 }
 
+/// <summary>
+/// Per-shop average cost carrier. Uploaded during sync (push) and retrieved on
+/// demand (GET /api/sharedsync/itemcost/{itemId}) so a shop that sells an item it
+/// never purchased can borrow the other shop's cost for COGS / profit analysis.
+///
+/// Deliberately separate from <see cref="SharedItemDto"/>: AverageCost is NOT part
+/// of the item LWW row (a purchase changes AverageCost without bumping
+/// Item.ModifiedAt, so it would never push on that channel). UpdatedAt is the LWW
+/// key. Mirror any change to the cashier-side GrKoukOrg.Erp.Dtos copy.
+/// </summary>
+public class SharedItemCostDto
+{
+    public Guid ItemId { get; set; }
+    public decimal AverageCost { get; set; }
+    public decimal LastPurchasePrice { get; set; }
+    public DateTime UpdatedAt { get; set; }
+    public string ShopId { get; set; } = string.Empty;
+}
+
 // ─── Request / Response DTOs ────────────────────────────────────────
 
 public class TombstoneAckDto
@@ -194,6 +213,10 @@ public class SharedSyncPushRequest
     // Optional field — old cashier builds without this code path send no acks; server
     // treats absent as empty list (backward-compatible).
     public List<TombstoneAckDto> TombstoneAcks { get; set; } = new();
+    // Inter-shop cost borrow — per-shop AverageCost for items touched since the last
+    // push. Upserted by (ShopId, ItemId), LWW by UpdatedAt. Optional field; old
+    // cashier builds send none, old servers ignore it (System.Text.Json).
+    public List<SharedItemCostDto> ItemCosts { get; set; } = new();
 }
 
 public class SharedSyncPushResponse
@@ -213,6 +236,7 @@ public class SharedSyncPushResponse
     public int ItemDeletionsApplied { get; set; }
     public int TombstoneAcksRecorded { get; set; }
     public int TombstonesPurged { get; set; }
+    public int ItemCostsUpserted { get; set; }
     public List<string> Errors { get; set; } = new();
 }
 

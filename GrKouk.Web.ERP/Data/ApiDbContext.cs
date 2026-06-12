@@ -113,6 +113,7 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<SharedTombstoneAck> SharedTombstoneAcks { get; set; }
         public DbSet<SharedItemDeleteReadiness> SharedItemDeleteReadinesses { get; set; }
         public DbSet<SharedItemDeletion> SharedItemDeletions { get; set; }
+        public DbSet<SharedItemCost> SharedItemCosts { get; set; }
         
        // public DbSet<SyncItem> SyncItems { get; set; }
         
@@ -984,6 +985,15 @@ namespace GrKouk.Web.ERP.Data
                 entity.HasIndex(d => d.ModifiedByShopId);
                 entity.Property(d => d.ModifiedAt)
                     .HasDefaultValueSql("GETUTCDATE()");
+            });
+
+            modelBuilder.Entity<SharedItemCost>(entity =>
+            {
+                entity.HasKey(c => new { c.ShopId, c.ItemId });
+                entity.HasIndex(c => c.ItemId);
+                entity.HasIndex(c => c.UpdatedAt);
+                entity.Property(c => c.AverageCost).HasColumnType("decimal(18,4)");
+                entity.Property(c => c.LastPurchasePrice).HasColumnType("decimal(18,4)");
             });
         }
         
