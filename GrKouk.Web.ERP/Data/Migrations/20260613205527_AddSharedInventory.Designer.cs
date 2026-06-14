@@ -4,6 +4,7 @@ using GrKouk.Web.ERP.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GrKouk.Web.ERP.Data.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260613205527_AddSharedInventory")]
+    partial class AddSharedInventory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2836,81 +2839,6 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.ToTable("SharedMeasureUnits");
                 });
 
-            modelBuilder.Entity("GrKouk.Erp.Domain.Shared.SharedStockTransfer", b =>
-                {
-                    b.Property<Guid>("TransferId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DestShopId")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime?>("MaterializedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Reference")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("SourceShopId")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<DateTime>("TransactionDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("TransferId");
-
-                    b.HasIndex("SourceShopId");
-
-                    b.HasIndex("DestShopId", "Status");
-
-                    b.ToTable("SharedStockTransfers");
-                });
-
-            modelBuilder.Entity("GrKouk.Erp.Domain.Shared.SharedStockTransferLine", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("BatchNumber")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<decimal>("CarriedUnitCost")
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<DateTime?>("ExpiryDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("ItemId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("Quantity")
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<Guid>("TransferId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TransferId");
-
-                    b.ToTable("SharedStockTransferLines");
-                });
-
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.SharedTombstoneAck", b =>
                 {
                     b.Property<Guid>("Id")
@@ -4971,17 +4899,6 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.Navigation("Transactor");
                 });
 
-            modelBuilder.Entity("GrKouk.Erp.Domain.Shared.SharedStockTransferLine", b =>
-                {
-                    b.HasOne("GrKouk.Erp.Domain.Shared.SharedStockTransfer", "Transfer")
-                        .WithMany("Lines")
-                        .HasForeignKey("TransferId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Transfer");
-                });
-
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.Transactor", b =>
                 {
                     b.HasOne("GrKouk.Erp.Domain.Shared.TransactorType", "TransactorType")
@@ -5289,11 +5206,6 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.Navigation("PaymentMappings");
 
                     b.Navigation("SellDocLines");
-                });
-
-            modelBuilder.Entity("GrKouk.Erp.Domain.Shared.SharedStockTransfer", b =>
-                {
-                    b.Navigation("Lines");
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.Transactor", b =>

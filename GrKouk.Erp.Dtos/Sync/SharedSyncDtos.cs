@@ -182,6 +182,67 @@ public class SharedItemCostDto
     public string ShopId { get; set; } = string.Empty;
 }
 
+/// <summary>
+/// Per-shop stock snapshot carrier. Uploaded during sync (push) and retrieved on
+/// demand (GET /api/sharedsync/stockacrossshops/{itemId}) so one shop can see how
+/// much stock a peer holds — a decision aid for inter-shop transfers.
+///
+/// Separate from <see cref="SharedItemCostDto"/>: that one is gated on a real
+/// purchase basis (cost-borrow feature); this carries raw on-hand stock for every
+/// item with inventory activity. UpdatedAt is the LWW key. Mirror any change to
+/// the cashier-side GrKoukOrg.Erp.Dtos copy.
+/// </summary>
+public class SharedInventoryDto
+{
+    public Guid ItemId { get; set; }
+    public decimal StockQuantity { get; set; }
+    public decimal AverageCost { get; set; }
+    public DateTime UpdatedAt { get; set; }
+    public string ShopId { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// A shop known to the shared registry (KnownShops row). Returned by
+/// GET /api/sharedsync/knownshops so a peer can enumerate the other shops and
+/// seed an inter-shop transactor per peer. DisplayName is the peer's CompanyCode
+/// (may be null for shops that registered before the name channel existed).
+/// </summary>
+public class KnownShopDto
+{
+    public string ShopId { get; set; } = string.Empty;
+    public string? DisplayName { get; set; }
+    public bool IsActive { get; set; }
+}
+
+/// <summary>
+/// Inter-shop stock transfer header (Feature A transport). Source pushes it after
+/// its OUT doc commits; dest pulls it (while Status == "Pushed") and materializes an
+/// IN doc, then acks via StockTransferAcks. Immutable once inserted. Mirror to the
+/// cashier-side GrKoukOrg.Erp.Dtos copy.
+/// </summary>
+public class SharedStockTransferDto
+{
+    public Guid TransferId { get; set; }
+    public string SourceShopId { get; set; } = string.Empty;
+    public string DestShopId { get; set; } = string.Empty;
+    public DateTime TransactionDate { get; set; }
+    public string? Reference { get; set; }
+    public string Status { get; set; } = string.Empty;
+    public DateTime? MaterializedAt { get; set; }
+    public List<SharedStockTransferLineDto> Lines { get; set; } = new();
+}
+
+/// <summary>A single item line of a <see cref="SharedStockTransferDto"/>.</summary>
+public class SharedStockTransferLineDto
+{
+    public Guid Id { get; set; }
+    public Guid ItemId { get; set; }
+    public decimal Quantity { get; set; }
+    public decimal CarriedUnitCost { get; set; }
+    public string? BatchNumber { get; set; }
+    public DateTime? ExpiryDate { get; set; }
+}
+
 // ─── Request / Response DTOs ────────────────────────────────────────
 
 public class TombstoneAckDto
@@ -193,6 +254,11 @@ public class TombstoneAckDto
 public class SharedSyncPushRequest
 {
     public string ShopId { get; set; } = string.Empty;
+    // Human-readable shop label (the pushing shop's CompanyCode from Settings).
+    // Stored on KnownShop.DisplayName so peers can show a readable name instead of
+    // the raw ShopId GUID (e.g. in the inter-shop transactor / "Άλλα καταστήματα").
+    // Optional — old cashier builds send none, server leaves DisplayName untouched.
+    public string? CompanyCode { get; set; }
     public List<SharedItemDto> Items { get; set; } = new();
     public List<SharedItemCategoryDto> Categories { get; set; } = new();
     public List<SharedVatClassDto> VatClasses { get; set; } = new();
@@ -217,6 +283,16 @@ public class SharedSyncPushRequest
     // push. Upserted by (ShopId, ItemId), LWW by UpdatedAt. Optional field; old
     // cashier builds send none, old servers ignore it (System.Text.Json).
     public List<SharedItemCostDto> ItemCosts { get; set; } = new();
+    // Cross-shop stock query — per-shop on-hand snapshot for items touched since the
+    // last push. Upserted by (ShopId, ItemId), LWW by UpdatedAt. Optional field;
+    // old cashier builds send none, old servers ignore it (System.Text.Json).
+    public List<SharedInventoryDto> Inventories { get; set; } = new();
+    // Feature A — inter-shop transfers this shop is publishing (source side). Inserted
+    // by TransferId, immutable (skipped if already present). Optional field.
+    public List<SharedStockTransferDto> StockTransfers { get; set; } = new();
+    // Feature A — TransferIds this shop (dest) has materialized; server flips their
+    // Status to "Materialized" and stamps MaterializedAt. Optional field.
+    public List<Guid> StockTransferAcks { get; set; } = new();
 }
 
 public class SharedSyncPushResponse
@@ -237,6 +313,9 @@ public class SharedSyncPushResponse
     public int TombstoneAcksRecorded { get; set; }
     public int TombstonesPurged { get; set; }
     public int ItemCostsUpserted { get; set; }
+    public int InventoriesUpserted { get; set; }
+    public int TransfersUpserted { get; set; }
+    public int TransferAcksApplied { get; set; }
     public List<string> Errors { get; set; } = new();
 }
 
@@ -254,5 +333,12 @@ public class SharedSyncPullResponse
     public List<SharedItemCodeDeletionDto> ItemCodeDeletions { get; set; } = new();
     public List<SharedItemPriceLevelMappingDeletionDto> ItemPriceLevelMappingDeletions { get; set; } = new();
     public List<SharedItemDeletionDto> ItemDeletions { get; set; } = new();
+    // Feature A — inter-shop transfers bound for the requesting shop (dest) that are
+    // not yet materialized. Returned regardless of the `since` watermark (the dest
+    // must keep receiving them until it acks). Empty for shops with no inbound.
+    public List<SharedStockTransferDto> StockTransfers { get; set; } = new();
+    // Feature A (step 6) — TransferIds this shop SOURCED that the dest materialized since
+    // `since`. Source clears its local Pushed rows so the watchdog stops flagging them.
+    public List<Guid> OutboundMaterializedTransferIds { get; set; } = new();
     public DateTime ServerTimestamp { get; set; }
 }

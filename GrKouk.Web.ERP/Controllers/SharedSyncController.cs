@@ -354,6 +354,45 @@ public class SharedSyncController : ControllerBase
             })
             .ToListAsync();
 
+        // Feature A — inbound transfers for this shop. NOT filtered by `since`: a dest
+        // must keep receiving a transfer on every pull until it materializes + acks it
+        // (Status flips to Materialized), so it can recover from a missed apply.
+        var stockTransfers = await _context.SharedStockTransfers
+            .Where(t => t.DestShopId == shopId && t.Status == StockTransferStatuses.Pushed)
+            .Select(t => new SharedStockTransferDto
+            {
+                TransferId = t.TransferId,
+                SourceShopId = t.SourceShopId,
+                DestShopId = t.DestShopId,
+                TransactionDate = t.TransactionDate,
+                Reference = t.Reference,
+                Status = t.Status,
+                MaterializedAt = t.MaterializedAt,
+                Lines = t.Lines.Select(l => new SharedStockTransferLineDto
+                {
+                    Id = l.Id,
+                    ItemId = l.ItemId,
+                    Quantity = l.Quantity,
+                    CarriedUnitCost = l.CarriedUnitCost,
+                    BatchNumber = l.BatchNumber,
+                    ExpiryDate = l.ExpiryDate
+                }).ToList()
+            })
+            .ToListAsync();
+
+        // Feature A (step 6) — positive materialization confirmations for transfers THIS
+        // shop SOURCED, so it can clear its local Pushed rows and stop the watchdog from
+        // flagging them. Bounded by `since` (only newly materialized) — a missed update
+        // just leaves the source's row Pushed (false-pending, the SAFE direction; never a
+        // false-clear, which absence-based inference would risk).
+        var outboundMaterializedTransferIds = await _context.SharedStockTransfers
+            .Where(t => t.SourceShopId == shopId
+                        && t.Status == StockTransferStatuses.Materialized
+                        && t.MaterializedAt != null
+                        && t.MaterializedAt > since)
+            .Select(t => t.TransferId)
+            .ToListAsync();
+
         _logger.LogInformation(
             "SharedSync Pull for shop {ShopId} since {Since}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {Depts} cashier depts, {ItemCodes} item codes ({IcDel} deletes), {ItemPrices} item prices ({IpDel} deletes), {Mappings} mappings, {MapDeletions} mapping deletions",
             shopId, since, items.Count, categories.Count, vatClasses.Count, measureUnits.Count, cashierDepartments.Count, itemCodes.Count, itemCodeDeletions.Count, itemPrices.Count, itemPriceLevelMappingDeletions.Count, itemErpMappings.Count, itemErpMappingDeletions.Count);
@@ -372,6 +411,8 @@ public class SharedSyncController : ControllerBase
             ItemCodeDeletions = itemCodeDeletions,
             ItemPriceLevelMappingDeletions = itemPriceLevelMappingDeletions,
             ItemDeletions = itemDeletions,
+            StockTransfers = stockTransfers,
+            OutboundMaterializedTransferIds = outboundMaterializedTransferIds,
             ServerTimestamp = serverTimestamp
         });
     }
@@ -406,6 +447,9 @@ public class SharedSyncController : ControllerBase
         int tombstoneAcksRecorded = 0;
         int tombstonesPurged = 0;
         int itemCostsUpserted = 0;
+        int inventoriesUpserted = 0;
+        int transfersUpserted = 0;
+        int transferAcksApplied = 0;
 
         try
         {
@@ -419,6 +463,7 @@ public class SharedSyncController : ControllerBase
                 _context.KnownShops.Add(new KnownShop
                 {
                     ShopId = request.ShopId,
+                    DisplayName = string.IsNullOrWhiteSpace(request.CompanyCode) ? null : request.CompanyCode,
                     FirstSeenAt = DateTime.UtcNow,
                     LastSeenAt = DateTime.UtcNow,
                     IsActive = true
@@ -427,6 +472,10 @@ public class SharedSyncController : ControllerBase
             else
             {
                 knownShop.LastSeenAt = DateTime.UtcNow;
+                // Refresh the display label from the caller's CompanyCode when supplied
+                // (keeps it current if the shop renamed; never blanks an existing name).
+                if (!string.IsNullOrWhiteSpace(request.CompanyCode))
+                    knownShop.DisplayName = request.CompanyCode;
             }
 
             // 1. Reference data first (items depend on these)
@@ -949,6 +998,83 @@ public class SharedSyncController : ControllerBase
                 }
             }
 
+            // 7c. Inter-shop stock snapshots. Per-shop on-hand quantity + AverageCost
+            // for items the calling shop has had inventory activity for. Keyed by
+            // (ShopId, ItemId); ShopId is always the caller's (never trust a foreign
+            // ShopId in the payload). LWW by UpdatedAt so a stale re-push can't clobber
+            // a fresher value. These rows feed the on-demand GET /stockacrossshops
+            // lookup for the OTHER shop's "Άλλα καταστήματα" panel.
+            foreach (var inv in request.Inventories)
+            {
+                var existing = await _context.SharedInventories
+                    .FindAsync(request.ShopId, inv.ItemId);
+                if (existing == null)
+                {
+                    _context.SharedInventories.Add(new SharedInventory
+                    {
+                        ShopId = request.ShopId,
+                        ItemId = inv.ItemId,
+                        StockQuantity = inv.StockQuantity,
+                        AverageCost = inv.AverageCost,
+                        UpdatedAt = inv.UpdatedAt
+                    });
+                    inventoriesUpserted++;
+                }
+                else if (inv.UpdatedAt > existing.UpdatedAt)
+                {
+                    existing.StockQuantity = inv.StockQuantity;
+                    existing.AverageCost = inv.AverageCost;
+                    existing.UpdatedAt = inv.UpdatedAt;
+                    inventoriesUpserted++;
+                }
+            }
+
+            // 7d. Inter-shop stock transfers (Feature A). The source shop publishes a
+            // transfer after its OUT doc commits. Transfers are FINAL — insert once by
+            // TransferId, never update (re-push is an idempotent no-op). SourceShopId is
+            // forced to the caller's ShopId (never trust a foreign source in the payload).
+            foreach (var t in request.StockTransfers)
+            {
+                if (t.TransferId == Guid.Empty) continue;
+                var exists = await _context.SharedStockTransfers.AnyAsync(x => x.TransferId == t.TransferId);
+                if (exists) continue;
+
+                _context.SharedStockTransfers.Add(new SharedStockTransfer
+                {
+                    TransferId = t.TransferId,
+                    SourceShopId = request.ShopId,
+                    DestShopId = t.DestShopId,
+                    TransactionDate = t.TransactionDate,
+                    Reference = t.Reference,
+                    Status = StockTransferStatuses.Pushed,
+                    CreatedAt = DateTime.UtcNow,
+                    Lines = t.Lines.Select(l => new SharedStockTransferLine
+                    {
+                        Id = l.Id == Guid.Empty ? Guid.NewGuid() : l.Id,
+                        TransferId = t.TransferId,
+                        ItemId = l.ItemId,
+                        Quantity = l.Quantity,
+                        CarriedUnitCost = l.CarriedUnitCost,
+                        BatchNumber = l.BatchNumber,
+                        ExpiryDate = l.ExpiryDate
+                    }).ToList()
+                });
+                transfersUpserted++;
+            }
+
+            // 7e. Materialization acks from the dest. Flip Status to Materialized once,
+            // stamp MaterializedAt. Idempotent — a transfer already Materialized is skipped.
+            foreach (var ackId in request.StockTransferAcks)
+            {
+                var transfer = await _context.SharedStockTransfers.FindAsync(ackId);
+                if (transfer != null && transfer.Status != StockTransferStatuses.Materialized)
+                {
+                    transfer.Status = StockTransferStatuses.Materialized;
+                    transfer.MaterializedAt = DateTime.UtcNow;
+                    transferAcksApplied++;
+                }
+            }
+
             await _context.SaveChangesAsync();
 
             // 8. Purge pass — delete tombstones every active KnownShop has acked.
@@ -972,8 +1098,8 @@ public class SharedSyncController : ControllerBase
             }
 
             _logger.LogInformation(
-                "SharedSync Push from shop {ShopId}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {Depts} cashier depts, {ItemCodes} item codes ({IcDel} deletes), {ItemPrices} item prices ({IpDel} deletes), {Mappings} mappings, {MapDeletions} mapping deletions, {ItemDels} item deletions, {Acks} acks, {Purged} purged, {ItemCosts} item costs",
-                request.ShopId, itemsUpserted, categoriesUpserted, vatClassesUpserted, measureUnitsUpserted, cashierDepartmentsUpserted, itemCodesUpserted, itemCodeDeletionsApplied, itemPricesUpserted, itemPriceLevelMappingDeletionsApplied, itemErpMappingsUpserted, itemErpMappingDeletionsApplied, itemDeletionsApplied, tombstoneAcksRecorded, tombstonesPurged, itemCostsUpserted);
+                "SharedSync Push from shop {ShopId}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {Depts} cashier depts, {ItemCodes} item codes ({IcDel} deletes), {ItemPrices} item prices ({IpDel} deletes), {Mappings} mappings, {MapDeletions} mapping deletions, {ItemDels} item deletions, {Acks} acks, {Purged} purged, {ItemCosts} item costs, {Inventories} inventories, {Transfers} transfers ({TransferAcks} acks)",
+                request.ShopId, itemsUpserted, categoriesUpserted, vatClassesUpserted, measureUnitsUpserted, cashierDepartmentsUpserted, itemCodesUpserted, itemCodeDeletionsApplied, itemPricesUpserted, itemPriceLevelMappingDeletionsApplied, itemErpMappingsUpserted, itemErpMappingDeletionsApplied, itemDeletionsApplied, tombstoneAcksRecorded, tombstonesPurged, itemCostsUpserted, inventoriesUpserted, transfersUpserted, transferAcksApplied);
         }
         catch (Exception ex)
         {
@@ -999,6 +1125,9 @@ public class SharedSyncController : ControllerBase
             TombstoneAcksRecorded = tombstoneAcksRecorded,
             TombstonesPurged = tombstonesPurged,
             ItemCostsUpserted = itemCostsUpserted,
+            InventoriesUpserted = inventoriesUpserted,
+            TransfersUpserted = transfersUpserted,
+            TransferAcksApplied = transferAcksApplied,
             Errors = errors
         });
     }
@@ -1034,6 +1163,64 @@ public class SharedSyncController : ControllerBase
             return NotFound();
 
         return Ok(cost);
+    }
+
+    /// <summary>
+    /// On-demand cross-shop stock query. Returns the on-hand snapshot every shop
+    /// OTHER than the requester has published for the given item (most-recent row
+    /// per shop), so the "Άλλα καταστήματα" panel can show how much stock peers
+    /// hold. requestingShopId is excluded so a shop never sees its own (locally
+    /// authoritative) stock echoed back. Returns an empty list when no peer has
+    /// published — never 404, since "no other shop has stock" is a valid answer.
+    /// </summary>
+    [HttpGet("stockacrossshops/{itemId}")]
+    [Authorize(Policy = "ApiPolicy2")]
+    public async Task<IActionResult> GetStockAcrossShops(Guid itemId, [FromQuery] string requestingShopId)
+    {
+        if (string.IsNullOrWhiteSpace(requestingShopId))
+            return BadRequest(new { error = "requestingShopId is required" });
+
+        var rows = await _context.SharedInventories
+            .Where(i => i.ItemId == itemId && i.ShopId != requestingShopId)
+            .OrderBy(i => i.ShopId)
+            .Select(i => new SharedInventoryDto
+            {
+                ItemId = i.ItemId,
+                StockQuantity = i.StockQuantity,
+                AverageCost = i.AverageCost,
+                UpdatedAt = i.UpdatedAt,
+                ShopId = i.ShopId
+            })
+            .ToListAsync();
+
+        return Ok(rows);
+    }
+
+    /// <summary>
+    /// Lists the shops known to the registry (KnownShops), excluding the requester,
+    /// so a shop can enumerate its peers and seed one inter-shop transactor per peer.
+    /// DisplayName carries the peer's CompanyCode (populated from the push heartbeat).
+    /// Only active shops are returned. requestingShopId is required and excluded.
+    /// </summary>
+    [HttpGet("knownshops")]
+    [Authorize(Policy = "ApiPolicy2")]
+    public async Task<IActionResult> GetKnownShops([FromQuery] string requestingShopId)
+    {
+        if (string.IsNullOrWhiteSpace(requestingShopId))
+            return BadRequest(new { error = "requestingShopId is required" });
+
+        var shops = await _context.KnownShops
+            .Where(s => s.IsActive && s.ShopId != requestingShopId)
+            .OrderBy(s => s.ShopId)
+            .Select(s => new KnownShopDto
+            {
+                ShopId = s.ShopId,
+                DisplayName = s.DisplayName,
+                IsActive = s.IsActive
+            })
+            .ToListAsync();
+
+        return Ok(shops);
     }
 
     /// <summary>

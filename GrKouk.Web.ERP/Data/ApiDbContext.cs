@@ -114,7 +114,10 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<SharedItemDeleteReadiness> SharedItemDeleteReadinesses { get; set; }
         public DbSet<SharedItemDeletion> SharedItemDeletions { get; set; }
         public DbSet<SharedItemCost> SharedItemCosts { get; set; }
-        
+        public DbSet<SharedInventory> SharedInventories { get; set; }
+        public DbSet<SharedStockTransfer> SharedStockTransfers { get; set; }
+        public DbSet<SharedStockTransferLine> SharedStockTransferLines { get; set; }
+
        // public DbSet<SyncItem> SyncItems { get; set; }
         
 
@@ -994,6 +997,35 @@ namespace GrKouk.Web.ERP.Data
                 entity.HasIndex(c => c.UpdatedAt);
                 entity.Property(c => c.AverageCost).HasColumnType("decimal(18,4)");
                 entity.Property(c => c.LastPurchasePrice).HasColumnType("decimal(18,4)");
+            });
+
+            modelBuilder.Entity<SharedInventory>(entity =>
+            {
+                entity.HasKey(i => new { i.ShopId, i.ItemId });
+                entity.HasIndex(i => i.ItemId);
+                entity.HasIndex(i => i.UpdatedAt);
+                entity.Property(i => i.StockQuantity).HasColumnType("decimal(18,4)");
+                entity.Property(i => i.AverageCost).HasColumnType("decimal(18,4)");
+            });
+
+            modelBuilder.Entity<SharedStockTransfer>(entity =>
+            {
+                entity.HasKey(t => t.TransferId);
+                // Dest pull filters on (DestShopId, Status); source watchdog reads SourceShopId.
+                entity.HasIndex(t => new { t.DestShopId, t.Status });
+                entity.HasIndex(t => t.SourceShopId);
+                entity.HasMany(t => t.Lines)
+                    .WithOne(l => l.Transfer!)
+                    .HasForeignKey(l => l.TransferId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<SharedStockTransferLine>(entity =>
+            {
+                entity.HasKey(l => l.Id);
+                entity.HasIndex(l => l.TransferId);
+                entity.Property(l => l.Quantity).HasColumnType("decimal(18,4)");
+                entity.Property(l => l.CarriedUnitCost).HasColumnType("decimal(18,4)");
             });
         }
         
