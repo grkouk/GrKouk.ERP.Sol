@@ -65,6 +65,14 @@ public class SharedStockTransferLine
     /// <summary>Shared Item GUID (cross-shop key), resolved to a local item at the dest.</summary>
     public Guid ItemId { get; set; }
 
+    /// <summary>
+    /// Source item Code snapshot, carried for human-readable diagnostics (e.g. when the
+    /// dest can't resolve <see cref="ItemId"/> because the item isn't synced there yet).
+    /// Display-only — materialization still keys on <see cref="ItemId"/>.
+    /// </summary>
+    [MaxLength(50)]
+    public string? ItemCode { get; set; }
+
     public decimal Quantity { get; set; }
 
     /// <summary>Source's average-cost snapshot carried to the dest as the IN unit cost.</summary>

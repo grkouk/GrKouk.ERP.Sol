@@ -372,6 +372,7 @@ public class SharedSyncController : ControllerBase
                 {
                     Id = l.Id,
                     ItemId = l.ItemId,
+                    ItemCode = l.ItemCode,
                     Quantity = l.Quantity,
                     CarriedUnitCost = l.CarriedUnitCost,
                     BatchNumber = l.BatchNumber,
@@ -1053,6 +1054,7 @@ public class SharedSyncController : ControllerBase
                         Id = l.Id == Guid.Empty ? Guid.NewGuid() : l.Id,
                         TransferId = t.TransferId,
                         ItemId = l.ItemId,
+                        ItemCode = l.ItemCode,
                         Quantity = l.Quantity,
                         CarriedUnitCost = l.CarriedUnitCost,
                         BatchNumber = l.BatchNumber,

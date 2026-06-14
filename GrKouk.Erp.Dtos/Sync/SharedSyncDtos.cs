@@ -237,6 +237,8 @@ public class SharedStockTransferLineDto
 {
     public Guid Id { get; set; }
     public Guid ItemId { get; set; }
+    /// <summary>Source item Code, carried for human-readable diagnostics at the dest.</summary>
+    public string? ItemCode { get; set; }
     public decimal Quantity { get; set; }
     public decimal CarriedUnitCost { get; set; }
     public string? BatchNumber { get; set; }
