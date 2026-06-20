@@ -1182,6 +1182,8 @@ public class SharedSyncController : ControllerBase
         if (string.IsNullOrWhiteSpace(requestingShopId))
             return BadRequest(new { error = "requestingShopId is required" });
 
+        // Left-join KnownShops so each row carries a human-readable label (the peer's
+        // CompanyCode); fall back to the raw ShopId when the registry has no name.
         var rows = await _context.SharedInventories
             .Where(i => i.ItemId == itemId && i.ShopId != requestingShopId)
             .OrderBy(i => i.ShopId)
@@ -1191,7 +1193,11 @@ public class SharedSyncController : ControllerBase
                 StockQuantity = i.StockQuantity,
                 AverageCost = i.AverageCost,
                 UpdatedAt = i.UpdatedAt,
-                ShopId = i.ShopId
+                ShopId = i.ShopId,
+                ShopName = _context.KnownShops
+                    .Where(s => s.ShopId == i.ShopId)
+                    .Select(s => s.DisplayName)
+                    .FirstOrDefault() ?? i.ShopId
             })
             .ToListAsync();
 

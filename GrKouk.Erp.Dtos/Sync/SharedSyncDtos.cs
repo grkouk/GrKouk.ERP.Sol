@@ -199,6 +199,13 @@ public class SharedInventoryDto
     public decimal AverageCost { get; set; }
     public DateTime UpdatedAt { get; set; }
     public string ShopId { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Human-readable label for the publishing shop, resolved from the KnownShops
+    /// registry (its CompanyCode), falling back to the raw ShopId GUID when the
+    /// registry has no name. Mirror to the cashier-side GrKoukOrg.Erp.Dtos copy.
+    /// </summary>
+    public string ShopName { get; set; } = string.Empty;
 }
 
 /// <summary>
