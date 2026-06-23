@@ -1182,8 +1182,10 @@ public class SharedSyncController : ControllerBase
         if (string.IsNullOrWhiteSpace(requestingShopId))
             return BadRequest(new { error = "requestingShopId is required" });
 
-        // Left-join KnownShops so each row carries a human-readable label (the peer's
-        // CompanyCode); fall back to the raw ShopId when the registry has no name.
+        // Fetch the raw inventory rows first — a plain, always-translatable query.
+        // (Do NOT correlate a KnownShops subquery inside this projection: that form
+        // throws at runtime on some EF Core versions and hard-fails the whole request
+        // with a 500 if the KnownShops table is absent/incompatible on this DB.)
         var rows = await _context.SharedInventories
             .Where(i => i.ItemId == itemId && i.ShopId != requestingShopId)
             .OrderBy(i => i.ShopId)
@@ -1194,12 +1196,29 @@ public class SharedSyncController : ControllerBase
                 AverageCost = i.AverageCost,
                 UpdatedAt = i.UpdatedAt,
                 ShopId = i.ShopId,
-                ShopName = _context.KnownShops
-                    .Where(s => s.ShopId == i.ShopId)
-                    .Select(s => s.DisplayName)
-                    .FirstOrDefault() ?? i.ShopId
+                ShopName = i.ShopId   // default label; upgraded below when available
             })
             .ToListAsync();
+
+        // Resolve human-readable shop names in a separate, failure-isolated pass so a
+        // missing/empty KnownShops registry degrades to raw ShopIds instead of a 500.
+        try
+        {
+            var shopIds = rows.Select(r => r.ShopId).Distinct().ToList();
+            var names = await _context.KnownShops
+                .Where(s => shopIds.Contains(s.ShopId) && s.DisplayName != null)
+                .Select(s => new { s.ShopId, s.DisplayName })
+                .ToListAsync();
+            var nameMap = names.ToDictionary(n => n.ShopId, n => n.DisplayName!);
+            foreach (var r in rows)
+                if (nameMap.TryGetValue(r.ShopId, out var dn) && !string.IsNullOrWhiteSpace(dn))
+                    r.ShopName = dn;
+        }
+        catch (Exception ex)
+        {
+            // Names are cosmetic; never let the registry lookup break the stock query.
+            _logger.LogWarning(ex, "GetStockAcrossShops: KnownShops name resolution failed; returning raw ShopIds.");
+        }
 
         return Ok(rows);
     }
