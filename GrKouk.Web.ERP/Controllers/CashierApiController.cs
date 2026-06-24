@@ -494,9 +494,27 @@ public class CashierApiController : ControllerBase
                 t.TransFpaAmount,
                 t.TransDiscountAmount,
                 t.CompanyId,
-                t.SectionId
+                t.SectionId,
+                t.CreatorId
             })
             .ToListAsync(ct);
+
+        // Resolve the payment method per row via the originating buy document. The document's
+        // supplier transaction (and its auto-payoff transaction) carry CreatorId = BuyDocument.Id;
+        // manual supplier payments leave CreatorId = 0, so they simply won't match.
+        var creatorIds = inPeriodRaw
+            .Where(t => t.CreatorId > 0)
+            .Select(t => t.CreatorId)
+            .Distinct()
+            .ToList();
+        var paymentMethodByBuyDocId = creatorIds.Count == 0
+            ? new Dictionary<int, string>()
+            : await _context.BuyDocuments
+                .Where(b => creatorIds.Contains(b.Id)
+                            && b.TransactorId == transactorId
+                            && companyIds.Contains(b.CompanyId))
+                .Select(b => new { b.Id, PaymentMethodName = b.PaymentMethod.Name })
+                .ToDictionaryAsync(b => b.Id, b => b.PaymentMethodName, ct);
 
         var rows = new List<SupplierLedgerRowDto>(inPeriodRaw.Count);
         foreach (var r in inPeriodRaw)
@@ -526,6 +544,7 @@ public class CashierApiController : ControllerBase
                 Credit = credit,
                 CompanyCode = co?.Code ?? string.Empty,
                 CompanyName = co?.Name ?? string.Empty,
+                PaymentMethodName = paymentMethodByBuyDocId.GetValueOrDefault(r.CreatorId, string.Empty),
                 IsPayment = paymentSectionId.HasValue && r.SectionId == paymentSectionId.Value
             });
         }
