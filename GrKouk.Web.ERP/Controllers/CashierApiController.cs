@@ -680,7 +680,12 @@ public class CashierApiController : ControllerBase
                 DueDate = b.TransDate.Date.AddDays(b.DaysOverdue ?? 0),
                 HasTerm = b.DaysOverdue.HasValue
             })
-            .OrderBy(b => b.TransDate)
+            // FIFO-apply payments by DUE date (earliest-due settled first), not by document
+            // date. Otherwise an older invoice that is not yet due (long credit term) gets
+            // consumed by the pool ahead of an already-due invoice and disappears from the
+            // open items entirely — so it shows in neither Current nor Future.
+            .OrderBy(b => b.DueDate)
+            .ThenBy(b => b.TransDate)
             .ThenBy(b => b.Id)
             .ToList();
 
