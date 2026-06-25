@@ -102,65 +102,10 @@ public class CashierApiController : ControllerBase
             query = query.Where(t => t.TransDate <= to);
         }
 
-        if (!string.IsNullOrWhiteSpace(searchText))
+        var searchPredicate = BuildPaymentSearchPredicate(searchText);
+        if (searchPredicate != null)
         {
-            var search = searchText.Trim().ToLower();
-            var terms = search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-            var parameter = Expression.Parameter(typeof(TransactorTransaction), "i");
-            var toLowerMethod = typeof(string).GetMethod("ToLower", Type.EmptyTypes)!;
-            var containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) })!;
-
-            // Two-hop property access for navigation properties
-            var transactorProp = Expression.Property(parameter, nameof(TransactorTransaction.Transactor));
-            var nameProp = Expression.Property(transactorProp, nameof(Transactor.Name));
-            var nameLower = Expression.Call(nameProp, toLowerMethod);
-
-            // 1. Transactor.Name matches ALL terms (with keyboard transliteration per term)
-            Expression nameExpr = null;
-            foreach (var term in terms)
-            {
-                var transliterated = KeyboardTransliterator.Transliterate(term);
-                var contains = Expression.Call(nameLower, containsMethod, Expression.Constant(term));
-
-                Expression termExpr = contains;
-                if (transliterated != term)
-                {
-                    var transContains = Expression.Call(nameLower, containsMethod, Expression.Constant(transliterated));
-                    termExpr = Expression.OrElse(contains, transContains);
-                }
-
-                nameExpr = nameExpr == null ? termExpr : Expression.AndAlso(nameExpr, termExpr);
-            }
-
-            // 2. Other fields match FULL search string
-            var searchConst = Expression.Constant(search);
-
-            Expression AddNullableContains(Expression target, string propName)
-            {
-                var prop = Expression.Property(target, propName);
-                var notNull = Expression.NotEqual(prop, Expression.Constant(null));
-                var lower = Expression.Call(prop, toLowerMethod);
-                var contains = Expression.Call(lower, containsMethod, searchConst);
-                return Expression.AndAlso(notNull, contains);
-            }
-
-            // Document series name (two-hop)
-            var seriesProp = Expression.Property(parameter, nameof(TransactorTransaction.TransTransactorDocSeries));
-            var seriesNameProp = Expression.Property(seriesProp, nameof(TransTransactorDocSeriesDef.Name));
-            var seriesNameLower = Expression.Call(seriesNameProp, toLowerMethod);
-            Expression otherExpr = Expression.Call(seriesNameLower, containsMethod, searchConst);
-
-            // Transactor.TaxNumber (nullable)
-            otherExpr = Expression.OrElse(otherExpr, AddNullableContains(transactorProp, nameof(Transactor.TaxNumber)));
-
-            // TransactorTransaction.TransRefCode (nullable)
-            otherExpr = Expression.OrElse(otherExpr, AddNullableContains(parameter, nameof(TransactorTransaction.TransRefCode)));
-
-            var finalExpr = nameExpr != null ? Expression.OrElse(nameExpr, otherExpr) : otherExpr;
-            var lambda = Expression.Lambda<Func<TransactorTransaction, bool>>(finalExpr, parameter);
-
-            query = query.Where(lambda);
+            query = query.Where(searchPredicate);
         }
 
         var items = await query
@@ -185,6 +130,192 @@ public class CashierApiController : ControllerBase
             .ToListAsync();
 
         return Ok(items);
+    }
+
+    /// <summary>
+    /// Like <see cref="GetErpSupplierPayments"/> but pools supplier payments across several
+    /// branches (companies are branches of one business; a supplier is a single shared account).
+    /// Accepts a comma-separated <paramref name="companyCodes"/> and tags each row with its branch.
+    /// Kept as a separate endpoint so the single-company route stays backward compatible.
+    /// </summary>
+    [HttpGet("GetErpSupplierPaymentsMulti")]
+    [Authorize(Policy = "ApiPolicy2")]
+    public async Task<ActionResult> GetErpSupplierPaymentsMulti(string companyCodes, string searchText, DateTime? dateFrom, DateTime? dateTo)
+    {
+        if (string.IsNullOrEmpty(companyCodes))
+        {
+            return BadRequest(new { error = "Company code is required" });
+        }
+
+        // Companies are branches of one business; the supplier sees a single account.
+        // Pool all selected branches and tag each row with its branch for the Company column.
+        var codes = companyCodes.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(c => c.Trim())
+            .Where(c => c.Length > 0)
+            .Distinct()
+            .ToList();
+        if (codes.Count == 0)
+        {
+            return BadRequest(new { error = "Company code is required" });
+        }
+
+        var companies = await _context.Companies
+            .Where(c => codes.Contains(c.Code))
+            .Select(c => new { c.Id, c.Code, c.Name })
+            .ToListAsync();
+        var missing = codes.Where(c => companies.All(co => co.Code != c)).ToList();
+        if (missing.Count > 0)
+        {
+            return BadRequest(new { error = $"Company with code '{string.Join(", ", missing)}' not found" });
+        }
+
+        var section = await _context.Sections.SingleOrDefaultAsync(p => p.Code == PaymentSectionCode);
+        if (section == null)
+        {
+            return BadRequest(new { error = $"Payment section with code '{PaymentSectionCode}' not found" });
+        }
+
+        var companyIds = companies.Select(c => c.Id).ToList();
+        var companyById = companies.ToDictionary(c => c.Id, c => c);
+        var sectionId = section.Id;
+
+        var query = _context.TransactorTransactions
+            .Where(t => companyIds.Contains(t.CompanyId) && t.SectionId == sectionId);
+
+        if (dateFrom.HasValue)
+        {
+            var from = dateFrom.Value.Date;
+            query = query.Where(t => t.TransDate >= from);
+        }
+        if (dateTo.HasValue)
+        {
+            var to = dateTo.Value.Date;
+            query = query.Where(t => t.TransDate <= to);
+        }
+
+        var searchPredicate = BuildPaymentSearchPredicate(searchText);
+        if (searchPredicate != null)
+        {
+            query = query.Where(searchPredicate);
+        }
+
+        // Project the company id alongside the row, then resolve code/name in memory from the
+        // dictionary above (mirrors GetErpSupplierLedger — avoids depending on a Company nav).
+        var raw = await query
+            .OrderBy(p => p.TransDate)
+            .Select(p => new
+            {
+                p.Id,
+                p.TransDate,
+                p.TransactorId,
+                TransactorName = p.Transactor.Name,
+                TransactorCode = p.Transactor.Code,
+                DocSeriesName = p.TransTransactorDocSeries.Name,
+                DocTypeName = p.TransTransactorDocType.Name,
+                p.TransRefCode,
+                p.AmountNet,
+                p.AmountFpa,
+                p.AmountDiscount,
+                p.Etiology,
+                p.Timestamp,
+                p.CompanyId
+            })
+            .ToListAsync();
+
+        var items = raw.Select(p =>
+        {
+            companyById.TryGetValue(p.CompanyId, out var co);
+            return new SupplierPaymentListItemDto
+            {
+                Id = p.Id,
+                TransDate = p.TransDate,
+                TransactorId = p.TransactorId,
+                TransactorName = p.TransactorName,
+                TransactorCode = p.TransactorCode,
+                DocSeriesName = p.DocSeriesName,
+                DocTypeName = p.DocTypeName,
+                TransRefCode = p.TransRefCode,
+                AmountNet = p.AmountNet,
+                AmountFpa = p.AmountFpa,
+                AmountDiscount = p.AmountDiscount,
+                AmountSum = p.AmountNet + p.AmountFpa - p.AmountDiscount,
+                Etiology = p.Etiology,
+                Timestamp = p.Timestamp,
+                CompanyCode = co?.Code ?? string.Empty,
+                CompanyName = co?.Name ?? string.Empty
+            };
+        }).ToList();
+
+        return Ok(items);
+    }
+
+    /// <summary>
+    /// Builds the word-based supplier-payment search predicate (supplier name with keyboard
+    /// transliteration, plus series name / tax number / ref code on the full string). Returns
+    /// null when there is nothing to search. Shared by the single- and multi-company endpoints.
+    /// </summary>
+    private static Expression<Func<TransactorTransaction, bool>>? BuildPaymentSearchPredicate(string searchText)
+    {
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            return null;
+        }
+
+        var search = searchText.Trim().ToLower();
+        var terms = search.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+        var parameter = Expression.Parameter(typeof(TransactorTransaction), "i");
+        var toLowerMethod = typeof(string).GetMethod("ToLower", Type.EmptyTypes)!;
+        var containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) })!;
+
+        // Two-hop property access for navigation properties
+        var transactorProp = Expression.Property(parameter, nameof(TransactorTransaction.Transactor));
+        var nameProp = Expression.Property(transactorProp, nameof(Transactor.Name));
+        var nameLower = Expression.Call(nameProp, toLowerMethod);
+
+        // 1. Transactor.Name matches ALL terms (with keyboard transliteration per term)
+        Expression nameExpr = null;
+        foreach (var term in terms)
+        {
+            var transliterated = KeyboardTransliterator.Transliterate(term);
+            var contains = Expression.Call(nameLower, containsMethod, Expression.Constant(term));
+
+            Expression termExpr = contains;
+            if (transliterated != term)
+            {
+                var transContains = Expression.Call(nameLower, containsMethod, Expression.Constant(transliterated));
+                termExpr = Expression.OrElse(contains, transContains);
+            }
+
+            nameExpr = nameExpr == null ? termExpr : Expression.AndAlso(nameExpr, termExpr);
+        }
+
+        // 2. Other fields match FULL search string
+        var searchConst = Expression.Constant(search);
+
+        Expression AddNullableContains(Expression target, string propName)
+        {
+            var prop = Expression.Property(target, propName);
+            var notNull = Expression.NotEqual(prop, Expression.Constant(null));
+            var lower = Expression.Call(prop, toLowerMethod);
+            var contains = Expression.Call(lower, containsMethod, searchConst);
+            return Expression.AndAlso(notNull, contains);
+        }
+
+        // Document series name (two-hop)
+        var seriesProp = Expression.Property(parameter, nameof(TransactorTransaction.TransTransactorDocSeries));
+        var seriesNameProp = Expression.Property(seriesProp, nameof(TransTransactorDocSeriesDef.Name));
+        var seriesNameLower = Expression.Call(seriesNameProp, toLowerMethod);
+        Expression otherExpr = Expression.Call(seriesNameLower, containsMethod, searchConst);
+
+        // Transactor.TaxNumber (nullable)
+        otherExpr = Expression.OrElse(otherExpr, AddNullableContains(transactorProp, nameof(Transactor.TaxNumber)));
+
+        // TransactorTransaction.TransRefCode (nullable)
+        otherExpr = Expression.OrElse(otherExpr, AddNullableContains(parameter, nameof(TransactorTransaction.TransRefCode)));
+
+        var finalExpr = nameExpr != null ? Expression.OrElse(nameExpr, otherExpr) : otherExpr;
+        return Expression.Lambda<Func<TransactorTransaction, bool>>(finalExpr, parameter);
     }
 
     /// <summary>

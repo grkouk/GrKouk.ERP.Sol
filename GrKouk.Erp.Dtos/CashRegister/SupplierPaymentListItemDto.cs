@@ -18,5 +18,7 @@ namespace GrKouk.Erp.Dtos.CashRegister
         public decimal AmountSum { get; set; }
         public string Etiology { get; set; }
         public byte[] Timestamp { get; set; }
+        public string CompanyCode { get; set; }
+        public string CompanyName { get; set; }
     }
 }
