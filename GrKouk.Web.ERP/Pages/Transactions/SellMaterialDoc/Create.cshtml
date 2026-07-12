@@ -57,6 +57,7 @@
             <input type="hidden" asp-for="@Model.CopyFromId" id="CopyFromId" />
             <input type="hidden" asp-for="@Model.InitialLoad" id="IsInitialLoad" />
             <input type="hidden" id="MaterialId" />
+            <input type="hidden" id="MaterialNature" />
             <input type="hidden" id="MaterialLastPrice" />
             <input type="hidden" id="MaterialNettoPrice" />
             <input type="hidden" id="MaterialBruttoPrice" />
@@ -406,6 +407,9 @@
             var priceOnTransUnitEl = document.getElementById("PriceOnTransUnit").ej2_instances[0];
             //#endregion
 
+            // Series-driven picker constraints (populated by seriesChanged from the selected sell doc type def)
+            var currentAllowedTransactorTypeIds = [];
+            var currentSelectedItemNatures = [];
 
             selectorsLib.initializeSelector();
            // $.fn.selectpicker.Constructor.BootstrapVersion = '4';
@@ -436,11 +440,19 @@
                     //var modal = $(this);
                     switch (selectorType) {
                     case "ProductsSelector":
-                        selectorsLib.showProductSelector(handleProductSelection);
+                        if (currentSelectedItemNatures && currentSelectedItemNatures.length > 0) {
+                            selectorsLib.showProductSelectorForNatures(currentSelectedItemNatures, handleProductSelection);
+                        } else {
+                            selectorsLib.showProductSelector(handleProductSelection);
+                        }
 
                         break;
                     case "CustomerSelector":
-                        selectorsLib.showCustomerSelector();
+                        if (currentAllowedTransactorTypeIds && currentAllowedTransactorTypeIds.length > 0) {
+                            selectorsLib.showTransactorSelectorForTypes(currentAllowedTransactorTypeIds);
+                        } else {
+                            selectorsLib.showCustomerSelector();
+                        }
 
                         break;
                     default:
@@ -753,6 +765,49 @@
                             console.log("Returned usedPrice=" + usedPrice);
                             $seriesUsedPrice.val(usedPrice);
 
+                            // Rebuild the transactor dropdown from the series' allowed transactor types
+                            if (myJson.transactors) {
+                                var $tr = $('#ItemVm_TransactorId');
+                                var prev = $tr.val();
+                                $tr.empty();
+                                $.each(myJson.transactors, function(i, t) {
+                                    $tr.append($('<option></option>').attr('value', t.id).text(t.name));
+                                });
+                                if (prev && $tr.find('option[value="' + prev + '"]').length > 0) {
+                                    $tr.val(prev);
+                                }
+                            }
+
+                            // Cache the series constraints for the modal selectors
+                            currentAllowedTransactorTypeIds = myJson.allowedTransactorTypeIds || [];
+                            currentSelectedItemNatures =
+                                (myJson.selectedWarehouseItemNatures && myJson.selectedWarehouseItemNatures.length > 0)
+                                    ? myJson.selectedWarehouseItemNatures.split(',')
+                                        .map(function(s) { return parseInt(s.trim(), 10); })
+                                        .filter(function(n) { return !isNaN(n); })
+                                    : [];
+
+                            // Re-validate already-added lines against the new series' allowed item natures.
+                            // Rows carry their nature in data-nature (stamped in addToList). Rows without it
+                            // (e.g. a copied document) cannot be judged and are left untouched.
+                            if (currentSelectedItemNatures.length > 0) {
+                                var removedLines = 0;
+                                $('#detailsTable tbody tr').each(function() {
+                                    var rowNatureRaw = $(this).attr('data-nature');
+                                    if (rowNatureRaw === undefined || rowNatureRaw === "") {
+                                        return;
+                                    }
+                                    var rowNature = parseInt(rowNatureRaw, 10);
+                                    if (!isNaN(rowNature) && currentSelectedItemNatures.indexOf(rowNature) === -1) {
+                                        $(this).remove();
+                                        removedLines++;
+                                    }
+                                });
+                                if (removedLines > 0) {
+                                    updateCounter();
+                                    toastr.warning(removedLines + ' γραμμή/ές αφαιρέθηκαν: το είδος τους δεν επιτρέπεται στη νέα σειρά', 'Προσοχή');
+                                }
+                            }
                         }
                         // $spinner.attr('hidden', true);
                     })
@@ -1018,6 +1073,7 @@
                 productLib.getProductItemInfo(itemId, $transactorId.val(), $companyId.val())
                     .then((data) => {
                         $materialId.val(itemId);
+                        $('#MaterialNature').val(data.warehouseItemNature);
                         var rate = data.fpaRate;
                         var lastPrice = data.lastPrice;
                         var fpaId = data.fpaId;
@@ -1060,7 +1116,12 @@
 
             };
             var autoCompleteNameDef = {
-                source: '/api/materials/SearchWarehouseItemsForSale',
+                source: function(request, response) {
+                    $.getJSON('/api/materials/SearchWarehouseItemsForSale', {
+                        term: request.term,
+                        seriesId: $transDocSeriesId.val() || 0
+                    }, response);
+                },
                 minLength: 2,
                 maxShowItems:10,
                 select: function(event, ui) {
@@ -1153,6 +1214,7 @@
                 var quantity2 = parseFloat(quantity2Str);
                 var discount = discountPercentEl.value;
                 var materialId = $materialId.val();
+                var itemNature = $('#MaterialNature').val();
                 var vatPercent = vatPercentEl.value;
                 var factor = $factor.val();
                 var mainUnitId = $mainUnitId.val();
@@ -1184,7 +1246,7 @@
                     var detailsTableBody = $("#detailsTable tbody");
 
                     //#region Add Table Line
-                    let prItem = '<tr><td class="small">';
+                    let prItem = `<tr data-nature="${itemNature}"><td class="small">`;
                     prItem += `${materialCounter}`;
                     prItem += '</td><td class="small " ';
                     prItem += `data-materialId=" ${materialId}" `;
@@ -1223,6 +1285,7 @@
                     var $tbl = $('#detailsTable');
                     var $rows = $('tr', $tbl);
                     var $row = $rows.eq(lineEdit);
+                    $row.attr('data-nature', itemNature);
 
                     var $colMaterial = $('td:eq(1)', $row);
                     var $colTransQ = $('td:eq(2)', $row);
@@ -1321,6 +1384,7 @@
                 var $self = $(this);
                 if ($(this).attr('data-itemId') == "0") {
                     var $row = $(this).parents('tr');
+                    $('#MaterialNature').val($row.attr('data-nature'));
 
                     var $colLine = $('td:eq(0)', $row);
                     var $colMaterial = $('td:eq(1)', $row);

@@ -662,12 +662,43 @@ var selectorsLib = (function () {
         seekItems = seekProducts;
         itemSelected = productSelectionCallback;
     };
+    // Opt-in, series-driven variants. Seed the type/nature filter from the caller instead of the
+    // hard-coded customer(=2)/all-natures behaviour. Existing show* functions are left untouched so
+    // other pages that consume this shared lib keep their current behaviour.
+    const showTransactorSelectorForTypes = (typeIds) => {
+        selectorDef = customerSelectorDef;
+        indPgLib.setIndexPageDefinition(selectorDef);
+        let $modal = $('#itemSelector');
+        $modal.find('.modal-title').text("Transactor selector");
+        $('#TransactorSelectorTypesDiv').show();
+        $('#MaterialNatureTypesDiv').hide();
+        $searchTextElement.val("");
+        clearTable();
+        transactorTypesSelected = (typeIds && typeIds.length > 0) ? JSON.stringify(typeIds) : "";
+        seekItems = seekCustomers;
+        itemSelected = transactorSelected;
+    };
+    const showProductSelectorForNatures = (natures, productSelectionCallback) => {
+        selectorDef = materialSelectorDef;
+        indPgLib.setIndexPageDefinition(selectorDef);
+        let $modal = $('#itemSelector');
+        $modal.find('.modal-title').text("Product selector");
+        $('#TransactorSelectorTypesDiv').hide();
+        $('#MaterialNatureTypesDiv').show();
+        $searchTextElement.val("");
+        clearTable();
+        productNaturesSelected = (natures && natures.length > 0) ? JSON.stringify(natures) : "";
+        seekItems = seekProducts;
+        itemSelected = productSelectionCallback;
+    };
     return {
         initializeSelector:initializeSelector,
         showTransactorSelector: showTransactorSelector,
         showSupplierSelector:showSupplierSelector,
         showCustomerSelector:showCustomerSelector,
         showProductSelector: showProductSelector,
+        showTransactorSelectorForTypes: showTransactorSelectorForTypes,
+        showProductSelectorForNatures: showProductSelectorForNatures,
         updateFilterControls: updateFilterControls
     };
 })();

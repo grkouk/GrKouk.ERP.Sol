@@ -16,6 +16,7 @@ namespace GrKouk.Web.ERP.Helpers
         public int SecondaryUnitId { get; set; }
         public string SecondaryUnitCode { get; set; }
         public double SecondaryFactor { get; set; }
+        public int WarehouseItemNature { get; set; }
         public IList<ProductUnit> ProductUnits { get; set; }
 
     }

@@ -493,7 +493,7 @@ namespace GrKouk.Web.ERP.Controllers
         }
 
         [HttpGet("SearchWarehouseItemsForSale")]
-        public async Task<IActionResult> GetWarehouseItemsForSale(string term)
+        public async Task<IActionResult> GetWarehouseItemsForSale(string term, int seriesId = 0)
         {
             var sessionCompanyId = HttpContext.Session.GetString("CompanyId");
             var sessionSeriesId = HttpContext.Session.GetString("BuySeriesId");
@@ -511,12 +511,18 @@ namespace GrKouk.Web.ERP.Controllers
                 }
             }
 
-            if (sessionSeriesId != null)
+            // Prefer the explicit seriesId query param (series-driven pickers); fall back to session for legacy callers.
+            int effectiveSeriesId = seriesId;
+            if (effectiveSeriesId <= 0 && sessionSeriesId != null)
             {
-                bool isInt = int.TryParse(sessionSeriesId, out int seriesId);
+                int.TryParse(sessionSeriesId, out effectiveSeriesId);
+            }
+
+            if (effectiveSeriesId > 0)
+            {
                 var series = await _context.SellDocSeriesDefs
                     .Include(p => p.SellDocTypeDef)
-                    .SingleOrDefaultAsync(p => p.Id == seriesId);
+                    .SingleOrDefaultAsync(p => p.Id == effectiveSeriesId);
                 if (series != null)
                 {
                     var docType = series.SellDocTypeDef;
@@ -755,6 +761,7 @@ namespace GrKouk.Web.ERP.Controllers
                 SecondaryUnitId = materialData.SecondaryMeasureUnitId,
                 SecondaryUnitCode = materialData.SecondaryMeasureUnit.Code,
                 SecondaryFactor = materialData.SecondaryUnitToMainRate,
+                WarehouseItemNature = (int)materialData.WarehouseItemNature,
                 ProductUnits = unitList
             };
             return Ok(response);
@@ -846,8 +853,39 @@ namespace GrKouk.Web.ERP.Controllers
             var salesTypeDef = salesSeriesDef.SellDocTypeDef;
             var usedPrice = salesTypeDef.UsedPrice;
 
+            // Allowed transactor types are stored as a comma-separated list of TransactorType Ids on the doc type def.
+            // When empty we keep the legacy default (customers + departments) so ordinary sell types are unaffected.
+            var allowedTransactorTypeIds = new List<int>();
+            if (!string.IsNullOrWhiteSpace(salesTypeDef.AllowedTransactorTypes))
+            {
+                foreach (var part in salesTypeDef.AllowedTransactorTypes.Split(','))
+                {
+                    if (int.TryParse(part.Trim(), out var typeId))
+                    {
+                        allowedTransactorTypeIds.Add(typeId);
+                    }
+                }
+            }
+
+            var transactorsQuery = _context.Transactors.AsQueryable();
+            transactorsQuery = allowedTransactorTypeIds.Count > 0
+                ? transactorsQuery.Where(t => allowedTransactorTypeIds.Contains(t.TransactorTypeId))
+                : transactorsQuery.Where(t => t.TransactorType.Code == "SYS.CUSTOMER" || t.TransactorType.Code == "SYS.DEPARTMENT");
+
+            var transactors = await transactorsQuery
+                .OrderBy(t => t.Name)
+                .Select(t => new { id = t.Id, name = t.Name })
+                .AsNoTracking()
+                .ToListAsync();
+
             Debug.Print("Inside GetSalesSeriesData Returning usedPrice " + usedPrice.ToString());
-            return Ok(new { UsedPrice = usedPrice });
+            return Ok(new
+            {
+                UsedPrice = usedPrice,
+                Transactors = transactors,
+                AllowedTransactorTypeIds = allowedTransactorTypeIds,
+                SelectedWarehouseItemNatures = salesTypeDef.SelectedWarehouseItemNatures ?? ""
+            });
         }
 
         [HttpGet("RecSeriesData")]
