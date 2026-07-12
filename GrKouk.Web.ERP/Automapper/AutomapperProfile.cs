@@ -106,7 +106,10 @@ namespace GrKouk.Web.ERP.Automapper {
             CreateMap<SellDocument, SellDocModifyAjaxNoLinesDto>().ReverseMap();
             CreateMap<SellDocument, SellDocLineAjaxDto>().ReverseMap();
             CreateMap<SellDocument, SellDocModifyDto>().ReverseMap();
-            CreateMap<SellDocLine, SellDocLineModifyDto>().ReverseMap();
+            CreateMap<SellDocLine, SellDocLineModifyDto>()
+                .ForMember(d => d.WarehouseItemNature,
+                    opt => opt.MapFrom(s => (int)s.WarehouseItem.WarehouseItemNature))
+                .ReverseMap();
 
             CreateMap<SellDocModifyAjaxDto, SellDocModifyAjaxNoLinesDto>();
             CreateMap<TransactorTransaction, SellDocCreateAjaxDto>().ReverseMap();

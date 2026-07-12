@@ -52,6 +52,7 @@
             <input type="hidden" asp-for="ItemVm.Timestamp" />
             <input type="hidden" asp-for="@Model.InitialLoad" id="IsInitialLoad" />
             <input type="hidden" id="MaterialId" />
+            <input type="hidden" id="MaterialNature" />
             <input type="hidden" id="MaterialLastPrice" />
             <input type="hidden" id="MaterialNettoPrice" />
             <input type="hidden" id="MaterialBruttoPrice" />
@@ -388,6 +389,10 @@
             var $priceLabel = $('#priceLabel');
             //#endregion
 
+            // Series-driven picker constraints (populated by seriesChanged from the selected sell doc type def)
+            var currentAllowedTransactorTypeIds = [];
+            var currentSelectedItemNatures = [];
+
              //#region items selectors modals
             selectorsLib.initializeSelector();
             // $.fn.selectpicker.Constructor.BootstrapVersion = '4';
@@ -410,57 +415,29 @@
                 });
             $('#itemSelector').on('shown.bs.modal',
                 function() {
-                    let currentCompany = $('#ItemVm_CompanyId').val();
-                    $('[name=itemsSearchText]').val("");
-                    $('#selectorItemsList > tbody').empty();
-                    $('#selectorItemsList > thead').empty();
-                    // $('#MaterialNatureTypes').selectpicker('deselectall');
-                    // $('#TransactorTypes').selectpicker('deselectall');
-                    var $compList = $('#CompaniesList');
-                    $compList.selectpicker('val', currentCompany);
-                    $compList.selectpicker('render');
-                    var $transList = $('#TransactorTypes');
-
-                    $transList.selectpicker('val', 2);
-                    $transList.selectpicker('render');
-
+                    selectorsLib.updateFilterControls();
                     $('[name=itemsSearchText]').trigger('focus');
-                    //$compList.selectpicker('refresh');
-
                 });
             $('#itemSelector').on('show.bs.modal',
                 function(event) {
                     var button = $(event.relatedTarget);
                     var selectorType = button.data('selectortype');
-                    var modal = $(this);
                     switch (selectorType) {
                     case "ProductsSelector":
-                        modal.find('.modal-title').text("Ευρετήριο Προιόντων");
-                        $('#TransactorSelectorTypesDiv').hide();
-                        $('#MaterialNatureTypesDiv').show();
-                        curSelectorType = "ProductsSelector";
-                        var $matNatures = $('#MaterialNatureTypes');
-                        if ($matNatures.children('option').length === 0) {
-                            getWarehouseItemNatureList();
+                        if (currentSelectedItemNatures && currentSelectedItemNatures.length > 0) {
+                            selectorsLib.showProductSelectorForNatures(currentSelectedItemNatures, handleProductSelection);
+                        } else {
+                            selectorsLib.showProductSelector(handleProductSelection);
                         }
                         break;
-                    case "SuppliersSelector":
-                        modal.find('.modal-title').text("Supplier selector");
-                        $('#TransactorSelectorTypesDiv').show();
-                        $('#MaterialNatureTypesDiv').hide();
-                        curSelectorType = "SuppliersSelector";
-                        var $transTypes = $('#TransactorTypes');
-                        if ($transTypes.children('option').length === 0) {
-                            getTransactorTypeList();
+                    case "CustomerSelector":
+                        if (currentAllowedTransactorTypeIds && currentAllowedTransactorTypeIds.length > 0) {
+                            selectorsLib.showTransactorSelectorForTypes(currentAllowedTransactorTypeIds);
+                        } else {
+                            selectorsLib.showCustomerSelector();
                         }
                         break;
                     default:
-                    }
-
-
-                    var $compList = $('#CompaniesList');
-                    if ($compList.children('option').length === 0) {
-                        getCompanyList();
                     }
                 });
            
@@ -769,6 +746,50 @@
                             console.log("Returned usedPrice=" + usedPrice);
                             $seriesUsedPrice.val(usedPrice);
 
+                            // Rebuild the transactor dropdown from the series' allowed transactor types
+                            if (myJson.transactors) {
+                                var $tr = $('#ItemVm_TransactorId');
+                                var prev = $tr.val();
+                                $tr.empty();
+                                $.each(myJson.transactors, function(i, t) {
+                                    $tr.append($('<option></option>').attr('value', t.id).text(t.name));
+                                });
+                                if (prev && $tr.find('option[value="' + prev + '"]').length > 0) {
+                                    $tr.val(prev);
+                                }
+                            }
+
+                            // Cache the series constraints for the modal selectors
+                            currentAllowedTransactorTypeIds = myJson.allowedTransactorTypeIds || [];
+                            currentSelectedItemNatures =
+                                (myJson.selectedWarehouseItemNatures && myJson.selectedWarehouseItemNatures.length > 0)
+                                    ? myJson.selectedWarehouseItemNatures.split(',')
+                                        .map(function(s) { return parseInt(s.trim(), 10); })
+                                        .filter(function(n) { return !isNaN(n); })
+                                    : [];
+
+                            // Re-validate already-added lines against the new series' allowed item natures.
+                            // Rows carry their nature in data-nature (server-rendered rows + addToList). Rows
+                            // without it cannot be judged and are left untouched. Skipped on the initial page
+                            // load so legitimately-saved lines are never dropped just by opening the document.
+                            if (currentSelectedItemNatures.length > 0 && $initialLoad.val() !== 'True') {
+                                var removedLines = 0;
+                                $('#detailsTable tbody tr').each(function() {
+                                    var rowNatureRaw = $(this).attr('data-nature');
+                                    if (rowNatureRaw === undefined || rowNatureRaw === "") {
+                                        return;
+                                    }
+                                    var rowNature = parseInt(rowNatureRaw, 10);
+                                    if (!isNaN(rowNature) && currentSelectedItemNatures.indexOf(rowNature) === -1) {
+                                        $(this).remove();
+                                        removedLines++;
+                                    }
+                                });
+                                if (removedLines > 0) {
+                                    updateCounter();
+                                    toastr.warning(removedLines + ' γραμμή/ές αφαιρέθηκαν: το είδος τους δεν επιτρέπεται στη νέα σειρά', 'Προσοχή');
+                                }
+                            }
                         }
                         // $spinner.attr('hidden', true);
                     })
@@ -1035,6 +1056,7 @@
                 productLib.getProductItemInfo(itemId, $transactorId.val(), $companyId.val())
                     .then((data) => {
                         $materialId.val(itemId);
+                        $('#MaterialNature').val(data.warehouseItemNature);
                         var rate = data.fpaRate;
                         var lastPrice = data.lastPrice;
                         var fpaId = data.fpaId;
@@ -1078,7 +1100,12 @@
             };
             
             var autoCompleteNameDef = {
-                source: '/api/materials/SearchWarehouseItemsForSale',
+                source: function(request, response) {
+                    $.getJSON('/api/materials/SearchWarehouseItemsForSale', {
+                        term: request.term,
+                        seriesId: $transDocSeriesId.val() || 0
+                    }, response);
+                },
                 minLength: 2,
                 maxShowItems:10,
                 select: function(event, ui) {
@@ -1176,6 +1203,7 @@
                var quantity2 = parseFloat(quantity2Str);
                 var discount = discountPercentEl.value;
                 var materialId = $materialId.val();
+                var itemNature = $('#MaterialNature').val();
                 var vatPercent = vatPercentEl.value;
                 var factor = $factor.val();
                 var mainUnitId = $mainUnitId.val();
@@ -1207,7 +1235,7 @@
                     var detailsTableBody = $("#detailsTable tbody");
 
                     //#region Add Table Line
-                    let prItem = '<tr><td class="small">';
+                    let prItem = `<tr data-nature="${itemNature}"><td class="small">`;
                     prItem += `${materialCounter}`;
                     prItem += '</td><td class="small " ';
                     prItem += `data-materialId=" ${materialId}" `;
@@ -1246,6 +1274,7 @@
                     var $tbl = $('#detailsTable');
                     var $rows = $('tr', $tbl);
                     var $row = $rows.eq(lineEdit);
+                    $row.attr('data-nature', itemNature);
 
                     var $colMaterial = $('td:eq(1)', $row);
                     var $colTransQ = $('td:eq(2)', $row);
@@ -1344,6 +1373,7 @@
                 var $self = $(this);
                 if ($(this).attr('data-itemId') == "0") {
                     var $row = $(this).parents('tr');
+                    $('#MaterialNature').val($row.attr('data-nature'));
 
                     var $colLine = $('td:eq(0)', $row);
                     var $colMaterial = $('td:eq(1)', $row);

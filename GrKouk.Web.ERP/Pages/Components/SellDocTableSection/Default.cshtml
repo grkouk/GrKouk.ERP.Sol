@@ -66,7 +66,8 @@
                 var transQuantityText = $@"{transQuantity:N2} {transUnitCode}";
                 var primaryUnitCode = docLine.PrimaryUnitCode;
                 var q1Text = $@"{q1:N2} {primaryUnitCode}";
-                var tLine = $"<tr><td class=\"small\"> {lineCount}" +
+                var itemNature = docLine.WarehouseItemNature;
+                var tLine = $"<tr data-nature=\"{itemNature}\"><td class=\"small\"> {lineCount}" +
                             $"</td><td class=\"small\" data-materialId=\"{materialId}\" " +
                             $"data-transUnitId=\"{transUnitId}\" data-transUnitFactor=\"{transUnitFactor}\" " +
                             $"data-Q2=\"{q2Actual}\"  " +

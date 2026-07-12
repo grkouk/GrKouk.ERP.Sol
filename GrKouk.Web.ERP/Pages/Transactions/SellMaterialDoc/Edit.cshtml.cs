@@ -80,15 +80,36 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
             }
           
 
-            LoadCombos();
+            await LoadCombos(ItemVm.SellDocSeriesId);
             return Page();
         }
 
-        private void LoadCombos()
+        private async Task LoadCombos(int seriesId)
         {
             List<SelectListItem> seekTypes = FiltersHelper.GetSeekTypesList();
             ViewData["SeekType"] = new SelectList(seekTypes, "Value", "Text");
-            var transactorList = _context.Transactors.Where(s => s.TransactorType.Code == "SYS.CUSTOMER" || s.TransactorType.Code == "SYS.DEPARTMENT").OrderBy(s => s.Name).AsNoTracking();
+
+            // Build the transactor list from the document's series allowed transactor types so a saved
+            // non-customer transactor (e.g. a supplier) is present and selectable. Empty => legacy default.
+            var allowedTransactorTypeIds = new List<int>();
+            var seriesDef = await _context.SellDocSeriesDefs
+                .Include(p => p.SellDocTypeDef)
+                .SingleOrDefaultAsync(p => p.Id == seriesId);
+            if (seriesDef?.SellDocTypeDef != null && !string.IsNullOrWhiteSpace(seriesDef.SellDocTypeDef.AllowedTransactorTypes))
+            {
+                foreach (var part in seriesDef.SellDocTypeDef.AllowedTransactorTypes.Split(','))
+                {
+                    if (int.TryParse(part.Trim(), out var typeId))
+                    {
+                        allowedTransactorTypeIds.Add(typeId);
+                    }
+                }
+            }
+            var transactorsQuery = _context.Transactors.AsQueryable();
+            transactorsQuery = allowedTransactorTypeIds.Count > 0
+                ? transactorsQuery.Where(s => allowedTransactorTypeIds.Contains(s.TransactorTypeId))
+                : transactorsQuery.Where(s => s.TransactorType.Code == "SYS.CUSTOMER" || s.TransactorType.Code == "SYS.DEPARTMENT");
+            var transactorList = transactorsQuery.OrderBy(s => s.Name).AsNoTracking();
             //ViewData["CompanyId"] = new SelectList(_context.Companies.OrderBy(p => p.Code).AsNoTracking(), "Id", "Code");
             ViewData["SellDocSeriesId"] = new SelectList(_context.SellDocSeriesDefs.OrderBy(p => p.Name).AsNoTracking(), "Id", "Name");
             ViewData["TransactorId"] = new SelectList(transactorList, "Id", "Name");

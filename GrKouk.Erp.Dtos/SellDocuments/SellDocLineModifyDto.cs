@@ -10,6 +10,7 @@ namespace GrKouk.Erp.Dtos.SellDocuments
 
         public int WarehouseItemId { get; set; }
         public string WarehouseItemName { get; set; }
+        public int WarehouseItemNature { get; set; }
         public int TransactionUnitId { get; set; }
         public string TransactionUnitName { get; set; }
         public string TransactionUnitCode { get; set; }
