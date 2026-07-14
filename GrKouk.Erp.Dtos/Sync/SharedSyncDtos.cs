@@ -80,6 +80,12 @@ public class SharedItemCodeDto
     public string Code { get; set; } = string.Empty;
     public Guid MeasureUnitId { get; set; }
     public decimal Quantity { get; set; } = 1;
+
+    /// <summary>Earliest known creation of this code across shops (MIN-merged). Null = unknown/legacy.</summary>
+    public DateTime? CreatedAt { get; set; }
+
+    /// <summary>Latest scan-commit of this code across shops (MAX-merged). Null = never observed.</summary>
+    public DateTime? LastUsedAt { get; set; }
 }
 
 public class SharedItemPriceDto

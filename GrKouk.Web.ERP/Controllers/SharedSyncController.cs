@@ -159,9 +159,23 @@ public class SharedSyncController : ControllerBase
         // the receiver with FK_ItemErpMappings_Items_LocalItemId. Pull in any missing
         // FK parents now, bypassing the echo filter — they're for FK satisfaction, not
         // change notification. The receiver's LWW guard skips redundant updates.
+        // Stale-barcode feature: SharedItemCode.LastUsedAt is its own pull-out
+        // watermark. A usage stamp changes no other column and never bumps the
+        // parent SharedItem.ModifiedAt, so codes selected only via parent-item
+        // recency would never carry stamps to the peer shop and the cross-shop
+        // MAX-merge would never converge. Their parent items also join the
+        // FK-parent pull-in below. (No ModifiedByShopId on codes → the pushing
+        // shop gets its own stamp echoed back; the client merge is idempotent.)
+        var stampedCodeItemIds = await _context.SharedItemCodes
+            .Where(ic => ic.LastUsedAt > since)
+            .Select(ic => ic.ItemId)
+            .Distinct()
+            .ToListAsync();
+
         var includedItemIds = items.Select(i => i.Id).ToHashSet();
         var referencedItemIds = itemErpMappings.Select(m => m.LocalItemId)
             .Concat(itemPrices.Select(p => p.ItemId))
+            .Concat(stampedCodeItemIds)
             .Where(id => !includedItemIds.Contains(id))
             .Distinct()
             .ToList();
@@ -291,10 +305,13 @@ public class SharedSyncController : ControllerBase
             cashierDepartments.AddRange(extraDepts);
         }
 
-        // For item codes, return codes belonging to items in the (now FK-complete) batch
+        // For item codes, return codes belonging to items in the (now FK-complete)
+        // batch, plus usage-stamped codes riding their own LastUsedAt watermark
+        // (their parents are already in the batch via stampedCodeItemIds above;
+        // the explicit clause keeps the watermark independent of that pull-in).
         var allItemIds = items.Select(i => i.Id).ToHashSet();
         var itemCodes = await _context.SharedItemCodes
-            .Where(ic => allItemIds.Contains(ic.ItemId))
+            .Where(ic => allItemIds.Contains(ic.ItemId) || ic.LastUsedAt > since)
             .Select(ic => new SharedItemCodeDto
             {
                 Id = ic.Id,
@@ -302,7 +319,9 @@ public class SharedSyncController : ControllerBase
                 CodeType = ic.CodeType,
                 Code = ic.Code,
                 MeasureUnitId = ic.MeasureUnitId,
-                Quantity = ic.Quantity
+                Quantity = ic.Quantity,
+                CreatedAt = ic.CreatedAt,
+                LastUsedAt = ic.LastUsedAt
             })
             .ToListAsync();
 
@@ -717,7 +736,9 @@ public class SharedSyncController : ControllerBase
                         CodeType = ic.CodeType,
                         Code = ic.Code,
                         MeasureUnitId = ic.MeasureUnitId,
-                        Quantity = ic.Quantity
+                        Quantity = ic.Quantity,
+                        CreatedAt = ic.CreatedAt,
+                        LastUsedAt = ic.LastUsedAt
                     });
                 }
                 else
@@ -727,6 +748,22 @@ public class SharedSyncController : ControllerBase
                     existing.Code = ic.Code;
                     existing.MeasureUnitId = ic.MeasureUnitId;
                     existing.Quantity = ic.Quantity;
+                    // Stale-barcode feature: convergent merge, NOT last-writer-wins.
+                    // Both shops push usage stamps independently; verbatim assignment
+                    // would let one shop's older stamp overwrite the other's newer one.
+                    // The server is the convergence hub: keep the LATEST LastUsedAt
+                    // (a code is stale only when stale in BOTH shops) and the EARLIEST
+                    // CreatedAt (null = unknown/legacy never overwrites a known value).
+                    if (ic.LastUsedAt.HasValue &&
+                        (existing.LastUsedAt == null || ic.LastUsedAt > existing.LastUsedAt))
+                    {
+                        existing.LastUsedAt = ic.LastUsedAt;
+                    }
+                    if (ic.CreatedAt.HasValue &&
+                        (existing.CreatedAt == null || ic.CreatedAt < existing.CreatedAt))
+                    {
+                        existing.CreatedAt = ic.CreatedAt;
+                    }
                 }
                 itemCodesUpserted++;
             }
@@ -1401,7 +1438,9 @@ public class SharedSyncController : ControllerBase
                 CodeType = ic.CodeType,
                 Code = ic.Code,
                 MeasureUnitId = ic.MeasureUnitId,
-                Quantity = ic.Quantity
+                Quantity = ic.Quantity,
+                CreatedAt = ic.CreatedAt,
+                LastUsedAt = ic.LastUsedAt
             })
             .ToListAsync();
 
