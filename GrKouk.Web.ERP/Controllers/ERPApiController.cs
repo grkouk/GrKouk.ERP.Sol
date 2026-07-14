@@ -33,12 +33,14 @@ namespace GrKouk.Web.ERP.Controllers
         private readonly IDocumentTransactionService _docTransSrv;
         private readonly IDocumentSyncService _docSyncSrv;
         private readonly IBuyDocumentUploadService _buyDocUploadSrv;
+        private readonly ISellDocumentUploadService _sellDocUploadSrv;
         private readonly IDayCloseUploadService _dayCloseUploadSrv;
         private readonly IWarehouseItemsManagementSrv _warehouseItemsManagementSrv;
 
         public ErpApiController(ApiDbContext context, ILogger<ErpApiController> logger,
             IDocumentTransactionService docTransSrv, IDocumentSyncService docSyncSrv,
             IBuyDocumentUploadService buyDocUploadSrv,
+            ISellDocumentUploadService sellDocUploadSrv,
             IDayCloseUploadService dayCloseUploadSrv,
             IWarehouseItemsManagementSrv warehouseItemsManagementSrv)
         {
@@ -47,6 +49,7 @@ namespace GrKouk.Web.ERP.Controllers
             _docTransSrv = docTransSrv;
             _docSyncSrv = docSyncSrv;
             _buyDocUploadSrv = buyDocUploadSrv;
+            _sellDocUploadSrv = sellDocUploadSrv;
             _dayCloseUploadSrv = dayCloseUploadSrv;
             _warehouseItemsManagementSrv = warehouseItemsManagementSrv;
         }
@@ -1762,6 +1765,57 @@ namespace GrKouk.Web.ERP.Controllers
                 var result = await _buyDocUploadSrv.DeleteAsync(request.LocalBuyDocumentId, request.ErpBuyDocId, request.CompanyCode);
                 if (result == null)
                     return StatusCode(500, new { error = "Internal server error during BuyDocument delete" });
+                if (!result.Success)
+                    return BadRequest(new { error = result.ErrorMessage, code = result.ErrorCode });
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.ToString() });
+            }
+        }
+
+        [HttpPost("SyncUploadSellDocument")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public async Task<IActionResult> SyncUploadSellDocument([FromBody] SellDocumentUploadRequest request)
+        {
+            if (request == null)
+                return BadRequest(new { error = "Empty request data" });
+
+            try
+            {
+                var result = await _sellDocUploadSrv.UploadAsync(request);
+                if (result == null)
+                    return StatusCode(500, new { error = "Internal server error during SellDocument upload" });
+                if (!result.Success)
+                    return BadRequest(new { error = result.ErrorMessage, code = result.ErrorCode });
+                return Ok(new { erpSellDocId = result.Data });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.ToString() });
+            }
+        }
+
+        public class SellDocumentDeleteRequest
+        {
+            public Guid LocalSellDocumentId { get; set; }
+            public int ErpSellDocId { get; set; }
+            public string CompanyCode { get; set; }
+        }
+
+        [HttpPost("SyncDeleteSellDocument")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public async Task<IActionResult> SyncDeleteSellDocument([FromBody] SellDocumentDeleteRequest request)
+        {
+            if (request == null)
+                return BadRequest(new { error = "Empty request data" });
+
+            try
+            {
+                var result = await _sellDocUploadSrv.DeleteAsync(request.LocalSellDocumentId, request.ErpSellDocId, request.CompanyCode);
+                if (result == null)
+                    return StatusCode(500, new { error = "Internal server error during SellDocument delete" });
                 if (!result.Success)
                     return BadRequest(new { error = result.ErrorMessage, code = result.ErrorCode });
                 return Ok();

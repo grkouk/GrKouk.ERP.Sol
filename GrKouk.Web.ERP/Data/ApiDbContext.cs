@@ -91,6 +91,7 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<SyncSaleDocument> SyncSaleDocuments { get; set; }
         public DbSet<SyncSupplier> SyncSuppliers { get; set; }
         public DbSet<UploadedBuyDocument> UploadedBuyDocuments { get; set; }
+        public DbSet<UploadedSellDocument> UploadedSellDocuments { get; set; }
         public DbSet<UploadedDayCloseSubmission> UploadedDayCloseSubmissions { get; set; }
 
         public DbSet<Warehouse> Warehouses { get; set; }
@@ -819,6 +820,14 @@ namespace GrKouk.Web.ERP.Data
                 entity.HasKey(p => p.Id);
                 entity.HasIndex(p => p.LocalBuyDocumentId).IsUnique();
                 entity.HasIndex(p => p.ErpBuyDocId);
+                entity.HasIndex(p => p.CompanyCode);
+                entity.Property(p => p.UploadedAt).HasDefaultValueSql("GETUTCDATE()");
+            });
+            modelBuilder.Entity<UploadedSellDocument>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+                entity.HasIndex(p => p.LocalSellDocumentId).IsUnique();
+                entity.HasIndex(p => p.ErpSellDocId);
                 entity.HasIndex(p => p.CompanyCode);
                 entity.Property(p => p.UploadedAt).HasDefaultValueSql("GETUTCDATE()");
             });
