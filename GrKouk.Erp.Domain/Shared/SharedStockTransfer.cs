@@ -39,6 +39,18 @@ public class SharedStockTransfer
     [MaxLength(200)]
     public string? Reference { get; set; }
 
+    /// <summary>
+    /// Set when this transfer ships a stock-request fulfillment: the
+    /// <see cref="SharedStockRequest.RequestId"/> being fulfilled. Null for ordinary transfers.
+    /// </summary>
+    public Guid? RequestId { get; set; }
+
+    /// <summary>
+    /// Paired with <see cref="RequestId"/>: the <see cref="SharedStockRequestFulfillment.ClaimId"/>
+    /// this transfer ships. On push insert, the matching fulfillment flips Claimed → Shipped.
+    /// </summary>
+    public Guid? ClaimId { get; set; }
+
     /// <summary>"Pushed" on insert; "Materialized" once the dest acks.</summary>
     [Required]
     [MaxLength(20)]

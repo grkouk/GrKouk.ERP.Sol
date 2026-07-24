@@ -118,6 +118,10 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<SharedInventory> SharedInventories { get; set; }
         public DbSet<SharedStockTransfer> SharedStockTransfers { get; set; }
         public DbSet<SharedStockTransferLine> SharedStockTransferLines { get; set; }
+        public DbSet<SharedStockRequest> SharedStockRequests { get; set; }
+        public DbSet<SharedStockRequestLine> SharedStockRequestLines { get; set; }
+        public DbSet<SharedStockRequestFulfillment> SharedStockRequestFulfillments { get; set; }
+        public DbSet<SharedStockRequestFulfillmentLine> SharedStockRequestFulfillmentLines { get; set; }
 
        // public DbSet<SyncItem> SyncItems { get; set; }
         
@@ -1035,6 +1039,50 @@ namespace GrKouk.Web.ERP.Data
                 entity.HasIndex(l => l.TransferId);
                 entity.Property(l => l.Quantity).HasColumnType("decimal(18,4)");
                 entity.Property(l => l.CarriedUnitCost).HasColumnType("decimal(18,4)");
+            });
+
+            modelBuilder.Entity<SharedStockRequest>(entity =>
+            {
+                entity.HasKey(r => r.RequestId);
+                // Fulfiller pull filters on Status; admin page + close signal on the rest.
+                entity.HasIndex(r => r.Status);
+                entity.HasIndex(r => new { r.RequestingShopId, r.UpdatedAt });
+                entity.HasIndex(r => r.UpdatedAt);
+                entity.HasMany(r => r.Lines)
+                    .WithOne(l => l.Request!)
+                    .HasForeignKey(l => l.RequestId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasMany(r => r.Fulfillments)
+                    .WithOne(f => f.Request!)
+                    .HasForeignKey(f => f.RequestId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<SharedStockRequestLine>(entity =>
+            {
+                entity.HasKey(l => l.Id);
+                entity.HasIndex(l => l.RequestId);
+                entity.Property(l => l.RequestedQuantity).HasColumnType("decimal(18,4)");
+                entity.Property(l => l.FulfilledQuantity).HasColumnType("decimal(18,4)");
+                entity.Property(l => l.CancelledQuantity).HasColumnType("decimal(18,4)");
+            });
+
+            modelBuilder.Entity<SharedStockRequestFulfillment>(entity =>
+            {
+                entity.HasKey(f => f.ClaimId);
+                // Stuck-claim flag scans (Status, CreatedAt).
+                entity.HasIndex(f => new { f.Status, f.CreatedAt });
+                entity.HasMany(f => f.Lines)
+                    .WithOne(l => l.Fulfillment!)
+                    .HasForeignKey(l => l.ClaimId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<SharedStockRequestFulfillmentLine>(entity =>
+            {
+                entity.HasKey(l => l.Id);
+                entity.HasIndex(l => l.ClaimId);
+                entity.Property(l => l.Quantity).HasColumnType("decimal(18,4)");
             });
         }
         

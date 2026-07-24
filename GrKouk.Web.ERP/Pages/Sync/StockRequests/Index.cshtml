@@ -1,0 +1,204 @@
+@page
+@using GrKouk.Erp.Domain.Shared
+@model GrKouk.Web.ERP.Pages.Sync.StockRequests.IndexModel
+
+@{
+    ViewData["Title"] = "Stock Requests";
+}
+
+<h4>@ViewData["Title"] <small class="text-muted">— inter-shop inventory requests</small></h4>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        @Model.Message
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="d-flex align-items-end mb-3 gap-2">
+    <form method="get" class="row g-2 align-items-end flex-grow-1">
+        <div class="col-auto">
+            <label class="form-label small mb-0">Status</label>
+            <select name="StatusFilter" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="All" selected="@(Model.StatusFilter == "All")">All</option>
+                <option value="@StockRequestStatuses.Open" selected="@(Model.StatusFilter == StockRequestStatuses.Open)">Open</option>
+                <option value="@StockRequestStatuses.Completed" selected="@(Model.StatusFilter == StockRequestStatuses.Completed)">Completed</option>
+                <option value="@StockRequestStatuses.Cancelled" selected="@(Model.StatusFilter == StockRequestStatuses.Cancelled)">Cancelled</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <label class="form-label small mb-0">Requesting shop</label>
+            <select name="ShopFilter" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="">All shops</option>
+                @foreach (var (shopId, name) in Model.ShopOptions)
+                {
+                    <option value="@shopId" selected="@(Model.ShopFilter == shopId)">@name</option>
+                }
+            </select>
+        </div>
+    </form>
+    <form method="post" asp-page-handler="ClearCompleted"
+          asp-route-StatusFilter="@Model.StatusFilter" asp-route-ShopFilter="@Model.ShopFilter"
+          onsubmit="return confirm('Delete ALL @Model.ClosedCount completed/cancelled requests? Transfers are not affected.');">
+        <button type="submit" class="btn btn-sm btn-outline-danger"
+                disabled="@(Model.ClosedCount == 0)">
+            Clear completed (@Model.ClosedCount)
+        </button>
+    </form>
+</div>
+
+@if (Model.Requests.Count == 0)
+{
+    <p class="text-muted">No stock requests match the current filter.</p>
+}
+else
+{
+    <table class="table table-bordered table-sm align-middle">
+        <thead class="thead-light">
+            <tr>
+                <th class="small"></th>
+                <th class="small">Requesting shop</th>
+                <th class="small">Date</th>
+                <th class="small">Status</th>
+                <th class="small text-end">Lines</th>
+                <th class="small text-end">Requested</th>
+                <th class="small text-end">Fulfilled</th>
+                <th class="small text-end">Remaining</th>
+                <th class="small">Reference</th>
+                <th class="small">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model.Requests)
+            {
+                var collapseId = $"req-{r.RequestId:N}";
+                var badgeClass = r.Status == StockRequestStatuses.Open ? "bg-primary"
+                    : r.Status == StockRequestStatuses.Completed ? "bg-success" : "bg-secondary";
+                <tr class="@(r.HasStuckClaim ? "table-warning" : null)">
+                    <td class="small">
+                        <a data-bs-toggle="collapse" href="#@collapseId" role="button"
+                           aria-expanded="false" aria-controls="@collapseId">▸</a>
+                    </td>
+                    <td class="small">@r.ShopName</td>
+                    <td class="small">@r.RequestDate.ToString("dd/MM/yyyy")</td>
+                    <td class="small">
+                        <span class="badge @badgeClass">@r.Status</span>
+                        @if (r.HasStuckClaim)
+                        {
+                            <span class="badge bg-warning text-dark"
+                                  title="A claim has been stuck for over @IndexModel.StuckClaimThresholdDays days — its transfer never arrived.">stuck claim</span>
+                        }
+                    </td>
+                    <td class="small text-end">@r.Lines.Count</td>
+                    <td class="small text-end">@r.Lines.Sum(l => l.Requested)</td>
+                    <td class="small text-end">@r.Lines.Sum(l => l.Fulfilled)</td>
+                    <td class="small text-end fw-bold">@r.Lines.Sum(l => l.Remaining)</td>
+                    <td class="small">@r.Reference</td>
+                    <td class="small text-nowrap">
+                        @if (r.IsOpen)
+                        {
+                            <form method="post" asp-page-handler="CancelRemainder" asp-route-id="@r.RequestId"
+                                  onsubmit="return confirm('Cancel the unfulfilled remainder of this request?');"
+                                  class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-warning">Cancel remainder</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form method="post" asp-page-handler="DeleteRequest" asp-route-id="@r.RequestId"
+                                  onsubmit="return confirm('Delete this closed request?');"
+                                  class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+                <tr class="collapse" id="@collapseId">
+                    <td colspan="10" class="bg-light">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong class="small">Lines</strong>
+                                <table class="table table-sm table-borderless mb-2">
+                                    <thead>
+                                        <tr>
+                                            <th class="small">Item code</th>
+                                            <th class="small text-end">Requested</th>
+                                            <th class="small text-end">Fulfilled</th>
+                                            <th class="small text-end">Cancelled</th>
+                                            <th class="small text-end">Remaining</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var l in r.Lines)
+                                        {
+                                            <tr>
+                                                <td class="small">@l.ItemCode</td>
+                                                <td class="small text-end">@l.Requested</td>
+                                                <td class="small text-end">@l.Fulfilled</td>
+                                                <td class="small text-end">@l.Cancelled</td>
+                                                <td class="small text-end fw-bold">@l.Remaining</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <strong class="small">Fulfillments</strong>
+                                @if (r.Fulfillments.Count == 0)
+                                {
+                                    <p class="small text-muted mb-2">None yet.</p>
+                                }
+                                else
+                                {
+                                    <table class="table table-sm table-borderless mb-2">
+                                        <thead>
+                                            <tr>
+                                                <th class="small">Shop</th>
+                                                <th class="small">Status</th>
+                                                <th class="small text-end">Qty</th>
+                                                <th class="small">Claimed at</th>
+                                                <th class="small">Transfer</th>
+                                                <th class="small"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var f in r.Fulfillments)
+                                            {
+                                                <tr class="@(f.IsStuck ? "table-warning" : null)">
+                                                    <td class="small">@f.ShopName</td>
+                                                    <td class="small">
+                                                        @f.Status
+                                                        @if (f.IsStuck)
+                                                        {
+                                                            <span class="badge bg-warning text-dark">stuck</span>
+                                                        }
+                                                    </td>
+                                                    <td class="small text-end">@f.TotalQuantity</td>
+                                                    <td class="small">@f.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                                    <td class="small">
+                                                        @(f.TransferId?.ToString() ?? "—")
+                                                    </td>
+                                                    <td class="small">
+                                                        @if (f.IsStuck)
+                                                        {
+                                                            <form method="post" asp-page-handler="VoidClaim" asp-route-claimId="@f.ClaimId"
+                                                                  onsubmit="return confirm('Void this stuck claim and return its quantity to the request? Only do this if you are sure the shop never shipped the goods.');"
+                                                                  class="d-inline">
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger">Void claim</button>
+                                                            </form>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

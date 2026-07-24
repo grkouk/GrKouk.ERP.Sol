@@ -240,6 +240,11 @@ public class SharedStockTransferDto
     public string DestShopId { get; set; } = string.Empty;
     public DateTime TransactionDate { get; set; }
     public string? Reference { get; set; }
+    /// <summary>Set when this transfer ships a stock-request fulfillment. Optional field.</summary>
+    public Guid? RequestId { get; set; }
+    /// <summary>Paired with RequestId: the claim being shipped — the server flips the matching
+    /// fulfillment Claimed → Shipped on push insert. Optional field.</summary>
+    public Guid? ClaimId { get; set; }
     public string Status { get; set; } = string.Empty;
     public DateTime? MaterializedAt { get; set; }
     public List<SharedStockTransferLineDto> Lines { get; set; } = new();
@@ -256,6 +261,81 @@ public class SharedStockTransferLineDto
     public decimal CarriedUnitCost { get; set; }
     public string? BatchNumber { get; set; }
     public DateTime? ExpiryDate { get; set; }
+}
+
+/// <summary>
+/// Inter-shop stock REQUEST (broadcast request/fulfill transport). The requester pushes it
+/// once (insert-immutable header/lines by RequestId); afterwards the ERP row is the single
+/// source of truth — per-line Fulfilled/CancelledQuantity and Status are only ever changed by
+/// the ERP's atomic claim / release / cancel-remainder endpoints and flow back through the
+/// pull: to fulfillers while Status == "Open" (un-since-filtered), to the requester as a
+/// since-filtered progress mirror. Mirror to the cashier-side GrKoukOrg.Erp.Dtos copy.
+/// </summary>
+public class SharedStockRequestDto
+{
+    public Guid RequestId { get; set; }
+    public string RequestingShopId { get; set; } = string.Empty;
+    /// <summary>Null = broadcast. Reserved for future targeted requests.</summary>
+    public string? TargetShopId { get; set; }
+    /// <summary>Future request-kind discriminator; always "Stock" for now.</summary>
+    public string RequestType { get; set; } = "Stock";
+    public DateTime RequestDate { get; set; }
+    public string? Reference { get; set; }
+    public string Status { get; set; } = string.Empty;
+    public DateTime UpdatedAt { get; set; }
+    public DateTime? CompletedAt { get; set; }
+    public List<SharedStockRequestLineDto> Lines { get; set; } = new();
+}
+
+/// <summary>A single item line of a <see cref="SharedStockRequestDto"/>. Remaining is always
+/// derived (max(0, Requested − Fulfilled − Cancelled)), never carried.</summary>
+public class SharedStockRequestLineDto
+{
+    public Guid Id { get; set; }
+    public Guid ItemId { get; set; }
+    /// <summary>Requester item Code, carried for human-readable diagnostics at fulfillers.</summary>
+    public string? ItemCode { get; set; }
+    public decimal RequestedQuantity { get; set; }
+    /// <summary>May exceed RequestedQuantity via confirmed over-fulfillment.</summary>
+    public decimal FulfilledQuantity { get; set; }
+    public decimal CancelledQuantity { get; set; }
+}
+
+/// <summary>
+/// Body of the synchronous claim endpoint
+/// (POST /api/sharedsync/stockrequests/{requestId}/claim). ClaimId is minted by the caller and
+/// makes the call idempotent — replaying a recorded ClaimId returns the original success.
+/// FulfillingShopId is verified against the authenticated caller.
+/// </summary>
+public class StockRequestClaimDto
+{
+    public Guid ClaimId { get; set; }
+    public string FulfillingShopId { get; set; } = string.Empty;
+    /// <summary>
+    /// True when the operator explicitly confirmed shipping above a line's remaining
+    /// (pack/carton rounding). Without it, any over-remaining line fails the claim with 409.
+    /// </summary>
+    public bool ConfirmedOverFulfill { get; set; }
+    public List<StockRequestClaimLineDto> Lines { get; set; } = new();
+}
+
+/// <summary>A single line of a <see cref="StockRequestClaimDto"/>.</summary>
+public class StockRequestClaimLineDto
+{
+    public Guid ItemId { get; set; }
+    public decimal Quantity { get; set; }
+}
+
+/// <summary>
+/// Result of the synchronous stock-request endpoints (claim / release / cancel-remainder).
+/// Returned with 200 on success and as the 409 body on a lost race — either way
+/// <see cref="Request"/> carries the FRESH request state so the caller can refresh in place.
+/// </summary>
+public class StockRequestOperationResultDto
+{
+    public bool Success { get; set; }
+    public string? Error { get; set; }
+    public SharedStockRequestDto? Request { get; set; }
 }
 
 // ─── Request / Response DTOs ────────────────────────────────────────
@@ -308,6 +388,10 @@ public class SharedSyncPushRequest
     // Feature A — TransferIds this shop (dest) has materialized; server flips their
     // Status to "Materialized" and stamps MaterializedAt. Optional field.
     public List<Guid> StockTransferAcks { get; set; } = new();
+    // Stock requests this shop authored (requester side). Insert-immutable by RequestId —
+    // all later state changes happen ONLY through the synchronous claim/release/
+    // cancel-remainder endpoints, never via push. Optional field.
+    public List<SharedStockRequestDto> StockRequests { get; set; } = new();
 }
 
 public class SharedSyncPushResponse
@@ -331,6 +415,7 @@ public class SharedSyncPushResponse
     public int InventoriesUpserted { get; set; }
     public int TransfersUpserted { get; set; }
     public int TransferAcksApplied { get; set; }
+    public int StockRequestsInserted { get; set; }
     public List<string> Errors { get; set; } = new();
 }
 
@@ -355,5 +440,15 @@ public class SharedSyncPullResponse
     // Feature A (step 6) — TransferIds this shop SOURCED that the dest materialized since
     // `since`. Source clears its local Pushed rows so the watchdog stops flagging them.
     public List<Guid> OutboundMaterializedTransferIds { get; set; } = new();
+    // Stock requests relevant to this shop, ONE list serving both roles (discriminate by
+    // RequestingShopId): foreign rows = OPEN requests this shop could fulfill (returned
+    // un-since-filtered so remaining self-refreshes every sync); own rows = progress
+    // mirror of my requests whose UpdatedAt > since. Optional field.
+    public List<SharedStockRequestDto> StockRequests { get; set; } = new();
+    // POSITIVE close signal for fulfillers: RequestIds of FOREIGN requests that left Open
+    // (Completed/Cancelled) with UpdatedAt > since. Local open mirrors close ONLY on this,
+    // never by absence from StockRequests (absence-inference risks false-clear on a
+    // partial pull). Optional field.
+    public List<Guid> ClosedStockRequestIds { get; set; } = new();
     public DateTime ServerTimestamp { get; set; }
 }

@@ -413,6 +413,54 @@ public class SharedSyncController : ControllerBase
             .Select(t => t.TransferId)
             .ToListAsync();
 
+        // Stock requests, ONE list serving both roles (client discriminates by
+        // RequestingShopId):
+        //  - FOREIGN OPEN requests this shop could fulfill. NOT filtered by `since` —
+        //    the fulfiller keeps receiving them until they close, so per-line
+        //    Fulfilled/CancelledQuantity self-refreshes every sync.
+        //  - The shop's OWN requests whose UpdatedAt moved past `since` — the progress
+        //    mirror (claims/cancel/completion made at the ERP flow back to the requester).
+        var stockRequests = await _context.SharedStockRequests
+            .Where(r => (r.RequestingShopId != shopId
+                         && r.Status == StockRequestStatuses.Open
+                         && (r.TargetShopId == null || r.TargetShopId == shopId))
+                        || (r.RequestingShopId == shopId && r.UpdatedAt > since))
+            .Select(r => new SharedStockRequestDto
+            {
+                RequestId = r.RequestId,
+                RequestingShopId = r.RequestingShopId,
+                TargetShopId = r.TargetShopId,
+                RequestType = r.RequestType,
+                RequestDate = r.RequestDate,
+                Reference = r.Reference,
+                Status = r.Status,
+                UpdatedAt = r.UpdatedAt,
+                CompletedAt = r.CompletedAt,
+                Lines = r.Lines.Select(l => new SharedStockRequestLineDto
+                {
+                    Id = l.Id,
+                    ItemId = l.ItemId,
+                    ItemCode = l.ItemCode,
+                    RequestedQuantity = l.RequestedQuantity,
+                    FulfilledQuantity = l.FulfilledQuantity,
+                    CancelledQuantity = l.CancelledQuantity
+                }).ToList()
+            })
+            .ToListAsync();
+
+        // POSITIVE close signal for fulfillers: FOREIGN requests that left Open since
+        // the watermark. Local open mirrors close ONLY on this — never by absence from
+        // the open list above, which would false-clear on a partial pull (same principle
+        // as OutboundMaterializedTransferIds). A missed close just leaves a stale grid
+        // row whose claim gets 409 — the SAFE direction.
+        var closedStockRequestIds = await _context.SharedStockRequests
+            .Where(r => r.RequestingShopId != shopId
+                        && r.Status != StockRequestStatuses.Open
+                        && (r.TargetShopId == null || r.TargetShopId == shopId)
+                        && r.UpdatedAt > since)
+            .Select(r => r.RequestId)
+            .ToListAsync();
+
         _logger.LogInformation(
             "SharedSync Pull for shop {ShopId} since {Since}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {Depts} cashier depts, {ItemCodes} item codes ({IcDel} deletes), {ItemPrices} item prices ({IpDel} deletes), {Mappings} mappings, {MapDeletions} mapping deletions",
             shopId, since, items.Count, categories.Count, vatClasses.Count, measureUnits.Count, cashierDepartments.Count, itemCodes.Count, itemCodeDeletions.Count, itemPrices.Count, itemPriceLevelMappingDeletions.Count, itemErpMappings.Count, itemErpMappingDeletions.Count);
@@ -433,6 +481,8 @@ public class SharedSyncController : ControllerBase
             ItemDeletions = itemDeletions,
             StockTransfers = stockTransfers,
             OutboundMaterializedTransferIds = outboundMaterializedTransferIds,
+            StockRequests = stockRequests,
+            ClosedStockRequestIds = closedStockRequestIds,
             ServerTimestamp = serverTimestamp
         });
     }
@@ -470,6 +520,7 @@ public class SharedSyncController : ControllerBase
         int inventoriesUpserted = 0;
         int transfersUpserted = 0;
         int transferAcksApplied = 0;
+        int stockRequestsInserted = 0;
 
         try
         {
@@ -1084,6 +1135,8 @@ public class SharedSyncController : ControllerBase
                     DestShopId = t.DestShopId,
                     TransactionDate = t.TransactionDate,
                     Reference = t.Reference,
+                    RequestId = t.RequestId,
+                    ClaimId = t.ClaimId,
                     Status = StockTransferStatuses.Pushed,
                     CreatedAt = DateTime.UtcNow,
                     Lines = t.Lines.Select(l => new SharedStockTransferLine
@@ -1099,6 +1152,23 @@ public class SharedSyncController : ControllerBase
                     }).ToList()
                 });
                 transfersUpserted++;
+
+                // A transfer that ships a stock-request claim flips the matching
+                // fulfillment Claimed → Shipped (idempotent: only from Claimed; a claim
+                // of another shop is never touched).
+                if (t.ClaimId is Guid claimId && claimId != Guid.Empty)
+                {
+                    var fulfillment = await _context.SharedStockRequestFulfillments
+                        .FirstOrDefaultAsync(f => f.ClaimId == claimId
+                                                  && f.FulfillingShopId == request.ShopId);
+                    if (fulfillment != null
+                        && fulfillment.Status == StockRequestFulfillmentStatuses.Claimed)
+                    {
+                        fulfillment.Status = StockRequestFulfillmentStatuses.Shipped;
+                        fulfillment.TransferId = t.TransferId;
+                        fulfillment.ShippedAt = DateTime.UtcNow;
+                    }
+                }
             }
 
             // 7e. Materialization acks from the dest. Flip Status to Materialized once,
@@ -1112,6 +1182,89 @@ public class SharedSyncController : ControllerBase
                     transfer.MaterializedAt = DateTime.UtcNow;
                     transferAcksApplied++;
                 }
+            }
+
+            // 7f. Inter-shop stock requests. The requester publishes a request ONCE —
+            // insert-immutable by RequestId (re-push is an idempotent no-op), header opens
+            // as "Open", RequestingShopId forced to the caller. Progress fields
+            // (Fulfilled/CancelledQuantity) are NEVER taken from a push: after this insert
+            // the ERP row is the single source of truth for remaining quantity and is only
+            // mutated by the atomic claim/release/cancel-remainder endpoints.
+            // ONE exception to the no-op: when the requester edited the draft while the
+            // original push was in flight, the client keeps it PendingPush and re-sends it
+            // next cycle — refresh the lines then, but only while nobody has acted on the
+            // request (still Open, zero fulfillment activity).
+            foreach (var r in request.StockRequests)
+            {
+                if (r.RequestId == Guid.Empty) continue;
+                var existingRequest = await _context.SharedStockRequests
+                    .Include(x => x.Lines)
+                    .FirstOrDefaultAsync(x => x.RequestId == r.RequestId);
+                if (existingRequest != null)
+                {
+                    if (existingRequest.RequestingShopId != request.ShopId) continue;
+                    if (existingRequest.Status != StockRequestStatuses.Open) continue;
+                    var hasFulfillmentActivity =
+                        await _context.SharedStockRequestFulfillments
+                            .AnyAsync(f => f.RequestId == r.RequestId)
+                        || existingRequest.Lines.Any(l =>
+                            l.FulfilledQuantity > 0 || l.CancelledQuantity > 0);
+                    if (hasFulfillmentActivity)
+                    {
+                        _logger.LogWarning(
+                            "SharedSync Push: stock request {RequestId} re-pushed by shop {ShopId} but already has fulfillment activity; keeping ERP lines.",
+                            r.RequestId, request.ShopId);
+                        continue;
+                    }
+                    _context.SharedStockRequestLines.RemoveRange(existingRequest.Lines);
+                    // Fresh line Ids on purpose: re-pushed lines may carry the Ids of the
+                    // rows being deleted in this same SaveChanges; the client's pull
+                    // reconcile falls back to ItemId matching, so new Ids are safe.
+                    existingRequest.Lines = r.Lines
+                        .Where(l => l.RequestedQuantity > 0)
+                        .Select(l => new SharedStockRequestLine
+                        {
+                            Id = Guid.NewGuid(),
+                            RequestId = r.RequestId,
+                            ItemId = l.ItemId,
+                            ItemCode = l.ItemCode,
+                            RequestedQuantity = l.RequestedQuantity,
+                            FulfilledQuantity = 0m,
+                            CancelledQuantity = 0m
+                        }).ToList();
+                    existingRequest.Reference = r.Reference;
+                    existingRequest.UpdatedAt = DateTime.UtcNow;
+                    continue;
+                }
+
+                var nowUtc = DateTime.UtcNow;
+                _context.SharedStockRequests.Add(new SharedStockRequest
+                {
+                    RequestId = r.RequestId,
+                    RequestingShopId = request.ShopId,
+                    TargetShopId = r.TargetShopId,
+                    RequestType = string.IsNullOrWhiteSpace(r.RequestType)
+                        ? StockRequestTypes.Stock
+                        : r.RequestType,
+                    RequestDate = r.RequestDate,
+                    Reference = r.Reference,
+                    Status = StockRequestStatuses.Open,
+                    CreatedAt = nowUtc,
+                    UpdatedAt = nowUtc,
+                    Lines = r.Lines
+                        .Where(l => l.RequestedQuantity > 0)
+                        .Select(l => new SharedStockRequestLine
+                        {
+                            Id = l.Id == Guid.Empty ? Guid.NewGuid() : l.Id,
+                            RequestId = r.RequestId,
+                            ItemId = l.ItemId,
+                            ItemCode = l.ItemCode,
+                            RequestedQuantity = l.RequestedQuantity,
+                            FulfilledQuantity = 0m,
+                            CancelledQuantity = 0m
+                        }).ToList()
+                });
+                stockRequestsInserted++;
             }
 
             await _context.SaveChangesAsync();
@@ -1137,8 +1290,8 @@ public class SharedSyncController : ControllerBase
             }
 
             _logger.LogInformation(
-                "SharedSync Push from shop {ShopId}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {Depts} cashier depts, {ItemCodes} item codes ({IcDel} deletes), {ItemPrices} item prices ({IpDel} deletes), {Mappings} mappings, {MapDeletions} mapping deletions, {ItemDels} item deletions, {Acks} acks, {Purged} purged, {ItemCosts} item costs, {Inventories} inventories, {Transfers} transfers ({TransferAcks} acks)",
-                request.ShopId, itemsUpserted, categoriesUpserted, vatClassesUpserted, measureUnitsUpserted, cashierDepartmentsUpserted, itemCodesUpserted, itemCodeDeletionsApplied, itemPricesUpserted, itemPriceLevelMappingDeletionsApplied, itemErpMappingsUpserted, itemErpMappingDeletionsApplied, itemDeletionsApplied, tombstoneAcksRecorded, tombstonesPurged, itemCostsUpserted, inventoriesUpserted, transfersUpserted, transferAcksApplied);
+                "SharedSync Push from shop {ShopId}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {Depts} cashier depts, {ItemCodes} item codes ({IcDel} deletes), {ItemPrices} item prices ({IpDel} deletes), {Mappings} mappings, {MapDeletions} mapping deletions, {ItemDels} item deletions, {Acks} acks, {Purged} purged, {ItemCosts} item costs, {Inventories} inventories, {Transfers} transfers ({TransferAcks} acks), {StockRequests} stock requests",
+                request.ShopId, itemsUpserted, categoriesUpserted, vatClassesUpserted, measureUnitsUpserted, cashierDepartmentsUpserted, itemCodesUpserted, itemCodeDeletionsApplied, itemPricesUpserted, itemPriceLevelMappingDeletionsApplied, itemErpMappingsUpserted, itemErpMappingDeletionsApplied, itemDeletionsApplied, tombstoneAcksRecorded, tombstonesPurged, itemCostsUpserted, inventoriesUpserted, transfersUpserted, transferAcksApplied, stockRequestsInserted);
         }
         catch (Exception ex)
         {
@@ -1167,9 +1320,322 @@ public class SharedSyncController : ControllerBase
             InventoriesUpserted = inventoriesUpserted,
             TransfersUpserted = transfersUpserted,
             TransferAcksApplied = transferAcksApplied,
+            StockRequestsInserted = stockRequestsInserted,
             Errors = errors
         });
     }
+
+    /// <summary>
+    /// Synchronous atomic CLAIM against an open stock request — the only way remaining
+    /// quantity is ever consumed. The fulfiller calls this BEFORE creating its XFER-OUT
+    /// doc (claim-before-ship): a lost race here can never strand shipped goods.
+    /// Idempotent by the caller-minted ClaimId — replaying a recorded claim returns the
+    /// original success with fresh state. Per line, Quantity must be ≤ remaining unless
+    /// ConfirmedOverFulfill is set (operator explicitly confirmed pack/carton rounding);
+    /// otherwise 409 with the FRESH request state so the fulfill dialog refreshes in place.
+    /// </summary>
+    [HttpPost("stockrequests/{requestId}/claim")]
+    [Authorize(Policy = "ApiPolicy2")]
+    public async Task<IActionResult> ClaimStockRequest(Guid requestId, [FromBody] StockRequestClaimDto claim)
+    {
+        if (claim == null || claim.ClaimId == Guid.Empty)
+            return BadRequest(new { error = "ClaimId is required" });
+        if (string.IsNullOrWhiteSpace(claim.FulfillingShopId))
+            return BadRequest(new { error = "FulfillingShopId is required" });
+        if (claim.Lines == null || claim.Lines.Count == 0 || claim.Lines.Any(l => l.Quantity <= 0))
+            return BadRequest(new { error = "At least one line with a positive quantity is required" });
+
+        await using var tx = await _context.Database
+            .BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+
+        // Replay of an already-recorded ClaimId → the original outcome (idempotent retry
+        // path for the cashier's crash-recovery pass).
+        var existing = await _context.SharedStockRequestFulfillments
+            .FirstOrDefaultAsync(f => f.ClaimId == claim.ClaimId);
+        if (existing != null)
+        {
+            var replayRequest = await LoadStockRequestAsync(existing.RequestId);
+            await tx.CommitAsync();
+            return Ok(new StockRequestOperationResultDto
+            {
+                Success = existing.Status != StockRequestFulfillmentStatuses.Released,
+                Error = existing.Status == StockRequestFulfillmentStatuses.Released
+                    ? "Claim was already released"
+                    : null,
+                Request = replayRequest == null ? null : MapStockRequestDto(replayRequest)
+            });
+        }
+
+        var request = await LoadStockRequestAsync(requestId);
+        if (request == null)
+            return NotFound(new { error = "Stock request not found" });
+
+        if (request.RequestingShopId == claim.FulfillingShopId)
+            return BadRequest(new { error = "A shop cannot fulfill its own request" });
+        if (request.TargetShopId != null && request.TargetShopId != claim.FulfillingShopId)
+            return BadRequest(new { error = "Request is targeted at another shop" });
+
+        if (request.Status != StockRequestStatuses.Open)
+        {
+            return Conflict(new StockRequestOperationResultDto
+            {
+                Success = false,
+                Error = "Request is no longer open",
+                Request = MapStockRequestDto(request)
+            });
+        }
+
+        // Aggregate by ItemId (a duplicated item in the body must not double-pass the
+        // remaining check), then VALIDATE EVERY line before mutating anything — a
+        // Conflict must return the request state exactly as persisted.
+        var nowUtc = DateTime.UtcNow;
+        var claimLines = claim.Lines
+            .GroupBy(l => l.ItemId)
+            .Select(g => new { ItemId = g.Key, Quantity = g.Sum(x => x.Quantity) })
+            .ToList();
+
+        foreach (var line in claimLines)
+        {
+            var requestLine = request.Lines.FirstOrDefault(l => l.ItemId == line.ItemId);
+            if (requestLine == null)
+            {
+                return Conflict(new StockRequestOperationResultDto
+                {
+                    Success = false,
+                    Error = $"Item {line.ItemId} is not part of the request",
+                    Request = MapStockRequestDto(request)
+                });
+            }
+
+            var remaining = requestLine.RequestedQuantity
+                            - requestLine.FulfilledQuantity
+                            - requestLine.CancelledQuantity;
+            if (line.Quantity > remaining && !claim.ConfirmedOverFulfill)
+            {
+                return Conflict(new StockRequestOperationResultDto
+                {
+                    Success = false,
+                    Error = "Requested quantity exceeds the remaining quantity",
+                    Request = MapStockRequestDto(request)
+                });
+            }
+        }
+
+        foreach (var line in claimLines)
+        {
+            var requestLine = request.Lines.First(l => l.ItemId == line.ItemId);
+            requestLine.FulfilledQuantity += line.Quantity;
+        }
+
+        _context.SharedStockRequestFulfillments.Add(new SharedStockRequestFulfillment
+        {
+            ClaimId = claim.ClaimId,
+            RequestId = request.RequestId,
+            FulfillingShopId = claim.FulfillingShopId,
+            Status = StockRequestFulfillmentStatuses.Claimed,
+            CreatedAt = nowUtc,
+            Lines = claimLines.Select(l => new SharedStockRequestFulfillmentLine
+            {
+                Id = Guid.NewGuid(),
+                ClaimId = claim.ClaimId,
+                ItemId = l.ItemId,
+                Quantity = l.Quantity
+            }).ToList()
+        });
+
+        if (request.Lines.All(l =>
+                l.RequestedQuantity - l.FulfilledQuantity - l.CancelledQuantity <= 0))
+        {
+            request.Status = StockRequestStatuses.Completed;
+            request.CompletedAt = nowUtc;
+        }
+        request.UpdatedAt = nowUtc;
+
+        await _context.SaveChangesAsync();
+        await tx.CommitAsync();
+
+        _logger.LogInformation(
+            "StockRequest claim {ClaimId} by shop {ShopId} on request {RequestId}: {Lines} line(s), status now {Status}",
+            claim.ClaimId, claim.FulfillingShopId, request.RequestId, claim.Lines.Count, request.Status);
+
+        return Ok(new StockRequestOperationResultDto
+        {
+            Success = true,
+            Request = MapStockRequestDto(request)
+        });
+    }
+
+    /// <summary>
+    /// Compensating RELEASE of a claim whose XFER-OUT doc could not be created (or was
+    /// re-driven to release by the cashier's recovery pass). Only a still-Claimed claim can
+    /// be released — once the shipping transfer arrived (Shipped) the goods are on their
+    /// way and the claim is immutable. Restores the request's remaining quantity and
+    /// reopens a request that had auto-completed. Idempotent: releasing a Released claim
+    /// returns success.
+    /// </summary>
+    [HttpPost("stockrequests/claims/{claimId}/release")]
+    [Authorize(Policy = "ApiPolicy2")]
+    public async Task<IActionResult> ReleaseStockRequestClaim(Guid claimId)
+    {
+        await using var tx = await _context.Database
+            .BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+
+        var fulfillment = await _context.SharedStockRequestFulfillments
+            .Include(f => f.Lines)
+            .FirstOrDefaultAsync(f => f.ClaimId == claimId);
+        if (fulfillment == null)
+            return NotFound(new { error = "Claim not found" });
+
+        var request = await LoadStockRequestAsync(fulfillment.RequestId);
+
+        if (fulfillment.Status == StockRequestFulfillmentStatuses.Released)
+        {
+            await tx.CommitAsync();
+            return Ok(new StockRequestOperationResultDto
+            {
+                Success = true,
+                Request = request == null ? null : MapStockRequestDto(request)
+            });
+        }
+
+        if (fulfillment.Status == StockRequestFulfillmentStatuses.Shipped)
+        {
+            return Conflict(new StockRequestOperationResultDto
+            {
+                Success = false,
+                Error = "Claim has already been shipped",
+                Request = request == null ? null : MapStockRequestDto(request)
+            });
+        }
+
+        var nowUtc = DateTime.UtcNow;
+        if (request != null)
+        {
+            foreach (var line in fulfillment.Lines)
+            {
+                var requestLine = request.Lines.FirstOrDefault(l => l.ItemId == line.ItemId);
+                if (requestLine != null)
+                {
+                    requestLine.FulfilledQuantity =
+                        Math.Max(0m, requestLine.FulfilledQuantity - line.Quantity);
+                }
+            }
+
+            if (request.Status == StockRequestStatuses.Completed
+                && request.Lines.Any(l =>
+                    l.RequestedQuantity - l.FulfilledQuantity - l.CancelledQuantity > 0))
+            {
+                request.Status = StockRequestStatuses.Open;
+                request.CompletedAt = null;
+            }
+            request.UpdatedAt = nowUtc;
+        }
+
+        fulfillment.Status = StockRequestFulfillmentStatuses.Released;
+        fulfillment.ReleasedAt = nowUtc;
+
+        await _context.SaveChangesAsync();
+        await tx.CommitAsync();
+
+        _logger.LogInformation(
+            "StockRequest claim {ClaimId} released (request {RequestId})",
+            claimId, fulfillment.RequestId);
+
+        return Ok(new StockRequestOperationResultDto
+        {
+            Success = true,
+            Request = request == null ? null : MapStockRequestDto(request)
+        });
+    }
+
+    /// <summary>
+    /// Requester-side CANCEL of a request's unfulfilled remainder. Serialized against
+    /// claims (a claim granted before this call keeps its goods; one arriving after loses
+    /// the race and gets 409). Per line CancelledQuantity absorbs max(0, remaining); the
+    /// header closes as Completed when anything was ever fulfilled, Cancelled otherwise.
+    /// Idempotent: cancelling an already-closed request returns success with fresh state.
+    /// </summary>
+    [HttpPost("stockrequests/{requestId}/cancelremainder")]
+    [Authorize(Policy = "ApiPolicy2")]
+    public async Task<IActionResult> CancelStockRequestRemainder(Guid requestId, [FromQuery] string shopId)
+    {
+        if (string.IsNullOrWhiteSpace(shopId))
+            return BadRequest(new { error = "shopId is required" });
+
+        await using var tx = await _context.Database
+            .BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+
+        var request = await LoadStockRequestAsync(requestId);
+        if (request == null)
+            return NotFound(new { error = "Stock request not found" });
+
+        if (request.RequestingShopId != shopId)
+            return BadRequest(new { error = "Only the requesting shop can cancel its request" });
+
+        if (request.Status != StockRequestStatuses.Open)
+        {
+            await tx.CommitAsync();
+            return Ok(new StockRequestOperationResultDto
+            {
+                Success = true,
+                Request = MapStockRequestDto(request)
+            });
+        }
+
+        var nowUtc = DateTime.UtcNow;
+        foreach (var line in request.Lines)
+        {
+            var remaining = line.RequestedQuantity - line.FulfilledQuantity - line.CancelledQuantity;
+            if (remaining > 0)
+                line.CancelledQuantity += remaining;
+        }
+
+        request.Status = request.Lines.Any(l => l.FulfilledQuantity > 0)
+            ? StockRequestStatuses.Completed
+            : StockRequestStatuses.Cancelled;
+        request.CompletedAt = nowUtc;
+        request.UpdatedAt = nowUtc;
+
+        await _context.SaveChangesAsync();
+        await tx.CommitAsync();
+
+        _logger.LogInformation(
+            "StockRequest {RequestId} remainder cancelled by shop {ShopId}, status now {Status}",
+            requestId, shopId, request.Status);
+
+        return Ok(new StockRequestOperationResultDto
+        {
+            Success = true,
+            Request = MapStockRequestDto(request)
+        });
+    }
+
+    private Task<SharedStockRequest?> LoadStockRequestAsync(Guid requestId) =>
+        _context.SharedStockRequests
+            .Include(r => r.Lines)
+            .FirstOrDefaultAsync(r => r.RequestId == requestId);
+
+    private static SharedStockRequestDto MapStockRequestDto(SharedStockRequest r) => new()
+    {
+        RequestId = r.RequestId,
+        RequestingShopId = r.RequestingShopId,
+        TargetShopId = r.TargetShopId,
+        RequestType = r.RequestType,
+        RequestDate = r.RequestDate,
+        Reference = r.Reference,
+        Status = r.Status,
+        UpdatedAt = r.UpdatedAt,
+        CompletedAt = r.CompletedAt,
+        Lines = r.Lines.Select(l => new SharedStockRequestLineDto
+        {
+            Id = l.Id,
+            ItemId = l.ItemId,
+            ItemCode = l.ItemCode,
+            RequestedQuantity = l.RequestedQuantity,
+            FulfilledQuantity = l.FulfilledQuantity,
+            CancelledQuantity = l.CancelledQuantity
+        }).ToList()
+    };
 
     /// <summary>
     /// On-demand cross-shop cost lookup. Returns the most recently-updated cost
