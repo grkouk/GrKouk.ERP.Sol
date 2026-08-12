@@ -1,0 +1,68 @@
+@page
+@model PasskeysModel
+@{
+    ViewData["Title"] = "Passkeys";
+    ViewData["ActivePage"] = ManageNavPages.Passkeys;
+}
+
+<h3>@ViewData["Title"]</h3>
+<partial name="_StatusMessage" for="StatusMessage" />
+
+<div class="row">
+    <div class="col-md-8">
+        <p>
+            A passkey lets you sign in with your device's fingerprint, face or PIN instead of your password.
+            Your password keeps working exactly as before.
+        </p>
+
+        <div data-passkey-requires-support>
+            @* The antiforgery token is what passkeys.js sends in the RequestVerificationToken header. *@
+            <form method="post" id="passkey-antiforgery-form"></form>
+
+            <div class="form-floating mb-3">
+                <input id="passkey-name" class="form-control" maxlength="64" placeholder="Work laptop" value="Passkey" />
+                <label for="passkey-name" class="form-label">Passkey name</label>
+            </div>
+            <button id="passkey-register" type="button" class="btn btn-primary mb-3">Add a passkey</button>
+            <div id="passkey-error" class="text-danger mb-3" role="alert"></div>
+        </div>
+
+        @if (Model.Passkeys.Count == 0)
+        {
+            <p class="text-muted">You have not registered any passkeys yet.</p>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Created</th>
+                        <th>Synced</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var passkey in Model.Passkeys)
+                    {
+                        <tr>
+                            <td>@passkey.Name</td>
+                            <td>@passkey.CreatedAt.ToLocalTime().ToString("g")</td>
+                            <td>@(passkey.IsBackedUp ? "Yes" : "No")</td>
+                            <td>
+                                <form method="post" asp-page-handler="Delete">
+                                    <input type="hidden" name="credentialId" value="@passkey.CredentialId" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/passkeys.js"></script>
+}

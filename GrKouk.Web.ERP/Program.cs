@@ -40,10 +40,27 @@ namespace GrKouk.Web.ERP
                 .AddIdentity<IdentityUser, IdentityRole>(options =>
                 {
                     options.ClaimsIdentity.RoleClaimType = ClaimTypes.Role;
+
+                    // Schema version 3 adds the AspNetUserPasskeys table to the Identity model.
+                    // This affects the EF model, so it must also be applied at design time when
+                    // running "dotnet ef migrations add" (see efcore#36314).
+                    options.Stores.SchemaVersion = IdentitySchemaVersions.Version3;
                 })
                 .AddDefaultUI()
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApiDbContext>();
+
+            // Passkey (WebAuthn) options. ServerDomain is the Relying Party ID: it must be a
+            // real domain name, never a bare IP address. Left null it is inferred from the
+            // Host header, which is only safe when the host is validated upstream.
+            builder.Services.Configure<IdentityPasskeyOptions>(options =>
+            {
+                var serverDomain = configuration["Passkeys:ServerDomain"];
+                if (!string.IsNullOrWhiteSpace(serverDomain))
+                {
+                    options.ServerDomain = serverDomain;
+                }
+            });
 
             // Health checks
             builder.Services.AddHealthChecks()
@@ -117,6 +134,15 @@ namespace GrKouk.Web.ERP
                         JwtBearerDefaults.AuthenticationScheme);
                     policy.RequireAuthenticatedUser();
                     policy.RequireRole("Admin");
+                });
+
+                // Passkey registration must authenticate against the Identity cookie, because that is the
+                // scheme SignInManager actually signs users in to. Deliberately not the JWT bearer scheme:
+                // passkeys are a browser-only flow and never issue API tokens.
+                options.AddPolicy("PasskeyManagement", policy =>
+                {
+                    policy.AddAuthenticationSchemes(IdentityConstants.ApplicationScheme);
+                    policy.RequireAuthenticatedUser();
                 });
             });
 

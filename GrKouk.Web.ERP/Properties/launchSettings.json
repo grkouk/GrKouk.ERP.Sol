@@ -23,6 +23,15 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
+    },
+    "GrKouk.Web.ERP (localhost + LAN)": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "Identity/Account/Login",
+      "applicationUrl": "https://localhost:5001;https://192.168.90.187:5001;http://192.168.90.187:5000",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
     }
   }
 }
