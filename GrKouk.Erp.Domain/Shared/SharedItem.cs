@@ -29,6 +29,12 @@ public class SharedItem
     public Guid MainUnitId { get; set; }
     public Guid? CashierDepartmentId { get; set; }
 
+    // Family / brand assignment. Raw Guid?, no FK (registry convention, like
+    // CashierDepartmentId). On update a null never overwrites a stored value
+    // (non-null wins) — see SharedSyncController.Push.
+    public Guid? ItemFamilyId { get; set; }
+    public Guid? ItemBrandId { get; set; }
+
     // Classification (stored as int for flexibility)
     public int ItemNature { get; set; }
     public int ItemType { get; set; }

@@ -15,6 +15,10 @@ public class SharedItemDto
     public Guid VatClassId { get; set; }
     public Guid MainUnitId { get; set; }
     public Guid? CashierDepartmentId { get; set; }
+    // Family / brand assignment. Optional — old cashier builds send none (null), and a
+    // null never overwrites a stored value on update (non-null wins).
+    public Guid? ItemFamilyId { get; set; }
+    public Guid? ItemBrandId { get; set; }
     public int ItemNature { get; set; }
     public int ItemType { get; set; }
     public string? ManufacturerCode { get; set; }
@@ -53,6 +57,35 @@ public class SharedItemCategoryDto
     public string Code { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public DateTime ModifiedAt { get; set; }
+}
+
+public class SharedItemFamilyDto
+{
+    public Guid Id { get; set; }
+    public string Code { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public DateTime ModifiedAt { get; set; }
+}
+
+public class SharedItemBrandDto
+{
+    public Guid Id { get; set; }
+    public string Code { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public DateTime ModifiedAt { get; set; }
+}
+
+/// <summary>
+/// One-time family/brand assignment seed (push only, never pulled). The server fills
+/// SharedItem.ItemFamilyId / ItemBrandId only where its own value is still null, and
+/// leaves ModifiedAt / ModifiedByShopId / Version alone so the seed never takes part in
+/// the item LWW race.
+/// </summary>
+public class SharedItemClassificationDto
+{
+    public Guid ItemId { get; set; }
+    public Guid? ItemFamilyId { get; set; }
+    public Guid? ItemBrandId { get; set; }
 }
 
 public class SharedVatClassDto
@@ -356,6 +389,12 @@ public class SharedSyncPushRequest
     public string? CompanyCode { get; set; }
     public List<SharedItemDto> Items { get; set; } = new();
     public List<SharedItemCategoryDto> Categories { get; set; } = new();
+    // Families / brands. Optional fields; old cashier builds send none.
+    public List<SharedItemFamilyDto> Families { get; set; } = new();
+    public List<SharedItemBrandDto> Brands { get; set; } = new();
+    // One-time assignment seed, sent while the client's family/brand watermark is unset.
+    // Fills null SharedItem slots only. Push only — never returned by pull.
+    public List<SharedItemClassificationDto> ItemClassifications { get; set; } = new();
     public List<SharedVatClassDto> VatClasses { get; set; } = new();
     public List<SharedMeasureUnitDto> MeasureUnits { get; set; } = new();
     public List<SharedCashierDepartmentDto> CashierDepartments { get; set; } = new();
@@ -399,6 +438,12 @@ public class SharedSyncPushResponse
     public bool Success { get; set; }
     public int ItemsUpserted { get; set; }
     public int CategoriesUpserted { get; set; }
+    // Count EVERY received family/brand row, changed or not: the client only advances its
+    // family/brand watermark when these are > 0, which is how it tells an upgraded server
+    // (which saw the rows) from an old one (which silently dropped them).
+    public int FamiliesUpserted { get; set; }
+    public int BrandsUpserted { get; set; }
+    public int ItemClassificationsFilled { get; set; }
     public int VatClassesUpserted { get; set; }
     public int MeasureUnitsUpserted { get; set; }
     public int CashierDepartmentsUpserted { get; set; }
@@ -423,6 +468,8 @@ public class SharedSyncPullResponse
 {
     public List<SharedItemDto> Items { get; set; } = new();
     public List<SharedItemCategoryDto> Categories { get; set; } = new();
+    public List<SharedItemFamilyDto> Families { get; set; } = new();
+    public List<SharedItemBrandDto> Brands { get; set; } = new();
     public List<SharedVatClassDto> VatClasses { get; set; } = new();
     public List<SharedMeasureUnitDto> MeasureUnits { get; set; } = new();
     public List<SharedCashierDepartmentDto> CashierDepartments { get; set; } = new();

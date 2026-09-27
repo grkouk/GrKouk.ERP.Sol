@@ -17,7 +17,7 @@ namespace GrKouk.Web.ERP.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.9")
+                .HasAnnotation("ProductVersion", "10.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -2412,7 +2412,13 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.Property<bool>("IsDepositItem")
                         .HasColumnType("bit");
 
+                    b.Property<Guid?>("ItemBrandId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("ItemCategoryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ItemFamilyId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("ItemNature")
@@ -2465,6 +2471,36 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasIndex("ModifiedByShopId");
 
                     b.ToTable("SharedItems");
+                });
+
+            modelBuilder.Entity("GrKouk.Erp.Domain.Shared.SharedItemBrand", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code");
+
+                    b.HasIndex("ModifiedAt");
+
+                    b.ToTable("SharedItemBrands");
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.SharedItemCategory", b =>
@@ -2721,6 +2757,36 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasIndex("ModifiedByShopId");
 
                     b.ToTable("SharedItemErpMappingDeletions");
+                });
+
+            modelBuilder.Entity("GrKouk.Erp.Domain.Shared.SharedItemFamily", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code");
+
+                    b.HasIndex("ModifiedAt");
+
+                    b.ToTable("SharedItemFamilies");
                 });
 
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.SharedItemPrice", b =>

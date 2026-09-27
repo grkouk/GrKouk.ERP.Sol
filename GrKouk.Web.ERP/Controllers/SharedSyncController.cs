@@ -53,6 +53,8 @@ public class SharedSyncController : ControllerBase
                 Name = i.Name,
                 Active = i.Active,
                 ItemCategoryId = i.ItemCategoryId,
+                ItemFamilyId = i.ItemFamilyId,
+                ItemBrandId = i.ItemBrandId,
                 VatClassId = i.VatClassId,
                 MainUnitId = i.MainUnitId,
                 CashierDepartmentId = i.CashierDepartmentId,
@@ -81,6 +83,28 @@ public class SharedSyncController : ControllerBase
                 Code = c.Code,
                 Name = c.Name,
                 ModifiedAt = c.ModifiedAt
+            })
+            .ToListAsync();
+
+        var families = await _context.SharedItemFamilies
+            .Where(f => f.ModifiedAt > since)
+            .Select(f => new SharedItemFamilyDto
+            {
+                Id = f.Id,
+                Code = f.Code,
+                Name = f.Name,
+                ModifiedAt = f.ModifiedAt
+            })
+            .ToListAsync();
+
+        var brands = await _context.SharedItemBrands
+            .Where(b => b.ModifiedAt > since)
+            .Select(b => new SharedItemBrandDto
+            {
+                Id = b.Id,
+                Code = b.Code,
+                Name = b.Name,
+                ModifiedAt = b.ModifiedAt
             })
             .ToListAsync();
 
@@ -190,6 +214,8 @@ public class SharedSyncController : ControllerBase
                     Name = i.Name,
                     Active = i.Active,
                     ItemCategoryId = i.ItemCategoryId,
+                    ItemFamilyId = i.ItemFamilyId,
+                    ItemBrandId = i.ItemBrandId,
                     VatClassId = i.VatClassId,
                     MainUnitId = i.MainUnitId,
                     ItemNature = i.ItemNature,
@@ -238,6 +264,53 @@ public class SharedSyncController : ControllerBase
                 })
                 .ToListAsync();
             categories.AddRange(extraCategories);
+        }
+
+        // Same FK-parent top-up for families / brands. The client would not FK-fail without
+        // it (an unknown family is treated as "no information"), but the assignment would be
+        // silently dropped on insert — so send the referenced rows.
+        var includedFamilyIds = families.Select(f => f.Id).ToHashSet();
+        var referencedFamilyIds = items
+            .Where(i => i.ItemFamilyId.HasValue)
+            .Select(i => i.ItemFamilyId!.Value)
+            .Where(id => !includedFamilyIds.Contains(id))
+            .Distinct()
+            .ToList();
+        if (referencedFamilyIds.Count > 0)
+        {
+            var extraFamilies = await _context.SharedItemFamilies
+                .Where(f => referencedFamilyIds.Contains(f.Id))
+                .Select(f => new SharedItemFamilyDto
+                {
+                    Id = f.Id,
+                    Code = f.Code,
+                    Name = f.Name,
+                    ModifiedAt = f.ModifiedAt
+                })
+                .ToListAsync();
+            families.AddRange(extraFamilies);
+        }
+
+        var includedBrandIds = brands.Select(b => b.Id).ToHashSet();
+        var referencedBrandIds = items
+            .Where(i => i.ItemBrandId.HasValue)
+            .Select(i => i.ItemBrandId!.Value)
+            .Where(id => !includedBrandIds.Contains(id))
+            .Distinct()
+            .ToList();
+        if (referencedBrandIds.Count > 0)
+        {
+            var extraBrands = await _context.SharedItemBrands
+                .Where(b => referencedBrandIds.Contains(b.Id))
+                .Select(b => new SharedItemBrandDto
+                {
+                    Id = b.Id,
+                    Code = b.Code,
+                    Name = b.Name,
+                    ModifiedAt = b.ModifiedAt
+                })
+                .ToListAsync();
+            brands.AddRange(extraBrands);
         }
 
         var includedVatClassIds = vatClasses.Select(v => v.Id).ToHashSet();
@@ -462,13 +535,15 @@ public class SharedSyncController : ControllerBase
             .ToListAsync();
 
         _logger.LogInformation(
-            "SharedSync Pull for shop {ShopId} since {Since}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {Depts} cashier depts, {ItemCodes} item codes ({IcDel} deletes), {ItemPrices} item prices ({IpDel} deletes), {Mappings} mappings, {MapDeletions} mapping deletions",
-            shopId, since, items.Count, categories.Count, vatClasses.Count, measureUnits.Count, cashierDepartments.Count, itemCodes.Count, itemCodeDeletions.Count, itemPrices.Count, itemPriceLevelMappingDeletions.Count, itemErpMappings.Count, itemErpMappingDeletions.Count);
+            "SharedSync Pull for shop {ShopId} since {Since}: {Items} items, {Categories} categories, {Families} families, {Brands} brands, {VatClasses} vat classes, {MeasureUnits} measure units, {Depts} cashier depts, {ItemCodes} item codes ({IcDel} deletes), {ItemPrices} item prices ({IpDel} deletes), {Mappings} mappings, {MapDeletions} mapping deletions",
+            shopId, since, items.Count, categories.Count, families.Count, brands.Count, vatClasses.Count, measureUnits.Count, cashierDepartments.Count, itemCodes.Count, itemCodeDeletions.Count, itemPrices.Count, itemPriceLevelMappingDeletions.Count, itemErpMappings.Count, itemErpMappingDeletions.Count);
 
         return Ok(new SharedSyncPullResponse
         {
             Items = items,
             Categories = categories,
+            Families = families,
+            Brands = brands,
             VatClasses = vatClasses,
             MeasureUnits = measureUnits,
             CashierDepartments = cashierDepartments,
@@ -503,6 +578,9 @@ public class SharedSyncController : ControllerBase
 
         var errors = new List<string>();
         int categoriesUpserted = 0;
+        int familiesUpserted = 0;
+        int brandsUpserted = 0;
+        int itemClassificationsFilled = 0;
         int vatClassesUpserted = 0;
         int measureUnitsUpserted = 0;
         int cashierDepartmentsUpserted = 0;
@@ -571,6 +649,54 @@ public class SharedSyncController : ControllerBase
                     existing.ModifiedAt = cat.ModifiedAt;
                     categoriesUpserted++;
                 }
+            }
+
+            // 1b. Families / brands — insert or LWW update, like categories. Unlike the other
+            // counters these count EVERY received row, changed or not: the client advances
+            // its family/brand watermark only when they come back > 0, which is how it tells
+            // this server apart from an old one that silently dropped the arrays.
+            foreach (var fam in request.Families)
+            {
+                var existing = await _context.SharedItemFamilies.FindAsync(fam.Id);
+                if (existing == null)
+                {
+                    _context.SharedItemFamilies.Add(new SharedItemFamily
+                    {
+                        Id = fam.Id,
+                        Code = fam.Code,
+                        Name = fam.Name,
+                        ModifiedAt = fam.ModifiedAt
+                    });
+                }
+                else if (fam.ModifiedAt > existing.ModifiedAt)
+                {
+                    existing.Code = fam.Code;
+                    existing.Name = fam.Name;
+                    existing.ModifiedAt = fam.ModifiedAt;
+                }
+                familiesUpserted++;
+            }
+
+            foreach (var brand in request.Brands)
+            {
+                var existing = await _context.SharedItemBrands.FindAsync(brand.Id);
+                if (existing == null)
+                {
+                    _context.SharedItemBrands.Add(new SharedItemBrand
+                    {
+                        Id = brand.Id,
+                        Code = brand.Code,
+                        Name = brand.Name,
+                        ModifiedAt = brand.ModifiedAt
+                    });
+                }
+                else if (brand.ModifiedAt > existing.ModifiedAt)
+                {
+                    existing.Code = brand.Code;
+                    existing.Name = brand.Name;
+                    existing.ModifiedAt = brand.ModifiedAt;
+                }
+                brandsUpserted++;
             }
 
             foreach (var vc in request.VatClasses)
@@ -664,6 +790,8 @@ public class SharedSyncController : ControllerBase
                         Name = item.Name,
                         Active = item.Active,
                         ItemCategoryId = item.ItemCategoryId,
+                        ItemFamilyId = item.ItemFamilyId,
+                        ItemBrandId = item.ItemBrandId,
                         VatClassId = item.VatClassId,
                         MainUnitId = item.MainUnitId,
                         CashierDepartmentId = item.CashierDepartmentId,
@@ -690,6 +818,11 @@ public class SharedSyncController : ControllerBase
                     existing.Name = item.Name;
                     existing.Active = item.Active;
                     existing.ItemCategoryId = item.ItemCategoryId;
+                    // Non-null wins: a shop that never assigned a family (or an old cashier
+                    // build that does not send the field) sends null, and that must not wipe
+                    // the other shop's assignment. Clears do not propagate — accepted.
+                    if (item.ItemFamilyId is not null) existing.ItemFamilyId = item.ItemFamilyId;
+                    if (item.ItemBrandId is not null) existing.ItemBrandId = item.ItemBrandId;
                     existing.VatClassId = item.VatClassId;
                     existing.MainUnitId = item.MainUnitId;
                     existing.CashierDepartmentId = item.CashierDepartmentId;
@@ -708,6 +841,36 @@ public class SharedSyncController : ControllerBase
                     existing.ModifiedByShopId = request.ShopId;
                     existing.Version++;
                     itemsUpserted++;
+                }
+            }
+
+            // 2a. One-time family/brand assignment seed. Fills ONLY null slots, and leaves
+            // ModifiedAt / ModifiedByShopId / Version alone so it never enters the item LWW
+            // race (and is not echoed as a change to the other shop). If both shops seed
+            // different values, the first seed wins here; normal item LWW settles it later.
+            if (request.ItemClassifications.Count > 0)
+            {
+                var seedIds = request.ItemClassifications.Select(c => c.ItemId).Distinct().ToList();
+                // Loads into the change tracker; items added by THIS push are already tracked
+                // with their incoming values and are simply not returned by the query.
+                var seedTargets = await _context.SharedItems
+                    .Where(i => seedIds.Contains(i.Id) && (i.ItemFamilyId == null || i.ItemBrandId == null))
+                    .ToDictionaryAsync(i => i.Id);
+                foreach (var c in request.ItemClassifications)
+                {
+                    if (!seedTargets.TryGetValue(c.ItemId, out var target)) continue;
+                    var filled = false;
+                    if (target.ItemFamilyId == null && c.ItemFamilyId != null)
+                    {
+                        target.ItemFamilyId = c.ItemFamilyId;
+                        filled = true;
+                    }
+                    if (target.ItemBrandId == null && c.ItemBrandId != null)
+                    {
+                        target.ItemBrandId = c.ItemBrandId;
+                        filled = true;
+                    }
+                    if (filled) itemClassificationsFilled++;
                 }
             }
 
@@ -1290,8 +1453,8 @@ public class SharedSyncController : ControllerBase
             }
 
             _logger.LogInformation(
-                "SharedSync Push from shop {ShopId}: {Items} items, {Categories} categories, {VatClasses} vat classes, {MeasureUnits} measure units, {Depts} cashier depts, {ItemCodes} item codes ({IcDel} deletes), {ItemPrices} item prices ({IpDel} deletes), {Mappings} mappings, {MapDeletions} mapping deletions, {ItemDels} item deletions, {Acks} acks, {Purged} purged, {ItemCosts} item costs, {Inventories} inventories, {Transfers} transfers ({TransferAcks} acks), {StockRequests} stock requests",
-                request.ShopId, itemsUpserted, categoriesUpserted, vatClassesUpserted, measureUnitsUpserted, cashierDepartmentsUpserted, itemCodesUpserted, itemCodeDeletionsApplied, itemPricesUpserted, itemPriceLevelMappingDeletionsApplied, itemErpMappingsUpserted, itemErpMappingDeletionsApplied, itemDeletionsApplied, tombstoneAcksRecorded, tombstonesPurged, itemCostsUpserted, inventoriesUpserted, transfersUpserted, transferAcksApplied, stockRequestsInserted);
+                "SharedSync Push from shop {ShopId}: {Items} items, {Categories} categories, {Families} families, {Brands} brands, {Classifications} classifications filled, {VatClasses} vat classes, {MeasureUnits} measure units, {Depts} cashier depts, {ItemCodes} item codes ({IcDel} deletes), {ItemPrices} item prices ({IpDel} deletes), {Mappings} mappings, {MapDeletions} mapping deletions, {ItemDels} item deletions, {Acks} acks, {Purged} purged, {ItemCosts} item costs, {Inventories} inventories, {Transfers} transfers ({TransferAcks} acks), {StockRequests} stock requests",
+                request.ShopId, itemsUpserted, categoriesUpserted, familiesUpserted, brandsUpserted, itemClassificationsFilled, vatClassesUpserted, measureUnitsUpserted, cashierDepartmentsUpserted, itemCodesUpserted, itemCodeDeletionsApplied, itemPricesUpserted, itemPriceLevelMappingDeletionsApplied, itemErpMappingsUpserted, itemErpMappingDeletionsApplied, itemDeletionsApplied, tombstoneAcksRecorded, tombstonesPurged, itemCostsUpserted, inventoriesUpserted, transfersUpserted, transferAcksApplied, stockRequestsInserted);
         }
         catch (Exception ex)
         {
@@ -1304,6 +1467,9 @@ public class SharedSyncController : ControllerBase
             Success = errors.Count == 0,
             ItemsUpserted = itemsUpserted,
             CategoriesUpserted = categoriesUpserted,
+            FamiliesUpserted = familiesUpserted,
+            BrandsUpserted = brandsUpserted,
+            ItemClassificationsFilled = itemClassificationsFilled,
             VatClassesUpserted = vatClassesUpserted,
             MeasureUnitsUpserted = measureUnitsUpserted,
             CashierDepartmentsUpserted = cashierDepartmentsUpserted,
@@ -1833,6 +1999,8 @@ public class SharedSyncController : ControllerBase
                 Name = i.Name,
                 Active = i.Active,
                 ItemCategoryId = i.ItemCategoryId,
+                ItemFamilyId = i.ItemFamilyId,
+                ItemBrandId = i.ItemBrandId,
                 VatClassId = i.VatClassId,
                 MainUnitId = i.MainUnitId,
                 CashierDepartmentId = i.CashierDepartmentId,
@@ -1860,6 +2028,26 @@ public class SharedSyncController : ControllerBase
                 Code = c.Code,
                 Name = c.Name,
                 ModifiedAt = c.ModifiedAt
+            })
+            .ToListAsync();
+
+        var families = await _context.SharedItemFamilies
+            .Select(f => new SharedItemFamilyDto
+            {
+                Id = f.Id,
+                Code = f.Code,
+                Name = f.Name,
+                ModifiedAt = f.ModifiedAt
+            })
+            .ToListAsync();
+
+        var brands = await _context.SharedItemBrands
+            .Select(b => new SharedItemBrandDto
+            {
+                Id = b.Id,
+                Code = b.Code,
+                Name = b.Name,
+                ModifiedAt = b.ModifiedAt
             })
             .ToListAsync();
 
@@ -1989,6 +2177,8 @@ public class SharedSyncController : ControllerBase
         {
             Items = items,
             Categories = categories,
+            Families = families,
+            Brands = brands,
             VatClasses = vatClasses,
             MeasureUnits = measureUnits,
             CashierDepartments = cashierDepartments,

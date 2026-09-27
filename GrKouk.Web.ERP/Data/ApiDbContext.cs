@@ -101,6 +101,8 @@ namespace GrKouk.Web.ERP.Data
         // Shared item registry (cross-shop sync)
         public DbSet<SharedItem> SharedItems { get; set; }
         public DbSet<SharedItemCategory> SharedItemCategories { get; set; }
+        public DbSet<SharedItemFamily> SharedItemFamilies { get; set; }
+        public DbSet<SharedItemBrand> SharedItemBrands { get; set; }
         public DbSet<SharedVatClass> SharedVatClasses { get; set; }
         public DbSet<SharedMeasureUnit> SharedMeasureUnits { get; set; }
         public DbSet<SharedCashierDepartment> SharedCashierDepartments { get; set; }
@@ -897,6 +899,22 @@ namespace GrKouk.Web.ERP.Data
                     .HasDefaultValueSql("GETUTCDATE()");
             });
             modelBuilder.Entity<SharedItemCategory>(entity =>
+            {
+                entity.HasIndex(p => p.Code);
+                entity.HasIndex(p => p.ModifiedAt);
+                entity.Property(p => p.ModifiedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+            });
+            // Families / brands: Code index NOT unique — deliberate, the two shops can hold
+            // the same Code under different Ids and the client parks that as a conflict.
+            modelBuilder.Entity<SharedItemFamily>(entity =>
+            {
+                entity.HasIndex(p => p.Code);
+                entity.HasIndex(p => p.ModifiedAt);
+                entity.Property(p => p.ModifiedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+            });
+            modelBuilder.Entity<SharedItemBrand>(entity =>
             {
                 entity.HasIndex(p => p.Code);
                 entity.HasIndex(p => p.ModifiedAt);
