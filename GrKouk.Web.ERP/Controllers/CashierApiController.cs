@@ -722,6 +722,20 @@ public class CashierApiController : ControllerBase
         return result.Success ? Ok(result.Data) : BadRequest(new { error = result.ErrorMessage });
     }
 
+    /// <summary>
+    /// Purchases per supplier of a period, pooled across the selected companies: invoices minus credit
+    /// notes, by each document type's own setting. Payments and refunds are not documents, so they are
+    /// not in it, which is why the supplier ledger cannot answer this. Read only.
+    /// </summary>
+    [HttpGet("GetMyDataSupplierTotalsMulti")]
+    [Authorize(Policy = "ApiPolicy2")]
+    public async Task<ActionResult<List<MyDataErpSupplierTotalDto>>> GetMyDataSupplierTotalsMulti(
+        string companyCodes, DateTime dateFrom, DateTime dateTo, CancellationToken ct = default)
+    {
+        var result = await _myDataClaims.GetSupplierTotalsAsync(companyCodes, dateFrom, dateTo, ct);
+        return result.Success ? Ok(result.Data) : BadRequest(new { error = result.ErrorMessage });
+    }
+
     /// <summary>Sets one issuer's rule for all shops (ErpOnly or Ignore). The action Normal removes it.</summary>
     [HttpPost("SetMyDataIssuerRule")]
     [Authorize(Policy = "ApiPolicy2")]

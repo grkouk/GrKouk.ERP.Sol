@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.CashRegister;
 using GrKouk.Web.ERP.Data;
@@ -29,6 +30,12 @@ public interface IMyDataClaimsService
 
     /// <summary>Sets one issuer's rule. The action Normal removes it. Data = the stored ΑΦΜ key.</summary>
     Task<ServiceResult> SetIssuerRuleAsync(MyDataIssuerRuleDto rule, CancellationToken ct = default);
+
+    /// <summary>
+    /// Purchases per supplier, pooled across the companies. Data = a list of
+    /// <see cref="MyDataErpSupplierTotalDto"/>. Read only.
+    /// </summary>
+    Task<ServiceResult> GetSupplierTotalsAsync(string companyCodes, DateTime dateFrom, DateTime dateTo, CancellationToken ct = default);
 }
 
 public class MyDataClaimsService : IMyDataClaimsService
@@ -251,6 +258,67 @@ public class MyDataClaimsService : IMyDataClaimsService
         await _context.SaveChangesAsync(ct);
         return ServiceResult.Ok(vat);
     }
+
+    public async Task<ServiceResult> GetSupplierTotalsAsync(
+        string companyCodes, DateTime dateFrom, DateTime dateTo, CancellationToken ct = default)
+    {
+        var codes = (companyCodes ?? string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(c => c.Trim())
+            .Where(c => c.Length > 0)
+            .Distinct()
+            .ToList();
+        if (codes.Count == 0)
+            return ServiceResult.Error("Company code is required", "BADREQUEST");
+
+        var from = dateFrom.Date;
+        var to = dateTo.Date;
+        if (to < from)
+            return ServiceResult.Error("The period ends before it starts", "BADREQUEST");
+        var toExclusive = to.AddDays(1);
+
+        var companies = await _context.Companies.AsNoTracking()
+            .Where(c => codes.Contains(c.Code))
+            .Select(c => new { c.Id, c.Code })
+            .ToListAsync(ct);
+        var missing = codes.Where(c => companies.All(co => co.Code != c)).ToList();
+        if (missing.Count > 0)
+            return ServiceResult.Error($"Company with code '{string.Join(", ", missing)}' not found", "COMPANY_NOT_FOUND");
+        var companyIds = companies.Select(c => c.Id).ToList();
+
+        var docs = await _context.BuyDocuments.AsNoTracking()
+            .Where(b => companyIds.Contains(b.CompanyId) && b.TransDate >= from && b.TransDate < toExclusive)
+            .Select(b => new
+            {
+                b.TransactorId,
+                b.Transactor.TaxNumber,
+                b.Transactor.Name,
+                b.TransRefCode,
+                b.TransDate,
+                Action = b.BuyDocType.TransTransactorDef.FinancialTransAction,
+                Gross = b.AmountNet + b.AmountFpa - b.AmountDiscount
+            })
+            .ToListAsync(ct);
+
+        var totals = docs
+            .Where(d => d.Action != FinActionsEnum.FinActionsEnumNoChange)
+            .GroupBy(d => new { d.TransactorId, d.TaxNumber, d.Name })
+            .Select(g => new MyDataErpSupplierTotalDto
+            {
+                TransactorId = g.Key.TransactorId,
+                TaxNumber = g.Key.TaxNumber,
+                Name = g.Key.Name,
+                Documents = g.Count(),
+                Gross = g.Sum(d => SupplierSign(d.Action) * d.Gross),
+                Docs = g.Select(d => new MyDataErpSupplierDocDto { RefCode = d.TransRefCode, Date = d.TransDate, Gross = d.Gross }).ToList()
+            })
+            .OrderBy(t => t.Name)
+            .ToList();
+        return ServiceResult.Ok(totals);
+    }
+
+    /// <summary>What a document does to the amount owed: an invoice adds, a credit note takes away.</summary>
+    private static decimal SupplierSign(FinActionsEnum action) =>
+        action is FinActionsEnum.FinActionsEnumCredit or FinActionsEnum.FinActionsEnumNegativeDebit ? 1m : -1m;
 
     private static string FindClaimProblem(List<MyDataClaimDto> claims, DateTime from, DateTime toExclusive)
     {

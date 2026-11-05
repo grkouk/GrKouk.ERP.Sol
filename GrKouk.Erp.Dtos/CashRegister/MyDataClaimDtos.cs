@@ -221,6 +221,31 @@ namespace GrKouk.Erp.Dtos.CashRegister
         public decimal Gross { get; set; }
     }
 
+    /// <summary>One supplier's purchase documents of a period, pooled across the selected companies.</summary>
+    public class MyDataErpSupplierTotalDto
+    {
+        public int TransactorId { get; set; }
+        public string TaxNumber { get; set; }
+        public string Name { get; set; }
+        public int Documents { get; set; }
+
+        /// <summary>Invoices minus credit notes, by each document type's own debit or credit setting.</summary>
+        public decimal Gross { get; set; }
+
+        /// <summary>
+        /// Its documents. Many old ERP suppliers have no ΑΦΜ, so the app recognises them by these: the
+        /// same numbers and amounts as a myDATA issuer's documents mean the same supplier.
+        /// </summary>
+        public List<MyDataErpSupplierDocDto> Docs { get; set; } = new();
+    }
+
+    public class MyDataErpSupplierDocDto
+    {
+        public string RefCode { get; set; }
+        public DateTime Date { get; set; }
+        public decimal Gross { get; set; }
+    }
+
     public class MyDataClaimsResponseDto
     {
         public List<MyDataStoredClaimDto> Claims { get; set; } = new();
