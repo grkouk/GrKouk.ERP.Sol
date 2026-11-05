@@ -150,6 +150,7 @@ namespace GrKouk.Web.ERP
             builder.Services.AddTransient<IBuyDocumentUploadService, BuyDocumentUploadService>();
             builder.Services.AddTransient<ISellDocumentUploadService, SellDocumentUploadService>();
             builder.Services.AddTransient<IDayCloseUploadService, DayCloseUploadService>();
+            builder.Services.AddTransient<IMyDataClaimsService, MyDataClaimsService>();
             builder.Services.AddTransient<ITransactorTransactionService, TransactorTransactionServiceV2>();
             builder.Services.AddTransient<ICFATransactionService, CFATransactionService>();
             builder.Services.AddTransient<IWarehouseItemsManagementSrv, WarehouseItemsManagementSrv>();

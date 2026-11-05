@@ -1925,6 +1925,159 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.ToTable("MeasureUnits");
                 });
 
+            modelBuilder.Entity("GrKouk.Erp.Domain.Shared.MyDataIssuerRule", b =>
+                {
+                    b.Property<string>("IssuerVat")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("At")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("By")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("IssuerVat");
+
+                    b.ToTable("MyDataIssuerRules");
+                });
+
+            modelBuilder.Entity("GrKouk.Erp.Domain.Shared.MyDataShopClaim", b =>
+                {
+                    b.Property<string>("CompanyCode")
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<long>("Mark")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Aa")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("AcceptedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("AcceptedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("AcceptedNote")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("AddressConflict")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ClaimKind")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int?>("ErpBuyDocId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("IssueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("IssuerVat")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<Guid?>("LocalBuyDocumentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("LocalContentModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LocalDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("LocalGross")
+                        .HasColumnType("decimal(18, 4)");
+
+                    b.Property<string>("LocalRatesJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LocalRefNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("MyDataGross")
+                        .HasColumnType("decimal(18, 4)");
+
+                    b.Property<DateTime>("PublishedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ReconCauses")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReconStatus")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Series")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("UploadState")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("CompanyCode", "Mark");
+
+                    b.HasIndex("CompanyCode", "IssueDate");
+
+                    b.ToTable("MyDataShopClaims");
+                });
+
+            modelBuilder.Entity("GrKouk.Erp.Domain.Shared.MyDataShopPublish", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClientVersion")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("CompanyCode")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<int>("Count")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("PeriodFrom")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("PeriodTo")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("PublishedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyCode", "PeriodFrom", "PeriodTo")
+                        .IsUnique();
+
+                    b.ToTable("MyDataShopPublishes");
+                });
+
             modelBuilder.Entity("GrKouk.Erp.Domain.Shared.ProductRecipe", b =>
                 {
                     b.Property<int>("Id")

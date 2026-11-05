@@ -125,6 +125,11 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<SharedStockRequestFulfillment> SharedStockRequestFulfillments { get; set; }
         public DbSet<SharedStockRequestFulfillmentLine> SharedStockRequestFulfillmentLines { get; set; }
 
+        // myDATA reconciliation: the shops' answers, shared through the ERP
+        public DbSet<MyDataShopClaim> MyDataShopClaims { get; set; }
+        public DbSet<MyDataShopPublish> MyDataShopPublishes { get; set; }
+        public DbSet<MyDataIssuerRule> MyDataIssuerRules { get; set; }
+
        // public DbSet<SyncItem> SyncItems { get; set; }
         
 
@@ -1101,6 +1106,19 @@ namespace GrKouk.Web.ERP.Data
                 entity.HasKey(l => l.Id);
                 entity.HasIndex(l => l.ClaimId);
                 entity.Property(l => l.Quantity).HasColumnType("decimal(18,4)");
+            });
+
+            modelBuilder.Entity<MyDataShopClaim>(entity =>
+            {
+                entity.HasKey(c => new { c.CompanyCode, c.Mark });
+                // A publish replaces, and a read returns, one company's rows of a period.
+                entity.HasIndex(c => new { c.CompanyCode, c.IssueDate });
+            });
+
+            modelBuilder.Entity<MyDataShopPublish>(entity =>
+            {
+                // A period is published again in place, so the table holds its latest publish.
+                entity.HasIndex(p => new { p.CompanyCode, p.PeriodFrom, p.PeriodTo }).IsUnique();
             });
         }
         

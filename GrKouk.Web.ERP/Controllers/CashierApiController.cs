@@ -29,15 +29,18 @@ public class CashierApiController : ControllerBase
     private readonly ApiDbContext _context;
     private readonly ILogger<CashierApiController> _logger;
     private readonly ITransactorTransactionService _transService;
+    private readonly IMyDataClaimsService _myDataClaims;
 
     public CashierApiController(
         ApiDbContext context,
         ILogger<CashierApiController> logger,
-        ITransactorTransactionService transService)
+        ITransactorTransactionService transService,
+        IMyDataClaimsService myDataClaims)
     {
         _context = context;
         _logger = logger;
         _transService = transService;
+        _myDataClaims = myDataClaims;
     }
 /// <summary>
 /// I have not desided yet wheather we get the suppliers from the main table or we use the sync table
@@ -687,6 +690,45 @@ public class CashierApiController : ControllerBase
             Rows = rows
         };
         return Ok(response);
+    }
+
+    /// <summary>
+    /// A shop's full list of answers about the myDATA documents of a period. It replaces what that
+    /// company published before for the period. The API login is shared by all shops, so the server
+    /// cannot tell which shop is calling: each client must send only its own company code.
+    /// </summary>
+    [HttpPost("PublishMyDataClaims")]
+    [Authorize(Policy = "ApiPolicy2")]
+    public async Task<IActionResult> PublishMyDataClaims([FromBody] MyDataPublishRequestDto request, CancellationToken ct = default)
+    {
+        var result = await _myDataClaims.PublishAsync(request, ct);
+        if (result.Success) return Ok(result.Data);
+        return result.ErrorCode == "PUBLISH_CONFLICT"
+            ? Conflict(new { error = result.ErrorMessage })
+            : BadRequest(new { error = result.ErrorMessage });
+    }
+
+    /// <summary>
+    /// Every selected shop's answers for the period, with the ERP's checks: its copy of each entered
+    /// purchase against the shop's amounts, and a search for the documents called ERP-only. A company
+    /// with no publish covering the period also gets its purchase headers, as a hint only.
+    /// </summary>
+    [HttpGet("GetMyDataClaimsMulti")]
+    [Authorize(Policy = "ApiPolicy2")]
+    public async Task<ActionResult<MyDataClaimsResponseDto>> GetMyDataClaimsMulti(
+        string companyCodes, DateTime dateFrom, DateTime dateTo, CancellationToken ct = default)
+    {
+        var result = await _myDataClaims.GetClaimsAsync(companyCodes, dateFrom, dateTo, ct);
+        return result.Success ? Ok(result.Data) : BadRequest(new { error = result.ErrorMessage });
+    }
+
+    /// <summary>Sets one issuer's rule for all shops (ErpOnly or Ignore). The action Normal removes it.</summary>
+    [HttpPost("SetMyDataIssuerRule")]
+    [Authorize(Policy = "ApiPolicy2")]
+    public async Task<IActionResult> SetMyDataIssuerRule([FromBody] MyDataIssuerRuleDto rule, CancellationToken ct = default)
+    {
+        var result = await _myDataClaims.SetIssuerRuleAsync(rule, ct);
+        return result.Success ? NoContent() : BadRequest(new { error = result.ErrorMessage });
     }
 
     /// <summary>
