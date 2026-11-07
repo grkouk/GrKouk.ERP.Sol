@@ -130,6 +130,9 @@ namespace GrKouk.Web.ERP.Data
         public DbSet<MyDataShopPublish> MyDataShopPublishes { get; set; }
         public DbSet<MyDataIssuerRule> MyDataIssuerRules { get; set; }
 
+        // Supplier codes shared between the shops, keyed by ΑΦΜ
+        public DbSet<SharedSupplierItemCode> SharedSupplierItemCodes { get; set; }
+
        // public DbSet<SyncItem> SyncItems { get; set; }
         
 
@@ -1119,6 +1122,14 @@ namespace GrKouk.Web.ERP.Data
             {
                 // A period is published again in place, so the table holds its latest publish.
                 entity.HasIndex(p => new { p.CompanyCode, p.PeriodFrom, p.PeriodTo }).IsUnique();
+            });
+
+            modelBuilder.Entity<SharedSupplierItemCode>(entity =>
+            {
+                entity.HasIndex(c => new { c.SupplierVat, c.MatchKind, c.MatchKey }).IsUnique();
+                // The pull asks for what was accepted since a server time.
+                entity.HasIndex(c => c.ReceivedAt);
+                entity.Property(c => c.Version).IsConcurrencyToken();
             });
         }
         
