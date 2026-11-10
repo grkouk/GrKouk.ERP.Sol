@@ -25,8 +25,19 @@ public class SharedItemCode
 
     /// <summary>
     /// Latest scan-commit of this code across shops (MAX-merged on push-in; the server is
-    /// the convergence hub). Null = never observed. Also the pull-out watermark: a stamp
-    /// changes no other column, so pulls must select on it, not just on parent-item recency.
+    /// the convergence hub). Null = never observed. A stamp changes no other column, so pulls
+    /// cannot select on parent-item recency alone: they select on <see cref="ReceivedAt"/>.
     /// </summary>
     public DateTime? LastUsedAt { get; set; }
+
+    /// <summary>
+    /// Hub clock (UTC) when a push last added this code or really changed it (a field or a newer
+    /// <see cref="LastUsedAt"/>). The pull asks by it, as for the other shared rows, so a scan stamp
+    /// a shop pushes late still reaches the other shops. Hub only: never sent to a shop.
+    /// </summary>
+    public DateTime ReceivedAt { get; set; }
+
+    /// <summary>Shop whose push set <see cref="ReceivedAt"/>; the pull does not send the change back to it. Null = backfill or catch-up.</summary>
+    [MaxLength(50)]
+    public string ModifiedByShopId { get; set; }
 }

@@ -988,6 +988,8 @@ namespace GrKouk.Web.ERP.Data
             modelBuilder.Entity<SharedCashierDepartment>().HasIndex(p => p.ReceivedAt);
             modelBuilder.Entity<SharedItemPrice>().HasIndex(p => p.ReceivedAt);
             modelBuilder.Entity<SharedItemErpMapping>().HasIndex(p => p.ReceivedAt);
+            // Item codes: same idea, own columns (no ModifiedAt). Backfill: SharedItemCodeReceivedAt_Backfill.sql.
+            modelBuilder.Entity<SharedItemCode>().HasIndex(p => p.ReceivedAt);
             modelBuilder.Entity<SharedItemErpMappingDeletion>(entity =>
             {
                 entity.HasIndex(p => p.LocalItemId);

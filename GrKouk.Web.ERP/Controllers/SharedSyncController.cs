@@ -78,6 +78,38 @@ public class SharedSyncController : ControllerBase
     }
 
     /// <summary>
+    /// Item codes changed for the pull. Codes have no <c>ModifiedAt</c>, so they do not go through
+    /// <see cref="ChangedSince{T}"/>: by default the hub's receive time less the overlap, without the
+    /// changes the asking shop pushed itself. With <c>SharedSync:PullByReceivedAt = false</c>, the old
+    /// behaviour: the scanning shop's <c>LastUsedAt</c>.
+    /// </summary>
+    private IQueryable<SharedItemCode> ItemCodesChangedSince(DateTime since, DateTime receivedFrom, string shopId)
+        => PullByReceivedAt
+            ? _context.SharedItemCodes.Where(ic => ic.ReceivedAt > receivedFrom && ic.ModifiedByShopId != shopId)
+            : _context.SharedItemCodes.Where(ic => ic.LastUsedAt > since);
+
+    /// <summary>
+    /// Stamps the hub's clock and the pushing shop on every item code this push added or really
+    /// changed. A code pushed with the values the hub already holds (the usual case when its item is
+    /// re-sent, or an older scan stamp that lost the MAX-merge) is not tracked as modified, so it is
+    /// left alone and not re-sent to the other shops.
+    /// </summary>
+    private int StampItemCodesReceived(DateTime nowUtc, string shopId)
+    {
+        var stamped = 0;
+        foreach (var entry in _context.ChangeTracker.Entries<SharedItemCode>())
+        {
+            if (entry.State is EntityState.Added or EntityState.Modified)
+            {
+                entry.Entity.ReceivedAt = nowUtc;
+                entry.Entity.ModifiedByShopId = shopId;
+                stamped++;
+            }
+        }
+        return stamped;
+    }
+
+    /// <summary>
     /// Pull changes from the shared registry.
     /// Returns items and reference data modified since the given timestamp,
     /// excluding changes that originated from the requesting shop.
@@ -226,15 +258,14 @@ public class SharedSyncController : ControllerBase
         // the receiver with FK_ItemErpMappings_Items_LocalItemId. Pull in any missing
         // FK parents now, bypassing the echo filter — they're for FK satisfaction, not
         // change notification. The receiver's LWW guard skips redundant updates.
-        // Stale-barcode feature: SharedItemCode.LastUsedAt is its own pull-out
-        // watermark. A usage stamp changes no other column and never bumps the
-        // parent SharedItem.ModifiedAt, so codes selected only via parent-item
-        // recency would never carry stamps to the peer shop and the cross-shop
-        // MAX-merge would never converge. Their parent items also join the
-        // FK-parent pull-in below. (No ModifiedByShopId on codes → the pushing
-        // shop gets its own stamp echoed back; the client merge is idempotent.)
-        var stampedCodeItemIds = await _context.SharedItemCodes
-            .Where(ic => ic.LastUsedAt > since)
+        // Stale-barcode feature: item codes ride their own pull-out watermark.
+        // A usage stamp changes no other column and never bumps the parent
+        // SharedItem.ModifiedAt, so codes selected only via parent-item recency
+        // would never carry stamps to the peer shop and the cross-shop MAX-merge
+        // would never converge. Their parent items also join the FK-parent
+        // pull-in below. The watermark is the hub's receive time, not the scan
+        // time: see ItemCodesChangedSince.
+        var stampedCodeItemIds = await ItemCodesChangedSince(since, receivedFrom, shopId)
             .Select(ic => ic.ItemId)
             .Distinct()
             .ToListAsync();
@@ -422,12 +453,13 @@ public class SharedSyncController : ControllerBase
         }
 
         // For item codes, return codes belonging to items in the (now FK-complete)
-        // batch, plus usage-stamped codes riding their own LastUsedAt watermark
+        // batch, plus changed codes riding their own watermark
         // (their parents are already in the batch via stampedCodeItemIds above;
         // the explicit clause keeps the watermark independent of that pull-in).
         var allItemIds = items.Select(i => i.Id).ToHashSet();
+        var changedCodeIds = ItemCodesChangedSince(since, receivedFrom, shopId).Select(ic => ic.Id);
         var itemCodes = await _context.SharedItemCodes
-            .Where(ic => allItemIds.Contains(ic.ItemId) || ic.LastUsedAt > since)
+            .Where(ic => allItemIds.Contains(ic.ItemId) || changedCodeIds.Contains(ic.Id))
             .Select(ic => new SharedItemCodeDto
             {
                 Id = ic.Id,
@@ -1475,7 +1507,9 @@ public class SharedSyncController : ControllerBase
 
             // Hub receive time on every catalog row this push really changed, right before the
             // commit: the pull asks by it (see ChangedSince).
-            StampReceivedAt(DateTime.UtcNow);
+            var receivedNow = DateTime.UtcNow;
+            StampReceivedAt(receivedNow);
+            StampItemCodesReceived(receivedNow, request.ShopId);
 
             await _context.SaveChangesAsync();
 

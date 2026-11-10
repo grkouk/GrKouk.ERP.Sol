@@ -2732,14 +2732,23 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.Property<Guid>("MeasureUnitId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("ModifiedByShopId")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<decimal>("Quantity")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("ReceivedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Code");
 
                     b.HasIndex("ItemId");
+
+                    b.HasIndex("ReceivedAt");
 
                     b.ToTable("SharedItemCodes");
                 });
