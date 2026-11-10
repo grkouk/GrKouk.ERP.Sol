@@ -8,7 +8,7 @@ namespace GrKouk.Erp.Domain.Shared;
 /// Code is deliberately NOT unique here: two shops can hold the same Code under different
 /// Ids, and the client resolves that (skip + conflict entry), not the hub.
 /// </summary>
-public class SharedItemFamily
+public class SharedItemFamily : IHubReceivedStamp
 {
     [Key]
     public Guid Id { get; set; }
@@ -22,4 +22,7 @@ public class SharedItemFamily
     public string Name { get; set; }
 
     public DateTime ModifiedAt { get; set; }
+
+    /// <summary>Hub clock when this change was stored; the pull filters by it.</summary>
+    public DateTime ReceivedAt { get; set; }
 }

@@ -9,7 +9,7 @@ namespace GrKouk.Erp.Domain.Shared;
 /// ERP financial aggregate it resolves to (ErpId, an int FK into the ERP DB).
 /// One alive mapping per LocalItemId is enforced via unique index.
 /// </summary>
-public class SharedItemErpMapping
+public class SharedItemErpMapping : IHubReceivedStamp
 {
     [Key]
     public Guid Id { get; set; }
@@ -24,6 +24,9 @@ public class SharedItemErpMapping
 
     // Tracking
     public DateTime ModifiedAt { get; set; }
+
+    /// <summary>Hub clock when this change was stored; the pull filters by it.</summary>
+    public DateTime ReceivedAt { get; set; }
 
     [Required]
     [MaxLength(50)]

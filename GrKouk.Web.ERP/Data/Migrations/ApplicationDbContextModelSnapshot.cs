@@ -2487,6 +2487,9 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<DateTime>("ReceivedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid>("VatClassId")
                         .HasColumnType("uniqueidentifier");
 
@@ -2497,6 +2500,8 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasIndex("ModifiedAt");
 
                     b.HasIndex("ModifiedByShopId");
+
+                    b.HasIndex("ReceivedAt");
 
                     b.ToTable("SharedCashierDepartments");
                 });
@@ -2602,6 +2607,9 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<DateTime>("ReceivedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("UpcCode")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -2622,6 +2630,8 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasIndex("ModifiedAt");
 
                     b.HasIndex("ModifiedByShopId");
+
+                    b.HasIndex("ReceivedAt");
 
                     b.ToTable("SharedItems");
                 });
@@ -2647,11 +2657,16 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<DateTime>("ReceivedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Code");
 
                     b.HasIndex("ModifiedAt");
+
+                    b.HasIndex("ReceivedAt");
 
                     b.ToTable("SharedItemBrands");
                 });
@@ -2677,11 +2692,16 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<DateTime>("ReceivedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Code");
 
                     b.HasIndex("ModifiedAt");
+
+                    b.HasIndex("ReceivedAt");
 
                     b.ToTable("SharedItemCategories");
                 });
@@ -2867,6 +2887,9 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<DateTime>("ReceivedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("LocalItemId")
@@ -2875,6 +2898,8 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasIndex("ModifiedAt");
 
                     b.HasIndex("ModifiedByShopId");
+
+                    b.HasIndex("ReceivedAt");
 
                     b.ToTable("SharedItemErpMappings");
                 });
@@ -2933,11 +2958,16 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<DateTime>("ReceivedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Code");
 
                     b.HasIndex("ModifiedAt");
+
+                    b.HasIndex("ReceivedAt");
 
                     b.ToTable("SharedItemFamilies");
                 });
@@ -2979,6 +3009,9 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.Property<Guid>("PriceLevelId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("ReceivedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("ValidFrom")
                         .HasColumnType("datetime2");
 
@@ -2994,6 +3027,8 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.HasIndex("ModifiedByShopId");
 
                     b.HasIndex("PriceLevelId");
+
+                    b.HasIndex("ReceivedAt");
 
                     b.ToTable("SharedItemPrices");
                 });
@@ -3052,11 +3087,16 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<DateTime>("ReceivedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Code");
 
                     b.HasIndex("ModifiedAt");
+
+                    b.HasIndex("ReceivedAt");
 
                     b.ToTable("SharedMeasureUnits");
                 });
@@ -3411,11 +3451,16 @@ namespace GrKouk.Web.ERP.Data.Migrations
                     b.Property<decimal>("Rate")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<DateTime>("ReceivedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Code");
 
                     b.HasIndex("ModifiedAt");
+
+                    b.HasIndex("ReceivedAt");
 
                     b.ToTable("SharedVatClasses");
                 });

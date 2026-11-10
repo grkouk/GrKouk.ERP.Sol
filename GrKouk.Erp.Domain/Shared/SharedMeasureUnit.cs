@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GrKouk.Erp.Domain.Shared;
 
-public class SharedMeasureUnit
+public class SharedMeasureUnit : IHubReceivedStamp
 {
     [Key]
     public Guid Id { get; set; }
@@ -17,4 +17,7 @@ public class SharedMeasureUnit
     public string Name { get; set; }
 
     public DateTime ModifiedAt { get; set; }
+
+    /// <summary>Hub clock when this change was stored; the pull filters by it.</summary>
+    public DateTime ReceivedAt { get; set; }
 }

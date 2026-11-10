@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GrKouk.Erp.Domain.Shared;
 
-public class SharedVatClass
+public class SharedVatClass : IHubReceivedStamp
 {
     [Key]
     public Guid Id { get; set; }
@@ -19,4 +19,7 @@ public class SharedVatClass
     public decimal Rate { get; set; }
 
     public DateTime ModifiedAt { get; set; }
+
+    /// <summary>Hub clock when this change was stored; the pull filters by it.</summary>
+    public DateTime ReceivedAt { get; set; }
 }

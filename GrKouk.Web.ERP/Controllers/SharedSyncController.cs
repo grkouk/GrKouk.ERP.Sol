@@ -8,6 +8,7 @@ using GrKouk.Web.ERP.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace GrKouk.Web.ERP.Controllers;
@@ -23,11 +24,57 @@ public class SharedSyncController : ControllerBase
 {
     private readonly ApiDbContext _context;
     private readonly ILogger<SharedSyncController> _logger;
+    private readonly IConfiguration _configuration;
 
-    public SharedSyncController(ApiDbContext context, ILogger<SharedSyncController> logger)
+    public SharedSyncController(ApiDbContext context, ILogger<SharedSyncController> logger, IConfiguration configuration)
     {
         _context = context;
         _logger = logger;
+        _configuration = configuration;
+    }
+
+    /// <summary>
+    /// Rows changed for the pull since <paramref name="since"/>. By default the hub's own receive time
+    /// (<see cref="IHubReceivedStamp.ReceivedAt"/>), less an overlap, so an edit a shop pushes late still
+    /// reaches a shop that pulled in between. <c>SharedSync:PullByReceivedAt = false</c> goes back to the
+    /// editing shop's <c>ModifiedAt</c> (the old behaviour) without a release.
+    /// Re-sending a row in the overlap is harmless: the client applies by last-writer-wins.
+    /// </summary>
+    private IQueryable<T> ChangedSince<T>(IQueryable<T> query, DateTime since, DateTime receivedFrom)
+        where T : class, IHubReceivedStamp
+        => PullByReceivedAt
+            ? query.Where(e => e.ReceivedAt > receivedFrom)
+            : query.Where(e => e.ModifiedAt > since);
+
+    private bool PullByReceivedAt => _configuration.GetValue("SharedSync:PullByReceivedAt", true);
+
+    /// <summary>The pull's <c>since</c> moved back by <c>SharedSync:PullOverlapSeconds</c> (default 120).</summary>
+    private DateTime ReceivedFrom(DateTime since)
+    {
+        var overlap = TimeSpan.FromSeconds(Math.Max(0, _configuration.GetValue("SharedSync:PullOverlapSeconds", 120)));
+        return since - DateTime.MinValue > overlap ? since - overlap : DateTime.MinValue;
+    }
+
+    /// <summary>
+    /// Stamps the hub's clock on every shared catalog row this push added, or updated past the
+    /// last-writer-wins guard (its <c>ModifiedAt</c> changed). Rows touched without a new
+    /// <c>ModifiedAt</c> (the family/brand seed) are left alone, so they are not re-sent, as before.
+    /// Call right before the save, so the time between stamp and commit is the save itself.
+    /// </summary>
+    private int StampReceivedAt(DateTime nowUtc)
+    {
+        var stamped = 0;
+        foreach (var entry in _context.ChangeTracker.Entries<IHubReceivedStamp>())
+        {
+            if (entry.State == EntityState.Added
+                || (entry.State == EntityState.Modified
+                    && entry.Property(nameof(IHubReceivedStamp.ModifiedAt)).IsModified))
+            {
+                entry.Entity.ReceivedAt = nowUtc;
+                stamped++;
+            }
+        }
+        return stamped;
     }
 
     /// <summary>
@@ -43,9 +90,10 @@ public class SharedSyncController : ControllerBase
             return BadRequest(new { error = "shopId is required" });
 
         var serverTimestamp = DateTime.UtcNow;
+        var receivedFrom = ReceivedFrom(since);
 
-        var items = await _context.SharedItems
-            .Where(i => i.ModifiedAt > since && i.ModifiedByShopId != shopId)
+        var items = await ChangedSince(_context.SharedItems, since, receivedFrom)
+            .Where(i => i.ModifiedByShopId != shopId)
             .Select(i => new SharedItemDto
             {
                 Id = i.Id,
@@ -75,8 +123,7 @@ public class SharedSyncController : ControllerBase
             })
             .ToListAsync();
 
-        var categories = await _context.SharedItemCategories
-            .Where(c => c.ModifiedAt > since)
+        var categories = await ChangedSince(_context.SharedItemCategories, since, receivedFrom)
             .Select(c => new SharedItemCategoryDto
             {
                 Id = c.Id,
@@ -86,8 +133,7 @@ public class SharedSyncController : ControllerBase
             })
             .ToListAsync();
 
-        var families = await _context.SharedItemFamilies
-            .Where(f => f.ModifiedAt > since)
+        var families = await ChangedSince(_context.SharedItemFamilies, since, receivedFrom)
             .Select(f => new SharedItemFamilyDto
             {
                 Id = f.Id,
@@ -97,8 +143,7 @@ public class SharedSyncController : ControllerBase
             })
             .ToListAsync();
 
-        var brands = await _context.SharedItemBrands
-            .Where(b => b.ModifiedAt > since)
+        var brands = await ChangedSince(_context.SharedItemBrands, since, receivedFrom)
             .Select(b => new SharedItemBrandDto
             {
                 Id = b.Id,
@@ -108,8 +153,7 @@ public class SharedSyncController : ControllerBase
             })
             .ToListAsync();
 
-        var vatClasses = await _context.SharedVatClasses
-            .Where(v => v.ModifiedAt > since)
+        var vatClasses = await ChangedSince(_context.SharedVatClasses, since, receivedFrom)
             .Select(v => new SharedVatClassDto
             {
                 Id = v.Id,
@@ -120,8 +164,7 @@ public class SharedSyncController : ControllerBase
             })
             .ToListAsync();
 
-        var measureUnits = await _context.SharedMeasureUnits
-            .Where(m => m.ModifiedAt > since)
+        var measureUnits = await ChangedSince(_context.SharedMeasureUnits, since, receivedFrom)
             .Select(m => new SharedMeasureUnitDto
             {
                 Id = m.Id,
@@ -131,8 +174,8 @@ public class SharedSyncController : ControllerBase
             })
             .ToListAsync();
 
-        var cashierDepartments = await _context.SharedCashierDepartments
-            .Where(d => d.ModifiedAt > since && d.ModifiedByShopId != shopId)
+        var cashierDepartments = await ChangedSince(_context.SharedCashierDepartments, since, receivedFrom)
+            .Where(d => d.ModifiedByShopId != shopId)
             .Select(d => new SharedCashierDepartmentDto
             {
                 Id = d.Id,
@@ -144,8 +187,8 @@ public class SharedSyncController : ControllerBase
             })
             .ToListAsync();
 
-        var itemPrices = await _context.SharedItemPrices
-            .Where(p => p.ModifiedAt > since && p.ModifiedByShopId != shopId)
+        var itemPrices = await ChangedSince(_context.SharedItemPrices, since, receivedFrom)
+            .Where(p => p.ModifiedByShopId != shopId)
             .Select(p => new SharedItemPriceDto
             {
                 Id = p.Id,
@@ -163,8 +206,8 @@ public class SharedSyncController : ControllerBase
             })
             .ToListAsync();
 
-        var itemErpMappings = await _context.SharedItemErpMappings
-            .Where(m => m.ModifiedAt > since && m.ModifiedByShopId != shopId)
+        var itemErpMappings = await ChangedSince(_context.SharedItemErpMappings, since, receivedFrom)
+            .Where(m => m.ModifiedByShopId != shopId)
             .Select(m => new SharedItemErpMappingDto
             {
                 Id = m.Id,
@@ -535,8 +578,8 @@ public class SharedSyncController : ControllerBase
             .ToListAsync();
 
         _logger.LogInformation(
-            "SharedSync Pull for shop {ShopId} since {Since}: {Items} items, {Categories} categories, {Families} families, {Brands} brands, {VatClasses} vat classes, {MeasureUnits} measure units, {Depts} cashier depts, {ItemCodes} item codes ({IcDel} deletes), {ItemPrices} item prices ({IpDel} deletes), {Mappings} mappings, {MapDeletions} mapping deletions",
-            shopId, since, items.Count, categories.Count, families.Count, brands.Count, vatClasses.Count, measureUnits.Count, cashierDepartments.Count, itemCodes.Count, itemCodeDeletions.Count, itemPrices.Count, itemPriceLevelMappingDeletions.Count, itemErpMappings.Count, itemErpMappingDeletions.Count);
+            "SharedSync Pull for shop {ShopId} since {Since} (by {PullBy}): {Items} items, {Categories} categories, {Families} families, {Brands} brands, {VatClasses} vat classes, {MeasureUnits} measure units, {Depts} cashier depts, {ItemCodes} item codes ({IcDel} deletes), {ItemPrices} item prices ({IpDel} deletes), {Mappings} mappings, {MapDeletions} mapping deletions",
+            shopId, since, PullByReceivedAt ? $"ReceivedAt > {receivedFrom:o}" : "ModifiedAt", items.Count, categories.Count, families.Count, brands.Count, vatClasses.Count, measureUnits.Count, cashierDepartments.Count, itemCodes.Count, itemCodeDeletions.Count, itemPrices.Count, itemPriceLevelMappingDeletions.Count, itemErpMappings.Count, itemErpMappingDeletions.Count);
 
         return Ok(new SharedSyncPullResponse
         {
@@ -1429,6 +1472,10 @@ public class SharedSyncController : ControllerBase
                 });
                 stockRequestsInserted++;
             }
+
+            // Hub receive time on every catalog row this push really changed, right before the
+            // commit: the pull asks by it (see ChangedSince).
+            StampReceivedAt(DateTime.UtcNow);
 
             await _context.SaveChangesAsync();
 

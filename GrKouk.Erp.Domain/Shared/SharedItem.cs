@@ -8,7 +8,7 @@ namespace GrKouk.Erp.Domain.Shared;
 /// Uses the local GUID as the shared identity (both shops start from the same DB clone).
 /// Prices and stock are excluded — they are shop-specific.
 /// </summary>
-public class SharedItem
+public class SharedItem : IHubReceivedStamp
 {
     [Key]
     public Guid Id { get; set; }
@@ -70,6 +70,9 @@ public class SharedItem
 
     // Tracking
     public DateTime ModifiedAt { get; set; }
+
+    /// <summary>Hub clock when this change was stored; the pull filters by it.</summary>
+    public DateTime ReceivedAt { get; set; }
 
     [Required]
     [MaxLength(50)]

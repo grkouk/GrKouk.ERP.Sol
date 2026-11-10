@@ -976,6 +976,18 @@ namespace GrKouk.Web.ERP.Data
                 entity.Property(p => p.ModifiedAt)
                     .HasDefaultValueSql("GETUTCDATE()");
             });
+            // The pull asks for rows the hub received since a server time (IHubReceivedStamp).
+            // No default value on purpose: Push always sets it, and existing rows get
+            // ReceivedAt = ModifiedAt from the backfill script, so nothing looks new.
+            modelBuilder.Entity<SharedItem>().HasIndex(p => p.ReceivedAt);
+            modelBuilder.Entity<SharedItemCategory>().HasIndex(p => p.ReceivedAt);
+            modelBuilder.Entity<SharedItemFamily>().HasIndex(p => p.ReceivedAt);
+            modelBuilder.Entity<SharedItemBrand>().HasIndex(p => p.ReceivedAt);
+            modelBuilder.Entity<SharedVatClass>().HasIndex(p => p.ReceivedAt);
+            modelBuilder.Entity<SharedMeasureUnit>().HasIndex(p => p.ReceivedAt);
+            modelBuilder.Entity<SharedCashierDepartment>().HasIndex(p => p.ReceivedAt);
+            modelBuilder.Entity<SharedItemPrice>().HasIndex(p => p.ReceivedAt);
+            modelBuilder.Entity<SharedItemErpMapping>().HasIndex(p => p.ReceivedAt);
             modelBuilder.Entity<SharedItemErpMappingDeletion>(entity =>
             {
                 entity.HasIndex(p => p.LocalItemId);

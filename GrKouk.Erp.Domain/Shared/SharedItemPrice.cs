@@ -7,7 +7,7 @@ namespace GrKouk.Erp.Domain.Shared;
 /// Shared item price for syncing inter-shop price level prices between shops.
 /// Uses the local GUID as the shared identity (both shops start from the same DB clone).
 /// </summary>
-public class SharedItemPrice
+public class SharedItemPrice : IHubReceivedStamp
 {
     [Key]
     public Guid Id { get; set; }
@@ -32,6 +32,9 @@ public class SharedItemPrice
 
     // Tracking
     public DateTime ModifiedAt { get; set; }
+
+    /// <summary>Hub clock when this change was stored; the pull filters by it.</summary>
+    public DateTime ReceivedAt { get; set; }
 
     [Required]
     [MaxLength(50)]

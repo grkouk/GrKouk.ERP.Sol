@@ -8,7 +8,7 @@ namespace GrKouk.Erp.Domain.Shared;
 /// DepartmentNumber is intentionally not stored here — it is the per-shop
 /// cashier-button position and must remain shop-local.
 /// </summary>
-public class SharedCashierDepartment
+public class SharedCashierDepartment : IHubReceivedStamp
 {
     [Key]
     public Guid Id { get; set; }
@@ -24,6 +24,9 @@ public class SharedCashierDepartment
     public Guid VatClassId { get; set; }
 
     public DateTime ModifiedAt { get; set; }
+
+    /// <summary>Hub clock when this change was stored; the pull filters by it.</summary>
+    public DateTime ReceivedAt { get; set; }
 
     [Required]
     [MaxLength(50)]
