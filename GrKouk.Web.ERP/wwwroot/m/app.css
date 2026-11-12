@@ -132,7 +132,40 @@ button.link {
     border-bottom: 1px solid var(--line);
 }
 
-.topbar select, .topbar input { margin-top: 0; flex: 1 1 auto; min-width: 0; }
+/* Basis 0, not the fields' own 100% width, so the button beside them stays on the same line. */
+.topbar select, .topbar input { margin-top: 0; flex: 1 1 0; min-width: 0; }
+
+/* Server address with a status dot: grey = checking, green = reachable, amber = answers but
+   reports a problem, red = unreachable. */
+.server {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 0;
+    font-size: 11px;
+    line-height: 1;
+    color: var(--muted);
+    opacity: .85;
+}
+
+.server .host { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.server .dot {
+    flex: none;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--muted);
+}
+
+.server.on .dot { background: var(--ok); }
+.server.warn .dot { background: #d9a100; }
+.server.off .dot { background: var(--danger); }
+
+.topbar { flex-wrap: wrap; row-gap: 4px; }
+.topbar .server { flex: 0 0 100%; }
+.login + .server { margin-top: 16px; }
 
 .tab { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
 

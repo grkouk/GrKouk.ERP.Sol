@@ -13,7 +13,7 @@
     <link rel="apple-touch-icon" href="icon-180.png">
     <link rel="icon" type="image/png" href="icon-180.png">
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="app.css?v=1">
+    <link rel="stylesheet" href="app.css?v=2">
 </head>
 <body>
 
@@ -30,6 +30,7 @@
         <p id="loginError" class="error" hidden></p>
         <button id="loginBtn" type="submit" class="primary">Σύνδεση</button>
     </form>
+    <p class="server" role="status"><span class="dot"></span><span class="host"></span></p>
 </section>
 
 <!-- Main -->
@@ -37,6 +38,7 @@
     <header class="topbar">
         <select id="companySelect" aria-label="Εταιρεία"></select>
         <button id="logoutBtn" type="button" class="link">Αποσύνδεση</button>
+        <p class="server" role="status"><span class="dot"></span><span class="host"></span></p>
     </header>
 
     <!-- Payment form -->
@@ -112,6 +114,6 @@
 
 <div id="toast" class="toast" hidden></div>
 
-<script src="app.js?v=2"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>

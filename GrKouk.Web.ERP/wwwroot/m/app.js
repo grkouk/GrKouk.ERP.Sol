@@ -5,7 +5,10 @@
 
     // Resolves to <site root>/api/ from both /m/ and /m/index.html.
     var API = new URL('../api/', location.href).href;
+    var HEALTH = new URL('../health', location.href).href;
     var REQUEST_TIMEOUT_MS = 30000;
+    var PING_TIMEOUT_MS = 8000;
+    var PING_INTERVAL_MS = 30000;
     var MAX_SUPPLIER_ROWS = 60;
 
     var KEY = {
@@ -153,11 +156,80 @@
         options.signal = controller.signal;
         options.cache = 'no-store';
         return fetch(url, options).then(
-            function (r) { clearTimeout(timer); return r; },
+            function (r) {
+                clearTimeout(timer);
+                // Only a success proves it is the ERP. Something else can sit on the same address
+                // while the ERP is stopped (macOS AirPlay answers 403 on port 5000).
+                if (r.ok) setServer('on');
+                return r;
+            },
             function () {
                 clearTimeout(timer);
-                throw new Error('Δεν υπάρχει σύνδεση με τον διακομιστή.');
+                setServer('off');
+                throw new Error(NO_SERVER);
             });
+    }
+
+    // ---------- server status ----------
+
+    var SERVER_TEXT = {
+        on: 'Ο διακομιστής είναι διαθέσιμος',
+        warn: 'Ο διακομιστής απαντά, αλλά αναφέρει πρόβλημα',
+        off: 'Δεν υπάρχει σύνδεση με τον διακομιστή',
+        unknown: 'Έλεγχος σύνδεσης…'
+    };
+
+    function setServer(status) {
+        var marks = document.querySelectorAll('.server');
+        for (var i = 0; i < marks.length; i++) {
+            marks[i].className = 'server' + (status === 'unknown' ? '' : ' ' + status);
+            marks[i].title = SERVER_TEXT[status];
+            marks[i].setAttribute('aria-label', location.host + ': ' + SERVER_TEXT[status]);
+        }
+    }
+
+    var NO_SERVER = 'Δεν υπάρχει σύνδεση με τον διακομιστή.';
+    var checkInFlight = null;
+
+    // /health needs no login and also checks the database, so green means payments can be saved.
+    // The body is read too: only the ERP answers "Healthy"/"Unhealthy", so another program
+    // listening on the same address counts as "no server". Resolves to 'on', 'warn' or 'off'.
+    function checkServer() {
+        if (!checkInFlight) {
+            var controller = new AbortController();
+            var timer = setTimeout(function () { controller.abort(); }, PING_TIMEOUT_MS);
+            checkInFlight = fetch(HEALTH, { cache: 'no-store', signal: controller.signal })
+                .then(function (r) {
+                    return r.text().then(function (body) {
+                        if (r.ok && /^(Healthy|Degraded)/.test(body)) return 'on';
+                        if (r.status === 503 && /^Unhealthy/.test(body)) return 'warn';
+                        return 'off';
+                    });
+                })
+                .catch(function () { return 'off'; })
+                .then(function (status) {
+                    clearTimeout(timer);
+                    checkInFlight = null;
+                    setServer(status);
+                    return status;
+                });
+        }
+        return checkInFlight;
+    }
+
+    function pingServer() {
+        if (!document.hidden) checkServer();
+    }
+
+    function startServerWatch() {
+        var hosts = document.querySelectorAll('.server .host');
+        for (var i = 0; i < hosts.length; i++) hosts[i].textContent = location.host;
+        setServer('unknown');
+        pingServer();
+        setInterval(pingServer, PING_INTERVAL_MS);
+        document.addEventListener('visibilitychange', pingServer);
+        window.addEventListener('online', pingServer);
+        window.addEventListener('offline', function () { setServer('off'); });
     }
 
     function tokenExpiresSoon(token) {
@@ -183,6 +255,8 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ token: access, refreshToken: refresh })
                 });
+                // Not the ERP answering: keep the session instead of signing the phone out.
+                if (!r.ok && (await checkServer()) === 'off') throw new Error(NO_SERVER);
                 if (!r.ok) return false;
                 var data = camel(await r.json());
                 if (!data.accessToken || !data.refreshToken) return false;
@@ -239,6 +313,8 @@
         }
 
         var noPermission = 'Ο χρήστης δεν έχει δικαίωμα για αυτή την ενέργεια (απαιτείται ρόλος Admin).';
+        // A refusal may come from another program on the address, not from the ERP.
+        if (!r.ok && (await checkServer()) === 'off') throw new Error(NO_SERVER);
         if (r.status === 403) throw new Error(noPermission);
         if (!r.ok) throw new Error(await errorText(r));
         if (r.status === 204) return null;
@@ -321,6 +397,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username: $('loginUser').value.trim(), password: $('loginPass').value })
             });
+            if (!r.ok && (await checkServer()) === 'off') throw new Error(NO_SERVER);
             if (r.status === 401) throw new Error('Λάθος όνομα χρήστη ή κωδικός.');
             if (!r.ok) throw new Error(await errorText(r));
             var data = camel(await r.json());
@@ -734,6 +811,8 @@
         $('listFrom').addEventListener('change', loadList);
         $('listTo').addEventListener('change', loadList);
         $('listSearch').addEventListener('input', onListSearch);
+
+        startServerWatch();
 
         if (store.get(KEY.access) && store.get(KEY.refresh)) enterApp();
         else showLogin('');
