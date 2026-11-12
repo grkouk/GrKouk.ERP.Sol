@@ -244,6 +244,30 @@ button.primary:disabled { background: var(--muted); border-color: var(--muted); 
 .item .amount { font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .item .line2 { font-size: 13px; color: var(--muted); margin-top: 2px; overflow-wrap: anywhere; }
 
+/* A payment created by a buy document: shown, but it can only be viewed. */
+.item .tag {
+    display: inline-block;
+    margin-right: 6px;
+    padding: 0 6px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.lock {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--bg);
+    font-size: 14px;
+}
+
+.lock strong { display: block; }
+
+input:disabled, select:disabled, .picker:disabled { opacity: 1; color: var(--muted); -webkit-text-fill-color: var(--muted); }
+
 .empty { text-align: center; color: var(--muted); padding: 24px 0; }
 
 .overlay {
