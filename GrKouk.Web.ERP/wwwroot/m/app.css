@@ -135,8 +135,9 @@ button.link {
 /* Basis 0, not the fields' own 100% width, so the button beside them stays on the same line. */
 .topbar select, .topbar input { margin-top: 0; flex: 1 1 0; min-width: 0; }
 
-/* Server address with a status dot: grey = checking, green = reachable, amber = answers but
-   reports a problem, red = unreachable. */
+/* Server status. Normally a quiet line: a small badge and the address. The badge carries a
+   sign as well as a colour: "…" checking, tick = reachable, "!" = answers but reports a problem,
+   cross = unreachable. While the server cannot be used the line becomes a strip with words. */
 .server {
     display: flex;
     align-items: center;
@@ -144,28 +145,56 @@ button.link {
     gap: 6px;
     margin: 0;
     font-size: 11px;
-    line-height: 1;
+    line-height: 14px;
     color: var(--muted);
-    opacity: .85;
 }
 
 .server .host { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.server .msg { display: none; }
 
 .server .dot {
     flex: none;
-    width: 7px;
-    height: 7px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
     background: var(--muted);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 14px;
+    text-align: center;
 }
 
+/* FE0E keeps iOS from drawing the signs as emoji. */
+.server .dot::before { content: '\2026'; }
+.server.on .dot::before { content: '\2713\FE0E'; }
+.server.warn .dot::before { content: '!'; }
+.server.off .dot::before { content: '\2715\FE0E'; }
+
 .server.on .dot { background: var(--ok); }
-.server.warn .dot { background: #d9a100; }
-.server.off .dot { background: var(--danger); }
+
+.server.off, .server.warn {
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.server.off { background: #c0392b; }
+.server.warn { background: #a36a00; }
+.server.off .host, .server.warn .host { display: none; }
+.server.off .msg, .server.warn .msg { display: inline; }
+.server.off .dot { background: #fff; color: #c0392b; }
+.server.warn .dot { background: #fff; color: #a36a00; }
 
 .topbar { flex-wrap: wrap; row-gap: 4px; }
 .topbar .server { flex: 0 0 100%; }
+/* The strip runs edge to edge, over the bar's own padding. */
+.topbar .server.off, .topbar .server.warn { flex-basis: calc(100% + 32px); margin: 4px -16px -8px; }
 .login + .server { margin-top: 16px; }
+.login + .server.off, .login + .server.warn { margin: 16px 16px 0; border-radius: 8px; }
+
+button.primary:disabled { background: var(--muted); border-color: var(--muted); opacity: .8; }
 
 .tab { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
 

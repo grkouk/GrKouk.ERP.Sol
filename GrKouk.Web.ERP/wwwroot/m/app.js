@@ -179,13 +179,26 @@
         unknown: 'Έλεγχος σύνδεσης…'
     };
 
+    // Shown as a coloured strip in place of the address while the server cannot be used.
+    var SERVER_STRIP = {
+        off: 'Εκτός σύνδεσης — δεν αποθηκεύονται πληρωμές',
+        warn: 'Πρόβλημα στον διακομιστή — δεν αποθηκεύονται πληρωμές'
+    };
+
+    var serverStatus = 'unknown';
+
+    function serverDown() { return serverStatus === 'off' || serverStatus === 'warn'; }
+
     function setServer(status) {
+        serverStatus = status;
         var marks = document.querySelectorAll('.server');
         for (var i = 0; i < marks.length; i++) {
             marks[i].className = 'server' + (status === 'unknown' ? '' : ' ' + status);
             marks[i].title = SERVER_TEXT[status];
             marks[i].setAttribute('aria-label', location.host + ': ' + SERVER_TEXT[status]);
+            marks[i].querySelector('.msg').textContent = SERVER_STRIP[status] || '';
         }
+        refreshButtons();
     }
 
     var NO_SERVER = 'Δεν υπάρχει σύνδεση με τον διακομιστή.';
@@ -224,6 +237,9 @@
     function startServerWatch() {
         var hosts = document.querySelectorAll('.server .host');
         for (var i = 0; i < hosts.length; i++) hosts[i].textContent = location.host;
+        // Tapping the line checks again at once, so a wrong "offline" never has to be waited out.
+        var marks = document.querySelectorAll('.server');
+        for (var j = 0; j < marks.length; j++) marks[j].addEventListener('click', checkServer);
         setServer('unknown');
         pingServer();
         setInterval(pingServer, PING_INTERVAL_MS);
@@ -602,11 +618,20 @@
         selectSupplier(null);
     }
 
+    var saving = false;
+
     function setBusy(busy) {
-        $('saveBtn').disabled = busy;
-        $('deleteBtn').disabled = busy;
-        $('cancelEditBtn').disabled = busy;
-        $('saveBtn').textContent = busy ? 'Αποθήκευση…' : 'Αποθήκευση';
+        saving = busy;
+        refreshButtons();
+    }
+
+    // Save and delete are also held back while the server cannot be reached.
+    function refreshButtons() {
+        var down = serverDown();
+        $('saveBtn').disabled = saving || down;
+        $('deleteBtn').disabled = saving || down;
+        $('cancelEditBtn').disabled = saving;
+        $('saveBtn').textContent = saving ? 'Αποθήκευση…' : down ? 'Εκτός σύνδεσης' : 'Αποθήκευση';
     }
 
     async function onSave(ev) {
