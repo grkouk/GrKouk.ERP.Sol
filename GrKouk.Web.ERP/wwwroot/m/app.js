@@ -97,6 +97,23 @@
             .replace(/ς/g, 'σ');
     }
 
+    // Same key-position table as the server's KeyboardTransliterator: text typed with the wrong
+    // keyboard layout still finds the name ("isaa" finds ΙΣΑΑΚ, "ψοψα" finds COCA).
+    var EN_KEYS = 'abcdefghijklmnopqrstuvwxyz';
+    var GR_KEYS = 'αβψδεφγηιξκλμνοπ;ρστθωςχυζ';
+
+    function swapKeyboard(text) {
+        var s = String(text || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+        var out = '';
+        for (var i = 0; i < s.length; i++) {
+            var ch = s.charAt(i);
+            var en = EN_KEYS.indexOf(ch);
+            var gr = GR_KEYS.indexOf(ch);
+            out += en >= 0 ? GR_KEYS.charAt(en) : gr >= 0 ? EN_KEYS.charAt(gr) : ch;
+        }
+        return out;
+    }
+
     // crypto.randomUUID needs HTTPS; getRandomValues works on plain HTTP too.
     function newKey() {
         var bytes = new Uint8Array(16);
@@ -422,12 +439,17 @@
         var box = $('supplierRows');
         box.textContent = '';
         var raw = $('supplierSearch').value.trim();
-        var terms = fold(raw).split(/\s+/).filter(Boolean);
+        // Each word may match as typed or as it would read on the other keyboard layout.
+        var terms = raw.split(/\s+/).filter(Boolean).map(function (t) {
+            return { typed: fold(t), swapped: fold(swapKeyboard(t)) };
+        });
         var rawLower = raw.toLowerCase();
 
         var matches = state.suppliers.filter(function (s) {
             if (terms.length === 0) return true;
-            if (terms.every(function (t) { return s.folded.indexOf(t) >= 0; })) return true;
+            if (terms.every(function (t) {
+                return s.folded.indexOf(t.typed) >= 0 || s.folded.indexOf(t.swapped) >= 0;
+            })) return true;
             return (s.taxNumber && s.taxNumber.indexOf(raw) >= 0) ||
                    (s.busCode && s.busCode.toLowerCase().indexOf(rawLower) >= 0);
         });
