@@ -207,6 +207,9 @@ namespace GrKouk.Web.ERP
             }
 
             // app.UseHttpsRedirection();
+            // Serves wwwroot/m/index.html at /m/ (the phone payments app). No other folder in
+            // wwwroot has a default document, so nothing else changes.
+            app.UseDefaultFiles();
             app.UseStaticFiles();
             app.UseCookiePolicy();
 

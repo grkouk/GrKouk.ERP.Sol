@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="el">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Πληρωμές</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Πληρωμές">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#1f5fbf">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="apple-touch-icon" href="icon-180.png">
+    <link rel="icon" type="image/png" href="icon-180.png">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="app.css?v=1">
+</head>
+<body>
+
+<!-- Login -->
+<section id="loginView" class="view" hidden>
+    <form id="loginForm" class="card login" autocomplete="on">
+        <h1>Πληρωμές Προμηθευτών</h1>
+        <label>Όνομα χρήστη
+            <input id="loginUser" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required>
+        </label>
+        <label>Κωδικός
+            <input id="loginPass" type="password" autocomplete="current-password" required>
+        </label>
+        <p id="loginError" class="error" hidden></p>
+        <button id="loginBtn" type="submit" class="primary">Σύνδεση</button>
+    </form>
+</section>
+
+<!-- Main -->
+<section id="mainView" class="view" hidden>
+    <header class="topbar">
+        <select id="companySelect" aria-label="Εταιρεία"></select>
+        <button id="logoutBtn" type="button" class="link">Αποσύνδεση</button>
+    </header>
+
+    <!-- Payment form -->
+    <main id="formTab" class="tab">
+        <form id="payForm" class="card" autocomplete="off" novalidate>
+            <h2 id="formTitle">Νέα πληρωμή</h2>
+
+            <label>Προμηθευτής
+                <button id="supplierBtn" type="button" class="picker placeholder">Επιλογή προμηθευτή…</button>
+            </label>
+            <p id="balanceLine" class="hint" hidden></p>
+
+            <div class="row">
+                <label>Ημερομηνία
+                    <input id="payDate" type="date" required>
+                </label>
+                <label>Ποσό (€)
+                    <input id="payAmount" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off">
+                </label>
+            </div>
+            <p id="amountNote" class="hint" hidden></p>
+
+            <label>Λογαριασμός πληρωμής
+                <select id="cfAccount"></select>
+            </label>
+            <label>Αρ. παραστατικού
+                <input id="payRef" type="text" maxlength="50" autocomplete="off">
+            </label>
+            <label>Αιτιολογία
+                <input id="payEtiology" type="text" maxlength="500" autocomplete="off">
+            </label>
+
+            <p id="formError" class="error" hidden></p>
+            <button id="saveBtn" type="submit" class="primary">Αποθήκευση</button>
+            <div id="editActions" class="row" hidden>
+                <button id="cancelEditBtn" type="button">Ακύρωση</button>
+                <button id="deleteBtn" type="button" class="danger">Διαγραφή</button>
+            </div>
+        </form>
+    </main>
+
+    <!-- Payments list -->
+    <main id="listTab" class="tab" hidden>
+        <div class="card filters">
+            <div class="row">
+                <label>Από
+                    <input id="listFrom" type="date">
+                </label>
+                <label>Έως
+                    <input id="listTo" type="date">
+                </label>
+            </div>
+            <input id="listSearch" type="search" placeholder="Αναζήτηση προμηθευτή, ΑΦΜ, αρ. παραστατικού" autocomplete="off">
+        </div>
+        <p id="listSummary" class="summary"></p>
+        <div id="listRows" class="list"></div>
+    </main>
+
+    <nav class="tabbar">
+        <button id="tabFormBtn" type="button" class="active">Πληρωμή</button>
+        <button id="tabListBtn" type="button">Λίστα</button>
+    </nav>
+</section>
+
+<!-- Supplier picker -->
+<section id="supplierPicker" class="overlay" hidden>
+    <header class="topbar">
+        <input id="supplierSearch" type="search" placeholder="Όνομα, ΑΦΜ ή κωδικός" autocomplete="off" autocorrect="off" spellcheck="false">
+        <button id="supplierCloseBtn" type="button" class="link">Άκυρο</button>
+    </header>
+    <div id="supplierRows" class="list"></div>
+</section>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="app.js?v=1"></script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -431,16 +432,109 @@ public class CashierApiController : ControllerBase
             Etiology = dto.Etiology
         };
 
-        var result = await _transService.AddTransactorTransaction(createDto, callerSectionCode: null);
-        if (result == null)
+        // Optional double-save guard. A client that sends the same key twice (a second tap, or a
+        // retry after a lost response) gets the first save's outcome instead of a second payment.
+        // Clients that send no key (the desktop app) are unaffected.
+        var idempotencyKey = ReadIdempotencyKey();
+        if (idempotencyKey != null)
         {
-            return StatusCode(500, new { error = "Empty response from transactor service" });
+            switch (ClaimPaymentKey(idempotencyKey))
+            {
+                case PaymentKeyClaim.AlreadySaved:
+                    return Ok(new { success = true, duplicate = true });
+                case PaymentKeyClaim.InProgress:
+                    return Conflict(new { error = "This payment is already being saved" });
+            }
         }
-        if (!result.Success)
+
+        var saved = false;
+        try
         {
-            return BadRequest(new { error = result.ErrorMessage });
+            var result = await _transService.AddTransactorTransaction(createDto, callerSectionCode: null);
+            if (result == null)
+            {
+                return StatusCode(500, new { error = "Empty response from transactor service" });
+            }
+            if (!result.Success)
+            {
+                return BadRequest(new { error = result.ErrorMessage });
+            }
+            saved = true;
+            return Ok(new { success = true });
         }
-        return Ok(new { success = true });
+        finally
+        {
+            if (idempotencyKey != null)
+            {
+                CompletePaymentKey(idempotencyKey, saved);
+            }
+        }
+    }
+
+    private const string IdempotencyHeader = "X-Idempotency-Key";
+    private static readonly TimeSpan PaymentKeyLifetime = TimeSpan.FromMinutes(30);
+
+    // Held in memory only: an application restart forgets the keys, which is acceptable for a
+    // guard whose job is to cover the seconds-to-minutes window of a double tap or a retry.
+    private static readonly ConcurrentDictionary<string, (DateTime At, bool Saved)> RecentPaymentKeys = new();
+
+    private enum PaymentKeyClaim { Claimed, InProgress, AlreadySaved }
+
+    private string ReadIdempotencyKey()
+    {
+        var key = Request.Headers[IdempotencyHeader].ToString().Trim();
+        return key.Length > 0 && key.Length <= 100 ? key : null;
+    }
+
+    private static PaymentKeyClaim ClaimPaymentKey(string key)
+    {
+        var now = DateTime.UtcNow;
+        foreach (var entry in RecentPaymentKeys)
+        {
+            if (now - entry.Value.At > PaymentKeyLifetime)
+            {
+                RecentPaymentKeys.TryRemove(entry.Key, out _);
+            }
+        }
+
+        if (RecentPaymentKeys.TryAdd(key, (now, false)))
+        {
+            return PaymentKeyClaim.Claimed;
+        }
+        return RecentPaymentKeys.TryGetValue(key, out var existing) && existing.Saved
+            ? PaymentKeyClaim.AlreadySaved
+            : PaymentKeyClaim.InProgress;
+    }
+
+    private static void CompletePaymentKey(string key, bool saved)
+    {
+        if (saved)
+        {
+            RecentPaymentKeys[key] = (DateTime.UtcNow, true);
+        }
+        else
+        {
+            // A failed save releases the key so the user can correct the form and try again.
+            RecentPaymentKeys.TryRemove(key, out _);
+        }
+    }
+
+    /// <summary>
+    /// The companies (branches) a payment can be entered for, without the system-wide
+    /// "all companies" entry. Used by the phone payments app to fill its company picker.
+    /// </summary>
+    [HttpGet("companies")]
+    [Authorize(Policy = "ApiPolicy2")]
+    public async Task<ActionResult> GetCompanies()
+    {
+        var allCompaniesId = await FiltersHelper.GetAllCompaniesIdAsync(_context);
+        var items = await _context.Companies
+            .AsNoTracking()
+            .Where(c => c.Id != allCompaniesId)
+            .OrderBy(c => c.Code)
+            .Select(c => new { c.Code, c.Name })
+            .ToListAsync();
+        return Ok(items);
     }
 
     /// <summary>
