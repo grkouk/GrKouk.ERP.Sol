@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using GrKouk.Erp.Domain.MediaEntities;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Erp.Dtos.WarehouseItems;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,12 +25,10 @@ namespace GrKouk.Web.ERP.Controllers
     public class AutoCompleteController : ControllerBase
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
 
-        public AutoCompleteController(ApiDbContext context, IMapper mapper)
+        public AutoCompleteController(ApiDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
         [HttpGet("GetShortcutsAutoCompleteData")]
         public async Task<IActionResult> GetShortcutsAutoCompleteData([FromQuery] ShortCutsAutoCompleteRequest request)
@@ -71,7 +68,7 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
             IEnumerable<Ej2ShortcutAutoCompleteItem> warehouseItems = await warehouseItem4FullListIq
-                .ProjectTo<WarehouseItemSearchListDto>(_mapper.ConfigurationProvider)
+                .Select(WarehouseItemMappings.ToSearchListDto)
                 .Select(p => new Ej2ShortcutAutoCompleteItem 
                     {
                         Text = p.Label, 
@@ -155,7 +152,7 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
             IEnumerable<Ej2AutoCompleteItem> items = await fullListIq
-                .ProjectTo<WarehouseItemSearchListDto>(_mapper.ConfigurationProvider)
+                .Select(WarehouseItemMappings.ToSearchListDto)
                 .Select(p => new Ej2AutoCompleteItem { Text = p.Label, Value = p.Id })
                 .ToListAsync();
 
@@ -229,7 +226,7 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
             IEnumerable<Ej2AutoCompleteItem> items = await fullListIq
-                .ProjectTo<WarehouseItemSearchListDto>(_mapper.ConfigurationProvider)
+                .Select(WarehouseItemMappings.ToSearchListDto)
                 .Select(p => new Ej2AutoCompleteItem { Text = p.Label, Value = p.Id })
                 .ToListAsync();
 
@@ -307,7 +304,7 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
             IEnumerable<Ej2AutoCompleteItem> items = await fullListIq
-                .ProjectTo<WarehouseItemSearchListDto>(_mapper.ConfigurationProvider)
+                .Select(WarehouseItemMappings.ToSearchListDto)
                 .Select(p => new Ej2AutoCompleteItem { Text = p.Label, Value = p.Id })
                 .ToListAsync();
 

@@ -63,4 +63,28 @@ public class EfTranslationTests
         var sql = db.CashFlowAccountTransactions.Select(CfaTransactionMappings.ToListDto).ToQueryString();
         Assert.Contains("[CurrencyId]", sql);
     }
+
+    [Fact]
+    public void WarehouseItem_ToListDto_translates_to_sql()
+    {
+        using var db = CreateContext();
+        var sql = db.WarehouseItems.Select(WarehouseItemMappings.ToListDto).ToQueryString();
+        Assert.Contains("JOIN", sql);
+    }
+
+    [Fact]
+    public void WarehouseItem_ToBigClass_translates_to_sql()
+    {
+        using var db = CreateContext();
+        var sql = db.CompanyWarehouseItemMappings.Select(WarehouseItemMappings.ToBigClass).ToQueryString();
+        Assert.Contains("CONVERT", sql);
+    }
+
+    [Fact]
+    public void WarehouseItem_ToSearchListDto_translates_to_sql()
+    {
+        using var db = CreateContext();
+        var sql = db.WarehouseItems.Select(WarehouseItemMappings.ToSearchListDto).ToQueryString();
+        Assert.Contains("[WarehouseItemNature]", sql);
+    }
 }

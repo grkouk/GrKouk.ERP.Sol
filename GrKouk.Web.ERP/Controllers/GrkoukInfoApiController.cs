@@ -3823,7 +3823,7 @@ namespace GrKouk.Web.ERP.Controllers
             PagedList<WarehouseItemListDto> listItems;
             try
             {
-                var projectedList = fullListIq.ProjectTo<WarehouseItemListDto>(_mapper.ConfigurationProvider);
+                var projectedList = fullListIq.Select(WarehouseItemMappings.ToListDto);
                 var pageIndex = request.PageIndex;
 
                 var pageSize = request.PageSize;
@@ -4055,7 +4055,7 @@ namespace GrKouk.Web.ERP.Controllers
                 .ThenInclude(p => p.FpaDef)
                 .Include(p => p.Company);
             IQueryable<WarehouseItemBigClass> fullListIq =
-                lst1.ProjectTo<WarehouseItemBigClass>(_mapper.ConfigurationProvider);
+                lst1.Select(WarehouseItemMappings.ToBigClass);
             // var t = fullListIq.ToList();
             //IQueryable<WarehouseItem> fullListIq = _context.WarehouseItems;
             if (!string.IsNullOrEmpty(request.WarehouseItemNatureFilter))
@@ -5423,7 +5423,7 @@ namespace GrKouk.Web.ERP.Controllers
             PagedList<WarehouseItemListDto> listItems;
             try
             {
-                var projectedList = fullListIq.ProjectTo<WarehouseItemListDto>(_mapper.ConfigurationProvider);
+                var projectedList = fullListIq.Select(WarehouseItemMappings.ToListDto);
                 var pageIndex = request.PageIndex;
 
                 var pageSize = request.PageSize;
@@ -5561,7 +5561,7 @@ namespace GrKouk.Web.ERP.Controllers
             PagedList<WarehouseItemListDto> listItems;
             try
             {
-                var projectedList = fullListIq.ProjectTo<WarehouseItemListDto>(_mapper.ConfigurationProvider);
+                var projectedList = fullListIq.Select(WarehouseItemMappings.ToListDto);
                 var pageIndex = request.PageIndex;
 
                 var pageSize = request.PageSize;

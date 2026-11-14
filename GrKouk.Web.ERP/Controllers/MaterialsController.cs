@@ -16,6 +16,7 @@ using GrKouk.Erp.Dtos.SellDocuments;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Erp.Dtos.WarehouseItems;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -429,7 +430,7 @@ namespace GrKouk.Web.ERP.Controllers
             fullListIq = fullListIq.Where(p => p.Active);
             fullListIq = fullListIq.Where(p => p.Name.Contains(term) || p.Code.Contains(term));
             var m = await fullListIq
-                .ProjectTo<WarehouseItemSearchListDto>(_mapper.ConfigurationProvider)
+                .Select(WarehouseItemMappings.ToSearchListDto)
                 .Select(p => new { label = p.Label, value = p.Id })
                 .ToListAsync();
 
@@ -480,7 +481,7 @@ namespace GrKouk.Web.ERP.Controllers
             //fullListIq = fullListIq.Where(p => p.Name.Contains(term) || p.Code.Contains(term));
 
             var materials = await fullListIq
-                .ProjectTo<WarehouseItemSearchListDto>(_mapper.ConfigurationProvider)
+                .Select(WarehouseItemMappings.ToSearchListDto)
                 .Select(p => new { label = p.Label, value = p.Id })
                 .ToListAsync();
 
@@ -541,7 +542,7 @@ namespace GrKouk.Web.ERP.Controllers
             //    .ProjectTo<WarehouseItemSearchListDto>(_mapper.ConfigurationProvider)
             //    .Select(p => new { label = p.Label, value = p.Id }).ToListAsync();
             var materials = await fullListIq
-                .ProjectTo<WarehouseItemSearchListDto>(_mapper.ConfigurationProvider)
+                .Select(WarehouseItemMappings.ToSearchListDto)
                 .Select(p => new { label = p.Label, value = p.Id }).ToListAsync();
             if (materials == null)
             {

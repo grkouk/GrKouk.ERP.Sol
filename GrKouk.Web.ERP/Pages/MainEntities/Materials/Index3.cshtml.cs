@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.WarehouseItems;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +18,6 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
     public class Index3Model : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
 
         public string NameSort { get; set; }
         public string NameSortIcon { get; set; }
@@ -33,10 +31,9 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
         public int TotalPages { get; set; }
         public int TotalCount { get; set; }
 
-        public Index3Model(ApiDbContext context, IMapper mapper)
+        public Index3Model(ApiDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
         public PagedList<WarehouseItemListDto> ListItems { get; set; }
@@ -105,7 +102,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
                     fullListIq = fullListIq.OrderBy(p => p.Id);
                     break;
             }
-            var t = fullListIq.ProjectTo<WarehouseItemListDto>(_mapper.ConfigurationProvider);
+            var t = fullListIq.Select(WarehouseItemMappings.ToListDto);
             ListItems = await PagedList<WarehouseItemListDto>.CreateAsync(
                 t, pageIndex ?? 1, PageSize);
 

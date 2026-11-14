@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Erp.Dtos.WarehouseItems;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Web.ERP.Helpers;
 using GrKouk.Web.ERP.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -24,14 +24,12 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
     public class CreateModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IWarehouseItemsManagementSrv _warehouseItemsManagementSrv;
         private readonly IToastNotification _toastNotification;
         public int CopyFromId { get; set; }
-        public CreateModel(ApiDbContext context, IMapper mapper, IWarehouseItemsManagementSrv warehouseItemsManagementSrv,IToastNotification toastNotification)
+        public CreateModel(ApiDbContext context, IWarehouseItemsManagementSrv warehouseItemsManagementSrv,IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _warehouseItemsManagementSrv = warehouseItemsManagementSrv;
             _toastNotification = toastNotification;
         }
@@ -56,7 +54,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
                     return NotFound();
                 }
 
-                WarehouseItemVm = _mapper.Map<WarehouseItemCreateDto>(materialToModify);
+                WarehouseItemVm = materialToModify.ToCreateDto();
 
             }
 
@@ -147,7 +145,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
                 LoadCombos();
                 return Page();
             }
-            var materialToAttach = _mapper.Map<WarehouseItem>(WarehouseItemVm);
+            var materialToAttach = WarehouseItemVm.ToEntity();
             await using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {

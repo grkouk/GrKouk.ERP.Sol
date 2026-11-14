@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
@@ -15,13 +14,11 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
     public class KartelaModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         public string WarehouseItemName { get; set; }
         public int WarehouseItemId { get; set; }
-        public KartelaModel(ApiDbContext context, IMapper mapper)
+        public KartelaModel(ApiDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
         public async Task<IActionResult> OnGetAsync(int warehouseItemId)

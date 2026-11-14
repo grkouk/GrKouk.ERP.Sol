@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Erp.Dtos.WarehouseItems;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,13 +24,11 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
     public class EditModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
 
-        public EditModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public EditModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
         }
 
@@ -57,7 +55,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
                 return NotFound();
             }
 
-            ItemVm = _mapper.Map<WarehouseItemModifyDto>(materialToModify);
+            ItemVm = materialToModify.ToModifyDto();
             string[] selectedCompanies = materialToModify.CompanyMappings.Select(x => x.CompanyId.ToString()).ToArray();
             ItemVm.SelectedCompanies = JsonSerializer.Serialize(selectedCompanies);
             LoadCombos();
@@ -109,9 +107,16 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
             await using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                var materialToAttach = _mapper.Map<WarehouseItem>(ItemVm);
+                var materialToAttach = await _context.WarehouseItems.FirstOrDefaultAsync(m => m.Id == ItemVm.Id);
+                if (materialToAttach == null)
+                {
+                    await transaction.RollbackAsync();
+                    _toastNotification.AddErrorToastMessage("WarehouseItem was not found");
+                    return NotFound();
+                }
+                _context.Entry(materialToAttach).Property(m => m.Timestamp).OriginalValue = ItemVm.Timestamp;
+                ItemVm.ApplyTo(materialToAttach);
                 materialToAttach.DateLastModified=DateTime.Today;
-                _context.Attach(materialToAttach).State = EntityState.Modified;
                 _context.CompanyWarehouseItemMappings.RemoveRange(_context.CompanyWarehouseItemMappings.Where(p => p.WarehouseItemId == materialToAttach.Id));
                 
                 string[] companiesSelected = JsonSerializer.Deserialize<string[]>(ItemVm.SelectedCompanies);
