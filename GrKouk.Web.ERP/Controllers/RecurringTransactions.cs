@@ -109,12 +109,12 @@ namespace GrKouk.Web.ERP.Controllers
             switch (recDef.RecurringDocType)
             {
                 case RecurringDocTypeEnum.BuyType:
-                    var buyDocDto = _mapper.Map<BuyDocCreateAjaxDto>(recDef);
+                    var buyDocDto = recDef.ToBuyDocCreateAjaxDto();
                     var buyUpdController = new MaterialsController(_context, _mapper, _docTransSrv);
                     actionResult = await CreateBuyDocFromRecTrans(buyDocDto, recDef);
                     break;
                 case RecurringDocTypeEnum.SellType:
-                    var sellDocDto = _mapper.Map<SellDocCreateAjaxDto>(recDef);
+                    var sellDocDto = recDef.ToSellDocCreateAjaxDto();
                     var sellUpdController = new MaterialsController(_context, _mapper,_docTransSrv);
                     actionResult = await CreateSellDocFromRecTrans(sellDocDto, recDef);
 

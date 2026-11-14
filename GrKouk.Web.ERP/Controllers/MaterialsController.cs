@@ -1021,7 +1021,6 @@ namespace GrKouk.Web.ERP.Controllers
             //bool noWarehouseTrans = false;
 
 
-            RecurringDocCreateAjaxNoLinesDto transToAttachNoLines;
             RecurringTransDoc transToAttach;
             DateTime dateOfTrans;
 
@@ -1035,8 +1034,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             try
             {
-                transToAttachNoLines = _mapper.Map<RecurringDocCreateAjaxNoLinesDto>(data);
-                transToAttach = _mapper.Map<RecurringTransDoc>(transToAttachNoLines);
+                transToAttach = data.ToEntity();
                 dateOfTrans = data.NextTransDate;
             }
             catch (Exception e)
@@ -1245,7 +1243,6 @@ namespace GrKouk.Web.ERP.Controllers
         {
             const string defaultBuySectionCode = "SYS-BUY-MATERIALS-SCN";
             const string defaultSellSectionCode = "SYS-SELL-COMBINED-SCN";
-            RecurringTransDocModifyAjaxNoLinesDto transToAttachNoLines;
             RecurringTransDoc transToAttach;
             DateTime dateOfTrans;
             if (data == null)
@@ -1258,8 +1255,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             try
             {
-                transToAttachNoLines = _mapper.Map<RecurringTransDocModifyAjaxNoLinesDto>(data);
-                transToAttach = _mapper.Map<RecurringTransDoc>(transToAttachNoLines);
+                transToAttach = data.ToEntity();
                 dateOfTrans = data.NextTransDate;
             }
             catch (Exception e)

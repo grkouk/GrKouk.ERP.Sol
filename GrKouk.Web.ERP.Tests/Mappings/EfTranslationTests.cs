@@ -119,4 +119,12 @@ public class EfTranslationTests
         var sql = db.SellDocuments.Select(SellDocumentMappings.ToListDto).ToQueryString();
         Assert.Contains("[CurrencyId]", sql);
     }
+
+    [Fact]
+    public void RecurringDocument_ToListDto_translates_to_sql()
+    {
+        using var db = CreateContext();
+        var sql = db.RecurringTransDocs.Select(RecurringDocumentMappings.ToListDto).ToQueryString();
+        Assert.Contains("[CurrencyId]", sql);
+    }
 }

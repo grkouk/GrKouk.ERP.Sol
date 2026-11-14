@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using GrKouk.Erp.Domain.RecurringTransactions;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;

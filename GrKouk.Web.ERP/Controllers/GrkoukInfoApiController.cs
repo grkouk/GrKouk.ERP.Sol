@@ -878,7 +878,7 @@ namespace GrKouk.Web.ERP.Controllers
             var docBuySeries = await _context.BuyDocSeriesDefs.ToListAsync();
             var docSellSeries = await _context.SellDocSeriesDefs.ToListAsync();
 
-            var t = fullListIq.ProjectTo<RecurringDocListDto>(_mapper.ConfigurationProvider);
+            var t = fullListIq.Select(RecurringDocumentMappings.ToListDto);
             var t1 = t.Select(p => new RecurringDocListDto
             {
                 Id = p.Id,

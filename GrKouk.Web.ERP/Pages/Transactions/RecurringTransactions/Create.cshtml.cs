@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Dtos.RecurringTransactions;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +20,6 @@ namespace GrKouk.Web.ERP.Pages.Transactions.RecurringTransactions
     public class CreateModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
 
         public string SeekType { get; set; }
@@ -31,10 +30,9 @@ namespace GrKouk.Web.ERP.Pages.Transactions.RecurringTransactions
         public int CreateFromId { get; set; }
         public RecurringDocTypeEnum CreateFromType { get; set; }
 
-        public CreateModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public CreateModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
         }
 
@@ -104,7 +102,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.RecurringTransactions
                             return NotFound();
                         }
                         //ItemVm = _mapper.Map<BuyDocCreateAjaxDto>(buyMatDoc);
-                        CopyFromItemVm = _mapper.Map<RecurringDocModifyDto>(buyMatDoc);
+                        CopyFromItemVm = buyMatDoc.ToRecurringModifyDto();
                         ItemVm = new RecurringTransDocCreateAjaxDto
                         {
                             NextTransDate = buyMatDoc.TransDate.AddMonths(1),
@@ -175,7 +173,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.RecurringTransactions
                         }
                         //ItemVm = _mapper.Map<BuyDocCreateAjaxDto>(buyMatDoc);
                         // _mapper.ConfigurationProvider.AssertConfigurationIsValid();
-                        CopyFromItemVm = _mapper.Map<RecurringDocModifyDto>(sellMatDoc);
+                        CopyFromItemVm = sellMatDoc.ToRecurringModifyDto();
                         ItemVm = new RecurringTransDocCreateAjaxDto
                         {
                             NextTransDate = sellMatDoc.TransDate.AddMonths(1),
