@@ -171,8 +171,6 @@ namespace GrKouk.Web.ERP.Automapper {
                    .ForMember(dest => dest.WarehouseItemNature,
                     opt => opt.MapFrom(src => src.WarehouseItem.WarehouseItemNature))
                .ForMember(dest => dest.Url, opt => opt.Ignore());
-            CreateMap<Warehouse, WarehouseCreateDto>().ReverseMap();
-            CreateMap<Warehouse, WarehouseModifyDto>().ReverseMap();
         }
     }
 }

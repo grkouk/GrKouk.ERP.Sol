@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using AutoMapper;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.Warehouses;
 using GrKouk.Erp.Dtos.CashFlowAccounts;
@@ -21,13 +21,11 @@ namespace GrKouk.Web.ERP.Pages.CommonEntities.Warehouses
     public class EditModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
 
-        public EditModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public EditModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
         }
 
@@ -51,7 +49,7 @@ namespace GrKouk.Web.ERP.Pages.CommonEntities.Warehouses
                 return NotFound();
             }
 
-            ItemVm = _mapper.Map<WarehouseModifyDto>(itemToModify);
+            ItemVm = itemToModify.ToModifyDto();
             string[] selectedCompanies = itemToModify.CompanyMappings.Select(x => x.CompanyId.ToString()).ToArray();
             ItemVm.SelectedCompanies = JsonSerializer.Serialize(selectedCompanies);
             LoadCombos();
@@ -80,9 +78,15 @@ namespace GrKouk.Web.ERP.Pages.CommonEntities.Warehouses
             await using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                var itemToAttach = _mapper.Map<Warehouse>(ItemVm);
+                var itemToAttach = await _context.Warehouses.FirstOrDefaultAsync(w => w.Id == ItemVm.Id);
+                if (itemToAttach == null)
+                {
+                    await transaction.RollbackAsync();
+                    _toastNotification.AddErrorToastMessage("Warehouse was not found");
+                    return NotFound();
+                }
+                ItemVm.ApplyTo(itemToAttach);
                 itemToAttach.DateLastModified = DateTime.Today;
-                _context.Attach(itemToAttach).State = EntityState.Modified;
                 _context.WarehouseCompanyMappings.RemoveRange(_context.WarehouseCompanyMappings.Where(p => p.WarehouseId == itemToAttach.Id));
                 string[] companiesSelected = JsonSerializer.Deserialize<string[]>(ItemVm.SelectedCompanies);
 

@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using AutoMapper;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Erp.Domain.Warehouses;
 using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Erp.Dtos.Warehouses;
@@ -19,13 +19,11 @@ namespace GrKouk.Web.ERP.Pages.CommonEntities.Warehouses
     {
         private readonly ApiDbContext _context;
         private readonly IToastNotification _toastNotification;
-        private readonly IMapper _mapper;
 
-        public CreateModel(ApiDbContext context, IToastNotification toastNotification, IMapper mapper)
+        public CreateModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
             _toastNotification = toastNotification;
-            _mapper = mapper;
         }
 
         public IActionResult OnGet()
@@ -55,7 +53,7 @@ namespace GrKouk.Web.ERP.Pages.CommonEntities.Warehouses
             {
                 return Page();
             }
-            var itemToAttach = _mapper.Map<Warehouse>(ItemVm);
+            var itemToAttach = ItemVm.ToEntity();
             // var itemToAttach2 = new Warehouse()
             // {
             //     Name = ItemVm.Name,
