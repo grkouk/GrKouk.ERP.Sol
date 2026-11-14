@@ -41,3 +41,10 @@
      border-radius: 50%;
      color:white;
  }
+ /* Opt-in: always open at a fixed width instead of expanding on hover. */
+ .searchbar.searchbar-fixed > .search_input{
+     padding: 0 5px;
+     width: 200px;
+     caret-color: auto;
+     transition: none;
+ }
