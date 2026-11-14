@@ -34,6 +34,15 @@ public class EfTranslationTests
     }
 
     [Fact]
+    public void BuyDocument_ToList2Dto_translates_to_sql()
+    {
+        using var db = CreateContext();
+        var sql = db.BuyDocuments.Select(BuyDocumentMappings.ToList2Dto).ToQueryString();
+        Assert.Contains("SUM(", sql);
+        Assert.Contains("JOIN", sql);
+    }
+
+    [Fact]
     public void WrItemCode_ToListDto_translates_to_sql()
     {
         using var db = CreateContext();
