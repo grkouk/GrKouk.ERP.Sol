@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.Shared;
@@ -21,14 +20,12 @@ public class DocumentTransactionServiceV2 : IDocumentTransactionService
 {
     private readonly ApiDbContext _context;
     private readonly ILogger<DocumentTransactionService> _logger;
-    private readonly IMapper _mapper;
     private readonly ITransactorTransactionService _transactorTransactionService;
 
-    public DocumentTransactionServiceV2(ApiDbContext context, ILogger<DocumentTransactionService> logger, IMapper mapper, ITransactorTransactionService transactorTransactionService)
+    public DocumentTransactionServiceV2(ApiDbContext context, ILogger<DocumentTransactionService> logger, ITransactorTransactionService transactorTransactionService)
     {
         _context = context;
         _logger = logger;
-        _mapper = mapper;
         _transactorTransactionService = transactorTransactionService;
     }
 

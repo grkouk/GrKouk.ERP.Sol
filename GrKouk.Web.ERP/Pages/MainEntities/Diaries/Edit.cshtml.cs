@@ -129,11 +129,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Diaries
                     Value = p.Id
                 }).ToList();
             #region MyRegion
-            //var BuyDocTypeListJs = _context.BuyDocTypeDefs.OrderBy(p => p.Name)
-            //   .ProjectTo<DiaryDocTypeItem>(_mapper.ConfigurationProvider).ToList();
 
-            //var SellDocTypeListJs = _context.SellDocTypeDefs.OrderBy(p => p.Name)
-            //    .ProjectTo<DiaryDocTypeItem>(_mapper.ConfigurationProvider).ToList();
 
 
             #endregion

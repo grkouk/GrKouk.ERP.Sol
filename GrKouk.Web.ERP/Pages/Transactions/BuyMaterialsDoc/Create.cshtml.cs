@@ -55,7 +55,6 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
                 {
                     return NotFound();
                 }
-                //ItemVm = _mapper.Map<BuyDocCreateAjaxDto>(buyMatDoc);
                 CopyFromItemVm = buyMatDoc.ToModifyDto();
                 //check for new values or old values
                 var vmLines = CopyFromItemVm.BuyDocLines;

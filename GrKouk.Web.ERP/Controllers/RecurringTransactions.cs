@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.RecurringTransactions;
 using GrKouk.Erp.Domain.Shared;
@@ -24,13 +23,11 @@ namespace GrKouk.Web.ERP.Controllers
     public class RecurringTransactionsController : ControllerBase
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IDocumentTransactionService _docTransSrv;
 
-        public RecurringTransactionsController(ApiDbContext context, IMapper mapper, IDocumentTransactionService docTransSrv)
+        public RecurringTransactionsController(ApiDbContext context, IDocumentTransactionService docTransSrv)
         {
             _context = context;
-            _mapper = mapper;
             _docTransSrv = docTransSrv;
         }
 
@@ -110,12 +107,10 @@ namespace GrKouk.Web.ERP.Controllers
             {
                 case RecurringDocTypeEnum.BuyType:
                     var buyDocDto = recDef.ToBuyDocCreateAjaxDto();
-                    var buyUpdController = new MaterialsController(_context, _mapper, _docTransSrv);
                     actionResult = await CreateBuyDocFromRecTrans(buyDocDto, recDef);
                     break;
                 case RecurringDocTypeEnum.SellType:
                     var sellDocDto = recDef.ToSellDocCreateAjaxDto();
-                    var sellUpdController = new MaterialsController(_context, _mapper,_docTransSrv);
                     actionResult = await CreateSellDocFromRecTrans(sellDocDto, recDef);
 
                     break;

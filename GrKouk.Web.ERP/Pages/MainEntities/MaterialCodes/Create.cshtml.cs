@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Dtos.WarehouseItems;
 using GrKouk.Web.ERP.Data;
@@ -20,14 +19,12 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.MaterialCodes
     {
        #region Fields
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
         public int CopyFromId { get; set; }
         #endregion
-        public CreateModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public CreateModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
         }
         public async Task<IActionResult> OnGetAsync(int? copyFromId)
@@ -45,7 +42,6 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.MaterialCodes
                     return NotFound();
                 }
 
-                //WarehouseItemVm = _mapper.Map<WarehouseItemCreateDto>(itemToCopy);
                 ItemVm = WrItemCodeCreateDto.Map( itemToCopy);
 
             }

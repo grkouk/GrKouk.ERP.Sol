@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using AutoMapper;
 using GrKouk.Erp.Dtos.CashFlowTransactions;
 using GrKouk.Erp.Dtos.Sync;
 using GrKouk.Web.ERP.Data;
@@ -14,12 +13,10 @@ namespace GrKouk.Web.ERP.Pages.Sync.Logging
     public class IndexModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         
-        public IndexModel(ApiDbContext context,IMapper mapper)
+        public IndexModel(ApiDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
         #region Fields
         public string SectionCode { get; set; } = "SYS-CFA-TRANS";

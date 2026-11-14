@@ -54,7 +54,6 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
                 {
                     return NotFound();
                 }
-                //ItemVm = _mapper.Map<BuyDocCreateAjaxDto>(buyMatDoc);
                 CopyFromItemVm = sellMatDoc.ToModifyDto();
                 if (CopyFromItemVm != null)
                 {
@@ -104,7 +103,6 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
                 return Page();
             }
 
-            //var itemToAttach = _mapper.Map<BuyDocument>(ItemVm);
             //_context.BuyDocuments.Add(itemToAttach);
             //await _context.SaveChangesAsync();
 

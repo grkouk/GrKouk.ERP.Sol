@@ -45,7 +45,6 @@ namespace GrKouk.Web.ERP.Pages.CommonEntities.Warehouses
             {
                 return NotFound();
             }
-            //ItemVm=_mapper.Map<WrItemDetailDto>(item);
 
             ItemVm = new CashFlowAccountDetailDto()
             {

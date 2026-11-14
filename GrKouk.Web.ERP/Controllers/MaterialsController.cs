@@ -4,8 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.RecurringTransactions;
@@ -34,15 +32,13 @@ namespace GrKouk.Web.ERP.Controllers
     public class MaterialsController : ControllerBase
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IDocumentTransactionService _docTransSrv;
 
-        public MaterialsController(ApiDbContext context, IMapper mapper
+        public MaterialsController(ApiDbContext context
             , IDocumentTransactionService docTransSrv
             )
         {
             _context = context;
-            _mapper = mapper;
             _docTransSrv = docTransSrv;
         }
 
@@ -538,9 +534,6 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
             fullListIq = fullListIq.Where(p => p.Name.Contains(term) || p.Code.Contains(term));
-            //var materials = await _context.WarehouseItems.Where(p => p.Name.Contains(term) )
-            //    .ProjectTo<WarehouseItemSearchListDto>(_mapper.ConfigurationProvider)
-            //    .Select(p => new { label = p.Label, value = p.Id }).ToListAsync();
             var materials = await fullListIq
                 .Select(WarehouseItemMappings.ToSearchListDto)
                 .Select(p => new { label = p.Label, value = p.Id }).ToListAsync();

@@ -108,7 +108,6 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
                 LoadCombos();
                 return Page();
             }
-            // var materialToAttach = _mapper.Map<WarehouseItem>(WarehouseItemVm);
         
             try
             {

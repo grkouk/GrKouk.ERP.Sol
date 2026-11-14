@@ -4,8 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using GrKouk.Web.ERP.Mappings;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.CashFlow;
@@ -74,16 +72,14 @@ namespace GrKouk.Web.ERP.Controllers
     public class GrkoukInfoApiController : ControllerBase
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IDocumentTransactionService _docTransSrv;
         private readonly PdfExportService _pdfService;
         private readonly IMemoryCache _cache;
 
-        public GrkoukInfoApiController(ApiDbContext context, IMapper mapper, IDocumentTransactionService docTransSrv
+        public GrkoukInfoApiController(ApiDbContext context, IDocumentTransactionService docTransSrv
             , PdfExportService pdfService, IMemoryCache cache)
         {
             _context = context;
-            _mapper = mapper;
             _docTransSrv = docTransSrv;
             _pdfService = pdfService;
             _cache = cache;
@@ -289,7 +285,6 @@ namespace GrKouk.Web.ERP.Controllers
                 CompanyCode = p.Company.Code,
                 CompanyCurrencyId = p.Company.CurrencyId
             });
-            //var t2 = expensesIq.ProjectTo<FinDiaryExpenseTransactionDto>(_mapper.ConfigurationProvider);
             var t1 = await t.ToListAsync();
             var grandSumOfAmountNew = t1.Sum(p => p.AmountTotal);
             var pageIndex = request.PageIndex;
@@ -4319,7 +4314,6 @@ namespace GrKouk.Web.ERP.Controllers
             PagedList<FinMovementListDto> listItems;
             try
             {
-                //var projectedList = fullListIq.ProjectTo<CfaDocTypeDefListDto>(_mapper.ConfigurationProvider);
                 var pageIndex = request.PageIndex;
 
                 var pageSize = request.PageSize;

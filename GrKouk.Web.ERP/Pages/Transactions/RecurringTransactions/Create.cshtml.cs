@@ -65,8 +65,6 @@ namespace GrKouk.Web.ERP.Pages.Transactions.RecurringTransactions
             //    {
             //        return NotFound();
             //    }
-            //    //ItemVm = _mapper.Map<BuyDocCreateAjaxDto>(buyMatDoc);
-            //    CopyFromItemVm = _mapper.Map<BuyDocModifyDto>(buyMatDoc);
             //    ItemVm = new BuyDocCreateAjaxDto
             //    {
             //        AmountDiscount = CopyFromItemVm.AmountDiscount,
@@ -101,7 +99,6 @@ namespace GrKouk.Web.ERP.Pages.Transactions.RecurringTransactions
                         {
                             return NotFound();
                         }
-                        //ItemVm = _mapper.Map<BuyDocCreateAjaxDto>(buyMatDoc);
                         CopyFromItemVm = buyMatDoc.ToRecurringModifyDto();
                         ItemVm = new RecurringTransDocCreateAjaxDto
                         {
@@ -171,8 +168,6 @@ namespace GrKouk.Web.ERP.Pages.Transactions.RecurringTransactions
                         {
                             return NotFound();
                         }
-                        //ItemVm = _mapper.Map<BuyDocCreateAjaxDto>(buyMatDoc);
-                        // _mapper.ConfigurationProvider.AssertConfigurationIsValid();
                         CopyFromItemVm = sellMatDoc.ToRecurringModifyDto();
                         ItemVm = new RecurringTransDocCreateAjaxDto
                         {

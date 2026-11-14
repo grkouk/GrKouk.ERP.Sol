@@ -4,8 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.Shared;
@@ -35,13 +33,11 @@ namespace GrKouk.Web.ERP.Controllers
     public class FinancialDataController : ControllerBase
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IMemoryCache _cache;
 
-        public FinancialDataController(ApiDbContext context, IMapper mapper, IMemoryCache cache)
+        public FinancialDataController(ApiDbContext context, IMemoryCache cache)
         {
             _context = context;
-            _mapper = mapper;
             _cache = cache;
         }
 
@@ -1498,7 +1494,6 @@ namespace GrKouk.Web.ERP.Controllers
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
                 .Take(10)
                 .ToListAsync();
-            //var t = fullListIq.ProjectTo<WarehouseTransListDto>(_mapper.ConfigurationProvider);
             var t1 = await fullListIq.Select(p => new WarehouseTransListDto
             {
                 TransDate = p.TransDate,

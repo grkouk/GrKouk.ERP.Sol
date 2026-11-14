@@ -46,7 +46,6 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.CashFlowAccounts
             {
                 return NotFound();
             }
-            //ItemVm=_mapper.Map<WrItemDetailDto>(item);
 
             ItemVm = new CashFlowAccountDetailDto()
             {

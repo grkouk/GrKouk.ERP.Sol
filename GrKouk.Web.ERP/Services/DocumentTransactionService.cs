@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.Shared;
@@ -21,13 +20,11 @@ public class DocumentTransactionService : IDocumentTransactionService
 {
     private readonly ApiDbContext _context;
     private readonly ILogger<DocumentTransactionService> _logger;
-    private readonly IMapper _mapper;
 
-    public DocumentTransactionService(ApiDbContext context, ILogger<DocumentTransactionService> logger, IMapper mapper)
+    public DocumentTransactionService(ApiDbContext context, ILogger<DocumentTransactionService> logger)
     {
         _context = context;
         _logger = logger;
-        _mapper = mapper;
     }
 
     public async Task<IActionResult> AddBuyDocument(BuyDocCreateAjaxDto docTrans)

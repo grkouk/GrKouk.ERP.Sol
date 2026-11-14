@@ -45,7 +45,6 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Materials
             {
                 return NotFound();
             }
-            //ItemVm=_mapper.Map<WrItemDetailDto>(item);
             int natureCode;
             string natureName;
             (natureCode, natureName) = HelperFunctions.GetWarehouseNatureDetails(item.WarehouseItemNature);

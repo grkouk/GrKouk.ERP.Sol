@@ -81,15 +81,6 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Diaries
                     Title = p.Name,
                     Value = p.Id
                 }).ToList();
-            #region CommentOut
-            //var BuyDocTypeListJs = _context.BuyDocTypeDefs.OrderBy(p => p.Name)
-            //   .ProjectTo<DiaryDocTypeItem>(_mapper.ConfigurationProvider).ToList();
-
-            //var SellDocTypeListJs = _context.SellDocTypeDefs.OrderBy(p => p.Name)
-            //    .ProjectTo<DiaryDocTypeItem>(_mapper.ConfigurationProvider).ToList();
-
-
-            #endregion
 
             var materialNatureList = Enum.GetValues(typeof(WarehouseItemNatureEnum))
                 .Cast<WarehouseItemNatureEnum>()

@@ -2,7 +2,6 @@ using System;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Services;
 using Microsoft.AspNetCore.Authentication;
@@ -139,8 +138,6 @@ namespace GrKouk.Web.ERP
                 options.Cookie.IsEssential = true;
             });
 
-            // AutoMapper, Controllers, Razor Pages
-            builder.Services.AddAutoMapper(typeof(Program));
             builder.Services.AddRazorPages();
             builder.Services.AddControllers().AddNewtonsoftJson();
 

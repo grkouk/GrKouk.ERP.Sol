@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using GrKouk.Web.ERP.Data;
+﻿using GrKouk.Web.ERP.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 

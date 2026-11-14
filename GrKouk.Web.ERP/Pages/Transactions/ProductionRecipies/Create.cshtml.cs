@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
 using GrKouk.Erp.Dtos.BuyDocuments;
 using GrKouk.Web.ERP.Data;
 using Microsoft.AspNetCore.Authorization;
@@ -16,17 +15,15 @@ namespace GrKouk.Web.ERP.Pages.Transactions.ProductionRecipies
     public class CreateModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
         public string SeekType { get; set; }
         public int RoutedCompanyId { get; set; }
         public int RoutedSectionId { get; set; }
         public bool InitialLoad = true;
         public int CopyFromId { get; set; }
-        public CreateModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public CreateModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
         }
 
