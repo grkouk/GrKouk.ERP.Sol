@@ -48,3 +48,22 @@
      caret-color: auto;
      transition: none;
  }
+
+ /* Clear button: shown only while the input has text. */
+ .search_clear{
+     display: inline-flex;
+     justify-content: center;
+     align-items: center;
+     width: 20px;
+     height: 20px;
+     color: white;
+     vertical-align: top;
+ }
+
+ .search_clear:hover{
+     color: #e74c3c;
+ }
+
+ .search_input:placeholder-shown + .search_clear{
+     display: none;
+ }

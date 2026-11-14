@@ -58,6 +58,9 @@
         <div class="col-md-auto">
             <div class="searchbar searchbar-fixed">
                 <input class="search_input" type="text" id="SearchFilter" placeholder="Search..." autocomplete="off">
+                <a href="#" class="search_clear" id="SearchClear" title="Clear search">
+                    <i class="fas fa-times fa-xs"></i>
+                </a>
                 <a href="#" class="search_icon" id="SearchButton">
                     <i class="fas fa-search fa-xs"></i>
                 </a>
@@ -561,6 +564,12 @@
             });
             document.getElementById('SearchButton').addEventListener('click', (e) => {
                 e.preventDefault();
+                runSearch();
+            });
+            document.getElementById('SearchClear').addEventListener('click', (e) => {
+                e.preventDefault();
+                searchEl.value = '';
+                searchEl.focus();
                 runSearch();
             });
 
