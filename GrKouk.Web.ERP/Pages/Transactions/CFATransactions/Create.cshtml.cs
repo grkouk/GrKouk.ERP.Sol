@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.Shared;
@@ -25,7 +25,6 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
     {
         private const string _sectionCode = "SYS-CFA-TRANS";
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
         private readonly ICFATransactionService _cfaTransSrv;
         public bool NotUpdatable;
@@ -33,10 +32,9 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
         public int CopyFromId { get; set; }
         public int CopyFromTransactorId { get; set; } = 0;
 
-        public CreateModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification, ICFATransactionService cfaTransSrv)
+        public CreateModel(ApiDbContext context, IToastNotification toastNotification, ICFATransactionService cfaTransSrv)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
             _cfaTransSrv = cfaTransSrv;
         }
@@ -63,7 +61,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
                     return NotFound();
                 }
 
-                ItemVm = _mapper.Map<CfaTransactionCreateDto>(transactionToModify);
+                ItemVm = transactionToModify.ToCreateDto();
                 CopyFromTransactorId = ItemVm.CashFlowAccountId;
             }
 
@@ -124,7 +122,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
                 return Page();
             }
             #endregion
-            var cfaTransaction = _mapper.Map<CashFlowAccountTransaction>(ItemVm);
+            var cfaTransaction = ItemVm.ToEntity();
 
             var docSeries = await
                 _context.CashFlowDocSeriesDefs.SingleOrDefaultAsync(m =>

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.CashFlowTransactions;
@@ -23,14 +22,12 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
     {
         private const string _sectionCode = "SYS-CFA-TRANS";
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
         [BindProperty] public CashFlowAccountCrossEntryDto ItemVm { get; set; }
 
-        public AddCrossEntry(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public AddCrossEntry(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
         }
 

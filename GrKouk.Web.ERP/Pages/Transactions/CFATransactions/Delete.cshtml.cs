@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Erp.Dtos.CashFlowTransactions;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Web.ERP.Data;
@@ -18,12 +18,10 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
     public class DeleteModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         public bool NotUpdatable;
-        public DeleteModel(ApiDbContext context, IMapper mapper)
+        public DeleteModel(ApiDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
         public int CfaId { get; set; }
         [BindProperty]
@@ -49,7 +47,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
             {
                 return NotFound();
             }
-            ItemVm = _mapper.Map<CfaTransactionModifyDto>(transactionToModify);
+            ItemVm = transactionToModify.ToModifyDto();
             NotUpdatable = ItemVm.CreatorId != 0;
             LoadCombos();
             return Page();

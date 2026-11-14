@@ -55,4 +55,12 @@ public class EfTranslationTests
         var sql = db.TransWarehouseDefs.Select(TransWarehouseDefMappings.ToListDto).ToQueryString();
         Assert.Contains("JOIN", sql);
     }
+
+    [Fact]
+    public void CfaTransaction_ToListDto_translates_to_sql()
+    {
+        using var db = CreateContext();
+        var sql = db.CashFlowAccountTransactions.Select(CfaTransactionMappings.ToListDto).ToQueryString();
+        Assert.Contains("[CurrencyId]", sql);
+    }
 }

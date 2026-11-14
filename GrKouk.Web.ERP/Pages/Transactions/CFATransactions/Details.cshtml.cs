@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.Shared;
@@ -23,17 +23,15 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
     {
         private const string _sectionCode = "SYS-CFA-TRANS";
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
         public bool NotUpdatable;
         public bool InitialLoad = true;
         public int CopyFromId { get; set; }
         public int CopyFromTransactorId { get; set; } = 0;
         public int CfaId { get; set; }
-        public DetailsModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public DetailsModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
         }
 
@@ -66,7 +64,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
             //     return BadRequest();
             // }
           
-            ItemVm = _mapper.Map<CfaTransactionModifyDto>(transactionToModify);
+            ItemVm = transactionToModify.ToModifyDto();
             LoadCombos();
             return Page();
         }

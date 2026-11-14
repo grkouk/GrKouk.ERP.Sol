@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.Shared;
@@ -24,14 +24,12 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
     {
         private const string _sectionCode = "SYS-CFA-TRANS";
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
         public bool NotUpdatable;
         public bool InitialLoad = true;
-        public EditModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public EditModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
         }
 
@@ -70,7 +68,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
             //If section is not our section the canot update disable input controls
             //NotUpdatable = transactionToModify.SectionId != section.Id;
             NotUpdatable=transactionToModify.CreatorId!=0;
-            ItemVm = _mapper.Map<CfaTransactionModifyDto>(transactionToModify);
+            ItemVm = transactionToModify.ToModifyDto();
             LoadCombos();
             return Page();
         }
@@ -84,7 +82,14 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
             }
            
 
-            var spTransactionToAttach = _mapper.Map<CashFlowAccountTransaction>(ItemVm);
+            var spTransactionToAttach = await _context.CashFlowAccountTransactions
+                .FirstOrDefaultAsync(t => t.Id == ItemVm.Id);
+            if (spTransactionToAttach == null)
+            {
+                return NotFound();
+            }
+            _context.Entry(spTransactionToAttach).Property(t => t.Timestamp).OriginalValue = ItemVm.Timestamp;
+            ItemVm.ApplyTo(spTransactionToAttach);
             #region Fiscal Period
             var fiscalPeriod = await HelperFunctions.GetFiscalPeriod(_context, ItemVm.TransDate);
             if (fiscalPeriod == null) {
@@ -137,7 +142,6 @@ namespace GrKouk.Web.ERP.Pages.Transactions.CFATransactions
                 ActionHandlers.CashFlowFinAction(cfaTransactionDef.CfaAction, spTransactionToAttach);
                 try
                 {
-                    _context.Attach(spTransactionToAttach).State = EntityState.Modified;
                     var docId = spTransactionToAttach.Id;
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();

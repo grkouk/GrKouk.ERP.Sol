@@ -6597,12 +6597,12 @@ namespace GrKouk.Web.ERP.Controllers
                 );
             }
 
-            var dbTrans = transactionsList.ProjectTo<CfaTransactionListDto>(_mapper.ConfigurationProvider);
+            var dbTrans = transactionsList.Select(CfaTransactionMappings.ToListDto);
 
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
                 .Take(10)
                 .ToListAsync();
-            var t = transListAll.ProjectTo<CfaTransactionListDto>(_mapper.ConfigurationProvider);
+            var t = transListAll.Select(CfaTransactionMappings.ToListDto);
             var t1 = await t.Select(p => new CfaTransactionListDto
             {
                 Id = p.Id,
@@ -6701,7 +6701,7 @@ namespace GrKouk.Web.ERP.Controllers
                  }
 
                  var dbTransBeforePeriod =
-                     transListBeforePeriod.ProjectTo<CfaTransactionListDto>(_mapper.ConfigurationProvider);
+                     transListBeforePeriod.Select(CfaTransactionMappings.ToListDto);
                  var transBeforePeriodList = await dbTransBeforePeriod.ToListAsync();
                  foreach (var item in transBeforePeriodList)
                  {
