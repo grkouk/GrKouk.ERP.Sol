@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.WarehouseTransactions;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -18,13 +17,11 @@ namespace GrKouk.Web.ERP.Pages.Transactions.WarehouseTransMng
     public class Index2Model : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
 
-        public Index2Model(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public Index2Model(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
         }
         #region Fields
@@ -140,7 +137,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.WarehouseTransMng
                     fullListIq = fullListIq.OrderBy(p => p.Id);
                     break;
             }
-            var t = fullListIq.ProjectTo<WarehouseTransListDto>(_mapper.ConfigurationProvider);
+            var t = fullListIq.Select(WarehouseTransactionMappings.ToListDto);
             ListItems = await PagedList<WarehouseTransListDto>.CreateAsync(
                 t, pageIndex ?? 1, PageSize);
             SumImportVolume = ListItems.Sum(p => p.InvoicedImportUnits);

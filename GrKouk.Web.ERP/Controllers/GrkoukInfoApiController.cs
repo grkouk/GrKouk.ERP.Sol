@@ -2330,7 +2330,7 @@ namespace GrKouk.Web.ERP.Controllers
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
                 .Take(10)
                 .ToListAsync();
-            var t = fullListIq.ProjectTo<WarehouseTransListDto>(_mapper.ConfigurationProvider);
+            var t = fullListIq.Select(WarehouseTransactionMappings.ToListDto);
             var t1 = await t.Select(p => new WarehouseTransListDto
             {
                 Id = p.Id,
@@ -2956,7 +2956,7 @@ namespace GrKouk.Web.ERP.Controllers
                 transactionsList = transactionsList.Where(p => p.WarehouseItem.Name.Contains(request.SearchFilter));
             }
 
-            var dbTrans = transactionsList.ProjectTo<WarehouseTransListDto>(_mapper.ConfigurationProvider);
+            var dbTrans = transactionsList.Select(WarehouseTransactionMappings.ToListDto);
             var d1 = dbTrans.ToList();
 
             List<WarehouseDiaryItem> dbTransactions;
@@ -3145,7 +3145,7 @@ namespace GrKouk.Web.ERP.Controllers
                 transactionsList = transactionsList.Where(p => p.WarehouseItem.Name.Contains(request.SearchFilter));
             }
 
-            var dbTrans = transactionsList.ProjectTo<WarehouseTransListDto>(_mapper.ConfigurationProvider);
+            var dbTrans = transactionsList.Select(WarehouseTransactionMappings.ToListDto);
             var intem = dbTrans.ToList();
 
             var dbTransactions = intem.GroupBy(g => new
@@ -8121,8 +8121,8 @@ namespace GrKouk.Web.ERP.Controllers
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
                 .Take(10)
                 .ToListAsync();
-            var dbTrans = transactionsList.ProjectTo<WarehouseTransListDto>(_mapper.ConfigurationProvider);
-            var t = transListAll.ProjectTo<WarehouseTransListDto>(_mapper.ConfigurationProvider);
+            var dbTrans = transactionsList.Select(WarehouseTransactionMappings.ToListDto);
+            var t = transListAll.Select(WarehouseTransactionMappings.ToListDto);
             var t1 = await t.Select(p => new WarehouseTransListDto
             {
                 Id = p.Id,
@@ -8202,7 +8202,7 @@ namespace GrKouk.Web.ERP.Controllers
             }
 
             var dbTransBeforePeriod =
-                transListBeforePeriod.ProjectTo<WarehouseTransListDto>(_mapper.ConfigurationProvider);
+                transListBeforePeriod.Select(WarehouseTransactionMappings.ToListDto);
             var transBeforePeriodList = await dbTransBeforePeriod.ToListAsync();
             foreach (var listItem in transBeforePeriodList)
             {

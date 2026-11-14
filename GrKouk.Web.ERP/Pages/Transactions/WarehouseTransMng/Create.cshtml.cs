@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.WarehouseTransactions;
@@ -12,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using NToastNotify;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Web.ERP.Helpers;
 
 namespace GrKouk.Web.ERP.Pages.Transactions.WarehouseTransMng
@@ -22,16 +22,14 @@ namespace GrKouk.Web.ERP.Pages.Transactions.WarehouseTransMng
         private const string SectionSystemCode = "SYS-WAREHOUSE-TRANS";
 
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
         public bool NotUpdatable;
         public bool InitialLoad = true;
         public int CopyFromId { get; set; }
 
-        public CreateModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public CreateModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
         }
 
@@ -75,7 +73,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.WarehouseTransMng
                 return Page();
             }
 
-            var transToAttach = _mapper.Map<WarehouseTransaction>(ItemVm);
+            var transToAttach = ItemVm.ToEntity();
             var docSeries = await
                 _context.TransWarehouseDocSeriesDefs.SingleOrDefaultAsync(m =>
                     m.Id == ItemVm.TransWarehouseDocSeriesId);

@@ -37,9 +37,6 @@ namespace GrKouk.Web.ERP.Automapper {
                     opt => opt.MapFrom(src => src.Company.CurrencyId)).ReverseMap();
             CreateMap<BuyDocument, BuyDocModifyDto>().ReverseMap();
             CreateMap<BuyDocLine, BuyDocLineModifyDto>().ReverseMap();
-            CreateMap<WarehouseTransaction, WarehouseTransListDto>();
-            CreateMap<WarehouseTransaction, WarehouseTransCreateDto>().ReverseMap();
-            CreateMap<WarehouseTransaction, WarehouseTransModifyDto>().ReverseMap();
             CreateMap<TransactorTransaction, TransactorTransCreateDto>().ReverseMap();
             CreateMap<TransactorTransaction, TransactorTransModifyDto>().ReverseMap();
             CreateMap<TransactorTransaction, TransactorTransListDto>()

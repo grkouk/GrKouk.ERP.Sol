@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.WarehouseTransactions;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -20,17 +20,15 @@ namespace GrKouk.Web.ERP.Pages.Transactions.WarehouseTransMng
     public class EditModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
         public bool NotUpdatable;
         public bool InitialLoad = true;
 
         private const string SectionSystemCode = "SYS-WAREHOUSE-TRANS";
 
-        public EditModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public EditModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
         }
 
@@ -65,7 +63,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.WarehouseTransMng
             //If section is not our section the cannot update disable input controls
             NotUpdatable = transToEdit.SectionId != section.Id;
 
-            ItemVm = _mapper.Map<WarehouseTransModifyDto>(transToEdit);
+            ItemVm = transToEdit.ToModifyDto();
             var mainUnit = await _context.MeasureUnits.SingleOrDefaultAsync(p => p.Id == transToEdit.PrimaryUnitId);
             var secUnit = await _context.MeasureUnits.SingleOrDefaultAsync(p => p.Id == transToEdit.SecondaryUnitId);
             ItemVm.PrimaryUnitCode = mainUnit==null ? "UNK" : mainUnit.Code;
@@ -103,7 +101,13 @@ namespace GrKouk.Web.ERP.Pages.Transactions.WarehouseTransMng
                 LoadCombos();
                 return Page();
             }
-            var transToAttach = _mapper.Map<WarehouseTransaction>(ItemVm);
+            var transToAttach = await _context.WarehouseTransactions.FirstOrDefaultAsync(t => t.Id == ItemVm.Id);
+            if (transToAttach == null)
+            {
+                return NotFound();
+            }
+            _context.Entry(transToAttach).Property(t => t.Timestamp).OriginalValue = ItemVm.Timestamp;
+            ItemVm.ApplyTo(transToAttach);
             var docSeries = await
                 _context.TransWarehouseDocSeriesDefs.SingleOrDefaultAsync(m =>
                     m.Id == ItemVm.TransWarehouseDocSeriesId);
@@ -236,8 +240,6 @@ namespace GrKouk.Web.ERP.Pages.Transactions.WarehouseTransMng
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
-            _context.Attach(transToAttach).State = EntityState.Modified;
 
             try
             {

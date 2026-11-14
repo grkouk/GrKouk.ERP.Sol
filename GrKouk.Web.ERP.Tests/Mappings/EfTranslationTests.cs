@@ -87,4 +87,12 @@ public class EfTranslationTests
         var sql = db.WarehouseItems.Select(WarehouseItemMappings.ToSearchListDto).ToQueryString();
         Assert.Contains("[WarehouseItemNature]", sql);
     }
+
+    [Fact]
+    public void WarehouseTransaction_ToListDto_translates_to_sql()
+    {
+        using var db = CreateContext();
+        var sql = db.WarehouseTransactions.Select(WarehouseTransactionMappings.ToListDto).ToQueryString();
+        Assert.Contains("[CurrencyId]", sql);
+    }
 }
