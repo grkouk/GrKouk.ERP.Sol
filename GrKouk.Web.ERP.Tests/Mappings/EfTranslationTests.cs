@@ -17,6 +17,14 @@ public class EfTranslationTests
             .Options);
 
     [Fact]
+    public void SellDocTypeDef_ToListDto_translates_to_sql()
+    {
+        using var db = CreateContext();
+        var sql = db.SellDocTypeDefs.Select(SellDocTypeDefMappings.ToListDto).ToQueryString();
+        Assert.Contains("LEFT JOIN", sql);
+    }
+
+    [Fact]
     public void WrItemCode_ToListDto_translates_to_sql()
     {
         using var db = CreateContext();

@@ -1,0 +1,296 @@
+@page
+@model GrKouk.Web.Erp.Pages.Configuration.SellDocTypeDefs.IndexSfModel
+
+@{
+    ViewData["Title"] = "Τύποι Παραστατικών Πωλήσεων";
+    var pageSizes = new[] { 10, 20, 50, 100 };
+}
+
+@section MyCss
+{
+    <link rel="stylesheet" href="~/css/searchbar.css" />
+}
+
+@Html.AntiForgeryToken()
+<h4>@ViewData["Title"]</h4>
+
+<div class="container">
+    <ul class="nav small justify-content-end">
+        <li class="nav-item">
+            <a class="nav-link" asp-page="./Create">Create New</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#" role="button" id="filtersToggle">Hide Filters</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#" role="button" id="rowSelectorsToggle">Show Row Selectors</a>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle disabled" role="button" id="ddSelectedRowsActions"
+               data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</a>
+            <div class="dropdown-menu small">
+                <a class="dropdown-item" href="#" id="deleteSelectedRows">Delete Selected</a>
+            </div>
+        </li>
+    </ul>
+</div>
+
+<div class="collapse show" id="filterCollapse">
+    <div class="row align-items-end g-2 mb-2">
+        <div class="col-md-auto">
+            <div class="searchbar">
+                <input class="search_input" type="text" id="SearchFilter" placeholder="Search..." autocomplete="off">
+                <a href="#" class="search_icon" id="SearchButton">
+                    <i class="fas fa-search fa-xs"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <ejs-combobox id="CompanyFilter" dataSource="@Model.CompanyFilterItems" value="@("0")"
+                          placeholder="Company" floatLabelType="Always" allowFiltering="true"
+                          allowCustom="false" showClearButton="false" change="filterChanged">
+                <e-combobox-fields text="Text" value="Value"></e-combobox-fields>
+            </ejs-combobox>
+        </div>
+        <div class="col-md-2 col-sm-6">
+            <ejs-combobox id="ActiveFilter" dataSource="@Model.ActiveFilterItems" value="@("")"
+                          placeholder="Status" floatLabelType="Always"
+                          allowCustom="false" showClearButton="false" change="filterChanged">
+                <e-combobox-fields text="Text" value="Value"></e-combobox-fields>
+            </ejs-combobox>
+        </div>
+    </div>
+</div>
+
+<ejs-grid id="DocTypesGrid" allowPaging="true" allowSorting="true" allowMultiSorting="false"
+          allowTextWrap="true" gridLines="Both" rowHeight="32"
+          load="gridLoad" actionComplete="gridActionComplete"
+          rowSelected="selectionChanged" rowDeselected="selectionChanged">
+    <e-data-manager url="@Url.Page("./IndexSf", "DataSource")" adaptor="UrlAdaptor"></e-data-manager>
+    <e-grid-selectionsettings type="Multiple" checkboxOnly="true" persistSelection="true"></e-grid-selectionsettings>
+    <e-grid-pagesettings pageSize="10" pageSizes="@pageSizes"></e-grid-pagesettings>
+    <e-grid-columns>
+        <e-grid-column type="checkbox" width="40" visible="false"></e-grid-column>
+        <e-grid-column field="id" isPrimaryKey="true" visible="false"></e-grid-column>
+        <e-grid-column field="code" headerText="Code" width="120"></e-grid-column>
+        <e-grid-column field="abbr" headerText="Συντόμευση" width="110" hideAtMedia="(min-width: 768px)"></e-grid-column>
+        <e-grid-column field="name" headerText="Name" width="220"></e-grid-column>
+        <e-grid-column field="active" headerText="Ενεργό" width="80" textAlign="Center"
+                       displayAsCheckBox="true" type="boolean"></e-grid-column>
+        <e-grid-column field="transTransactorDefName" headerText="Κίνηση Συναλ/νου" width="170"
+                       hideAtMedia="(min-width: 768px)"></e-grid-column>
+        <e-grid-column field="transWarehouseDefName" headerText="Κίνηση Αποθήκης" width="170"
+                       hideAtMedia="(min-width: 768px)"></e-grid-column>
+        <e-grid-column field="companyCode" headerText="Company" width="100"></e-grid-column>
+        <e-grid-column headerText="" width="110" textAlign="Center" allowSorting="false"
+                       template="#actionsTemplate"></e-grid-column>
+    </e-grid-columns>
+</ejs-grid>
+
+<script id="actionsTemplate" type="text/x-template">
+    <a href="@Url.Page("./Edit")?id=${id}" title="Edit"><i class="fas fa-edit fa-lg" style="color:slategray"></i></a>
+    <a href="@Url.Page("./Details")?id=${id}" title="Details" class="ms-2"><i class="fas fa-info-circle fa-lg" style="color:slategray"></i></a>
+    <a href="@Url.Page("./Delete")?id=${id}" title="Delete" class="ms-2"><i class="fas fa-trash fa-lg" style="color:slategray"></i></a>
+</script>
+
+<partial name="_DeleteConfirmationPartial" />
+
+@section Scripts
+{
+    <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
+    <script>
+        // Handlers referenced by the Syncfusion controls: they must exist before <ejs-scripts>
+        // creates the controls, so this block comes first.
+        // Page settings kept between visits (same idea as the other index pages).
+        const storageKey = 'SellDocTypeDefsIndexSf';
+        const defaultSettings = {
+            pageSize: 10,
+            companyFilter: '0',
+            activeFilter: '',
+            searchFilter: '',
+            sortField: '',
+            sortDirection: '',
+            filtersVisible: true,
+            rowSelectorsVisible: false
+        };
+        const pageSettings = (() => {
+            try {
+                return Object.assign({}, defaultSettings, JSON.parse(localStorage.getItem(storageKey) || '{}'));
+            } catch (e) {
+                return Object.assign({}, defaultSettings);
+            }
+        })();
+        const saveSettings = () => {
+            try {
+                localStorage.setItem(storageKey, JSON.stringify(pageSettings));
+            } catch (e) {
+                // Storage unavailable (private window etc.): settings just are not remembered.
+            }
+        };
+
+        const getGrid = () => document.getElementById('DocTypesGrid').ej2_instances[0];
+        const getCombo = (id) => document.getElementById(id).ej2_instances[0];
+
+        const buildQuery = () => new ej.data.Query()
+            .addParams('companyFilter', pageSettings.companyFilter ?? '0')
+            .addParams('activeFilter', pageSettings.activeFilter ?? '')
+            .addParams('searchFilter', pageSettings.searchFilter ?? '');
+
+        // Grid "load" runs before the first request: add the antiforgery header,
+        // the filter parameters and the remembered paging/sorting.
+        function gridLoad() {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            this.dataSource.dataSource.headers = [{ 'RequestVerificationToken': token }];
+            this.query = buildQuery();
+            this.pageSettings.pageSize = pageSettings.pageSize;
+            if (pageSettings.sortField) {
+                this.sortSettings.columns = [{ field: pageSettings.sortField, direction: pageSettings.sortDirection || 'Ascending' }];
+            }
+            this.columns[0].visible = !!pageSettings.rowSelectorsVisible;
+        }
+
+        function gridActionComplete(args) {
+            if (args.requestType === 'paging') {
+                pageSettings.pageSize = this.pageSettings.pageSize;
+                saveSettings();
+            }
+            if (args.requestType === 'sorting') {
+                const sorted = this.sortSettings.columns[0];
+                pageSettings.sortField = sorted ? sorted.field : '';
+                pageSettings.sortDirection = sorted ? sorted.direction : '';
+                saveSettings();
+            }
+        }
+
+        function selectionChanged() {
+            const hasSelection = getGrid().getSelectedRecords().length > 0;
+            document.getElementById('ddSelectedRowsActions').classList.toggle('disabled', !hasSelection);
+        }
+
+        const refreshGrid = () => {
+            const grid = getGrid();
+            grid.clearSelection();
+            grid.query = buildQuery();
+            grid.goToPage(1);
+            grid.refresh();
+        };
+
+        function filterChanged(args) {
+            // Ignore the programmatic change made when the remembered filters are restored.
+            if (args && args.isInteracted === false) {
+                return;
+            }
+            pageSettings.companyFilter = getCombo('CompanyFilter').value ?? '0';
+            pageSettings.activeFilter = getCombo('ActiveFilter').value ?? '';
+            saveSettings();
+            refreshGrid();
+        }
+
+    </script>
+    <ejs-scripts></ejs-scripts>
+    <script>
+        // Wiring that needs the created controls; runs after <ejs-scripts>.
+        document.addEventListener('DOMContentLoaded', () => {
+            const filterCollapseEl = document.getElementById('filterCollapse');
+            const filtersToggleEl = document.getElementById('filtersToggle');
+            const rowSelectorsToggleEl = document.getElementById('rowSelectorsToggle');
+            const searchEl = document.getElementById('SearchFilter');
+
+            // Restore remembered filters without firing change (the grid reads them in gridLoad).
+            getCombo('CompanyFilter').value = pageSettings.companyFilter;
+            getCombo('ActiveFilter').value = pageSettings.activeFilter;
+            searchEl.value = pageSettings.searchFilter;
+
+            // Filters panel toggle
+            const filterCollapse = new bootstrap.Collapse(filterCollapseEl, { toggle: false });
+            const showFilters = (visible) => {
+                visible ? filterCollapse.show() : filterCollapse.hide();
+                filtersToggleEl.textContent = visible ? 'Hide Filters' : 'Show Filters';
+            };
+            if (!pageSettings.filtersVisible) {
+                filterCollapseEl.classList.remove('show');
+                filtersToggleEl.textContent = 'Show Filters';
+            }
+            filtersToggleEl.addEventListener('click', (e) => {
+                e.preventDefault();
+                pageSettings.filtersVisible = !pageSettings.filtersVisible;
+                saveSettings();
+                showFilters(pageSettings.filtersVisible);
+            });
+
+            // Row selectors (checkbox column) toggle
+            const setRowSelectorsText = () => {
+                rowSelectorsToggleEl.textContent = pageSettings.rowSelectorsVisible ? 'Hide Row Selectors' : 'Show Row Selectors';
+            };
+            setRowSelectorsText();
+            rowSelectorsToggleEl.addEventListener('click', (e) => {
+                e.preventDefault();
+                pageSettings.rowSelectorsVisible = !pageSettings.rowSelectorsVisible;
+                saveSettings();
+                setRowSelectorsText();
+                const grid = getGrid();
+                if (!pageSettings.rowSelectorsVisible) {
+                    grid.clearSelection();
+                    selectionChanged();
+                }
+                grid.columns[0].visible = pageSettings.rowSelectorsVisible;
+                grid.refreshColumns();
+            });
+
+            // Search: on Enter, on the icon, or 600ms after typing stops
+            let searchTimer;
+            const runSearch = () => {
+                clearTimeout(searchTimer);
+                if (pageSettings.searchFilter === searchEl.value) {
+                    return;
+                }
+                pageSettings.searchFilter = searchEl.value;
+                saveSettings();
+                refreshGrid();
+            };
+            searchEl.addEventListener('keyup', (e) => {
+                clearTimeout(searchTimer);
+                if (e.key === 'Enter') {
+                    runSearch();
+                } else {
+                    searchTimer = setTimeout(runSearch, 600);
+                }
+            });
+            document.getElementById('SearchButton').addEventListener('click', (e) => {
+                e.preventDefault();
+                runSearch();
+            });
+
+            // Delete selected rows (after confirmation)
+            const confirmModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+            document.getElementById('deleteSelectedRows').addEventListener('click', (e) => {
+                e.preventDefault();
+                if (getGrid().getSelectedRecords().length > 0) {
+                    confirmModal.show();
+                }
+            });
+            document.getElementById('confirmDelete').addEventListener('click', async () => {
+                confirmModal.hide();
+                const ids = getGrid().getSelectedRecords().map(r => r.id);
+                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                try {
+                    const response = await fetch('@Url.Page("./IndexSf", "DeleteSelected")', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
+                        body: JSON.stringify({ ids: ids })
+                    });
+                    const result = await response.json().catch(() => ({}));
+                    if (response.ok) {
+                        toastr.success(`${result.deleted} item(s) deleted`, 'Delete');
+                        refreshGrid();
+                        selectionChanged();
+                    } else {
+                        toastr.error(result.error || 'Delete failed', 'Error');
+                    }
+                } catch (err) {
+                    toastr.error('Delete failed', 'Error');
+                }
+            });
+        });
+    </script>
+}
