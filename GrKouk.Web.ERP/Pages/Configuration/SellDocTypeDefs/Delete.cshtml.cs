@@ -53,7 +53,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.SellDocTypeDefs
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("./IndexSf");
         }
     }
 }

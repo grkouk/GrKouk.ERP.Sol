@@ -71,7 +71,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.SellDocTypeDefs
                 }
             }
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("./IndexSf");
         }
 
         private bool SellDocTypeDefExists(int id)

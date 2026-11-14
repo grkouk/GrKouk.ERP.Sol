@@ -42,7 +42,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.SellDocTypeDefs
             _context.SellDocTypeDefs.Add(SellDocTypeDef);
             await _context.SaveChangesAsync();
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("./IndexSf");
         }
 
         private void LoadCombos()
