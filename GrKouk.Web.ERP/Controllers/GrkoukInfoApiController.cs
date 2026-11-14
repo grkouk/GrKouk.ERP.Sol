@@ -4421,7 +4421,7 @@ namespace GrKouk.Web.ERP.Controllers
             PagedList<CFATransactionDefListDto> listItems;
             try
             {
-                var projectedList = fullListIq.ProjectTo<CFATransactionDefListDto>(_mapper.ConfigurationProvider);
+                var projectedList = fullListIq.Select(CashFlowDefinitionMappings.TransactionDefToListDto);
                 var pageIndex = request.PageIndex;
 
                 var pageSize = request.PageSize;
@@ -4523,7 +4523,7 @@ namespace GrKouk.Web.ERP.Controllers
             PagedList<CfaDocTypeDefListDto> listItems;
             try
             {
-                var projectedList = fullListIq.ProjectTo<CfaDocTypeDefListDto>(_mapper.ConfigurationProvider);
+                var projectedList = fullListIq.Select(CashFlowDefinitionMappings.DocTypeDefToListDto);
                 var pageIndex = request.PageIndex;
 
                 var pageSize = request.PageSize;
@@ -4625,7 +4625,7 @@ namespace GrKouk.Web.ERP.Controllers
             PagedList<CfaDocSeriesDefListDto> listItems;
             try
             {
-                var projectedList = fullListIq.ProjectTo<CfaDocSeriesDefListDto>(_mapper.ConfigurationProvider);
+                var projectedList = fullListIq.Select(CashFlowDefinitionMappings.DocSeriesDefToListDto);
                 var pageIndex = request.PageIndex;
 
                 var pageSize = request.PageSize;

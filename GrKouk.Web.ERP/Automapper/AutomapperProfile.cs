@@ -179,47 +179,6 @@ namespace GrKouk.Web.ERP.Automapper {
                     opt => opt.MapFrom(src => src.SecondaryUnitId))
                 .ForMember(d => d.Price,
                     opt => opt.MapFrom(src => src.UnitPrice));
-            CreateMap<CashFlowTransactionDef, CfaTransactionDefCreateDto>().ReverseMap();
-            CreateMap<CashFlowTransactionDef, CfaTransactionDefModifyDto>().ReverseMap();
-            CreateMap<CashFlowDocTypeDef, CfaDocTypeDefCreateDto>().ReverseMap();
-            CreateMap<CashFlowDocTypeDef, CfaDocTypeDefModifyDto>().ReverseMap();
-            CreateMap<CashFlowDocSeriesDef, CfaDocSeriesDefCreateDto>().ReverseMap();
-            CreateMap<CashFlowDocSeriesDef, CfaDocSeriesDefModifyDto>().ReverseMap();
-            CreateMap<CashFlowTransactionDef, CFATransactionDefListDto>()
-                .ForMember(dest => dest.CompanyName,
-                    opt =>
-                        opt.MapFrom(src => src.Company.Name))
-                .ForMember(dest => dest.CompanyCode,
-                    opt =>
-                        opt.MapFrom(src => src.Company.Code));
-
-            CreateMap<CashFlowDocTypeDef, CfaDocTypeDefListDto>()
-                .ForMember(dest => dest.CfaTransactionDefName,
-                    opt =>
-                        opt.MapFrom(src => src.CashFlowTransactionDefinition.Name))
-                .ForMember(dest => dest.CfaTransactionDefCode,
-                    opt =>
-                        opt.MapFrom(src => src.CashFlowTransactionDefinition.Code))
-                .ForMember(dest => dest.CompanyName,
-                    opt =>
-                        opt.MapFrom(src => src.Company.Name))
-                .ForMember(dest => dest.CompanyCode,
-                    opt =>
-                        opt.MapFrom(src => src.Company.Code));
-
-            CreateMap<CashFlowDocSeriesDef, CfaDocSeriesDefListDto>()
-                .ForMember(dest => dest.CfaDocTypeDefName,
-                    opt =>
-                        opt.MapFrom(src => src.CashFlowDocTypeDefinition.Name))
-                .ForMember(dest => dest.CfaDocTypeDefCode,
-                    opt =>
-                        opt.MapFrom(src => src.CashFlowDocTypeDefinition.Code))
-                .ForMember(dest => dest.CompanyName,
-                    opt =>
-                        opt.MapFrom(src => src.Company.Name))
-                .ForMember(dest => dest.CompanyCode,
-                    opt =>
-                        opt.MapFrom(src => src.Company.Code));
             CreateMap<CashFlowAccountTransaction, CfaTransactionCreateDto>()
                 .ForMember(dest => dest.DocSeriesId,
                     opt =>

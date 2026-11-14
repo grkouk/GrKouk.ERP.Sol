@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using GrKouk.Web.ERP.Data;
+﻿using GrKouk.Web.ERP.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -9,7 +8,7 @@ namespace GrKouk.Web.ERP.Pages.Configuration.CashFlow.CFADocTypeDefs
     public class IndexModelOld : PageModel
     {
       
-        public IndexModelOld(ApiDbContext context, IMapper mapper)
+        public IndexModelOld(ApiDbContext context)
         {
            
         }
