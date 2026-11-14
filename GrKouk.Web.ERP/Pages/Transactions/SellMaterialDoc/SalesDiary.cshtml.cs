@@ -1,6 +1,6 @@
 ﻿using System.Linq;
-using AutoMapper;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -13,13 +13,11 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
     public class SalesDiary : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
 
-        public SalesDiary(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public SalesDiary(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
         }
         

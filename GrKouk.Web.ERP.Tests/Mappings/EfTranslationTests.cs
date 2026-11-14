@@ -111,4 +111,12 @@ public class EfTranslationTests
         var sql = db.BuyDocuments.Select(BuyDocumentMappings.ToListDto).ToQueryString();
         Assert.Contains("[CurrencyId]", sql);
     }
+
+    [Fact]
+    public void SellDocument_ToListDto_translates_to_sql()
+    {
+        using var db = CreateContext();
+        var sql = db.SellDocuments.Select(SellDocumentMappings.ToListDto).ToQueryString();
+        Assert.Contains("[CurrencyId]", sql);
+    }
 }

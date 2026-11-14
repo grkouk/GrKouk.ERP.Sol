@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Dtos.SellDocuments;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +18,6 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
     public class CreateModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
         public string SeekType { get; set; }
         public bool InitialLoad = true;
@@ -26,10 +25,9 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
         public int RoutedSectionId { get; set; }
         public int CopyFromId { get; set; }
 
-        public CreateModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public CreateModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
         }
 
@@ -57,7 +55,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
                     return NotFound();
                 }
                 //ItemVm = _mapper.Map<BuyDocCreateAjaxDto>(buyMatDoc);
-                CopyFromItemVm = _mapper.Map<SellDocModifyDto>(sellMatDoc);
+                CopyFromItemVm = sellMatDoc.ToModifyDto();
                 if (CopyFromItemVm != null)
                 {
                     ItemVm = new SellDocCreateAjaxDto()

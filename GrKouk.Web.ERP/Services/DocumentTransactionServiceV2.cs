@@ -1018,7 +1018,6 @@ public class DocumentTransactionServiceV2 : IDocumentTransactionService
          
         bool noWarehouseTrans = false;
         int docId = 0;
-        SellDocCreateAjaxNoLinesDto transToAttachNoLines;
         SellDocument transToAttach;
         DateTime dateOfTrans;
 
@@ -1032,8 +1031,7 @@ public class DocumentTransactionServiceV2 : IDocumentTransactionService
 
         try
         {
-            transToAttachNoLines = _mapper.Map<SellDocCreateAjaxNoLinesDto>(docTrans);
-            transToAttach = _mapper.Map<SellDocument>(transToAttachNoLines);
+            transToAttach = docTrans.ToEntity();
             dateOfTrans = docTrans.TransDate;
         }
         catch (Exception e)
@@ -1153,7 +1151,7 @@ public class DocumentTransactionServiceV2 : IDocumentTransactionService
                     });
                 }
 
-                var sTransactorTransaction = _mapper.Map<TransactorTransaction>(docTrans);
+                var sTransactorTransaction = docTrans.ToTransactorTransaction();
                 sTransactorTransaction.TransactorId = docTrans.TransactorId;
                 sTransactorTransaction.SectionId = sectionId;
                 sTransactorTransaction.CreatorSectionId = sectionId;
@@ -1222,7 +1220,7 @@ public class DocumentTransactionServiceV2 : IDocumentTransactionService
                     var transactor = await _context.Transactors
                         .Where(p => p.Id == docTrans.TransactorId)
                         .SingleOrDefaultAsync();
-                    var sTransactorTransaction = _mapper.Map<TransactorTransaction>(docTrans);
+                    var sTransactorTransaction = docTrans.ToTransactorTransaction();
                     var transTransactorEtiology =
                         $"{transTransactorPayOffSeries.Name} created from {docSeries.Name} for {transactor.Name} with {docTrans.Etiology} ";
 
@@ -1541,7 +1539,6 @@ public class DocumentTransactionServiceV2 : IDocumentTransactionService
         const string sectionCode = "SYS-SELL-COMBINED-SCN";
         bool noWarehouseTrans;
 
-        SellDocModifyAjaxNoLinesDto transToAttachNoLines;
         SellDocument transToAttach;
         DateTime dateOfTrans;
         if (docTrans == null)
@@ -1554,8 +1551,7 @@ public class DocumentTransactionServiceV2 : IDocumentTransactionService
 
         try
         {
-            transToAttachNoLines = _mapper.Map<SellDocModifyAjaxNoLinesDto>(docTrans);
-            transToAttach = _mapper.Map<SellDocument>(transToAttachNoLines);
+            transToAttach = docTrans.ToEntity();
             dateOfTrans = docTrans.TransDate;
         }
         catch (Exception e)
@@ -1672,7 +1668,7 @@ public class DocumentTransactionServiceV2 : IDocumentTransactionService
                     });
                 }
 
-                var spTransactorCreateDto = _mapper.Map<TransactorTransCreateDto>(docTrans);
+                var spTransactorCreateDto = docTrans.ToTransactorTransCreateDto();
                 //Ετσι δεν μεταφέρει το Id απο το docTrans
                 var sTransactorTransaction = spTransactorCreateDto.ToEntity();
 
@@ -1731,7 +1727,7 @@ public class DocumentTransactionServiceV2 : IDocumentTransactionService
                     var transactor = await _context.Transactors
                         .Where(p => p.Id == docTrans.TransactorId)
                         .SingleOrDefaultAsync();
-                    var spTransactorCreateDto = _mapper.Map<TransactorTransCreateDto>(docTrans);
+                    var spTransactorCreateDto = docTrans.ToTransactorTransCreateDto();
                     var transTransactorEtiology =
                         $"{transTransactorPayOffSeries.Name} created from {docSeries.Name} for {transactor.Name} with {docTrans.Etiology} ";
 

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Dtos.SellDocuments;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,15 +18,13 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
     public class EditModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
         public string SeekType { get; set; }
         public bool InitialLoad = true;
 
-        public EditModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public EditModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
         }
 
@@ -54,7 +52,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
             {
                 return NotFound();
             }
-            ItemVm = _mapper.Map<SellDocModifyDto>(sellMatDoc);
+            ItemVm = sellMatDoc.ToModifyDto();
 
             if (ItemVm == null)
             {

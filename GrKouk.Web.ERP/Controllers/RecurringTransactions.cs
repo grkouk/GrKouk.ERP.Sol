@@ -551,7 +551,6 @@ namespace GrKouk.Web.ERP.Controllers
 
             bool noWarehouseTrans = false;
 
-            SellDocCreateAjaxNoLinesDto transToAttachNoLines;
             SellDocument transToAttach;
             DateTime dateOfTrans;
 
@@ -565,8 +564,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             try
             {
-                transToAttachNoLines = _mapper.Map<SellDocCreateAjaxNoLinesDto>(data);
-                transToAttach = _mapper.Map<SellDocument>(transToAttachNoLines);
+                transToAttach = data.ToEntity();
                 transToAttach.SalesChannelId = 1;
                 dateOfTrans = data.TransDate;
             }
@@ -685,7 +683,7 @@ namespace GrKouk.Web.ERP.Controllers
                         });
                     }
 
-                    var sTransactorTransaction = _mapper.Map<TransactorTransaction>(data);
+                    var sTransactorTransaction = data.ToTransactorTransaction();
                     sTransactorTransaction.TransactorId = data.TransactorId;
                     sTransactorTransaction.SectionId = sectionId;
                     sTransactorTransaction.CreatorSectionId = sectionId;
@@ -746,7 +744,7 @@ namespace GrKouk.Web.ERP.Controllers
                             });
                         }
 
-                        var sTransactorTransaction = _mapper.Map<TransactorTransaction>(data);
+                        var sTransactorTransaction = data.ToTransactorTransaction();
                         sTransactorTransaction.TransactorId = data.TransactorId;
                         
                         sTransactorTransaction.TransTransactorDocTypeId =

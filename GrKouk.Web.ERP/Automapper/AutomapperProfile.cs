@@ -25,28 +25,6 @@ using GrKouk.Web.ERP.Helpers;
 namespace GrKouk.Web.ERP.Automapper {
     public class AutoMapperProfile : Profile {
         public AutoMapperProfile() {
-            //.ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Company.Name));
-
-
-            CreateMap<SellDocument, SellDocListDto>()
-                .ForMember(dest => dest.CompanyCurrencyId,
-                    opt => opt.MapFrom(src => src.Company.CurrencyId)).ReverseMap();
-            CreateMap<SellDocument, SellDocCreateAjaxNoLinesDto>().ReverseMap();
-            CreateMap<SellDocCreateAjaxDto, SellDocCreateAjaxNoLinesDto>().ReverseMap();
-            CreateMap<SellDocument, SellDocModifyAjaxNoLinesDto>().ReverseMap();
-            CreateMap<SellDocument, SellDocLineAjaxDto>().ReverseMap();
-            CreateMap<SellDocument, SellDocModifyDto>().ReverseMap();
-            CreateMap<SellDocLine, SellDocLineModifyDto>()
-                .ForMember(d => d.WarehouseItemNature,
-                    opt => opt.MapFrom(s => (int)s.WarehouseItem.WarehouseItemNature))
-                .ReverseMap();
-
-            CreateMap<SellDocModifyAjaxDto, SellDocModifyAjaxNoLinesDto>();
-            CreateMap<TransactorTransaction, SellDocCreateAjaxDto>().ReverseMap();
-            CreateMap<TransactorTransaction, SellDocModifyAjaxDto>().ReverseMap();
-            CreateMap<TransactorTransCreateDto, SellDocModifyAjaxDto>().ReverseMap();
-
-
             CreateMap<RecurringTransDoc, RecurringDocCreateAjaxNoLinesDto>().ReverseMap();
             CreateMap<RecurringTransDocCreateAjaxDto, RecurringDocCreateAjaxNoLinesDto>().ReverseMap();
             CreateMap<RecurringTransDocModifyAjaxDto, RecurringTransDocModifyAjaxNoLinesDto>().ReverseMap();
