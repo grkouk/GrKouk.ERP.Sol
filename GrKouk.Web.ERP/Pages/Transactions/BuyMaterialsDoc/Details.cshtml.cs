@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Dtos.BuyDocuments;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -14,12 +14,10 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
     public class DetailsModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
 
-        public DetailsModel(ApiDbContext context, IMapper mapper)
+        public DetailsModel(ApiDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
         public decimal DocumentSum { get; set; }
         public BuyDocModifyDto ItemVm { get; set; }
@@ -41,7 +39,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
                 .ThenInclude(m => m.WarehouseItem)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            ItemVm = _mapper.Map<BuyDocModifyDto>(buyMatDoc);
+            ItemVm = buyMatDoc.ToModifyDto();
 
             if (ItemVm == null)
             {

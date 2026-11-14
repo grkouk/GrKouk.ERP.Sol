@@ -39,7 +39,6 @@ public class DocumentTransactionServiceV2 : IDocumentTransactionService
         bool noWarehouseTrans = false;
         int newDocumentId = 0;
 
-        BuyDocCreateAjaxNoLinesDto transToAttachNoLines;
         BuyDocument transToAttach;
         DateTime dateOfTrans;
 
@@ -53,8 +52,7 @@ public class DocumentTransactionServiceV2 : IDocumentTransactionService
 
         try
         {
-            transToAttachNoLines = _mapper.Map<BuyDocCreateAjaxNoLinesDto>(docTrans);
-            transToAttach = _mapper.Map<BuyDocument>(transToAttachNoLines);
+            transToAttach = docTrans.ToEntity();
             dateOfTrans = docTrans.TransDate;
         }
         catch (Exception e)
@@ -478,7 +476,6 @@ public class DocumentTransactionServiceV2 : IDocumentTransactionService
         const string sectionCode = "SYS-BUY-MATERIALS-SCN";
         bool noWarehouseTrans;
 
-        BuyDocModifyAjaxNoLinesDto transToAttachNoLines;
         BuyDocument transToAttach;
         DateTime dateOfTrans;
         if (docTrans == null)
@@ -491,8 +488,7 @@ public class DocumentTransactionServiceV2 : IDocumentTransactionService
 
         try
         {
-            transToAttachNoLines = _mapper.Map<BuyDocModifyAjaxNoLinesDto>(docTrans);
-            transToAttach = _mapper.Map<BuyDocument>(transToAttachNoLines);
+            transToAttach = docTrans.ToEntity();
             dateOfTrans = docTrans.TransDate;
         }
         catch (Exception e)

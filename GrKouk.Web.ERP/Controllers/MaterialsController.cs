@@ -2049,7 +2049,6 @@ namespace GrKouk.Web.ERP.Controllers
             bool noWarehouseTrans = false;
 
 
-            BuyDocCreateAjaxNoLinesDto transToAttachNoLines;
             BuyDocument transToAttach;
             DateTime dateOfTrans;
 
@@ -2063,8 +2062,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             try
             {
-                transToAttachNoLines = _mapper.Map<BuyDocCreateAjaxNoLinesDto>(data);
-                transToAttach = _mapper.Map<BuyDocument>(transToAttachNoLines);
+                transToAttach = data.ToEntity();
                 dateOfTrans = data.TransDate;
             }
             catch (Exception e)
@@ -2185,7 +2183,7 @@ namespace GrKouk.Web.ERP.Controllers
                         });
                     }
 
-                    var sTransactorTransaction = _mapper.Map<TransactorTransaction>(data);
+                    var sTransactorTransaction = data.ToTransactorTransaction();
                     sTransactorTransaction.TransactorId = data.TransactorId;
                     sTransactorTransaction.SectionId = sectionId;
                     sTransactorTransaction.CfAccountId = 0;
@@ -2255,7 +2253,7 @@ namespace GrKouk.Web.ERP.Controllers
                         var transactor = await _context.Transactors
                             .Where(p => p.Id == data.TransactorId)
                             .SingleOrDefaultAsync();
-                        var sTransactorTransaction = _mapper.Map<TransactorTransaction>(data);
+                        var sTransactorTransaction = data.ToTransactorTransaction();
                         var transTransactorEtiology =
                             $"{transTransactorPayOffSeries.Name} created from {docSeries.Name} for {transactor.Name} with {data.Etiology} ";
                         sTransactorTransaction.TransactorId = data.TransactorId;
@@ -2572,7 +2570,6 @@ namespace GrKouk.Web.ERP.Controllers
             const string sectionCode = "SYS-BUY-MATERIALS-SCN";
             bool noWarehouseTrans;
 
-            BuyDocModifyAjaxNoLinesDto transToAttachNoLines;
             BuyDocument transToAttach;
             DateTime dateOfTrans;
             if (data == null)
@@ -2585,8 +2582,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             try
             {
-                transToAttachNoLines = _mapper.Map<BuyDocModifyAjaxNoLinesDto>(data);
-                transToAttach = _mapper.Map<BuyDocument>(transToAttachNoLines);
+                transToAttach = data.ToEntity();
                 dateOfTrans = data.TransDate;
             }
             catch (Exception e)
@@ -2702,7 +2698,7 @@ namespace GrKouk.Web.ERP.Controllers
 
                     try
                     {
-                        var spTransactorCreateDto = _mapper.Map<TransactorTransCreateDto>(data);
+                        var spTransactorCreateDto = data.ToTransactorTransCreateDto();
                         //Ετσι δεν μεταφέρει το Id απο το data
                         var sTransactorTransaction = spTransactorCreateDto.ToEntity();
 
@@ -2771,7 +2767,7 @@ namespace GrKouk.Web.ERP.Controllers
                         var transactor = await _context.Transactors
                             .Where(p => p.Id == data.TransactorId)
                             .SingleOrDefaultAsync();
-                        var spTransactorCreateDto = _mapper.Map<TransactorTransCreateDto>(data);
+                        var spTransactorCreateDto = data.ToTransactorTransCreateDto();
                         //Ετσι δεν μεταφέρει το Id απο το data
                         var sTransactorTransaction = spTransactorCreateDto.ToEntity();
                         var transTransactorEtiology =

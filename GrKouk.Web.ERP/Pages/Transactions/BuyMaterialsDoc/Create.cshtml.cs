@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Dtos.BuyDocuments;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +19,6 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
     public class CreateModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
 
         public string SeekType { get; set; }
@@ -27,10 +26,9 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
         public int RoutedSectionId { get; set; }
         public bool InitialLoad = true;
         public int CopyFromId { get; set; }
-        public CreateModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public CreateModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
         }
 
@@ -58,7 +56,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
                     return NotFound();
                 }
                 //ItemVm = _mapper.Map<BuyDocCreateAjaxDto>(buyMatDoc);
-                CopyFromItemVm = _mapper.Map<BuyDocModifyDto>(buyMatDoc);
+                CopyFromItemVm = buyMatDoc.ToModifyDto();
                 //check for new values or old values
                 var vmLines = CopyFromItemVm.BuyDocLines;
                 foreach (var vmLine in vmLines)

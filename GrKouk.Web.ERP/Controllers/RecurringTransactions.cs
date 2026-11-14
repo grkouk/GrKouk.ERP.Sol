@@ -9,6 +9,7 @@ using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.BuyDocuments;
 using GrKouk.Erp.Dtos.SellDocuments;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Web.ERP.Helpers;
 using GrKouk.Web.ERP.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -136,7 +137,6 @@ namespace GrKouk.Web.ERP.Controllers
 
             #region BuyDocument
 
-            BuyDocCreateAjaxNoLinesDto transToAttachNoLines;
             BuyDocument transToAttach;
             DateTime dateOfTrans;
 
@@ -150,8 +150,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             try
             {
-                transToAttachNoLines = _mapper.Map<BuyDocCreateAjaxNoLinesDto>(data);
-                transToAttach = _mapper.Map<BuyDocument>(transToAttachNoLines);
+                transToAttach = data.ToEntity();
                 dateOfTrans = data.TransDate;
             }
             catch (Exception e)
@@ -274,7 +273,7 @@ namespace GrKouk.Web.ERP.Controllers
                         });
                     }
 
-                    var sTransactorTransaction = _mapper.Map<TransactorTransaction>(data);
+                    var sTransactorTransaction = data.ToTransactorTransaction();
                     sTransactorTransaction.TransactorId = data.TransactorId;
                     sTransactorTransaction.SectionId = sectionId;
                     sTransactorTransaction.CreatorSectionId = sectionId;
@@ -333,7 +332,7 @@ namespace GrKouk.Web.ERP.Controllers
                             });
                         }
 
-                        var sTransactorTransaction = _mapper.Map<TransactorTransaction>(data);
+                        var sTransactorTransaction = data.ToTransactorTransaction();
                         sTransactorTransaction.TransactorId = data.TransactorId;
                         
                         sTransactorTransaction.TransTransactorDocTypeId =

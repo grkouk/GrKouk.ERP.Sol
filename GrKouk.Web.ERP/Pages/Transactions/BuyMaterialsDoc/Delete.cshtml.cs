@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.BuyDocuments;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Web.ERP.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,14 +20,12 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
     public class DeleteModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IDocumentTransactionService _docTransSrv;
         private readonly IToastNotification _toastNotification;
 
-        public DeleteModel(ApiDbContext context, IMapper mapper, IDocumentTransactionService docTransSrv,IToastNotification toastNotification)
+        public DeleteModel(ApiDbContext context, IDocumentTransactionService docTransSrv,IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _docTransSrv = docTransSrv;
             _toastNotification = toastNotification;
         }
@@ -52,7 +50,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
                 .ThenInclude(m => m.WarehouseItem)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            ItemVm = _mapper.Map<BuyDocModifyDto>(buyMatDoc);
+            ItemVm = buyMatDoc.ToModifyDto();
 
             if (ItemVm == null)
             {

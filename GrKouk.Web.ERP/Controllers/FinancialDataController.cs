@@ -209,7 +209,7 @@ namespace GrKouk.Web.ERP.Controllers
                 }
 
 
-                var t = fullListIq.ProjectTo<BuyDocListDto>(_mapper.ConfigurationProvider);
+                var t = fullListIq.Select(BuyDocumentMappings.ToListDto);
                 var t1 = await t.Select(p => new BuyDocListDto
                 {
                     TransDate = p.TransDate,
