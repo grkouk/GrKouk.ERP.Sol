@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.FinDiary;
@@ -17,14 +17,12 @@ namespace GrKouk.Web.Erp.Pages.Expenses
     public class CreateModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
         public int  CopyFromId { get; set; }
 
-        public CreateModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public CreateModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
         }
 
@@ -47,7 +45,7 @@ namespace GrKouk.Web.Erp.Pages.Expenses
 
                 if (diaryTransactionToModify != null)
                 {
-                    ItemVm = _mapper.Map<FinDiaryExpenceTransModifyDto>(diaryTransactionToModify);
+                    ItemVm = diaryTransactionToModify.ToExpenseModifyDto();
                 }
                 
             }
@@ -66,7 +64,7 @@ namespace GrKouk.Web.Erp.Pages.Expenses
                 return Page();
             }
 
-            var diaryTransactionToAttach = _mapper.Map<FinDiaryTransaction>(ItemVm);
+            var diaryTransactionToAttach = ItemVm.ToEntity();
 
             diaryTransactionToAttach.Kind = (int)DiaryTransactionsKindEnum.Expence;
             diaryTransactionToAttach.RevenueCentreId = 1;

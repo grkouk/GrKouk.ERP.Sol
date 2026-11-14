@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.FinDiary;
 using GrKouk.Web.ERP.Data;
@@ -16,14 +16,12 @@ namespace GrKouk.Web.Erp.Pages.Expenses
     public class EditModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
 
 
-        public EditModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public EditModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
         }
 
@@ -50,7 +48,7 @@ namespace GrKouk.Web.Erp.Pages.Expenses
                 return NotFound();
             }
 
-            ItemVm = _mapper.Map<FinDiaryExpenceTransModifyDto>(diaryTransactionToModify);
+            ItemVm = diaryTransactionToModify.ToExpenseModifyDto();
 
             LoadCompbos();
 
@@ -65,12 +63,14 @@ namespace GrKouk.Web.Erp.Pages.Expenses
                 return Page();
             }
 
-            var diaryTransactionToAttach = _mapper.Map<FinDiaryTransaction>(ItemVm);
-
-            //diaryTransactionToAttach.Kind = (int)DiaryTransactionsKindEnum.Expence;
-            //diaryTransactionToAttach.RevenueCentreId = 1;
-
-            _context.Attach(diaryTransactionToAttach).State = EntityState.Modified;
+            var diaryTransactionToAttach = await _context.FinDiaryTransactions
+                .FirstOrDefaultAsync(t => t.Id == ItemVm.Id);
+            if (diaryTransactionToAttach == null)
+            {
+                return NotFound();
+            }
+            _context.Entry(diaryTransactionToAttach).Property(t => t.Timestamp).OriginalValue = ItemVm.Timestamp;
+            ItemVm.ApplyTo(diaryTransactionToAttach);
 
             try
             {

@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using GrKouk.Web.ERP.Data;
+﻿using GrKouk.Web.ERP.Data;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
@@ -9,12 +8,10 @@ namespace GrKouk.Web.Erp.Pages.Expenses
     public class IndexModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
 
-        public IndexModel(ApiDbContext context, IMapper mapper)
+        public IndexModel(ApiDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
         public void OnGet()
         {
