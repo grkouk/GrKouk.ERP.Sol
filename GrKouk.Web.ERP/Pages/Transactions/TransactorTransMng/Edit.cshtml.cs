@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Web.ERP.Helpers;
 using GrKouk.Web.ERP.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -25,17 +25,15 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
     {
         private const string _sectionCode = "SYS-TRANSACTOR-TRANS";
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
                 private readonly ITransactorTransactionService _transService;
         public bool NotUpdatable;
         public bool InitialLoad = true;
         public int EntityInTransactionId { get; set; }
 
-        public EditModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification, ITransactorTransactionService transService)
+        public EditModel(ApiDbContext context, IToastNotification toastNotification, ITransactorTransactionService transService)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
             _transService = transService;
         }
@@ -73,7 +71,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
             //If section is not our section the canot update disable input controls
             //NotUpdatable = transactionToModify.SectionId != section.Id;
             NotUpdatable = transactionToModify.CreatorId != 0;
-            ItemVm = _mapper.Map<TransactorTransModifyDto>(transactionToModify);
+            ItemVm = transactionToModify.ToModifyDto();
             LoadCombos();
             return Page();
         }

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,12 +17,10 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
     public class DetailsModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
 
-        public DetailsModel(ApiDbContext context, IMapper mapper)
+        public DetailsModel(ApiDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
         
@@ -49,7 +47,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
 
            
            
-            ItemVm = _mapper.Map<TransactorTransModifyDto>(transactionToModify);
+            ItemVm = transactionToModify.ToModifyDto();
             LoadCombos();
             return Page();
         }

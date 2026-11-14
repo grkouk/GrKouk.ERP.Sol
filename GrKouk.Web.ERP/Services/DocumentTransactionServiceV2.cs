@@ -9,6 +9,7 @@ using GrKouk.Erp.Dtos.BuyDocuments;
 using GrKouk.Erp.Dtos.SellDocuments;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -1677,7 +1678,7 @@ public class DocumentTransactionServiceV2 : IDocumentTransactionService
 
                 var spTransactorCreateDto = _mapper.Map<TransactorTransCreateDto>(docTrans);
                 //Ετσι δεν μεταφέρει το Id απο το docTrans
-                var sTransactorTransaction = _mapper.Map<TransactorTransaction>(spTransactorCreateDto);
+                var sTransactorTransaction = spTransactorCreateDto.ToEntity();
 
                 sTransactorTransaction.TransactorId = docTrans.TransactorId;
                 sTransactorTransaction.SectionId = sectionId;
@@ -1739,7 +1740,7 @@ public class DocumentTransactionServiceV2 : IDocumentTransactionService
                         $"{transTransactorPayOffSeries.Name} created from {docSeries.Name} for {transactor.Name} with {docTrans.Etiology} ";
 
                     //Ετσι δεν μεταφέρει το Id απο το docTrans
-                    var sTransactorTransaction = _mapper.Map<TransactorTransaction>(spTransactorCreateDto);
+                    var sTransactorTransaction = spTransactorCreateDto.ToEntity();
                     sTransactorTransaction.TransactorId = docTrans.TransactorId;
 
                     sTransactorTransaction.TransTransactorDocTypeId =

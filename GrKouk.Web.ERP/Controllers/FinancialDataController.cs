@@ -16,6 +16,7 @@ using GrKouk.Erp.Dtos.SellDocuments;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Erp.Dtos.WarehouseTransactions;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -469,7 +470,7 @@ namespace GrKouk.Web.ERP.Controllers
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
                 .Take(10)
                 .ToListAsync();
-            var t = fullListIq.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
+            var t = fullListIq.Select(TransactorTransactionMappings.ToListDto);
             var t1 = await t.Select(p => new TransactorTransListDto
             {
                 TransTransactorDocSeriesId = p.TransTransactorDocSeriesId,
@@ -576,7 +577,7 @@ namespace GrKouk.Web.ERP.Controllers
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
                 .Take(10)
                 .ToListAsync();
-            var t = fullListIq.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
+            var t = fullListIq.Select(TransactorTransactionMappings.ToListDto);
             var t1 = await t.Select(p => new TransactorTransListDto
             {
                 TransTransactorDocSeriesId = p.TransTransactorDocSeriesId,
@@ -709,7 +710,7 @@ namespace GrKouk.Web.ERP.Controllers
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
                 .Take(10)
                 .ToListAsync();
-            //var t = fullListIq.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
+            //var t = fullListIq.Select(TransactorTransactionMappings.ToListDto);
 
             var t1 = await fullListIq.Select(p => new CfaTransactionListDto()
             {
@@ -856,7 +857,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             }
 
-            var dbTrans = transactionsList.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
+            var dbTrans = transactionsList.Select(TransactorTransactionMappings.ToListDto);
 
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
                 .Take(10)
@@ -1206,12 +1207,12 @@ namespace GrKouk.Web.ERP.Controllers
                 );
             }
 
-            var dbTrans = transactionsList.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
+            var dbTrans = transactionsList.Select(TransactorTransactionMappings.ToListDto);
 
             var currencyRates = await _context.ExchangeRates.OrderByDescending(p => p.ClosingDate)
                 .Take(10)
                 .ToListAsync();
-            var t = transListAll.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
+            var t = transListAll.Select(TransactorTransactionMappings.ToListDto);
             var t1 = await t.Select(p => new TransactorTransListDto
             {
                 Id = p.Id,
@@ -1282,7 +1283,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             //-----------------------------------------------
             var dbTransBeforePeriod =
-                transListBeforePeriod.ProjectTo<TransactorTransListDto>(_mapper.ConfigurationProvider);
+                transListBeforePeriod.Select(TransactorTransactionMappings.ToListDto);
             var transBeforePeriodList = await dbTransBeforePeriod.ToListAsync();
             foreach (var item in transBeforePeriodList)
             {

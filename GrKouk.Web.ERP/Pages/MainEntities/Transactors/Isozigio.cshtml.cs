@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
@@ -15,13 +14,11 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors
     public class IsozigioModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
 
-        public IsozigioModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public IsozigioModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
         }
        

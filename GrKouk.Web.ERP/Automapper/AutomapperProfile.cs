@@ -37,18 +37,9 @@ namespace GrKouk.Web.ERP.Automapper {
                     opt => opt.MapFrom(src => src.Company.CurrencyId)).ReverseMap();
             CreateMap<BuyDocument, BuyDocModifyDto>().ReverseMap();
             CreateMap<BuyDocLine, BuyDocLineModifyDto>().ReverseMap();
-            CreateMap<TransactorTransaction, TransactorTransCreateDto>().ReverseMap();
-            CreateMap<TransactorTransaction, TransactorTransModifyDto>().ReverseMap();
-            CreateMap<TransactorTransaction, TransactorTransListDto>()
-                .ForMember(dest => dest.CompanyCurrencyId,
-                    opt => opt.MapFrom(src => src.Company.CurrencyId))
-                .ForMember(dest => dest.TransTransactorDocSeriesCode, opt => opt.MapFrom(src => src.TransTransactorDocSeries.Code))
-                .ForMember(dest => dest.TransTransactorDocSeriesName, opt => opt.MapFrom(src => src.TransTransactorDocSeries.Name));
             CreateMap<TransactorTransaction, BuyDocCreateAjaxDto>().ReverseMap();
             CreateMap<TransactorTransaction, BuyDocModifyAjaxDto>().ReverseMap();
             CreateMap<TransactorTransCreateDto, BuyDocModifyAjaxDto>().ReverseMap();
-            CreateMap<TransactorTransListDto, KartelaLine>()
-                .ForMember(dest => dest.DocSeriesCode, opt => opt.MapFrom(src => src.TransTransactorDocSeriesCode));
 
             CreateMap<SellDocument, SellDocListDto>()
                 .ForMember(dest => dest.CompanyCurrencyId,

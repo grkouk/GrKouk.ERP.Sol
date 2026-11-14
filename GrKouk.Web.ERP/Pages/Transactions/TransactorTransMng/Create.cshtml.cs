@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Web.ERP.Helpers;
 using GrKouk.Web.ERP.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -26,7 +26,6 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
     {
         private const string _sectionCode = "SYS-TRANSACTOR-TRANS";
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
         private readonly ITransactorTransactionService _transService;
         public bool NotUpdatable;
@@ -34,10 +33,9 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
         public int CopyFromId { get; set; }
         public int CopyFromTransactorId { get; set; } = 0;
 
-        public CreateModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification, ITransactorTransactionService transService)
+        public CreateModel(ApiDbContext context, IToastNotification toastNotification, ITransactorTransactionService transService)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
             _transService = transService;
         }
@@ -63,7 +61,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
                     return NotFound();
                 }
 
-                ItemVm = _mapper.Map<TransactorTransCreateDto>(transactionToModify);
+                ItemVm = transactionToModify.ToCreateDto();
                 CopyFromTransactorId = ItemVm.TransactorId;
             }
 
@@ -128,7 +126,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
 
             #endregion
 
-            var spTransaction = _mapper.Map<TransactorTransaction>(ItemVm);
+            var spTransaction = ItemVm.ToEntity();
 
             var docSeries = await
                 _context.TransTransactorDocSeriesDefs.SingleOrDefaultAsync(m =>

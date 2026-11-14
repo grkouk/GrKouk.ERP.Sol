@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Dtos.TransactorTransactions;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Web.ERP.Helpers;
 using GrKouk.Web.ERP.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -17,12 +17,10 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
     [Authorize(Roles = "Admin")]
     public class DeleteModel : PageModel {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly ITransactorTransactionService _transService;
         public bool NotUpdatable;
-        public DeleteModel(ApiDbContext context, IMapper mapper, ITransactorTransactionService transService) {
+        public DeleteModel(ApiDbContext context, ITransactorTransactionService transService) {
             _context = context;
-            _mapper = mapper;
             _transService = transService;
         }
 
@@ -46,7 +44,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng {
             if (transactionToModify == null) {
                 return NotFound();
             }
-            ItemVm = _mapper.Map<TransactorTransModifyDto>(transactionToModify);
+            ItemVm = transactionToModify.ToModifyDto();
             NotUpdatable = ItemVm.CreatorId != 0;
             LoadCombos();
             return Page();

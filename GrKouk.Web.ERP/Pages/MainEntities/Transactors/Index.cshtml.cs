@@ -9,7 +9,7 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors
     public class IndexModel : PageModel
     {
       
-        public IndexModel(ApiDbContext context, IMapper mapper)
+        public IndexModel(ApiDbContext context)
         {
            
         }

@@ -3,7 +3,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Domain.DocDefinitions;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
@@ -23,16 +22,14 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Transactors
     public class KartelaModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
 
         public string TransactorName { get; set; }
         public int TransactorId { get; set; }
 
-        public KartelaModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public KartelaModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
         }
 

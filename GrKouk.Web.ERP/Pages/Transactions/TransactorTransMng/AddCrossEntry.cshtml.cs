@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.TransactorTransactions;
@@ -22,14 +21,12 @@ namespace GrKouk.Web.ERP.Pages.Transactions.TransactorTransMng
     {
         private const string _sectionCode = "SYS-TRANSACTOR-TRANS";
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
         [BindProperty] public TransactorCrossEntryDto ItemVm { get; set; }
 
-        public AddCrossEntry(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public AddCrossEntry(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
         }
 

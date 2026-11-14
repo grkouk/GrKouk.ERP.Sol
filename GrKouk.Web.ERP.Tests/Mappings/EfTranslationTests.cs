@@ -95,4 +95,12 @@ public class EfTranslationTests
         var sql = db.WarehouseTransactions.Select(WarehouseTransactionMappings.ToListDto).ToQueryString();
         Assert.Contains("[CurrencyId]", sql);
     }
+
+    [Fact]
+    public void TransactorTransaction_ToListDto_translates_to_sql()
+    {
+        using var db = CreateContext();
+        var sql = db.TransactorTransactions.Select(TransactorTransactionMappings.ToListDto).ToQueryString();
+        Assert.Contains("[CurrencyId]", sql);
+    }
 }

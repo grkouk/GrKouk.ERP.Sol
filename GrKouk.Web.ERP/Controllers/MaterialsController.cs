@@ -2704,7 +2704,7 @@ namespace GrKouk.Web.ERP.Controllers
                     {
                         var spTransactorCreateDto = _mapper.Map<TransactorTransCreateDto>(data);
                         //Ετσι δεν μεταφέρει το Id απο το data
-                        var sTransactorTransaction = _mapper.Map<TransactorTransaction>(spTransactorCreateDto);
+                        var sTransactorTransaction = spTransactorCreateDto.ToEntity();
 
                         sTransactorTransaction.TransactorId = data.TransactorId;
                         sTransactorTransaction.SectionId = sectionId;
@@ -2773,7 +2773,7 @@ namespace GrKouk.Web.ERP.Controllers
                             .SingleOrDefaultAsync();
                         var spTransactorCreateDto = _mapper.Map<TransactorTransCreateDto>(data);
                         //Ετσι δεν μεταφέρει το Id απο το data
-                        var sTransactorTransaction = _mapper.Map<TransactorTransaction>(spTransactorCreateDto);
+                        var sTransactorTransaction = spTransactorCreateDto.ToEntity();
                         var transTransactorEtiology =
                             $"{transTransactorPayOffSeries.Name} created from {docSeries.Name} for {transactor.Name} with {data.Etiology} ";
                         sTransactorTransaction.TransactorId = data.TransactorId;
@@ -3789,7 +3789,7 @@ namespace GrKouk.Web.ERP.Controllers
 
                     var spTransactorCreateDto = _mapper.Map<TransactorTransCreateDto>(data);
                     //Ετσι δεν μεταφέρει το Id απο το data
-                    var sTransactorTransaction = _mapper.Map<TransactorTransaction>(spTransactorCreateDto);
+                    var sTransactorTransaction = spTransactorCreateDto.ToEntity();
 
                     sTransactorTransaction.TransactorId = data.TransactorId;
                     sTransactorTransaction.SectionId = sectionId;
@@ -3853,7 +3853,7 @@ namespace GrKouk.Web.ERP.Controllers
                             $"{transTransactorPayOffSeries.Name} created from {docSeries.Name} for {transactor.Name} with {data.Etiology} ";
 
                         //Ετσι δεν μεταφέρει το Id απο το data
-                        var sTransactorTransaction = _mapper.Map<TransactorTransaction>(spTransactorCreateDto);
+                        var sTransactorTransaction = spTransactorCreateDto.ToEntity();
                         sTransactorTransaction.TransactorId = data.TransactorId;
 
                         sTransactorTransaction.TransTransactorDocTypeId =
