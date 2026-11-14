@@ -129,7 +129,7 @@
     </e-grid-columns>
 </ejs-grid>
 
-<div class="d-flex justify-content-end mt-2">
+<div class="d-flex justify-content-end mt-2" id="totalsBar">
     <table class="table table-sm table-borderless w-auto small text-end" id="totalsTable">
         <thead>
         <tr>
@@ -254,6 +254,7 @@
 @section Scripts
 {
     <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
+    <script src="~/js/sf-grid-fit.js" asp-append-version="true"></script>
     <script>
         // Handlers referenced by the Syncfusion controls: they must exist before <ejs-scripts>
         // creates the controls, so this block comes first.
@@ -320,6 +321,8 @@
         }
 
         const getGrid = () => document.getElementById('SellDocsGrid').ej2_instances[0];
+        // Grid height follows the window: rows scroll inside, totals and footer stay on screen.
+        const fitGrid = () => requestAnimationFrame(() => sfGridFit.fit('SellDocsGrid'));
         const getControl = (id) => document.getElementById(id).ej2_instances[0];
         const getToken = () => document.querySelector('input[name="__RequestVerificationToken"]').value;
 
@@ -404,6 +407,7 @@
             setText('pageNetAmount', sum('totalNetAmount'));
             setText('pageAmount', sum('totalAmount'));
             setText('pagePayedAmount', sum('payedOfAmount'));
+            fitGrid();
         }
 
         function selectionChanged() {
@@ -430,6 +434,7 @@
 
         const showCustomDates = () => {
             document.getElementById('customDates').classList.toggle('visible', pageSettings.dateRange === 'CUSTOM');
+            fitGrid();
         };
 
         function filterChanged(args) {
@@ -490,6 +495,9 @@
 
             // Filters panel toggle
             const filterCollapse = new bootstrap.Collapse(filterCollapseEl, { toggle: false });
+            sfGridFit.watch('SellDocsGrid');
+            filterCollapseEl.addEventListener('shown.bs.collapse', fitGrid);
+            filterCollapseEl.addEventListener('hidden.bs.collapse', fitGrid);
             const showFilters = (visible) => {
                 visible ? filterCollapse.show() : filterCollapse.hide();
                 filtersToggleEl.textContent = visible ? 'Hide Filters' : 'Show Filters';

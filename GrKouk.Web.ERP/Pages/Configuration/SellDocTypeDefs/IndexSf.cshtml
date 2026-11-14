@@ -64,7 +64,7 @@
 
 <ejs-grid id="DocTypesGrid" allowPaging="true" allowSorting="true" allowMultiSorting="false"
           allowTextWrap="true" gridLines="Both" rowHeight="32"
-          load="gridLoad" actionComplete="gridActionComplete"
+          load="gridLoad" actionComplete="gridActionComplete" dataBound="fitGrid"
           rowSelected="selectionChanged" rowDeselected="selectionChanged">
     <e-data-manager url="@Url.Page("./IndexSf", "DataSource")" adaptor="UrlAdaptor"></e-data-manager>
     <e-grid-selectionsettings type="Multiple" checkboxOnly="true" persistSelection="true"></e-grid-selectionsettings>
@@ -98,6 +98,7 @@
 @section Scripts
 {
     <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
+    <script src="~/js/sf-grid-fit.js" asp-append-version="true"></script>
     <script>
         // Handlers referenced by the Syncfusion controls: they must exist before <ejs-scripts>
         // creates the controls, so this block comes first.
@@ -129,6 +130,10 @@
         };
 
         const getGrid = () => document.getElementById('DocTypesGrid').ej2_instances[0];
+        // Grid height follows the window: rows scroll inside, footer stays on screen.
+        function fitGrid() {
+            requestAnimationFrame(() => sfGridFit.fit('DocTypesGrid'));
+        }
         const getCombo = (id) => document.getElementById(id).ej2_instances[0];
 
         const buildQuery = () => new ej.data.Query()
@@ -203,6 +208,9 @@
 
             // Filters panel toggle
             const filterCollapse = new bootstrap.Collapse(filterCollapseEl, { toggle: false });
+            sfGridFit.watch('DocTypesGrid');
+            filterCollapseEl.addEventListener('shown.bs.collapse', fitGrid);
+            filterCollapseEl.addEventListener('hidden.bs.collapse', fitGrid);
             const showFilters = (visible) => {
                 visible ? filterCollapse.show() : filterCollapse.hide();
                 filtersToggleEl.textContent = visible ? 'Hide Filters' : 'Show Filters';
