@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.Diaries;
@@ -17,12 +16,9 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Diaries
     public class EditModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
-
-        public EditModel(ApiDbContext context, IMapper mapper)
+        public EditModel(ApiDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
         [BindProperty]

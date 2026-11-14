@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
+using GrKouk.Web.ERP.Mappings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -16,12 +16,9 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Diaries
     public class CreateModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
-
-        public CreateModel(ApiDbContext context, IMapper mapper)
+        public CreateModel(ApiDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
         public IActionResult OnGet()
@@ -133,7 +130,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.Diaries
                 return Page();
             }
 
-            var diaryDef = _mapper.Map<DiaryDef>(ItemVm);
+            var diaryDef = ItemVm.ToEntity();
             _context.DiaryDefs.Add(diaryDef);
             await _context.SaveChangesAsync();
 

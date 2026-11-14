@@ -115,8 +115,6 @@ namespace GrKouk.Web.ERP.Automapper {
             CreateMap<TransactorTransaction, SellDocCreateAjaxDto>().ReverseMap();
             CreateMap<TransactorTransaction, SellDocModifyAjaxDto>().ReverseMap();
             CreateMap<TransactorTransCreateDto, SellDocModifyAjaxDto>().ReverseMap();
-            CreateMap<DiaryDto, DiaryDef>().ReverseMap();
-            CreateMap<DiaryModifyDto, DiaryDef>().ReverseMap();
             CreateMap<CrCatWarehouseItem, CashRegCatProductListDto>()
                 .ForMember(dest => dest.CompanyCode, opt => opt.MapFrom(src => src.ClientProfile.Company.Code));
             CreateMap<MediaEntry, MediaEntryDto>();
