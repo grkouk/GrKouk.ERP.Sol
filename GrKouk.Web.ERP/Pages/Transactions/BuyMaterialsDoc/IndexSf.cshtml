@@ -173,9 +173,11 @@
     <a href="@Url.Page("./Details")?id=${id}" title="Details" class="ms-2"><i class="fas fa-info-circle fa-lg" style="color:slategray"></i></a>
     <a href="@Url.Page("./Delete")?id=${id}" title="Delete" class="ms-2"><i class="fas fa-trash fa-lg" style="color:slategray"></i></a>
     <a href="@Url.Page("./Create")?copyFromId=${id}" title="Duplicate" class="ms-2"><i class="fas fa-clone fa-lg" style="color:slategray"></i></a>
+    @* The Syncfusion template engine turns every "..." into '...', which would break the JSON in
+       data-bs-popper-config; &quot; survives it and the browser decodes it back to ". *@
     <span class="dropdown ms-2">
         <a href="#" role="button" title="More" data-bs-toggle="dropdown" aria-expanded="false"
-           data-bs-popper-config='{"strategy":"fixed"}'><i class="fas fa-ellipsis-v fa-lg" style="color:slategray"></i></a>
+           data-bs-popper-config="{&quot;strategy&quot;:&quot;fixed&quot;}"><i class="fas fa-ellipsis-v fa-lg" style="color:slategray"></i></a>
         <span class="dropdown-menu dropdown-menu-end small">
             <a class="dropdown-item" target="_blank"
                href="@Url.Page("/Transactions/RecurringTransactions/Create")?createFromType=1&createFromId=${id}">
