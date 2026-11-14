@@ -1,0 +1,756 @@
+@page
+@model GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc.IndexSfModel
+
+@{
+    ViewData["Title"] = "Παραστατικά Πώλησης";
+    var pageSizes = new[] { 10, 20, 50, 100 };
+}
+
+@section MyCss
+{
+    <link rel="stylesheet" href="~/css/searchbar.css" />
+    <style>
+        #totalsTable td { min-width: 9rem; }
+        #customDates { display: none; }
+        #customDates.visible { display: block; }
+    </style>
+}
+
+@Html.AntiForgeryToken()
+<h4>@ViewData["Title"]</h4>
+
+<div class="container">
+    <ul class="nav small justify-content-end">
+        <li class="nav-item">
+            <a class="nav-link" asp-page="./Create">Create New</a>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="btn btn-sm btn-outline-secondary dropdown-toggle" role="button" id="ddDiaries"
+               data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Ημερολόγια</a>
+            <div class="dropdown-menu small">
+                <h6 class="dropdown-header">Σχετικά Ημερολόγια</h6>
+                @foreach (var diary in Model.Diaries)
+                {
+                    <a class="dropdown-item small" target="_blank"
+                       asp-page="./SalesDiary" asp-route-diaryId="@diary.Value">@diary.Text</a>
+                }
+            </div>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#" role="button" id="filtersToggle">Hide Filters</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#" role="button" id="rowSelectorsToggle">Show Row Selectors</a>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle disabled" role="button" id="ddSelectedRowsActions"
+               data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</a>
+            <div class="dropdown-menu small">
+                <a class="dropdown-item" href="#" id="deleteSelectedRows">Delete Selected</a>
+            </div>
+        </li>
+    </ul>
+</div>
+
+<div class="collapse show" id="filterCollapse">
+    <div class="row align-items-end g-2 mb-2">
+        <div class="col-md-auto">
+            <div class="searchbar">
+                <input class="search_input" type="text" id="SearchFilter" placeholder="Search..." autocomplete="off">
+                <a href="#" class="search_icon" id="SearchButton">
+                    <i class="fas fa-search fa-xs"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-6">
+            <ejs-combobox id="DatePeriodFilter" dataSource="@Model.DatePeriodItems" value="@("CURYEAR")"
+                          placeholder="Period" floatLabelType="Always" allowFiltering="true"
+                          allowCustom="false" showClearButton="false" change="datePeriodChanged">
+                <e-combobox-fields text="Text" value="Value"></e-combobox-fields>
+            </ejs-combobox>
+        </div>
+        <div class="col-md-3 col-sm-6" id="customDates">
+            <div class="row g-2">
+                <div class="col-6">
+                    <ejs-datepicker id="FromDateFilter" placeholder="From" floatLabelType="Always"
+                                    format="dd/MM/yyyy" change="customDateChanged"></ejs-datepicker>
+                </div>
+                <div class="col-6">
+                    <ejs-datepicker id="ToDateFilter" placeholder="To" floatLabelType="Always"
+                                    format="dd/MM/yyyy" change="customDateChanged"></ejs-datepicker>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-6">
+            <ejs-combobox id="CompanyFilter" dataSource="@Model.CompanyFilterItems" value="@("0")"
+                          placeholder="Company" floatLabelType="Always" allowFiltering="true"
+                          allowCustom="false" showClearButton="false" change="filterChanged">
+                <e-combobox-fields text="Text" value="Value"></e-combobox-fields>
+            </ejs-combobox>
+        </div>
+        <div class="col-md-1 col-sm-6">
+            <ejs-combobox id="CurrencySelector" dataSource="@Model.CurrencyItems" value="@(1)"
+                          placeholder="Currency" floatLabelType="Always"
+                          allowCustom="false" showClearButton="false" change="filterChanged">
+                <e-combobox-fields text="Code" value="Id"></e-combobox-fields>
+            </ejs-combobox>
+        </div>
+    </div>
+</div>
+
+<ejs-grid id="SellDocsGrid" allowPaging="true" allowSorting="true" allowMultiSorting="false"
+          allowTextWrap="true" gridLines="Both" rowHeight="32" enableHtmlSanitizer="true"
+          load="gridLoad" actionComplete="gridActionComplete" actionFailure="gridActionFailure"
+          dataBound="gridDataBound" rowSelected="selectionChanged" rowDeselected="selectionChanged">
+    <e-data-manager url="@Url.Page("./IndexSf", "DataSource")" adaptor="UrlAdaptor"></e-data-manager>
+    <e-grid-selectionsettings type="Multiple" checkboxOnly="true" persistSelection="true"></e-grid-selectionsettings>
+    <e-grid-pagesettings pageSize="10" pageSizes="@pageSizes"></e-grid-pagesettings>
+    <e-grid-columns>
+        <e-grid-column type="checkbox" width="40" visible="false"></e-grid-column>
+        <e-grid-column field="id" isPrimaryKey="true" visible="false"></e-grid-column>
+        <e-grid-column field="transDate" headerText="Date" width="125" template="#dateTemplate"></e-grid-column>
+        <e-grid-column field="transactorName" headerText="Transactor" width="220"
+                       template="#transactorTemplate"></e-grid-column>
+        <e-grid-column field="sellDocSeriesCode" headerText="Series" width="100"
+                       hideAtMedia="(min-width: 768px)"></e-grid-column>
+        <e-grid-column field="transRefCode" headerText="Ref Number" width="120"
+                       hideAtMedia="(min-width: 768px)"></e-grid-column>
+        <e-grid-column field="companyCode" headerText="Company" width="90"></e-grid-column>
+        <e-grid-column field="totalNetAmount" headerText="Net Amount" width="120" textAlign="Right"
+                       allowSorting="false" valueAccessor="@("currencyAccessor")"
+                       hideAtMedia="(min-width: 768px)"></e-grid-column>
+        <e-grid-column field="totalAmount" headerText="Amount" width="120" textAlign="Right"
+                       allowSorting="false" valueAccessor="@("currencyAccessor")"></e-grid-column>
+        <e-grid-column field="payedOfAmount" headerText="Payed Amount" width="120" textAlign="Right"
+                       allowSorting="false" valueAccessor="@("currencyAccessor")"
+                       hideAtMedia="(min-width: 768px)"></e-grid-column>
+        <e-grid-column headerText="" width="150" textAlign="Center" allowSorting="false"
+                       template="#actionsTemplate"></e-grid-column>
+    </e-grid-columns>
+</ejs-grid>
+
+<div class="d-flex justify-content-end mt-2">
+    <table class="table table-sm table-borderless w-auto small text-end" id="totalsTable">
+        <thead>
+        <tr>
+            <th></th>
+            <th>Net Amount</th>
+            <th>Amount</th>
+            <th>Payed Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="text-start">Page</th>
+            <td id="pageNetAmount"></td>
+            <td id="pageAmount"></td>
+            <td id="pagePayedAmount"></td>
+        </tr>
+        <tr class="fw-bold">
+            <th class="text-start">Total</th>
+            <td id="grandNetAmount"></td>
+            <td id="grandAmount"></td>
+            <td id="grandPayedAmount"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script id="dateTemplate" type="text/x-template">${transDateText}</script>
+
+<script id="transactorTemplate" type="text/x-template">
+    <a href="@Url.Page("/MainEntities/Transactors/Details")?id=${transactorId}">${transactorName}</a>
+</script>
+
+<script id="actionsTemplate" type="text/x-template">
+    <a href="@Url.Page("./Edit")?id=${id}" title="Edit"><i class="fas fa-edit fa-lg" style="color:slategray"></i></a>
+    <a href="@Url.Page("./Details")?id=${id}" title="Details" class="ms-2"><i class="fas fa-info-circle fa-lg" style="color:slategray"></i></a>
+    <a href="@Url.Page("./Delete")?id=${id}" title="Delete" class="ms-2"><i class="fas fa-trash fa-lg" style="color:slategray"></i></a>
+    <a href="@Url.Page("./Create")?copyFromId=${id}" title="Duplicate" class="ms-2"><i class="fas fa-clone fa-lg" style="color:slategray"></i></a>
+    <span class="dropdown ms-2">
+        <a href="#" role="button" title="More" data-bs-toggle="dropdown" aria-expanded="false"
+           data-bs-popper-config='{"strategy":"fixed"}'><i class="fas fa-ellipsis-v fa-lg" style="color:slategray"></i></a>
+        <span class="dropdown-menu dropdown-menu-end small">
+            <a class="dropdown-item" target="_blank"
+               href="@Url.Page("/Transactions/RecurringTransactions/Create")?createFromType=2&createFromId=${id}">
+                <i class="fas fa-info-circle" style="color:slategray"></i> Νέα Συνδρομή
+            </a>
+            ${if(hasBalance)}
+            <a class="dropdown-item" href="#" data-action="payoff" data-id="${id}">
+                <i class="fab fa-amazon-pay" style="color:slategray"></i> Εξόφληση Παραστατικού
+            </a>
+            <a class="dropdown-item" href="#" data-action="assignReceipts" data-id="${id}">
+                <i class="fas fa-compress-arrows-alt" style="color:slategray"></i> Αντιστοίχιση Εισπράξεων
+            </a>
+            ${/if}
+        </span>
+    </span>
+</script>
+
+<partial name="_DeleteConfirmationPartial" />
+
+<!-- Receipts assignment -->
+<div class="modal fade" id="receiptsModal" tabindex="-1" aria-labelledby="receiptsModalLabel" aria-hidden="true"
+     data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="container-fluid">
+                    <div class="row mb-1">
+                        <div class="col-10">
+                            <p class="modal-title fw-bold" id="receiptsModalLabel">Ευρετήριο Εισπράξεων από Πελάτες</p>
+                        </div>
+                        <div class="col-2 text-end">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 col-6 text-center">
+                            <h4 id="rcDocAmount">0</h4>
+                            <span class="text-muted small">Doc Amount</span>
+                        </div>
+                        <div class="col-md-3 col-6 text-center">
+                            <h4 id="rcToCover">0</h4>
+                            <span class="text-muted small">To Cover</span>
+                        </div>
+                        <div class="col-md-3 col-6 text-center">
+                            <h4 id="rcCovered">0</h4>
+                            <span class="text-muted small">Covered</span>
+                        </div>
+                        <div class="col-md-3 col-6 text-center">
+                            <h4 id="rcRemaining">0</h4>
+                            <span class="text-muted small">Remaining</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="text-center" id="rcSpinner" style="display:none">
+                    <span class="spinner-border spinner-border-sm text-primary"></span>
+                </div>
+                <table class="table table-bordered table-sm small" id="receiptsTable">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="text-center d-none d-md-table-cell">Date</th>
+                        <th class="text-center">Doc Series</th>
+                        <th class="text-center">Amount</th>
+                        <th class="text-center">Already Used Amount</th>
+                        <th class="text-center">Company</th>
+                        <th class="text-center">Reserved Amount</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveReceipts">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
+    <script>
+        // Handlers referenced by the Syncfusion controls: they must exist before <ejs-scripts>
+        // creates the controls, so this block comes first.
+        const storageKey = 'SellDocIndexSf';
+        const defaultSettings = {
+            pageSize: 10,
+            dateRange: 'CURYEAR',
+            fromDate: '',
+            toDate: '',
+            companyFilter: '0',
+            displayCurrencyId: 1,
+            searchFilter: '',
+            sortField: 'transDate',
+            sortDirection: 'Ascending',
+            filtersVisible: true,
+            rowSelectorsVisible: false
+        };
+        const pageSettings = (() => {
+            try {
+                return Object.assign({}, defaultSettings, JSON.parse(localStorage.getItem(storageKey) || '{}'));
+            } catch (e) {
+                return Object.assign({}, defaultSettings);
+            }
+        })();
+        const saveSettings = () => {
+            try {
+                localStorage.setItem(storageKey, JSON.stringify(pageSettings));
+            } catch (e) {
+                // Storage unavailable (private window etc.): settings just are not remembered.
+            }
+        };
+
+        const currencies = @Html.Raw(Json.Serialize(Model.CurrencyItems));
+        const currentCulture = '@System.Globalization.CultureInfo.CurrentCulture.Name';
+        let currencyFormatter;
+        const setCurrencyFormatter = () => {
+            const currency = currencies.find(c => c.id === Number(pageSettings.displayCurrencyId)) || { code: 'EUR' };
+            try {
+                currencyFormatter = new Intl.NumberFormat(currency.displayLocale || currentCulture,
+                    { style: 'currency', currency: currency.code, minimumFractionDigits: 2 });
+            } catch (e) {
+                currencyFormatter = new Intl.NumberFormat(currentCulture, { minimumFractionDigits: 2 });
+            }
+        };
+        setCurrencyFormatter();
+        const formatCurrency = (value) => currencyFormatter.format(Number(value) || 0);
+
+        const pad2 = (n) => String(n).padStart(2, '0');
+        const toIsoDate = (d) => d ? `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}` : '';
+        const fromIsoDate = (s) => {
+            if (!s) return null;
+            const [y, m, d] = s.split('-').map(Number);
+            return new Date(y, m - 1, d);
+        };
+        const formatDate = (value) => {
+            if (!value) return '';
+            const d = value instanceof Date ? value : new Date(value);
+            return isNaN(d) ? '' : `${pad2(d.getDate())}/${pad2(d.getMonth() + 1)}/${d.getFullYear()}`;
+        };
+
+        // Column value accessors (named in the grid columns)
+        function currencyAccessor(field, data) {
+            return formatCurrency(data[field]);
+        }
+
+        const getGrid = () => document.getElementById('SellDocsGrid').ej2_instances[0];
+        const getControl = (id) => document.getElementById(id).ej2_instances[0];
+        const getToken = () => document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+        // A custom period without both dates falls back to the default period.
+        const effectiveDateRange = () =>
+            pageSettings.dateRange === 'CUSTOM' && !(pageSettings.fromDate && pageSettings.toDate)
+                ? defaultSettings.dateRange
+                : (pageSettings.dateRange || defaultSettings.dateRange);
+
+        const currentFilters = () => ({
+            dateRange: effectiveDateRange(),
+            fromDate: pageSettings.fromDate || null,
+            toDate: pageSettings.toDate || null,
+            companyFilter: String(pageSettings.companyFilter ?? '0'),
+            searchFilter: pageSettings.searchFilter ?? '',
+            displayCurrencyId: Number(pageSettings.displayCurrencyId) || 1
+        });
+
+        const buildQuery = () => {
+            const query = new ej.data.Query();
+            Object.entries(currentFilters()).forEach(([key, value]) => query.addParams(key, value ?? ''));
+            return query;
+        };
+
+        const setText = (id, value) => document.getElementById(id).textContent = formatCurrency(value);
+
+        // Grand totals of everything that matches the filters (not just the current page).
+        const loadGrandTotals = async () => {
+            try {
+                const response = await fetch('@Url.Page("./IndexSf", "Totals")', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': getToken() },
+                    body: JSON.stringify(currentFilters())
+                });
+                if (!response.ok) {
+                    throw new Error(response.statusText);
+                }
+                const totals = await response.json();
+                setText('grandNetAmount', totals.netAmount);
+                setText('grandAmount', totals.amount);
+                setText('grandPayedAmount', totals.payedAmount);
+            } catch (err) {
+                console.log(err);
+                toastr.error('Could not load the totals', 'Error');
+            }
+        };
+
+        // Grid "load" runs before the first request: add the antiforgery header,
+        // the filter parameters and the remembered paging/sorting.
+        function gridLoad() {
+            this.dataSource.dataSource.headers = [{ 'RequestVerificationToken': getToken() }];
+            this.query = buildQuery();
+            this.pageSettings.pageSize = pageSettings.pageSize;
+            if (pageSettings.sortField) {
+                this.sortSettings.columns = [{ field: pageSettings.sortField, direction: pageSettings.sortDirection || 'Ascending' }];
+            }
+            this.columns[0].visible = !!pageSettings.rowSelectorsVisible;
+        }
+
+        function gridActionComplete(args) {
+            if (args.requestType === 'paging') {
+                pageSettings.pageSize = this.pageSettings.pageSize;
+                saveSettings();
+            }
+            if (args.requestType === 'sorting') {
+                const sorted = this.sortSettings.columns[0];
+                pageSettings.sortField = sorted ? sorted.field : '';
+                pageSettings.sortDirection = sorted ? sorted.direction : '';
+                saveSettings();
+            }
+        }
+
+        function gridActionFailure(args) {
+            console.log(args);
+            toastr.error('Could not load the documents', 'Error');
+        }
+
+        // Page totals from the rows on screen (already in the display currency).
+        function gridDataBound() {
+            const rows = this.getCurrentViewRecords();
+            const sum = (key) => rows.reduce((total, row) => total + (Number(row[key]) || 0), 0);
+            setText('pageNetAmount', sum('totalNetAmount'));
+            setText('pageAmount', sum('totalAmount'));
+            setText('pagePayedAmount', sum('payedOfAmount'));
+        }
+
+        function selectionChanged() {
+            const hasSelection = getGrid().getSelectedRecords().length > 0;
+            document.getElementById('ddSelectedRowsActions').classList.toggle('disabled', !hasSelection);
+        }
+
+        // Reload the grid from page 1 (and the grand totals) with the current filters.
+        const refreshAll = () => {
+            const grid = getGrid();
+            grid.clearSelection();
+            grid.query = buildQuery();
+            grid.goToPage(1);
+            grid.refresh();
+            selectionChanged();
+            loadGrandTotals();
+        };
+
+        // Reload the current page and the grand totals (after payoff, receipts assignment etc.).
+        const reloadData = () => {
+            getGrid().refresh();
+            loadGrandTotals();
+        };
+
+        const showCustomDates = () => {
+            document.getElementById('customDates').classList.toggle('visible', pageSettings.dateRange === 'CUSTOM');
+        };
+
+        function filterChanged(args) {
+            // Ignore the programmatic changes made when the remembered filters are restored.
+            if (args && args.isInteracted === false) {
+                return;
+            }
+            pageSettings.companyFilter = getControl('CompanyFilter').value ?? '0';
+            pageSettings.displayCurrencyId = Number(getControl('CurrencySelector').value) || 1;
+            setCurrencyFormatter();
+            saveSettings();
+            refreshAll();
+        }
+
+        function datePeriodChanged(args) {
+            if (args && args.isInteracted === false) {
+                return;
+            }
+            pageSettings.dateRange = getControl('DatePeriodFilter').value || defaultSettings.dateRange;
+            saveSettings();
+            showCustomDates();
+            // A custom period waits until both dates are picked.
+            if (pageSettings.dateRange !== 'CUSTOM' || (pageSettings.fromDate && pageSettings.toDate)) {
+                refreshAll();
+            }
+        }
+
+        function customDateChanged(args) {
+            if (args && args.isInteracted === false) {
+                return;
+            }
+            pageSettings.fromDate = toIsoDate(getControl('FromDateFilter').value);
+            pageSettings.toDate = toIsoDate(getControl('ToDateFilter').value);
+            saveSettings();
+            if (pageSettings.fromDate && pageSettings.toDate) {
+                refreshAll();
+            }
+        }
+    </script>
+    <ejs-scripts></ejs-scripts>
+    <script>
+        // Wiring that needs the created controls; runs after <ejs-scripts>.
+        document.addEventListener('DOMContentLoaded', () => {
+            const filterCollapseEl = document.getElementById('filterCollapse');
+            const filtersToggleEl = document.getElementById('filtersToggle');
+            const rowSelectorsToggleEl = document.getElementById('rowSelectorsToggle');
+            const searchEl = document.getElementById('SearchFilter');
+
+            // Restore remembered filters without firing change (the grid reads them in gridLoad).
+            getControl('DatePeriodFilter').value = pageSettings.dateRange;
+            getControl('FromDateFilter').value = fromIsoDate(pageSettings.fromDate);
+            getControl('ToDateFilter').value = fromIsoDate(pageSettings.toDate);
+            getControl('CompanyFilter').value = String(pageSettings.companyFilter);
+            getControl('CurrencySelector').value = Number(pageSettings.displayCurrencyId) || 1;
+            searchEl.value = pageSettings.searchFilter;
+            showCustomDates();
+            loadGrandTotals();
+
+            // Filters panel toggle
+            const filterCollapse = new bootstrap.Collapse(filterCollapseEl, { toggle: false });
+            const showFilters = (visible) => {
+                visible ? filterCollapse.show() : filterCollapse.hide();
+                filtersToggleEl.textContent = visible ? 'Hide Filters' : 'Show Filters';
+            };
+            if (!pageSettings.filtersVisible) {
+                filterCollapseEl.classList.remove('show');
+                filtersToggleEl.textContent = 'Show Filters';
+            }
+            filtersToggleEl.addEventListener('click', (e) => {
+                e.preventDefault();
+                pageSettings.filtersVisible = !pageSettings.filtersVisible;
+                saveSettings();
+                showFilters(pageSettings.filtersVisible);
+            });
+
+            // Row selectors (checkbox column) toggle
+            const setRowSelectorsText = () => {
+                rowSelectorsToggleEl.textContent = pageSettings.rowSelectorsVisible ? 'Hide Row Selectors' : 'Show Row Selectors';
+            };
+            setRowSelectorsText();
+            rowSelectorsToggleEl.addEventListener('click', (e) => {
+                e.preventDefault();
+                pageSettings.rowSelectorsVisible = !pageSettings.rowSelectorsVisible;
+                saveSettings();
+                setRowSelectorsText();
+                const grid = getGrid();
+                if (!pageSettings.rowSelectorsVisible) {
+                    grid.clearSelection();
+                    selectionChanged();
+                }
+                grid.columns[0].visible = pageSettings.rowSelectorsVisible;
+                grid.refreshColumns();
+            });
+
+            // Search (transactor name or ref number): on Enter, on the icon, or 600ms after typing stops
+            let searchTimer;
+            const runSearch = () => {
+                clearTimeout(searchTimer);
+                if (pageSettings.searchFilter === searchEl.value) {
+                    return;
+                }
+                pageSettings.searchFilter = searchEl.value;
+                saveSettings();
+                refreshAll();
+            };
+            searchEl.addEventListener('keyup', (e) => {
+                clearTimeout(searchTimer);
+                if (e.key === 'Enter') {
+                    runSearch();
+                } else {
+                    searchTimer = setTimeout(runSearch, 600);
+                }
+            });
+            document.getElementById('SearchButton').addEventListener('click', (e) => {
+                e.preventDefault();
+                runSearch();
+            });
+
+            // Delete selected documents (after confirmation)
+            const confirmModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+            document.getElementById('deleteSelectedRows').addEventListener('click', (e) => {
+                e.preventDefault();
+                if (getGrid().getSelectedRecords().length > 0) {
+                    confirmModal.show();
+                }
+            });
+            document.getElementById('confirmDelete').addEventListener('click', async () => {
+                confirmModal.hide();
+                const ids = getGrid().getSelectedRecords().map(r => r.id);
+                try {
+                    const response = await fetch('@Url.Page("./IndexSf", "DeleteSelected")', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': getToken() },
+                        body: JSON.stringify({ ids: ids })
+                    });
+                    const result = await response.json().catch(() => ({}));
+                    if (response.ok) {
+                        toastr.success(`${result.deleted} document(s) deleted`, 'Delete');
+                        refreshAll();
+                    } else {
+                        toastr.error(result.error || 'Delete failed', 'Error');
+                    }
+                } catch (err) {
+                    toastr.error('Delete failed', 'Error');
+                }
+            });
+
+            // Row menu actions (payoff, receipts assignment)
+            document.getElementById('SellDocsGrid').addEventListener('click', (e) => {
+                const actionEl = e.target.closest('[data-action]');
+                if (!actionEl) {
+                    return;
+                }
+                e.preventDefault();
+                const docId = parseInt(actionEl.dataset.id, 10);
+                switch (actionEl.dataset.action) {
+                    case 'payoff':
+                        payOffDocument(docId);
+                        break;
+                    case 'assignReceipts':
+                        openReceiptsModal(docId);
+                        break;
+                }
+            });
+
+            const payOffDocument = async (docId) => {
+                try {
+                    const response = await fetch('/api/materials/AddSalePaymentMapping', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ids: [docId] })
+                    });
+                    const result = await response.json().catch(() => ({}));
+                    if (response.ok) {
+                        toastr.success(result.message || 'Done');
+                        reloadData();
+                    } else {
+                        toastr.error(result.errorMessage || result.error || 'Payoff failed', 'Error');
+                    }
+                } catch (err) {
+                    toastr.error('Payoff failed', 'Error');
+                }
+            };
+
+            // #region Receipts assignment modal
+            const receiptsModalEl = document.getElementById('receiptsModal');
+            const receiptsModal = new bootstrap.Modal(receiptsModalEl);
+            const receiptsBody = document.querySelector('#receiptsTable > tbody');
+            const rcSpinner = document.getElementById('rcSpinner');
+            const rcState = { docId: 0, docAmount: 0, toCover: 0, covered: 0, receipts: [] };
+
+            const renderReceiptTotals = () => {
+                document.getElementById('rcDocAmount').textContent = formatCurrency(rcState.docAmount);
+                document.getElementById('rcToCover').textContent = formatCurrency(rcState.toCover);
+                document.getElementById('rcCovered').textContent = formatCurrency(rcState.covered);
+                document.getElementById('rcRemaining').textContent = formatCurrency(rcState.toCover - rcState.covered);
+            };
+
+            const renderReceipts = () => {
+                receiptsBody.innerHTML = '';
+                rcState.receipts.forEach((receipt, index) => {
+                    const tr = document.createElement('tr');
+                    const cells = [
+                        { text: formatDate(receipt.transDate), cls: 'd-none d-md-table-cell' },
+                        { text: receipt.docSeriesCode ?? '' },
+                        { text: formatCurrency(receipt.totalAmount), cls: 'text-end' },
+                        { text: formatCurrency(receipt.amountUsedInPayments), cls: 'text-end' },
+                        { text: receipt.companyCode ?? '' },
+                        { text: formatCurrency(receipt.reserved), cls: 'text-end text-primary' }
+                    ];
+                    cells.forEach(c => {
+                        const td = document.createElement('td');
+                        td.textContent = c.text;
+                        if (c.cls) td.className = c.cls;
+                        tr.appendChild(td);
+                    });
+                    const tdCheck = document.createElement('td');
+                    tdCheck.className = 'text-center';
+                    const check = document.createElement('input');
+                    check.type = 'checkbox';
+                    check.className = 'form-check-input';
+                    check.checked = receipt.reserved > 0;
+                    check.dataset.index = index;
+                    tdCheck.appendChild(check);
+                    tr.appendChild(tdCheck);
+                    receiptsBody.appendChild(tr);
+                });
+            };
+
+            // Checking a receipt reserves what is still available on it, up to what remains to cover.
+            receiptsBody.addEventListener('change', (e) => {
+                const check = e.target.closest('input[type=checkbox]');
+                if (!check) {
+                    return;
+                }
+                const receipt = rcState.receipts[Number(check.dataset.index)];
+                if (check.checked) {
+                    const remaining = rcState.toCover - rcState.covered;
+                    const available = receipt.totalAmount - receipt.amountUsedInPayments;
+                    const toReserve = Math.min(available, remaining);
+                    if (toReserve <= 0) {
+                        check.checked = false;
+                        return;
+                    }
+                    receipt.reserved = toReserve;
+                    rcState.covered += toReserve;
+                } else {
+                    rcState.covered -= receipt.reserved;
+                    receipt.reserved = 0;
+                }
+                check.closest('tr').children[5].textContent = formatCurrency(receipt.reserved);
+                renderReceiptTotals();
+            });
+
+            const openReceiptsModal = async (docId) => {
+                rcState.docId = docId;
+                rcState.receipts = [];
+                receiptsBody.innerHTML = '';
+                rcSpinner.style.display = '';
+                receiptsModal.show();
+                const params = new URLSearchParams({
+                    pageIndex: 1,
+                    pageSize: 100,
+                    companyFilter: '',
+                    sortData: '',
+                    documentId: docId,
+                    searchFilter: '',
+                    displayCurrencyId: Number(pageSettings.displayCurrencyId) || 1
+                });
+                try {
+                    const response = await fetch(`/api/GrKoukInfoApi/GetSelectorPaymentsFromCustomersItems?${params}`);
+                    const result = await response.json().catch(() => ({}));
+                    if (!response.ok) {
+                        toastr.error(result.error || 'Could not load the receipts', 'Error');
+                        return;
+                    }
+                    rcState.docAmount = Number(result.sumOfAmount) || 0;
+                    rcState.toCover = rcState.docAmount - (Number(result.sumOfPayedAmount) || 0);
+                    rcState.covered = 0;
+                    rcState.receipts = (result.data || []).map(r => Object.assign({}, r, {
+                        totalAmount: Number(r.totalAmount) || 0,
+                        amountUsedInPayments: Number(r.amountUsedInPayments) || 0,
+                        reserved: 0
+                    }));
+                    renderReceiptTotals();
+                    renderReceipts();
+                } catch (err) {
+                    console.log(err);
+                    toastr.error('Could not load the receipts', 'Error');
+                } finally {
+                    rcSpinner.style.display = 'none';
+                }
+            };
+
+            document.getElementById('saveReceipts').addEventListener('click', async () => {
+                const lines = rcState.receipts
+                    .filter(r => r.reserved > 0)
+                    .map(r => ({ receiptId: r.id, amountUsed: r.reserved }));
+                try {
+                    const response = await fetch('/api/Materials/AddSalePaymentMappingList', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            docId: rcState.docId,
+                            displayCurrencyId: Number(pageSettings.displayCurrencyId) || 1,
+                            paymentMappingLines: lines
+                        })
+                    });
+                    const result = await response.json().catch(() => ({}));
+                    if (response.ok) {
+                        toastr.success('Saved Mappings', 'Saved Mappings');
+                        receiptsModal.hide();
+                        reloadData();
+                    } else {
+                        toastr.error(result.error || 'Save failed', 'Error');
+                    }
+                } catch (err) {
+                    toastr.error('Save failed', 'Error');
+                }
+            });
+            // #endregion
+        });
+    </script>
+}

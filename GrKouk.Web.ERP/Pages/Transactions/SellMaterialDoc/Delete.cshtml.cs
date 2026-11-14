@@ -69,7 +69,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
             }
             _toastNotification.AddSuccessToastMessage("Delete operation was successfull");
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("./IndexSf");
         }
     }
 }

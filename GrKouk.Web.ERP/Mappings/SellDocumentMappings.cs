@@ -169,5 +169,32 @@ namespace GrKouk.Web.ERP.Mappings
                 CompanyCurrencyId = src.Company.CurrencyId,
                 SalesChannelId = src.SalesChannelId
             };
+
+        /// <summary>
+        /// EF-translatable index projection with the paid amount (sum of the payment mappings).
+        /// Amounts are in the company currency; convert them for display after loading.
+        /// </summary>
+        public static readonly Expression<Func<SellDocument, SellDocList2Dto>> ToList2Dto =
+            src => new SellDocList2Dto
+            {
+                Id = src.Id,
+                TransDate = src.TransDate,
+                TransRefCode = src.TransRefCode,
+                SectionId = src.SectionId,
+                SectionCode = src.Section.Code,
+                TransactorId = src.TransactorId,
+                TransactorName = src.Transactor.Name,
+                SellDocSeriesId = src.SellDocSeriesId,
+                SellDocSeriesCode = src.SellDocSeries.Code,
+                SellDocSeriesName = src.SellDocSeries.Name,
+                AmountFpa = src.AmountFpa,
+                AmountNet = src.AmountNet,
+                AmountDiscount = src.AmountDiscount,
+                CompanyId = src.CompanyId,
+                CompanyCode = src.Company.Code,
+                CompanyCurrencyId = src.Company.CurrencyId,
+                SalesChannelId = src.SalesChannelId,
+                PayedOfAmount = src.PaymentMappings.Sum(t => t.AmountUsed)
+            };
     }
 }

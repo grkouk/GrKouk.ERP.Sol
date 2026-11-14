@@ -106,7 +106,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
             //_context.BuyDocuments.Add(itemToAttach);
             //await _context.SaveChangesAsync();
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("./IndexSf");
         }
 
     }

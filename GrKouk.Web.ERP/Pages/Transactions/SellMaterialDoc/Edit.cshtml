@@ -300,7 +300,7 @@
 
 
 <div>
-    <a asp-page="./Index">Back to List</a>
+    <a asp-page="./IndexSf">Back to List</a>
 </div>
 <!-- Modal Image Viewer -->
 <div class="modal fade" id="imageViewer" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
@@ -1470,7 +1470,7 @@
                     success: function(result) {
                         toastr.success("Success", "Success");
                         //location.reload();
-                        window.location.href = '@Url.Page("Index")';
+                        window.location.href = '@Url.Page("IndexSf")';
                     },
                     error: function(e) {
                         var r = e.responseJSON.error;
