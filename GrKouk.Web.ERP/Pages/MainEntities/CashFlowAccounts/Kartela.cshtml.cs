@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
@@ -16,16 +15,14 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.CashFlowAccounts
     public class KartelaModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
 
         public string CfaName { get; set; }
         public int CfaId { get; set; }
 
-        public KartelaModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public KartelaModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
         }
 

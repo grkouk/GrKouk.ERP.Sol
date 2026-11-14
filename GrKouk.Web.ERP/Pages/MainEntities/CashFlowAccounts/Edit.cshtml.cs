@@ -2,11 +2,11 @@
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Dtos.CashFlowAccounts;
 using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -19,13 +19,11 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.CashFlowAccounts
     public class EditModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private readonly IToastNotification _toastNotification;
 
-        public EditModel(ApiDbContext context, IMapper mapper, IToastNotification toastNotification)
+        public EditModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
-            _mapper = mapper;
             _toastNotification = toastNotification;
         }
 
@@ -49,7 +47,7 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.CashFlowAccounts
                 return NotFound();
             }
 
-            ItemVm = _mapper.Map<CashFlowAccountModifyDto>(itemToModify);
+            ItemVm = itemToModify.ToModifyDto();
             string[] selectedCompanies = itemToModify.CompanyMappings.Select(x => x.CompanyId.ToString()).ToArray();
             ItemVm.SelectedCompanies = JsonSerializer.Serialize(selectedCompanies);
             LoadCombos();
@@ -78,9 +76,17 @@ namespace GrKouk.Web.ERP.Pages.MainEntities.CashFlowAccounts
             await using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                var itemToAttach = _mapper.Map<CashFlowAccount>(ItemVm);
+                // Load the stored row and copy only the editable fields onto it, so columns the
+                // form does not post (DateCreated) keep their values.
+                var itemToAttach = await _context.CashFlowAccounts.FirstOrDefaultAsync(p => p.Id == ItemVm.Id);
+                if (itemToAttach == null)
+                {
+                    await transaction.RollbackAsync();
+                    _toastNotification.AddErrorToastMessage("Cash flow Account was not found");
+                    return NotFound();
+                }
+                ItemVm.ApplyTo(itemToAttach);
                 itemToAttach.DateLastModified = DateTime.Today;
-                _context.Attach(itemToAttach).State = EntityState.Modified;
                 _context.CashFlowAccountCompanyMappings.RemoveRange(_context.CashFlowAccountCompanyMappings.Where(p => p.CashFlowAccountId == itemToAttach.Id));
                 string[] companiesSelected = JsonSerializer.Deserialize<string[]>(ItemVm.SelectedCompanies);
 

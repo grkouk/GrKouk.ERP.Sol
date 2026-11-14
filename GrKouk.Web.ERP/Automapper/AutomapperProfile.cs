@@ -179,8 +179,6 @@ namespace GrKouk.Web.ERP.Automapper {
                     opt => opt.MapFrom(src => src.SecondaryUnitId))
                 .ForMember(d => d.Price,
                     opt => opt.MapFrom(src => src.UnitPrice));
-            CreateMap<CashFlowAccount, CashFlowAccountCreateDto>().ReverseMap();
-            CreateMap<CashFlowAccount, CashFlowAccountModifyDto>().ReverseMap();
             CreateMap<CashFlowTransactionDef, CfaTransactionDefCreateDto>().ReverseMap();
             CreateMap<CashFlowTransactionDef, CfaTransactionDefModifyDto>().ReverseMap();
             CreateMap<CashFlowDocTypeDef, CfaDocTypeDefCreateDto>().ReverseMap();
