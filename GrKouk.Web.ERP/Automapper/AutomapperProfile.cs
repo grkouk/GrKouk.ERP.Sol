@@ -58,9 +58,6 @@ namespace GrKouk.Web.ERP.Automapper {
             CreateMap<FinDiaryTransaction, FinDiaryTransactionModifyDto>().ReverseMap();
             CreateMap<FinDiaryTransaction, FinDiaryExpenceTransModifyDto>().ReverseMap();
 
-            CreateMap<TransWarehouseDef, TransWarehouseDefListDto>()
-                .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Company.Name));
-
             CreateMap<WarehouseItem, WarehouseItemListDto>()
                 .ForMember(dest => dest.Url, opt => opt.Ignore());
             //.ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Company.Name));
@@ -115,15 +112,9 @@ namespace GrKouk.Web.ERP.Automapper {
             CreateMap<TransactorTransaction, SellDocCreateAjaxDto>().ReverseMap();
             CreateMap<TransactorTransaction, SellDocModifyAjaxDto>().ReverseMap();
             CreateMap<TransactorTransCreateDto, SellDocModifyAjaxDto>().ReverseMap();
-            CreateMap<CrCatWarehouseItem, CashRegCatProductListDto>()
-                .ForMember(dest => dest.CompanyCode, opt => opt.MapFrom(src => src.ClientProfile.Company.Code));
-            CreateMap<MediaEntry, MediaEntryDto>();
-            CreateMap<ProductRecipe, ProductRecipeDto>()
-                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name));
 
             CreateMap<Transactor, TransactorCreateDto>().ReverseMap();
             CreateMap<Transactor, TransactorModifyDto>().ReverseMap();
-            CreateMap<WrItemCode, WrItemCodeListDto>();
 
             CreateMap<RecurringTransDoc, RecurringDocCreateAjaxNoLinesDto>().ReverseMap();
             CreateMap<RecurringTransDocCreateAjaxDto, RecurringDocCreateAjaxNoLinesDto>().ReverseMap();

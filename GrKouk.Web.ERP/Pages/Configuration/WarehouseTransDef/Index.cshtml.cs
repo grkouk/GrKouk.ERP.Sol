@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using GrKouk.Erp.Dtos.WarehouseTransactions;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,12 +12,9 @@ namespace GrKouk.Web.Erp.Pages.Configuration.WarehouseTransDef
     public class IndexModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
-
-        public IndexModel(ApiDbContext context, IMapper mapper)
+        public IndexModel(ApiDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
         public IList<TransWarehouseDefListDto> ListItemsDtos { get; set; }
@@ -25,7 +22,7 @@ namespace GrKouk.Web.Erp.Pages.Configuration.WarehouseTransDef
         public async Task OnGetAsync()
         {
             ListItemsDtos = await _context.TransWarehouseDefs
-                .ProjectTo<TransWarehouseDefListDto>(_mapper.ConfigurationProvider)
+                .Select(TransWarehouseDefMappings.ToListDto)
                 .ToListAsync();
         }
     }

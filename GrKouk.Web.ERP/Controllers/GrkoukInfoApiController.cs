@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Erp.Definitions;
 using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.DocDefinitions;
@@ -990,7 +991,7 @@ namespace GrKouk.Web.ERP.Controllers
                                                    || p.Company.Name.Contains(request.SearchFilter));
             }
 
-            var t = fullListIq.ProjectTo<ProductRecipeDto>(_mapper.ConfigurationProvider);
+            var t = fullListIq.Select(ProductRecipeMappings.ToDto);
             var pageIndex = request.PageIndex;
 
             var pageSize = request.PageSize;
@@ -3660,7 +3661,7 @@ namespace GrKouk.Web.ERP.Controllers
             PagedList<WrItemCodeListDto> listItems;
             try
             {
-                var projectedList = fullListIq.ProjectTo<WrItemCodeListDto>(_mapper.ConfigurationProvider);
+                var projectedList = fullListIq.Select(WrItemCodeMappings.ToListDto);
                 var pageIndex = request.PageIndex;
 
                 var pageSize = request.PageSize;
@@ -8418,7 +8419,7 @@ namespace GrKouk.Web.ERP.Controllers
                 );
             }
 
-            var projectedList = fullListIq.ProjectTo<CashRegCatProductListDto>(_mapper.ConfigurationProvider);
+            var projectedList = fullListIq.Select(CrCatWarehouseItemMappings.ToListDto);
             var pageIndex = request.PageIndex;
 
             var pageSize = request.PageSize;
@@ -8981,7 +8982,7 @@ namespace GrKouk.Web.ERP.Controllers
                 fullListIq = fullListIq.Where(p => p.MediaFile.Contains(request.SearchFilter));
             }
 
-            var projectedList = fullListIq.ProjectTo<MediaEntryDto>(_mapper.ConfigurationProvider);
+            var projectedList = fullListIq.Select(MediaEntryMappings.ToDto);
             var pageIndex = request.PageIndex;
 
             var pageSize = request.PageSize;

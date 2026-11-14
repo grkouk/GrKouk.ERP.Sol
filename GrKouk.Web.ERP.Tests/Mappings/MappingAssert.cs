@@ -11,21 +11,28 @@ public static class MappingAssert
 {
     public static TDest AllMatchingPropertiesCopied<TSrc, TDest>(
         Func<TSrc, TDest> map, params string[] ignore) where TSrc : new()
+        => AllMatchingPropertiesCopied(CreateFilled<TSrc>(), map, ignore);
+
+    /// <summary>
+    /// Same check, with a caller-prepared source (e.g. one whose navigation
+    /// properties have been set). Property names match case-insensitively, as AutoMapper did.
+    /// </summary>
+    public static TDest AllMatchingPropertiesCopied<TSrc, TDest>(
+        TSrc source, Func<TSrc, TDest> map, params string[] ignore)
     {
-        var source = CreateFilled<TSrc>();
         var dest = map(source);
         Assert.NotNull(dest);
 
         var destProps = typeof(TDest)
             .GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .Where(p => p.CanRead)
-            .ToDictionary(p => p.Name);
+            .ToDictionary(p => p.Name, StringComparer.OrdinalIgnoreCase);
 
         var failures = new List<string>();
         var checkedCount = 0;
         foreach (var sp in SimpleProps(typeof(TSrc)))
         {
-            if (ignore.Contains(sp.Name) || !destProps.TryGetValue(sp.Name, out var dp))
+            if (ignore.Contains(sp.Name, StringComparer.OrdinalIgnoreCase) || !destProps.TryGetValue(sp.Name, out var dp))
                 continue;
 
             checkedCount++;
