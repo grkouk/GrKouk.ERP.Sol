@@ -6,7 +6,7 @@
     <Authors>George Koukoudis</Authors>
     <Company>GrKoukOrg</Company>
     <Copyright>GrKoukOrg</Copyright>
-    <Version>2.2.2.2</Version>
+    <Version>2.3.0.0</Version>
     <PackageVersion>$(Version)</PackageVersion>
     <AssemblyVersion>$(Version)</AssemblyVersion>
     <FileVersion>$(Version)</FileVersion>
@@ -32,8 +32,8 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="10.0.2" />
     <PackageReference Include="NToastNotify" Version="8.0.0" />
     <PackageReference Include="QuestPDF" Version="2025.4.0" />
-    <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="31.1.21" />
-    <PackageReference Include="Syncfusion.Pdf.Net.Core" Version="31.1.21" />
+    <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="35.1.46" />
+    <PackageReference Include="Syncfusion.Pdf.Net.Core" Version="35.1.46" />
   </ItemGroup>
 
   <ItemGroup>
