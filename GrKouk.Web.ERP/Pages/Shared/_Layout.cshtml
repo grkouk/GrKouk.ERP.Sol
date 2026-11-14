@@ -182,7 +182,8 @@
 
 @RenderSection("OutOfBody",required:false)
 <br/>
-<div class="container mt-5 pt-2">
+@* Pages that need the full window width (wide grids) set ViewData["FluidContainer"] = true. *@
+<div class="@(ViewData["FluidContainer"] is true ? "container-fluid" : "container") mt-5 pt-2">
     @RenderBody()
     <hr/>
     <footer>

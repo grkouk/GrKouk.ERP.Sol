@@ -3,6 +3,7 @@
 
 @{
     ViewData["Title"] = "Παραστατικά Αγορών/Εξόδων";
+    ViewData["FluidContainer"] = true;
     var pageSizes = new[] { 10, 20, 50, 100 };
 }
 
@@ -19,7 +20,7 @@
 @Html.AntiForgeryToken()
 <h4>@ViewData["Title"]</h4>
 
-<div class="container">
+<div>
     <ul class="nav small justify-content-end">
         <li class="nav-item">
             <a class="nav-link" asp-page="./Create">Create New</a>
@@ -378,6 +379,11 @@
             this.dataSource.dataSource.headers = [{ 'RequestVerificationToken': getToken() }];
             this.query = buildQuery();
             this.pageSettings.pageSize = pageSettings.pageSize;
+            // The pager copied pageSettings before "load" fired, so update its copy too
+            // or the page size dropdown keeps showing the markup value.
+            if (this.pagerModule && this.pagerModule.pagerObj) {
+                this.pagerModule.pagerObj.pageSize = pageSettings.pageSize;
+            }
             if (pageSettings.sortField) {
                 this.sortSettings.columns = [{ field: pageSettings.sortField, direction: pageSettings.sortDirection || 'Ascending' }];
             }
