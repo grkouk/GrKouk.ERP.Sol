@@ -2,11 +2,11 @@
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Erp.Dtos.Transactors;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -19,12 +19,10 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors {
     public class CreateModel : PageModel {
         private readonly ApiDbContext _context;
         private readonly IToastNotification _toastNotification;
-        private readonly IMapper _mapper;
 
-        public CreateModel(ApiDbContext context, IToastNotification toastNotification, IMapper mapper) {
+        public CreateModel(ApiDbContext context, IToastNotification toastNotification) {
             _context = context;
             _toastNotification = toastNotification;
-            _mapper = mapper;
         }
 
         public IActionResult OnGet() {
@@ -49,7 +47,7 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors {
             if (!ModelState.IsValid) {
                 return Page();
             }
-            var itemToAttach = _mapper.Map<Transactor>(ItemVm);
+            var itemToAttach = ItemVm.ToEntity();
             await using var transaction = await _context.Database.BeginTransactionAsync();
             try {
                 itemToAttach.DateCreated = DateTime.Today;

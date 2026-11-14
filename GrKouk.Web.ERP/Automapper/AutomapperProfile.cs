@@ -113,8 +113,6 @@ namespace GrKouk.Web.ERP.Automapper {
             CreateMap<TransactorTransaction, SellDocModifyAjaxDto>().ReverseMap();
             CreateMap<TransactorTransCreateDto, SellDocModifyAjaxDto>().ReverseMap();
 
-            CreateMap<Transactor, TransactorCreateDto>().ReverseMap();
-            CreateMap<Transactor, TransactorModifyDto>().ReverseMap();
 
             CreateMap<RecurringTransDoc, RecurringDocCreateAjaxNoLinesDto>().ReverseMap();
             CreateMap<RecurringTransDocCreateAjaxDto, RecurringDocCreateAjaxNoLinesDto>().ReverseMap();
@@ -181,8 +179,6 @@ namespace GrKouk.Web.ERP.Automapper {
                     opt => opt.MapFrom(src => src.SecondaryUnitId))
                 .ForMember(d => d.Price,
                     opt => opt.MapFrom(src => src.UnitPrice));
-            CreateMap<Transactor, TransactorDetailDto>()
-                .ForMember(x => x.Companies, opt => opt.Ignore());
             CreateMap<CashFlowAccount, CashFlowAccountCreateDto>().ReverseMap();
             CreateMap<CashFlowAccount, CashFlowAccountModifyDto>().ReverseMap();
             CreateMap<CashFlowTransactionDef, CfaTransactionDefCreateDto>().ReverseMap();

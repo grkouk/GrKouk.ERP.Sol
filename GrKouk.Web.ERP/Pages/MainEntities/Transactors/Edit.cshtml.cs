@@ -2,12 +2,12 @@
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Domain.CashFlow;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Erp.Dtos.Transactors;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -22,13 +22,11 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors
     {
         private readonly ApiDbContext _context;
         private readonly IToastNotification _toastNotification;
-        private readonly IMapper _mapper;
 
-        public EditModel(ApiDbContext context, IToastNotification toastNotification,IMapper mapper)
+        public EditModel(ApiDbContext context, IToastNotification toastNotification)
         {
             _context = context;
             _toastNotification = toastNotification;
-            _mapper = mapper;
         }
 
         [BindProperty]
@@ -51,7 +49,7 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors
                 return NotFound();
             }
 
-            ItemVm = _mapper.Map<TransactorModifyDto>(dbTransactor);
+            ItemVm = dbTransactor.ToModifyDto();
             string[] selectedCompanies = dbTransactor.TransactorCompanyMappings.Select(x => x.CompanyId.ToString()).ToArray();
             ItemVm.SelectedCompanies = JsonSerializer.Serialize(selectedCompanies);
 
@@ -80,9 +78,17 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors
             {
                 return Page();
             }
-            var transactorToAdd = _mapper.Map<Transactor>(ItemVm);
+            // Load the stored row and copy only the editable fields onto it, so columns the
+            // form does not carry (e.g. DateCreated) keep their values.
+            var transactorToAdd = await _context.Transactors.FirstOrDefaultAsync(t => t.Id == ItemVm.Id);
+            if (transactorToAdd == null)
+            {
+                return NotFound();
+            }
+            // Optimistic concurrency: compare against the row version the form was loaded with.
+            _context.Entry(transactorToAdd).Property(t => t.Timestamp).OriginalValue = ItemVm.Timestamp;
+            ItemVm.ApplyTo(transactorToAdd);
             transactorToAdd.DateLastModified=DateTime.Today;
-            _context.Attach(transactorToAdd).State = EntityState.Modified;
             
             _context.TransactorCompanyMappings.RemoveRange(_context.TransactorCompanyMappings.Where(p => p.TransactorId == transactorToAdd.Id));
             

@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.Diaries;
 using GrKouk.Erp.Dtos.Transactors;
 using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using GrKouk.Web.ERP.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,14 +20,12 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors
     public class DetailsModel : PageModel
     {
         private readonly ApiDbContext _context;
-        private readonly IMapper _mapper;
         private int _id;
 
 
-        public DetailsModel(ApiDbContext context, IMapper mapper)
+        public DetailsModel(ApiDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
         [BindProperty] public TransactorDetailDto Item { get; set; }
@@ -52,7 +50,7 @@ namespace GrKouk.Web.Erp.Pages.MainEntities.Transactors
                 return NotFound();
             }
 
-            Item = _mapper.Map<TransactorDetailDto>(transactor);
+            Item = transactor.ToDetailDto();
             var compList = transactor.TransactorCompanyMappings.Select(x => x.Company.Code).ToList();
             Item.Companies = String.Join(",", compList);
             var transactorTitle = $"{Item.TransactorTypeName} {Item.Name}";
