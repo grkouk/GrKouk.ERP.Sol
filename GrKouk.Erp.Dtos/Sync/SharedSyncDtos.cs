@@ -25,6 +25,11 @@ public class SharedItemDto
     public string? UpcCode { get; set; }
     public string? EanCode { get; set; }
     public bool UseBatchTracking { get; set; }
+    // Expiry rule (0 FollowCategory, 1 Always, 2 Never) + item shelf life. Optional — old
+    // cashier builds send none. Null ExpiryRequirement = sender does not know the pair: never
+    // overwrites a stored value, and a receiving shop keeps its own.
+    public int? ExpiryRequirement { get; set; }
+    public int? ShelfLifeDays { get; set; }
     public Guid? DepositItemId { get; set; }
     public bool IsDepositItem { get; set; }
     // Two-phase delete (Workstream B). Transient cross-shop negotiation state;
@@ -56,6 +61,10 @@ public class SharedItemCategoryDto
     public Guid Id { get; set; }
     public string Code { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
+    // Expiry rule. Optional — old cashier builds send none. Null RequiresExpiry = sender does
+    // not know the pair: never overwrites a stored value, and a receiving shop keeps its own.
+    public bool? RequiresExpiry { get; set; }
+    public int? ShelfLifeDays { get; set; }
     public DateTime ModifiedAt { get; set; }
 }
 
@@ -294,6 +303,8 @@ public class SharedStockTransferLineDto
     public decimal CarriedUnitCost { get; set; }
     public string? BatchNumber { get; set; }
     public DateTime? ExpiryDate { get; set; }
+    /// <summary>Expiry estimated from a shelf life. Optional — old cashier builds send false.</summary>
+    public bool IsExpiryEstimated { get; set; }
 }
 
 /// <summary>

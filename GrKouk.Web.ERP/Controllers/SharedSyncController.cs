@@ -144,6 +144,8 @@ public class SharedSyncController : ControllerBase
                 UpcCode = i.UpcCode,
                 EanCode = i.EanCode,
                 UseBatchTracking = i.UseBatchTracking,
+                ExpiryRequirement = i.ExpiryRequirement,
+                ShelfLifeDays = i.ShelfLifeDays,
                 DepositItemId = i.DepositItemId,
                 IsDepositItem = i.IsDepositItem,
                 DeleteRequested = i.DeleteRequested,
@@ -161,6 +163,8 @@ public class SharedSyncController : ControllerBase
                 Id = c.Id,
                 Code = c.Code,
                 Name = c.Name,
+                RequiresExpiry = c.RequiresExpiry,
+                ShelfLifeDays = c.ShelfLifeDays,
                 ModifiedAt = c.ModifiedAt
             })
             .ToListAsync();
@@ -299,6 +303,8 @@ public class SharedSyncController : ControllerBase
                     EanCode = i.EanCode,
                     CashierDepartmentId = i.CashierDepartmentId,
                     UseBatchTracking = i.UseBatchTracking,
+                    ExpiryRequirement = i.ExpiryRequirement,
+                    ShelfLifeDays = i.ShelfLifeDays,
                     DepositItemId = i.DepositItemId,
                     IsDepositItem = i.IsDepositItem,
                     DeleteRequested = i.DeleteRequested,
@@ -334,6 +340,8 @@ public class SharedSyncController : ControllerBase
                     Id = c.Id,
                     Code = c.Code,
                     Name = c.Name,
+                    RequiresExpiry = c.RequiresExpiry,
+                    ShelfLifeDays = c.ShelfLifeDays,
                     ModifiedAt = c.ModifiedAt
                 })
                 .ToListAsync();
@@ -543,7 +551,8 @@ public class SharedSyncController : ControllerBase
                     Quantity = l.Quantity,
                     CarriedUnitCost = l.CarriedUnitCost,
                     BatchNumber = l.BatchNumber,
-                    ExpiryDate = l.ExpiryDate
+                    ExpiryDate = l.ExpiryDate,
+                    IsExpiryEstimated = l.IsExpiryEstimated
                 }).ToList()
             })
             .ToListAsync();
@@ -713,6 +722,8 @@ public class SharedSyncController : ControllerBase
                         Id = cat.Id,
                         Code = cat.Code,
                         Name = cat.Name,
+                        RequiresExpiry = cat.RequiresExpiry,
+                        ShelfLifeDays = cat.RequiresExpiry is null ? null : cat.ShelfLifeDays,
                         ModifiedAt = cat.ModifiedAt
                     });
                     categoriesUpserted++;
@@ -721,6 +732,14 @@ public class SharedSyncController : ControllerBase
                 {
                     existing.Code = cat.Code;
                     existing.Name = cat.Name;
+                    // Expiry pair: a null RequiresExpiry comes from a cashier build that does not
+                    // know the fields, and must not wipe what a newer shop stored. A non-null one
+                    // carries both, so a cleared shelf life (null) does propagate.
+                    if (cat.RequiresExpiry is not null)
+                    {
+                        existing.RequiresExpiry = cat.RequiresExpiry;
+                        existing.ShelfLifeDays = cat.ShelfLifeDays;
+                    }
                     existing.ModifiedAt = cat.ModifiedAt;
                     categoriesUpserted++;
                 }
@@ -876,6 +895,8 @@ public class SharedSyncController : ControllerBase
                         UpcCode = item.UpcCode,
                         EanCode = item.EanCode,
                         UseBatchTracking = item.UseBatchTracking,
+                        ExpiryRequirement = item.ExpiryRequirement,
+                        ShelfLifeDays = item.ExpiryRequirement is null ? null : item.ShelfLifeDays,
                         DepositItemId = item.DepositItemId,
                         IsDepositItem = item.IsDepositItem,
                         DeleteRequested = item.DeleteRequested,
@@ -907,6 +928,14 @@ public class SharedSyncController : ControllerBase
                     existing.UpcCode = item.UpcCode;
                     existing.EanCode = item.EanCode;
                     existing.UseBatchTracking = item.UseBatchTracking;
+                    // Expiry pair: a null ExpiryRequirement comes from a cashier build that does
+                    // not know the fields, and must not wipe what a newer shop stored. A non-null
+                    // one carries both, so a cleared shelf life (null) does propagate.
+                    if (item.ExpiryRequirement is not null)
+                    {
+                        existing.ExpiryRequirement = item.ExpiryRequirement;
+                        existing.ShelfLifeDays = item.ShelfLifeDays;
+                    }
                     existing.DepositItemId = item.DepositItemId;
                     existing.IsDepositItem = item.IsDepositItem;
                     existing.DeleteRequested = item.DeleteRequested;
@@ -1386,7 +1415,8 @@ public class SharedSyncController : ControllerBase
                         Quantity = l.Quantity,
                         CarriedUnitCost = l.CarriedUnitCost,
                         BatchNumber = l.BatchNumber,
-                        ExpiryDate = l.ExpiryDate
+                        ExpiryDate = l.ExpiryDate,
+                        IsExpiryEstimated = l.IsExpiryEstimated
                     }).ToList()
                 });
                 transfersUpserted++;
@@ -2091,6 +2121,8 @@ public class SharedSyncController : ControllerBase
                 UpcCode = i.UpcCode,
                 EanCode = i.EanCode,
                 UseBatchTracking = i.UseBatchTracking,
+                ExpiryRequirement = i.ExpiryRequirement,
+                ShelfLifeDays = i.ShelfLifeDays,
                 DepositItemId = i.DepositItemId,
                 IsDepositItem = i.IsDepositItem,
                 DeleteRequested = i.DeleteRequested,
@@ -2108,6 +2140,8 @@ public class SharedSyncController : ControllerBase
                 Id = c.Id,
                 Code = c.Code,
                 Name = c.Name,
+                RequiresExpiry = c.RequiresExpiry,
+                ShelfLifeDays = c.ShelfLifeDays,
                 ModifiedAt = c.ModifiedAt
             })
             .ToListAsync();

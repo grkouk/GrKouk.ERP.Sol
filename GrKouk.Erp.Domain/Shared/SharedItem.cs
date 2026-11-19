@@ -50,6 +50,13 @@ public class SharedItem : IHubReceivedStamp
     // Costing
     public bool UseBatchTracking { get; set; }
 
+    // Expiry rule (cashier ExpiryRequirementEnum: 0 FollowCategory, 1 Always, 2 Never) and the
+    // item's own shelf life in days. Null ExpiryRequirement = no shop that knows these fields has
+    // pushed this item yet; the pair is then unknown and the receiving shop keeps its own values.
+    // ShelfLifeDays is only meaningful when ExpiryRequirement is set (null there = no shelf life).
+    public int? ExpiryRequirement { get; set; }
+    public int? ShelfLifeDays { get; set; }
+
     // Bottle deposit (Εγγύηση Συσκευασίας). DepositItemId points at another
     // SharedItem that represents the packaging deposit charged with this item.
     // No FK constraint here — registry table convention (raw Guid? like

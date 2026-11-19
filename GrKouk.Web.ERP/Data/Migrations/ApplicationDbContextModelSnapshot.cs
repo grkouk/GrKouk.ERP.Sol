@@ -2567,6 +2567,9 @@ namespace GrKouk.Web.ERP.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int?>("ExpiryRequirement")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsDepositItem")
                         .HasColumnType("bit");
 
@@ -2609,6 +2612,9 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.Property<DateTime>("ReceivedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("ShelfLifeDays")
+                        .HasColumnType("int");
 
                     b.Property<string>("UpcCode")
                         .HasMaxLength(50)
@@ -2694,6 +2700,12 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.Property<DateTime>("ReceivedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool?>("RequiresExpiry")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("ShelfLifeDays")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -3320,6 +3332,9 @@ namespace GrKouk.Web.ERP.Data.Migrations
 
                     b.Property<DateTime?>("ExpiryDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsExpiryEstimated")
+                        .HasColumnType("bit");
 
                     b.Property<string>("ItemCode")
                         .HasMaxLength(50)

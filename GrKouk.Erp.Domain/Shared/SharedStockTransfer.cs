@@ -96,6 +96,12 @@ public class SharedStockTransferLine
 
     /// <summary>Optional expiry supplied on the line; null = never-expiring at dest.</summary>
     public DateTime? ExpiryDate { get; set; }
+
+    /// <summary>
+    /// The source batch's expiry was estimated from a shelf life, not read off the package.
+    /// Old cashier builds never send it (false).
+    /// </summary>
+    public bool IsExpiryEstimated { get; set; }
 }
 
 /// <summary>Status constants for <see cref="SharedStockTransfer.Status"/>.</summary>
