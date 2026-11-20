@@ -113,7 +113,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.BuyMaterialsDoc
 
 
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("./IndexSf");
         }
 
     }

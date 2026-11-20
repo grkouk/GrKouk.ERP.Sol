@@ -219,9 +219,9 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
             };
         }
 
-        private static readonly string[] DayAbbreviations = { "Su", "Mo", "Tu", "We", "Th", "Fr", "Sa" };
+        private static readonly string[] DayAbbreviations = { "Κυ", "Δε", "Τρ", "Τε", "Πε", "Πα", "Σα" };
 
-        /// <summary>Grid date text: two-letter day name plus date, e.g. "Mo 27/12/2026".</summary>
+        /// <summary>Grid date text: two-letter day name plus date, e.g. "Δε 27/12/2026".</summary>
         private static string FormatGridDate(DateTime date) =>
             $"{DayAbbreviations[(int)date.DayOfWeek]} {date.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture)}";
 
