@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using GrKouk.Erp.Definitions;
@@ -8,13 +7,13 @@ using GrKouk.Erp.Domain.Shared;
 using GrKouk.Erp.Dtos.SellDocuments;
 using GrKouk.Web.ERP.Data;
 using GrKouk.Web.ERP.Helpers;
+using GrKouk.Web.ERP.Helpers.SfGrid;
 using GrKouk.Web.ERP.Mappings;
 using GrKouk.Web.ERP.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using Syncfusion.EJ2.Base;
 
 namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
 {
@@ -22,6 +21,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
     /// Sell documents index built on Syncfusion controls: combos for the filters, a grid with
     /// server-side paging and sorting, amounts converted to the selected display currency,
     /// page and grand totals, bulk delete, payoff and receipt assignment.
+    /// Paging, sorting, lookups and the search come from the shared <see cref="SfGrid"/> helpers.
     /// </summary>
     [Authorize(Roles = "Admin,Operator")]
     public class IndexSfModel : PageModel
@@ -35,84 +35,58 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
             _docTransSrv = docTransSrv;
         }
 
-        public List<FilterItem> CompanyFilterItems { get; set; }
-        public List<FilterItem> DatePeriodItems { get; set; }
-        public List<CurrencyItem> CurrencyItems { get; set; }
-        public List<FilterItem> Diaries { get; set; }
+        public List<SfFilterItem> CompanyFilterItems { get; set; }
+        public List<SfFilterItem> DatePeriodItems { get; set; }
+        public List<SfCurrencyItem> CurrencyItems { get; set; }
+        public List<SfFilterItem> Diaries { get; set; }
+
+        /// <summary>Sortable grid columns. Amounts are not sortable: they are converted per
+        /// company currency after loading.</summary>
+        private static readonly SfSortMap<SellDocList2Dto> Sorts = new SfSortMap<SellDocList2Dto>(p => p.Id)
+            .Add("transDate", p => p.TransDate, isDefault: true)
+            .Add("transactorName", p => p.TransactorName)
+            .Add("sellDocSeriesCode", p => p.SellDocSeriesCode)
+            .Add("transRefCode", p => p.TransRefCode)
+            .Add("companyCode", p => p.CompanyCode);
 
         public async Task OnGetAsync()
         {
-            CompanyFilterItems = (await FiltersHelper.GetCompaniesFilterListAsync(_context))
-                .Select(p => new FilterItem { Value = p.Value, Text = p.Text })
-                .ToList();
-            // The shared list repeats some "last year" months; a combo needs unique values.
-            DatePeriodItems = DateFilter.GetDateFiltersSelectList()
-                .DistinctBy(p => p.Value)
-                .Select(p => new FilterItem { Value = p.Value, Text = p.Text })
-                .ToList();
-            CurrencyItems = await _context.Currencies.AsNoTracking()
-                .OrderBy(p => p.Id)
-                .Select(p => new CurrencyItem
-                {
-                    Id = p.Id,
-                    Code = p.Code,
-                    Name = p.Name,
-                    DisplayLocale = p.DisplayLocale
-                })
-                .ToListAsync();
-            Diaries = await _context.DiaryDefs.AsNoTracking()
-                .Where(p => p.DiaryType == DiaryTypeEnum.DiaryTypeEnumSales)
-                .OrderBy(p => p.Name)
-                .Select(p => new FilterItem { Value = p.Id.ToString(), Text = p.Name })
-                .ToListAsync();
+            CompanyFilterItems = await SfIndexLookups.GetCompanyItemsAsync(_context);
+            DatePeriodItems = SfIndexLookups.GetDatePeriodItems();
+            CurrencyItems = await SfIndexLookups.GetCurrencyItemsAsync(_context);
+            Diaries = await SfIndexLookups.GetDiaryItemsAsync(_context, DiaryTypeEnum.DiaryTypeEnumSales);
         }
 
         /// <summary>
         /// Grid data source (Syncfusion UrlAdaptor). Filters arrive in <c>dm.Params</c>;
         /// sorting and paging are the grid's own. Amounts come back in the display currency.
         /// </summary>
-        public async Task<IActionResult> OnPostDataSourceAsync([FromBody] GridRequest dm)
+        public async Task<IActionResult> OnPostDataSourceAsync([FromBody] SfGridRequest dm)
         {
-            var filters = SellDocFilters.FromParams(dm.Params);
+            var filters = SfDocIndexFilters.FromRequest(dm);
             IQueryable<SellDocList2Dto> query;
             try
             {
-                query = ApplyFilters(filters);
+                query = await ApplyFiltersAsync(filters);
             }
             catch (ArgumentException e)
             {
                 return BadRequest(new { error = e.Message });
             }
 
-            var count = await query.CountAsync();
-
-            query = ApplySort(query, dm.Sorted);
-            if (dm.Skip > 0)
-            {
-                query = query.Skip(dm.Skip);
-            }
-            if (dm.Take > 0)
-            {
-                query = query.Take(dm.Take);
-            }
-
-            var rows = await query.ToListAsync();
-            var rates = await GetRecentRatesAsync();
-            var result = rows.Select(p => ToGridRow(p, filters.DisplayCurrencyId, rates)).ToList();
-
-            return dm.RequiresCounts
-                ? new JsonResult(new { result, count })
-                : new JsonResult(result);
+            var (rows, count) = await SfGrid.LoadPageAsync(query, dm, Sorts);
+            var rates = await SfIndexLookups.GetRecentRatesAsync(_context);
+            return SfGrid.Result(rows.Select(p => ToGridRow(p, filters.DisplayCurrencyId, rates)), count, dm);
         }
 
         /// <summary>Grand totals of all the documents that match the filters, in the display currency.</summary>
-        public async Task<IActionResult> OnPostTotalsAsync([FromBody] SellDocFilters filters)
+        public async Task<IActionResult> OnPostTotalsAsync([FromBody] SfDocIndexFilters filters)
         {
-            filters ??= new SellDocFilters();
+            filters ??= new SfDocIndexFilters();
             IQueryable<SellDocList2Dto> query;
             try
             {
-                query = ApplyFilters(filters);
+                query = await ApplyFiltersAsync(filters);
             }
             catch (ArgumentException e)
             {
@@ -130,7 +104,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
                     p.PayedOfAmount
                 })
                 .ToListAsync();
-            var rates = await GetRecentRatesAsync();
+            var rates = await SfIndexLookups.GetRecentRatesAsync(_context);
             decimal Convert(int currencyId, decimal amount) =>
                 CurrencyConverter.ConvertAmount(currencyId, filters.DisplayCurrencyId, rates, amount);
 
@@ -148,7 +122,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
         /// Deletes the selected documents with their lines and related transactions,
         /// in one transaction (all or nothing).
         /// </summary>
-        public async Task<IActionResult> OnPostDeleteSelectedAsync([FromBody] DeleteSelectedRequest request)
+        public async Task<IActionResult> OnPostDeleteSelectedAsync([FromBody] SfDeleteSelectedRequest request)
         {
             if (request?.Ids == null || request.Ids.Count == 0)
             {
@@ -170,10 +144,11 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
             return new JsonResult(new { deleted = request.Ids.Count });
         }
 
-        private IQueryable<SellDocList2Dto> ApplyFilters(SellDocFilters filters)
+        private async Task<IQueryable<SellDocList2Dto>> ApplyFiltersAsync(SfDocIndexFilters filters)
         {
-            var query = _context.SellDocuments.AsNoTracking()
-                .Select(SellDocumentMappings.ToList2Dto);
+            var documents = await SearchSpec(_context)
+                .ApplyAsync(_context.SellDocuments.AsNoTracking(), filters.SearchFilter);
+            var query = documents.Select(SellDocumentMappings.ToList2Dto);
 
             var (fromDate, toDate) = FilterEval.GetDateRange(filters.DateRange, filters.FromDate, filters.ToDate);
             if (fromDate.HasValue && toDate.HasValue)
@@ -183,17 +158,20 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
                 query = query.Where(p => p.TransDate >= from && p.TransDate <= to);
             }
 
-            query = FilterEval.ApplyCompanyFilter(query, filters.CompanyFilter, p => p.CompanyId);
-            query = FilterEval.ApplySearchFilter(query, filters.SearchFilter,
-                p => p.TransactorName, p => p.TransRefCode);
-            return query;
+            return FilterEval.ApplyCompanyFilter(query, filters.CompanyFilter, p => p.CompanyId);
         }
 
-        private Task<List<ExchangeRate>> GetRecentRatesAsync() =>
-            _context.ExchangeRates.AsNoTracking()
-                .OrderByDescending(p => p.ClosingDate)
-                .Take(10)
-                .ToListAsync();
+        /// <summary>
+        /// The search box looks in every text column the grid shows. Transactor, series and
+        /// company are small tables: they are searched first and the documents
+        /// filtered by their ids, which is much faster than testing the joined columns per document.
+        /// </summary>
+        public static TextSearchSpec<SellDocument> SearchSpec(ApiDbContext context) =>
+            TextSearch.For<SellDocument>()
+                .Column(b => b.TransRefCode)
+                .Lookup(context.Transactors, t => t.Id, b => b.TransactorId, t => t.Name)
+                .Lookup(context.SellDocSeriesDefs, s => s.Id, b => b.SellDocSeriesId, s => s.Code, s => s.Name)
+                .Lookup(context.Companies, c => c.Id, b => b.CompanyId, c => c.Code);
 
         private static GridRow ToGridRow(SellDocList2Dto src, int displayCurrencyId, IList<ExchangeRate> rates)
         {
@@ -204,7 +182,7 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
             {
                 Id = src.Id,
                 TransDate = src.TransDate,
-                TransDateText = FormatGridDate(src.TransDate),
+                TransDateText = SfIndexLookups.FormatGridDate(src.TransDate),
                 TransRefCode = src.TransRefCode,
                 TransactorId = src.TransactorId,
                 TransactorName = src.TransactorName,
@@ -217,85 +195,6 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
                 // Same rule as the old page: payoff/assign receipts only while something is unpaid.
                 HasBalance = src.TotalAmount - src.PayedOfAmount != 0
             };
-        }
-
-        private static readonly string[] DayAbbreviations = { "Κυ", "Δε", "Τρ", "Τε", "Πε", "Πα", "Σα" };
-
-        /// <summary>Grid date text: two-letter day name plus date, e.g. "Δε 27/12/2026".</summary>
-        private static string FormatGridDate(DateTime date) =>
-            $"{DayAbbreviations[(int)date.DayOfWeek]} {date.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture)}";
-
-        /// <summary>Single-column sort; Id keeps paging stable. Amount columns are not sortable
-        /// (they are converted per company currency after loading).</summary>
-        private static IQueryable<SellDocList2Dto> ApplySort(IQueryable<SellDocList2Dto> query, List<Sort> sorted)
-        {
-            var sort = sorted?.FirstOrDefault();
-            var desc = string.Equals(sort?.Direction, "descending", StringComparison.OrdinalIgnoreCase);
-            IOrderedQueryable<SellDocList2Dto> ordered = (sort?.Name ?? "").ToLowerInvariant() switch
-            {
-                "transactorname" => desc
-                    ? query.OrderByDescending(p => p.TransactorName)
-                    : query.OrderBy(p => p.TransactorName),
-                "selldocseriescode" => desc
-                    ? query.OrderByDescending(p => p.SellDocSeriesCode)
-                    : query.OrderBy(p => p.SellDocSeriesCode),
-                "transrefcode" => desc
-                    ? query.OrderByDescending(p => p.TransRefCode)
-                    : query.OrderBy(p => p.TransRefCode),
-                "companycode" => desc
-                    ? query.OrderByDescending(p => p.CompanyCode)
-                    : query.OrderBy(p => p.CompanyCode),
-                _ => desc ? query.OrderByDescending(p => p.TransDate) : query.OrderBy(p => p.TransDate)
-            };
-            return ordered.ThenBy(p => p.Id);
-        }
-
-        public class FilterItem
-        {
-            public string Value { get; set; }
-            public string Text { get; set; }
-        }
-
-        public class CurrencyItem
-        {
-            public int Id { get; set; }
-            public string Code { get; set; }
-            public string Name { get; set; }
-            public string DisplayLocale { get; set; }
-        }
-
-        /// <summary>The page filters, posted as the grid's params or as the totals request body.</summary>
-        public class SellDocFilters
-        {
-            public string DateRange { get; set; }
-            public DateTime? FromDate { get; set; }
-            public DateTime? ToDate { get; set; }
-            public string CompanyFilter { get; set; }
-            public string SearchFilter { get; set; }
-            public int DisplayCurrencyId { get; set; } = 1;
-
-            public static SellDocFilters FromParams(Dictionary<string, object> values)
-            {
-                string Get(string key) =>
-                    values != null && values.TryGetValue(key, out var value) && value != null
-                        ? System.Convert.ToString(value, CultureInfo.InvariantCulture)
-                        : null;
-
-                DateTime? GetDate(string key) =>
-                    DateTime.TryParse(Get(key), CultureInfo.InvariantCulture, DateTimeStyles.None, out var d)
-                        ? d
-                        : null;
-
-                return new SellDocFilters
-                {
-                    DateRange = Get("dateRange"),
-                    FromDate = GetDate("fromDate"),
-                    ToDate = GetDate("toDate"),
-                    CompanyFilter = Get("companyFilter"),
-                    SearchFilter = Get("searchFilter"),
-                    DisplayCurrencyId = int.TryParse(Get("displayCurrencyId"), out var c) && c > 0 ? c : 1
-                };
-            }
         }
 
         public class GridRow
@@ -313,17 +212,6 @@ namespace GrKouk.Web.ERP.Pages.Transactions.SellMaterialDoc
             public decimal TotalAmount { get; set; }
             public decimal PayedOfAmount { get; set; }
             public bool HasBalance { get; set; }
-        }
-
-        /// <summary>Grid request plus the values added with Query.addParams (sent as "params").</summary>
-        public class GridRequest : DataManagerRequest
-        {
-            public Dictionary<string, object> Params { get; set; }
-        }
-
-        public class DeleteSelectedRequest
-        {
-            public List<int> Ids { get; set; }
         }
     }
 }
