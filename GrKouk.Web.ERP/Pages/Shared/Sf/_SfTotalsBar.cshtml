@@ -1,0 +1,32 @@
+@model GrKouk.Web.ERP.Helpers.SfGrid.SfTotalsBarModel
+@* Page and grand totals under a Syncfusion index grid. sf-index-page.js fills the cells
+   "page{Key}" (from the rows on screen) and "grand{Key}" (from the page's Totals handler). *@
+<div class="d-flex justify-content-end mt-2" id="totalsBar">
+    <table class="table table-sm table-borderless w-auto small text-end" id="totalsTable">
+        <thead>
+        <tr>
+            <th></th>
+            @foreach (var column in Model.Columns)
+            {
+                <th>@column.Header</th>
+            }
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="text-start">Page</th>
+            @foreach (var column in Model.Columns)
+            {
+                <td id="page@(column.Key)"></td>
+            }
+        </tr>
+        <tr class="fw-bold">
+            <th class="text-start">Total</th>
+            @foreach (var column in Model.Columns)
+            {
+                <td id="grand@(column.Key)"></td>
+            }
+        </tr>
+        </tbody>
+    </table>
+</div>

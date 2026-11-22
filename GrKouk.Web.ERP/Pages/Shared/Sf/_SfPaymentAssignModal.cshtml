@@ -1,0 +1,62 @@
+@model GrKouk.Web.ERP.Helpers.SfGrid.SfPaymentAssignModalModel
+@* Receipts/payments assignment modal of the sell and buy index pages; sf-payment-assign.js drives it. *@
+<div class="modal fade" id="paymentAssignModal" tabindex="-1" aria-labelledby="paymentAssignModalLabel"
+     aria-hidden="true" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="container-fluid">
+                    <div class="row mb-1">
+                        <div class="col-10">
+                            <p class="modal-title fw-bold" id="paymentAssignModalLabel">@Model.Title</p>
+                        </div>
+                        <div class="col-2 text-end">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 col-6 text-center">
+                            <h4 id="paDocAmount">0</h4>
+                            <span class="text-muted small">Doc Amount</span>
+                        </div>
+                        <div class="col-md-3 col-6 text-center">
+                            <h4 id="paToCover">0</h4>
+                            <span class="text-muted small">To Cover</span>
+                        </div>
+                        <div class="col-md-3 col-6 text-center">
+                            <h4 id="paCovered">0</h4>
+                            <span class="text-muted small">Covered</span>
+                        </div>
+                        <div class="col-md-3 col-6 text-center">
+                            <h4 id="paRemaining">0</h4>
+                            <span class="text-muted small">Remaining</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="text-center" id="paSpinner" style="display:none">
+                    <span class="spinner-border spinner-border-sm text-primary"></span>
+                </div>
+                <table class="table table-bordered table-sm small" id="paTable">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="text-center d-none d-md-table-cell">Date</th>
+                        <th class="text-center">Doc Series</th>
+                        <th class="text-center">Amount</th>
+                        <th class="text-center">Already Used Amount</th>
+                        <th class="text-center">Company</th>
+                        <th class="text-center">Reserved Amount</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="paSave">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>

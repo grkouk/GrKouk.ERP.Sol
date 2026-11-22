@@ -1,0 +1,43 @@
+@model GrKouk.Web.ERP.Helpers.SfGrid.SfIndexToolbarModel
+@* Links and menus above a Syncfusion index grid. sf-index-page.js wires the toggles and Delete Selected. *@
+<div>
+    <ul class="nav small justify-content-end">
+        @if (Model.CreatePage != null)
+        {
+            <li class="nav-item">
+                <a class="nav-link" asp-page="@Model.CreatePage">Create New</a>
+            </li>
+        }
+        @if (Model.Diaries is { Count: > 0 })
+        {
+            <li class="nav-item dropdown">
+                <a class="btn btn-sm btn-outline-secondary dropdown-toggle" role="button" id="ddDiaries"
+                   data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Ημερολόγια</a>
+                <div class="dropdown-menu small">
+                    <h6 class="dropdown-header">Σχετικά Ημερολόγια</h6>
+                    @foreach (var diary in Model.Diaries)
+                    {
+                        <a class="dropdown-item small" target="_blank"
+                           asp-page="@Model.DiaryPage" asp-route-diaryId="@diary.Value">@diary.Text</a>
+                    }
+                </div>
+            </li>
+        }
+        <li class="nav-item">
+            <a class="nav-link" href="#" role="button" id="filtersToggle">Hide Filters</a>
+        </li>
+        @if (Model.RowSelection)
+        {
+            <li class="nav-item">
+                <a class="nav-link" href="#" role="button" id="rowSelectorsToggle">Show Row Selectors</a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle disabled" role="button" id="ddSelectedRowsActions"
+                   data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</a>
+                <div class="dropdown-menu small">
+                    <a class="dropdown-item" href="#" id="deleteSelectedRows">Delete Selected</a>
+                </div>
+            </li>
+        }
+    </ul>
+</div>

@@ -1,0 +1,62 @@
+@model GrKouk.Web.ERP.Helpers.SfGrid.SfIndexFiltersModel
+@* The filters panel of a Syncfusion index page: search box plus the optional period (with custom
+   dates), company and display currency combos. The element ids and change handlers are the ones
+   sf-index-page.js expects. *@
+<div class="collapse show" id="filterCollapse">
+    <div class="row align-items-end g-2 mb-2">
+        <div class="col-md-auto">
+            <div class="searchbar searchbar-fixed">
+                <input class="search_input" type="text" id="SearchFilter" placeholder="@Model.SearchPlaceholder"
+                       title="Search words in any column; Greek or English keyboard, accents ignored" autocomplete="off">
+                <a href="#" class="search_clear" id="SearchClear" title="Clear search">
+                    <i class="fas fa-times fa-xs"></i>
+                </a>
+                <a href="#" class="search_icon" id="SearchButton">
+                    <i class="fas fa-search fa-xs"></i>
+                </a>
+            </div>
+        </div>
+        @if (Model.DatePeriodItems != null)
+        {
+            <div class="col-md-2 col-sm-6">
+                <ejs-combobox id="DatePeriodFilter" dataSource="@Model.DatePeriodItems" value="@("CURYEAR")"
+                              placeholder="Period" floatLabelType="Always" allowFiltering="true"
+                              allowCustom="false" showClearButton="false" change="sfDatePeriodChanged">
+                    <e-combobox-fields text="Text" value="Value"></e-combobox-fields>
+                </ejs-combobox>
+            </div>
+            <div class="col-md-3 col-sm-6" id="customDates">
+                <div class="row g-2">
+                    <div class="col-6">
+                        <ejs-datepicker id="FromDateFilter" placeholder="From" floatLabelType="Always"
+                                        format="dd/MM/yyyy" change="sfCustomDateChanged"></ejs-datepicker>
+                    </div>
+                    <div class="col-6">
+                        <ejs-datepicker id="ToDateFilter" placeholder="To" floatLabelType="Always"
+                                        format="dd/MM/yyyy" change="sfCustomDateChanged"></ejs-datepicker>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (Model.CompanyItems != null)
+        {
+            <div class="col-md-2 col-sm-6">
+                <ejs-combobox id="CompanyFilter" dataSource="@Model.CompanyItems" value="@("0")"
+                              placeholder="Company" floatLabelType="Always" allowFiltering="true"
+                              allowCustom="false" showClearButton="false" change="sfFilterChanged">
+                    <e-combobox-fields text="Text" value="Value"></e-combobox-fields>
+                </ejs-combobox>
+            </div>
+        }
+        @if (Model.CurrencyItems != null)
+        {
+            <div class="col-md-1 col-sm-6">
+                <ejs-combobox id="CurrencySelector" dataSource="@Model.CurrencyItems" value="@(1)"
+                              placeholder="Currency" floatLabelType="Always"
+                              allowCustom="false" showClearButton="false" change="sfFilterChanged">
+                    <e-combobox-fields text="Code" value="Id"></e-combobox-fields>
+                </ejs-combobox>
+            </div>
+        }
+    </div>
+</div>

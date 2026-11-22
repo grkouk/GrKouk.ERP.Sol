@@ -1,0 +1,4 @@
+/* Shared styles of the Syncfusion index pages (Pages/Shared/Sf partials). */
+#totalsTable td { min-width: 9rem; }
+#customDates { display: none; }
+#customDates.visible { display: block; }
