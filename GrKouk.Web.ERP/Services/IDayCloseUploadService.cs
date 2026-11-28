@@ -19,7 +19,11 @@ public interface IDayCloseUploadService
     /// to the ERP. Idempotent on SubmissionId — a retry returns the original
     /// ErpSellDocIds instead of double-booking.
     /// </summary>
-    Task<ServiceResult> UploadAsync(DayCloseUploadRequest request);
+    /// <param name="allowPlatformCustomers">
+    /// True on V3: a document's ErpTransactorId (a SYS.CUSTOMER) replaces the retail customer.
+    /// False on V2: a document carrying one is refused.
+    /// </param>
+    Task<ServiceResult> UploadAsync(DayCloseUploadRequest request, bool allowPlatformCustomers = false);
 }
 
 public class DayCloseUploadService : IDayCloseUploadService
@@ -43,7 +47,7 @@ public class DayCloseUploadService : IDayCloseUploadService
         _logger = logger;
     }
 
-    public async Task<ServiceResult> UploadAsync(DayCloseUploadRequest request)
+    public async Task<ServiceResult> UploadAsync(DayCloseUploadRequest request, bool allowPlatformCustomers = false)
     {
         if (request == null)
             return ServiceResult.Error("Request is null", "BADREQUEST");
@@ -84,6 +88,29 @@ public class DayCloseUploadService : IDayCloseUploadService
                 $"Retail customer ({RetailCustomerCode}) not found", "CUSTOMER_NOT_FOUND");
         int retailCustomerId = customer.Id;
 
+        // Platform groups: each named customer must exist and be a customer. V2 refuses them.
+        var platformCustomerIds = request.Documents
+            .Where(d => d.ErpTransactorId.HasValue)
+            .Select(d => d.ErpTransactorId!.Value)
+            .Distinct()
+            .ToList();
+        if (platformCustomerIds.Count > 0)
+        {
+            if (!allowPlatformCustomers)
+                return ServiceResult.Error(
+                    "Platform customer documents need SyncUploadDayCloseV3", "PLATFORM_NEEDS_V3");
+
+            var validCustomerIds = await _context.Transactors
+                .AsNoTracking()
+                .Where(p => platformCustomerIds.Contains(p.Id) && p.TransactorType.Code == RetailCustomerTypeCode)
+                .Select(p => p.Id)
+                .ToListAsync();
+            var invalid = platformCustomerIds.Except(validCustomerIds).ToList();
+            if (invalid.Count > 0)
+                return ServiceResult.Error(
+                    $"Platform customer(s) not found or not a customer: {string.Join(", ", invalid)}", "PLATFORM_CUSTOMER_NOT_FOUND");
+        }
+
         // Per-document self-consistency check (Net+Vat=Brut), independent of client claims.
         for (int i = 0; i < request.Documents.Count; i++)
         {
@@ -117,23 +144,26 @@ public class DayCloseUploadService : IDayCloseUploadService
             for (int i = 0; i < request.Documents.Count; i++)
             {
                 var doc = request.Documents[i];
-                var marker = doc.PaymentKind switch
-                {
-                    "star" => "ST",
-                    "cash" => "CH",
-                    "card" => "CD",
-                    _ => doc.IsStar ? "ST" : (i + 1).ToString()
-                };
+                var marker = !string.IsNullOrWhiteSpace(doc.TransRefMarker)
+                    ? doc.TransRefMarker.Trim().ToUpperInvariant()
+                    : doc.PaymentKind switch
+                    {
+                        "star" => "ST",
+                        "cash" => "CH",
+                        "card" => "CD",
+                        _ => doc.IsStar ? "ST" : (i + 1).ToString()
+                    };
                 var docTrans = new SellDocCreateAjaxDto
                 {
                     TransDate = request.TransDate.Date,
-                    TransactorId = retailCustomerId,
+                    // Platform group: the platform's customer (owes us the sales); else retail.
+                    TransactorId = doc.ErpTransactorId ?? retailCustomerId,
                     SellDocSeriesId = doc.ErpSellDocSeriesId,
                     PaymentMethodId = doc.ErpPaymentMethodId,
                     CompanyId = companyId,
                     SalesChannelId = DefaultSalesChannelId,
                     TransRefCode = $"Z{request.ZNumber}-{marker}",
-                    Etiology = $"{etiologyBase} (bucket {i + 1}/{request.Documents.Count}{(doc.IsStar ? ", star" : "")})",
+                    Etiology = $"{etiologyBase} (bucket {i + 1}/{request.Documents.Count}{(doc.IsStar ? ", star" : "")}{(doc.ErpTransactorId.HasValue ? ", platform" : "")})",
                     AmountNet = doc.AmountNet,
                     AmountFpa = doc.AmountFpa,
                     AmountDiscount = 0,

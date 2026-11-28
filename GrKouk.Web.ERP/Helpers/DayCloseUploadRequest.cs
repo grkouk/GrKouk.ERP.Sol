@@ -56,6 +56,19 @@ public class DayCloseUploadDocument
     [JsonPropertyName("sourceDocumentCount")]
     public int SourceDocumentCount { get; set; }
 
+    /// <summary>
+    /// Platform group (sales an order platform such as efood collected): the ERP customer the
+    /// document posts to, instead of the retail customer. Honoured by SyncUploadDayCloseV3 only;
+    /// V2 refuses a request that carries one, so it can never land on the retail customer.
+    /// </summary>
+    [JsonPropertyName("erpTransactorId")]
+    public int? ErpTransactorId { get; set; }
+
+    /// <summary>TransRefCode suffix for a platform group ("EF" → Z702-EF). Empty = from PaymentKind.</summary>
+    [JsonPropertyName("transRefMarker")]
+    [MaxLength(4)]
+    public string? TransRefMarker { get; set; }
+
     [JsonPropertyName("amountNet")]
     public decimal AmountNet { get; set; }
 

@@ -839,9 +839,20 @@ namespace GrKouk.Web.ERP.Controllers
 
         [HttpGet("GetErpSuppliers")]
         [Authorize(Policy = "ApiPolicy2")]
-        public async Task<IActionResult> GetErpSuppliers(string companyCode)
+        public Task<IActionResult> GetErpSuppliers(string companyCode)
+            => GetErpTransactorsOfType(companyCode, "SYS.SUPPLIER");
+
+        /// <summary>
+        /// Customers of the company (SYS.CUSTOMER), same shape as GetErpSuppliers. The cashier's
+        /// customer matching links its platform channel customers (efood) to these.
+        /// </summary>
+        [HttpGet("GetErpCustomers")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public Task<IActionResult> GetErpCustomers(string companyCode)
+            => GetErpTransactorsOfType(companyCode, "SYS.CUSTOMER");
+
+        private async Task<IActionResult> GetErpTransactorsOfType(string companyCode, string transactorTypeCode)
         {
-            const string supplierTypeCode = "SYS.SUPPLIER";
             int allCompaniesId = 0;
             var allCompCode =
                 await _context.AppSettings.SingleOrDefaultAsync(p => p.Code == Constants.AllCompaniesCodeKey);
@@ -889,7 +900,7 @@ namespace GrKouk.Web.ERP.Controllers
 
             fullListIq = fullListIq.Where(t =>
                 (t.CompanyId == companyId || t.CompanyId == allCompaniesId) &&
-                t.TransactorTypeCode == supplierTypeCode);
+                t.TransactorTypeCode == transactorTypeCode);
 
             var testList = fullListIq.ToList();
             var projectedList = testList.GroupBy(g => g.Id)
@@ -1742,6 +1753,35 @@ namespace GrKouk.Web.ERP.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "SyncUploadDayCloseV2 failed");
+                return BadRequest(new { error = ex.ToString() });
+            }
+        }
+
+        /// <summary>
+        /// V2 plus platform groups: a document's ErpTransactorId (a SYS.CUSTOMER, e.g. efood) replaces
+        /// the retail customer and its TransRefMarker the CH/CD/ST suffix (Z702-EF). A new route rather
+        /// than a new field on V2, so an older ERP answers 404 instead of silently posting platform
+        /// sales to the retail customer.
+        /// </summary>
+        [HttpPost("SyncUploadDayCloseV3")]
+        [Authorize(Policy = "ApiPolicy2")]
+        public async Task<IActionResult> SyncUploadDayCloseV3([FromBody] DayCloseUploadRequest request)
+        {
+            if (request == null)
+                return BadRequest(new { error = "Empty request data" });
+
+            try
+            {
+                var result = await _dayCloseUploadSrv.UploadAsync(request, allowPlatformCustomers: true);
+                if (result == null)
+                    return StatusCode(500, new { error = "Internal server error during DayClose upload" });
+                if (!result.Success)
+                    return BadRequest(new { error = result.ErrorMessage, code = result.ErrorCode });
+                return Ok(result.Data);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "SyncUploadDayCloseV3 failed");
                 return BadRequest(new { error = ex.ToString() });
             }
         }
