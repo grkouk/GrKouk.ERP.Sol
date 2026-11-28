@@ -1,6 +1,6 @@
 @model GrKouk.Web.ERP.Helpers.SfGrid.SfIndexFiltersModel
 @* The filters panel of a Syncfusion index page: search box plus the optional period (with custom
-   dates), company and display currency combos. The element ids and change handlers are the ones
+   dates), company, status and display currency combos. The element ids and change handlers are the ones
    sf-index-page.js expects. *@
 <div class="collapse show" id="filterCollapse">
     <div class="row align-items-end g-2 mb-2">
@@ -43,6 +43,16 @@
             <div class="col-md-2 col-sm-6">
                 <ejs-combobox id="CompanyFilter" dataSource="@Model.CompanyItems" value="@("0")"
                               placeholder="Company" floatLabelType="Always" allowFiltering="true"
+                              allowCustom="false" showClearButton="false" change="sfFilterChanged">
+                    <e-combobox-fields text="Text" value="Value"></e-combobox-fields>
+                </ejs-combobox>
+            </div>
+        }
+        @if (Model.ActiveItems != null)
+        {
+            <div class="col-md-2 col-sm-6">
+                <ejs-combobox id="ActiveFilter" dataSource="@Model.ActiveItems" value="@("")"
+                              placeholder="Status" floatLabelType="Always"
                               allowCustom="false" showClearButton="false" change="sfFilterChanged">
                     <e-combobox-fields text="Text" value="Value"></e-combobox-fields>
                 </ejs-combobox>

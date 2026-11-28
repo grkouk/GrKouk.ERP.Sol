@@ -18,6 +18,14 @@ public static class SfIndexLookups
         .Select(p => new SfFilterItem { Value = p.Value, Text = p.Text })
         .ToList();
 
+    /// <summary>Status filter items: "" all, "1" active, "0" inactive.</summary>
+    public static List<SfFilterItem> GetActiveItems() => new()
+    {
+        new SfFilterItem { Value = "", Text = "{All}" },
+        new SfFilterItem { Value = "1", Text = "Active" },
+        new SfFilterItem { Value = "0", Text = "Inactive" }
+    };
+
     /// <summary>The period list. The shared list repeats some "last year" months; a combo needs unique values.</summary>
     public static List<SfFilterItem> GetDatePeriodItems() =>
         DateFilter.GetDateFiltersSelectList()

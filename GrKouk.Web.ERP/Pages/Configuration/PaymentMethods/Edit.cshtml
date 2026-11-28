@@ -2,59 +2,79 @@
 @model GrKouk.Web.Erp.Pages.Configuration.PaymentMethods.EditModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Τρόπος Πληρωμής";
 }
-
-<h4>Edit PaymentMethod</h4>
+<h4>@ViewData["Title"]</h4>
 <hr />
 <div class="container">
     <form method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="hidden" asp-for="ItemVm.Id" />
         <div class="row mb-3">
+            <div class="form-group col-md-2">
+                <label asp-for="ItemVm.Code" class="form-label small"></label>
+                <input asp-for="ItemVm.Code" class="form-control form-control-sm" />
+                <span asp-validation-for="ItemVm.Code" class="text-danger small"></span>
+            </div>
             <div class="form-group col-md-4">
                 <label asp-for="ItemVm.Name" class="form-label small"></label>
-                <input asp-for="ItemVm.Name" class="form-control form-control-sm"/>
-                <span asp-validation-for="ItemVm.Name" class="text-danger"></span>
-            </div>
-            <div class="form-group col-md-4">
-                <label asp-for="ItemVm.Code" class="form-label small"></label>
-                <input asp-for="ItemVm.Code" class="form-control form-control-sm"/>
-                <span asp-validation-for="ItemVm.Code" class="text-danger"></span>
+                <input asp-for="ItemVm.Name" class="form-control form-control-sm" />
+                <span asp-validation-for="ItemVm.Name" class="text-danger small"></span>
             </div>
             <div class="form-group col-md-2">
-                <label asp-for="ItemVm.DaysOverdue" class="form-label small"></label>
-                <input asp-for="ItemVm.DaysOverdue" class="form-control form-control-sm"/>
-                <span asp-validation-for="ItemVm.DaysOverdue" class="text-danger"></span>
+                <label asp-for="ItemVm.CompanyId" class="form-label small"></label>
+                <select asp-for="ItemVm.CompanyId" class="form-select form-select-sm" asp-items="Model.Form.Companies"></select>
+                <span asp-validation-for="ItemVm.CompanyId" class="text-danger small"></span>
+            </div>
+            <div class="form-group col-md-2 align-self-end">
+                <div class="form-check">
+                    <input asp-for="ItemVm.Active" class="form-check-input" />
+                    <label asp-for="ItemVm.Active" class="form-check-label small"></label>
+                </div>
             </div>
         </div>
         <div class="row mb-3">
-            <div class="form-group col-md-3">
-                <label asp-for="ItemVm.AutoPayoffWay" class="form-label small"></label>
-                <select asp-for="ItemVm.AutoPayoffWay" class="form-select form-select-sm" asp-items="ViewBag.AutoPayoffWay"></select>
-                <span asp-validation-for="ItemVm.AutoPayoffWay" class="text-danger"></span>
+            <div class="form-group col-md-2">
+                <label asp-for="ItemVm.DaysOverdue" class="form-label small"></label>
+                <input asp-for="ItemVm.DaysOverdue" class="form-control form-control-sm" />
+                <span asp-validation-for="ItemVm.DaysOverdue" class="text-danger small"></span>
             </div>
-            @*<div class="form-group col-md-3">
-                <label asp-for="ItemVm.PayoffSeriesId" class="form-label small"></label>
-                <input asp-for="ItemVm.PayoffSeriesId" class="form-control form-control-sm"/>
-                <span asp-validation-for="ItemVm.PayoffSeriesId" class="text-danger"></span>
-            </div>*@
+            <div class="form-group col-md-2">
+                <label asp-for="ItemVm.AutoPayoffWay" class="form-label small"></label>
+                <select asp-for="ItemVm.AutoPayoffWay" class="form-select form-select-sm" asp-items="Model.Form.AutoPayoffWays"></select>
+                <span asp-validation-for="ItemVm.AutoPayoffWay" class="text-danger small"></span>
+            </div>
             <div class="form-group col-md-3">
-                <label asp-for="ItemVm.CfAccountId" class="form-label"></label>
-                <select asp-for="ItemVm.CfAccountId" class="form-select form-select-sm" asp-items="ViewBag.CfAccountId"></select>
+                <label asp-for="ItemVm.PayoffSeriesId" class="form-label small"></label>
+                <select asp-for="ItemVm.PayoffSeriesId" class="form-select form-select-sm" asp-items="Model.Form.PayoffSeries"></select>
+                <span asp-validation-for="ItemVm.PayoffSeriesId" class="text-danger small"></span>
+            </div>
+            <div class="form-group col-md-3">
+                <label asp-for="ItemVm.CfAccountId" class="form-label small"></label>
+                <select asp-for="ItemVm.CfAccountId" class="form-select form-select-sm" asp-items="Model.Form.CfAccounts"></select>
+                <span asp-validation-for="ItemVm.CfAccountId" class="text-danger small"></span>
+            </div>
+        </div>
+        @* Shown only: the dates are kept by the server (CreatedAt never changes, ModifiedAt is set on save). *@
+        <div class="row mb-3 small text-muted">
+            <div class="col-md-3">
+                @Html.DisplayNameFor(m => m.ItemVm.CreatedAt): @Model.ItemVm.CreatedAt.ToString("dd/MM/yyyy")
+            </div>
+            <div class="col-md-3">
+                @Html.DisplayNameFor(m => m.ItemVm.ModifiedAt): @Model.ItemVm.ModifiedAt.ToString("dd/MM/yyyy")
             </div>
         </div>
 
         <div class="row mb-3">
             <div class="form-group">
-                <input type="submit" value="update" class="btn btn-secondary btn-sm"/>
+                <input type="submit" value="Save" class="btn btn-secondary btn-sm" />
             </div>
         </div>
     </form>
 </div>
 
 <div>
-    <a asp-page="./Index">Back to List</a>
+    <a class="small" asp-page="./IndexSf">Back to List</a>
 </div>
 
 @section Scripts {

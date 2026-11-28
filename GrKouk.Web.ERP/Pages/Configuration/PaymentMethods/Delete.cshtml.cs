@@ -44,13 +44,21 @@ namespace GrKouk.Web.Erp.Pages.Configuration.PaymentMethods
 
             PaymentMethod = await _context.PaymentMethods.FindAsync(id);
 
+            // Buy and sell documents reference the method with cascade delete: never delete a used one.
+            if (PaymentMethod != null
+                && (await PaymentMethodUsage.GetUsedCodesAsync(_context, new[] { PaymentMethod.Id })).Count > 0)
+            {
+                ModelState.AddModelError(string.Empty, "Ο τρόπος πληρωμής χρησιμοποιείται σε παραστατικά και δεν μπορεί να διαγραφεί.");
+                return Page();
+            }
+
             if (PaymentMethod != null)
             {
                 _context.PaymentMethods.Remove(PaymentMethod);
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("./IndexSf");
         }
     }
 }

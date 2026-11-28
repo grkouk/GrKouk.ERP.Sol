@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
-using GrKouk.Erp.Definitions;
-using GrKouk.Erp.Domain.DocDefinitions;
+using GrKouk.Erp.Dtos.PaymentMethods;
+using GrKouk.Web.ERP.Data;
+using GrKouk.Web.ERP.Mappings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using GrKouk.Web.ERP.Data;
-using GrKouk.Web.ERP.Helpers;
 
 namespace GrKouk.Web.Erp.Pages.Configuration.PaymentMethods
 {
@@ -21,61 +17,41 @@ namespace GrKouk.Web.Erp.Pages.Configuration.PaymentMethods
             _context = context;
         }
 
-        public IActionResult OnGet()
+        [BindProperty]
+        public PaymentMethodCreateDto ItemVm { get; set; }
+
+        public PaymentMethodForm Form { get; private set; }
+
+        public async Task<IActionResult> OnGetAsync()
         {
-            LoadCombos();
+            // A new method is active and, by default, belongs to all companies ({Ολες}):
+            // the cash register lists the methods of its company or of all companies.
+            ItemVm = new PaymentMethodCreateDto
+            {
+                Active = true,
+                CompanyId = await PaymentMethodForm.GetAllCompaniesIdAsync(_context)
+            };
+            Form = await PaymentMethodForm.LoadAsync(_context);
             return Page();
         }
 
-        private void LoadCombos()
-        {
-            var seriesAutoPayOffList = Enum.GetValues(typeof(SeriesAutoPayoffEnum))
-                .Cast<SeriesAutoPayoffEnum>()
-                .Select(c => new SelectListItem()
-                {
-                    Value = c.ToString(),
-                    Text = c.GetDescription()
-                }).ToList();
-            ViewData["AutoPayoffWay"] = new SelectList(seriesAutoPayOffList, "Value", "Text");
-            ViewData["CfAccountId"] = SelectListHelpers.GetCfAccountsNoSelectionList(_context);
-        }
-        [BindProperty]
-        public PaymentMethod ItemVm { get; set; }
-
         public async Task<IActionResult> OnPostAsync()
         {
+            await PaymentMethodForm.ValidateAsync(_context, ModelState, 0, ItemVm.Code, ItemVm.CompanyId);
             if (!ModelState.IsValid)
             {
-                LoadCombos();
+                Form = await PaymentMethodForm.LoadAsync(_context);
                 return Page();
             }
 
-            // The form has no company: a new method belongs to all companies ({Ολες}), like every
-            // existing one. CompanyId 0 hid it from the cashier's list (company or all companies).
-            var allCompaniesCode = await _context.AppSettings
-                .Where(p => p.Code == GrKouk.Erp.Definitions.Constants.AllCompaniesCodeKey)
-                .Select(p => p.Value)
-                .SingleOrDefaultAsync();
-            var allCompaniesId = await _context.Companies
-                .Where(c => c.Code == allCompaniesCode)
-                .Select(c => c.Id)
-                .SingleOrDefaultAsync();
-            if (allCompaniesId == 0)
-            {
-                ModelState.AddModelError(string.Empty, "Δεν βρέθηκε η εταιρεία «Όλες» (ρύθμιση ALLCOMPCODE).");
-                LoadCombos();
-                return Page();
-            }
+            var entity = ItemVm.ToEntity();
+            entity.CreatedAt = DateTime.UtcNow;
+            entity.ModifiedAt = DateTime.UtcNow;
 
-            ItemVm.CompanyId = allCompaniesId;
-            ItemVm.Active = true;
-            ItemVm.CreatedAt = DateTime.UtcNow;
-            ItemVm.ModifiedAt = DateTime.UtcNow;
-
-            _context.PaymentMethods.Add(ItemVm);
+            _context.PaymentMethods.Add(entity);
             await _context.SaveChangesAsync();
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("./IndexSf");
         }
     }
 }

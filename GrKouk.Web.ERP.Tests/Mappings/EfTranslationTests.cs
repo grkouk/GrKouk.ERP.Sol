@@ -17,6 +17,24 @@ public class EfTranslationTests
             .Options);
 
     [Fact]
+    public void PaymentMethod_ToListQuery_translates_to_sql_with_left_joins()
+    {
+        using var db = CreateContext();
+        var sql = PaymentMethodMappings.ToListQuery(db).ToQueryString();
+        Assert.Equal(3, sql.Split("LEFT JOIN").Length - 1);
+    }
+
+    [Fact]
+    public void PaymentMethod_index_search_translates_to_sql()
+    {
+        using var db = CreateContext();
+        var query = GrKouk.Web.ERP.Helpers.TextSearch.Apply(PaymentMethodMappings.ToListQuery(db), "μετρητά visa",
+            p => p.Code, p => p.Name, p => p.CfAccountName, p => p.PayoffSeriesName, p => p.CompanyCode);
+        var sql = query.ToQueryString();
+        Assert.Contains("Greek_CI_AI", sql);
+    }
+
+    [Fact]
     public void SellDocTypeDef_ToListDto_translates_to_sql()
     {
         using var db = CreateContext();

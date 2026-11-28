@@ -27,6 +27,10 @@ public class SfIndexFiltersModel
     public List<SfFilterItem> DatePeriodItems { get; set; }
     public List<SfFilterItem> CompanyItems { get; set; }
     public List<SfCurrencyItem> CurrencyItems { get; set; }
+
+    /// <summary>Active / inactive status (see <see cref="SfIndexLookups.GetActiveItems"/>); sent as "activeFilter".</summary>
+    public List<SfFilterItem> ActiveItems { get; set; }
+
     public string SearchPlaceholder { get; set; } = "Search...";
 }
 
