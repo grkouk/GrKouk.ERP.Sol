@@ -56,26 +56,28 @@ namespace GrKouk.Web.Erp.Pages.Configuration.PaymentMethods
         {
             if (!ModelState.IsValid)
             {
+                LoadCombos();
                 return Page();
             }
 
-            _context.Attach(ItemVm).State = EntityState.Modified;
+            // Copy only the fields the form shows. Saving the posted object whole reset the
+            // fields the form lacks (CompanyId → 0, Active → false, CreatedAt → 0001-01-01),
+            // and CompanyId 0 hides the method from the cashier.
+            var entity = await _context.PaymentMethods.FirstOrDefaultAsync(m => m.Id == ItemVm.Id);
+            if (entity == null)
+            {
+                return NotFound();
+            }
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PaymentMethodExists(ItemVm.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            entity.Name = ItemVm.Name;
+            entity.Code = ItemVm.Code;
+            entity.DaysOverdue = ItemVm.DaysOverdue;
+            entity.AutoPayoffWay = ItemVm.AutoPayoffWay;
+            entity.PayoffSeriesId = ItemVm.PayoffSeriesId;
+            entity.CfAccountId = ItemVm.CfAccountId;
+            entity.ModifiedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");
         }
